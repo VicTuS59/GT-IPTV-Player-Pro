@@ -1,0 +1,3823 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GT IPTV Player Pro 1.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
+"POT-Creation-Date: 2023-11-14 22:13+0000\n"
+"PO-Revision-Date: 2026-09-16 00:00+0000\n"
+"Last-Translator: GT IPTV Player Pro contributors\n"
+"Language-Team: cs\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : (n >= 2 && n <= 4) ? 1 : 2;\n"
+
+#: ../GTIPTVPlayerPro/browser.py:155 ../GTIPTVPlayerPro/browser.py:7260
+#: ../GTIPTVPlayerPro/browser.py:7269 ../GTIPTVPlayerPro/browser.py:7339
+#: ../GTIPTVPlayerPro/browser.py:7364
+msgid "This source does not support the selected content type."
+msgstr "Tento zdroj nepodporuje vybraný typ obsahu."
+
+#: ../GTIPTVPlayerPro/browser.py:337
+msgid "NO RATING"
+msgstr "BEZ HODNOCENÍ"
+
+#: ../GTIPTVPlayerPro/browser.py:739
+#, python-brace-format
+msgid "{} added to favorites."
+msgstr "{} přidáno do oblíbených."
+
+#: ../GTIPTVPlayerPro/browser.py:741 ../GTIPTVPlayerPro/browser.py:6566
+#, python-brace-format
+msgid "{} removed from favorites."
+msgstr "{} odebráno z oblíbených."
+
+#: ../GTIPTVPlayerPro/browser.py:742 ../GTIPTVPlayerPro/browser.py:6549
+msgid "Could not update favorites."
+msgstr "Oblíbené se nepodařilo aktualizovat."
+
+#: ../GTIPTVPlayerPro/browser.py:4447
+msgid "CONTENT BROWSER"
+msgstr "PROHLÍŽEČ OBSAHU"
+
+#: ../GTIPTVPlayerPro/browser.py:4520 ../GTIPTVPlayerPro/browser.py:5476
+#: ../GTIPTVPlayerPro/browser.py:13098 ../GTIPTVPlayerPro/browser.py:13138
+msgid "No content found."
+msgstr "Nebyl nalezen žádný obsah."
+
+#: ../GTIPTVPlayerPro/browser.py:4538
+#: ../GTIPTVPlayerPro/category_filter_ui.py:175
+msgid "Loading content..."
+msgstr "Načítání obsahu..."
+
+#: ../GTIPTVPlayerPro/browser.py:4539 ../GTIPTVPlayerPro/browser.py:6948
+#: ../GTIPTVPlayerPro/browser.py:7272 ../GTIPTVPlayerPro/browser.py:7480
+#: ../GTIPTVPlayerPro/browser.py:7537 ../GTIPTVPlayerPro/browser.py:7626
+#: ../GTIPTVPlayerPro/browser.py:8706 ../GTIPTVPlayerPro/browser.py:9003
+#: ../GTIPTVPlayerPro/browser.py:9010 ../GTIPTVPlayerPro/browser.py:9013
+#: ../GTIPTVPlayerPro/browser.py:10900 ../GTIPTVPlayerPro/browser.py:11745
+#: ../GTIPTVPlayerPro/browser.py:12021 ../GTIPTVPlayerPro/browser.py:12985
+#: ../GTIPTVPlayerPro/browser.py:13066 ../GTIPTVPlayerPro/browser.py:13094
+#: ../GTIPTVPlayerPro/browser.py:13519 ../GTIPTVPlayerPro/browser.py:14291
+#: ../GTIPTVPlayerPro/browser.py:14629 ../GTIPTVPlayerPro/browser.py:14713
+#: ../GTIPTVPlayerPro/browser.py:16342 ../GTIPTVPlayerPro/browser.py:16360
+#: ../GTIPTVPlayerPro/browser.py:18208 ../GTIPTVPlayerPro/browser.py:19380
+#: ../GTIPTVPlayerPro/browser.py:21070 ../GTIPTVPlayerPro/browser.py:21335
+#: ../GTIPTVPlayerPro/category_filter_ui.py:177
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1295 ../GTIPTVPlayerPro/dvb_epg_ui.py:1920
+#: ../GTIPTVPlayerPro/main.py:5702 ../GTIPTVPlayerPro/main.py:5767
+#: ../GTIPTVPlayerPro/main.py:6363 ../GTIPTVPlayerPro/main.py:6393
+#: ../GTIPTVPlayerPro/main.py:6399 ../GTIPTVPlayerPro/main.py:6513
+#: ../GTIPTVPlayerPro/main.py:6590
+msgid "Please wait"
+msgstr "Čekejte"
+
+#: ../GTIPTVPlayerPro/browser.py:4568 ../GTIPTVPlayerPro/browser.py:4593
+#: ../GTIPTVPlayerPro/browser.py:7251 ../GTIPTVPlayerPro/browser.py:13652
+#: ../GTIPTVPlayerPro/catchup.py:192 ../GTIPTVPlayerPro/content.py:614
+#: ../GTIPTVPlayerPro/content.py:628 ../GTIPTVPlayerPro/m3u.py:405
+#: ../GTIPTVPlayerPro/m3u.py:1003 ../GTIPTVPlayerPro/m3u.py:1011
+#: ../GTIPTVPlayerPro/playlist.py:856 ../GTIPTVPlayerPro/stalker.py:1396
+msgid "Request timed out"
+msgstr "Vypršel časový limit požadavku"
+
+#: ../GTIPTVPlayerPro/browser.py:4570 ../GTIPTVPlayerPro/browser.py:7253
+#: ../GTIPTVPlayerPro/catchup.py:190 ../GTIPTVPlayerPro/catchup_m3u.py:198
+#: ../GTIPTVPlayerPro/content.py:609 ../GTIPTVPlayerPro/content.py:921
+#: ../GTIPTVPlayerPro/content.py:944 ../GTIPTVPlayerPro/content.py:990
+#: ../GTIPTVPlayerPro/content.py:1001 ../GTIPTVPlayerPro/content.py:1026
+#: ../GTIPTVPlayerPro/m3u.py:403 ../GTIPTVPlayerPro/m3u.py:998
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:526 ../GTIPTVPlayerPro/m3u_epg_ui.py:1177
+#: ../GTIPTVPlayerPro/main.py:6072 ../GTIPTVPlayerPro/playlist.py:848
+#: ../GTIPTVPlayerPro/playlist.py:1350 ../GTIPTVPlayerPro/playlist.py:1361
+#: ../GTIPTVPlayerPro/playlist.py:1396 ../GTIPTVPlayerPro/playlist.py:1494
+#: ../GTIPTVPlayerPro/stalker.py:1388
+msgid "Request cancelled"
+msgstr "Požadavek zrušen"
+
+#: ../GTIPTVPlayerPro/browser.py:4575 ../GTIPTVPlayerPro/browser.py:13773
+msgid "Could not load content"
+msgstr "Nelze načíst obsah"
+
+#: ../GTIPTVPlayerPro/browser.py:4605 ../GTIPTVPlayerPro/browser.py:6652
+#: ../GTIPTVPlayerPro/browser.py:8262 ../GTIPTVPlayerPro/browser.py:8582
+#: ../GTIPTVPlayerPro/browser.py:8594 ../GTIPTVPlayerPro/browser.py:9007
+#: ../GTIPTVPlayerPro/browser.py:9023 ../GTIPTVPlayerPro/browser.py:9057
+#: ../GTIPTVPlayerPro/browser.py:13011
+msgid "Could not open the content list."
+msgstr "Seznam obsahu nelze otevřít."
+
+#: ../GTIPTVPlayerPro/browser.py:4615
+msgid "Press GREEN to try again"
+msgstr "Zkuste to znovu stisknutím ZELENÉHO"
+
+#: ../GTIPTVPlayerPro/browser.py:4701
+msgid "LIVE TV CATEGORY SETTINGS"
+msgstr "NASTAVENÍ KATEGORIÍ ŽIVÉHO VYSÍLÁNÍ"
+
+#: ../GTIPTVPlayerPro/browser.py:4702
+msgid "MOVIE CATEGORY SETTINGS"
+msgstr "NASTAVENÍ KATEGORIÍ FILMŮ"
+
+#: ../GTIPTVPlayerPro/browser.py:4703
+msgid "SERIES CATEGORY SETTINGS"
+msgstr "NASTAVENÍ KATEGORIÍ SERIÁLŮ"
+
+#: ../GTIPTVPlayerPro/browser.py:4752
+#: ../GTIPTVPlayerPro/category_filter_ui.py:56
+msgid "Category Manager"
+msgstr "Správce kategorií"
+
+#: ../GTIPTVPlayerPro/browser.py:4753 ../GTIPTVPlayerPro/dvb_epg_ui.py:624
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:841 ../GTIPTVPlayerPro/main.py:4058
+#: ../GTIPTVPlayerPro/main.py:4381 ../GTIPTVPlayerPro/main.py:4512
+#: ../GTIPTVPlayerPro/remote_footer.py:90
+msgid "Settings"
+msgstr "Nastavení"
+
+#: ../GTIPTVPlayerPro/browser.py:4848 ../GTIPTVPlayerPro/browser.py:8246
+msgid "No category found."
+msgstr "Nebyla nalezena žádná kategorie."
+
+#: ../GTIPTVPlayerPro/browser.py:4870 ../GTIPTVPlayerPro/content.py:130
+msgid "Category"
+msgstr "Kategorie"
+
+#: ../GTIPTVPlayerPro/browser.py:4879 ../GTIPTVPlayerPro/browser.py:4926
+#: ../GTIPTVPlayerPro/category_filter_ui.py:193
+#: ../GTIPTVPlayerPro/category_filter_ui.py:226
+msgid "Hidden"
+msgstr "Skryté"
+
+#: ../GTIPTVPlayerPro/browser.py:4924
+#: ../GTIPTVPlayerPro/category_filter_ui.py:194
+#: ../GTIPTVPlayerPro/category_filter_ui.py:225
+msgid "Visible"
+msgstr "Viditelné"
+
+#: ../GTIPTVPlayerPro/browser.py:4933 ../GTIPTVPlayerPro/browser.py:4936
+msgid "Marked"
+msgstr "Označeno"
+
+#: ../GTIPTVPlayerPro/browser.py:5014
+#, python-brace-format
+msgid "{} is always visible."
+msgstr "Položka „{}“ je vždy viditelná."
+
+#: ../GTIPTVPlayerPro/browser.py:5022
+#: ../GTIPTVPlayerPro/category_filter_ui.py:53
+#: ../GTIPTVPlayerPro/category_filter_ui.py:58
+#: ../GTIPTVPlayerPro/category_filter_ui.py:220
+#: ../GTIPTVPlayerPro/category_filter_ui.py:301
+#: ../GTIPTVPlayerPro/remote_footer.py:132
+msgid "Filter Search"
+msgstr "Hledání filtrů"
+
+#: ../GTIPTVPlayerPro/browser.py:5023
+msgid "Category shown."
+msgstr "Kategorie byla zobrazena."
+
+#: ../GTIPTVPlayerPro/browser.py:5027
+msgid "Category hidden."
+msgstr "Kategorie byla skryta."
+
+#: ../GTIPTVPlayerPro/browser.py:5035
+msgid "Mark categories with RED first."
+msgstr "Nejprve označte kategorie ČERVENÝM tlačítkem."
+
+#: ../GTIPTVPlayerPro/browser.py:5050
+msgid "Choose the destination with the arrows. OK places marked categories below the line; EXIT cancels."
+msgstr "Šipkami vyberte cílové místo. OK vloží označené kategorie pod čáru; EXIT akci zruší."
+
+#: ../GTIPTVPlayerPro/browser.py:5081
+msgid "Position updated. Press GREEN to save."
+msgstr "Pozice byla změněna. Uložte stisknutím ZELENÉHO."
+
+#: ../GTIPTVPlayerPro/browser.py:5098 ../GTIPTVPlayerPro/browser.py:6525
+msgid "Move cancelled."
+msgstr "Přesun byl zrušen."
+
+#: ../GTIPTVPlayerPro/browser.py:5116
+msgid "Default order restored. Press GREEN to save."
+msgstr "Výchozí pořadí bylo obnoveno. Uložte stisknutím ZELENÉHO."
+
+#: ../GTIPTVPlayerPro/browser.py:5237 ../GTIPTVPlayerPro/main.py:5114
+#: ../GTIPTVPlayerPro/playlist.py:38
+msgid "Settings could not be saved. Check the receiver storage."
+msgstr "Nastavení nelze uložit. Zkontrolujte úložiště přijímače."
+
+#: ../GTIPTVPlayerPro/browser.py:5251
+#, python-brace-format
+msgid "{} cannot be moved."
+msgstr "Položku „{}“ nelze přesunout."
+
+#: ../GTIPTVPlayerPro/browser.py:5294
+msgid "Filters updated. Press GREEN to save."
+msgstr "Filtry byly aktualizovány. Uložte je ZELENÝM tlačítkem."
+
+#: ../GTIPTVPlayerPro/browser.py:5358
+msgid "Continue Watching"
+msgstr "Pokračovat ve sledování"
+
+#: ../GTIPTVPlayerPro/browser.py:5371
+msgid "Unfinished movies and series episodes"
+msgstr "Nedokončené filmy a epizody seriálů"
+
+#: ../GTIPTVPlayerPro/browser.py:5544 ../GTIPTVPlayerPro/browser.py:6026
+#: ../GTIPTVPlayerPro/browser.py:6057 ../GTIPTVPlayerPro/browser.py:6268
+#: ../GTIPTVPlayerPro/content.py:43 ../GTIPTVPlayerPro/main.py:6683
+#: ../GTIPTVPlayerPro/main.py:6691 ../GTIPTVPlayerPro/main.py:6854
+#: ../GTIPTVPlayerPro/main.py:6866
+msgid "Movies"
+msgstr "Filmy"
+
+#: ../GTIPTVPlayerPro/browser.py:5544 ../GTIPTVPlayerPro/browser.py:6026
+#: ../GTIPTVPlayerPro/browser.py:6058 ../GTIPTVPlayerPro/browser.py:6269
+#: ../GTIPTVPlayerPro/browser.py:13077 ../GTIPTVPlayerPro/content.py:44
+#: ../GTIPTVPlayerPro/main.py:6684 ../GTIPTVPlayerPro/main.py:6692
+#: ../GTIPTVPlayerPro/main.py:6855 ../GTIPTVPlayerPro/main.py:6867
+msgid "Series"
+msgstr "Seriál"
+
+#: ../GTIPTVPlayerPro/browser.py:5552
+#, python-brace-format
+msgid "S{}  •  E{}"
+msgstr "S{}  •  E{}"
+
+#: ../GTIPTVPlayerPro/browser.py:5571
+#, python-brace-format
+msgid "%{} • {} min remaining"
+msgstr "%{} • zbývá {} min"
+
+#: ../GTIPTVPlayerPro/browser.py:6055
+msgid "All"
+msgstr "Vše"
+
+#: ../GTIPTVPlayerPro/browser.py:6056 ../GTIPTVPlayerPro/browser.py:6267
+#: ../GTIPTVPlayerPro/content.py:42 ../GTIPTVPlayerPro/main.py:6682
+#: ../GTIPTVPlayerPro/main.py:6687 ../GTIPTVPlayerPro/main.py:6690
+#: ../GTIPTVPlayerPro/main.py:6839 ../GTIPTVPlayerPro/main.py:6853
+#: ../GTIPTVPlayerPro/main.py:6865 ../GTIPTVPlayerPro/main.py:6870
+msgid "Live TV"
+msgstr "Živé vysílání"
+
+#: ../GTIPTVPlayerPro/browser.py:6087 ../GTIPTVPlayerPro/browser.py:6110
+#: ../GTIPTVPlayerPro/browser.py:6336 ../GTIPTVPlayerPro/browser.py:6350
+#: ../GTIPTVPlayerPro/browser.py:6368
+msgid "Favorites"
+msgstr "Oblíbené"
+
+#: ../GTIPTVPlayerPro/browser.py:6089
+msgid "Favorite channels, movies and series"
+msgstr "Oblíbené kanály, filmy a seriály"
+
+#: ../GTIPTVPlayerPro/browser.py:6148 ../GTIPTVPlayerPro/main.py:237
+#: ../GTIPTVPlayerPro/main.py:6095 ../GTIPTVPlayerPro/main.py:6747
+#: ../GTIPTVPlayerPro/main.py:8994 ../GTIPTVPlayerPro/remote_footer.py:87
+msgid "Source"
+msgstr "Zdroj"
+
+#: ../GTIPTVPlayerPro/browser.py:6262
+msgid "No favorites have been added."
+msgstr "Nebyly přidány žádné oblíbené položky."
+
+#: ../GTIPTVPlayerPro/browser.py:6271 ../GTIPTVPlayerPro/browser.py:19194
+#: ../GTIPTVPlayerPro/browser.py:21659 ../GTIPTVPlayerPro/remote_footer.py:123
+msgid "Favorite"
+msgstr "Oblíbené"
+
+#: ../GTIPTVPlayerPro/browser.py:6336 ../GTIPTVPlayerPro/browser.py:6350
+#: ../GTIPTVPlayerPro/browser.py:6369 ../GTIPTVPlayerPro/browser.py:12219
+#: ../GTIPTVPlayerPro/main.py:5574 ../GTIPTVPlayerPro/main.py:6103
+#: ../GTIPTVPlayerPro/main.py:6109 ../GTIPTVPlayerPro/remote_footer.py:105
+#: ../GTIPTVPlayerPro/remote_footer.py:128
+msgid "Page"
+msgstr "Stránka"
+
+#: ../GTIPTVPlayerPro/browser.py:6509
+msgid "Could not save the favorite order."
+msgstr "Pořadí oblíbených se nepodařilo uložit."
+
+#: ../GTIPTVPlayerPro/browser.py:6513
+msgid "Favorite order saved."
+msgstr "Pořadí oblíbených bylo uloženo."
+
+#: ../GTIPTVPlayerPro/browser.py:6577 ../GTIPTVPlayerPro/browser.py:6597
+msgid "This channel is no longer present in the M3U source."
+msgstr "Tento kanál již ve zdroji M3U není."
+
+#: ../GTIPTVPlayerPro/browser.py:6735 ../GTIPTVPlayerPro/browser.py:6814
+#: ../GTIPTVPlayerPro/browser.py:6854 ../GTIPTVPlayerPro/browser.py:9288
+msgid "Search All Movies"
+msgstr "Hledat ve všech filmech"
+
+#: ../GTIPTVPlayerPro/browser.py:6743 ../GTIPTVPlayerPro/browser.py:13116
+#: ../GTIPTVPlayerPro/browser.py:13155 ../GTIPTVPlayerPro/dvb_epg_ui.py:2147
+#: ../GTIPTVPlayerPro/main.py:3747 ../GTIPTVPlayerPro/main.py:3984
+#: ../GTIPTVPlayerPro/remote_footer.py:121
+msgid "Search"
+msgstr "Hledat"
+
+#: ../GTIPTVPlayerPro/browser.py:6744 ../GTIPTVPlayerPro/browser.py:6762
+#: ../GTIPTVPlayerPro/browser.py:6763 ../GTIPTVPlayerPro/browser.py:6893
+#: ../GTIPTVPlayerPro/browser.py:7266 ../GTIPTVPlayerPro/browser.py:7371
+msgid "Enter a movie name."
+msgstr "Zadejte název filmu."
+
+#: ../GTIPTVPlayerPro/browser.py:6747 ../GTIPTVPlayerPro/browser.py:9287
+#: ../GTIPTVPlayerPro/content.py:43
+msgid "All Movies"
+msgstr "Všechny filmy"
+
+#: ../GTIPTVPlayerPro/browser.py:6757 ../GTIPTVPlayerPro/browser.py:7356
+#: ../GTIPTVPlayerPro/browser.py:8790 ../GTIPTVPlayerPro/browser.py:10205
+msgid "Selecting movie..."
+msgstr "Výběr filmu..."
+
+#: ../GTIPTVPlayerPro/browser.py:6761 ../GTIPTVPlayerPro/browser.py:8794
+msgid "MOVIE SUMMARY"
+msgstr "SOUHRN FILMU"
+
+#: ../GTIPTVPlayerPro/browser.py:6844 ../GTIPTVPlayerPro/browser.py:7632
+#: ../GTIPTVPlayerPro/browser.py:13104
+#: ../GTIPTVPlayerPro/category_filter_ui.py:292
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2229 ../GTIPTVPlayerPro/m3u_epg_ui.py:985
+#: ../GTIPTVPlayerPro/main.py:3976 ../GTIPTVPlayerPro/main.py:4171
+#: ../GTIPTVPlayerPro/main.py:4989 ../GTIPTVPlayerPro/main.py:7053
+#: ../GTIPTVPlayerPro/main.py:7703 ../GTIPTVPlayerPro/main.py:8163
+#: ../GTIPTVPlayerPro/main.py:8414
+msgid "The virtual keyboard is unavailable on this image."
+msgstr "Virtuální klávesnice není na tomto image dostupná."
+
+#: ../GTIPTVPlayerPro/browser.py:6849 ../GTIPTVPlayerPro/browser.py:7637
+#: ../GTIPTVPlayerPro/browser.py:13110
+#: ../GTIPTVPlayerPro/category_filter_ui.py:297
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2232 ../GTIPTVPlayerPro/m3u_epg_ui.py:989
+#: ../GTIPTVPlayerPro/main.py:3979 ../GTIPTVPlayerPro/main.py:4174
+#: ../GTIPTVPlayerPro/main.py:4992 ../GTIPTVPlayerPro/main.py:7057
+#: ../GTIPTVPlayerPro/main.py:7707 ../GTIPTVPlayerPro/main.py:8167
+#: ../GTIPTVPlayerPro/main.py:8417
+msgid "Could not open the virtual keyboard."
+msgstr "Virtuální klávesnici nelze otevřít."
+
+#: ../GTIPTVPlayerPro/browser.py:7255 ../GTIPTVPlayerPro/playlist.py:1429
+msgid "Server denied access"
+msgstr "Server odepřel přístup"
+
+#: ../GTIPTVPlayerPro/browser.py:7257 ../GTIPTVPlayerPro/content.py:753
+#: ../GTIPTVPlayerPro/playlist.py:1431
+msgid "Server request limit reached"
+msgstr "Dosažen limit požadavků serveru"
+
+#: ../GTIPTVPlayerPro/browser.py:7262 ../GTIPTVPlayerPro/browser.py:7344
+#: ../GTIPTVPlayerPro/browser.py:7367 ../GTIPTVPlayerPro/browser.py:9428
+#: ../GTIPTVPlayerPro/browser.py:9495
+msgid "Could not load movies"
+msgstr "Nelze načíst filmy"
+
+#: ../GTIPTVPlayerPro/browser.py:7275
+#, python-brace-format
+msgid "{movies} movies • {results} results"
+msgstr "{movies} filmů • {results} výsledků"
+
+#: ../GTIPTVPlayerPro/browser.py:7303 ../GTIPTVPlayerPro/browser.py:7388
+#: ../GTIPTVPlayerPro/content.py:230 ../GTIPTVPlayerPro/metadata.py:888
+msgid "Movie"
+msgstr "Film"
+
+#: ../GTIPTVPlayerPro/browser.py:7346 ../GTIPTVPlayerPro/browser.py:7369
+msgid "No movies matched this search."
+msgstr "Tomuto hledání neodpovídají žádné filmy."
+
+#: ../GTIPTVPlayerPro/browser.py:7407 ../GTIPTVPlayerPro/browser.py:10808
+#: ../GTIPTVPlayerPro/browser.py:10832 ../GTIPTVPlayerPro/browser.py:12712
+#: ../GTIPTVPlayerPro/browser.py:12748
+msgid "Information unavailable."
+msgstr "Informace nejsou dostupné."
+
+#: ../GTIPTVPlayerPro/browser.py:7422 ../GTIPTVPlayerPro/browser.py:10841
+msgid "Movie summary unavailable."
+msgstr "Souhrn filmu není dostupný."
+
+#: ../GTIPTVPlayerPro/browser.py:7499 ../GTIPTVPlayerPro/browser.py:8146
+msgid "Select content before using favorites."
+msgstr "Před použitím oblíbených vyberte obsah."
+
+#: ../GTIPTVPlayerPro/browser.py:7588 ../GTIPTVPlayerPro/browser.py:7642
+msgid "Search All Channels"
+msgstr "Hledat ve všech kanálech"
+
+#: ../GTIPTVPlayerPro/browser.py:7591 ../GTIPTVPlayerPro/content.py:42
+#: ../GTIPTVPlayerPro/m3u.py:1223
+msgid "All Channels"
+msgstr "Všechny kanály"
+
+#: ../GTIPTVPlayerPro/browser.py:7594
+msgid "M3U CHANNEL SEARCH"
+msgstr "HLEDÁNÍ KANÁLŮ M3U"
+
+#: ../GTIPTVPlayerPro/browser.py:7678
+msgid "No channels matched this search."
+msgstr "Tomuto hledání neodpovídají žádné kanály."
+
+#: ../GTIPTVPlayerPro/browser.py:7679
+msgid "Enter a channel name."
+msgstr "Zadejte název kanálu."
+
+#: ../GTIPTVPlayerPro/browser.py:7691
+#, python-brace-format
+msgid "First {} matching channels"
+msgstr "Prvních {} odpovídajících kanálů"
+
+#: ../GTIPTVPlayerPro/browser.py:7695
+#, python-brace-format
+msgid "{} channels found"
+msgstr "Nalezeno kanálů: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:8027
+#, python-brace-format
+msgid "{}  |  Select a category"
+msgstr "{}  |  Vyberte kategorii"
+
+#: ../GTIPTVPlayerPro/browser.py:8045
+msgid "LIVE TV CATEGORIES"
+msgstr "KATEGORIE ŽIVÉHO VYSÍLÁNÍ"
+
+#: ../GTIPTVPlayerPro/browser.py:8052
+msgid "5-DAY WEATHER FORECAST"
+msgstr "PŘEDPOVĚĎ POČASÍ NA 5 DNÍ"
+
+#: ../GTIPTVPlayerPro/browser.py:8056
+msgid "TODAY"
+msgstr "DNES"
+
+#: ../GTIPTVPlayerPro/browser.py:8058 ../GTIPTVPlayerPro/browser.py:19199
+#: ../GTIPTVPlayerPro/browser.py:23060
+msgid "Loading weather data"
+msgstr "Načítání údajů o počasí"
+
+#: ../GTIPTVPlayerPro/browser.py:8273
+msgid "No categories found; press GREEN to try again."
+msgstr "Nebyly nalezeny žádné kategorie; zkuste to znovu stisknutím ZELENÉHO."
+
+#: ../GTIPTVPlayerPro/browser.py:8307 ../GTIPTVPlayerPro/browser.py:8967
+#: ../GTIPTVPlayerPro/browser.py:11329
+msgid "Categories"
+msgstr "Kategorie"
+
+#: ../GTIPTVPlayerPro/browser.py:8382 ../GTIPTVPlayerPro/main.py:4751
+msgid "Category edit lock data is damaged. Remove and reinstall the plugin to reset only this lock."
+msgstr "Data zámku úprav kategorií jsou poškozena. Odinstalujte a znovu nainstalujte plugin, aby se resetoval pouze tento zámek."
+
+#: ../GTIPTVPlayerPro/browser.py:8395
+msgid "Category editor locked"
+msgstr "Editor kategorií je uzamčen"
+
+#: ../GTIPTVPlayerPro/browser.py:8396
+msgid "Enter the 4-digit category edit PIN."
+msgstr "Zadejte čtyřmístný PIN pro úpravy kategorií."
+
+#: ../GTIPTVPlayerPro/browser.py:8415 ../GTIPTVPlayerPro/browser.py:8436
+#: ../GTIPTVPlayerPro/main.py:4707 ../GTIPTVPlayerPro/main.py:4728
+msgid "The PIN entry screen is unavailable on this image."
+msgstr "Obrazovka pro zadání PINu není v tomto image dostupná."
+
+#: ../GTIPTVPlayerPro/browser.py:8447 ../GTIPTVPlayerPro/main.py:4856
+msgid "Category lock recovery"
+msgstr "Obnovení zámku kategorií"
+
+#: ../GTIPTVPlayerPro/browser.py:8448 ../GTIPTVPlayerPro/main.py:4857
+msgid "Enter the 12-digit recovery code."
+msgstr "Zadejte 12místný kód pro obnovení."
+
+#: ../GTIPTVPlayerPro/browser.py:8457
+msgid "Incorrect PIN. Category editor remains locked."
+msgstr "Nesprávný PIN. Editor kategorií zůstává uzamčen."
+
+#: ../GTIPTVPlayerPro/browser.py:8476
+msgid "Incorrect recovery code. Category editor remains locked."
+msgstr "Nesprávný kód pro obnovení. Editor kategorií zůstává uzamčen."
+
+#: ../GTIPTVPlayerPro/browser.py:8487
+msgid "Create a new category edit PIN"
+msgstr "Vytvořit nový PIN pro úpravy kategorií"
+
+#: ../GTIPTVPlayerPro/browser.py:8488 ../GTIPTVPlayerPro/main.py:4788
+msgid "Enter a new 4-digit PIN."
+msgstr "Zadejte nový čtyřmístný PIN."
+
+#: ../GTIPTVPlayerPro/browser.py:8497
+msgid "Confirm the new category edit PIN"
+msgstr "Potvrdit nový PIN pro úpravy kategorií"
+
+#: ../GTIPTVPlayerPro/browser.py:8498 ../GTIPTVPlayerPro/main.py:4798
+msgid "Enter the same 4-digit PIN again."
+msgstr "Zadejte znovu stejný čtyřmístný PIN."
+
+#: ../GTIPTVPlayerPro/browser.py:8509 ../GTIPTVPlayerPro/main.py:4810
+msgid "The PIN entries do not match. Nothing was changed."
+msgstr "Zadané PINy se neshodují. Nic nebylo změněno."
+
+#: ../GTIPTVPlayerPro/browser.py:8526
+msgid "The new PIN could not be saved. Category editor remains locked."
+msgstr "Nový PIN se nepodařilo uložit. Editor kategorií zůstává uzamčen."
+
+#: ../GTIPTVPlayerPro/browser.py:8537
+#, python-brace-format
+msgid ""
+"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
+"\n"
+"{}"
+msgstr ""
+"Obnovení bylo úspěšné. Zapište si nový kód pro obnovení; zobrazí se pouze jednou:\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/browser.py:8540
+msgid "Category edit PIN renewed."
+msgstr "PIN pro úpravy kategorií byl obnoven."
+
+#: ../GTIPTVPlayerPro/browser.py:8780
+msgid "MOVIE CATEGORIES"
+msgstr "KATEGORIE FILMŮ"
+
+#: ../GTIPTVPlayerPro/browser.py:8786
+msgid ""
+"GT\n"
+"MOVIE"
+msgstr ""
+"GT\n"
+"FILM"
+
+#: ../GTIPTVPlayerPro/browser.py:8796
+msgid "The selected movie's details will be loaded from the server."
+msgstr "Podrobnosti vybraného filmu budou načteny ze serveru."
+
+#: ../GTIPTVPlayerPro/browser.py:8804
+msgid "MOVIES IN THE SELECTED CATEGORY"
+msgstr "FILMY VE VYBRANÉ KATEGORII"
+
+#: ../GTIPTVPlayerPro/browser.py:8908
+msgid "Movie category not found"
+msgstr "Kategorie filmů nebyla nalezena"
+
+#: ../GTIPTVPlayerPro/browser.py:9292
+msgid "Press BLUE to search all movies."
+msgstr "Stisknutím MODRÉHO tlačítka prohledáte všechny filmy."
+
+#: ../GTIPTVPlayerPro/browser.py:9391
+#, python-brace-format
+msgid "{} • LOADING MOVIES"
+msgstr "{} • NAČÍTÁNÍ FILMŮ"
+
+#: ../GTIPTVPlayerPro/browser.py:9525
+#, python-brace-format
+msgid "{} • {} MOVIES"
+msgstr "{} • {} FILMŮ"
+
+#: ../GTIPTVPlayerPro/browser.py:9603
+msgid "Movie request timed out"
+msgstr "Vypršel časový limit požadavku na film"
+
+#: ../GTIPTVPlayerPro/browser.py:10220
+msgid "Loading movie information from the server."
+msgstr "Načítání informací o filmu ze serveru."
+
+#: ../GTIPTVPlayerPro/browser.py:10228
+msgid "COULD NOT LOAD MOVIES"
+msgstr "FILMY SE NEPODAŘILO NAČÍST"
+
+#: ../GTIPTVPlayerPro/browser.py:10233
+msgid "NO MOVIES FOUND IN THIS CATEGORY"
+msgstr "V TÉTO KATEGORII NEBYLY NALEZENY ŽÁDNÉ FILMY"
+
+#: ../GTIPTVPlayerPro/browser.py:10234
+msgid "Try another category."
+msgstr "Zkuste jinou kategorii."
+
+#: ../GTIPTVPlayerPro/browser.py:10811
+msgid "Movie information unavailable."
+msgstr "Informace o filmu nejsou dostupné."
+
+#: ../GTIPTVPlayerPro/browser.py:10837
+msgid "Genre unavailable"
+msgstr "Žánr není dostupný"
+
+#: ../GTIPTVPlayerPro/browser.py:10846 ../GTIPTVPlayerPro/browser.py:12758
+#, python-brace-format
+msgid "Director: {}"
+msgstr "Režie: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:10850 ../GTIPTVPlayerPro/browser.py:12760
+#, python-brace-format
+msgid "Cast: {}"
+msgstr "Obsazení: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:11140
+#, python-brace-format
+msgid "{}   |   CONTENT BROWSER"
+msgstr "{}   |   PROHLÍŽEČ OBSAHU"
+
+#: ../GTIPTVPlayerPro/browser.py:11166
+msgid "CATEGORIES"
+msgstr "KATEGORIE"
+
+#: ../GTIPTVPlayerPro/browser.py:11174
+msgid ""
+"GT\n"
+"SERIES"
+msgstr ""
+"GT\n"
+"SERIÁL"
+
+#: ../GTIPTVPlayerPro/browser.py:11176 ../GTIPTVPlayerPro/browser.py:19374
+#: ../GTIPTVPlayerPro/main.py:445 ../GTIPTVPlayerPro/main.py:9014
+msgid "SERIES"
+msgstr "SERIÁLY"
+
+#: ../GTIPTVPlayerPro/browser.py:11191 ../GTIPTVPlayerPro/browser.py:11983
+msgid "Selecting series..."
+msgstr "Výběr seriálu..."
+
+#: ../GTIPTVPlayerPro/browser.py:11194
+msgid "SERIES SUMMARY"
+msgstr "SHRNUTÍ SERIÁLU"
+
+#: ../GTIPTVPlayerPro/browser.py:11195 ../GTIPTVPlayerPro/browser.py:11998
+msgid "Loading series information from the server."
+msgstr "Načítání informací o seriálu ze serveru."
+
+#: ../GTIPTVPlayerPro/browser.py:11298
+msgid "Series category not found"
+msgstr "Kategorie seriálů nebyla nalezena"
+
+#: ../GTIPTVPlayerPro/browser.py:11491
+#, python-brace-format
+msgid "{} • LOADING SERIES"
+msgstr "{} • NAČÍTÁNÍ SERIÁLŮ"
+
+#: ../GTIPTVPlayerPro/browser.py:11532 ../GTIPTVPlayerPro/browser.py:11606
+msgid "Could not load series"
+msgstr "Nelze načíst seriály"
+
+#: ../GTIPTVPlayerPro/browser.py:11653
+#, python-brace-format
+msgid "Series scan • {} pages"
+msgstr "Prohledávání seriálů • {} stránek"
+
+#: ../GTIPTVPlayerPro/browser.py:11696
+#, python-brace-format
+msgid "{} • {} SERIES"
+msgstr "{} • {} SERIÁLŮ"
+
+#: ../GTIPTVPlayerPro/browser.py:11800
+msgid "Series request timed out"
+msgstr "Vypršel časový limit požadavku na seriál"
+
+#: ../GTIPTVPlayerPro/browser.py:12012
+msgid "COULD NOT LOAD SERIES"
+msgstr "SERIÁLY SE NEPODAŘILO NAČÍST"
+
+#: ../GTIPTVPlayerPro/browser.py:12027
+msgid "SERIES DATA COULD NOT BE READ"
+msgstr "DATA SERIÁLU NELZE PŘEČÍST"
+
+#: ../GTIPTVPlayerPro/browser.py:12029
+msgid "The series response uses an unsupported format. Categories remain available."
+msgstr "Odpověď seriálů používá nepodporovaný formát. Kategorie zůstávají dostupné."
+
+#: ../GTIPTVPlayerPro/browser.py:12032
+msgid "SERIES DATA UNAVAILABLE"
+msgstr "DATA SERIÁLU NEJSOU DOSTUPNÁ"
+
+#: ../GTIPTVPlayerPro/browser.py:12034
+msgid "The server did not answer the series request. Categories remain available."
+msgstr "Server neodpověděl na požadavek seriálů. Kategorie zůstávají dostupné."
+
+#: ../GTIPTVPlayerPro/browser.py:12038
+msgid "NO SERIES FOUND IN THIS CATEGORY"
+msgstr "V TÉTO KATEGORII NEBYLY NALEZENY ŽÁDNÉ SERIÁLY"
+
+#: ../GTIPTVPlayerPro/browser.py:12041
+msgid "No series were found on this server or in this category."
+msgstr "Na tomto serveru ani v této kategorii nebyly nalezeny žádné seriály."
+
+#: ../GTIPTVPlayerPro/browser.py:12716 ../GTIPTVPlayerPro/browser.py:12752
+msgid "Series summary unavailable."
+msgstr "Souhrn seriálu není dostupný."
+
+#: ../GTIPTVPlayerPro/browser.py:12740 ../GTIPTVPlayerPro/browser.py:12741
+msgid "Seasons"
+msgstr "Série"
+
+#: ../GTIPTVPlayerPro/browser.py:13244 ../GTIPTVPlayerPro/browser.py:23057
+#: ../GTIPTVPlayerPro/browser.py:23077
+msgid "Weather is disabled"
+msgstr "Počasí je vypnuto"
+
+#: ../GTIPTVPlayerPro/browser.py:13245
+msgid "You can enable it in Settings."
+msgstr "Můžete to zapnout v Nastavení."
+
+#: ../GTIPTVPlayerPro/browser.py:13248
+msgid "Loading forecast"
+msgstr "Načítání předpovědi"
+
+#: ../GTIPTVPlayerPro/browser.py:13351 ../GTIPTVPlayerPro/weather.py:497
+#: ../GTIPTVPlayerPro/weather.py:539 ../GTIPTVPlayerPro/weather.py:573
+msgid "Weather request timed out"
+msgstr "Vypršel časový limit požadavku na počasí"
+
+#: ../GTIPTVPlayerPro/browser.py:13352 ../GTIPTVPlayerPro/browser.py:13364
+#: ../GTIPTVPlayerPro/main.py:3845 ../GTIPTVPlayerPro/main.py:3859
+#: ../GTIPTVPlayerPro/main.py:4202 ../GTIPTVPlayerPro/main.py:4268
+msgid "Weather data unavailable."
+msgstr "Údaje o počasí nejsou dostupné."
+
+#: ../GTIPTVPlayerPro/browser.py:13389
+#, python-brace-format
+msgid "Humidity {}% • Wind {:.0f} km/h"
+msgstr "Vlhkost {}% • Vítr {:.0f} km/h"
+
+#: ../GTIPTVPlayerPro/browser.py:13394
+msgid "  •  Cached"
+msgstr "  •  V mezipaměti"
+
+#: ../GTIPTVPlayerPro/browser.py:13396
+#, python-brace-format
+msgid "Updated: {}{}"
+msgstr "Aktualizováno: {}{}"
+
+#: ../GTIPTVPlayerPro/browser.py:13406
+msgid "Today"
+msgstr "Dnes"
+
+#: ../GTIPTVPlayerPro/browser.py:13827
+#, python-brace-format
+msgid "%{}  •  {} MIN REMAINING"
+msgstr "%{}  •  ZBÝVÁ {} MIN"
+
+#: ../GTIPTVPlayerPro/browser.py:14080
+msgid "CHANNEL LIST"
+msgstr "SEZNAM KANÁLŮ"
+
+#: ../GTIPTVPlayerPro/browser.py:14094 ../GTIPTVPlayerPro/browser.py:15960
+#: ../GTIPTVPlayerPro/browser.py:19184 ../GTIPTVPlayerPro/browser.py:21623
+msgid "NOW"
+msgstr "NYNÍ"
+
+#: ../GTIPTVPlayerPro/browser.py:14095 ../GTIPTVPlayerPro/browser.py:14113
+#: ../GTIPTVPlayerPro/browser.py:14142 ../GTIPTVPlayerPro/browser.py:14185
+#: ../GTIPTVPlayerPro/browser.py:14617 ../GTIPTVPlayerPro/browser.py:14660
+msgid "SELECT A CHANNEL"
+msgstr "VYBRAT KANÁL"
+
+#: ../GTIPTVPlayerPro/browser.py:14096 ../GTIPTVPlayerPro/browser.py:14125
+#: ../GTIPTVPlayerPro/browser.py:15900 ../GTIPTVPlayerPro/browser.py:15910
+msgid "Waiting for programme information"
+msgstr "Čekání na informace o programu"
+
+#: ../GTIPTVPlayerPro/browser.py:14099 ../GTIPTVPlayerPro/browser.py:14116
+#: ../GTIPTVPlayerPro/browser.py:15902 ../GTIPTVPlayerPro/browser.py:15920
+#: ../GTIPTVPlayerPro/browser.py:15963 ../GTIPTVPlayerPro/browser.py:15987
+#: ../GTIPTVPlayerPro/browser.py:19186 ../GTIPTVPlayerPro/browser.py:19346
+#: ../GTIPTVPlayerPro/browser.py:21626
+msgid "NEXT"
+msgstr "DALŠÍ"
+
+#: ../GTIPTVPlayerPro/browser.py:14124
+msgid "PROGRAMME SUMMARY"
+msgstr "SOUHRN PROGRAMU"
+
+#: ../GTIPTVPlayerPro/browser.py:14326 ../GTIPTVPlayerPro/browser.py:14341
+#: ../GTIPTVPlayerPro/browser.py:14872 ../GTIPTVPlayerPro/browser.py:14874
+#: ../GTIPTVPlayerPro/browser.py:16389 ../GTIPTVPlayerPro/browser.py:16394
+#: ../GTIPTVPlayerPro/browser.py:16475 ../GTIPTVPlayerPro/browser.py:16487
+#: ../GTIPTVPlayerPro/browser.py:16496 ../GTIPTVPlayerPro/browser.py:18336
+#: ../GTIPTVPlayerPro/browser.py:20771 ../GTIPTVPlayerPro/browser.py:20843
+#: ../GTIPTVPlayerPro/browser.py:21506
+msgid "Could not open the stream."
+msgstr "Stream nelze otevřít."
+
+#: ../GTIPTVPlayerPro/browser.py:14478
+msgid "No channels found; press GREEN to try again."
+msgstr "Nebyly nalezeny žádné kanály; zkuste to znovu stisknutím ZELENÉHO."
+
+#: ../GTIPTVPlayerPro/browser.py:15918 ../GTIPTVPlayerPro/browser.py:15923
+#: ../GTIPTVPlayerPro/browser.py:15943 ../GTIPTVPlayerPro/browser.py:15995
+#: ../GTIPTVPlayerPro/browser.py:20160 ../GTIPTVPlayerPro/browser.py:20171
+#: ../GTIPTVPlayerPro/browser.py:21630
+msgid "EPG information unavailable."
+msgstr "Informace EPG nejsou dostupné."
+
+#: ../GTIPTVPlayerPro/browser.py:15934 ../GTIPTVPlayerPro/browser.py:16015
+msgid "No summary is available for this programme."
+msgstr "Pro tento program není dostupný žádný souhrn."
+
+#: ../GTIPTVPlayerPro/browser.py:15963
+msgid "LATER"
+msgstr "POZDĚJI"
+
+#: ../GTIPTVPlayerPro/browser.py:16589 ../GTIPTVPlayerPro/browser.py:20008
+#: ../GTIPTVPlayerPro/browser.py:21192 ../GTIPTVPlayerPro/browser.py:21510
+#: ../GTIPTVPlayerPro/browser.py:22231 ../GTIPTVPlayerPro/browser.py:22272
+#: ../GTIPTVPlayerPro/browser.py:23860 ../GTIPTVPlayerPro/browser.py:23950
+msgid "Keeping the current stream"
+msgstr "Ponechává se aktuální stream"
+
+#: ../GTIPTVPlayerPro/browser.py:16747
+#, python-brace-format
+msgid "{}  >  Series  >  Select season and episode"
+msgstr "{}  >  Seriály  >  Vyberte sérii a epizodu"
+
+#: ../GTIPTVPlayerPro/browser.py:16765 ../GTIPTVPlayerPro/browser.py:16768
+msgid "EPISODES"
+msgstr "EPIZODY"
+
+#: ../GTIPTVPlayerPro/browser.py:16859
+msgid "No episodes were found for this series."
+msgstr "Pro tento seriál nebyly nalezeny žádné epizody."
+
+#: ../GTIPTVPlayerPro/browser.py:16975
+msgid "Enigma2 player service support is unavailable"
+msgstr "Služba přehrávače Enigma2 není dostupná"
+
+#: ../GTIPTVPlayerPro/browser.py:18063
+#, python-brace-format
+msgid ""
+"Resume playback from the saved position?\n"
+"\n"
+"Saved position: {}"
+msgstr ""
+"Pokračovat v přehrávání z uložené pozice?\n"
+"\n"
+"Uložená pozice: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:18254 ../GTIPTVPlayerPro/browser.py:18268
+msgid "Stream link timed out"
+msgstr "Vypršel časový limit odkazu streamu"
+
+#: ../GTIPTVPlayerPro/browser.py:18334 ../GTIPTVPlayerPro/catchup_ui.py:542
+msgid "Could not open the archived programme."
+msgstr "Archivovaný pořad se nepodařilo otevřít."
+
+#: ../GTIPTVPlayerPro/browser.py:19178
+msgid "Player"
+msgstr "Přehrávač"
+
+#: ../GTIPTVPlayerPro/browser.py:19179 ../GTIPTVPlayerPro/browser.py:21617
+msgid "Reading resolution"
+msgstr "Načítání rozlišení"
+
+#: ../GTIPTVPlayerPro/browser.py:19181 ../GTIPTVPlayerPro/browser.py:21619
+#: ../GTIPTVPlayerPro/browser.py:23514
+msgid "VIDEO: --"
+msgstr "VIDEO: --"
+
+#: ../GTIPTVPlayerPro/browser.py:19182 ../GTIPTVPlayerPro/browser.py:21620
+#: ../GTIPTVPlayerPro/browser.py:23522
+msgid "AUDIO: --"
+msgstr "ZVUK: --"
+
+#: ../GTIPTVPlayerPro/browser.py:19185 ../GTIPTVPlayerPro/browser.py:21632
+msgid "Loading EPG..."
+msgstr "Načítání EPG..."
+
+#: ../GTIPTVPlayerPro/browser.py:19330 ../GTIPTVPlayerPro/browser.py:19344
+#: ../GTIPTVPlayerPro/browser.py:19351 ../GTIPTVPlayerPro/browser.py:19360
+#: ../GTIPTVPlayerPro/browser.py:19369 ../GTIPTVPlayerPro/main.py:430
+msgid "LIVE TV"
+msgstr "ŽIVÉ VYSÍLÁNÍ"
+
+#: ../GTIPTVPlayerPro/browser.py:19330
+msgid "EPG information unavailable"
+msgstr "Informace EPG nejsou dostupné"
+
+#: ../GTIPTVPlayerPro/browser.py:19366 ../GTIPTVPlayerPro/browser.py:19394
+#: ../GTIPTVPlayerPro/browser.py:21626
+msgid "REMAINING"
+msgstr "ZBÝVÁ"
+
+#: ../GTIPTVPlayerPro/browser.py:19373 ../GTIPTVPlayerPro/catchup_ui.py:240
+#: ../GTIPTVPlayerPro/catchup_ui.py:481 ../GTIPTVPlayerPro/main.py:435
+msgid "TV Archive"
+msgstr "TV archiv"
+
+#: ../GTIPTVPlayerPro/browser.py:19374 ../GTIPTVPlayerPro/main.py:440
+#: ../GTIPTVPlayerPro/main.py:9013
+msgid "MOVIES"
+msgstr "FILMY"
+
+#: ../GTIPTVPlayerPro/browser.py:20687
+msgid "Could not start the player."
+msgstr "Přehrávač nelze spustit."
+
+#: ../GTIPTVPlayerPro/browser.py:21068 ../GTIPTVPlayerPro/browser.py:21333
+msgid "Reconnecting the stream..."
+msgstr "Opětovné připojování streamu..."
+
+#: ../GTIPTVPlayerPro/browser.py:21623
+msgid "PREVIOUS"
+msgstr "PŘEDCHOZÍ"
+
+#: ../GTIPTVPlayerPro/browser.py:21637
+msgid "Reading duration..."
+msgstr "Načítání délky..."
+
+#: ../GTIPTVPlayerPro/browser.py:21734
+msgid "Audio track"
+msgstr "Zvuková stopa"
+
+#: ../GTIPTVPlayerPro/browser.py:21824
+msgid "No audio tracks are available."
+msgstr "Nejsou k dispozici žádné zvukové stopy."
+
+#: ../GTIPTVPlayerPro/browser.py:21828
+msgid "This content has only one audio track."
+msgstr "Tento obsah má pouze jednu zvukovou stopu."
+
+#: ../GTIPTVPlayerPro/browser.py:21833 ../GTIPTVPlayerPro/browser.py:21843
+#: ../GTIPTVPlayerPro/browser.py:21897 ../GTIPTVPlayerPro/browser.py:21902
+#: ../GTIPTVPlayerPro/browser.py:21944
+msgid "Audio track selection is unavailable on this image."
+msgstr "Výběr zvukové stopy není na tomto image dostupný."
+
+#: ../GTIPTVPlayerPro/browser.py:21882 ../GTIPTVPlayerPro/browser.py:21891
+msgid "Audio tracks"
+msgstr "Zvukové stopy"
+
+#: ../GTIPTVPlayerPro/browser.py:21911
+msgid "The playing service changed. Open audio selection again."
+msgstr "Přehrávaná služba se změnila. Otevřete výběr zvuku znovu."
+
+#: ../GTIPTVPlayerPro/browser.py:21929 ../GTIPTVPlayerPro/browser.py:21938
+msgid "Audio tracks changed. Open audio selection again."
+msgstr "Zvukové stopy se změnily. Otevřete výběr zvuku znovu."
+
+#: ../GTIPTVPlayerPro/browser.py:21954
+msgid "Could not select the requested audio track."
+msgstr "Požadovanou zvukovou stopu se nepodařilo vybrat."
+
+#: ../GTIPTVPlayerPro/browser.py:21966 ../GTIPTVPlayerPro/browser.py:23517
+#, python-brace-format
+msgid "AUDIO: {}"
+msgstr "ZVUK: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:22084
+msgid "Changing channel..."
+msgstr "Přepínání kanálu..."
+
+#: ../GTIPTVPlayerPro/browser.py:22227 ../GTIPTVPlayerPro/browser.py:22268
+msgid "Could not open the channel."
+msgstr "Kanál nelze otevřít."
+
+#: ../GTIPTVPlayerPro/browser.py:22366 ../GTIPTVPlayerPro/browser.py:22489
+#: ../GTIPTVPlayerPro/browser.py:22543 ../GTIPTVPlayerPro/browser.py:23001
+msgid "PAUSED"
+msgstr "POZASTAVENO"
+
+#: ../GTIPTVPlayerPro/browser.py:22366
+msgid "SEEK MODE"
+msgstr "REŽIM PŘETÁČENÍ"
+
+#: ../GTIPTVPlayerPro/browser.py:22367
+msgid "LEFT / RIGHT to select time   •   OK to continue"
+msgstr "VLEVO / VPRAVO vybere čas   •   OK pokračuje"
+
+#: ../GTIPTVPlayerPro/browser.py:22490 ../GTIPTVPlayerPro/browser.py:22544
+#: ../GTIPTVPlayerPro/browser.py:23002
+msgid "PLAY / PAUSE to continue   •   STOP to close the video"
+msgstr "PLAY / PAUSE pokračuje   •   STOP zavře video"
+
+#: ../GTIPTVPlayerPro/browser.py:22686
+msgid "THIS STREAM CANNOT BE SEEKED"
+msgstr "TENTO STREAM NELZE PŘETÁČET"
+
+#: ../GTIPTVPlayerPro/browser.py:22687
+msgid "The server or playback format does not support seeking"
+msgstr "Server nebo formát přehrávání nepodporuje přetáčení"
+
+#: ../GTIPTVPlayerPro/browser.py:22715
+msgid "SEEK FORWARD"
+msgstr "PŘETOČIT VPŘED"
+
+#: ../GTIPTVPlayerPro/browser.py:22717
+msgid "SEEK BACKWARD"
+msgstr "PŘETOČIT ZPĚT"
+
+#: ../GTIPTVPlayerPro/browser.py:22721
+msgid "LEFT / RIGHT to select time   •   OK to continue   •   EXIT to cancel"
+msgstr "VLEVO / VPRAVO vybere čas   •   OK pokračuje   •   EXIT zruší"
+
+#: ../GTIPTVPlayerPro/browser.py:22983
+msgid "PAUSE IS NOT AVAILABLE"
+msgstr "POZASTAVENÍ NENÍ DOSTUPNÉ"
+
+#: ../GTIPTVPlayerPro/browser.py:22984
+msgid "This server or playback format does not support pausing"
+msgstr "Tento server nebo formát přehrávání nepodporuje pozastavení"
+
+#: ../GTIPTVPlayerPro/browser.py:23079
+msgid "Weather information is not ready"
+msgstr "Informace o počasí ještě nejsou připraveny"
+
+#: ../GTIPTVPlayerPro/browser.py:23154
+msgid "Could not load the weather forecast"
+msgstr "Nelze načíst předpověď počasí"
+
+#: ../GTIPTVPlayerPro/browser.py:23179 ../GTIPTVPlayerPro/browser.py:23192
+msgid "Weather information unavailable."
+msgstr "Informace o počasí nejsou dostupné."
+
+#: ../GTIPTVPlayerPro/browser.py:23492
+msgid "Resolution: --"
+msgstr "Rozlišení: --"
+
+#: ../GTIPTVPlayerPro/browser.py:23509
+#, python-brace-format
+msgid "VIDEO: {}"
+msgstr "VIDEO: {}"
+
+#: ../GTIPTVPlayerPro/catchup.py:91 ../GTIPTVPlayerPro/content.py:292
+msgid "No programme information"
+msgstr "Žádné informace o programu"
+
+#: ../GTIPTVPlayerPro/catchup.py:122 ../GTIPTVPlayerPro/catchup.py:495
+#: ../GTIPTVPlayerPro/catchup.py:543 ../GTIPTVPlayerPro/catchup_m3u.py:200
+#: ../GTIPTVPlayerPro/catchup_ui.py:375 ../GTIPTVPlayerPro/catchup_ui.py:387
+msgid "Could not load the TV archive."
+msgstr "TV archiv se nepodařilo načíst."
+
+#: ../GTIPTVPlayerPro/catchup.py:187 ../GTIPTVPlayerPro/catchup.py:356
+#: ../GTIPTVPlayerPro/catchup.py:363 ../GTIPTVPlayerPro/catchup.py:410
+#: ../GTIPTVPlayerPro/catchup.py:477 ../GTIPTVPlayerPro/content.py:1684
+#: ../GTIPTVPlayerPro/m3u.py:886 ../GTIPTVPlayerPro/m3u.py:892
+#: ../GTIPTVPlayerPro/stalker.py:7312 ../GTIPTVPlayerPro/stalker.py:7447
+#: ../GTIPTVPlayerPro/stalker.py:7534
+msgid "Invalid playback item"
+msgstr "Neplatná položka přehrávání"
+
+#: ../GTIPTVPlayerPro/catchup.py:202 ../GTIPTVPlayerPro/catchup_stalker.py:116
+#: ../GTIPTVPlayerPro/catchup_ui.py:37
+msgid "TV archive is not supported by this source."
+msgstr "Tento zdroj nepodporuje TV archiv."
+
+#: ../GTIPTVPlayerPro/catchup.py:242 ../GTIPTVPlayerPro/catchup.py:582
+#: ../GTIPTVPlayerPro/catchup_m3u.py:36
+#: ../GTIPTVPlayerPro/catchup_stalker.py:123
+msgid "Archive playback is unavailable for this channel."
+msgstr "Přehrávání z archivu není pro tento kanál dostupné."
+
+#: ../GTIPTVPlayerPro/catchup.py:358 ../GTIPTVPlayerPro/catchup_m3u.py:230
+#: ../GTIPTVPlayerPro/catchup_stalker.py:130
+msgid "This programme is no longer available in the TV archive."
+msgstr "Tento pořad již není v TV archivu dostupný."
+
+#: ../GTIPTVPlayerPro/catchup_m3u.py:177 ../GTIPTVPlayerPro/catchup_ui.py:36
+msgid "Configure an XMLTV guide for this M3U source to use TV archive."
+msgstr "Pro použití TV archivu nastavte pro tento zdroj M3U programového průvodce XMLTV."
+
+#: ../GTIPTVPlayerPro/catchup_stalker.py:426 ../GTIPTVPlayerPro/stalker.py:2493
+msgid "Portal request limit reached"
+msgstr "Byl dosažen limit požadavků portálu"
+
+#: ../GTIPTVPlayerPro/catchup_stalker.py:430 ../GTIPTVPlayerPro/stalker.py:1808
+#: ../GTIPTVPlayerPro/stalker.py:2344 ../GTIPTVPlayerPro/stalker.py:2364
+#: ../GTIPTVPlayerPro/stalker.py:2378 ../GTIPTVPlayerPro/stalker.py:2479
+msgid "Portal access denied"
+msgstr "Přístup k portálu byl odepřen"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:482 ../GTIPTVPlayerPro/remote_footer.py:111
+msgid "Channels"
+msgstr "Kanály"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:521
+#, python-brace-format
+msgid "{} min"
+msgstr "{} min"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:536
+msgid "Watch from archive"
+msgstr "Sledovat z archivu"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:546
+msgid "Loading programmes..."
+msgstr "Načítání pořadů..."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:546
+msgid "Loading TV archive..."
+msgstr "Načítání TV archivu..."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:548
+msgid "No archived channels are available for this account."
+msgstr "Pro tento účet nejsou k dispozici žádné kanály s archivem."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:550
+msgid "No archived programmes are available for this day."
+msgstr "Pro tento den nejsou k dispozici žádné archivované pořady."
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:54
+msgid "Filter rules: Show / Hide / Clear"
+msgstr "Pravidla filtrů: Zobrazit / Skrýt / Vymazat"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:199
+msgid "Hide"
+msgstr "Skrýt"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:200
+msgid "Show"
+msgstr "Zobrazit"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:219
+msgid "No filters found."
+msgstr "Nebyly nalezeny žádné filtry."
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:220
+#: ../GTIPTVPlayerPro/remote_footer.py:134
+msgid "Preview"
+msgstr "Náhled"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:125
+msgid "NUMBER KEYS: Enter  |  YELLOW: Delete  |  OK/GREEN: Confirm  |  BACK: Cancel"
+msgstr "NUMBER KEYS: Zadání  |  YELLOW: Smazat  |  OK/GREEN: Potvrdit  |  BACK: Zrušit"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:129
+msgid "BLUE: Recovery code"
+msgstr "BLUE: Kód pro obnovení"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:168
+#, python-brace-format
+msgid "Digits entered: {}/{}"
+msgstr "Zadané číslice: {}/{}"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:191
+#, python-brace-format
+msgid "Enter exactly {} digits."
+msgstr "Zadejte přesně {} číslic."
+
+#: ../GTIPTVPlayerPro/content.py:44
+msgid "All Series"
+msgstr "Všechny seriály"
+
+#: ../GTIPTVPlayerPro/content.py:153 ../GTIPTVPlayerPro/content.py:877
+msgid "Untitled content"
+msgstr "Obsah bez názvu"
+
+#: ../GTIPTVPlayerPro/content.py:702 ../GTIPTVPlayerPro/playlist.py:168
+msgid "Unsupported content type"
+msgstr "Nepodporovaný typ obsahu"
+
+#: ../GTIPTVPlayerPro/content.py:744
+#, python-brace-format
+msgid "API HTTP error action={}"
+msgstr "Chyba HTTP API, akce={}"
+
+#: ../GTIPTVPlayerPro/content.py:747
+msgid "Server denied access to content"
+msgstr "Server odepřel přístup k obsahu"
+
+#: ../GTIPTVPlayerPro/content.py:758 ../GTIPTVPlayerPro/playlist.py:1433
+#, python-brace-format
+msgid "Server returned HTTP {}"
+msgstr "Server vrátil HTTP {}"
+
+#: ../GTIPTVPlayerPro/content.py:765
+#, python-brace-format
+msgid "API connection error action={}"
+msgstr "Chyba připojení API, akce={}"
+
+#: ../GTIPTVPlayerPro/content.py:769
+msgid "Could not connect to the content server"
+msgstr "Nelze se připojit k serveru obsahu"
+
+#: ../GTIPTVPlayerPro/content.py:778 ../GTIPTVPlayerPro/content.py:958
+#: ../GTIPTVPlayerPro/content.py:1335
+msgid "Server content list is too large"
+msgstr "Seznam obsahu serveru je příliš velký"
+
+#: ../GTIPTVPlayerPro/content.py:787
+#, python-brace-format
+msgid "Invalid JSON action={}"
+msgstr "Neplatná akce JSON={}"
+
+#: ../GTIPTVPlayerPro/content.py:789
+msgid "Server returned an invalid content response"
+msgstr "Server vrátil neplatnou odpověď obsahu"
+
+#: ../GTIPTVPlayerPro/content.py:953 ../GTIPTVPlayerPro/content.py:1162
+#: ../GTIPTVPlayerPro/content.py:1297 ../GTIPTVPlayerPro/content.py:1330
+msgid "Could not load the content list"
+msgstr "Nelze načíst seznam obsahu"
+
+#: ../GTIPTVPlayerPro/content.py:1103
+msgid "Could not load the category list"
+msgstr "Nelze načíst seznam kategorií"
+
+#: ../GTIPTVPlayerPro/content.py:1383
+msgid "Invalid movie ID"
+msgstr "Neplatné ID filmu"
+
+#: ../GTIPTVPlayerPro/content.py:1389
+msgid "Could not load movie information"
+msgstr "Nelze načíst informace o filmu"
+
+#: ../GTIPTVPlayerPro/content.py:1439
+msgid "Invalid series ID"
+msgstr "Neplatné ID seriálu"
+
+#: ../GTIPTVPlayerPro/content.py:1445
+msgid "Could not load series information"
+msgstr "Nelze načíst informace o seriálu"
+
+#: ../GTIPTVPlayerPro/content.py:1454
+msgid "Could not load series episodes"
+msgstr "Nelze načíst epizody seriálu"
+
+#: ../GTIPTVPlayerPro/content.py:1477 ../GTIPTVPlayerPro/stalker.py:5470
+#: ../GTIPTVPlayerPro/stalker.py:5864
+msgid "Episode"
+msgstr "Epizoda"
+
+#: ../GTIPTVPlayerPro/content.py:1478 ../GTIPTVPlayerPro/stalker.py:5473
+#, python-brace-format
+msgid "S{} E{}"
+msgstr "S{} E{}"
+
+#: ../GTIPTVPlayerPro/content.py:1627 ../GTIPTVPlayerPro/content.py:1640
+msgid "Invalid channel ID"
+msgstr "Neplatné ID kanálu"
+
+#: ../GTIPTVPlayerPro/content.py:1695
+msgid "Could not create the stream URL"
+msgstr "Nelze vytvořit URL streamu"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:409 ../GTIPTVPlayerPro/dvb_epg_ui.py:417
+msgid "Never"
+msgstr "Nikdy"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:582 ../GTIPTVPlayerPro/m3u_epg_ui.py:750
+msgid "Update mode"
+msgstr "Režim aktualizace"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:583 ../GTIPTVPlayerPro/m3u_epg_ui.py:751
+msgid "Update interval"
+msgstr "Interval aktualizací"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:584
+msgid "Update on startup if overdue"
+msgstr "Při spuštění aktualizovat, pokud je aktualizace po termínu."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:585
+msgid "Update in normal standby"
+msgstr "Aktualizovat v běžném pohotovostním režimu"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:586 ../GTIPTVPlayerPro/m3u_epg_ui.py:752
+#: ../GTIPTVPlayerPro/main.py:4010
+msgid "Last update"
+msgstr "Poslední aktualizace"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:587
+msgid "Next update"
+msgstr "Příští aktualizace"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:588 ../GTIPTVPlayerPro/dvb_epg_ui.py:740
+msgid "Deep standby wake"
+msgstr "Probuzení z hlubokého pohotovostního režimu"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:625
+msgid "DVB EPG AUTOMATIC UPDATES"
+msgstr "AUTOMATICKÉ AKTUALIZACE DVB EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:632 ../GTIPTVPlayerPro/dvb_epg_ui.py:1467
+msgid "XMLTV offsets are converted to UTC automatically; no manual timezone is used."
+msgstr "Posuny XMLTV jsou automaticky převáděny na UTC; ruční časové pásmo se nepoužívá."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:653 ../GTIPTVPlayerPro/dvb_epg_ui.py:875
+msgid "Settings - DVB EPG"
+msgstr "Nastavení – DVB EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:663
+msgid "Due now"
+msgstr "Aktualizovat nyní"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:666
+#, python-brace-format
+msgid "Overdue: {}"
+msgstr "Po termínu: {}"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:672 ../GTIPTVPlayerPro/dvb_epg_ui.py:975
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1796 ../GTIPTVPlayerPro/i18n.py:348
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:853
+msgid "Automatic"
+msgstr "Automaticky"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:672 ../GTIPTVPlayerPro/dvb_epg_ui.py:979
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1788 ../GTIPTVPlayerPro/m3u_epg_ui.py:853
+msgid "Manual"
+msgstr "Ručně"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:673 ../GTIPTVPlayerPro/dvb_epg_ui.py:977
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:854 ../GTIPTVPlayerPro/playlist.py:1461
+#, python-brace-format
+msgid "{} hours"
+msgstr "{} hodin"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
+#: ../GTIPTVPlayerPro/main.py:733 ../GTIPTVPlayerPro/main.py:734
+#: ../GTIPTVPlayerPro/main.py:4094 ../GTIPTVPlayerPro/main.py:4386
+#: ../GTIPTVPlayerPro/main.py:4601 ../GTIPTVPlayerPro/main.py:4609
+msgid "On"
+msgstr "Zapnuto"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
+#: ../GTIPTVPlayerPro/main.py:738 ../GTIPTVPlayerPro/main.py:739
+#: ../GTIPTVPlayerPro/main.py:742 ../GTIPTVPlayerPro/main.py:4094
+#: ../GTIPTVPlayerPro/main.py:4386 ../GTIPTVPlayerPro/main.py:4603
+#: ../GTIPTVPlayerPro/main.py:4609 ../GTIPTVPlayerPro/main.py:9666
+#: ../GTIPTVPlayerPro/main.py:9672 ../GTIPTVPlayerPro/subtitles.py:189
+#: ../GTIPTVPlayerPro/subtitles.py:591
+msgid "Off"
+msgstr "Vypnuto"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:682 ../GTIPTVPlayerPro/dvb_epg_ui.py:741
+msgid "Always off"
+msgstr "Vždy vypnuto"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:708 ../GTIPTVPlayerPro/m3u_epg_ui.py:940
+msgid "Switch Update mode to Automatic to change this option."
+msgstr "Chcete-li tuto možnost změnit, přepněte režim aktualizace na „Automaticky“."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:726 ../GTIPTVPlayerPro/m3u_epg_ui.py:953
+msgid "Status information is read-only."
+msgstr "Informace o stavu jsou pouze pro čtení."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:735
+msgid "Deep standby never wakes the receiver; an overdue update runs after the next startup."
+msgstr "Při hlubokém pohotovostním režimu se přijímač nikdy neprobudí; zmeškaná aktualizace proběhne po příštím spuštění."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:745 ../GTIPTVPlayerPro/dvb_epg_ui.py:1062
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:955 ../GTIPTVPlayerPro/m3u_epg_ui.py:1012
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1031 ../GTIPTVPlayerPro/main.py:4528
+#: ../GTIPTVPlayerPro/main.py:4670 ../GTIPTVPlayerPro/main.py:4976
+msgid "Press GREEN to save the changes."
+msgstr "Uložte změny stisknutím ZELENÉHO."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:765 ../GTIPTVPlayerPro/dvb_epg_ui.py:1096
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1110 ../GTIPTVPlayerPro/dvb_epg_ui.py:1974
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2021
+msgid "DVB EPG settings could not be saved. Check the receiver storage."
+msgstr "Nastavení DVB EPG se nepodařilo uložit. Zkontrolujte úložiště přijímače."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:771
+msgid "Automatic update settings saved."
+msgstr "Nastavení automatických aktualizací bylo uloženo."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:779
+msgid "Enable DVB EPG"
+msgstr "Povolit DVB EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:780
+msgid "Xtream XMLTV source"
+msgstr "Zdroj Xtream XMLTV"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:781
+msgid "Target DVB bouquet"
+msgstr "Cílový buket DVB"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:782
+msgid "EPG range"
+msgstr "Rozsah EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:783 ../GTIPTVPlayerPro/dvb_epg_ui.py:1552
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1592
+msgid "Manual channel mapping"
+msgstr "Ruční přiřazení kanálů"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:784
+msgid "Automatic updates"
+msgstr "Automatické aktualizace"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:842
+msgid "DVB SATELLITE EPG"
+msgstr "DVB SATELITNÍ EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:951
+msgid "All TV bouquets"
+msgstr "Všechny TV bukety"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:956 ../GTIPTVPlayerPro/dvb_epg_ui.py:1041
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1147
+msgid "Scanning DVB bouquets..."
+msgstr "Prohledávání buketů DVB..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:957
+msgid "Selected bouquet is unavailable"
+msgstr "Vybraný buket není dostupný"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:961
+msgid "No Xtream source"
+msgstr "Žádný zdroj Xtream"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:965
+msgid "No DVB EPG update has been completed yet."
+msgstr "Zatím nebyla dokončena žádná aktualizace DVB EPG."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:966
+#, python-brace-format
+msgid "Last update: {}  •  {} channels  •  {} events"
+msgstr "Poslední aktualizace: {}  •  {} kanálů  •  {} událostí"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:985
+#, python-brace-format
+msgid "{} days"
+msgstr "{} dní"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:986
+#, python-brace-format
+msgid "Open ({} mapped)"
+msgstr "Otevřít (přiřazeno {})"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1033
+msgid "No valid Xtream source was found."
+msgstr "Nebyl nalezen žádný platný zdroj Xtream."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1136 ../GTIPTVPlayerPro/dvb_epg_ui.py:1144
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1166 ../GTIPTVPlayerPro/dvb_epg_ui.py:1407
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1436 ../GTIPTVPlayerPro/dvb_epg_ui.py:1473
+msgid "DVB EPG update is still running..."
+msgstr "Aktualizace DVB EPG stále probíhá..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1140
+msgid "DVB EPG settings saved."
+msgstr "Nastavení DVB EPG bylo uloženo."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1150
+msgid "Enable DVB EPG before starting an update."
+msgstr "Před spuštěním aktualizace povolte DVB EPG."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1154 ../GTIPTVPlayerPro/dvb_epg_ui.py:1411
+msgid "Select a valid Xtream XMLTV source."
+msgstr "Vyberte platný zdroj Xtream XMLTV."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1158
+msgid "The receiver clock is not ready. Check network time and try again."
+msgstr "Hodiny přijímače nejsou připraveny. Zkontrolujte síťový čas a zkuste to znovu."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1170 ../GTIPTVPlayerPro/dvb_epg_ui.py:1608
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1831
+msgid "An automatic DVB EPG update is already running."
+msgstr "Automatická aktualizace DVB EPG již probíhá."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1183
+msgid "Downloading and preparing the Xtream XMLTV guide..."
+msgstr "Stahování a příprava průvodce Xtream XMLTV..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1197 ../GTIPTVPlayerPro/dvb_epg_ui.py:1275
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1344
+msgid "DVB EPG update failed. No existing EPG data was removed."
+msgstr "Aktualizace DVB EPG selhala. Žádná stávající data EPG nebyla odstraněna."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1287
+msgid "The native Enigma2 EPG cache rejected the update."
+msgstr "Nativní mezipaměť Enigma2 EPG aktualizaci odmítla."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1361
+#, python-brace-format
+msgid "DVB EPG updated: {} channels and {} events imported."
+msgstr "DVB EPG aktualizováno: importováno {} kanálů a {} událostí."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1384
+msgid "DVB bouquets could not be scanned."
+msgstr "Bukety DVB se nepodařilo prohledat."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1399
+msgid "DVB EPG update timed out."
+msgstr "Vypršel časový limit aktualizace DVB EPG."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1414
+msgid "Manual channel mapping could not be opened."
+msgstr "Ruční přiřazení kanálů se nepodařilo otevřít."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1440
+msgid "Automatic update settings could not be opened."
+msgstr "Nastavení automatických aktualizací se nepodařilo otevřít."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1487
+msgid "DVB EPG update cancelled."
+msgstr "Aktualizace DVB EPG byla zrušena."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1564 ../GTIPTVPlayerPro/dvb_epg_ui.py:1624
+msgid "Loading DVB services and cached XMLTV channels..."
+msgstr "Načítání služeb DVB a kanálů XMLTV z mezipaměti..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1622
+msgid "Downloading the Xtream XMLTV guide..."
+msgstr "Stahování průvodce Xtream XMLTV..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1645 ../GTIPTVPlayerPro/dvb_epg_ui.py:1733
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1746
+msgid "Channel mapping data could not be loaded."
+msgstr "Data přiřazení kanálů se nepodařilo načíst."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1755
+msgid "No real DVB service was found in the selected bouquet."
+msgstr "Ve vybraném buketu nebyla nalezena žádná skutečná služba DVB."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1757
+msgid "No cached XMLTV guide was found. Press YELLOW to download it."
+msgstr "V mezipaměti nebyl nalezen žádný průvodce XMLTV. Stisknutím ŽLUTÉHO jej stáhnete."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1760
+msgid "Press OK to choose an XMLTV channel; RED blocks or restores automatic matching."
+msgstr "Stisknutím OK vyberte kanál XMLTV; ČERVENÉ tlačítko zablokuje nebo obnoví automatické přiřazení."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1783 ../GTIPTVPlayerPro/main.py:740
+#: ../GTIPTVPlayerPro/main.py:741 ../GTIPTVPlayerPro/main.py:8561
+#: ../GTIPTVPlayerPro/main.py:8684
+msgid "Blocked"
+msgstr "Blokováno"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1799
+msgid "Unmatched"
+msgstr "Bez shody"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1848
+#, python-brace-format
+msgid "{} DVB services  •  {} XMLTV channels  •  {} mapped"
+msgstr "{} služeb DVB  •  {} kanálů XMLTV  •  {} přiřazeno"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1928
+msgid "No real DVB service is available for mapping."
+msgstr "Pro přiřazení není k dispozici žádná skutečná služba DVB."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1931
+msgid "Press YELLOW to download the XMLTV channel list first."
+msgstr "Nejprve stáhněte seznam kanálů XMLTV stisknutím ŽLUTÉHO."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1934
+msgid "The XMLTV channel list could not be opened."
+msgstr "Seznam kanálů XMLTV se nepodařilo otevřít."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1963
+msgid "That XMLTV channel is already assigned to another DVB service."
+msgstr "Tento kanál XMLTV je již přiřazen jiné službě DVB."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1967 ../GTIPTVPlayerPro/dvb_epg_ui.py:2014
+msgid "The manual channel mapping could not be saved."
+msgstr "Ruční přiřazení kanálů se nepodařilo uložit."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1981
+#, python-brace-format
+msgid "Manual mapping saved: {} -> {}"
+msgstr "Ruční přiřazení uloženo: {} -> {}"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2001
+#, python-brace-format
+msgid "Automatic matching restored for {}."
+msgstr "Automatické přiřazení pro {} bylo obnoveno."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2009
+#, python-brace-format
+msgid "EPG mapping removed and automatic matching blocked for {}."
+msgstr "Přiřazení EPG bylo odstraněno a automatické přiřazení pro {} zablokováno."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2047
+msgid "Channel mapping refresh cancelled."
+msgstr "Aktualizace přiřazení kanálů byla zrušena."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2096 ../GTIPTVPlayerPro/dvb_epg_ui.py:2134
+msgid "Select XMLTV channel"
+msgstr "Vybrat kanál XMLTV"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2109
+msgid "Press GREEN to filter the XMLTV channel list."
+msgstr "Stisknutím ZELENÉHO filtrujte seznam kanálů XMLTV."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2145
+#, python-brace-format
+msgid "{} XMLTV channels"
+msgstr "{} kanálů XMLTV"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2221
+msgid "No XMLTV channel matches the current filter."
+msgstr "Aktuálnímu filtru neodpovídá žádný kanál XMLTV."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2237
+msgid "Search XMLTV channels"
+msgstr "Hledat kanály XMLTV"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2263
+msgid "XMLTV channel filter cleared."
+msgstr "Filtr kanálů XMLTV byl vymazán."
+
+#: ../GTIPTVPlayerPro/i18n.py:147 ../GTIPTVPlayerPro/i18n.py:148
+msgid "Arabic"
+msgstr "Arabština"
+
+#: ../GTIPTVPlayerPro/i18n.py:149 ../GTIPTVPlayerPro/i18n.py:150
+#: ../GTIPTVPlayerPro/i18n.py:151
+msgid "Czech"
+msgstr "Čeština"
+
+#: ../GTIPTVPlayerPro/i18n.py:152 ../GTIPTVPlayerPro/i18n.py:153
+#: ../GTIPTVPlayerPro/i18n.py:154
+msgid "German"
+msgstr "Němčina"
+
+#: ../GTIPTVPlayerPro/i18n.py:155 ../GTIPTVPlayerPro/i18n.py:156
+#: ../GTIPTVPlayerPro/i18n.py:157
+msgid "Greek"
+msgstr "Řečtina"
+
+#: ../GTIPTVPlayerPro/i18n.py:158 ../GTIPTVPlayerPro/i18n.py:159
+msgid "English"
+msgstr "Angličtina"
+
+#: ../GTIPTVPlayerPro/i18n.py:160 ../GTIPTVPlayerPro/i18n.py:161
+msgid "Spanish"
+msgstr "Španělština"
+
+#: ../GTIPTVPlayerPro/i18n.py:162 ../GTIPTVPlayerPro/i18n.py:163
+msgid "Estonian"
+msgstr "Estonština"
+
+#: ../GTIPTVPlayerPro/i18n.py:164 ../GTIPTVPlayerPro/i18n.py:165
+msgid "Finnish"
+msgstr "Finština"
+
+#: ../GTIPTVPlayerPro/i18n.py:166 ../GTIPTVPlayerPro/i18n.py:167
+#: ../GTIPTVPlayerPro/i18n.py:168
+msgid "French"
+msgstr "Francouzština"
+
+#: ../GTIPTVPlayerPro/i18n.py:169 ../GTIPTVPlayerPro/i18n.py:170
+msgid "Hungarian"
+msgstr "Maďarština"
+
+#: ../GTIPTVPlayerPro/i18n.py:171 ../GTIPTVPlayerPro/i18n.py:172
+msgid "Italian"
+msgstr "Italština"
+
+#: ../GTIPTVPlayerPro/i18n.py:173 ../GTIPTVPlayerPro/i18n.py:174
+#: ../GTIPTVPlayerPro/i18n.py:175
+msgid "Dutch"
+msgstr "Nizozemština"
+
+#: ../GTIPTVPlayerPro/i18n.py:176 ../GTIPTVPlayerPro/i18n.py:177
+msgid "Polish"
+msgstr "Polština"
+
+#: ../GTIPTVPlayerPro/i18n.py:178 ../GTIPTVPlayerPro/i18n.py:179
+msgid "Portuguese"
+msgstr "Portugalština"
+
+#: ../GTIPTVPlayerPro/i18n.py:180 ../GTIPTVPlayerPro/i18n.py:181
+msgid "Russian"
+msgstr "Ruština"
+
+#: ../GTIPTVPlayerPro/i18n.py:182 ../GTIPTVPlayerPro/i18n.py:183
+#: ../GTIPTVPlayerPro/i18n.py:184
+msgid "Slovak"
+msgstr "Slovenština"
+
+#: ../GTIPTVPlayerPro/i18n.py:185 ../GTIPTVPlayerPro/i18n.py:186
+#: ../GTIPTVPlayerPro/i18n.py:187
+msgid "Albanian"
+msgstr "Albánština"
+
+#: ../GTIPTVPlayerPro/i18n.py:188 ../GTIPTVPlayerPro/i18n.py:189
+msgid "Serbian"
+msgstr "Srbština"
+
+#: ../GTIPTVPlayerPro/i18n.py:190 ../GTIPTVPlayerPro/i18n.py:191
+msgid "Swedish"
+msgstr "Švédština"
+
+#: ../GTIPTVPlayerPro/i18n.py:192 ../GTIPTVPlayerPro/i18n.py:193
+msgid "Turkish"
+msgstr "Turečtina"
+
+#: ../GTIPTVPlayerPro/i18n.py:194 ../GTIPTVPlayerPro/i18n.py:195
+#: ../GTIPTVPlayerPro/i18n.py:196
+msgid "Chinese"
+msgstr "Čínština"
+
+#: ../GTIPTVPlayerPro/m3u.py:102
+msgid "M3U source ID is invalid."
+msgstr "ID zdroje M3U je neplatné."
+
+#: ../GTIPTVPlayerPro/m3u.py:110
+msgid "M3U source type is invalid."
+msgstr "Typ zdroje M3U je neplatný."
+
+#: ../GTIPTVPlayerPro/m3u.py:118
+msgid "M3U source location is invalid."
+msgstr "Umístění zdroje M3U je neplatné."
+
+#: ../GTIPTVPlayerPro/m3u.py:121 ../GTIPTVPlayerPro/m3u.py:1730
+#: ../GTIPTVPlayerPro/main.py:7319 ../GTIPTVPlayerPro/main.py:7327
+#: ../GTIPTVPlayerPro/main.py:8151 ../GTIPTVPlayerPro/main.py:8183
+msgid "M3U file path is invalid."
+msgstr "Cesta k souboru M3U je neplatná."
+
+#: ../GTIPTVPlayerPro/m3u.py:136 ../GTIPTVPlayerPro/m3u_epg_ui.py:326
+msgid "M3U source"
+msgstr "Zdroj M3U"
+
+#: ../GTIPTVPlayerPro/m3u.py:140
+msgid "FILE"
+msgstr "SOUBOR"
+
+#: ../GTIPTVPlayerPro/m3u.py:140
+msgid "WEB"
+msgstr "WEB"
+
+#: ../GTIPTVPlayerPro/m3u.py:146 ../GTIPTVPlayerPro/main.py:6860
+msgid "Local file"
+msgstr "Místní soubor"
+
+#: ../GTIPTVPlayerPro/m3u.py:194 ../GTIPTVPlayerPro/m3u.py:199
+#: ../GTIPTVPlayerPro/m3u.py:206 ../GTIPTVPlayerPro/m3u.py:211
+#: ../GTIPTVPlayerPro/m3u.py:213
+msgid "M3U source file is invalid."
+msgstr "Soubor zdrojů M3U je neplatný."
+
+#: ../GTIPTVPlayerPro/m3u.py:196
+msgid "M3U source file version is not supported."
+msgstr "Verze souboru zdrojů M3U není podporována."
+
+#: ../GTIPTVPlayerPro/m3u.py:243 ../GTIPTVPlayerPro/m3u.py:627
+msgid "M3U source is invalid."
+msgstr "Zdroj M3U je neplatný."
+
+#: ../GTIPTVPlayerPro/m3u.py:281
+msgid "Too many M3U sources are configured."
+msgstr "Je nakonfigurováno příliš mnoho zdrojů M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:310 ../GTIPTVPlayerPro/m3u.py:332
+msgid "M3U source cache could not be deleted."
+msgstr "Mezipaměť zdroje M3U se nepodařilo odstranit."
+
+#: ../GTIPTVPlayerPro/m3u.py:606
+msgid "M3U source file is too large."
+msgstr "Soubor zdrojů M3U je příliš velký."
+
+#: ../GTIPTVPlayerPro/m3u.py:631 ../GTIPTVPlayerPro/m3u.py:633
+msgid "M3U timeout is invalid."
+msgstr "Časový limit M3U je neplatný."
+
+#: ../GTIPTVPlayerPro/m3u.py:899
+msgid "Channel is no longer present in the M3U source."
+msgstr "Kanál již ve zdroji M3U není."
+
+#: ../GTIPTVPlayerPro/m3u.py:981
+msgid "This M3U source supports Live TV only."
+msgstr "Tento zdroj M3U podporuje pouze živou TV."
+
+#: ../GTIPTVPlayerPro/m3u.py:1132 ../GTIPTVPlayerPro/m3u.py:2988
+msgid "Could not load the M3U source."
+msgstr "Zdroj M3U nelze načíst."
+
+#: ../GTIPTVPlayerPro/m3u.py:1151 ../GTIPTVPlayerPro/m3u.py:1312
+msgid "M3U source returned an invalid response."
+msgstr "Zdroj M3U vrátil neplatnou odpověď."
+
+#: ../GTIPTVPlayerPro/m3u.py:1156 ../GTIPTVPlayerPro/m3u.py:1317
+#: ../GTIPTVPlayerPro/m3u.py:1807 ../GTIPTVPlayerPro/m3u.py:1846
+#: ../GTIPTVPlayerPro/m3u.py:2855 ../GTIPTVPlayerPro/m3u.py:2952
+msgid "M3U source exceeds the safe size limit."
+msgstr "Zdroj M3U překračuje bezpečný limit velikosti."
+
+#: ../GTIPTVPlayerPro/m3u.py:1233
+msgid "Uncategorized"
+msgstr "Bez kategorie"
+
+#: ../GTIPTVPlayerPro/m3u.py:1322
+msgid "M3U source contains invalid data."
+msgstr "Zdroj M3U obsahuje neplatná data."
+
+#: ../GTIPTVPlayerPro/m3u.py:1337
+msgid "M3U source contains a line that is too long."
+msgstr "Zdroj M3U obsahuje příliš dlouhý řádek."
+
+#: ../GTIPTVPlayerPro/m3u.py:1349
+msgid "The selected file is an HLS stream manifest, not a channel list."
+msgstr "Vybraný soubor je manifest streamu HLS, nikoli seznam kanálů."
+
+#: ../GTIPTVPlayerPro/m3u.py:1355 ../GTIPTVPlayerPro/m3u.py:1402
+msgid "M3U source header is missing."
+msgstr "Chybí hlavička souboru zdrojů M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:1396
+msgid "M3U source contains too many channels."
+msgstr "Zdroj M3U obsahuje příliš mnoho kanálů."
+
+#: ../GTIPTVPlayerPro/m3u.py:1422
+msgid "M3U source contains too many categories."
+msgstr "Zdroj M3U obsahuje příliš mnoho kategorií."
+
+#: ../GTIPTVPlayerPro/m3u.py:1459
+msgid "M3U source does not contain playable channels."
+msgstr "Zdroj M3U neobsahuje přehratelné kanály."
+
+#: ../GTIPTVPlayerPro/m3u.py:1736
+msgid "M3U file path traversal is not allowed."
+msgstr "Procházení nadřazených složek v cestě M3U není povoleno."
+
+#: ../GTIPTVPlayerPro/m3u.py:1743
+msgid "Symbolic links cannot be used as M3U sources."
+msgstr "Symbolické odkazy nelze použít jako zdroje M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:1757
+msgid "M3U file is outside the allowed directories."
+msgstr "Soubor M3U je mimo povolené adresáře."
+
+#: ../GTIPTVPlayerPro/m3u.py:1764 ../GTIPTVPlayerPro/m3u.py:1789
+msgid "M3U file could not be opened."
+msgstr "Soubor M3U nelze otevřít."
+
+#: ../GTIPTVPlayerPro/m3u.py:1769 ../GTIPTVPlayerPro/m3u.py:1802
+msgid "M3U source must be a regular file."
+msgstr "Zdroj M3U musí být běžný soubor."
+
+#: ../GTIPTVPlayerPro/m3u.py:1855
+msgid "M3U file changed while it was being read."
+msgstr "Soubor M3U byl během čtení změněn."
+
+#: ../GTIPTVPlayerPro/m3u.py:2622 ../GTIPTVPlayerPro/m3u.py:2627
+msgid "M3U URL is invalid."
+msgstr "URL M3U je neplatná."
+
+#: ../GTIPTVPlayerPro/m3u.py:2636
+msgid "M3U URL is not safe."
+msgstr "URL M3U není bezpečná."
+
+#: ../GTIPTVPlayerPro/m3u.py:2638
+msgid "M3U URL port is invalid."
+msgstr "Port URL M3U je neplatný."
+
+#: ../GTIPTVPlayerPro/m3u.py:2642
+msgid "M3U host name is invalid."
+msgstr "Název hostitele M3U je neplatný."
+
+#: ../GTIPTVPlayerPro/m3u.py:2666
+msgid "M3U host address is invalid."
+msgstr "Adresa hostitele M3U je neplatná."
+
+#: ../GTIPTVPlayerPro/m3u.py:2677
+msgid "M3U host address is not allowed."
+msgstr "Adresa hostitele M3U není povolena."
+
+#: ../GTIPTVPlayerPro/m3u.py:2697
+msgid "M3U host name resolution is busy."
+msgstr "Probíhá překlad názvu hostitele M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:2730
+msgid "M3U host name could not be resolved."
+msgstr "Název hostitele M3U nelze přeložit."
+
+#: ../GTIPTVPlayerPro/m3u.py:2746
+msgid "M3U host resolved to an unsafe address set."
+msgstr "Hostitel M3U byl přeložen na nebezpečnou sadu adres."
+
+#: ../GTIPTVPlayerPro/m3u.py:2752
+msgid "M3U redirect changed the network scope."
+msgstr "Přesměrování M3U změnilo rozsah sítě."
+
+#: ../GTIPTVPlayerPro/m3u.py:2879
+msgid "An HTTPS M3U request cannot be redirected to HTTP."
+msgstr "Požadavek HTTPS M3U nelze přesměrovat na HTTP."
+
+#: ../GTIPTVPlayerPro/m3u.py:2930
+#, python-brace-format
+msgid "M3U server returned HTTP {}."
+msgstr "Server M3U vrátil HTTP {}."
+
+#: ../GTIPTVPlayerPro/m3u.py:2938
+msgid "Compressed M3U responses are not accepted."
+msgstr "Komprimované odpovědi M3U nejsou přijímány."
+
+#: ../GTIPTVPlayerPro/m3u.py:2947
+msgid "M3U response size is invalid."
+msgstr "Velikost odpovědi M3U je neplatná."
+
+#: ../GTIPTVPlayerPro/m3u.py:2996
+msgid "M3U redirect URL is missing."
+msgstr "Chybí URL přesměrování M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:3001
+msgid "M3U request was redirected too many times."
+msgstr "Požadavek M3U byl příliš mnohokrát přesměrován."
+
+#: ../GTIPTVPlayerPro/m3u.py:3009
+msgid "M3U redirect URL is invalid."
+msgstr "URL přesměrování M3U je neplatná."
+
+#: ../GTIPTVPlayerPro/m3u.py:3013
+msgid "M3U redirection could not be completed."
+msgstr "Přesměrování M3U nelze dokončit."
+
+#: ../GTIPTVPlayerPro/m3u.py:3026
+msgid "M3U response headers are invalid."
+msgstr "Hlavičky odpovědi M3U jsou neplatné."
+
+#: ../GTIPTVPlayerPro/m3u.py:3034
+msgid "M3U response has conflicting size information."
+msgstr "Odpověď M3U obsahuje rozporné informace o velikosti."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:472 ../GTIPTVPlayerPro/m3u_epg_ui.py:663
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:718 ../GTIPTVPlayerPro/main.py:7193
+#: ../GTIPTVPlayerPro/main.py:7265 ../GTIPTVPlayerPro/main.py:7310
+#: ../GTIPTVPlayerPro/main.py:7823 ../GTIPTVPlayerPro/main.py:7891
+#: ../GTIPTVPlayerPro/main.py:7932 ../GTIPTVPlayerPro/remote_footer.py:119
+msgid "Storage"
+msgstr "Úložiště"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:524 ../GTIPTVPlayerPro/m3u_epg_ui.py:538
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1161
+msgid "Background update requested"
+msgstr "Aktualizace na pozadí byla vyžádána"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:531 ../GTIPTVPlayerPro/m3u_epg_ui.py:1180
+msgid "Update failed; the previous guide remains available."
+msgstr "Aktualizace selhala; předchozí programový průvodce zůstává dostupný."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:533
+#, python-brace-format
+msgid "Completed: {} channels, {} events"
+msgstr "Dokončeno: {} kanálů, {} událostí"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:539
+msgid "No update has been completed yet."
+msgstr "Zatím nebyla dokončena žádná aktualizace."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:607 ../GTIPTVPlayerPro/m3u_epg_ui.py:652
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:749
+msgid "XMLTV source"
+msgstr "Zdroj XMLTV"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:609
+msgid "Choose an XML, XML.GZ or GZ file from local or mounted storage."
+msgstr "Vyberte soubor XML, XML.GZ nebo GZ z místního nebo připojeného úložiště."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:694
+msgid "This folder is outside the allowed storage locations."
+msgstr "Tato složka je mimo povolená umístění úložiště."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:713
+msgid "No allowed storage location is available."
+msgstr "Není k dispozici žádné povolené umístění úložiště."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:727 ../GTIPTVPlayerPro/m3u_epg_ui.py:735
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1005 ../GTIPTVPlayerPro/m3u_epg_ui.py:1010
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1047
+msgid "XMLTV file path is invalid."
+msgstr "Cesta k souboru XMLTV je neplatná."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:747
+msgid "Enable external XMLTV EPG"
+msgstr "Povolit externí XMLTV EPG"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:748 ../GTIPTVPlayerPro/main.py:6742
+#: ../GTIPTVPlayerPro/main.py:6901 ../GTIPTVPlayerPro/main.py:7360
+#: ../GTIPTVPlayerPro/main.py:7407
+msgid "Source type"
+msgstr "Typ zdroje"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:753 ../GTIPTVPlayerPro/main.py:6267
+msgid "Status"
+msgstr "Stav"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:797 ../GTIPTVPlayerPro/m3u_epg_ui.py:835
+msgid "External XMLTV EPG"
+msgstr "Externí XMLTV EPG"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:806
+msgid "XMLTV settings could not be read; safe defaults are shown."
+msgstr "Nastavení XMLTV se nepodařilo načíst; jsou zobrazena bezpečná výchozí nastavení."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:808
+msgid "Updates run in the background. Channel changes never download EPG data."
+msgstr "Aktualizace probíhají na pozadí. Při přepínání kanálů se data EPG nikdy nestahují."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:848 ../GTIPTVPlayerPro/main.py:4614
+msgid "Not configured"
+msgstr "Nenakonfigurováno"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8009
+msgid "Local / NAS"
+msgstr "Místní / NAS"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8010
+#: ../GTIPTVPlayerPro/main.py:8072 ../GTIPTVPlayerPro/playlist.py:1559
+msgid "Web URL"
+msgstr "Webová URL"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:915
+msgid "Choose an XMLTV source before enabling this option."
+msgstr "Před povolením této možnosti vyberte zdroj XMLTV."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:973
+msgid "The XMLTV file browser is unavailable."
+msgstr "Prohlížeč souborů XMLTV není dostupný."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:995
+msgid "Enter the XMLTV HTTP(S) URL"
+msgstr "Zadejte URL HTTP(S) pro XMLTV"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1001
+msgid "File selection cancelled."
+msgstr "Výběr souboru byl zrušen."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1018 ../GTIPTVPlayerPro/main.py:7069
+#: ../GTIPTVPlayerPro/main.py:8206 ../GTIPTVPlayerPro/main.py:8432
+msgid "Field entry cancelled."
+msgstr "Zadávání pole zrušeno."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1023 ../GTIPTVPlayerPro/m3u_epg_ui.py:1051
+msgid "XMLTV URL must start with http:// or https://."
+msgstr "URL XMLTV musí začínat http:// nebo https://."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1029
+msgid "XMLTV URL is invalid."
+msgstr "URL XMLTV je neplatná."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1038
+msgid "Choose an XMLTV source before saving."
+msgstr "Před uložením vyberte zdroj XMLTV."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1100
+msgid "XMLTV settings could not be saved. Check the receiver storage."
+msgstr "Nastavení XMLTV se nepodařilo uložit. Zkontrolujte úložiště přijímače."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1110
+msgid "External XMLTV EPG settings saved."
+msgstr "Nastavení externího XMLTV EPG bylo uloženo."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1220
+msgid "Enable external XMLTV EPG before requesting an update."
+msgstr "Před vyžádáním aktualizace povolte externí XMLTV EPG."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1235 ../GTIPTVPlayerPro/m3u_epg_ui.py:1261
+msgid "The XMLTV update was queued in the background."
+msgstr "Aktualizace XMLTV byla zařazena do fronty na pozadí."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1270
+msgid "The XMLTV update could not be queued. Try again shortly."
+msgstr "Aktualizaci XMLTV se nepodařilo zařadit do fronty. Zkuste to znovu za chvíli."
+
+#: ../GTIPTVPlayerPro/main.py:304 ../GTIPTVPlayerPro/main.py:7106
+#: ../GTIPTVPlayerPro/main.py:7585 ../GTIPTVPlayerPro/main.py:8559
+#: ../GTIPTVPlayerPro/main.py:8678 ../GTIPTVPlayerPro/stalker.py:8161
+msgid "Active"
+msgstr "Aktivní"
+
+#: ../GTIPTVPlayerPro/main.py:305 ../GTIPTVPlayerPro/playlist.py:1289
+#: ../GTIPTVPlayerPro/stalker.py:8166
+msgid "Connection limit reached"
+msgstr "Dosažen limit připojení"
+
+#: ../GTIPTVPlayerPro/main.py:306 ../GTIPTVPlayerPro/main.py:5562
+#: ../GTIPTVPlayerPro/main.py:5579 ../GTIPTVPlayerPro/main.py:5631
+#: ../GTIPTVPlayerPro/main.py:6075
+msgid "Inactive"
+msgstr "Neaktivní"
+
+#: ../GTIPTVPlayerPro/main.py:307 ../GTIPTVPlayerPro/main.py:311
+#: ../GTIPTVPlayerPro/main.py:317 ../GTIPTVPlayerPro/main.py:721
+#: ../GTIPTVPlayerPro/main.py:765 ../GTIPTVPlayerPro/main.py:6245
+#: ../GTIPTVPlayerPro/main.py:6246 ../GTIPTVPlayerPro/main.py:8542
+#: ../GTIPTVPlayerPro/main.py:8571 ../GTIPTVPlayerPro/main.py:8635
+#: ../GTIPTVPlayerPro/main.py:8655 ../GTIPTVPlayerPro/main.py:8687
+#: ../GTIPTVPlayerPro/main.py:8745 ../GTIPTVPlayerPro/main.py:8824
+#: ../GTIPTVPlayerPro/main.py:8829 ../GTIPTVPlayerPro/main.py:8841
+#: ../GTIPTVPlayerPro/main.py:8842 ../GTIPTVPlayerPro/main.py:8843
+#: ../GTIPTVPlayerPro/main.py:8861 ../GTIPTVPlayerPro/main.py:9355
+#: ../GTIPTVPlayerPro/main.py:9359 ../GTIPTVPlayerPro/main.py:9637
+#: ../GTIPTVPlayerPro/main.py:9650 ../GTIPTVPlayerPro/main.py:9676
+#: ../GTIPTVPlayerPro/main.py:9677 ../GTIPTVPlayerPro/main.py:9760
+#: ../GTIPTVPlayerPro/main.py:9761 ../GTIPTVPlayerPro/playlist.py:245
+#: ../GTIPTVPlayerPro/playlist.py:1241 ../GTIPTVPlayerPro/playlist.py:1297
+#: ../GTIPTVPlayerPro/playlist.py:1301 ../GTIPTVPlayerPro/playlist.py:1303
+#: ../GTIPTVPlayerPro/playlist.py:1304 ../GTIPTVPlayerPro/playlist.py:1305
+#: ../GTIPTVPlayerPro/playlist.py:1307 ../GTIPTVPlayerPro/playlist.py:1547
+#: ../GTIPTVPlayerPro/subtitles.py:16
+msgid "Unknown"
+msgstr "Neznámé"
+
+#: ../GTIPTVPlayerPro/main.py:394
+msgid "No valid M3U source was found"
+msgstr "Nebyl nalezen žádný platný zdroj M3U"
+
+#: ../GTIPTVPlayerPro/main.py:408
+msgid "Unsupported source type"
+msgstr "Nepodporovaný typ zdroje"
+
+#: ../GTIPTVPlayerPro/main.py:431
+msgid "Access your channels quickly"
+msgstr "Rychlý přístup ke kanálům"
+
+#: ../GTIPTVPlayerPro/main.py:436
+msgid "Watch programmes you missed"
+msgstr "Sledujte pořady, které jste zmeškali"
+
+#: ../GTIPTVPlayerPro/main.py:441
+msgid "Explore your movie library"
+msgstr "Prozkoumejte svou filmovou knihovnu"
+
+#: ../GTIPTVPlayerPro/main.py:446
+msgid "Browse seasons and episodes"
+msgstr "Procházet série a epizody"
+
+#: ../GTIPTVPlayerPro/main.py:450 ../GTIPTVPlayerPro/main.py:9015
+msgid "CONTINUE WATCHING"
+msgstr "POKRAČOVAT VE SLEDOVÁNÍ"
+
+#: ../GTIPTVPlayerPro/main.py:451
+msgid "Resume unfinished movies and series episodes"
+msgstr "Pokračovat v nedokončených filmech a epizodách seriálů"
+
+#: ../GTIPTVPlayerPro/main.py:455 ../GTIPTVPlayerPro/main.py:9025
+#: ../GTIPTVPlayerPro/main.py:9027
+msgid "FAVORITES"
+msgstr "OBLÍBENÉ"
+
+#: ../GTIPTVPlayerPro/main.py:456
+msgid "Favorite channels, movies and series in one place"
+msgstr "Oblíbené kanály, filmy a seriály na jednom místě"
+
+#: ../GTIPTVPlayerPro/main.py:460
+msgid "SETTINGS"
+msgstr "NASTAVENÍ"
+
+#: ../GTIPTVPlayerPro/main.py:461
+msgid "Manage the player and appearance"
+msgstr "Správa přehrávače a vzhledu"
+
+#: ../GTIPTVPlayerPro/main.py:468
+#, python-brace-format
+msgid ""
+"{} v{}\n"
+"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
+"\n"
+"DEVELOPER\n"
+"{}\n"
+"\n"
+"LEGAL NOTICE\n"
+"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
+"\n"
+"PRIVACY\n"
+"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr ""
+"{} v{}\n"
+"Přehrávač IPTV s otevřeným zdrojovým kódem pro Enigma2. Podporuje účty Xtream Codes a živou TV ze standardních místních, připojených síťových nebo HTTP(S) playlistů M3U. Běžné zdroje M3U poskytují pouze živou TV.\n"
+"\n"
+"VÝVOJÁŘ\n"
+"{}\n"
+"\n"
+"PRÁVNÍ UPOZORNĚNÍ\n"
+"Tento plugin neposkytuje kanály, streamy, účty ani playlisty. Uživatel odpovídá za používání pouze obsahu, ke kterému má přístupová a užívací práva.\n"
+"\n"
+"SOUKROMÍ\n"
+"Když je Open-Meteo zapnuto, vybrané město a poloha jsou odeslány do Open-Meteo pro předpověď počasí. Když je TMDb zapnuto, název filmu/seriálu a klíč nebo token TMDb zadaný uživatelem jsou odeslány do TMDb. Uživatelské jméno a heslo IPTV nejsou do těchto služeb odesílány."
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "SOURCE CODE"
+msgstr "ZDROJOVÝ KÓD"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "REPORT AN ISSUE"
+msgstr "NAHLÁSIT PROBLÉM"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "LICENSE"
+msgstr "LICENCE"
+
+#: ../GTIPTVPlayerPro/main.py:735
+msgid "Connected"
+msgstr "Připojeno"
+
+#: ../GTIPTVPlayerPro/main.py:736 ../GTIPTVPlayerPro/main.py:8561
+#: ../GTIPTVPlayerPro/main.py:8683
+msgid "Busy"
+msgstr "Zaneprázdněno"
+
+#: ../GTIPTVPlayerPro/main.py:737 ../GTIPTVPlayerPro/main.py:8681
+msgid "Warning"
+msgstr "Varování"
+
+#: ../GTIPTVPlayerPro/main.py:743 ../GTIPTVPlayerPro/main.py:7641
+#: ../GTIPTVPlayerPro/main.py:7946 ../GTIPTVPlayerPro/main.py:7951
+#: ../GTIPTVPlayerPro/main.py:7955 ../GTIPTVPlayerPro/main.py:8686
+#: ../GTIPTVPlayerPro/stalker.py:8186
+msgid "Invalid"
+msgstr "Neplatné"
+
+#: ../GTIPTVPlayerPro/main.py:747
+#, python-brace-format
+msgid ""
+"Read time: {} ms\n"
+"Source type: {}\n"
+"Size: {} bytes\n"
+"Channels: {}\n"
+"Categories: {}\n"
+"Cache age: {}\n"
+"Last modified: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Doba čtení: {} ms\n"
+"Typ zdroje: {}\n"
+"Velikost: {} bajtů\n"
+"Kanály: {}\n"
+"Kategorie: {}\n"
+"Stáří mezipaměti: {}\n"
+"Poslední změna: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/main.py:757
+#, python-brace-format
+msgid ""
+"Latency: {} ms\n"
+"Account status: {}\n"
+"Protocol: {}\n"
+"Output format: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Latence: {} ms\n"
+"Stav účtu: {}\n"
+"Protokol: {}\n"
+"Výstupní formát: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/main.py:3746 ../GTIPTVPlayerPro/main.py:3782
+msgid "Weather"
+msgstr "Počasí"
+
+#: ../GTIPTVPlayerPro/main.py:3909
+msgid "Loading..."
+msgstr "Načítání..."
+
+#: ../GTIPTVPlayerPro/main.py:3918
+msgid "No items found."
+msgstr "Nebyly nalezeny žádné položky."
+
+#: ../GTIPTVPlayerPro/main.py:3991 ../GTIPTVPlayerPro/remote_footer.py:109
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: ../GTIPTVPlayerPro/main.py:4007
+msgid "Show weather"
+msgstr "Zobrazit počasí"
+
+#: ../GTIPTVPlayerPro/main.py:4008 ../GTIPTVPlayerPro/main.py:4179
+msgid "City"
+msgstr "Město"
+
+#: ../GTIPTVPlayerPro/main.py:4009
+msgid "Temperature unit"
+msgstr "Jednotka teploty"
+
+#: ../GTIPTVPlayerPro/main.py:4059
+msgid "WEATHER"
+msgstr "POČASÍ"
+
+#: ../GTIPTVPlayerPro/main.py:4066
+msgid "Press OK on the City row to open the keyboard."
+msgstr "Stisknutím OK na řádku Město otevřete klávesnici."
+
+#: ../GTIPTVPlayerPro/main.py:4090
+msgid "Settings - Weather"
+msgstr "Nastavení – Počasí"
+
+#: ../GTIPTVPlayerPro/main.py:4132
+#, python-brace-format
+msgid "Settings could not be saved: {}"
+msgstr "Nastavení nelze uložit: {}"
+
+#: ../GTIPTVPlayerPro/main.py:4145
+msgid "Weather display updated."
+msgstr "Zobrazení počasí aktualizováno."
+
+#: ../GTIPTVPlayerPro/main.py:4149
+msgid "Temperature unit updated."
+msgstr "Jednotka teploty aktualizována."
+
+#: ../GTIPTVPlayerPro/main.py:4162
+msgid "The last-update time refreshes when weather data is received."
+msgstr "Čas poslední aktualizace se mění po přijetí údajů o počasí."
+
+#: ../GTIPTVPlayerPro/main.py:4186
+msgid "City change cancelled."
+msgstr "Změna města zrušena."
+
+#: ../GTIPTVPlayerPro/main.py:4215
+#, python-brace-format
+msgid "Checking {}..."
+msgstr "Kontrola {}..."
+
+#: ../GTIPTVPlayerPro/main.py:4280
+msgid "No weather forecast is available for this city."
+msgstr "Pro toto město není dostupná předpověď počasí."
+
+#: ../GTIPTVPlayerPro/main.py:4298
+#, python-brace-format
+msgid "{} was saved."
+msgstr "{} bylo uloženo."
+
+#: ../GTIPTVPlayerPro/main.py:4323
+msgid "Standard"
+msgstr "Standardní"
+
+#: ../GTIPTVPlayerPro/main.py:4324
+msgid "Large"
+msgstr "Velká"
+
+#: ../GTIPTVPlayerPro/main.py:4325
+msgid "Very large"
+msgstr "Velmi velká"
+
+#: ../GTIPTVPlayerPro/main.py:4327
+msgid "Text size"
+msgstr "Velikost textu"
+
+#: ../GTIPTVPlayerPro/main.py:4327
+msgid "Cinematic view"
+msgstr "Filmové zobrazení"
+
+#: ../GTIPTVPlayerPro/main.py:4347 ../GTIPTVPlayerPro/main.py:4350
+#: ../GTIPTVPlayerPro/main.py:4381 ../GTIPTVPlayerPro/main.py:4450
+msgid "Appearance"
+msgstr "Vzhled"
+
+#: ../GTIPTVPlayerPro/main.py:4358 ../GTIPTVPlayerPro/main.py:4651
+#: ../GTIPTVPlayerPro/main.py:4654 ../GTIPTVPlayerPro/main.py:4952
+#: ../GTIPTVPlayerPro/main.py:8081 ../GTIPTVPlayerPro/remote_footer.py:89
+#: ../GTIPTVPlayerPro/remote_footer.py:92
+msgid "Select"
+msgstr "Vybrat"
+
+#: ../GTIPTVPlayerPro/main.py:4443
+msgid "Live TV service type"
+msgstr "Typ služby živého vysílání"
+
+#: ../GTIPTVPlayerPro/main.py:4444
+msgid "Movie service type"
+msgstr "Typ služby filmů"
+
+#: ../GTIPTVPlayerPro/main.py:4445
+msgid "Series service type"
+msgstr "Typ služby seriálů"
+
+#: ../GTIPTVPlayerPro/main.py:4446
+msgid "TMDb metadata enrichment"
+msgstr "Obohacení metadat TMDb"
+
+#: ../GTIPTVPlayerPro/main.py:4447
+msgid "TMDb API key / token"
+msgstr "Klíč API / token TMDb"
+
+#: ../GTIPTVPlayerPro/main.py:4448
+msgid "DVB EPG"
+msgstr "DVB EPG"
+
+#: ../GTIPTVPlayerPro/main.py:4449
+msgid "Category edit lock"
+msgstr "Zámek úprav kategorií"
+
+#: ../GTIPTVPlayerPro/main.py:4451 ../GTIPTVPlayerPro/main.py:7359
+#: ../GTIPTVPlayerPro/main.py:7401 ../GTIPTVPlayerPro/main.py:7469
+#: ../GTIPTVPlayerPro/main.py:7508 ../GTIPTVPlayerPro/main.py:7839
+#: ../GTIPTVPlayerPro/main.py:7884
+msgid "Select playlist"
+msgstr "Vybrat playlist"
+
+#: ../GTIPTVPlayerPro/main.py:4516
+msgid "Player / Codec"
+msgstr "Přehrávač / Kodek"
+
+#: ../GTIPTVPlayerPro/main.py:4518
+msgid "LANGUAGE"
+msgstr "JAZYK"
+
+#: ../GTIPTVPlayerPro/main.py:4560
+msgid "Settings - Player / Codec"
+msgstr "Nastavení – Přehrávač / Kodek"
+
+#: ../GTIPTVPlayerPro/main.py:4591 ../GTIPTVPlayerPro/remote_footer.py:106
+msgid "Open"
+msgstr "Otevřít"
+
+#: ../GTIPTVPlayerPro/main.py:4604 ../GTIPTVPlayerPro/main.py:7535
+#: ../GTIPTVPlayerPro/main.py:7587 ../GTIPTVPlayerPro/main.py:7673
+#: ../GTIPTVPlayerPro/main.py:7729 ../GTIPTVPlayerPro/main.py:7766
+#: ../GTIPTVPlayerPro/main.py:8563 ../GTIPTVPlayerPro/main.py:8686
+#: ../GTIPTVPlayerPro/main.py:8795 ../GTIPTVPlayerPro/main.py:8797
+msgid "Error"
+msgstr "Chyba"
+
+#: ../GTIPTVPlayerPro/main.py:4612
+#, python-brace-format
+msgid "Configured ••••{}"
+msgstr "Nakonfigurováno ••••{}"
+
+#: ../GTIPTVPlayerPro/main.py:4642
+msgid "Press OK to open the DVB EPG settings."
+msgstr "Stisknutím OK otevřete nastavení DVB EPG."
+
+#: ../GTIPTVPlayerPro/main.py:4647
+msgid "Press OK to turn the category edit lock on or off."
+msgstr "Stisknutím OK zapnete nebo vypnete zámek úprav kategorií."
+
+#: ../GTIPTVPlayerPro/main.py:4658
+msgid "Press OK to enter or change the TMDb key."
+msgstr "Stisknutím OK zadejte nebo změňte klíč TMDb."
+
+#: ../GTIPTVPlayerPro/main.py:4762 ../GTIPTVPlayerPro/main.py:4782
+#: ../GTIPTVPlayerPro/main.py:7743
+msgid "The confirmation screen is unavailable on this image."
+msgstr "Potvrzovací obrazovka není v tomto image dostupná."
+
+#: ../GTIPTVPlayerPro/main.py:4775
+msgid "Disable the category edit lock?"
+msgstr "Vypnout zámek úprav kategorií?"
+
+#: ../GTIPTVPlayerPro/main.py:4787
+msgid "Create category edit PIN"
+msgstr "Vytvořit PIN pro úpravy kategorií"
+
+#: ../GTIPTVPlayerPro/main.py:4797
+msgid "Confirm category edit PIN"
+msgstr "Potvrdit PIN pro úpravy kategorií"
+
+#: ../GTIPTVPlayerPro/main.py:4823
+msgid "Category edit lock could not be saved. Check the receiver storage."
+msgstr "Zámek úprav kategorií se nepodařilo uložit. Zkontrolujte úložiště přijímače."
+
+#: ../GTIPTVPlayerPro/main.py:4831
+msgid "Category edit lock enabled."
+msgstr "Zámek úprav kategorií byl zapnut."
+
+#: ../GTIPTVPlayerPro/main.py:4834
+#, python-brace-format
+msgid ""
+"Write down this recovery code. It is shown only once:\n"
+"\n"
+"{}\n"
+"\n"
+"If you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr ""
+"Tento kód pro obnovení si zapište. Zobrazí se pouze jednou:\n"
+"\n"
+"{}\n"
+"\n"
+"Pokud oba kódy zapomenete, odinstalace a opětovná instalace pluginu resetuje pouze tento zámek."
+
+#: ../GTIPTVPlayerPro/main.py:4845
+msgid "Disable category edit lock"
+msgstr "Vypnout zámek úprav kategorií"
+
+#: ../GTIPTVPlayerPro/main.py:4846
+msgid "Enter the current 4-digit PIN."
+msgstr "Zadejte aktuální čtyřmístný PIN."
+
+#: ../GTIPTVPlayerPro/main.py:4866
+msgid "Incorrect PIN. Lock unchanged."
+msgstr "Nesprávný PIN. Zámek zůstal beze změny."
+
+#: ../GTIPTVPlayerPro/main.py:4879
+msgid "Incorrect recovery code. Lock unchanged."
+msgstr "Nesprávný kód pro obnovení. Zámek zůstal beze změny."
+
+#: ../GTIPTVPlayerPro/main.py:4892
+msgid "Category edit lock disabled."
+msgstr "Zámek úprav kategorií byl vypnut."
+
+#: ../GTIPTVPlayerPro/main.py:4897
+msgid "Category edit lock could not be removed. Check the receiver storage."
+msgstr "Zámek úprav kategorií se nepodařilo odstranit. Zkontrolujte úložiště přijímače."
+
+#: ../GTIPTVPlayerPro/main.py:4908
+msgid "DVB EPG settings are unavailable on this image."
+msgstr "Nastavení DVB EPG nejsou v tomto systému dostupná."
+
+#: ../GTIPTVPlayerPro/main.py:4981
+msgid "DVB EPG settings closed."
+msgstr "Nastavení DVB EPG bylo zavřeno."
+
+#: ../GTIPTVPlayerPro/main.py:4998
+msgid "Enter the TMDb API key or access token"
+msgstr "Zadejte klíč API nebo přístupový token TMDb"
+
+#: ../GTIPTVPlayerPro/main.py:5005
+msgid "TMDb key change cancelled."
+msgstr "Změna klíče TMDb zrušena."
+
+#: ../GTIPTVPlayerPro/main.py:5011
+msgid "TMDb key saved; press BLUE to test and GREEN to save."
+msgstr "Klíč TMDb uložen; testujte stisknutím MODRÉHO a uložte stisknutím ZELENÉHO."
+
+#: ../GTIPTVPlayerPro/main.py:5013
+msgid "TMDb key cleared; press GREEN to save."
+msgstr "Klíč TMDb vymazán; uložte stisknutím ZELENÉHO."
+
+#: ../GTIPTVPlayerPro/main.py:5019
+msgid "The TMDb connection test is still running..."
+msgstr "Test připojení TMDb stále probíhá..."
+
+#: ../GTIPTVPlayerPro/main.py:5023
+msgid "No TMDb key is configured. Press OK on the key row."
+msgstr "Není nakonfigurován žádný klíč TMDb. Stiskněte OK na řádku klíče."
+
+#: ../GTIPTVPlayerPro/main.py:5028
+msgid "Testing the TMDb connection and API key..."
+msgstr "Testování připojení TMDb a klíče API..."
+
+#: ../GTIPTVPlayerPro/main.py:5057
+msgid "TMDb connection successful; the API key is valid."
+msgstr "Připojení k TMDb bylo úspěšné; klíč API je platný."
+
+#: ../GTIPTVPlayerPro/main.py:5061
+msgid " Metadata enrichment is currently disabled."
+msgstr " Obohacení metadat je nyní vypnuto."
+
+#: ../GTIPTVPlayerPro/main.py:5067
+#, python-brace-format
+msgid "TMDb test failed: {}."
+msgstr "Test TMDb selhal: {}."
+
+#: ../GTIPTVPlayerPro/main.py:5070 ../GTIPTVPlayerPro/main.py:5088
+msgid "TMDb test failed: could not connect."
+msgstr "Test TMDb selhal: nelze se připojit."
+
+#: ../GTIPTVPlayerPro/main.py:5188 ../GTIPTVPlayerPro/main.py:5204
+#: ../GTIPTVPlayerPro/main.py:5401 ../GTIPTVPlayerPro/main.py:8801
+msgid "The health check could not be completed."
+msgstr "Kontrolu stavu nelze dokončit."
+
+#: ../GTIPTVPlayerPro/main.py:5317 ../GTIPTVPlayerPro/main.py:5360
+#: ../GTIPTVPlayerPro/main.py:8835 ../GTIPTVPlayerPro/main.py:8876
+#: ../GTIPTVPlayerPro/main.py:8915
+msgid "Information"
+msgstr "Informace"
+
+#: ../GTIPTVPlayerPro/main.py:5477 ../GTIPTVPlayerPro/main.py:5565
+#: ../GTIPTVPlayerPro/main.py:5584 ../GTIPTVPlayerPro/main.py:5633
+#: ../GTIPTVPlayerPro/main.py:6064 ../GTIPTVPlayerPro/main.py:6094
+#: ../GTIPTVPlayerPro/remote_footer.py:117
+msgid "Accounts"
+msgstr "Účty"
+
+#: ../GTIPTVPlayerPro/main.py:5478 ../GTIPTVPlayerPro/main.py:5489
+#: ../GTIPTVPlayerPro/main.py:8743 ../GTIPTVPlayerPro/main.py:9624
+msgid "TESTING..."
+msgstr "TESTOVÁNÍ..."
+
+#: ../GTIPTVPlayerPro/main.py:5503 ../GTIPTVPlayerPro/main.py:6095
+#: ../GTIPTVPlayerPro/main.py:6747 ../GTIPTVPlayerPro/remote_footer.py:86
+msgid "Account"
+msgstr "Účet"
+
+#: ../GTIPTVPlayerPro/main.py:5567 ../GTIPTVPlayerPro/main.py:5701
+#: ../GTIPTVPlayerPro/main.py:7779 ../GTIPTVPlayerPro/remote_footer.py:99
+#: ../GTIPTVPlayerPro/remote_footer.py:101
+msgid "Delete"
+msgstr "Smazat"
+
+#: ../GTIPTVPlayerPro/main.py:5633 ../GTIPTVPlayerPro/main.py:6376
+#: ../GTIPTVPlayerPro/main.py:7750
+#, python-brace-format
+msgid "Delete {}?"
+msgstr "Odstranit {}?"
+
+#: ../GTIPTVPlayerPro/main.py:5739 ../GTIPTVPlayerPro/main.py:6457
+#: ../GTIPTVPlayerPro/main.py:7766
+#, python-brace-format
+msgid "Could not delete the source: {}"
+msgstr "Zdroj nelze odstranit: {}"
+
+#: ../GTIPTVPlayerPro/main.py:5874
+msgid "SELECTED SOURCE"
+msgstr "VYBRANÝ ZDROJ"
+
+#: ../GTIPTVPlayerPro/main.py:5884 ../GTIPTVPlayerPro/main.py:6295
+#: ../GTIPTVPlayerPro/remote_footer.py:100
+#: ../GTIPTVPlayerPro/remote_footer.py:102
+msgid "Connect"
+msgstr "Připojit"
+
+#: ../GTIPTVPlayerPro/main.py:5950 ../GTIPTVPlayerPro/main.py:6674
+msgid "Xtream Codes Accounts"
+msgstr "Účty Xtream Codes"
+
+#: ../GTIPTVPlayerPro/main.py:5951 ../GTIPTVPlayerPro/main.py:6675
+msgid "M3U Sources"
+msgstr "Zdroje M3U"
+
+#: ../GTIPTVPlayerPro/main.py:5952 ../GTIPTVPlayerPro/main.py:6676
+msgid "Stalker / MAC Portal Accounts"
+msgstr "Účty portálu Stalker / MAC"
+
+#: ../GTIPTVPlayerPro/main.py:5953 ../GTIPTVPlayerPro/main.py:6094
+#: ../GTIPTVPlayerPro/main.py:9552 ../GTIPTVPlayerPro/remote_footer.py:118
+msgid "Sources"
+msgstr "Zdroje"
+
+#: ../GTIPTVPlayerPro/main.py:6063 ../GTIPTVPlayerPro/main.py:6478
+#, python-brace-format
+msgid "{} was deleted ({} records)."
+msgstr "{} bylo odstraněno ({} záznamů)."
+
+#: ../GTIPTVPlayerPro/main.py:6114
+msgid ""
+"No source was found.\n"
+"\n"
+"Create one from the ADD SOURCE panel on the home screen."
+msgstr ""
+"Nebyl nalezen žádný zdroj.\n"
+"\n"
+"Vytvořte jej na panelu PŘIDAT ZDROJ na domovské obrazovce."
+
+#: ../GTIPTVPlayerPro/main.py:6136 ../GTIPTVPlayerPro/main.py:6155
+#: ../GTIPTVPlayerPro/main.py:6825 ../GTIPTVPlayerPro/main.py:6894
+#: ../GTIPTVPlayerPro/main.py:6953 ../GTIPTVPlayerPro/main.py:7000
+msgid "Add Source"
+msgstr "Přidat zdroj"
+
+#: ../GTIPTVPlayerPro/main.py:6235 ../GTIPTVPlayerPro/main.py:7644
+#: ../GTIPTVPlayerPro/main.py:7732 ../GTIPTVPlayerPro/main.py:9518
+msgid "Ready to connect"
+msgstr "Připraveno k připojení"
+
+#: ../GTIPTVPlayerPro/main.py:6245 ../GTIPTVPlayerPro/main.py:6281
+#: ../GTIPTVPlayerPro/main.py:8890 ../GTIPTVPlayerPro/main.py:9627
+#: ../GTIPTVPlayerPro/main.py:9640 ../GTIPTVPlayerPro/main.py:9683
+#, python-brace-format
+msgid "Expiry: {}"
+msgstr "Platnost do: {}"
+
+#: ../GTIPTVPlayerPro/main.py:6351
+msgid "Choose a source type first."
+msgstr "Nejprve vyberte typ zdroje."
+
+#: ../GTIPTVPlayerPro/main.py:6366
+msgid "No source is selected for deletion."
+msgstr "Není vybrán žádný zdroj k odstranění."
+
+#: ../GTIPTVPlayerPro/main.py:6370
+msgid "Could not open the deletion confirmation."
+msgstr "Potvrzení odstranění nelze otevřít."
+
+#: ../GTIPTVPlayerPro/main.py:6387
+msgid "Source deletion cancelled."
+msgstr "Odstranění zdroje zrušeno."
+
+#: ../GTIPTVPlayerPro/main.py:6516 ../GTIPTVPlayerPro/main.py:6554
+#: ../GTIPTVPlayerPro/main.py:9835
+msgid "A source connection is already in progress."
+msgstr "Připojení ke zdroji již probíhá."
+
+#: ../GTIPTVPlayerPro/main.py:6545 ../GTIPTVPlayerPro/main.py:8707
+msgid "XMLTV EPG settings could not be opened."
+msgstr "Nastavení XMLTV EPG se nepodařilo otevřít."
+
+#: ../GTIPTVPlayerPro/main.py:6551 ../GTIPTVPlayerPro/main.py:7651
+msgid "No source is available to connect."
+msgstr "Není dostupný žádný zdroj k připojení."
+
+#: ../GTIPTVPlayerPro/main.py:6582 ../GTIPTVPlayerPro/main.py:9855
+msgid "CONNECTING..."
+msgstr "PŘIPOJOVÁNÍ..."
+
+#: ../GTIPTVPlayerPro/main.py:6596
+#, python-brace-format
+msgid "Connecting to {}, please wait."
+msgstr "Připojování k {}, čekejte."
+
+#: ../GTIPTVPlayerPro/main.py:6607 ../GTIPTVPlayerPro/main.py:9866
+msgid "CONNECTED"
+msgstr "PŘIPOJENO"
+
+#: ../GTIPTVPlayerPro/main.py:6611
+msgid "OPENING MAIN PANEL"
+msgstr "OTEVÍRÁNÍ HLAVNÍHO PANELU"
+
+#: ../GTIPTVPlayerPro/main.py:6614
+#, python-brace-format
+msgid "Connected to {}."
+msgstr "Připojeno k {}."
+
+#: ../GTIPTVPlayerPro/main.py:6630 ../GTIPTVPlayerPro/remote_footer.py:103
+msgid "Retry"
+msgstr "Znovu"
+
+#: ../GTIPTVPlayerPro/main.py:6634 ../GTIPTVPlayerPro/main.py:9883
+#, python-brace-format
+msgid "Could not connect to {}: {}"
+msgstr "Nelze se připojit k {}: {}"
+
+#: ../GTIPTVPlayerPro/main.py:6661 ../GTIPTVPlayerPro/main.py:6721
+msgid "Manage Sources"
+msgstr "Spravovat zdroje"
+
+#: ../GTIPTVPlayerPro/main.py:6664 ../GTIPTVPlayerPro/main.py:7362
+msgid "Choose the source type you want to manage."
+msgstr "Vyberte typ zdroje, který chcete spravovat."
+
+#: ../GTIPTVPlayerPro/main.py:6677 ../GTIPTVPlayerPro/main.py:6843
+#: ../GTIPTVPlayerPro/main.py:7373
+msgid "Server URL, username and password"
+msgstr "URL serveru, uživatelské jméno a heslo"
+
+#: ../GTIPTVPlayerPro/main.py:6678 ../GTIPTVPlayerPro/main.py:6846
+msgid "Local file, NAS or web link"
+msgstr "Místní soubor, NAS nebo webový odkaz"
+
+#: ../GTIPTVPlayerPro/main.py:6679 ../GTIPTVPlayerPro/main.py:6849
+#: ../GTIPTVPlayerPro/main.py:7376 ../GTIPTVPlayerPro/main.py:8996
+msgid "Portal"
+msgstr "Portál"
+
+#: ../GTIPTVPlayerPro/main.py:6770
+msgid "Each source type is listed separately. Each section can contain up to 500 sources."
+msgstr "Každý typ zdroje je uveden samostatně. Každá část může obsahovat až 500 zdrojů."
+
+#: ../GTIPTVPlayerPro/main.py:6805
+msgid "Xtream Codes provides Live TV, Movies and Series."
+msgstr "Xtream Codes poskytuje živé vysílání, filmy a seriály."
+
+#: ../GTIPTVPlayerPro/main.py:6807
+msgid "M3U sources provide Live TV only. Categories, search and favorites are supported."
+msgstr "Zdroje M3U poskytují pouze živé vysílání. Podporovány jsou kategorie, vyhledávání a oblíbené položky."
+
+#: ../GTIPTVPlayerPro/main.py:6811 ../GTIPTVPlayerPro/main.py:6973
+#: ../GTIPTVPlayerPro/main.py:8550
+msgid "The Stalker / MAC portal will be checked automatically when this screen opens."
+msgstr "Portál Stalker / MAC bude automaticky zkontrolován při otevření této obrazovky."
+
+#: ../GTIPTVPlayerPro/main.py:6828
+msgid "Choose the source type to add."
+msgstr "Vyberte typ zdroje, který chcete přidat."
+
+#: ../GTIPTVPlayerPro/main.py:6935 ../GTIPTVPlayerPro/stalker.py:550
+#: ../GTIPTVPlayerPro/stalker.py:554 ../GTIPTVPlayerPro/stalker.py:563
+#: ../GTIPTVPlayerPro/stalker.py:565
+msgid "Enter a valid portal URL"
+msgstr "Zadejte platnou URL portálu"
+
+#: ../GTIPTVPlayerPro/main.py:6936 ../GTIPTVPlayerPro/stalker.py:543
+msgid "Enter a valid MAC address"
+msgstr "Zadejte platnou adresu MAC"
+
+#: ../GTIPTVPlayerPro/main.py:6956 ../GTIPTVPlayerPro/main.py:7993
+msgid "Source details"
+msgstr "Podrobnosti zdroje"
+
+#: ../GTIPTVPlayerPro/main.py:6960
+msgid "Portal URL / MAC"
+msgstr "URL portálu / MAC"
+
+#: ../GTIPTVPlayerPro/main.py:6961
+msgid "GREEN"
+msgstr "ZELENÉ"
+
+#: ../GTIPTVPlayerPro/main.py:6962 ../GTIPTVPlayerPro/remote_footer.py:97
+msgid "Save"
+msgstr "Uložit"
+
+#: ../GTIPTVPlayerPro/main.py:7016
+msgid "Portal URL"
+msgstr "URL portálu"
+
+#: ../GTIPTVPlayerPro/main.py:7024
+msgid "MAC address"
+msgstr "Adresa MAC"
+
+#: ../GTIPTVPlayerPro/main.py:7079 ../GTIPTVPlayerPro/main.py:8199
+#: ../GTIPTVPlayerPro/main.py:8212 ../GTIPTVPlayerPro/main.py:8439
+msgid "Information received. Edit the next field or press GREEN to save."
+msgstr "Informace přijaty. Upravte další pole nebo uložte stisknutím ZELENÉHO."
+
+#: ../GTIPTVPlayerPro/main.py:7208 ../GTIPTVPlayerPro/main.py:7254
+#: ../GTIPTVPlayerPro/playlist.py:1557
+msgid "Local / NAS file"
+msgstr "Místní soubor / NAS"
+
+#: ../GTIPTVPlayerPro/main.py:7211 ../GTIPTVPlayerPro/main.py:7842
+#: ../GTIPTVPlayerPro/main.py:8012
+msgid "Device, USB or mounted network storage"
+msgstr "Zařízení, USB nebo připojené síťové úložiště"
+
+#: ../GTIPTVPlayerPro/main.py:7576
+msgid "Add playlist"
+msgstr "Přidat playlist"
+
+#: ../GTIPTVPlayerPro/main.py:7627 ../GTIPTVPlayerPro/main.py:7656
+#: ../GTIPTVPlayerPro/main.py:7698 ../GTIPTVPlayerPro/main.py:7739
+#: ../GTIPTVPlayerPro/main.py:9301
+msgid "Not available"
+msgstr "Není k dispozici"
+
+#: ../GTIPTVPlayerPro/main.py:7667 ../GTIPTVPlayerPro/playlist.py:1121
+msgid "No valid IPTV source was found"
+msgstr "Nebyl nalezen žádný platný zdroj IPTV"
+
+#: ../GTIPTVPlayerPro/main.py:7713 ../GTIPTVPlayerPro/remote_footer.py:95
+msgid "Rename"
+msgstr "Přejmenovat"
+
+#: ../GTIPTVPlayerPro/main.py:7970
+msgid "Enter a name for the M3U source"
+msgstr "Zadejte název zdroje M3U"
+
+#: ../GTIPTVPlayerPro/main.py:7972
+msgid "Enter the M3U file path or HTTP(S) URL"
+msgstr "Zadejte cestu k souboru M3U nebo URL HTTP(S)"
+
+#: ../GTIPTVPlayerPro/main.py:7991 ../GTIPTVPlayerPro/main.py:8048
+msgid "Add M3U Source"
+msgstr "Přidat zdroj M3U"
+
+#: ../GTIPTVPlayerPro/main.py:7996
+msgid "Give the source a name and choose its location."
+msgstr "Pojmenujte zdroj a vyberte jeho umístění."
+
+#: ../GTIPTVPlayerPro/main.py:7999
+msgid "Source name"
+msgstr "Název zdroje"
+
+#: ../GTIPTVPlayerPro/main.py:8015
+msgid "Direct HTTP(S) M3U link"
+msgstr "Přímý odkaz M3U přes HTTP(S)"
+
+#: ../GTIPTVPlayerPro/main.py:8053
+msgid "M3U URL must start with http:// or https://."
+msgstr "URL M3U musí začínat http:// nebo https://."
+
+#: ../GTIPTVPlayerPro/main.py:8070
+msgid "Enter a source name"
+msgstr "Zadejte název zdroje"
+
+#: ../GTIPTVPlayerPro/main.py:8072
+msgid "File path"
+msgstr "Cesta k souboru"
+
+#: ../GTIPTVPlayerPro/main.py:8081 ../GTIPTVPlayerPro/remote_footer.py:94
+msgid "Edit"
+msgstr "Upravit"
+
+#: ../GTIPTVPlayerPro/main.py:8247
+#, python-brace-format
+msgid "Could not save the M3U source: {}"
+msgstr "Zdroj M3U nelze uložit: {}"
+
+#: ../GTIPTVPlayerPro/main.py:8256
+#, python-brace-format
+msgid "{} was saved as an M3U Live TV source."
+msgstr "{} byl uložen jako zdroj M3U živé TV."
+
+#: ../GTIPTVPlayerPro/main.py:8269
+msgid "Enter the server URL"
+msgstr "Zadejte URL serveru"
+
+#: ../GTIPTVPlayerPro/main.py:8270 ../GTIPTVPlayerPro/main.py:8343
+msgid "Enter the username"
+msgstr "Zadejte uživatelské jméno"
+
+#: ../GTIPTVPlayerPro/main.py:8271 ../GTIPTVPlayerPro/main.py:8347
+msgid "Enter the password"
+msgstr "Zadejte heslo"
+
+#: ../GTIPTVPlayerPro/main.py:8293 ../GTIPTVPlayerPro/main.py:8330
+msgid "ADD NEW ACCOUNT"
+msgstr "PŘIDAT NOVÝ ÚČET"
+
+#: ../GTIPTVPlayerPro/main.py:8295 ../GTIPTVPlayerPro/main.py:8333
+msgid "Press OK in a text field; use LEFT / RIGHT on the output row."
+msgstr "Stiskněte OK v textovém poli; na řádku výstupu použijte VLEVO / VPRAVO."
+
+#: ../GTIPTVPlayerPro/main.py:8304
+msgid "Press GREEN to save  |  Select a TS or M3U8 output supported by the server."
+msgstr "Uložte stisknutím ZELENÉHO  |  Vyberte výstup TS nebo M3U8 podporovaný serverem."
+
+#: ../GTIPTVPlayerPro/main.py:8327 ../GTIPTVPlayerPro/main.py:8331
+msgid "Add New Account"
+msgstr "Přidat nový účet"
+
+#: ../GTIPTVPlayerPro/main.py:8350
+#, python-brace-format
+msgid "  SERVER URL        {}"
+msgstr "  URL SERVERU        {}"
+
+#: ../GTIPTVPlayerPro/main.py:8355
+#, python-brace-format
+msgid "  USERNAME          {}"
+msgstr "  UŽIVATELSKÉ JMÉNO  {}"
+
+#: ../GTIPTVPlayerPro/main.py:8359
+#, python-brace-format
+msgid "  PASSWORD          {}"
+msgstr "  HESLO              {}"
+
+#: ../GTIPTVPlayerPro/main.py:8362
+#, python-brace-format
+msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
+msgstr "  VÝSTUPNÍ FORMÁT     {}     Změnit pomocí VLEVO / VPRAVO"
+
+#: ../GTIPTVPlayerPro/main.py:8395
+#, python-brace-format
+msgid "Live TV output selected: {}."
+msgstr "Vybrán výstup živého vysílání: {}."
+
+#: ../GTIPTVPlayerPro/main.py:8454
+#, python-brace-format
+msgid "Could not save the account: {}"
+msgstr "Nelze uložit účet: {}"
+
+#: ../GTIPTVPlayerPro/main.py:8464
+#, python-brace-format
+msgid "{} was saved with {} output."
+msgstr "{} bylo uloženo s výstupem {}."
+
+#: ../GTIPTVPlayerPro/main.py:8522 ../GTIPTVPlayerPro/main.py:8595
+msgid "Source Health"
+msgstr "Stav zdroje"
+
+#: ../GTIPTVPlayerPro/main.py:8524 ../GTIPTVPlayerPro/main.py:8597
+msgid "Portal Health"
+msgstr "Stav portálu"
+
+#: ../GTIPTVPlayerPro/main.py:8524 ../GTIPTVPlayerPro/main.py:8597
+msgid "Server Health"
+msgstr "Stav serveru"
+
+#: ../GTIPTVPlayerPro/main.py:8538 ../GTIPTVPlayerPro/main.py:8569
+msgid "WAITING FOR TEST"
+msgstr "ČEKÁNÍ NA TEST"
+
+#: ../GTIPTVPlayerPro/main.py:8546
+msgid "The M3U source will be checked automatically when this screen opens."
+msgstr "Zdroj M3U bude automaticky zkontrolován při otevření této obrazovky."
+
+#: ../GTIPTVPlayerPro/main.py:8554
+msgid "The Xtream API connection will be tested automatically when this screen opens."
+msgstr "Připojení API Xtream bude automaticky otestováno při otevření této obrazovky."
+
+#: ../GTIPTVPlayerPro/main.py:8727
+msgid "XMLTV EPG is disabled for this M3U source."
+msgstr "XMLTV EPG je pro tento zdroj M3U vypnuto."
+
+#: ../GTIPTVPlayerPro/main.py:8731
+msgid "XMLTV EPG is ready from the local cache."
+msgstr "XMLTV EPG je připraveno v místní mezipaměti."
+
+#: ../GTIPTVPlayerPro/main.py:8733
+msgid "XMLTV EPG is enabled and waiting for its first update."
+msgstr "XMLTV EPG je povoleno a čeká na první aktualizaci."
+
+#: ../GTIPTVPlayerPro/main.py:8751
+msgid "Checking M3U access, catalogue size and cache status."
+msgstr "Kontrola přístupu k M3U, velikosti katalogu a stavu mezipaměti."
+
+#: ../GTIPTVPlayerPro/main.py:8754
+msgid "Checking portal authentication, categories and latency."
+msgstr "Probíhá kontrola ověření portálu, kategorií a odezvy."
+
+#: ../GTIPTVPlayerPro/main.py:8757
+msgid "Checking API access, account status, latency and connection limits."
+msgstr "Kontrola přístupu API, stavu účtu, latence a limitů připojení."
+
+#: ../GTIPTVPlayerPro/main.py:8883 ../GTIPTVPlayerPro/stalker.py:1908
+#: ../GTIPTVPlayerPro/stalker.py:1911 ../GTIPTVPlayerPro/stalker.py:1914
+#: ../GTIPTVPlayerPro/stalker.py:1925 ../GTIPTVPlayerPro/stalker.py:1940
+#: ../GTIPTVPlayerPro/stalker.py:1944 ../GTIPTVPlayerPro/stalker.py:8114
+msgid "Server does not report expiry"
+msgstr "Server neuvádí datum vypršení"
+
+#: ../GTIPTVPlayerPro/main.py:8996
+msgid "Server"
+msgstr "Server"
+
+#: ../GTIPTVPlayerPro/main.py:9302
+msgid "Standard M3U sources support Live TV only."
+msgstr "Standardní zdroje M3U podporují pouze živou TV."
+
+#: ../GTIPTVPlayerPro/main.py:9347 ../GTIPTVPlayerPro/remote_footer.py:136
+msgid "About"
+msgstr "O programu"
+
+#: ../GTIPTVPlayerPro/main.py:9420
+msgid "SECURE SOURCE CONNECTION"
+msgstr "ZABEZPEČENÉ PŘIPOJENÍ ZDROJE"
+
+#: ../GTIPTVPlayerPro/main.py:9421
+msgid "Welcome"
+msgstr "Vítejte"
+
+#: ../GTIPTVPlayerPro/main.py:9423
+msgid "Select and connect to a saved source to start watching."
+msgstr "Vyberte a připojte uložený zdroj a začněte sledovat."
+
+#: ../GTIPTVPlayerPro/main.py:9426
+msgid "SAVED SOURCE"
+msgstr "ULOŽENÝ ZDROJ"
+
+#: ../GTIPTVPlayerPro/main.py:9537
+msgid "Source status is checked automatically when connecting."
+msgstr "Stav zdroje se při připojení kontroluje automaticky."
+
+#: ../GTIPTVPlayerPro/main.py:9541
+msgid "No saved source found"
+msgstr "Nebyl nalezen žádný uložený zdroj"
+
+#: ../GTIPTVPlayerPro/main.py:9544
+msgid "Create a new source from the ADD SOURCE panel."
+msgstr "Vytvořte nový zdroj na panelu PŘIDAT ZDROJ."
+
+#: ../GTIPTVPlayerPro/main.py:9554
+msgid "No saved source. Create one from the ADD SOURCE panel."
+msgstr "Žádný uložený zdroj. Vytvořte jej na panelu PŘIDAT ZDROJ."
+
+#: ../GTIPTVPlayerPro/main.py:9557
+msgid "CONNECT SOURCE"
+msgstr "PŘIPOJIT ZDROJ"
+
+#: ../GTIPTVPlayerPro/main.py:9558
+msgid "MANAGE SOURCES"
+msgstr "SPRAVOVAT ZDROJE"
+
+#: ../GTIPTVPlayerPro/main.py:9559
+msgid "ADD SOURCE"
+msgstr "PŘIDAT ZDROJ"
+
+#: ../GTIPTVPlayerPro/main.py:9671 ../GTIPTVPlayerPro/playlist.py:1282
+#, python-brace-format
+msgid "Account status: {}"
+msgstr "Stav účtu: {}"
+
+#: ../GTIPTVPlayerPro/main.py:9858
+#, python-brace-format
+msgid "Checking {}, please wait."
+msgstr "Kontrola {}, čekejte."
+
+#: ../GTIPTVPlayerPro/main.py:9869
+#, python-brace-format
+msgid "Connected to {}; opening the dashboard."
+msgstr "Připojeno k {}; otevírá se hlavní panel."
+
+#: ../GTIPTVPlayerPro/main.py:9902
+msgid "Close the open screen before opening another one."
+msgstr "Před otevřením další obrazovky zavřete tu aktuální."
+
+#: ../GTIPTVPlayerPro/metadata.py:255
+msgid "TMDb request cancelled"
+msgstr "Požadavek TMDb zrušen"
+
+#: ../GTIPTVPlayerPro/metadata.py:266 ../GTIPTVPlayerPro/metadata.py:284
+msgid "TMDb request timed out"
+msgstr "Vypršel časový limit požadavku TMDb"
+
+#: ../GTIPTVPlayerPro/metadata.py:354
+msgid "Could not load the TMDb configuration"
+msgstr "Nelze načíst konfiguraci TMDb"
+
+#: ../GTIPTVPlayerPro/metadata.py:364 ../GTIPTVPlayerPro/metadata.py:754
+#: ../GTIPTVPlayerPro/metadata.py:822
+msgid "TMDb API key is not configured"
+msgstr "Klíč API TMDb není nakonfigurován"
+
+#: ../GTIPTVPlayerPro/metadata.py:398
+#, python-brace-format
+msgid "TMDb HTTP error path={}"
+msgstr "Chyba HTTP TMDb, cesta={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:400 ../GTIPTVPlayerPro/metadata.py:421
+msgid "TMDb API key is invalid"
+msgstr "Klíč API TMDb je neplatný"
+
+#: ../GTIPTVPlayerPro/metadata.py:402
+msgid "TMDb request limit reached"
+msgstr "Dosažen limit požadavků TMDb"
+
+#: ../GTIPTVPlayerPro/metadata.py:403
+#, python-brace-format
+msgid "TMDb returned HTTP {}"
+msgstr "TMDb vrátil HTTP {}"
+
+#: ../GTIPTVPlayerPro/metadata.py:405
+#, python-brace-format
+msgid "TMDb connection error path={}"
+msgstr "Chyba připojení TMDb, cesta={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:406
+msgid "Could not connect to the TMDb service"
+msgstr "Nelze se připojit ke službě TMDb"
+
+#: ../GTIPTVPlayerPro/metadata.py:408
+msgid "TMDb response is too large"
+msgstr "Odpověď TMDb je příliš velká"
+
+#: ../GTIPTVPlayerPro/metadata.py:414
+#, python-brace-format
+msgid "Invalid TMDb JSON path={}"
+msgstr "Neplatná cesta JSON TMDb={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:415 ../GTIPTVPlayerPro/metadata.py:417
+msgid "TMDb returned an invalid response"
+msgstr "TMDb vrátil neplatnou odpověď"
+
+#: ../GTIPTVPlayerPro/metadata.py:422
+msgid "TMDb request was rejected"
+msgstr "Požadavek TMDb byl odmítnut"
+
+#: ../GTIPTVPlayerPro/metadata.py:752 ../GTIPTVPlayerPro/metadata.py:820
+msgid "TMDb metadata enrichment is disabled"
+msgstr "Obohacení metadat TMDb je vypnuto"
+
+#: ../GTIPTVPlayerPro/metadata.py:761 ../GTIPTVPlayerPro/metadata.py:828
+msgid "No valid title was found for TMDb"
+msgstr "Pro TMDb nebyl nalezen žádný platný název"
+
+#: ../GTIPTVPlayerPro/metadata.py:789 ../GTIPTVPlayerPro/metadata.py:808
+#: ../GTIPTVPlayerPro/metadata.py:857 ../GTIPTVPlayerPro/metadata.py:876
+msgid "No TMDb match was found"
+msgstr "Nebyla nalezena žádná shoda TMDb"
+
+#: ../GTIPTVPlayerPro/metadata.py:798 ../GTIPTVPlayerPro/metadata.py:799
+#: ../GTIPTVPlayerPro/metadata.py:866 ../GTIPTVPlayerPro/metadata.py:867
+msgid "Could not load TMDb information"
+msgstr "Nelze načíst informace TMDb"
+
+#: ../GTIPTVPlayerPro/network_security.py:45
+#: ../GTIPTVPlayerPro/network_security.py:53
+#: ../GTIPTVPlayerPro/network_security.py:55
+msgid "Image request headers are invalid."
+msgstr "Hlavičky požadavku na obrázek jsou neplatné."
+
+#: ../GTIPTVPlayerPro/network_security.py:64
+msgid "Network address could not be resolved."
+msgstr "Síťovou adresu nelze přeložit."
+
+#: ../GTIPTVPlayerPro/network_security.py:67
+msgid "Image requests to local, private or reserved network addresses are prohibited."
+msgstr "Požadavky na obrázky na místní, soukromé nebo vyhrazené síťové adresy jsou zakázány."
+
+#: ../GTIPTVPlayerPro/network_security.py:79
+#: ../GTIPTVPlayerPro/network_security.py:84
+msgid "Image URL is invalid."
+msgstr "URL obrázku je neplatná."
+
+#: ../GTIPTVPlayerPro/network_security.py:94
+msgid "Image URL is not safe."
+msgstr "URL obrázku není bezpečná."
+
+#: ../GTIPTVPlayerPro/network_security.py:97
+msgid "Image URL port is invalid."
+msgstr "Port URL obrázku je neplatný."
+
+#: ../GTIPTVPlayerPro/network_security.py:101
+#: ../GTIPTVPlayerPro/network_security.py:103
+msgid "Image host name is invalid."
+msgstr "Název hostitele obrázku je neplatný."
+
+#: ../GTIPTVPlayerPro/network_security.py:132
+msgid "Image download timed out."
+msgstr "Vypršel časový limit stahování obrázku."
+
+#: ../GTIPTVPlayerPro/network_security.py:161
+#: ../GTIPTVPlayerPro/network_security.py:184
+msgid "Image host name resolution timed out."
+msgstr "Vypršel časový limit překladu názvu hostitele obrázku."
+
+#: ../GTIPTVPlayerPro/network_security.py:194
+msgid "Image host name could not be resolved."
+msgstr "Název hostitele obrázku nelze přeložit."
+
+#: ../GTIPTVPlayerPro/network_security.py:206
+msgid "Image host did not resolve to a public IP address."
+msgstr "Hostitel obrázku nebyl přeložen na veřejnou IP adresu."
+
+#: ../GTIPTVPlayerPro/network_security.py:282
+msgid "Image response has conflicting size information."
+msgstr "Odpověď s obrázkem obsahuje konfliktní informace o velikosti."
+
+#: ../GTIPTVPlayerPro/network_security.py:336
+#, python-brace-format
+msgid "Image server returned HTTP {}."
+msgstr "Server obrázků vrátil HTTP {}."
+
+#: ../GTIPTVPlayerPro/network_security.py:341
+msgid "Compressed image HTTP responses are not accepted."
+msgstr "Komprimované odpovědi HTTP s obrázky nejsou přijímány."
+
+#: ../GTIPTVPlayerPro/network_security.py:349
+msgid "Image response size is invalid."
+msgstr "Velikost odpovědi s obrázkem je neplatná."
+
+#: ../GTIPTVPlayerPro/network_security.py:353
+#: ../GTIPTVPlayerPro/network_security.py:371
+msgid "Image response exceeds the safe size limit."
+msgstr "Odpověď s obrázkem překračuje bezpečný limit velikosti."
+
+#: ../GTIPTVPlayerPro/network_security.py:403
+#: ../GTIPTVPlayerPro/network_security.py:405
+msgid "Image download limits are invalid."
+msgstr "Limity stahování obrázků jsou neplatné."
+
+#: ../GTIPTVPlayerPro/network_security.py:419
+msgid "An HTTPS image request cannot be redirected to HTTP."
+msgstr "Požadavek na obrázek HTTPS nelze přesměrovat na HTTP."
+
+#: ../GTIPTVPlayerPro/network_security.py:452
+msgid "Could not establish a secure connection to the image server."
+msgstr "Nelze navázat zabezpečené připojení k serveru obrázků."
+
+#: ../GTIPTVPlayerPro/network_security.py:459
+msgid "Image redirect URL is missing."
+msgstr "Chybí URL přesměrování obrázku."
+
+#: ../GTIPTVPlayerPro/network_security.py:461
+msgid "Image request was redirected too many times."
+msgstr "Požadavek na obrázek byl příliš mnohokrát přesměrován."
+
+#: ../GTIPTVPlayerPro/network_security.py:475
+msgid "Image redirection could not be completed."
+msgstr "Přesměrování obrázku nelze dokončit."
+
+#: ../GTIPTVPlayerPro/playlist.py:41
+#, python-brace-format
+msgid ""
+"Latency: {} ms\n"
+"Account status: {}\n"
+"Active / Maximum: {}\n"
+"Expiry: {}\n"
+"Server time: {}\n"
+"Time zone: {}\n"
+"Protocol: {}\n"
+"Output format: {}\n"
+"Server version: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Latence: {} ms\n"
+"Stav účtu: {}\n"
+"Aktivní / Maximum: {}\n"
+"Platnost: {}\n"
+"Čas serveru: {}\n"
+"Časové pásmo: {}\n"
+"Protokol: {}\n"
+"Výstupní formát: {}\n"
+"Verze serveru: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/playlist.py:171
+msgid "Invalid stream ID"
+msgstr "Neplatné ID streamu"
+
+#: ../GTIPTVPlayerPro/playlist.py:390 ../GTIPTVPlayerPro/playlist.py:402
+#: ../GTIPTVPlayerPro/playlist.py:781
+msgid "Playlist file is too large"
+msgstr "Soubor playlistu je příliš velký"
+
+#: ../GTIPTVPlayerPro/playlist.py:731
+msgid "Enter a valid Xtream URL"
+msgstr "Zadejte platnou URL Xtream"
+
+#: ../GTIPTVPlayerPro/playlist.py:760
+msgid "The Xtream account limit was reached"
+msgstr "Byl dosažen limit účtů Xtream"
+
+#: ../GTIPTVPlayerPro/playlist.py:800
+msgid "Server URL, username and password are required"
+msgstr "Je vyžadována URL serveru, uživatelské jméno a heslo"
+
+#: ../GTIPTVPlayerPro/playlist.py:803
+msgid "Output format must be TS or M3U8"
+msgstr "Výstupní formát musí být TS nebo M3U8"
+
+#: ../GTIPTVPlayerPro/playlist.py:808
+msgid "Enter a valid server URL"
+msgstr "Zadejte platnou URL serveru"
+
+#: ../GTIPTVPlayerPro/playlist.py:810
+msgid "Server URL must start with http:// or https://"
+msgstr "URL serveru musí začínat http:// nebo https://"
+
+#: ../GTIPTVPlayerPro/playlist.py:813
+msgid "Do not include a username or password in the server URL"
+msgstr "Do URL serveru nezahrnujte uživatelské jméno ani heslo"
+
+#: ../GTIPTVPlayerPro/playlist.py:816
+msgid "Server URL port is invalid"
+msgstr "Port URL serveru je neplatný"
+
+#: ../GTIPTVPlayerPro/playlist.py:879 ../GTIPTVPlayerPro/playlist.py:965
+#: ../GTIPTVPlayerPro/playlist.py:1591 ../GTIPTVPlayerPro/playlist.py:1603
+msgid "The account selected for deletion is invalid"
+msgstr "Účet vybraný k odstranění je neplatný"
+
+#: ../GTIPTVPlayerPro/playlist.py:941 ../GTIPTVPlayerPro/playlist.py:1010
+msgid "The selected account was not found in the account files"
+msgstr "Vybraný účet nebyl nalezen v souborech účtů"
+
+#: ../GTIPTVPlayerPro/playlist.py:1069
+msgid "playlists.txt was not found"
+msgstr "Soubor playlists.txt nebyl nalezen"
+
+#: ../GTIPTVPlayerPro/playlist.py:1071
+msgid "No valid Xtream account was found"
+msgstr "Nebyl nalezen žádný platný účet Xtream"
+
+#: ../GTIPTVPlayerPro/playlist.py:1119
+msgid "No saved IPTV source was found"
+msgstr "Nebyl nalezen žádný uložený zdroj IPTV"
+
+#: ../GTIPTVPlayerPro/playlist.py:1163
+msgid "The selected M3U source was not found"
+msgstr "Vybraný zdroj M3U nebyl nalezen"
+
+#: ../GTIPTVPlayerPro/playlist.py:1237
+msgid "Never / unknown"
+msgstr "Nikdy / neznámé"
+
+#: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1255
+#: ../GTIPTVPlayerPro/playlist.py:1415 ../GTIPTVPlayerPro/playlist.py:1434
+#: ../GTIPTVPlayerPro/playlist.py:1445 ../GTIPTVPlayerPro/playlist.py:1493
+#: ../GTIPTVPlayerPro/playlist.py:1541 ../GTIPTVPlayerPro/stalker.py:8184
+msgid "ERROR"
+msgstr "CHYBA"
+
+#: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1257
+msgid "API response is invalid"
+msgstr "Odpověď API je neplatná"
+
+#: ../GTIPTVPlayerPro/playlist.py:1272 ../GTIPTVPlayerPro/stalker.py:8184
+msgid "INVALID"
+msgstr "NEPLATNÉ"
+
+#: ../GTIPTVPlayerPro/playlist.py:1273
+msgid "Server did not validate the account"
+msgstr "Server neověřil účet"
+
+#: ../GTIPTVPlayerPro/playlist.py:1281
+msgid "DISABLED"
+msgstr "VYPNUTO"
+
+#: ../GTIPTVPlayerPro/playlist.py:1288 ../GTIPTVPlayerPro/stalker.py:8159
+msgid "BUSY"
+msgstr "ZANEPRÁZDNĚNO"
+
+#: ../GTIPTVPlayerPro/playlist.py:1292
+msgid "API connection successful"
+msgstr "Připojení API bylo úspěšné"
+
+#: ../GTIPTVPlayerPro/playlist.py:1415
+msgid "API response is too large"
+msgstr "Odpověď API je příliš velká"
+
+#: ../GTIPTVPlayerPro/playlist.py:1426
+msgid "Server health check HTTP error"
+msgstr "Chyba HTTP při kontrole stavu serveru"
+
+#: ../GTIPTVPlayerPro/playlist.py:1443
+msgid "Server health check connection error"
+msgstr "Chyba připojení při kontrole stavu serveru"
+
+#: ../GTIPTVPlayerPro/playlist.py:1445
+msgid "Could not connect to the server"
+msgstr "Nelze se připojit k serveru"
+
+#: ../GTIPTVPlayerPro/playlist.py:1454
+msgid "Not cached"
+msgstr "Není v mezipaměti"
+
+#: ../GTIPTVPlayerPro/playlist.py:1458
+msgid "Less than one minute"
+msgstr "Méně než jedna minuta"
+
+#: ../GTIPTVPlayerPro/playlist.py:1460
+#, python-brace-format
+msgid "{} minutes"
+msgstr "{} minut"
+
+#: ../GTIPTVPlayerPro/playlist.py:1524 ../GTIPTVPlayerPro/playlist.py:1544
+msgid "The M3U source could not be checked."
+msgstr "Zdroj M3U nelze zkontrolovat."
+
+#: ../GTIPTVPlayerPro/playlist.py:1534
+msgid "M3U catalogue loaded from cache."
+msgstr "Katalog M3U byl načten z mezipaměti."
+
+#: ../GTIPTVPlayerPro/playlist.py:1536
+msgid "M3U source is accessible."
+msgstr "Zdroj M3U je dostupný."
+
+#: ../GTIPTVPlayerPro/playlist.py:1539
+msgid "The source is unavailable; a stale cache is in use."
+msgstr "Zdroj není dostupný; používá se zastaralá mezipaměť."
+
+#: ../GTIPTVPlayerPro/plugin.py:91
+msgid "Modern Enigma2 IPTV player"
+msgstr "Moderní IPTV přehrávač pro Enigma2"
+
+#: ../GTIPTVPlayerPro/portal_expiry.py:64
+#: ../GTIPTVPlayerPro/portal_expiry.py:148
+msgid "Unlimited"
+msgstr "Bez omezení"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:88
+msgid "Action"
+msgstr "Akce"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:91
+msgid "Exit"
+msgstr "Ukončit"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:93
+#: ../GTIPTVPlayerPro/remote_footer.py:115
+#: ../GTIPTVPlayerPro/remote_footer.py:116
+msgid "Change"
+msgstr "Změnit"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:96
+msgid "Continue"
+msgstr "Pokračovat"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:98
+msgid "Test"
+msgstr "Test"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:104
+msgid "Navigate"
+msgstr "Navigace"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:107
+msgid "Refresh"
+msgstr "Obnovit"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:108
+msgid "Back"
+msgstr "Zpět"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:110
+msgid "Play"
+msgstr "Přehrát"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:112
+msgid "EPG settings"
+msgstr "Nastavení EPG"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:114
+msgid "Full screen"
+msgstr "Celá obrazovka"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:120
+#: ../GTIPTVPlayerPro/remote_footer.py:124
+msgid "Remove"
+msgstr "Odebrat"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:122
+msgid "Clear search"
+msgstr "Vymazat hledání"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:125
+msgid "Filter"
+msgstr "Filtr"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:126
+msgid "New"
+msgstr "Nový"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:127
+msgid "Move"
+msgstr "Přesunout"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:129
+msgid "Reset"
+msgstr "Resetovat"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:130
+msgid "Show / Hide"
+msgstr "Zobrazit / Skrýt"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:131
+msgid "Mark"
+msgstr "Označit"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:133
+msgid "Clear"
+msgstr "Vymazat"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:135
+msgid "Rescan"
+msgstr "Znovu prohledat"
+
+#: ../GTIPTVPlayerPro/stalker.py:556
+msgid "Portal URL must start with http:// or https://"
+msgstr "URL portálu musí začínat http:// nebo https://"
+
+#: ../GTIPTVPlayerPro/stalker.py:567
+msgid "Portal URL port is invalid"
+msgstr "Port v URL portálu je neplatný"
+
+#: ../GTIPTVPlayerPro/stalker.py:569
+msgid "Do not include a query or fragment in the portal URL"
+msgstr "Do URL portálu nezahrnujte dotaz ani fragment"
+
+#: ../GTIPTVPlayerPro/stalker.py:1208 ../GTIPTVPlayerPro/stalker.py:1213
+msgid "The Stalker account directory could not be created"
+msgstr "Adresář účtu Stalker se nepodařilo vytvořit"
+
+#: ../GTIPTVPlayerPro/stalker.py:1220
+msgid "The Stalker account directory is unsafe"
+msgstr "Adresář účtu Stalker není bezpečný"
+
+#: ../GTIPTVPlayerPro/stalker.py:1232
+msgid "The Stalker account file is unsafe"
+msgstr "Soubor účtu Stalker není bezpečný"
+
+#: ../GTIPTVPlayerPro/stalker.py:1248 ../GTIPTVPlayerPro/stalker.py:1257
+msgid "The Stalker account file could not be created"
+msgstr "Soubor účtu Stalker se nepodařilo vytvořit"
+
+#: ../GTIPTVPlayerPro/stalker.py:1278 ../GTIPTVPlayerPro/stalker.py:1297
+#: ../GTIPTVPlayerPro/stalker.py:1410
+msgid "The Stalker account file is too large"
+msgstr "Soubor účtu Stalker je příliš velký"
+
+#: ../GTIPTVPlayerPro/stalker.py:1289
+msgid "The Stalker account file changed while opening"
+msgstr "Soubor účtu Stalker se při otevírání změnil"
+
+#: ../GTIPTVPlayerPro/stalker.py:1350 ../GTIPTVPlayerPro/stalker.py:1365
+msgid "No valid Stalker / MAC account was found"
+msgstr "Nebyl nalezen žádný platný účet Stalker / MAC"
+
+#: ../GTIPTVPlayerPro/stalker.py:1363 ../GTIPTVPlayerPro/stalker.py:1513
+msgid "The Stalker account file was not found"
+msgstr "Soubor účtu Stalker nebyl nalezen"
+
+#: ../GTIPTVPlayerPro/stalker.py:1434
+msgid "The Stalker account file could not be saved"
+msgstr "Soubor účtu Stalker se nepodařilo uložit"
+
+#: ../GTIPTVPlayerPro/stalker.py:1480
+msgid "This Stalker / MAC account already exists"
+msgstr "Tento účet Stalker / MAC již existuje"
+
+#: ../GTIPTVPlayerPro/stalker.py:1482
+msgid "The Stalker / MAC account limit was reached"
+msgstr "Byl dosažen limit účtů Stalker / MAC"
+
+#: ../GTIPTVPlayerPro/stalker.py:1500 ../GTIPTVPlayerPro/stalker.py:1551
+#: ../GTIPTVPlayerPro/stalker.py:1630
+msgid "Invalid Stalker / MAC account"
+msgstr "Neplatný účet Stalker / MAC"
+
+#: ../GTIPTVPlayerPro/stalker.py:1523 ../GTIPTVPlayerPro/stalker.py:1600
+msgid "The Stalker / MAC account was not found"
+msgstr "Účet Stalker / MAC nebyl nalezen"
+
+#: ../GTIPTVPlayerPro/stalker.py:1810 ../GTIPTVPlayerPro/stalker.py:2487
+#: ../GTIPTVPlayerPro/stalker.py:2648 ../GTIPTVPlayerPro/stalker.py:2670
+msgid "Portal authentication failed"
+msgstr "Ověření portálu selhalo"
+
+#: ../GTIPTVPlayerPro/stalker.py:1992 ../GTIPTVPlayerPro/stalker.py:1997
+msgid "Portal request cancelled"
+msgstr "Požadavek portálu byl zrušen"
+
+#: ../GTIPTVPlayerPro/stalker.py:2002
+msgid "Portal request timed out"
+msgstr "Vypršel časový limit požadavku portálu"
+
+#: ../GTIPTVPlayerPro/stalker.py:2213
+msgid "Content type unavailable"
+msgstr "Typ obsahu není k dispozici"
+
+#: ../GTIPTVPlayerPro/stalker.py:2335 ../GTIPTVPlayerPro/stalker.py:2524
+msgid "Invalid portal response"
+msgstr "Neplatná odpověď portálu"
+
+#: ../GTIPTVPlayerPro/stalker.py:2368 ../GTIPTVPlayerPro/stalker.py:5330
+#: ../GTIPTVPlayerPro/stalker.py:6222 ../GTIPTVPlayerPro/stalker.py:6236
+msgid "Portal request failed"
+msgstr "Požadavek portálu selhal"
+
+#: ../GTIPTVPlayerPro/stalker.py:2498
+msgid "Portal HTTP request failed"
+msgstr "HTTP požadavek portálu selhal"
+
+#: ../GTIPTVPlayerPro/stalker.py:2505
+msgid "Portal is unavailable"
+msgstr "Portál není dostupný"
+
+#: ../GTIPTVPlayerPro/stalker.py:2514
+msgid "Portal response is too large"
+msgstr "Odpověď portálu je příliš velká"
+
+#: ../GTIPTVPlayerPro/stalker.py:5192
+msgid "Portal catalogue did not make progress"
+msgstr "Katalog portálu se neposouvá"
+
+#: ../GTIPTVPlayerPro/stalker.py:6333 ../GTIPTVPlayerPro/stalker.py:6345
+#: ../GTIPTVPlayerPro/stalker.py:6354 ../GTIPTVPlayerPro/stalker.py:6661
+msgid "Invalid stream link"
+msgstr "Neplatný odkaz streamu"
+
+#: ../GTIPTVPlayerPro/stalker.py:7200 ../GTIPTVPlayerPro/stalker.py:7318
+#: ../GTIPTVPlayerPro/stalker.py:7453 ../GTIPTVPlayerPro/stalker.py:7588
+msgid "Stream link unavailable"
+msgstr "Odkaz streamu není dostupný"
+
+#: ../GTIPTVPlayerPro/stalker.py:8168
+msgid "Portal connection successful"
+msgstr "Připojení k portálu bylo úspěšné"
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:222
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:233
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:283
+#: ../GTIPTVPlayerPro/subtitles.py:672
+msgid "Could not open SubsSupport subtitle search."
+msgstr "Vyhledávání titulků v SubsSupport se nepodařilo otevřít."
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:407
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:438
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:480
+#: ../GTIPTVPlayerPro/subtitles.py:717
+msgid "Could not load the downloaded subtitle."
+msgstr "Stažené titulky se nepodařilo načíst."
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:412
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:510
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:532
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:580
+#: ../GTIPTVPlayerPro/subtitles.py:636
+msgid "External subtitle synchronization is unavailable."
+msgstr "Synchronizace externích titulků není dostupná."
+
+#: ../GTIPTVPlayerPro/subtitles.py:11
+msgid "DVB"
+msgstr "DVB"
+
+#: ../GTIPTVPlayerPro/subtitles.py:12
+msgid "Teletext"
+msgstr "Teletext"
+
+#: ../GTIPTVPlayerPro/subtitles.py:17 ../GTIPTVPlayerPro/subtitles.py:51
+#: ../GTIPTVPlayerPro/subtitles.py:53
+msgid "Embedded"
+msgstr "Vložené"
+
+#: ../GTIPTVPlayerPro/subtitles.py:18
+msgid "SSA"
+msgstr "SSA"
+
+#: ../GTIPTVPlayerPro/subtitles.py:19
+msgid "ASS"
+msgstr "ASS"
+
+#: ../GTIPTVPlayerPro/subtitles.py:20
+msgid "SRT"
+msgstr "SRT"
+
+#: ../GTIPTVPlayerPro/subtitles.py:21
+msgid "VOB"
+msgstr "VOB"
+
+#: ../GTIPTVPlayerPro/subtitles.py:22
+msgid "PGS"
+msgstr "PGS"
+
+#: ../GTIPTVPlayerPro/subtitles.py:23
+msgid "WebVTT"
+msgstr "WebVTT"
+
+#: ../GTIPTVPlayerPro/subtitles.py:63
+msgid "Subtitle"
+msgstr "Titulek"
+
+#: ../GTIPTVPlayerPro/subtitles.py:178
+msgid "No embedded subtitles are available."
+msgstr "Nejsou k dispozici žádné vložené titulky."
+
+#: ../GTIPTVPlayerPro/subtitles.py:184 ../GTIPTVPlayerPro/subtitles.py:234
+#: ../GTIPTVPlayerPro/subtitles.py:237 ../GTIPTVPlayerPro/subtitles.py:288
+#: ../GTIPTVPlayerPro/subtitles.py:296 ../GTIPTVPlayerPro/subtitles.py:482
+msgid "Subtitle selection is unavailable on this image."
+msgstr "Výběr titulků není na tomto image dostupný."
+
+#: ../GTIPTVPlayerPro/subtitles.py:219 ../GTIPTVPlayerPro/subtitles.py:230
+#: ../GTIPTVPlayerPro/subtitles.py:607
+msgid "Subtitles"
+msgstr "Titulky"
+
+#: ../GTIPTVPlayerPro/subtitles.py:313 ../GTIPTVPlayerPro/subtitles.py:352
+#: ../GTIPTVPlayerPro/subtitles.py:357
+msgid "Could not enable the selected subtitle."
+msgstr "Vybrané titulky se nepodařilo povolit."
+
+#: ../GTIPTVPlayerPro/subtitles.py:579
+msgid "Search subtitles with SubsSupport"
+msgstr "Hledat titulky pomocí SubsSupport"
+
+#: ../GTIPTVPlayerPro/subtitles.py:581
+#, python-format
+msgid "Search subtitles with %s"
+msgstr "Hledat titulky pomocí %s"
+
+#: ../GTIPTVPlayerPro/subtitles.py:584
+msgid "Embedded subtitles"
+msgstr "Vložené titulky"
+
+#: ../GTIPTVPlayerPro/subtitles.py:589
+msgid "External subtitle synchronization"
+msgstr "Synchronizace externích titulků"
+
+#: ../GTIPTVPlayerPro/subtitles.py:651
+msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
+msgstr "Vyhledávání titulků vyžaduje funkční instalaci SubsSupport nebo SubsSupportPro."
+
+#: ../GTIPTVPlayerPro/weather.py:435
+msgid "Could not save weather settings through Enigma2 config"
+msgstr "Nastavení počasí nelze uložit prostřednictvím konfigurace Enigma2"
+
+#: ../GTIPTVPlayerPro/weather.py:445
+msgid "Clear skies"
+msgstr "Jasná obloha"
+
+#: ../GTIPTVPlayerPro/weather.py:447
+msgid "Partly cloudy"
+msgstr "Polojasno"
+
+#: ../GTIPTVPlayerPro/weather.py:449
+msgid "Cloudy"
+msgstr "Zataženo"
+
+#: ../GTIPTVPlayerPro/weather.py:451
+msgid "Foggy"
+msgstr "Mlha"
+
+#: ../GTIPTVPlayerPro/weather.py:453
+msgid "Drizzle"
+msgstr "Mrholení"
+
+#: ../GTIPTVPlayerPro/weather.py:455
+msgid "Rainy"
+msgstr "Deštivo"
+
+#: ../GTIPTVPlayerPro/weather.py:457
+msgid "Snowy"
+msgstr "Sněžení"
+
+#: ../GTIPTVPlayerPro/weather.py:459
+msgid "Thunderstorms"
+msgstr "Bouřky"
+
+#: ../GTIPTVPlayerPro/weather.py:460
+msgid "Variable"
+msgstr "Proměnlivé"
+
+#: ../GTIPTVPlayerPro/weather.py:495 ../GTIPTVPlayerPro/weather.py:844
+#: ../GTIPTVPlayerPro/weather.py:867
+msgid "Weather request cancelled"
+msgstr "Požadavek na počasí zrušen"
+
+#: ../GTIPTVPlayerPro/weather.py:588
+msgid "Weather service response is too large"
+msgstr "Odpověď služby počasí je příliš velká"
+
+#: ../GTIPTVPlayerPro/weather.py:599 ../GTIPTVPlayerPro/weather.py:602
+msgid "Open-Meteo request failed"
+msgstr "Požadavek Open-Meteo selhal"
+
+#: ../GTIPTVPlayerPro/weather.py:600 ../GTIPTVPlayerPro/weather.py:603
+msgid "Could not reach the weather service"
+msgstr "Nelze se spojit se službou počasí"
+
+#: ../GTIPTVPlayerPro/weather.py:605 ../GTIPTVPlayerPro/weather.py:696
+msgid "Weather service returned an invalid response"
+msgstr "Služba počasí vrátila neplatnou odpověď"
+
+#: ../GTIPTVPlayerPro/weather.py:617
+msgid "City name cannot be empty"
+msgstr "Název města nesmí být prázdný"
+
+#: ../GTIPTVPlayerPro/weather.py:661
+#, python-brace-format
+msgid "Could not find {}"
+msgstr "Nelze najít {}"
+
+#: ../GTIPTVPlayerPro/weather.py:745
+msgid "Could not load the five-day forecast"
+msgstr "Nelze načíst pětidenní předpověď"
+
+#: ../GTIPTVPlayerPro/weather.py:886
+msgid "Not fetched yet"
+msgstr "Dosud nenačteno"

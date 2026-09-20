@@ -1,0 +1,3823 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GT IPTV Player Pro 1.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
+"POT-Creation-Date: 2023-11-14 22:13+0000\n"
+"PO-Revision-Date: 2026-09-16 00:00+0000\n"
+"Last-Translator: GT IPTV Player Pro contributors\n"
+"Language-Team: hu\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../GTIPTVPlayerPro/browser.py:155 ../GTIPTVPlayerPro/browser.py:7260
+#: ../GTIPTVPlayerPro/browser.py:7269 ../GTIPTVPlayerPro/browser.py:7339
+#: ../GTIPTVPlayerPro/browser.py:7364
+msgid "This source does not support the selected content type."
+msgstr "Ez a forrás nem támogatja a kiválasztott tartalomtípust."
+
+#: ../GTIPTVPlayerPro/browser.py:337
+msgid "NO RATING"
+msgstr "NINCS ÉRTÉKELÉS"
+
+#: ../GTIPTVPlayerPro/browser.py:739
+#, python-brace-format
+msgid "{} added to favorites."
+msgstr "{} hozzáadva a kedvencekhez."
+
+#: ../GTIPTVPlayerPro/browser.py:741 ../GTIPTVPlayerPro/browser.py:6566
+#, python-brace-format
+msgid "{} removed from favorites."
+msgstr "{} eltávolítva a kedvencekből."
+
+#: ../GTIPTVPlayerPro/browser.py:742 ../GTIPTVPlayerPro/browser.py:6549
+msgid "Could not update favorites."
+msgstr "A kedvencek frissítése nem sikerült."
+
+#: ../GTIPTVPlayerPro/browser.py:4447
+msgid "CONTENT BROWSER"
+msgstr "TARTALOMBÖNGÉSZŐ"
+
+#: ../GTIPTVPlayerPro/browser.py:4520 ../GTIPTVPlayerPro/browser.py:5476
+#: ../GTIPTVPlayerPro/browser.py:13098 ../GTIPTVPlayerPro/browser.py:13138
+msgid "No content found."
+msgstr "Nem található tartalom."
+
+#: ../GTIPTVPlayerPro/browser.py:4538
+#: ../GTIPTVPlayerPro/category_filter_ui.py:175
+msgid "Loading content..."
+msgstr "Tartalom betöltése..."
+
+#: ../GTIPTVPlayerPro/browser.py:4539 ../GTIPTVPlayerPro/browser.py:6948
+#: ../GTIPTVPlayerPro/browser.py:7272 ../GTIPTVPlayerPro/browser.py:7480
+#: ../GTIPTVPlayerPro/browser.py:7537 ../GTIPTVPlayerPro/browser.py:7626
+#: ../GTIPTVPlayerPro/browser.py:8706 ../GTIPTVPlayerPro/browser.py:9003
+#: ../GTIPTVPlayerPro/browser.py:9010 ../GTIPTVPlayerPro/browser.py:9013
+#: ../GTIPTVPlayerPro/browser.py:10900 ../GTIPTVPlayerPro/browser.py:11745
+#: ../GTIPTVPlayerPro/browser.py:12021 ../GTIPTVPlayerPro/browser.py:12985
+#: ../GTIPTVPlayerPro/browser.py:13066 ../GTIPTVPlayerPro/browser.py:13094
+#: ../GTIPTVPlayerPro/browser.py:13519 ../GTIPTVPlayerPro/browser.py:14291
+#: ../GTIPTVPlayerPro/browser.py:14629 ../GTIPTVPlayerPro/browser.py:14713
+#: ../GTIPTVPlayerPro/browser.py:16342 ../GTIPTVPlayerPro/browser.py:16360
+#: ../GTIPTVPlayerPro/browser.py:18208 ../GTIPTVPlayerPro/browser.py:19380
+#: ../GTIPTVPlayerPro/browser.py:21070 ../GTIPTVPlayerPro/browser.py:21335
+#: ../GTIPTVPlayerPro/category_filter_ui.py:177
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1295 ../GTIPTVPlayerPro/dvb_epg_ui.py:1920
+#: ../GTIPTVPlayerPro/main.py:5702 ../GTIPTVPlayerPro/main.py:5767
+#: ../GTIPTVPlayerPro/main.py:6363 ../GTIPTVPlayerPro/main.py:6393
+#: ../GTIPTVPlayerPro/main.py:6399 ../GTIPTVPlayerPro/main.py:6513
+#: ../GTIPTVPlayerPro/main.py:6590
+msgid "Please wait"
+msgstr "Kérjük, várjon"
+
+#: ../GTIPTVPlayerPro/browser.py:4568 ../GTIPTVPlayerPro/browser.py:4593
+#: ../GTIPTVPlayerPro/browser.py:7251 ../GTIPTVPlayerPro/browser.py:13652
+#: ../GTIPTVPlayerPro/catchup.py:192 ../GTIPTVPlayerPro/content.py:614
+#: ../GTIPTVPlayerPro/content.py:628 ../GTIPTVPlayerPro/m3u.py:405
+#: ../GTIPTVPlayerPro/m3u.py:1003 ../GTIPTVPlayerPro/m3u.py:1011
+#: ../GTIPTVPlayerPro/playlist.py:856 ../GTIPTVPlayerPro/stalker.py:1396
+msgid "Request timed out"
+msgstr "A kérés túllépte az időkorlátot"
+
+#: ../GTIPTVPlayerPro/browser.py:4570 ../GTIPTVPlayerPro/browser.py:7253
+#: ../GTIPTVPlayerPro/catchup.py:190 ../GTIPTVPlayerPro/catchup_m3u.py:198
+#: ../GTIPTVPlayerPro/content.py:609 ../GTIPTVPlayerPro/content.py:921
+#: ../GTIPTVPlayerPro/content.py:944 ../GTIPTVPlayerPro/content.py:990
+#: ../GTIPTVPlayerPro/content.py:1001 ../GTIPTVPlayerPro/content.py:1026
+#: ../GTIPTVPlayerPro/m3u.py:403 ../GTIPTVPlayerPro/m3u.py:998
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:526 ../GTIPTVPlayerPro/m3u_epg_ui.py:1177
+#: ../GTIPTVPlayerPro/main.py:6072 ../GTIPTVPlayerPro/playlist.py:848
+#: ../GTIPTVPlayerPro/playlist.py:1350 ../GTIPTVPlayerPro/playlist.py:1361
+#: ../GTIPTVPlayerPro/playlist.py:1396 ../GTIPTVPlayerPro/playlist.py:1494
+#: ../GTIPTVPlayerPro/stalker.py:1388
+msgid "Request cancelled"
+msgstr "A kérés megszakítva"
+
+#: ../GTIPTVPlayerPro/browser.py:4575 ../GTIPTVPlayerPro/browser.py:13773
+msgid "Could not load content"
+msgstr "A tartalom nem tölthető be"
+
+#: ../GTIPTVPlayerPro/browser.py:4605 ../GTIPTVPlayerPro/browser.py:6652
+#: ../GTIPTVPlayerPro/browser.py:8262 ../GTIPTVPlayerPro/browser.py:8582
+#: ../GTIPTVPlayerPro/browser.py:8594 ../GTIPTVPlayerPro/browser.py:9007
+#: ../GTIPTVPlayerPro/browser.py:9023 ../GTIPTVPlayerPro/browser.py:9057
+#: ../GTIPTVPlayerPro/browser.py:13011
+msgid "Could not open the content list."
+msgstr "A tartalomlista nem nyitható meg."
+
+#: ../GTIPTVPlayerPro/browser.py:4615
+msgid "Press GREEN to try again"
+msgstr "Nyomja meg a ZÖLD gombot az újbóli próbálkozáshoz"
+
+#: ../GTIPTVPlayerPro/browser.py:4701
+msgid "LIVE TV CATEGORY SETTINGS"
+msgstr "ÉLŐ TV KATEGÓRIABEÁLLÍTÁSAI"
+
+#: ../GTIPTVPlayerPro/browser.py:4702
+msgid "MOVIE CATEGORY SETTINGS"
+msgstr "FILMKATEGÓRIA-BEÁLLÍTÁSOK"
+
+#: ../GTIPTVPlayerPro/browser.py:4703
+msgid "SERIES CATEGORY SETTINGS"
+msgstr "SOROZATKATEGÓRIA-BEÁLLÍTÁSOK"
+
+#: ../GTIPTVPlayerPro/browser.py:4752
+#: ../GTIPTVPlayerPro/category_filter_ui.py:56
+msgid "Category Manager"
+msgstr "Kategóriakezelés"
+
+#: ../GTIPTVPlayerPro/browser.py:4753 ../GTIPTVPlayerPro/dvb_epg_ui.py:624
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:841 ../GTIPTVPlayerPro/main.py:4058
+#: ../GTIPTVPlayerPro/main.py:4381 ../GTIPTVPlayerPro/main.py:4512
+#: ../GTIPTVPlayerPro/remote_footer.py:90
+msgid "Settings"
+msgstr "Beállítások"
+
+#: ../GTIPTVPlayerPro/browser.py:4848 ../GTIPTVPlayerPro/browser.py:8246
+msgid "No category found."
+msgstr "Nem található kategória."
+
+#: ../GTIPTVPlayerPro/browser.py:4870 ../GTIPTVPlayerPro/content.py:130
+msgid "Category"
+msgstr "Kategória"
+
+#: ../GTIPTVPlayerPro/browser.py:4879 ../GTIPTVPlayerPro/browser.py:4926
+#: ../GTIPTVPlayerPro/category_filter_ui.py:193
+#: ../GTIPTVPlayerPro/category_filter_ui.py:226
+msgid "Hidden"
+msgstr "Rejtett"
+
+#: ../GTIPTVPlayerPro/browser.py:4924
+#: ../GTIPTVPlayerPro/category_filter_ui.py:194
+#: ../GTIPTVPlayerPro/category_filter_ui.py:225
+msgid "Visible"
+msgstr "Látható"
+
+#: ../GTIPTVPlayerPro/browser.py:4933 ../GTIPTVPlayerPro/browser.py:4936
+msgid "Marked"
+msgstr "Kijelölve"
+
+#: ../GTIPTVPlayerPro/browser.py:5014
+#, python-brace-format
+msgid "{} is always visible."
+msgstr "{} mindig látható."
+
+#: ../GTIPTVPlayerPro/browser.py:5022
+#: ../GTIPTVPlayerPro/category_filter_ui.py:53
+#: ../GTIPTVPlayerPro/category_filter_ui.py:58
+#: ../GTIPTVPlayerPro/category_filter_ui.py:220
+#: ../GTIPTVPlayerPro/category_filter_ui.py:301
+#: ../GTIPTVPlayerPro/remote_footer.py:132
+msgid "Filter Search"
+msgstr "Szűrőkeresés"
+
+#: ../GTIPTVPlayerPro/browser.py:5023
+msgid "Category shown."
+msgstr "Kategória megjelenítve."
+
+#: ../GTIPTVPlayerPro/browser.py:5027
+msgid "Category hidden."
+msgstr "Kategória elrejtve."
+
+#: ../GTIPTVPlayerPro/browser.py:5035
+msgid "Mark categories with RED first."
+msgstr "Először jelölje meg a kategóriákat a PIROS gombbal."
+
+#: ../GTIPTVPlayerPro/browser.py:5050
+msgid "Choose the destination with the arrows. OK places marked categories below the line; EXIT cancels."
+msgstr "Válassza ki a célhelyet a nyílgombokkal. Az OK a vonal alá helyezi a megjelölt kategóriákat; az EXIT megszakítja a műveletet."
+
+#: ../GTIPTVPlayerPro/browser.py:5081
+msgid "Position updated. Press GREEN to save."
+msgstr "A pozíció frissítve. A mentéshez nyomja meg a ZÖLD gombot."
+
+#: ../GTIPTVPlayerPro/browser.py:5098 ../GTIPTVPlayerPro/browser.py:6525
+msgid "Move cancelled."
+msgstr "A mozgatás megszakítva."
+
+#: ../GTIPTVPlayerPro/browser.py:5116
+msgid "Default order restored. Press GREEN to save."
+msgstr "Az alapértelmezett sorrend visszaállítva. A mentéshez nyomja meg a ZÖLD gombot."
+
+#: ../GTIPTVPlayerPro/browser.py:5237 ../GTIPTVPlayerPro/main.py:5114
+#: ../GTIPTVPlayerPro/playlist.py:38
+msgid "Settings could not be saved. Check the receiver storage."
+msgstr "A beállítások nem menthetők. Ellenőrizze a vevő tárhelyét."
+
+#: ../GTIPTVPlayerPro/browser.py:5251
+#, python-brace-format
+msgid "{} cannot be moved."
+msgstr "{} nem helyezhető át."
+
+#: ../GTIPTVPlayerPro/browser.py:5294
+msgid "Filters updated. Press GREEN to save."
+msgstr "Szűrők frissítve. A mentéshez nyomja meg a ZÖLD gombot."
+
+#: ../GTIPTVPlayerPro/browser.py:5358
+msgid "Continue Watching"
+msgstr "Megtekintés folytatása"
+
+#: ../GTIPTVPlayerPro/browser.py:5371
+msgid "Unfinished movies and series episodes"
+msgstr "Befejezetlen filmek és sorozatepizódok"
+
+#: ../GTIPTVPlayerPro/browser.py:5544 ../GTIPTVPlayerPro/browser.py:6026
+#: ../GTIPTVPlayerPro/browser.py:6057 ../GTIPTVPlayerPro/browser.py:6268
+#: ../GTIPTVPlayerPro/content.py:43 ../GTIPTVPlayerPro/main.py:6683
+#: ../GTIPTVPlayerPro/main.py:6691 ../GTIPTVPlayerPro/main.py:6854
+#: ../GTIPTVPlayerPro/main.py:6866
+msgid "Movies"
+msgstr "Filmek"
+
+#: ../GTIPTVPlayerPro/browser.py:5544 ../GTIPTVPlayerPro/browser.py:6026
+#: ../GTIPTVPlayerPro/browser.py:6058 ../GTIPTVPlayerPro/browser.py:6269
+#: ../GTIPTVPlayerPro/browser.py:13077 ../GTIPTVPlayerPro/content.py:44
+#: ../GTIPTVPlayerPro/main.py:6684 ../GTIPTVPlayerPro/main.py:6692
+#: ../GTIPTVPlayerPro/main.py:6855 ../GTIPTVPlayerPro/main.py:6867
+msgid "Series"
+msgstr "Sorozat"
+
+#: ../GTIPTVPlayerPro/browser.py:5552
+#, python-brace-format
+msgid "S{}  •  E{}"
+msgstr "É{}  •  E{}"
+
+#: ../GTIPTVPlayerPro/browser.py:5571
+#, python-brace-format
+msgid "%{} • {} min remaining"
+msgstr "%{} • {} perc van hátra"
+
+#: ../GTIPTVPlayerPro/browser.py:6055
+msgid "All"
+msgstr "Összes"
+
+#: ../GTIPTVPlayerPro/browser.py:6056 ../GTIPTVPlayerPro/browser.py:6267
+#: ../GTIPTVPlayerPro/content.py:42 ../GTIPTVPlayerPro/main.py:6682
+#: ../GTIPTVPlayerPro/main.py:6687 ../GTIPTVPlayerPro/main.py:6690
+#: ../GTIPTVPlayerPro/main.py:6839 ../GTIPTVPlayerPro/main.py:6853
+#: ../GTIPTVPlayerPro/main.py:6865 ../GTIPTVPlayerPro/main.py:6870
+msgid "Live TV"
+msgstr "Élő TV"
+
+#: ../GTIPTVPlayerPro/browser.py:6087 ../GTIPTVPlayerPro/browser.py:6110
+#: ../GTIPTVPlayerPro/browser.py:6336 ../GTIPTVPlayerPro/browser.py:6350
+#: ../GTIPTVPlayerPro/browser.py:6368
+msgid "Favorites"
+msgstr "Kedvencek"
+
+#: ../GTIPTVPlayerPro/browser.py:6089
+msgid "Favorite channels, movies and series"
+msgstr "Kedvenc csatornák, filmek és sorozatok"
+
+#: ../GTIPTVPlayerPro/browser.py:6148 ../GTIPTVPlayerPro/main.py:237
+#: ../GTIPTVPlayerPro/main.py:6095 ../GTIPTVPlayerPro/main.py:6747
+#: ../GTIPTVPlayerPro/main.py:8994 ../GTIPTVPlayerPro/remote_footer.py:87
+msgid "Source"
+msgstr "Forrás"
+
+#: ../GTIPTVPlayerPro/browser.py:6262
+msgid "No favorites have been added."
+msgstr "Még nincsenek kedvencek."
+
+#: ../GTIPTVPlayerPro/browser.py:6271 ../GTIPTVPlayerPro/browser.py:19194
+#: ../GTIPTVPlayerPro/browser.py:21659 ../GTIPTVPlayerPro/remote_footer.py:123
+msgid "Favorite"
+msgstr "Kedvenc"
+
+#: ../GTIPTVPlayerPro/browser.py:6336 ../GTIPTVPlayerPro/browser.py:6350
+#: ../GTIPTVPlayerPro/browser.py:6369 ../GTIPTVPlayerPro/browser.py:12219
+#: ../GTIPTVPlayerPro/main.py:5574 ../GTIPTVPlayerPro/main.py:6103
+#: ../GTIPTVPlayerPro/main.py:6109 ../GTIPTVPlayerPro/remote_footer.py:105
+#: ../GTIPTVPlayerPro/remote_footer.py:128
+msgid "Page"
+msgstr "Oldal"
+
+#: ../GTIPTVPlayerPro/browser.py:6509
+msgid "Could not save the favorite order."
+msgstr "A kedvencek sorrendje nem menthető."
+
+#: ../GTIPTVPlayerPro/browser.py:6513
+msgid "Favorite order saved."
+msgstr "A kedvencek sorrendje mentve."
+
+#: ../GTIPTVPlayerPro/browser.py:6577 ../GTIPTVPlayerPro/browser.py:6597
+msgid "This channel is no longer present in the M3U source."
+msgstr "Ez a csatorna már nem szerepel az M3U-forrásban."
+
+#: ../GTIPTVPlayerPro/browser.py:6735 ../GTIPTVPlayerPro/browser.py:6814
+#: ../GTIPTVPlayerPro/browser.py:6854 ../GTIPTVPlayerPro/browser.py:9288
+msgid "Search All Movies"
+msgstr "Keresés az összes filmben"
+
+#: ../GTIPTVPlayerPro/browser.py:6743 ../GTIPTVPlayerPro/browser.py:13116
+#: ../GTIPTVPlayerPro/browser.py:13155 ../GTIPTVPlayerPro/dvb_epg_ui.py:2147
+#: ../GTIPTVPlayerPro/main.py:3747 ../GTIPTVPlayerPro/main.py:3984
+#: ../GTIPTVPlayerPro/remote_footer.py:121
+msgid "Search"
+msgstr "Keresés"
+
+#: ../GTIPTVPlayerPro/browser.py:6744 ../GTIPTVPlayerPro/browser.py:6762
+#: ../GTIPTVPlayerPro/browser.py:6763 ../GTIPTVPlayerPro/browser.py:6893
+#: ../GTIPTVPlayerPro/browser.py:7266 ../GTIPTVPlayerPro/browser.py:7371
+msgid "Enter a movie name."
+msgstr "Adja meg a film címét."
+
+#: ../GTIPTVPlayerPro/browser.py:6747 ../GTIPTVPlayerPro/browser.py:9287
+#: ../GTIPTVPlayerPro/content.py:43
+msgid "All Movies"
+msgstr "Összes film"
+
+#: ../GTIPTVPlayerPro/browser.py:6757 ../GTIPTVPlayerPro/browser.py:7356
+#: ../GTIPTVPlayerPro/browser.py:8790 ../GTIPTVPlayerPro/browser.py:10205
+msgid "Selecting movie..."
+msgstr "Film kiválasztása..."
+
+#: ../GTIPTVPlayerPro/browser.py:6761 ../GTIPTVPlayerPro/browser.py:8794
+msgid "MOVIE SUMMARY"
+msgstr "FILMISMERTETŐ"
+
+#: ../GTIPTVPlayerPro/browser.py:6844 ../GTIPTVPlayerPro/browser.py:7632
+#: ../GTIPTVPlayerPro/browser.py:13104
+#: ../GTIPTVPlayerPro/category_filter_ui.py:292
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2229 ../GTIPTVPlayerPro/m3u_epg_ui.py:985
+#: ../GTIPTVPlayerPro/main.py:3976 ../GTIPTVPlayerPro/main.py:4171
+#: ../GTIPTVPlayerPro/main.py:4989 ../GTIPTVPlayerPro/main.py:7053
+#: ../GTIPTVPlayerPro/main.py:7703 ../GTIPTVPlayerPro/main.py:8163
+#: ../GTIPTVPlayerPro/main.py:8414
+msgid "The virtual keyboard is unavailable on this image."
+msgstr "A virtuális billentyűzet nem érhető el ezen az image-en."
+
+#: ../GTIPTVPlayerPro/browser.py:6849 ../GTIPTVPlayerPro/browser.py:7637
+#: ../GTIPTVPlayerPro/browser.py:13110
+#: ../GTIPTVPlayerPro/category_filter_ui.py:297
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2232 ../GTIPTVPlayerPro/m3u_epg_ui.py:989
+#: ../GTIPTVPlayerPro/main.py:3979 ../GTIPTVPlayerPro/main.py:4174
+#: ../GTIPTVPlayerPro/main.py:4992 ../GTIPTVPlayerPro/main.py:7057
+#: ../GTIPTVPlayerPro/main.py:7707 ../GTIPTVPlayerPro/main.py:8167
+#: ../GTIPTVPlayerPro/main.py:8417
+msgid "Could not open the virtual keyboard."
+msgstr "A virtuális billentyűzet nem nyitható meg."
+
+#: ../GTIPTVPlayerPro/browser.py:7255 ../GTIPTVPlayerPro/playlist.py:1429
+msgid "Server denied access"
+msgstr "A kiszolgáló megtagadta a hozzáférést"
+
+#: ../GTIPTVPlayerPro/browser.py:7257 ../GTIPTVPlayerPro/content.py:753
+#: ../GTIPTVPlayerPro/playlist.py:1431
+msgid "Server request limit reached"
+msgstr "Elérte a kiszolgálókérések korlátját"
+
+#: ../GTIPTVPlayerPro/browser.py:7262 ../GTIPTVPlayerPro/browser.py:7344
+#: ../GTIPTVPlayerPro/browser.py:7367 ../GTIPTVPlayerPro/browser.py:9428
+#: ../GTIPTVPlayerPro/browser.py:9495
+msgid "Could not load movies"
+msgstr "A filmek nem tölthetők be"
+
+#: ../GTIPTVPlayerPro/browser.py:7275
+#, python-brace-format
+msgid "{movies} movies • {results} results"
+msgstr "{movies} film • {results} találat"
+
+#: ../GTIPTVPlayerPro/browser.py:7303 ../GTIPTVPlayerPro/browser.py:7388
+#: ../GTIPTVPlayerPro/content.py:230 ../GTIPTVPlayerPro/metadata.py:888
+msgid "Movie"
+msgstr "Film"
+
+#: ../GTIPTVPlayerPro/browser.py:7346 ../GTIPTVPlayerPro/browser.py:7369
+msgid "No movies matched this search."
+msgstr "Nincs a keresésnek megfelelő film."
+
+#: ../GTIPTVPlayerPro/browser.py:7407 ../GTIPTVPlayerPro/browser.py:10808
+#: ../GTIPTVPlayerPro/browser.py:10832 ../GTIPTVPlayerPro/browser.py:12712
+#: ../GTIPTVPlayerPro/browser.py:12748
+msgid "Information unavailable."
+msgstr "Az információ nem érhető el."
+
+#: ../GTIPTVPlayerPro/browser.py:7422 ../GTIPTVPlayerPro/browser.py:10841
+msgid "Movie summary unavailable."
+msgstr "A filmismertető nem érhető el."
+
+#: ../GTIPTVPlayerPro/browser.py:7499 ../GTIPTVPlayerPro/browser.py:8146
+msgid "Select content before using favorites."
+msgstr "A kedvencek használata előtt válasszon tartalmat."
+
+#: ../GTIPTVPlayerPro/browser.py:7588 ../GTIPTVPlayerPro/browser.py:7642
+msgid "Search All Channels"
+msgstr "Keresés az összes csatornában"
+
+#: ../GTIPTVPlayerPro/browser.py:7591 ../GTIPTVPlayerPro/content.py:42
+#: ../GTIPTVPlayerPro/m3u.py:1223
+msgid "All Channels"
+msgstr "Összes csatorna"
+
+#: ../GTIPTVPlayerPro/browser.py:7594
+msgid "M3U CHANNEL SEARCH"
+msgstr "M3U-CSATORNAKERESÉS"
+
+#: ../GTIPTVPlayerPro/browser.py:7678
+msgid "No channels matched this search."
+msgstr "Nincs a keresésnek megfelelő csatorna."
+
+#: ../GTIPTVPlayerPro/browser.py:7679
+msgid "Enter a channel name."
+msgstr "Adja meg a csatorna nevét."
+
+#: ../GTIPTVPlayerPro/browser.py:7691
+#, python-brace-format
+msgid "First {} matching channels"
+msgstr "Az első {} egyező csatorna"
+
+#: ../GTIPTVPlayerPro/browser.py:7695
+#, python-brace-format
+msgid "{} channels found"
+msgstr "{} csatorna található"
+
+#: ../GTIPTVPlayerPro/browser.py:8027
+#, python-brace-format
+msgid "{}  |  Select a category"
+msgstr "{}  |  Válasszon kategóriát"
+
+#: ../GTIPTVPlayerPro/browser.py:8045
+msgid "LIVE TV CATEGORIES"
+msgstr "ÉLŐ TV KATEGÓRIÁK"
+
+#: ../GTIPTVPlayerPro/browser.py:8052
+msgid "5-DAY WEATHER FORECAST"
+msgstr "5 NAPOS IDŐJÁRÁS-ELŐREJELZÉS"
+
+#: ../GTIPTVPlayerPro/browser.py:8056
+msgid "TODAY"
+msgstr "MA"
+
+#: ../GTIPTVPlayerPro/browser.py:8058 ../GTIPTVPlayerPro/browser.py:19199
+#: ../GTIPTVPlayerPro/browser.py:23060
+msgid "Loading weather data"
+msgstr "Időjárási adatok betöltése"
+
+#: ../GTIPTVPlayerPro/browser.py:8273
+msgid "No categories found; press GREEN to try again."
+msgstr "Nem található kategória; nyomja meg a ZÖLD gombot az újbóli próbálkozáshoz."
+
+#: ../GTIPTVPlayerPro/browser.py:8307 ../GTIPTVPlayerPro/browser.py:8967
+#: ../GTIPTVPlayerPro/browser.py:11329
+msgid "Categories"
+msgstr "Kategóriák"
+
+#: ../GTIPTVPlayerPro/browser.py:8382 ../GTIPTVPlayerPro/main.py:4751
+msgid "Category edit lock data is damaged. Remove and reinstall the plugin to reset only this lock."
+msgstr "A kategóriaszerkesztési zár adatai megsérültek. Távolítsa el, majd telepítse újra a bővítményt, hogy csak ezt a zárat állítsa alaphelyzetbe."
+
+#: ../GTIPTVPlayerPro/browser.py:8395
+msgid "Category editor locked"
+msgstr "Kategóriaszerkesztő zárolva"
+
+#: ../GTIPTVPlayerPro/browser.py:8396
+msgid "Enter the 4-digit category edit PIN."
+msgstr "Adja meg a kategóriaszerkesztés 4 számjegyű PIN-kódját."
+
+#: ../GTIPTVPlayerPro/browser.py:8415 ../GTIPTVPlayerPro/browser.py:8436
+#: ../GTIPTVPlayerPro/main.py:4707 ../GTIPTVPlayerPro/main.py:4728
+msgid "The PIN entry screen is unavailable on this image."
+msgstr "A PIN-kód beviteli képernyője nem érhető el ezen a rendszerképen."
+
+#: ../GTIPTVPlayerPro/browser.py:8447 ../GTIPTVPlayerPro/main.py:4856
+msgid "Category lock recovery"
+msgstr "A kategóriazár helyreállítása"
+
+#: ../GTIPTVPlayerPro/browser.py:8448 ../GTIPTVPlayerPro/main.py:4857
+msgid "Enter the 12-digit recovery code."
+msgstr "Adja meg a 12 számjegyű helyreállítási kódot."
+
+#: ../GTIPTVPlayerPro/browser.py:8457
+msgid "Incorrect PIN. Category editor remains locked."
+msgstr "Helytelen PIN-kód. A kategóriaszerkesztő zárolva marad."
+
+#: ../GTIPTVPlayerPro/browser.py:8476
+msgid "Incorrect recovery code. Category editor remains locked."
+msgstr "Helytelen helyreállítási kód. A kategóriaszerkesztő zárolva marad."
+
+#: ../GTIPTVPlayerPro/browser.py:8487
+msgid "Create a new category edit PIN"
+msgstr "Hozzon létre új PIN-kódot a kategóriaszerkesztéshez"
+
+#: ../GTIPTVPlayerPro/browser.py:8488 ../GTIPTVPlayerPro/main.py:4788
+msgid "Enter a new 4-digit PIN."
+msgstr "Adjon meg egy új, 4 számjegyű PIN-kódot."
+
+#: ../GTIPTVPlayerPro/browser.py:8497
+msgid "Confirm the new category edit PIN"
+msgstr "Erősítse meg az új kategóriaszerkesztési PIN-kódot"
+
+#: ../GTIPTVPlayerPro/browser.py:8498 ../GTIPTVPlayerPro/main.py:4798
+msgid "Enter the same 4-digit PIN again."
+msgstr "Adja meg újra ugyanazt a 4 számjegyű PIN-kódot."
+
+#: ../GTIPTVPlayerPro/browser.py:8509 ../GTIPTVPlayerPro/main.py:4810
+msgid "The PIN entries do not match. Nothing was changed."
+msgstr "A PIN-kódok nem egyeznek. Nem történt módosítás."
+
+#: ../GTIPTVPlayerPro/browser.py:8526
+msgid "The new PIN could not be saved. Category editor remains locked."
+msgstr "Az új PIN-kódot nem sikerült menteni. A kategóriaszerkesztő zárolva marad."
+
+#: ../GTIPTVPlayerPro/browser.py:8537
+#, python-brace-format
+msgid ""
+"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
+"\n"
+"{}"
+msgstr ""
+"A helyreállítás sikerült. Jegyezze fel az új helyreállítási kódot; csak egyszer jelenik meg:\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/browser.py:8540
+msgid "Category edit PIN renewed."
+msgstr "A kategóriaszerkesztési PIN-kód megújítva."
+
+#: ../GTIPTVPlayerPro/browser.py:8780
+msgid "MOVIE CATEGORIES"
+msgstr "FILMKATEGÓRIÁK"
+
+#: ../GTIPTVPlayerPro/browser.py:8786
+msgid ""
+"GT\n"
+"MOVIE"
+msgstr ""
+"GT\n"
+"FILM"
+
+#: ../GTIPTVPlayerPro/browser.py:8796
+msgid "The selected movie's details will be loaded from the server."
+msgstr "A kiválasztott film részletei a kiszolgálóról lesznek betöltve."
+
+#: ../GTIPTVPlayerPro/browser.py:8804
+msgid "MOVIES IN THE SELECTED CATEGORY"
+msgstr "FILMEK A KIVÁLASZTOTT KATEGÓRIÁBAN"
+
+#: ../GTIPTVPlayerPro/browser.py:8908
+msgid "Movie category not found"
+msgstr "A filmkategória nem található"
+
+#: ../GTIPTVPlayerPro/browser.py:9292
+msgid "Press BLUE to search all movies."
+msgstr "Nyomja meg a KÉK gombot az összes filmben való kereséshez."
+
+#: ../GTIPTVPlayerPro/browser.py:9391
+#, python-brace-format
+msgid "{} • LOADING MOVIES"
+msgstr "{} • FILMEK BETÖLTÉSE"
+
+#: ../GTIPTVPlayerPro/browser.py:9525
+#, python-brace-format
+msgid "{} • {} MOVIES"
+msgstr "{} • {} FILM"
+
+#: ../GTIPTVPlayerPro/browser.py:9603
+msgid "Movie request timed out"
+msgstr "A filmkérés túllépte az időkorlátot"
+
+#: ../GTIPTVPlayerPro/browser.py:10220
+msgid "Loading movie information from the server."
+msgstr "Filmadatok betöltése a kiszolgálóról."
+
+#: ../GTIPTVPlayerPro/browser.py:10228
+msgid "COULD NOT LOAD MOVIES"
+msgstr "A FILMEK NEM TÖLTHETŐK BE"
+
+#: ../GTIPTVPlayerPro/browser.py:10233
+msgid "NO MOVIES FOUND IN THIS CATEGORY"
+msgstr "EBBEN A KATEGÓRIÁBAN NEM TALÁLHATÓ FILM"
+
+#: ../GTIPTVPlayerPro/browser.py:10234
+msgid "Try another category."
+msgstr "Próbáljon másik kategóriát."
+
+#: ../GTIPTVPlayerPro/browser.py:10811
+msgid "Movie information unavailable."
+msgstr "A filmadatok nem érhetők el."
+
+#: ../GTIPTVPlayerPro/browser.py:10837
+msgid "Genre unavailable"
+msgstr "A műfaj nem érhető el"
+
+#: ../GTIPTVPlayerPro/browser.py:10846 ../GTIPTVPlayerPro/browser.py:12758
+#, python-brace-format
+msgid "Director: {}"
+msgstr "Rendező: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:10850 ../GTIPTVPlayerPro/browser.py:12760
+#, python-brace-format
+msgid "Cast: {}"
+msgstr "Szereplők: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:11140
+#, python-brace-format
+msgid "{}   |   CONTENT BROWSER"
+msgstr "{}   |   TARTALOMBÖNGÉSZŐ"
+
+#: ../GTIPTVPlayerPro/browser.py:11166
+msgid "CATEGORIES"
+msgstr "KATEGÓRIÁK"
+
+#: ../GTIPTVPlayerPro/browser.py:11174
+msgid ""
+"GT\n"
+"SERIES"
+msgstr ""
+"GT\n"
+"SOROZAT"
+
+#: ../GTIPTVPlayerPro/browser.py:11176 ../GTIPTVPlayerPro/browser.py:19374
+#: ../GTIPTVPlayerPro/main.py:445 ../GTIPTVPlayerPro/main.py:9014
+msgid "SERIES"
+msgstr "SOROZATOK"
+
+#: ../GTIPTVPlayerPro/browser.py:11191 ../GTIPTVPlayerPro/browser.py:11983
+msgid "Selecting series..."
+msgstr "Sorozat kiválasztása..."
+
+#: ../GTIPTVPlayerPro/browser.py:11194
+msgid "SERIES SUMMARY"
+msgstr "SOROZAT ÖSSZEFOGLALÓ"
+
+#: ../GTIPTVPlayerPro/browser.py:11195 ../GTIPTVPlayerPro/browser.py:11998
+msgid "Loading series information from the server."
+msgstr "Sorozatadatok betöltése a kiszolgálóról."
+
+#: ../GTIPTVPlayerPro/browser.py:11298
+msgid "Series category not found"
+msgstr "A sorozatkategória nem található"
+
+#: ../GTIPTVPlayerPro/browser.py:11491
+#, python-brace-format
+msgid "{} • LOADING SERIES"
+msgstr "{} • SOROZATOK BETÖLTÉSE"
+
+#: ../GTIPTVPlayerPro/browser.py:11532 ../GTIPTVPlayerPro/browser.py:11606
+msgid "Could not load series"
+msgstr "A sorozatok nem tölthetők be"
+
+#: ../GTIPTVPlayerPro/browser.py:11653
+#, python-brace-format
+msgid "Series scan • {} pages"
+msgstr "Sorozatkeresés • {} oldal"
+
+#: ../GTIPTVPlayerPro/browser.py:11696
+#, python-brace-format
+msgid "{} • {} SERIES"
+msgstr "{} • {} SOROZAT"
+
+#: ../GTIPTVPlayerPro/browser.py:11800
+msgid "Series request timed out"
+msgstr "A sorozatkérés túllépte az időkorlátot"
+
+#: ../GTIPTVPlayerPro/browser.py:12012
+msgid "COULD NOT LOAD SERIES"
+msgstr "A SOROZATOK NEM TÖLTHETŐK BE"
+
+#: ../GTIPTVPlayerPro/browser.py:12027
+msgid "SERIES DATA COULD NOT BE READ"
+msgstr "A SOROZAT ADATAI NEM OLVASHATÓK"
+
+#: ../GTIPTVPlayerPro/browser.py:12029
+msgid "The series response uses an unsupported format. Categories remain available."
+msgstr "A sorozatválasz nem támogatott formátumú. A kategóriák továbbra is elérhetők."
+
+#: ../GTIPTVPlayerPro/browser.py:12032
+msgid "SERIES DATA UNAVAILABLE"
+msgstr "A SOROZAT ADATAI NEM ÉRHETŐK EL"
+
+#: ../GTIPTVPlayerPro/browser.py:12034
+msgid "The server did not answer the series request. Categories remain available."
+msgstr "A szerver nem válaszolt a sorozatkérésre. A kategóriák továbbra is elérhetők."
+
+#: ../GTIPTVPlayerPro/browser.py:12038
+msgid "NO SERIES FOUND IN THIS CATEGORY"
+msgstr "EBBEN A KATEGÓRIÁBAN NEM TALÁLHATÓ SOROZAT"
+
+#: ../GTIPTVPlayerPro/browser.py:12041
+msgid "No series were found on this server or in this category."
+msgstr "Ezen a szerveren vagy ebben a kategóriában nem található sorozat."
+
+#: ../GTIPTVPlayerPro/browser.py:12716 ../GTIPTVPlayerPro/browser.py:12752
+msgid "Series summary unavailable."
+msgstr "A sorozat ismertetője nem érhető el."
+
+#: ../GTIPTVPlayerPro/browser.py:12740 ../GTIPTVPlayerPro/browser.py:12741
+msgid "Seasons"
+msgstr "Évadok"
+
+#: ../GTIPTVPlayerPro/browser.py:13244 ../GTIPTVPlayerPro/browser.py:23057
+#: ../GTIPTVPlayerPro/browser.py:23077
+msgid "Weather is disabled"
+msgstr "Az időjárás ki van kapcsolva"
+
+#: ../GTIPTVPlayerPro/browser.py:13245
+msgid "You can enable it in Settings."
+msgstr "A Beállításokban kapcsolhatja be."
+
+#: ../GTIPTVPlayerPro/browser.py:13248
+msgid "Loading forecast"
+msgstr "Előrejelzés betöltése"
+
+#: ../GTIPTVPlayerPro/browser.py:13351 ../GTIPTVPlayerPro/weather.py:497
+#: ../GTIPTVPlayerPro/weather.py:539 ../GTIPTVPlayerPro/weather.py:573
+msgid "Weather request timed out"
+msgstr "Az időjárási kérés túllépte az időkorlátot"
+
+#: ../GTIPTVPlayerPro/browser.py:13352 ../GTIPTVPlayerPro/browser.py:13364
+#: ../GTIPTVPlayerPro/main.py:3845 ../GTIPTVPlayerPro/main.py:3859
+#: ../GTIPTVPlayerPro/main.py:4202 ../GTIPTVPlayerPro/main.py:4268
+msgid "Weather data unavailable."
+msgstr "Az időjárási adatok nem érhetők el."
+
+#: ../GTIPTVPlayerPro/browser.py:13389
+#, python-brace-format
+msgid "Humidity {}% • Wind {:.0f} km/h"
+msgstr "Páratartalom {}% • Szél {:.0f} km/h"
+
+#: ../GTIPTVPlayerPro/browser.py:13394
+msgid "  •  Cached"
+msgstr "  •  Gyorsítótárazva"
+
+#: ../GTIPTVPlayerPro/browser.py:13396
+#, python-brace-format
+msgid "Updated: {}{}"
+msgstr "Frissítve: {}{}"
+
+#: ../GTIPTVPlayerPro/browser.py:13406
+msgid "Today"
+msgstr "Ma"
+
+#: ../GTIPTVPlayerPro/browser.py:13827
+#, python-brace-format
+msgid "%{}  •  {} MIN REMAINING"
+msgstr "%{}  •  {} PERC VAN HÁTRA"
+
+#: ../GTIPTVPlayerPro/browser.py:14080
+msgid "CHANNEL LIST"
+msgstr "CSATORNALISTA"
+
+#: ../GTIPTVPlayerPro/browser.py:14094 ../GTIPTVPlayerPro/browser.py:15960
+#: ../GTIPTVPlayerPro/browser.py:19184 ../GTIPTVPlayerPro/browser.py:21623
+msgid "NOW"
+msgstr "MOST"
+
+#: ../GTIPTVPlayerPro/browser.py:14095 ../GTIPTVPlayerPro/browser.py:14113
+#: ../GTIPTVPlayerPro/browser.py:14142 ../GTIPTVPlayerPro/browser.py:14185
+#: ../GTIPTVPlayerPro/browser.py:14617 ../GTIPTVPlayerPro/browser.py:14660
+msgid "SELECT A CHANNEL"
+msgstr "CSATORNA KIVÁLASZTÁSA"
+
+#: ../GTIPTVPlayerPro/browser.py:14096 ../GTIPTVPlayerPro/browser.py:14125
+#: ../GTIPTVPlayerPro/browser.py:15900 ../GTIPTVPlayerPro/browser.py:15910
+msgid "Waiting for programme information"
+msgstr "Várakozás a műsorinformációra"
+
+#: ../GTIPTVPlayerPro/browser.py:14099 ../GTIPTVPlayerPro/browser.py:14116
+#: ../GTIPTVPlayerPro/browser.py:15902 ../GTIPTVPlayerPro/browser.py:15920
+#: ../GTIPTVPlayerPro/browser.py:15963 ../GTIPTVPlayerPro/browser.py:15987
+#: ../GTIPTVPlayerPro/browser.py:19186 ../GTIPTVPlayerPro/browser.py:19346
+#: ../GTIPTVPlayerPro/browser.py:21626
+msgid "NEXT"
+msgstr "KÖVETKEZŐ"
+
+#: ../GTIPTVPlayerPro/browser.py:14124
+msgid "PROGRAMME SUMMARY"
+msgstr "MŰSORISMERTETŐ"
+
+#: ../GTIPTVPlayerPro/browser.py:14326 ../GTIPTVPlayerPro/browser.py:14341
+#: ../GTIPTVPlayerPro/browser.py:14872 ../GTIPTVPlayerPro/browser.py:14874
+#: ../GTIPTVPlayerPro/browser.py:16389 ../GTIPTVPlayerPro/browser.py:16394
+#: ../GTIPTVPlayerPro/browser.py:16475 ../GTIPTVPlayerPro/browser.py:16487
+#: ../GTIPTVPlayerPro/browser.py:16496 ../GTIPTVPlayerPro/browser.py:18336
+#: ../GTIPTVPlayerPro/browser.py:20771 ../GTIPTVPlayerPro/browser.py:20843
+#: ../GTIPTVPlayerPro/browser.py:21506
+msgid "Could not open the stream."
+msgstr "A stream nem nyitható meg."
+
+#: ../GTIPTVPlayerPro/browser.py:14478
+msgid "No channels found; press GREEN to try again."
+msgstr "Nem található csatorna; nyomja meg a ZÖLD gombot az újbóli próbálkozáshoz."
+
+#: ../GTIPTVPlayerPro/browser.py:15918 ../GTIPTVPlayerPro/browser.py:15923
+#: ../GTIPTVPlayerPro/browser.py:15943 ../GTIPTVPlayerPro/browser.py:15995
+#: ../GTIPTVPlayerPro/browser.py:20160 ../GTIPTVPlayerPro/browser.py:20171
+#: ../GTIPTVPlayerPro/browser.py:21630
+msgid "EPG information unavailable."
+msgstr "Az EPG-adatok nem érhetők el."
+
+#: ../GTIPTVPlayerPro/browser.py:15934 ../GTIPTVPlayerPro/browser.py:16015
+msgid "No summary is available for this programme."
+msgstr "Ehhez a műsorhoz nem érhető el ismertető."
+
+#: ../GTIPTVPlayerPro/browser.py:15963
+msgid "LATER"
+msgstr "KÉSŐBB"
+
+#: ../GTIPTVPlayerPro/browser.py:16589 ../GTIPTVPlayerPro/browser.py:20008
+#: ../GTIPTVPlayerPro/browser.py:21192 ../GTIPTVPlayerPro/browser.py:21510
+#: ../GTIPTVPlayerPro/browser.py:22231 ../GTIPTVPlayerPro/browser.py:22272
+#: ../GTIPTVPlayerPro/browser.py:23860 ../GTIPTVPlayerPro/browser.py:23950
+msgid "Keeping the current stream"
+msgstr "A jelenlegi stream megtartása"
+
+#: ../GTIPTVPlayerPro/browser.py:16747
+#, python-brace-format
+msgid "{}  >  Series  >  Select season and episode"
+msgstr "{}  >  Sorozatok  >  Válasszon évadot és epizódot"
+
+#: ../GTIPTVPlayerPro/browser.py:16765 ../GTIPTVPlayerPro/browser.py:16768
+msgid "EPISODES"
+msgstr "EPIZÓDOK"
+
+#: ../GTIPTVPlayerPro/browser.py:16859
+msgid "No episodes were found for this series."
+msgstr "Ehhez a sorozathoz nem található epizód."
+
+#: ../GTIPTVPlayerPro/browser.py:16975
+msgid "Enigma2 player service support is unavailable"
+msgstr "Az Enigma2 lejátszószolgáltatás támogatása nem érhető el"
+
+#: ../GTIPTVPlayerPro/browser.py:18063
+#, python-brace-format
+msgid ""
+"Resume playback from the saved position?\n"
+"\n"
+"Saved position: {}"
+msgstr ""
+"Folytatja a lejátszást a mentett pozíciótól?\n"
+"\n"
+"Mentett pozíció: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:18254 ../GTIPTVPlayerPro/browser.py:18268
+msgid "Stream link timed out"
+msgstr "A streamhivatkozás időtúllépés miatt megszakadt"
+
+#: ../GTIPTVPlayerPro/browser.py:18334 ../GTIPTVPlayerPro/catchup_ui.py:542
+msgid "Could not open the archived programme."
+msgstr "Nem sikerült megnyitni az archivált műsort."
+
+#: ../GTIPTVPlayerPro/browser.py:19178
+msgid "Player"
+msgstr "Lejátszó"
+
+#: ../GTIPTVPlayerPro/browser.py:19179 ../GTIPTVPlayerPro/browser.py:21617
+msgid "Reading resolution"
+msgstr "Felbontás beolvasása"
+
+#: ../GTIPTVPlayerPro/browser.py:19181 ../GTIPTVPlayerPro/browser.py:21619
+#: ../GTIPTVPlayerPro/browser.py:23514
+msgid "VIDEO: --"
+msgstr "VIDEÓ: --"
+
+#: ../GTIPTVPlayerPro/browser.py:19182 ../GTIPTVPlayerPro/browser.py:21620
+#: ../GTIPTVPlayerPro/browser.py:23522
+msgid "AUDIO: --"
+msgstr "HANG: --"
+
+#: ../GTIPTVPlayerPro/browser.py:19185 ../GTIPTVPlayerPro/browser.py:21632
+msgid "Loading EPG..."
+msgstr "EPG betöltése..."
+
+#: ../GTIPTVPlayerPro/browser.py:19330 ../GTIPTVPlayerPro/browser.py:19344
+#: ../GTIPTVPlayerPro/browser.py:19351 ../GTIPTVPlayerPro/browser.py:19360
+#: ../GTIPTVPlayerPro/browser.py:19369 ../GTIPTVPlayerPro/main.py:430
+msgid "LIVE TV"
+msgstr "ÉLŐ TV"
+
+#: ../GTIPTVPlayerPro/browser.py:19330
+msgid "EPG information unavailable"
+msgstr "Az EPG-adatok nem érhetők el"
+
+#: ../GTIPTVPlayerPro/browser.py:19366 ../GTIPTVPlayerPro/browser.py:19394
+#: ../GTIPTVPlayerPro/browser.py:21626
+msgid "REMAINING"
+msgstr "HÁTRALÉVŐ"
+
+#: ../GTIPTVPlayerPro/browser.py:19373 ../GTIPTVPlayerPro/catchup_ui.py:240
+#: ../GTIPTVPlayerPro/catchup_ui.py:481 ../GTIPTVPlayerPro/main.py:435
+msgid "TV Archive"
+msgstr "TV-archívum"
+
+#: ../GTIPTVPlayerPro/browser.py:19374 ../GTIPTVPlayerPro/main.py:440
+#: ../GTIPTVPlayerPro/main.py:9013
+msgid "MOVIES"
+msgstr "FILMEK"
+
+#: ../GTIPTVPlayerPro/browser.py:20687
+msgid "Could not start the player."
+msgstr "A lejátszó nem indítható el."
+
+#: ../GTIPTVPlayerPro/browser.py:21068 ../GTIPTVPlayerPro/browser.py:21333
+msgid "Reconnecting the stream..."
+msgstr "A stream újracsatlakoztatása..."
+
+#: ../GTIPTVPlayerPro/browser.py:21623
+msgid "PREVIOUS"
+msgstr "ELŐZŐ"
+
+#: ../GTIPTVPlayerPro/browser.py:21637
+msgid "Reading duration..."
+msgstr "Időtartam beolvasása..."
+
+#: ../GTIPTVPlayerPro/browser.py:21734
+msgid "Audio track"
+msgstr "Hangsáv"
+
+#: ../GTIPTVPlayerPro/browser.py:21824
+msgid "No audio tracks are available."
+msgstr "Nincsenek elérhető hangsávok."
+
+#: ../GTIPTVPlayerPro/browser.py:21828
+msgid "This content has only one audio track."
+msgstr "Ehhez a tartalomhoz csak egy hangsáv tartozik."
+
+#: ../GTIPTVPlayerPro/browser.py:21833 ../GTIPTVPlayerPro/browser.py:21843
+#: ../GTIPTVPlayerPro/browser.py:21897 ../GTIPTVPlayerPro/browser.py:21902
+#: ../GTIPTVPlayerPro/browser.py:21944
+msgid "Audio track selection is unavailable on this image."
+msgstr "A hangsávválasztás nem érhető el ezen az image-en."
+
+#: ../GTIPTVPlayerPro/browser.py:21882 ../GTIPTVPlayerPro/browser.py:21891
+msgid "Audio tracks"
+msgstr "Hangsávok"
+
+#: ../GTIPTVPlayerPro/browser.py:21911
+msgid "The playing service changed. Open audio selection again."
+msgstr "A lejátszott szolgáltatás megváltozott. Nyissa meg újra a hangválasztást."
+
+#: ../GTIPTVPlayerPro/browser.py:21929 ../GTIPTVPlayerPro/browser.py:21938
+msgid "Audio tracks changed. Open audio selection again."
+msgstr "A hangsávok megváltoztak. Nyissa meg újra a hangválasztást."
+
+#: ../GTIPTVPlayerPro/browser.py:21954
+msgid "Could not select the requested audio track."
+msgstr "A kért hangsáv nem választható ki."
+
+#: ../GTIPTVPlayerPro/browser.py:21966 ../GTIPTVPlayerPro/browser.py:23517
+#, python-brace-format
+msgid "AUDIO: {}"
+msgstr "HANG: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:22084
+msgid "Changing channel..."
+msgstr "Csatornaváltás..."
+
+#: ../GTIPTVPlayerPro/browser.py:22227 ../GTIPTVPlayerPro/browser.py:22268
+msgid "Could not open the channel."
+msgstr "A csatorna nem nyitható meg."
+
+#: ../GTIPTVPlayerPro/browser.py:22366 ../GTIPTVPlayerPro/browser.py:22489
+#: ../GTIPTVPlayerPro/browser.py:22543 ../GTIPTVPlayerPro/browser.py:23001
+msgid "PAUSED"
+msgstr "SZÜNETELTETVE"
+
+#: ../GTIPTVPlayerPro/browser.py:22366
+msgid "SEEK MODE"
+msgstr "KERESÉSI MÓD"
+
+#: ../GTIPTVPlayerPro/browser.py:22367
+msgid "LEFT / RIGHT to select time   •   OK to continue"
+msgstr "BALRA / JOBBRA az idő kiválasztásához   •   OK a folytatáshoz"
+
+#: ../GTIPTVPlayerPro/browser.py:22490 ../GTIPTVPlayerPro/browser.py:22544
+#: ../GTIPTVPlayerPro/browser.py:23002
+msgid "PLAY / PAUSE to continue   •   STOP to close the video"
+msgstr "PLAY / PAUSE a folytatáshoz   •   STOP a videó bezárásához"
+
+#: ../GTIPTVPlayerPro/browser.py:22686
+msgid "THIS STREAM CANNOT BE SEEKED"
+msgstr "EBBEN A STREAMBEN NEM LEHET KERESNI"
+
+#: ../GTIPTVPlayerPro/browser.py:22687
+msgid "The server or playback format does not support seeking"
+msgstr "A kiszolgáló vagy a lejátszási formátum nem támogatja a keresést"
+
+#: ../GTIPTVPlayerPro/browser.py:22715
+msgid "SEEK FORWARD"
+msgstr "KERESÉS ELŐRE"
+
+#: ../GTIPTVPlayerPro/browser.py:22717
+msgid "SEEK BACKWARD"
+msgstr "KERESÉS VISSZA"
+
+#: ../GTIPTVPlayerPro/browser.py:22721
+msgid "LEFT / RIGHT to select time   •   OK to continue   •   EXIT to cancel"
+msgstr "BALRA / JOBBRA az idő kiválasztásához   •   OK a folytatáshoz   •   EXIT a megszakításhoz"
+
+#: ../GTIPTVPlayerPro/browser.py:22983
+msgid "PAUSE IS NOT AVAILABLE"
+msgstr "A SZÜNETELTETÉS NEM ÉRHETŐ EL"
+
+#: ../GTIPTVPlayerPro/browser.py:22984
+msgid "This server or playback format does not support pausing"
+msgstr "Ez a kiszolgáló vagy lejátszási formátum nem támogatja a szüneteltetést"
+
+#: ../GTIPTVPlayerPro/browser.py:23079
+msgid "Weather information is not ready"
+msgstr "Az időjárási információ még nem áll készen"
+
+#: ../GTIPTVPlayerPro/browser.py:23154
+msgid "Could not load the weather forecast"
+msgstr "Az időjárás-előrejelzés nem tölthető be"
+
+#: ../GTIPTVPlayerPro/browser.py:23179 ../GTIPTVPlayerPro/browser.py:23192
+msgid "Weather information unavailable."
+msgstr "Az időjárási információ nem érhető el."
+
+#: ../GTIPTVPlayerPro/browser.py:23492
+msgid "Resolution: --"
+msgstr "Felbontás: --"
+
+#: ../GTIPTVPlayerPro/browser.py:23509
+#, python-brace-format
+msgid "VIDEO: {}"
+msgstr "VIDEÓ: {}"
+
+#: ../GTIPTVPlayerPro/catchup.py:91 ../GTIPTVPlayerPro/content.py:292
+msgid "No programme information"
+msgstr "Nincs műsorinformáció"
+
+#: ../GTIPTVPlayerPro/catchup.py:122 ../GTIPTVPlayerPro/catchup.py:495
+#: ../GTIPTVPlayerPro/catchup.py:543 ../GTIPTVPlayerPro/catchup_m3u.py:200
+#: ../GTIPTVPlayerPro/catchup_ui.py:375 ../GTIPTVPlayerPro/catchup_ui.py:387
+msgid "Could not load the TV archive."
+msgstr "Nem sikerült betölteni a TV-archívumot."
+
+#: ../GTIPTVPlayerPro/catchup.py:187 ../GTIPTVPlayerPro/catchup.py:356
+#: ../GTIPTVPlayerPro/catchup.py:363 ../GTIPTVPlayerPro/catchup.py:410
+#: ../GTIPTVPlayerPro/catchup.py:477 ../GTIPTVPlayerPro/content.py:1684
+#: ../GTIPTVPlayerPro/m3u.py:886 ../GTIPTVPlayerPro/m3u.py:892
+#: ../GTIPTVPlayerPro/stalker.py:7312 ../GTIPTVPlayerPro/stalker.py:7447
+#: ../GTIPTVPlayerPro/stalker.py:7534
+msgid "Invalid playback item"
+msgstr "Érvénytelen lejátszási elem"
+
+#: ../GTIPTVPlayerPro/catchup.py:202 ../GTIPTVPlayerPro/catchup_stalker.py:116
+#: ../GTIPTVPlayerPro/catchup_ui.py:37
+msgid "TV archive is not supported by this source."
+msgstr "Ez a forrás nem támogatja a TV-archívumot."
+
+#: ../GTIPTVPlayerPro/catchup.py:242 ../GTIPTVPlayerPro/catchup.py:582
+#: ../GTIPTVPlayerPro/catchup_m3u.py:36
+#: ../GTIPTVPlayerPro/catchup_stalker.py:123
+msgid "Archive playback is unavailable for this channel."
+msgstr "Ennél a csatornánál nem érhető el az archívumból történő lejátszás."
+
+#: ../GTIPTVPlayerPro/catchup.py:358 ../GTIPTVPlayerPro/catchup_m3u.py:230
+#: ../GTIPTVPlayerPro/catchup_stalker.py:130
+msgid "This programme is no longer available in the TV archive."
+msgstr "Ez a műsor már nem érhető el a TV-archívumban."
+
+#: ../GTIPTVPlayerPro/catchup_m3u.py:177 ../GTIPTVPlayerPro/catchup_ui.py:36
+msgid "Configure an XMLTV guide for this M3U source to use TV archive."
+msgstr "A TV-archívum használatához állítson be XMLTV műsorújságot ehhez az M3U-forráshoz."
+
+#: ../GTIPTVPlayerPro/catchup_stalker.py:426 ../GTIPTVPlayerPro/stalker.py:2493
+msgid "Portal request limit reached"
+msgstr "A portál kérési korlátja elérve"
+
+#: ../GTIPTVPlayerPro/catchup_stalker.py:430 ../GTIPTVPlayerPro/stalker.py:1808
+#: ../GTIPTVPlayerPro/stalker.py:2344 ../GTIPTVPlayerPro/stalker.py:2364
+#: ../GTIPTVPlayerPro/stalker.py:2378 ../GTIPTVPlayerPro/stalker.py:2479
+msgid "Portal access denied"
+msgstr "A portálhoz való hozzáférés megtagadva"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:482 ../GTIPTVPlayerPro/remote_footer.py:111
+msgid "Channels"
+msgstr "Csatornák"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:521
+#, python-brace-format
+msgid "{} min"
+msgstr "{} perc"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:536
+msgid "Watch from archive"
+msgstr "Megtekintés az archívumból"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:546
+msgid "Loading programmes..."
+msgstr "Műsorok betöltése..."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:546
+msgid "Loading TV archive..."
+msgstr "TV-archívum betöltése..."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:548
+msgid "No archived channels are available for this account."
+msgstr "Ehhez a fiókhoz nem érhetők el archívummal rendelkező csatornák."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:550
+msgid "No archived programmes are available for this day."
+msgstr "Erre a napra nem érhetők el archivált műsorok."
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:54
+msgid "Filter rules: Show / Hide / Clear"
+msgstr "Szűrési szabályok: Megjelenítés / Elrejtés / Törlés"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:199
+msgid "Hide"
+msgstr "Elrejtés"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:200
+msgid "Show"
+msgstr "Megjelenítés"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:219
+msgid "No filters found."
+msgstr "Nem találhatók szűrők."
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:220
+#: ../GTIPTVPlayerPro/remote_footer.py:134
+msgid "Preview"
+msgstr "Előnézet"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:125
+msgid "NUMBER KEYS: Enter  |  YELLOW: Delete  |  OK/GREEN: Confirm  |  BACK: Cancel"
+msgstr "SZÁMGOMBOK: Bevitel  |  SÁRGA: Törlés  |  OK/ZÖLD: Megerősítés  |  VISSZA: Mégse"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:129
+msgid "BLUE: Recovery code"
+msgstr "KÉK: Helyreállítási kód"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:168
+#, python-brace-format
+msgid "Digits entered: {}/{}"
+msgstr "Beírt számjegyek: {}/{}"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:191
+#, python-brace-format
+msgid "Enter exactly {} digits."
+msgstr "Pontosan {} számjegyet adjon meg."
+
+#: ../GTIPTVPlayerPro/content.py:44
+msgid "All Series"
+msgstr "Összes sorozat"
+
+#: ../GTIPTVPlayerPro/content.py:153 ../GTIPTVPlayerPro/content.py:877
+msgid "Untitled content"
+msgstr "Névtelen tartalom"
+
+#: ../GTIPTVPlayerPro/content.py:702 ../GTIPTVPlayerPro/playlist.py:168
+msgid "Unsupported content type"
+msgstr "Nem támogatott tartalomtípus"
+
+#: ../GTIPTVPlayerPro/content.py:744
+#, python-brace-format
+msgid "API HTTP error action={}"
+msgstr "API HTTP-hiba, művelet={}"
+
+#: ../GTIPTVPlayerPro/content.py:747
+msgid "Server denied access to content"
+msgstr "A kiszolgáló megtagadta a tartalomhoz való hozzáférést"
+
+#: ../GTIPTVPlayerPro/content.py:758 ../GTIPTVPlayerPro/playlist.py:1433
+#, python-brace-format
+msgid "Server returned HTTP {}"
+msgstr "A kiszolgáló HTTP {} választ adott"
+
+#: ../GTIPTVPlayerPro/content.py:765
+#, python-brace-format
+msgid "API connection error action={}"
+msgstr "API-kapcsolati hiba, művelet={}"
+
+#: ../GTIPTVPlayerPro/content.py:769
+msgid "Could not connect to the content server"
+msgstr "Nem sikerült csatlakozni a tartalomkiszolgálóhoz"
+
+#: ../GTIPTVPlayerPro/content.py:778 ../GTIPTVPlayerPro/content.py:958
+#: ../GTIPTVPlayerPro/content.py:1335
+msgid "Server content list is too large"
+msgstr "A kiszolgáló tartalomlistája túl nagy"
+
+#: ../GTIPTVPlayerPro/content.py:787
+#, python-brace-format
+msgid "Invalid JSON action={}"
+msgstr "Érvénytelen JSON-művelet={}"
+
+#: ../GTIPTVPlayerPro/content.py:789
+msgid "Server returned an invalid content response"
+msgstr "A kiszolgáló érvénytelen tartalomválaszt adott"
+
+#: ../GTIPTVPlayerPro/content.py:953 ../GTIPTVPlayerPro/content.py:1162
+#: ../GTIPTVPlayerPro/content.py:1297 ../GTIPTVPlayerPro/content.py:1330
+msgid "Could not load the content list"
+msgstr "A tartalomlista nem tölthető be"
+
+#: ../GTIPTVPlayerPro/content.py:1103
+msgid "Could not load the category list"
+msgstr "A kategórialista nem tölthető be"
+
+#: ../GTIPTVPlayerPro/content.py:1383
+msgid "Invalid movie ID"
+msgstr "Érvénytelen filmazonosító"
+
+#: ../GTIPTVPlayerPro/content.py:1389
+msgid "Could not load movie information"
+msgstr "A film adatai nem tölthetők be"
+
+#: ../GTIPTVPlayerPro/content.py:1439
+msgid "Invalid series ID"
+msgstr "Érvénytelen sorozatazonosító"
+
+#: ../GTIPTVPlayerPro/content.py:1445
+msgid "Could not load series information"
+msgstr "A sorozat adatai nem tölthetők be"
+
+#: ../GTIPTVPlayerPro/content.py:1454
+msgid "Could not load series episodes"
+msgstr "A sorozat epizódjai nem tölthetők be"
+
+#: ../GTIPTVPlayerPro/content.py:1477 ../GTIPTVPlayerPro/stalker.py:5470
+#: ../GTIPTVPlayerPro/stalker.py:5864
+msgid "Episode"
+msgstr "Epizód"
+
+#: ../GTIPTVPlayerPro/content.py:1478 ../GTIPTVPlayerPro/stalker.py:5473
+#, python-brace-format
+msgid "S{} E{}"
+msgstr "É{} E{}"
+
+#: ../GTIPTVPlayerPro/content.py:1627 ../GTIPTVPlayerPro/content.py:1640
+msgid "Invalid channel ID"
+msgstr "Érvénytelen csatornaazonosító"
+
+#: ../GTIPTVPlayerPro/content.py:1695
+msgid "Could not create the stream URL"
+msgstr "Nem sikerült létrehozni a stream URL-címét"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:409 ../GTIPTVPlayerPro/dvb_epg_ui.py:417
+msgid "Never"
+msgstr "Soha"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:582 ../GTIPTVPlayerPro/m3u_epg_ui.py:750
+msgid "Update mode"
+msgstr "Frissítési mód"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:583 ../GTIPTVPlayerPro/m3u_epg_ui.py:751
+msgid "Update interval"
+msgstr "Frissítési időköz"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:584
+msgid "Update on startup if overdue"
+msgstr "Indításkor frissítsen, ha lejárt az esedékesség."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:585
+msgid "Update in normal standby"
+msgstr "Frissítés normál készenléti módban"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:586 ../GTIPTVPlayerPro/m3u_epg_ui.py:752
+#: ../GTIPTVPlayerPro/main.py:4010
+msgid "Last update"
+msgstr "Utolsó frissítés"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:587
+msgid "Next update"
+msgstr "Következő frissítés"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:588 ../GTIPTVPlayerPro/dvb_epg_ui.py:740
+msgid "Deep standby wake"
+msgstr "Ébresztés mély készenléti módból"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:625
+msgid "DVB EPG AUTOMATIC UPDATES"
+msgstr "AUTOMATIKUS DVB EPG-FRISSÍTÉSEK"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:632 ../GTIPTVPlayerPro/dvb_epg_ui.py:1467
+msgid "XMLTV offsets are converted to UTC automatically; no manual timezone is used."
+msgstr "Az XMLTV időeltolások automatikusan UTC-re lesznek átalakítva; nincs kézi időzóna használatban."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:653 ../GTIPTVPlayerPro/dvb_epg_ui.py:875
+msgid "Settings - DVB EPG"
+msgstr "Beállítások - DVB EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:663
+msgid "Due now"
+msgstr "Most esedékes"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:666
+#, python-brace-format
+msgid "Overdue: {}"
+msgstr "Lejárt: {}"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:672 ../GTIPTVPlayerPro/dvb_epg_ui.py:975
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1796 ../GTIPTVPlayerPro/i18n.py:348
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:853
+msgid "Automatic"
+msgstr "Automatikus"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:672 ../GTIPTVPlayerPro/dvb_epg_ui.py:979
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1788 ../GTIPTVPlayerPro/m3u_epg_ui.py:853
+msgid "Manual"
+msgstr "Kézi"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:673 ../GTIPTVPlayerPro/dvb_epg_ui.py:977
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:854 ../GTIPTVPlayerPro/playlist.py:1461
+#, python-brace-format
+msgid "{} hours"
+msgstr "{} óra"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
+#: ../GTIPTVPlayerPro/main.py:733 ../GTIPTVPlayerPro/main.py:734
+#: ../GTIPTVPlayerPro/main.py:4094 ../GTIPTVPlayerPro/main.py:4386
+#: ../GTIPTVPlayerPro/main.py:4601 ../GTIPTVPlayerPro/main.py:4609
+msgid "On"
+msgstr "Be"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
+#: ../GTIPTVPlayerPro/main.py:738 ../GTIPTVPlayerPro/main.py:739
+#: ../GTIPTVPlayerPro/main.py:742 ../GTIPTVPlayerPro/main.py:4094
+#: ../GTIPTVPlayerPro/main.py:4386 ../GTIPTVPlayerPro/main.py:4603
+#: ../GTIPTVPlayerPro/main.py:4609 ../GTIPTVPlayerPro/main.py:9666
+#: ../GTIPTVPlayerPro/main.py:9672 ../GTIPTVPlayerPro/subtitles.py:189
+#: ../GTIPTVPlayerPro/subtitles.py:591
+msgid "Off"
+msgstr "Ki"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:682 ../GTIPTVPlayerPro/dvb_epg_ui.py:741
+msgid "Always off"
+msgstr "Mindig kikapcsolva"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:708 ../GTIPTVPlayerPro/m3u_epg_ui.py:940
+msgid "Switch Update mode to Automatic to change this option."
+msgstr "A beállítás módosításához állítsa a frissítési módot „Automatikus” értékre."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:726 ../GTIPTVPlayerPro/m3u_epg_ui.py:953
+msgid "Status information is read-only."
+msgstr "Az állapotinformációk csak olvashatók."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:735
+msgid "Deep standby never wakes the receiver; an overdue update runs after the next startup."
+msgstr "Mély készenléti módban a vevő soha nem ébred fel; az esedékessé vált frissítés a következő indítás után fut le."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:745 ../GTIPTVPlayerPro/dvb_epg_ui.py:1062
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:955 ../GTIPTVPlayerPro/m3u_epg_ui.py:1012
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1031 ../GTIPTVPlayerPro/main.py:4528
+#: ../GTIPTVPlayerPro/main.py:4670 ../GTIPTVPlayerPro/main.py:4976
+msgid "Press GREEN to save the changes."
+msgstr "Nyomja meg a ZÖLD gombot a módosítások mentéséhez."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:765 ../GTIPTVPlayerPro/dvb_epg_ui.py:1096
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1110 ../GTIPTVPlayerPro/dvb_epg_ui.py:1974
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2021
+msgid "DVB EPG settings could not be saved. Check the receiver storage."
+msgstr "A DVB EPG beállításai nem menthetők. Ellenőrizze a vevő tárhelyét."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:771
+msgid "Automatic update settings saved."
+msgstr "Az automatikus frissítés beállításai elmentve."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:779
+msgid "Enable DVB EPG"
+msgstr "DVB EPG engedélyezése"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:780
+msgid "Xtream XMLTV source"
+msgstr "Xtream XMLTV-forrás"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:781
+msgid "Target DVB bouquet"
+msgstr "Cél DVB-csatornacsokor"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:782
+msgid "EPG range"
+msgstr "EPG időtartomány"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:783 ../GTIPTVPlayerPro/dvb_epg_ui.py:1552
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1592
+msgid "Manual channel mapping"
+msgstr "Kézi csatornapárosítás"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:784
+msgid "Automatic updates"
+msgstr "Automatikus frissítések"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:842
+msgid "DVB SATELLITE EPG"
+msgstr "DVB MŰHOLDAS EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:951
+msgid "All TV bouquets"
+msgstr "Összes TV-csatornacsokor"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:956 ../GTIPTVPlayerPro/dvb_epg_ui.py:1041
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1147
+msgid "Scanning DVB bouquets..."
+msgstr "DVB-csatornacsokrok vizsgálata..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:957
+msgid "Selected bouquet is unavailable"
+msgstr "A kiválasztott csatornacsokor nem érhető el"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:961
+msgid "No Xtream source"
+msgstr "Nincs Xtream-forrás"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:965
+msgid "No DVB EPG update has been completed yet."
+msgstr "Még nem fejeződött be DVB EPG-frissítés."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:966
+#, python-brace-format
+msgid "Last update: {}  •  {} channels  •  {} events"
+msgstr "Utolsó frissítés: {}  •  {} csatorna  •  {} esemény"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:985
+#, python-brace-format
+msgid "{} days"
+msgstr "{} nap"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:986
+#, python-brace-format
+msgid "Open ({} mapped)"
+msgstr "Megnyitás ({} párosítva)"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1033
+msgid "No valid Xtream source was found."
+msgstr "Nem található érvényes Xtream-forrás."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1136 ../GTIPTVPlayerPro/dvb_epg_ui.py:1144
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1166 ../GTIPTVPlayerPro/dvb_epg_ui.py:1407
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1436 ../GTIPTVPlayerPro/dvb_epg_ui.py:1473
+msgid "DVB EPG update is still running..."
+msgstr "A DVB EPG frissítése még folyamatban van..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1140
+msgid "DVB EPG settings saved."
+msgstr "A DVB EPG beállításai mentve."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1150
+msgid "Enable DVB EPG before starting an update."
+msgstr "Frissítés indítása előtt engedélyezze a DVB EPG-t."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1154 ../GTIPTVPlayerPro/dvb_epg_ui.py:1411
+msgid "Select a valid Xtream XMLTV source."
+msgstr "Válasszon érvényes Xtream XMLTV-forrást."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1158
+msgid "The receiver clock is not ready. Check network time and try again."
+msgstr "A vevő órája még nincs beállítva. Ellenőrizze a hálózati időt, majd próbálja újra."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1170 ../GTIPTVPlayerPro/dvb_epg_ui.py:1608
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1831
+msgid "An automatic DVB EPG update is already running."
+msgstr "Már folyamatban van a DVB EPG automatikus frissítése."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1183
+msgid "Downloading and preparing the Xtream XMLTV guide..."
+msgstr "Az Xtream XMLTV-műsorújság letöltése és előkészítése..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1197 ../GTIPTVPlayerPro/dvb_epg_ui.py:1275
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1344
+msgid "DVB EPG update failed. No existing EPG data was removed."
+msgstr "A DVB EPG frissítése sikertelen. A meglévő EPG-adatok nem lettek eltávolítva."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1287
+msgid "The native Enigma2 EPG cache rejected the update."
+msgstr "Az Enigma2 natív EPG-gyorsítótára elutasította a frissítést."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1361
+#, python-brace-format
+msgid "DVB EPG updated: {} channels and {} events imported."
+msgstr "A DVB EPG frissítve: {} csatorna és {} esemény importálva."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1384
+msgid "DVB bouquets could not be scanned."
+msgstr "A DVB-csatornacsokrok nem vizsgálhatók át."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1399
+msgid "DVB EPG update timed out."
+msgstr "A DVB EPG frissítése túllépte az időkorlátot."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1414
+msgid "Manual channel mapping could not be opened."
+msgstr "A kézi csatornapárosítás nem nyitható meg."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1440
+msgid "Automatic update settings could not be opened."
+msgstr "Az automatikus frissítés beállításait nem sikerült megnyitni."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1487
+msgid "DVB EPG update cancelled."
+msgstr "A DVB EPG frissítése megszakítva."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1564 ../GTIPTVPlayerPro/dvb_epg_ui.py:1624
+msgid "Loading DVB services and cached XMLTV channels..."
+msgstr "DVB-szolgáltatások és gyorsítótárazott XMLTV-csatornák betöltése..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1622
+msgid "Downloading the Xtream XMLTV guide..."
+msgstr "Az Xtream XMLTV-műsorújság letöltése..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1645 ../GTIPTVPlayerPro/dvb_epg_ui.py:1733
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1746
+msgid "Channel mapping data could not be loaded."
+msgstr "A csatornapárosítási adatok nem tölthetők be."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1755
+msgid "No real DVB service was found in the selected bouquet."
+msgstr "A kiválasztott csatornacsokorban nem található valódi DVB-szolgáltatás."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1757
+msgid "No cached XMLTV guide was found. Press YELLOW to download it."
+msgstr "Nem található gyorsítótárazott XMLTV-műsorújság. A letöltéshez nyomja meg a SÁRGA gombot."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1760
+msgid "Press OK to choose an XMLTV channel; RED blocks or restores automatic matching."
+msgstr "XMLTV-csatorna kiválasztásához nyomja meg az OK gombot; a PIROS gomb letiltja vagy visszaállítja az automatikus párosítást."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1783 ../GTIPTVPlayerPro/main.py:740
+#: ../GTIPTVPlayerPro/main.py:741 ../GTIPTVPlayerPro/main.py:8561
+#: ../GTIPTVPlayerPro/main.py:8684
+msgid "Blocked"
+msgstr "Letiltva"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1799
+msgid "Unmatched"
+msgstr "Nincs párosítva"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1848
+#, python-brace-format
+msgid "{} DVB services  •  {} XMLTV channels  •  {} mapped"
+msgstr "{} DVB-szolgáltatás  •  {} XMLTV-csatorna  •  {} párosítva"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1928
+msgid "No real DVB service is available for mapping."
+msgstr "Nincs párosítható valódi DVB-szolgáltatás."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1931
+msgid "Press YELLOW to download the XMLTV channel list first."
+msgstr "Először nyomja meg a SÁRGA gombot az XMLTV-csatornalista letöltéséhez."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1934
+msgid "The XMLTV channel list could not be opened."
+msgstr "Az XMLTV-csatornalista nem nyitható meg."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1963
+msgid "That XMLTV channel is already assigned to another DVB service."
+msgstr "Ez az XMLTV-csatorna már hozzá van rendelve egy másik DVB-szolgáltatáshoz."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1967 ../GTIPTVPlayerPro/dvb_epg_ui.py:2014
+msgid "The manual channel mapping could not be saved."
+msgstr "A kézi csatornapárosítás nem menthető."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1981
+#, python-brace-format
+msgid "Manual mapping saved: {} -> {}"
+msgstr "Kézi párosítás mentve: {} -> {}"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2001
+#, python-brace-format
+msgid "Automatic matching restored for {}."
+msgstr "Az automatikus párosítás visszaállítva ehhez: {}."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2009
+#, python-brace-format
+msgid "EPG mapping removed and automatic matching blocked for {}."
+msgstr "Az EPG-párosítás eltávolítva, az automatikus párosítás letiltva ehhez: {}."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2047
+msgid "Channel mapping refresh cancelled."
+msgstr "A csatornapárosítás frissítése megszakítva."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2096 ../GTIPTVPlayerPro/dvb_epg_ui.py:2134
+msgid "Select XMLTV channel"
+msgstr "XMLTV-csatorna kiválasztása"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2109
+msgid "Press GREEN to filter the XMLTV channel list."
+msgstr "Az XMLTV-csatornalista szűréséhez nyomja meg a ZÖLD gombot."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2145
+#, python-brace-format
+msgid "{} XMLTV channels"
+msgstr "{} XMLTV-csatorna"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2221
+msgid "No XMLTV channel matches the current filter."
+msgstr "Nincs az aktuális szűrőnek megfelelő XMLTV-csatorna."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2237
+msgid "Search XMLTV channels"
+msgstr "Keresés az XMLTV-csatornák között"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2263
+msgid "XMLTV channel filter cleared."
+msgstr "Az XMLTV-csatornaszűrő törölve."
+
+#: ../GTIPTVPlayerPro/i18n.py:147 ../GTIPTVPlayerPro/i18n.py:148
+msgid "Arabic"
+msgstr "Arab"
+
+#: ../GTIPTVPlayerPro/i18n.py:149 ../GTIPTVPlayerPro/i18n.py:150
+#: ../GTIPTVPlayerPro/i18n.py:151
+msgid "Czech"
+msgstr "Cseh"
+
+#: ../GTIPTVPlayerPro/i18n.py:152 ../GTIPTVPlayerPro/i18n.py:153
+#: ../GTIPTVPlayerPro/i18n.py:154
+msgid "German"
+msgstr "Német"
+
+#: ../GTIPTVPlayerPro/i18n.py:155 ../GTIPTVPlayerPro/i18n.py:156
+#: ../GTIPTVPlayerPro/i18n.py:157
+msgid "Greek"
+msgstr "Görög"
+
+#: ../GTIPTVPlayerPro/i18n.py:158 ../GTIPTVPlayerPro/i18n.py:159
+msgid "English"
+msgstr "Angol"
+
+#: ../GTIPTVPlayerPro/i18n.py:160 ../GTIPTVPlayerPro/i18n.py:161
+msgid "Spanish"
+msgstr "Spanyol"
+
+#: ../GTIPTVPlayerPro/i18n.py:162 ../GTIPTVPlayerPro/i18n.py:163
+msgid "Estonian"
+msgstr "Észt"
+
+#: ../GTIPTVPlayerPro/i18n.py:164 ../GTIPTVPlayerPro/i18n.py:165
+msgid "Finnish"
+msgstr "Finn"
+
+#: ../GTIPTVPlayerPro/i18n.py:166 ../GTIPTVPlayerPro/i18n.py:167
+#: ../GTIPTVPlayerPro/i18n.py:168
+msgid "French"
+msgstr "Francia"
+
+#: ../GTIPTVPlayerPro/i18n.py:169 ../GTIPTVPlayerPro/i18n.py:170
+msgid "Hungarian"
+msgstr "Magyar"
+
+#: ../GTIPTVPlayerPro/i18n.py:171 ../GTIPTVPlayerPro/i18n.py:172
+msgid "Italian"
+msgstr "Olasz"
+
+#: ../GTIPTVPlayerPro/i18n.py:173 ../GTIPTVPlayerPro/i18n.py:174
+#: ../GTIPTVPlayerPro/i18n.py:175
+msgid "Dutch"
+msgstr "Holland"
+
+#: ../GTIPTVPlayerPro/i18n.py:176 ../GTIPTVPlayerPro/i18n.py:177
+msgid "Polish"
+msgstr "Lengyel"
+
+#: ../GTIPTVPlayerPro/i18n.py:178 ../GTIPTVPlayerPro/i18n.py:179
+msgid "Portuguese"
+msgstr "Portugál"
+
+#: ../GTIPTVPlayerPro/i18n.py:180 ../GTIPTVPlayerPro/i18n.py:181
+msgid "Russian"
+msgstr "Orosz"
+
+#: ../GTIPTVPlayerPro/i18n.py:182 ../GTIPTVPlayerPro/i18n.py:183
+#: ../GTIPTVPlayerPro/i18n.py:184
+msgid "Slovak"
+msgstr "Szlovák"
+
+#: ../GTIPTVPlayerPro/i18n.py:185 ../GTIPTVPlayerPro/i18n.py:186
+#: ../GTIPTVPlayerPro/i18n.py:187
+msgid "Albanian"
+msgstr "Albán"
+
+#: ../GTIPTVPlayerPro/i18n.py:188 ../GTIPTVPlayerPro/i18n.py:189
+msgid "Serbian"
+msgstr "Szerb"
+
+#: ../GTIPTVPlayerPro/i18n.py:190 ../GTIPTVPlayerPro/i18n.py:191
+msgid "Swedish"
+msgstr "Svéd"
+
+#: ../GTIPTVPlayerPro/i18n.py:192 ../GTIPTVPlayerPro/i18n.py:193
+msgid "Turkish"
+msgstr "Török"
+
+#: ../GTIPTVPlayerPro/i18n.py:194 ../GTIPTVPlayerPro/i18n.py:195
+#: ../GTIPTVPlayerPro/i18n.py:196
+msgid "Chinese"
+msgstr "Kínai"
+
+#: ../GTIPTVPlayerPro/m3u.py:102
+msgid "M3U source ID is invalid."
+msgstr "Az M3U-forrás azonosítója érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:110
+msgid "M3U source type is invalid."
+msgstr "Az M3U-forrás típusa érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:118
+msgid "M3U source location is invalid."
+msgstr "Az M3U-forrás helye érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:121 ../GTIPTVPlayerPro/m3u.py:1730
+#: ../GTIPTVPlayerPro/main.py:7319 ../GTIPTVPlayerPro/main.py:7327
+#: ../GTIPTVPlayerPro/main.py:8151 ../GTIPTVPlayerPro/main.py:8183
+msgid "M3U file path is invalid."
+msgstr "Az M3U-fájl elérési útja érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:136 ../GTIPTVPlayerPro/m3u_epg_ui.py:326
+msgid "M3U source"
+msgstr "M3U-forrás"
+
+#: ../GTIPTVPlayerPro/m3u.py:140
+msgid "FILE"
+msgstr "FÁJL"
+
+#: ../GTIPTVPlayerPro/m3u.py:140
+msgid "WEB"
+msgstr "WEB"
+
+#: ../GTIPTVPlayerPro/m3u.py:146 ../GTIPTVPlayerPro/main.py:6860
+msgid "Local file"
+msgstr "Helyi fájl"
+
+#: ../GTIPTVPlayerPro/m3u.py:194 ../GTIPTVPlayerPro/m3u.py:199
+#: ../GTIPTVPlayerPro/m3u.py:206 ../GTIPTVPlayerPro/m3u.py:211
+#: ../GTIPTVPlayerPro/m3u.py:213
+msgid "M3U source file is invalid."
+msgstr "Az M3U-forrásfájl érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:196
+msgid "M3U source file version is not supported."
+msgstr "Az M3U-forrásfájl verziója nem támogatott."
+
+#: ../GTIPTVPlayerPro/m3u.py:243 ../GTIPTVPlayerPro/m3u.py:627
+msgid "M3U source is invalid."
+msgstr "Az M3U-forrás érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:281
+msgid "Too many M3U sources are configured."
+msgstr "Túl sok M3U-forrás van beállítva."
+
+#: ../GTIPTVPlayerPro/m3u.py:310 ../GTIPTVPlayerPro/m3u.py:332
+msgid "M3U source cache could not be deleted."
+msgstr "Az M3U-forrás gyorsítótárát nem sikerült törölni."
+
+#: ../GTIPTVPlayerPro/m3u.py:606
+msgid "M3U source file is too large."
+msgstr "Az M3U-forrásfájl túl nagy."
+
+#: ../GTIPTVPlayerPro/m3u.py:631 ../GTIPTVPlayerPro/m3u.py:633
+msgid "M3U timeout is invalid."
+msgstr "Az M3U időkorlátja érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:899
+msgid "Channel is no longer present in the M3U source."
+msgstr "A csatorna már nem szerepel az M3U-forrásban."
+
+#: ../GTIPTVPlayerPro/m3u.py:981
+msgid "This M3U source supports Live TV only."
+msgstr "Ez az M3U-forrás csak az élő TV-t támogatja."
+
+#: ../GTIPTVPlayerPro/m3u.py:1132 ../GTIPTVPlayerPro/m3u.py:2988
+msgid "Could not load the M3U source."
+msgstr "Az M3U-forrás nem tölthető be."
+
+#: ../GTIPTVPlayerPro/m3u.py:1151 ../GTIPTVPlayerPro/m3u.py:1312
+msgid "M3U source returned an invalid response."
+msgstr "Az M3U-forrás érvénytelen választ adott."
+
+#: ../GTIPTVPlayerPro/m3u.py:1156 ../GTIPTVPlayerPro/m3u.py:1317
+#: ../GTIPTVPlayerPro/m3u.py:1807 ../GTIPTVPlayerPro/m3u.py:1846
+#: ../GTIPTVPlayerPro/m3u.py:2855 ../GTIPTVPlayerPro/m3u.py:2952
+msgid "M3U source exceeds the safe size limit."
+msgstr "Az M3U-forrás meghaladja a biztonságos méretkorlátot."
+
+#: ../GTIPTVPlayerPro/m3u.py:1233
+msgid "Uncategorized"
+msgstr "Kategória nélkül"
+
+#: ../GTIPTVPlayerPro/m3u.py:1322
+msgid "M3U source contains invalid data."
+msgstr "Az M3U-forrás érvénytelen adatokat tartalmaz."
+
+#: ../GTIPTVPlayerPro/m3u.py:1337
+msgid "M3U source contains a line that is too long."
+msgstr "Az M3U-forrás túl hosszú sort tartalmaz."
+
+#: ../GTIPTVPlayerPro/m3u.py:1349
+msgid "The selected file is an HLS stream manifest, not a channel list."
+msgstr "A kiválasztott fájl HLS-adatfolyamjegyzék, nem csatornalista."
+
+#: ../GTIPTVPlayerPro/m3u.py:1355 ../GTIPTVPlayerPro/m3u.py:1402
+msgid "M3U source header is missing."
+msgstr "Hiányzik az M3U-forrásfájl fejléce."
+
+#: ../GTIPTVPlayerPro/m3u.py:1396
+msgid "M3U source contains too many channels."
+msgstr "Az M3U-forrás túl sok csatornát tartalmaz."
+
+#: ../GTIPTVPlayerPro/m3u.py:1422
+msgid "M3U source contains too many categories."
+msgstr "Az M3U-forrás túl sok kategóriát tartalmaz."
+
+#: ../GTIPTVPlayerPro/m3u.py:1459
+msgid "M3U source does not contain playable channels."
+msgstr "Az M3U-forrás nem tartalmaz lejátszható csatornákat."
+
+#: ../GTIPTVPlayerPro/m3u.py:1736
+msgid "M3U file path traversal is not allowed."
+msgstr "Az M3U-fájl elérési útjában a könyvtárbejárás nem engedélyezett."
+
+#: ../GTIPTVPlayerPro/m3u.py:1743
+msgid "Symbolic links cannot be used as M3U sources."
+msgstr "Szimbolikus hivatkozás nem használható M3U-forrásként."
+
+#: ../GTIPTVPlayerPro/m3u.py:1757
+msgid "M3U file is outside the allowed directories."
+msgstr "Az M3U-fájl az engedélyezett könyvtárakon kívül található."
+
+#: ../GTIPTVPlayerPro/m3u.py:1764 ../GTIPTVPlayerPro/m3u.py:1789
+msgid "M3U file could not be opened."
+msgstr "Az M3U-fájl nem nyitható meg."
+
+#: ../GTIPTVPlayerPro/m3u.py:1769 ../GTIPTVPlayerPro/m3u.py:1802
+msgid "M3U source must be a regular file."
+msgstr "Az M3U-forrásnak normál fájlnak kell lennie."
+
+#: ../GTIPTVPlayerPro/m3u.py:1855
+msgid "M3U file changed while it was being read."
+msgstr "Az M3U-fájl olvasás közben megváltozott."
+
+#: ../GTIPTVPlayerPro/m3u.py:2622 ../GTIPTVPlayerPro/m3u.py:2627
+msgid "M3U URL is invalid."
+msgstr "Az M3U URL-címe érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2636
+msgid "M3U URL is not safe."
+msgstr "Az M3U URL-címe nem biztonságos."
+
+#: ../GTIPTVPlayerPro/m3u.py:2638
+msgid "M3U URL port is invalid."
+msgstr "Az M3U URL-portja érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2642
+msgid "M3U host name is invalid."
+msgstr "Az M3U-állomás neve érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2666
+msgid "M3U host address is invalid."
+msgstr "Az M3U-állomás címe érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2677
+msgid "M3U host address is not allowed."
+msgstr "Az M3U-állomás címe nem engedélyezett."
+
+#: ../GTIPTVPlayerPro/m3u.py:2697
+msgid "M3U host name resolution is busy."
+msgstr "Az M3U-állomás nevének feloldása folyamatban van."
+
+#: ../GTIPTVPlayerPro/m3u.py:2730
+msgid "M3U host name could not be resolved."
+msgstr "Az M3U-állomás neve nem oldható fel."
+
+#: ../GTIPTVPlayerPro/m3u.py:2746
+msgid "M3U host resolved to an unsafe address set."
+msgstr "Az M3U-állomás neve nem biztonságos címkészletre oldódott fel."
+
+#: ../GTIPTVPlayerPro/m3u.py:2752
+msgid "M3U redirect changed the network scope."
+msgstr "Az M3U-átirányítás megváltoztatta a hálózati tartományt."
+
+#: ../GTIPTVPlayerPro/m3u.py:2879
+msgid "An HTTPS M3U request cannot be redirected to HTTP."
+msgstr "A HTTPS M3U-kérés nem irányítható át HTTP-re."
+
+#: ../GTIPTVPlayerPro/m3u.py:2930
+#, python-brace-format
+msgid "M3U server returned HTTP {}."
+msgstr "Az M3U-kiszolgáló HTTP {} választ adott."
+
+#: ../GTIPTVPlayerPro/m3u.py:2938
+msgid "Compressed M3U responses are not accepted."
+msgstr "A tömörített M3U-válaszok nem fogadhatók el."
+
+#: ../GTIPTVPlayerPro/m3u.py:2947
+msgid "M3U response size is invalid."
+msgstr "Az M3U-válasz mérete érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2996
+msgid "M3U redirect URL is missing."
+msgstr "Hiányzik az M3U átirányítási URL-címe."
+
+#: ../GTIPTVPlayerPro/m3u.py:3001
+msgid "M3U request was redirected too many times."
+msgstr "Az M3U-kérést túl sokszor irányították át."
+
+#: ../GTIPTVPlayerPro/m3u.py:3009
+msgid "M3U redirect URL is invalid."
+msgstr "Az M3U átirányítási URL-címe érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u.py:3013
+msgid "M3U redirection could not be completed."
+msgstr "Az M3U-átirányítás nem fejezhető be."
+
+#: ../GTIPTVPlayerPro/m3u.py:3026
+msgid "M3U response headers are invalid."
+msgstr "Az M3U-válasz fejlécei érvénytelenek."
+
+#: ../GTIPTVPlayerPro/m3u.py:3034
+msgid "M3U response has conflicting size information."
+msgstr "Az M3U-válasz ellentmondó méretadatokat tartalmaz."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:472 ../GTIPTVPlayerPro/m3u_epg_ui.py:663
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:718 ../GTIPTVPlayerPro/main.py:7193
+#: ../GTIPTVPlayerPro/main.py:7265 ../GTIPTVPlayerPro/main.py:7310
+#: ../GTIPTVPlayerPro/main.py:7823 ../GTIPTVPlayerPro/main.py:7891
+#: ../GTIPTVPlayerPro/main.py:7932 ../GTIPTVPlayerPro/remote_footer.py:119
+msgid "Storage"
+msgstr "Tárhely"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:524 ../GTIPTVPlayerPro/m3u_epg_ui.py:538
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1161
+msgid "Background update requested"
+msgstr "Háttérfrissítés kérve"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:531 ../GTIPTVPlayerPro/m3u_epg_ui.py:1180
+msgid "Update failed; the previous guide remains available."
+msgstr "A frissítés sikertelen; az előző műsorújság továbbra is elérhető."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:533
+#, python-brace-format
+msgid "Completed: {} channels, {} events"
+msgstr "Befejezve: {} csatorna, {} esemény"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:539
+msgid "No update has been completed yet."
+msgstr "Még nem fejeződött be frissítés."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:607 ../GTIPTVPlayerPro/m3u_epg_ui.py:652
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:749
+msgid "XMLTV source"
+msgstr "XMLTV-forrás"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:609
+msgid "Choose an XML, XML.GZ or GZ file from local or mounted storage."
+msgstr "Válasszon XML-, XML.GZ- vagy GZ-fájlt a helyi vagy csatolt tárhelyről."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:694
+msgid "This folder is outside the allowed storage locations."
+msgstr "Ez a mappa az engedélyezett tárhelyeken kívül található."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:713
+msgid "No allowed storage location is available."
+msgstr "Nem érhető el engedélyezett tárhely."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:727 ../GTIPTVPlayerPro/m3u_epg_ui.py:735
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1005 ../GTIPTVPlayerPro/m3u_epg_ui.py:1010
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1047
+msgid "XMLTV file path is invalid."
+msgstr "Az XMLTV-fájl elérési útja érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:747
+msgid "Enable external XMLTV EPG"
+msgstr "Külső XMLTV EPG engedélyezése"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:748 ../GTIPTVPlayerPro/main.py:6742
+#: ../GTIPTVPlayerPro/main.py:6901 ../GTIPTVPlayerPro/main.py:7360
+#: ../GTIPTVPlayerPro/main.py:7407
+msgid "Source type"
+msgstr "Forrás típusa"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:753 ../GTIPTVPlayerPro/main.py:6267
+msgid "Status"
+msgstr "Állapot"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:797 ../GTIPTVPlayerPro/m3u_epg_ui.py:835
+msgid "External XMLTV EPG"
+msgstr "Külső XMLTV EPG"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:806
+msgid "XMLTV settings could not be read; safe defaults are shown."
+msgstr "Az XMLTV-beállítások nem olvashatók; a biztonságos alapértékek jelennek meg."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:808
+msgid "Updates run in the background. Channel changes never download EPG data."
+msgstr "A frissítések a háttérben futnak. Csatornaváltáskor nem töltődnek le EPG-adatok."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:848 ../GTIPTVPlayerPro/main.py:4614
+msgid "Not configured"
+msgstr "Nincs beállítva"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8009
+msgid "Local / NAS"
+msgstr "Helyi / NAS"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8010
+#: ../GTIPTVPlayerPro/main.py:8072 ../GTIPTVPlayerPro/playlist.py:1559
+msgid "Web URL"
+msgstr "Webes URL"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:915
+msgid "Choose an XMLTV source before enabling this option."
+msgstr "A beállítás engedélyezése előtt válasszon XMLTV-forrást."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:973
+msgid "The XMLTV file browser is unavailable."
+msgstr "Az XMLTV-fájlböngésző nem érhető el."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:995
+msgid "Enter the XMLTV HTTP(S) URL"
+msgstr "Adja meg az XMLTV HTTP(S) URL-címét"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1001
+msgid "File selection cancelled."
+msgstr "A fájlkiválasztás megszakítva."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1018 ../GTIPTVPlayerPro/main.py:7069
+#: ../GTIPTVPlayerPro/main.py:8206 ../GTIPTVPlayerPro/main.py:8432
+msgid "Field entry cancelled."
+msgstr "A mező kitöltése megszakítva."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1023 ../GTIPTVPlayerPro/m3u_epg_ui.py:1051
+msgid "XMLTV URL must start with http:// or https://."
+msgstr "Az XMLTV URL-címének http:// vagy https:// előtaggal kell kezdődnie."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1029
+msgid "XMLTV URL is invalid."
+msgstr "Az XMLTV URL-címe érvénytelen."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1038
+msgid "Choose an XMLTV source before saving."
+msgstr "Mentés előtt válasszon XMLTV-forrást."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1100
+msgid "XMLTV settings could not be saved. Check the receiver storage."
+msgstr "Az XMLTV-beállítások nem menthetők. Ellenőrizze a vevő tárhelyét."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1110
+msgid "External XMLTV EPG settings saved."
+msgstr "A külső XMLTV EPG beállításai mentve."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1220
+msgid "Enable external XMLTV EPG before requesting an update."
+msgstr "Frissítés kérése előtt engedélyezze a külső XMLTV EPG-t."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1235 ../GTIPTVPlayerPro/m3u_epg_ui.py:1261
+msgid "The XMLTV update was queued in the background."
+msgstr "Az XMLTV-frissítés sorba állítva a háttérben."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1270
+msgid "The XMLTV update could not be queued. Try again shortly."
+msgstr "Az XMLTV-frissítés nem állítható sorba. Próbálja újra hamarosan."
+
+#: ../GTIPTVPlayerPro/main.py:304 ../GTIPTVPlayerPro/main.py:7106
+#: ../GTIPTVPlayerPro/main.py:7585 ../GTIPTVPlayerPro/main.py:8559
+#: ../GTIPTVPlayerPro/main.py:8678 ../GTIPTVPlayerPro/stalker.py:8161
+msgid "Active"
+msgstr "Aktív"
+
+#: ../GTIPTVPlayerPro/main.py:305 ../GTIPTVPlayerPro/playlist.py:1289
+#: ../GTIPTVPlayerPro/stalker.py:8166
+msgid "Connection limit reached"
+msgstr "Elérte a kapcsolati korlátot"
+
+#: ../GTIPTVPlayerPro/main.py:306 ../GTIPTVPlayerPro/main.py:5562
+#: ../GTIPTVPlayerPro/main.py:5579 ../GTIPTVPlayerPro/main.py:5631
+#: ../GTIPTVPlayerPro/main.py:6075
+msgid "Inactive"
+msgstr "Inaktív"
+
+#: ../GTIPTVPlayerPro/main.py:307 ../GTIPTVPlayerPro/main.py:311
+#: ../GTIPTVPlayerPro/main.py:317 ../GTIPTVPlayerPro/main.py:721
+#: ../GTIPTVPlayerPro/main.py:765 ../GTIPTVPlayerPro/main.py:6245
+#: ../GTIPTVPlayerPro/main.py:6246 ../GTIPTVPlayerPro/main.py:8542
+#: ../GTIPTVPlayerPro/main.py:8571 ../GTIPTVPlayerPro/main.py:8635
+#: ../GTIPTVPlayerPro/main.py:8655 ../GTIPTVPlayerPro/main.py:8687
+#: ../GTIPTVPlayerPro/main.py:8745 ../GTIPTVPlayerPro/main.py:8824
+#: ../GTIPTVPlayerPro/main.py:8829 ../GTIPTVPlayerPro/main.py:8841
+#: ../GTIPTVPlayerPro/main.py:8842 ../GTIPTVPlayerPro/main.py:8843
+#: ../GTIPTVPlayerPro/main.py:8861 ../GTIPTVPlayerPro/main.py:9355
+#: ../GTIPTVPlayerPro/main.py:9359 ../GTIPTVPlayerPro/main.py:9637
+#: ../GTIPTVPlayerPro/main.py:9650 ../GTIPTVPlayerPro/main.py:9676
+#: ../GTIPTVPlayerPro/main.py:9677 ../GTIPTVPlayerPro/main.py:9760
+#: ../GTIPTVPlayerPro/main.py:9761 ../GTIPTVPlayerPro/playlist.py:245
+#: ../GTIPTVPlayerPro/playlist.py:1241 ../GTIPTVPlayerPro/playlist.py:1297
+#: ../GTIPTVPlayerPro/playlist.py:1301 ../GTIPTVPlayerPro/playlist.py:1303
+#: ../GTIPTVPlayerPro/playlist.py:1304 ../GTIPTVPlayerPro/playlist.py:1305
+#: ../GTIPTVPlayerPro/playlist.py:1307 ../GTIPTVPlayerPro/playlist.py:1547
+#: ../GTIPTVPlayerPro/subtitles.py:16
+msgid "Unknown"
+msgstr "Ismeretlen"
+
+#: ../GTIPTVPlayerPro/main.py:394
+msgid "No valid M3U source was found"
+msgstr "Nem található érvényes M3U-forrás"
+
+#: ../GTIPTVPlayerPro/main.py:408
+msgid "Unsupported source type"
+msgstr "Nem támogatott forrástípus"
+
+#: ../GTIPTVPlayerPro/main.py:431
+msgid "Access your channels quickly"
+msgstr "Gyors hozzáférés a csatornáihoz"
+
+#: ../GTIPTVPlayerPro/main.py:436
+msgid "Watch programmes you missed"
+msgstr "Nézze meg a kihagyott műsorokat"
+
+#: ../GTIPTVPlayerPro/main.py:441
+msgid "Explore your movie library"
+msgstr "Böngéssze filmkönyvtárát"
+
+#: ../GTIPTVPlayerPro/main.py:446
+msgid "Browse seasons and episodes"
+msgstr "Évadok és epizódok böngészése"
+
+#: ../GTIPTVPlayerPro/main.py:450 ../GTIPTVPlayerPro/main.py:9015
+msgid "CONTINUE WATCHING"
+msgstr "MEGTEKINTÉS FOLYTATÁSA"
+
+#: ../GTIPTVPlayerPro/main.py:451
+msgid "Resume unfinished movies and series episodes"
+msgstr "Befejezetlen filmek és sorozatepizódok folytatása"
+
+#: ../GTIPTVPlayerPro/main.py:455 ../GTIPTVPlayerPro/main.py:9025
+#: ../GTIPTVPlayerPro/main.py:9027
+msgid "FAVORITES"
+msgstr "KEDVENCEK"
+
+#: ../GTIPTVPlayerPro/main.py:456
+msgid "Favorite channels, movies and series in one place"
+msgstr "Kedvenc csatornák, filmek és sorozatok egy helyen"
+
+#: ../GTIPTVPlayerPro/main.py:460
+msgid "SETTINGS"
+msgstr "BEÁLLÍTÁSOK"
+
+#: ../GTIPTVPlayerPro/main.py:461
+msgid "Manage the player and appearance"
+msgstr "A lejátszó és a megjelenés kezelése"
+
+#: ../GTIPTVPlayerPro/main.py:468
+#, python-brace-format
+msgid ""
+"{} v{}\n"
+"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
+"\n"
+"DEVELOPER\n"
+"{}\n"
+"\n"
+"LEGAL NOTICE\n"
+"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
+"\n"
+"PRIVACY\n"
+"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr ""
+"{} v{}\n"
+"Nyílt forráskódú IPTV-lejátszó Enigma2 rendszerhez. Támogatja az Xtream Codes-fiókokat, valamint az élő TV-t szabványos helyi, csatolt hálózati vagy HTTP(S) M3U-lejátszási listákból. A sima M3U-források csak élő TV-t biztosítanak.\n"
+"\n"
+"FEJLESZTŐ\n"
+"{}\n"
+"\n"
+"JOGI NYILATKOZAT\n"
+"Ez a bővítmény nem biztosít csatornákat, adatfolyamokat, fiókokat vagy lejátszási listákat. A felhasználó felelős azért, hogy kizárólag olyan tartalmat használjon, amelyhez hozzáférési és használati joga van.\n"
+"\n"
+"ADATVÉDELEM\n"
+"Ha az Open-Meteo engedélyezve van, a kiválasztott várost és helyet elküldi az Open-Meteo szolgáltatásnak az időjárás-előrejelzéshez. Ha a TMDb engedélyezve van, a film/sorozat címét és a felhasználó által megadott TMDb-kulcsot vagy tokent elküldi a TMDb szolgáltatásnak. Az IPTV felhasználónevét és jelszavát nem küldi el ezeknek a szolgáltatásoknak."
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "SOURCE CODE"
+msgstr "FORRÁSKÓD"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "REPORT AN ISSUE"
+msgstr "HIBA BEJELENTÉSE"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "LICENSE"
+msgstr "LICENC"
+
+#: ../GTIPTVPlayerPro/main.py:735
+msgid "Connected"
+msgstr "Csatlakozva"
+
+#: ../GTIPTVPlayerPro/main.py:736 ../GTIPTVPlayerPro/main.py:8561
+#: ../GTIPTVPlayerPro/main.py:8683
+msgid "Busy"
+msgstr "Foglalt"
+
+#: ../GTIPTVPlayerPro/main.py:737 ../GTIPTVPlayerPro/main.py:8681
+msgid "Warning"
+msgstr "Figyelmeztetés"
+
+#: ../GTIPTVPlayerPro/main.py:743 ../GTIPTVPlayerPro/main.py:7641
+#: ../GTIPTVPlayerPro/main.py:7946 ../GTIPTVPlayerPro/main.py:7951
+#: ../GTIPTVPlayerPro/main.py:7955 ../GTIPTVPlayerPro/main.py:8686
+#: ../GTIPTVPlayerPro/stalker.py:8186
+msgid "Invalid"
+msgstr "Érvénytelen"
+
+#: ../GTIPTVPlayerPro/main.py:747
+#, python-brace-format
+msgid ""
+"Read time: {} ms\n"
+"Source type: {}\n"
+"Size: {} bytes\n"
+"Channels: {}\n"
+"Categories: {}\n"
+"Cache age: {}\n"
+"Last modified: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Olvasási idő: {} ms\n"
+"Forrás típusa: {}\n"
+"Méret: {} bájt\n"
+"Csatornák: {}\n"
+"Kategóriák: {}\n"
+"Gyorsítótár kora: {}\n"
+"Utolsó módosítás: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/main.py:757
+#, python-brace-format
+msgid ""
+"Latency: {} ms\n"
+"Account status: {}\n"
+"Protocol: {}\n"
+"Output format: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Késleltetés: {} ms\n"
+"Fiók állapota: {}\n"
+"Protokoll: {}\n"
+"Kimeneti formátum: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/main.py:3746 ../GTIPTVPlayerPro/main.py:3782
+msgid "Weather"
+msgstr "Időjárás"
+
+#: ../GTIPTVPlayerPro/main.py:3909
+msgid "Loading..."
+msgstr "Betöltés..."
+
+#: ../GTIPTVPlayerPro/main.py:3918
+msgid "No items found."
+msgstr "Nem található elem."
+
+#: ../GTIPTVPlayerPro/main.py:3991 ../GTIPTVPlayerPro/remote_footer.py:109
+msgid "Cancel"
+msgstr "Mégse"
+
+#: ../GTIPTVPlayerPro/main.py:4007
+msgid "Show weather"
+msgstr "Időjárás megjelenítése"
+
+#: ../GTIPTVPlayerPro/main.py:4008 ../GTIPTVPlayerPro/main.py:4179
+msgid "City"
+msgstr "Város"
+
+#: ../GTIPTVPlayerPro/main.py:4009
+msgid "Temperature unit"
+msgstr "Hőmérsékleti egység"
+
+#: ../GTIPTVPlayerPro/main.py:4059
+msgid "WEATHER"
+msgstr "IDŐJÁRÁS"
+
+#: ../GTIPTVPlayerPro/main.py:4066
+msgid "Press OK on the City row to open the keyboard."
+msgstr "Nyomja meg az OK gombot a Város sorában a billentyűzet megnyitásához."
+
+#: ../GTIPTVPlayerPro/main.py:4090
+msgid "Settings - Weather"
+msgstr "Beállítások – Időjárás"
+
+#: ../GTIPTVPlayerPro/main.py:4132
+#, python-brace-format
+msgid "Settings could not be saved: {}"
+msgstr "A beállítások nem menthetők: {}"
+
+#: ../GTIPTVPlayerPro/main.py:4145
+msgid "Weather display updated."
+msgstr "Az időjárás megjelenítése frissítve."
+
+#: ../GTIPTVPlayerPro/main.py:4149
+msgid "Temperature unit updated."
+msgstr "A hőmérsékleti egység frissítve."
+
+#: ../GTIPTVPlayerPro/main.py:4162
+msgid "The last-update time refreshes when weather data is received."
+msgstr "Az utolsó frissítés ideje az időjárási adatok beérkezésekor frissül."
+
+#: ../GTIPTVPlayerPro/main.py:4186
+msgid "City change cancelled."
+msgstr "A város módosítása megszakítva."
+
+#: ../GTIPTVPlayerPro/main.py:4215
+#, python-brace-format
+msgid "Checking {}..."
+msgstr "{} ellenőrzése..."
+
+#: ../GTIPTVPlayerPro/main.py:4280
+msgid "No weather forecast is available for this city."
+msgstr "Ehhez a városhoz nem érhető el időjárás-előrejelzés."
+
+#: ../GTIPTVPlayerPro/main.py:4298
+#, python-brace-format
+msgid "{} was saved."
+msgstr "{} mentve."
+
+#: ../GTIPTVPlayerPro/main.py:4323
+msgid "Standard"
+msgstr "Normál"
+
+#: ../GTIPTVPlayerPro/main.py:4324
+msgid "Large"
+msgstr "Nagy"
+
+#: ../GTIPTVPlayerPro/main.py:4325
+msgid "Very large"
+msgstr "Nagyon nagy"
+
+#: ../GTIPTVPlayerPro/main.py:4327
+msgid "Text size"
+msgstr "Szövegméret"
+
+#: ../GTIPTVPlayerPro/main.py:4327
+msgid "Cinematic view"
+msgstr "Mozi nézet"
+
+#: ../GTIPTVPlayerPro/main.py:4347 ../GTIPTVPlayerPro/main.py:4350
+#: ../GTIPTVPlayerPro/main.py:4381 ../GTIPTVPlayerPro/main.py:4450
+msgid "Appearance"
+msgstr "Megjelenés"
+
+#: ../GTIPTVPlayerPro/main.py:4358 ../GTIPTVPlayerPro/main.py:4651
+#: ../GTIPTVPlayerPro/main.py:4654 ../GTIPTVPlayerPro/main.py:4952
+#: ../GTIPTVPlayerPro/main.py:8081 ../GTIPTVPlayerPro/remote_footer.py:89
+#: ../GTIPTVPlayerPro/remote_footer.py:92
+msgid "Select"
+msgstr "Kiválasztás"
+
+#: ../GTIPTVPlayerPro/main.py:4443
+msgid "Live TV service type"
+msgstr "Élő TV szolgáltatástípusa"
+
+#: ../GTIPTVPlayerPro/main.py:4444
+msgid "Movie service type"
+msgstr "Filmszolgáltatás típusa"
+
+#: ../GTIPTVPlayerPro/main.py:4445
+msgid "Series service type"
+msgstr "Sorozatszolgáltatás típusa"
+
+#: ../GTIPTVPlayerPro/main.py:4446
+msgid "TMDb metadata enrichment"
+msgstr "TMDb metaadat-bővítés"
+
+#: ../GTIPTVPlayerPro/main.py:4447
+msgid "TMDb API key / token"
+msgstr "TMDb API-kulcs / token"
+
+#: ../GTIPTVPlayerPro/main.py:4448
+msgid "DVB EPG"
+msgstr "DVB EPG"
+
+#: ../GTIPTVPlayerPro/main.py:4449
+msgid "Category edit lock"
+msgstr "Kategóriaszerkesztési zár"
+
+#: ../GTIPTVPlayerPro/main.py:4451 ../GTIPTVPlayerPro/main.py:7359
+#: ../GTIPTVPlayerPro/main.py:7401 ../GTIPTVPlayerPro/main.py:7469
+#: ../GTIPTVPlayerPro/main.py:7508 ../GTIPTVPlayerPro/main.py:7839
+#: ../GTIPTVPlayerPro/main.py:7884
+msgid "Select playlist"
+msgstr "Lejátszási lista kiválasztása"
+
+#: ../GTIPTVPlayerPro/main.py:4516
+msgid "Player / Codec"
+msgstr "Lejátszó / Kodek"
+
+#: ../GTIPTVPlayerPro/main.py:4518
+msgid "LANGUAGE"
+msgstr "NYELV"
+
+#: ../GTIPTVPlayerPro/main.py:4560
+msgid "Settings - Player / Codec"
+msgstr "Beállítások – Lejátszó / Kodek"
+
+#: ../GTIPTVPlayerPro/main.py:4591 ../GTIPTVPlayerPro/remote_footer.py:106
+msgid "Open"
+msgstr "Megnyitás"
+
+#: ../GTIPTVPlayerPro/main.py:4604 ../GTIPTVPlayerPro/main.py:7535
+#: ../GTIPTVPlayerPro/main.py:7587 ../GTIPTVPlayerPro/main.py:7673
+#: ../GTIPTVPlayerPro/main.py:7729 ../GTIPTVPlayerPro/main.py:7766
+#: ../GTIPTVPlayerPro/main.py:8563 ../GTIPTVPlayerPro/main.py:8686
+#: ../GTIPTVPlayerPro/main.py:8795 ../GTIPTVPlayerPro/main.py:8797
+msgid "Error"
+msgstr "Hiba"
+
+#: ../GTIPTVPlayerPro/main.py:4612
+#, python-brace-format
+msgid "Configured ••••{}"
+msgstr "Beállítva ••••{}"
+
+#: ../GTIPTVPlayerPro/main.py:4642
+msgid "Press OK to open the DVB EPG settings."
+msgstr "A DVB EPG beállításainak megnyitásához nyomja meg az OK gombot."
+
+#: ../GTIPTVPlayerPro/main.py:4647
+msgid "Press OK to turn the category edit lock on or off."
+msgstr "Nyomja meg az OK gombot a kategóriaszerkesztési zár be- vagy kikapcsolásához."
+
+#: ../GTIPTVPlayerPro/main.py:4658
+msgid "Press OK to enter or change the TMDb key."
+msgstr "Nyomja meg az OK gombot a TMDb-kulcs megadásához vagy módosításához."
+
+#: ../GTIPTVPlayerPro/main.py:4762 ../GTIPTVPlayerPro/main.py:4782
+#: ../GTIPTVPlayerPro/main.py:7743
+msgid "The confirmation screen is unavailable on this image."
+msgstr "A megerősítési képernyő nem érhető el ezen a rendszerképen."
+
+#: ../GTIPTVPlayerPro/main.py:4775
+msgid "Disable the category edit lock?"
+msgstr "Kikapcsolja a kategóriaszerkesztési zárat?"
+
+#: ../GTIPTVPlayerPro/main.py:4787
+msgid "Create category edit PIN"
+msgstr "Kategóriaszerkesztési PIN-kód létrehozása"
+
+#: ../GTIPTVPlayerPro/main.py:4797
+msgid "Confirm category edit PIN"
+msgstr "Kategóriaszerkesztési PIN-kód megerősítése"
+
+#: ../GTIPTVPlayerPro/main.py:4823
+msgid "Category edit lock could not be saved. Check the receiver storage."
+msgstr "A kategóriaszerkesztési zárat nem sikerült menteni. Ellenőrizze a vevőegység tárhelyét."
+
+#: ../GTIPTVPlayerPro/main.py:4831
+msgid "Category edit lock enabled."
+msgstr "A kategóriaszerkesztési zár bekapcsolva."
+
+#: ../GTIPTVPlayerPro/main.py:4834
+#, python-brace-format
+msgid ""
+"Write down this recovery code. It is shown only once:\n"
+"\n"
+"{}\n"
+"\n"
+"If you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr ""
+"Jegyezze fel ezt a helyreállítási kódot. Csak egyszer jelenik meg:\n"
+"\n"
+"{}\n"
+"\n"
+"Ha mindkét kódot elfelejti, a bővítmény eltávolítása és újratelepítése csak ezt a zárat állítja alaphelyzetbe."
+
+#: ../GTIPTVPlayerPro/main.py:4845
+msgid "Disable category edit lock"
+msgstr "Kategóriaszerkesztési zár kikapcsolása"
+
+#: ../GTIPTVPlayerPro/main.py:4846
+msgid "Enter the current 4-digit PIN."
+msgstr "Adja meg a jelenlegi 4 számjegyű PIN-kódot."
+
+#: ../GTIPTVPlayerPro/main.py:4866
+msgid "Incorrect PIN. Lock unchanged."
+msgstr "Helytelen PIN-kód. A zár változatlan maradt."
+
+#: ../GTIPTVPlayerPro/main.py:4879
+msgid "Incorrect recovery code. Lock unchanged."
+msgstr "Helytelen helyreállítási kód. A zár változatlan maradt."
+
+#: ../GTIPTVPlayerPro/main.py:4892
+msgid "Category edit lock disabled."
+msgstr "A kategóriaszerkesztési zár kikapcsolva."
+
+#: ../GTIPTVPlayerPro/main.py:4897
+msgid "Category edit lock could not be removed. Check the receiver storage."
+msgstr "A kategóriaszerkesztési zárat nem sikerült eltávolítani. Ellenőrizze a vevőegység tárhelyét."
+
+#: ../GTIPTVPlayerPro/main.py:4908
+msgid "DVB EPG settings are unavailable on this image."
+msgstr "A DVB EPG beállításai nem érhetők el ezen az image-en."
+
+#: ../GTIPTVPlayerPro/main.py:4981
+msgid "DVB EPG settings closed."
+msgstr "A DVB EPG beállításai bezárva."
+
+#: ../GTIPTVPlayerPro/main.py:4998
+msgid "Enter the TMDb API key or access token"
+msgstr "Adja meg a TMDb API-kulcsát vagy hozzáférési tokenjét"
+
+#: ../GTIPTVPlayerPro/main.py:5005
+msgid "TMDb key change cancelled."
+msgstr "A TMDb-kulcs módosítása megszakítva."
+
+#: ../GTIPTVPlayerPro/main.py:5011
+msgid "TMDb key saved; press BLUE to test and GREEN to save."
+msgstr "A TMDb-kulcs mentve; nyomja meg a KÉK gombot a teszthez és a ZÖLD gombot a mentéshez."
+
+#: ../GTIPTVPlayerPro/main.py:5013
+msgid "TMDb key cleared; press GREEN to save."
+msgstr "A TMDb-kulcs törölve; nyomja meg a ZÖLD gombot a mentéshez."
+
+#: ../GTIPTVPlayerPro/main.py:5019
+msgid "The TMDb connection test is still running..."
+msgstr "A TMDb-kapcsolat tesztje még fut..."
+
+#: ../GTIPTVPlayerPro/main.py:5023
+msgid "No TMDb key is configured. Press OK on the key row."
+msgstr "Nincs beállítva TMDb-kulcs. Nyomja meg az OK gombot a kulcs sorában."
+
+#: ../GTIPTVPlayerPro/main.py:5028
+msgid "Testing the TMDb connection and API key..."
+msgstr "A TMDb-kapcsolat és az API-kulcs tesztelése..."
+
+#: ../GTIPTVPlayerPro/main.py:5057
+msgid "TMDb connection successful; the API key is valid."
+msgstr "A TMDb-kapcsolat sikeres; az API-kulcs érvényes."
+
+#: ../GTIPTVPlayerPro/main.py:5061
+msgid " Metadata enrichment is currently disabled."
+msgstr " A metaadat-bővítés jelenleg ki van kapcsolva."
+
+#: ../GTIPTVPlayerPro/main.py:5067
+#, python-brace-format
+msgid "TMDb test failed: {}."
+msgstr "A TMDb-teszt sikertelen: {}."
+
+#: ../GTIPTVPlayerPro/main.py:5070 ../GTIPTVPlayerPro/main.py:5088
+msgid "TMDb test failed: could not connect."
+msgstr "A TMDb-teszt sikertelen: nem sikerült csatlakozni."
+
+#: ../GTIPTVPlayerPro/main.py:5188 ../GTIPTVPlayerPro/main.py:5204
+#: ../GTIPTVPlayerPro/main.py:5401 ../GTIPTVPlayerPro/main.py:8801
+msgid "The health check could not be completed."
+msgstr "Az állapotellenőrzés nem fejezhető be."
+
+#: ../GTIPTVPlayerPro/main.py:5317 ../GTIPTVPlayerPro/main.py:5360
+#: ../GTIPTVPlayerPro/main.py:8835 ../GTIPTVPlayerPro/main.py:8876
+#: ../GTIPTVPlayerPro/main.py:8915
+msgid "Information"
+msgstr "Információ"
+
+#: ../GTIPTVPlayerPro/main.py:5477 ../GTIPTVPlayerPro/main.py:5565
+#: ../GTIPTVPlayerPro/main.py:5584 ../GTIPTVPlayerPro/main.py:5633
+#: ../GTIPTVPlayerPro/main.py:6064 ../GTIPTVPlayerPro/main.py:6094
+#: ../GTIPTVPlayerPro/remote_footer.py:117
+msgid "Accounts"
+msgstr "Fiókok"
+
+#: ../GTIPTVPlayerPro/main.py:5478 ../GTIPTVPlayerPro/main.py:5489
+#: ../GTIPTVPlayerPro/main.py:8743 ../GTIPTVPlayerPro/main.py:9624
+msgid "TESTING..."
+msgstr "TESZTELÉS..."
+
+#: ../GTIPTVPlayerPro/main.py:5503 ../GTIPTVPlayerPro/main.py:6095
+#: ../GTIPTVPlayerPro/main.py:6747 ../GTIPTVPlayerPro/remote_footer.py:86
+msgid "Account"
+msgstr "Fiók"
+
+#: ../GTIPTVPlayerPro/main.py:5567 ../GTIPTVPlayerPro/main.py:5701
+#: ../GTIPTVPlayerPro/main.py:7779 ../GTIPTVPlayerPro/remote_footer.py:99
+#: ../GTIPTVPlayerPro/remote_footer.py:101
+msgid "Delete"
+msgstr "Törlés"
+
+#: ../GTIPTVPlayerPro/main.py:5633 ../GTIPTVPlayerPro/main.py:6376
+#: ../GTIPTVPlayerPro/main.py:7750
+#, python-brace-format
+msgid "Delete {}?"
+msgstr "Törli ezt: {}?"
+
+#: ../GTIPTVPlayerPro/main.py:5739 ../GTIPTVPlayerPro/main.py:6457
+#: ../GTIPTVPlayerPro/main.py:7766
+#, python-brace-format
+msgid "Could not delete the source: {}"
+msgstr "A forrás nem törölhető: {}"
+
+#: ../GTIPTVPlayerPro/main.py:5874
+msgid "SELECTED SOURCE"
+msgstr "KIVÁLASZTOTT FORRÁS"
+
+#: ../GTIPTVPlayerPro/main.py:5884 ../GTIPTVPlayerPro/main.py:6295
+#: ../GTIPTVPlayerPro/remote_footer.py:100
+#: ../GTIPTVPlayerPro/remote_footer.py:102
+msgid "Connect"
+msgstr "Csatlakozás"
+
+#: ../GTIPTVPlayerPro/main.py:5950 ../GTIPTVPlayerPro/main.py:6674
+msgid "Xtream Codes Accounts"
+msgstr "Xtream Codes-fiókok"
+
+#: ../GTIPTVPlayerPro/main.py:5951 ../GTIPTVPlayerPro/main.py:6675
+msgid "M3U Sources"
+msgstr "M3U-források"
+
+#: ../GTIPTVPlayerPro/main.py:5952 ../GTIPTVPlayerPro/main.py:6676
+msgid "Stalker / MAC Portal Accounts"
+msgstr "Stalker / MAC-portálfiókok"
+
+#: ../GTIPTVPlayerPro/main.py:5953 ../GTIPTVPlayerPro/main.py:6094
+#: ../GTIPTVPlayerPro/main.py:9552 ../GTIPTVPlayerPro/remote_footer.py:118
+msgid "Sources"
+msgstr "Források"
+
+#: ../GTIPTVPlayerPro/main.py:6063 ../GTIPTVPlayerPro/main.py:6478
+#, python-brace-format
+msgid "{} was deleted ({} records)."
+msgstr "{} törölve ({} rekord)."
+
+#: ../GTIPTVPlayerPro/main.py:6114
+msgid ""
+"No source was found.\n"
+"\n"
+"Create one from the ADD SOURCE panel on the home screen."
+msgstr ""
+"Nem található forrás.\n"
+"\n"
+"Hozzon létre egyet a kezdőképernyő FORRÁS HOZZÁADÁSA panelén."
+
+#: ../GTIPTVPlayerPro/main.py:6136 ../GTIPTVPlayerPro/main.py:6155
+#: ../GTIPTVPlayerPro/main.py:6825 ../GTIPTVPlayerPro/main.py:6894
+#: ../GTIPTVPlayerPro/main.py:6953 ../GTIPTVPlayerPro/main.py:7000
+msgid "Add Source"
+msgstr "Forrás hozzáadása"
+
+#: ../GTIPTVPlayerPro/main.py:6235 ../GTIPTVPlayerPro/main.py:7644
+#: ../GTIPTVPlayerPro/main.py:7732 ../GTIPTVPlayerPro/main.py:9518
+msgid "Ready to connect"
+msgstr "Csatlakozásra kész"
+
+#: ../GTIPTVPlayerPro/main.py:6245 ../GTIPTVPlayerPro/main.py:6281
+#: ../GTIPTVPlayerPro/main.py:8890 ../GTIPTVPlayerPro/main.py:9627
+#: ../GTIPTVPlayerPro/main.py:9640 ../GTIPTVPlayerPro/main.py:9683
+#, python-brace-format
+msgid "Expiry: {}"
+msgstr "Lejárat: {}"
+
+#: ../GTIPTVPlayerPro/main.py:6351
+msgid "Choose a source type first."
+msgstr "Először válasszon forrástípust."
+
+#: ../GTIPTVPlayerPro/main.py:6366
+msgid "No source is selected for deletion."
+msgstr "Nincs törlésre kijelölt forrás."
+
+#: ../GTIPTVPlayerPro/main.py:6370
+msgid "Could not open the deletion confirmation."
+msgstr "A törlés megerősítése nem nyitható meg."
+
+#: ../GTIPTVPlayerPro/main.py:6387
+msgid "Source deletion cancelled."
+msgstr "A forrás törlése megszakítva."
+
+#: ../GTIPTVPlayerPro/main.py:6516 ../GTIPTVPlayerPro/main.py:6554
+#: ../GTIPTVPlayerPro/main.py:9835
+msgid "A source connection is already in progress."
+msgstr "Már folyamatban van a csatlakozás egy forráshoz."
+
+#: ../GTIPTVPlayerPro/main.py:6545 ../GTIPTVPlayerPro/main.py:8707
+msgid "XMLTV EPG settings could not be opened."
+msgstr "Az XMLTV EPG beállításai nem nyithatók meg."
+
+#: ../GTIPTVPlayerPro/main.py:6551 ../GTIPTVPlayerPro/main.py:7651
+msgid "No source is available to connect."
+msgstr "Nincs csatlakoztatható forrás."
+
+#: ../GTIPTVPlayerPro/main.py:6582 ../GTIPTVPlayerPro/main.py:9855
+msgid "CONNECTING..."
+msgstr "CSATLAKOZÁS..."
+
+#: ../GTIPTVPlayerPro/main.py:6596
+#, python-brace-format
+msgid "Connecting to {}, please wait."
+msgstr "Csatlakozás ehhez: {}, kérjük, várjon."
+
+#: ../GTIPTVPlayerPro/main.py:6607 ../GTIPTVPlayerPro/main.py:9866
+msgid "CONNECTED"
+msgstr "CSATLAKOZVA"
+
+#: ../GTIPTVPlayerPro/main.py:6611
+msgid "OPENING MAIN PANEL"
+msgstr "A FŐPANEL MEGNYITÁSA"
+
+#: ../GTIPTVPlayerPro/main.py:6614
+#, python-brace-format
+msgid "Connected to {}."
+msgstr "Csatlakoztatva ehhez: {}."
+
+#: ../GTIPTVPlayerPro/main.py:6630 ../GTIPTVPlayerPro/remote_footer.py:103
+msgid "Retry"
+msgstr "Újra"
+
+#: ../GTIPTVPlayerPro/main.py:6634 ../GTIPTVPlayerPro/main.py:9883
+#, python-brace-format
+msgid "Could not connect to {}: {}"
+msgstr "Nem sikerült csatlakozni ehhez: {}: {}"
+
+#: ../GTIPTVPlayerPro/main.py:6661 ../GTIPTVPlayerPro/main.py:6721
+msgid "Manage Sources"
+msgstr "Források kezelése"
+
+#: ../GTIPTVPlayerPro/main.py:6664 ../GTIPTVPlayerPro/main.py:7362
+msgid "Choose the source type you want to manage."
+msgstr "Válassza ki a kezelni kívánt forrástípust."
+
+#: ../GTIPTVPlayerPro/main.py:6677 ../GTIPTVPlayerPro/main.py:6843
+#: ../GTIPTVPlayerPro/main.py:7373
+msgid "Server URL, username and password"
+msgstr "A kiszolgáló URL-címe, a felhasználónév és a jelszó"
+
+#: ../GTIPTVPlayerPro/main.py:6678 ../GTIPTVPlayerPro/main.py:6846
+msgid "Local file, NAS or web link"
+msgstr "Helyi fájl, NAS vagy webes hivatkozás"
+
+#: ../GTIPTVPlayerPro/main.py:6679 ../GTIPTVPlayerPro/main.py:6849
+#: ../GTIPTVPlayerPro/main.py:7376 ../GTIPTVPlayerPro/main.py:8996
+msgid "Portal"
+msgstr "Portál"
+
+#: ../GTIPTVPlayerPro/main.py:6770
+msgid "Each source type is listed separately. Each section can contain up to 500 sources."
+msgstr "Minden forrástípus külön szerepel. Egy-egy szakasz legfeljebb 500 forrást tartalmazhat."
+
+#: ../GTIPTVPlayerPro/main.py:6805
+msgid "Xtream Codes provides Live TV, Movies and Series."
+msgstr "Az Xtream Codes élő TV-t, filmeket és sorozatokat biztosít."
+
+#: ../GTIPTVPlayerPro/main.py:6807
+msgid "M3U sources provide Live TV only. Categories, search and favorites are supported."
+msgstr "Az M3U-források csak élő TV-t biztosítanak. A kategóriák, a keresés és a kedvencek támogatottak."
+
+#: ../GTIPTVPlayerPro/main.py:6811 ../GTIPTVPlayerPro/main.py:6973
+#: ../GTIPTVPlayerPro/main.py:8550
+msgid "The Stalker / MAC portal will be checked automatically when this screen opens."
+msgstr "A Stalker / MAC-portál ellenőrzése automatikusan megtörténik a képernyő megnyitásakor."
+
+#: ../GTIPTVPlayerPro/main.py:6828
+msgid "Choose the source type to add."
+msgstr "Válassza ki a hozzáadandó forrás típusát."
+
+#: ../GTIPTVPlayerPro/main.py:6935 ../GTIPTVPlayerPro/stalker.py:550
+#: ../GTIPTVPlayerPro/stalker.py:554 ../GTIPTVPlayerPro/stalker.py:563
+#: ../GTIPTVPlayerPro/stalker.py:565
+msgid "Enter a valid portal URL"
+msgstr "Adjon meg érvényes portál URL-címet"
+
+#: ../GTIPTVPlayerPro/main.py:6936 ../GTIPTVPlayerPro/stalker.py:543
+msgid "Enter a valid MAC address"
+msgstr "Adjon meg érvényes MAC-címet"
+
+#: ../GTIPTVPlayerPro/main.py:6956 ../GTIPTVPlayerPro/main.py:7993
+msgid "Source details"
+msgstr "Forrás részletei"
+
+#: ../GTIPTVPlayerPro/main.py:6960
+msgid "Portal URL / MAC"
+msgstr "Portál URL-címe / MAC"
+
+#: ../GTIPTVPlayerPro/main.py:6961
+msgid "GREEN"
+msgstr "ZÖLD"
+
+#: ../GTIPTVPlayerPro/main.py:6962 ../GTIPTVPlayerPro/remote_footer.py:97
+msgid "Save"
+msgstr "Mentés"
+
+#: ../GTIPTVPlayerPro/main.py:7016
+msgid "Portal URL"
+msgstr "Portál URL-címe"
+
+#: ../GTIPTVPlayerPro/main.py:7024
+msgid "MAC address"
+msgstr "MAC-cím"
+
+#: ../GTIPTVPlayerPro/main.py:7079 ../GTIPTVPlayerPro/main.py:8199
+#: ../GTIPTVPlayerPro/main.py:8212 ../GTIPTVPlayerPro/main.py:8439
+msgid "Information received. Edit the next field or press GREEN to save."
+msgstr "Az adatok megérkeztek. Szerkessze a következő mezőt, vagy nyomja meg a ZÖLD gombot a mentéshez."
+
+#: ../GTIPTVPlayerPro/main.py:7208 ../GTIPTVPlayerPro/main.py:7254
+#: ../GTIPTVPlayerPro/playlist.py:1557
+msgid "Local / NAS file"
+msgstr "Helyi / NAS-fájl"
+
+#: ../GTIPTVPlayerPro/main.py:7211 ../GTIPTVPlayerPro/main.py:7842
+#: ../GTIPTVPlayerPro/main.py:8012
+msgid "Device, USB or mounted network storage"
+msgstr "Eszköz, USB vagy csatolt hálózati tárhely"
+
+#: ../GTIPTVPlayerPro/main.py:7576
+msgid "Add playlist"
+msgstr "Lejátszási lista hozzáadása"
+
+#: ../GTIPTVPlayerPro/main.py:7627 ../GTIPTVPlayerPro/main.py:7656
+#: ../GTIPTVPlayerPro/main.py:7698 ../GTIPTVPlayerPro/main.py:7739
+#: ../GTIPTVPlayerPro/main.py:9301
+msgid "Not available"
+msgstr "Nem érhető el"
+
+#: ../GTIPTVPlayerPro/main.py:7667 ../GTIPTVPlayerPro/playlist.py:1121
+msgid "No valid IPTV source was found"
+msgstr "Nem található érvényes IPTV-forrás"
+
+#: ../GTIPTVPlayerPro/main.py:7713 ../GTIPTVPlayerPro/remote_footer.py:95
+msgid "Rename"
+msgstr "Átnevezés"
+
+#: ../GTIPTVPlayerPro/main.py:7970
+msgid "Enter a name for the M3U source"
+msgstr "Adja meg az M3U-forrás nevét"
+
+#: ../GTIPTVPlayerPro/main.py:7972
+msgid "Enter the M3U file path or HTTP(S) URL"
+msgstr "Adja meg az M3U-fájl elérési útját vagy a HTTP(S) URL-címet"
+
+#: ../GTIPTVPlayerPro/main.py:7991 ../GTIPTVPlayerPro/main.py:8048
+msgid "Add M3U Source"
+msgstr "M3U-forrás hozzáadása"
+
+#: ../GTIPTVPlayerPro/main.py:7996
+msgid "Give the source a name and choose its location."
+msgstr "Nevezze el a forrást, és válassza ki a helyét."
+
+#: ../GTIPTVPlayerPro/main.py:7999
+msgid "Source name"
+msgstr "Forrás neve"
+
+#: ../GTIPTVPlayerPro/main.py:8015
+msgid "Direct HTTP(S) M3U link"
+msgstr "Közvetlen HTTP(S) M3U-hivatkozás"
+
+#: ../GTIPTVPlayerPro/main.py:8053
+msgid "M3U URL must start with http:// or https://."
+msgstr "Az M3U URL-címnek http:// vagy https:// előtaggal kell kezdődnie."
+
+#: ../GTIPTVPlayerPro/main.py:8070
+msgid "Enter a source name"
+msgstr "Adja meg a forrás nevét"
+
+#: ../GTIPTVPlayerPro/main.py:8072
+msgid "File path"
+msgstr "Fájl elérési útja"
+
+#: ../GTIPTVPlayerPro/main.py:8081 ../GTIPTVPlayerPro/remote_footer.py:94
+msgid "Edit"
+msgstr "Szerkesztés"
+
+#: ../GTIPTVPlayerPro/main.py:8247
+#, python-brace-format
+msgid "Could not save the M3U source: {}"
+msgstr "Az M3U-forrás nem menthető: {}"
+
+#: ../GTIPTVPlayerPro/main.py:8256
+#, python-brace-format
+msgid "{} was saved as an M3U Live TV source."
+msgstr "{} M3U élő TV-forrásként mentve."
+
+#: ../GTIPTVPlayerPro/main.py:8269
+msgid "Enter the server URL"
+msgstr "Adja meg a kiszolgáló URL-címét"
+
+#: ../GTIPTVPlayerPro/main.py:8270 ../GTIPTVPlayerPro/main.py:8343
+msgid "Enter the username"
+msgstr "Adja meg a felhasználónevet"
+
+#: ../GTIPTVPlayerPro/main.py:8271 ../GTIPTVPlayerPro/main.py:8347
+msgid "Enter the password"
+msgstr "Adja meg a jelszót"
+
+#: ../GTIPTVPlayerPro/main.py:8293 ../GTIPTVPlayerPro/main.py:8330
+msgid "ADD NEW ACCOUNT"
+msgstr "ÚJ FIÓK HOZZÁADÁSA"
+
+#: ../GTIPTVPlayerPro/main.py:8295 ../GTIPTVPlayerPro/main.py:8333
+msgid "Press OK in a text field; use LEFT / RIGHT on the output row."
+msgstr "Nyomja meg az OK gombot egy szövegmezőben; a kimeneti sorban használja a BALRA / JOBBRA gombot."
+
+#: ../GTIPTVPlayerPro/main.py:8304
+msgid "Press GREEN to save  |  Select a TS or M3U8 output supported by the server."
+msgstr "Nyomja meg a ZÖLD gombot a mentéshez  |  Válasszon a kiszolgáló által támogatott TS vagy M3U8 kimenetet."
+
+#: ../GTIPTVPlayerPro/main.py:8327 ../GTIPTVPlayerPro/main.py:8331
+msgid "Add New Account"
+msgstr "Új fiók hozzáadása"
+
+#: ../GTIPTVPlayerPro/main.py:8350
+#, python-brace-format
+msgid "  SERVER URL        {}"
+msgstr "  KISZOLGÁLÓ URL-CÍME {}"
+
+#: ../GTIPTVPlayerPro/main.py:8355
+#, python-brace-format
+msgid "  USERNAME          {}"
+msgstr "  FELHASZNÁLÓNÉV      {}"
+
+#: ../GTIPTVPlayerPro/main.py:8359
+#, python-brace-format
+msgid "  PASSWORD          {}"
+msgstr "  JELSZÓ               {}"
+
+#: ../GTIPTVPlayerPro/main.py:8362
+#, python-brace-format
+msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
+msgstr "  KIMENETI FORMÁTUM     {}     Módosítás BALRA / JOBBRA"
+
+#: ../GTIPTVPlayerPro/main.py:8395
+#, python-brace-format
+msgid "Live TV output selected: {}."
+msgstr "Kiválasztott élő TV kimenet: {}."
+
+#: ../GTIPTVPlayerPro/main.py:8454
+#, python-brace-format
+msgid "Could not save the account: {}"
+msgstr "A fiók nem menthető: {}"
+
+#: ../GTIPTVPlayerPro/main.py:8464
+#, python-brace-format
+msgid "{} was saved with {} output."
+msgstr "{} mentve {} kimenettel."
+
+#: ../GTIPTVPlayerPro/main.py:8522 ../GTIPTVPlayerPro/main.py:8595
+msgid "Source Health"
+msgstr "Forrás állapota"
+
+#: ../GTIPTVPlayerPro/main.py:8524 ../GTIPTVPlayerPro/main.py:8597
+msgid "Portal Health"
+msgstr "Portál állapota"
+
+#: ../GTIPTVPlayerPro/main.py:8524 ../GTIPTVPlayerPro/main.py:8597
+msgid "Server Health"
+msgstr "Kiszolgáló állapota"
+
+#: ../GTIPTVPlayerPro/main.py:8538 ../GTIPTVPlayerPro/main.py:8569
+msgid "WAITING FOR TEST"
+msgstr "VÁRAKOZÁS A TESZTRE"
+
+#: ../GTIPTVPlayerPro/main.py:8546
+msgid "The M3U source will be checked automatically when this screen opens."
+msgstr "Az M3U-forrás ellenőrzése automatikusan megtörténik a képernyő megnyitásakor."
+
+#: ../GTIPTVPlayerPro/main.py:8554
+msgid "The Xtream API connection will be tested automatically when this screen opens."
+msgstr "Az Xtream API-kapcsolat automatikusan tesztelve lesz a képernyő megnyitásakor."
+
+#: ../GTIPTVPlayerPro/main.py:8727
+msgid "XMLTV EPG is disabled for this M3U source."
+msgstr "Az XMLTV EPG ki van kapcsolva ennél az M3U-forrásnál."
+
+#: ../GTIPTVPlayerPro/main.py:8731
+msgid "XMLTV EPG is ready from the local cache."
+msgstr "Az XMLTV EPG elérhető a helyi gyorsítótárból."
+
+#: ../GTIPTVPlayerPro/main.py:8733
+msgid "XMLTV EPG is enabled and waiting for its first update."
+msgstr "Az XMLTV EPG engedélyezve van, és az első frissítésre vár."
+
+#: ../GTIPTVPlayerPro/main.py:8751
+msgid "Checking M3U access, catalogue size and cache status."
+msgstr "Az M3U-hozzáférés, a katalógusméret és a gyorsítótár állapotának ellenőrzése."
+
+#: ../GTIPTVPlayerPro/main.py:8754
+msgid "Checking portal authentication, categories and latency."
+msgstr "A portál hitelesítésének, kategóriáinak és késleltetésének ellenőrzése."
+
+#: ../GTIPTVPlayerPro/main.py:8757
+msgid "Checking API access, account status, latency and connection limits."
+msgstr "API-hozzáférés, fiókállapot, késleltetés és kapcsolati korlátok ellenőrzése."
+
+#: ../GTIPTVPlayerPro/main.py:8883 ../GTIPTVPlayerPro/stalker.py:1908
+#: ../GTIPTVPlayerPro/stalker.py:1911 ../GTIPTVPlayerPro/stalker.py:1914
+#: ../GTIPTVPlayerPro/stalker.py:1925 ../GTIPTVPlayerPro/stalker.py:1940
+#: ../GTIPTVPlayerPro/stalker.py:1944 ../GTIPTVPlayerPro/stalker.py:8114
+msgid "Server does not report expiry"
+msgstr "A kiszolgáló nem közöl lejárati dátumot"
+
+#: ../GTIPTVPlayerPro/main.py:8996
+msgid "Server"
+msgstr "Kiszolgáló"
+
+#: ../GTIPTVPlayerPro/main.py:9302
+msgid "Standard M3U sources support Live TV only."
+msgstr "A szabványos M3U-források csak az élő TV-t támogatják."
+
+#: ../GTIPTVPlayerPro/main.py:9347 ../GTIPTVPlayerPro/remote_footer.py:136
+msgid "About"
+msgstr "Névjegy"
+
+#: ../GTIPTVPlayerPro/main.py:9420
+msgid "SECURE SOURCE CONNECTION"
+msgstr "BIZTONSÁGOS FORRÁSKAPCSOLAT"
+
+#: ../GTIPTVPlayerPro/main.py:9421
+msgid "Welcome"
+msgstr "Üdvözöljük"
+
+#: ../GTIPTVPlayerPro/main.py:9423
+msgid "Select and connect to a saved source to start watching."
+msgstr "A megtekintéshez válasszon ki és csatlakoztasson egy mentett forrást."
+
+#: ../GTIPTVPlayerPro/main.py:9426
+msgid "SAVED SOURCE"
+msgstr "MENTETT FORRÁS"
+
+#: ../GTIPTVPlayerPro/main.py:9537
+msgid "Source status is checked automatically when connecting."
+msgstr "A forrás állapotát csatlakozáskor automatikusan ellenőrzi."
+
+#: ../GTIPTVPlayerPro/main.py:9541
+msgid "No saved source found"
+msgstr "Nem található mentett forrás"
+
+#: ../GTIPTVPlayerPro/main.py:9544
+msgid "Create a new source from the ADD SOURCE panel."
+msgstr "Hozzon létre új forrást a FORRÁS HOZZÁADÁSA panelen."
+
+#: ../GTIPTVPlayerPro/main.py:9554
+msgid "No saved source. Create one from the ADD SOURCE panel."
+msgstr "Nincs mentett forrás. Hozzon létre egyet a FORRÁS HOZZÁADÁSA panelen."
+
+#: ../GTIPTVPlayerPro/main.py:9557
+msgid "CONNECT SOURCE"
+msgstr "FORRÁS CSATLAKOZTATÁSA"
+
+#: ../GTIPTVPlayerPro/main.py:9558
+msgid "MANAGE SOURCES"
+msgstr "FORRÁSOK KEZELÉSE"
+
+#: ../GTIPTVPlayerPro/main.py:9559
+msgid "ADD SOURCE"
+msgstr "FORRÁS HOZZÁADÁSA"
+
+#: ../GTIPTVPlayerPro/main.py:9671 ../GTIPTVPlayerPro/playlist.py:1282
+#, python-brace-format
+msgid "Account status: {}"
+msgstr "Fiók állapota: {}"
+
+#: ../GTIPTVPlayerPro/main.py:9858
+#, python-brace-format
+msgid "Checking {}, please wait."
+msgstr "{} ellenőrzése, kérjük, várjon."
+
+#: ../GTIPTVPlayerPro/main.py:9869
+#, python-brace-format
+msgid "Connected to {}; opening the dashboard."
+msgstr "Csatlakoztatva ehhez: {}; a vezérlőpult megnyitása."
+
+#: ../GTIPTVPlayerPro/main.py:9902
+msgid "Close the open screen before opening another one."
+msgstr "Zárja be a megnyitott képernyőt, mielőtt másikat nyitna."
+
+#: ../GTIPTVPlayerPro/metadata.py:255
+msgid "TMDb request cancelled"
+msgstr "A TMDb-kérés megszakítva"
+
+#: ../GTIPTVPlayerPro/metadata.py:266 ../GTIPTVPlayerPro/metadata.py:284
+msgid "TMDb request timed out"
+msgstr "A TMDb-kérés túllépte az időkorlátot"
+
+#: ../GTIPTVPlayerPro/metadata.py:354
+msgid "Could not load the TMDb configuration"
+msgstr "A TMDb konfigurációja nem tölthető be"
+
+#: ../GTIPTVPlayerPro/metadata.py:364 ../GTIPTVPlayerPro/metadata.py:754
+#: ../GTIPTVPlayerPro/metadata.py:822
+msgid "TMDb API key is not configured"
+msgstr "A TMDb API-kulcs nincs beállítva"
+
+#: ../GTIPTVPlayerPro/metadata.py:398
+#, python-brace-format
+msgid "TMDb HTTP error path={}"
+msgstr "TMDb HTTP-hiba, útvonal={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:400 ../GTIPTVPlayerPro/metadata.py:421
+msgid "TMDb API key is invalid"
+msgstr "A TMDb API-kulcs érvénytelen"
+
+#: ../GTIPTVPlayerPro/metadata.py:402
+msgid "TMDb request limit reached"
+msgstr "Elérte a TMDb-kérések korlátját"
+
+#: ../GTIPTVPlayerPro/metadata.py:403
+#, python-brace-format
+msgid "TMDb returned HTTP {}"
+msgstr "A TMDb HTTP {} választ adott"
+
+#: ../GTIPTVPlayerPro/metadata.py:405
+#, python-brace-format
+msgid "TMDb connection error path={}"
+msgstr "TMDb kapcsolati hiba, útvonal={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:406
+msgid "Could not connect to the TMDb service"
+msgstr "Nem sikerült csatlakozni a TMDb szolgáltatáshoz"
+
+#: ../GTIPTVPlayerPro/metadata.py:408
+msgid "TMDb response is too large"
+msgstr "A TMDb válasza túl nagy"
+
+#: ../GTIPTVPlayerPro/metadata.py:414
+#, python-brace-format
+msgid "Invalid TMDb JSON path={}"
+msgstr "Érvénytelen TMDb JSON-útvonal={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:415 ../GTIPTVPlayerPro/metadata.py:417
+msgid "TMDb returned an invalid response"
+msgstr "A TMDb érvénytelen választ adott"
+
+#: ../GTIPTVPlayerPro/metadata.py:422
+msgid "TMDb request was rejected"
+msgstr "A TMDb-kérést elutasították"
+
+#: ../GTIPTVPlayerPro/metadata.py:752 ../GTIPTVPlayerPro/metadata.py:820
+msgid "TMDb metadata enrichment is disabled"
+msgstr "A TMDb metaadat-bővítés ki van kapcsolva"
+
+#: ../GTIPTVPlayerPro/metadata.py:761 ../GTIPTVPlayerPro/metadata.py:828
+msgid "No valid title was found for TMDb"
+msgstr "Nem található érvényes cím a TMDb számára"
+
+#: ../GTIPTVPlayerPro/metadata.py:789 ../GTIPTVPlayerPro/metadata.py:808
+#: ../GTIPTVPlayerPro/metadata.py:857 ../GTIPTVPlayerPro/metadata.py:876
+msgid "No TMDb match was found"
+msgstr "Nem található TMDb-egyezés"
+
+#: ../GTIPTVPlayerPro/metadata.py:798 ../GTIPTVPlayerPro/metadata.py:799
+#: ../GTIPTVPlayerPro/metadata.py:866 ../GTIPTVPlayerPro/metadata.py:867
+msgid "Could not load TMDb information"
+msgstr "A TMDb-adatok nem tölthetők be"
+
+#: ../GTIPTVPlayerPro/network_security.py:45
+#: ../GTIPTVPlayerPro/network_security.py:53
+#: ../GTIPTVPlayerPro/network_security.py:55
+msgid "Image request headers are invalid."
+msgstr "A képkérés fejlécei érvénytelenek."
+
+#: ../GTIPTVPlayerPro/network_security.py:64
+msgid "Network address could not be resolved."
+msgstr "A hálózati cím nem oldható fel."
+
+#: ../GTIPTVPlayerPro/network_security.py:67
+msgid "Image requests to local, private or reserved network addresses are prohibited."
+msgstr "A helyi, privát vagy fenntartott hálózati címekre irányuló képkérések tiltottak."
+
+#: ../GTIPTVPlayerPro/network_security.py:79
+#: ../GTIPTVPlayerPro/network_security.py:84
+msgid "Image URL is invalid."
+msgstr "A kép URL-címe érvénytelen."
+
+#: ../GTIPTVPlayerPro/network_security.py:94
+msgid "Image URL is not safe."
+msgstr "A kép URL-címe nem biztonságos."
+
+#: ../GTIPTVPlayerPro/network_security.py:97
+msgid "Image URL port is invalid."
+msgstr "A kép URL-címének portja érvénytelen."
+
+#: ../GTIPTVPlayerPro/network_security.py:101
+#: ../GTIPTVPlayerPro/network_security.py:103
+msgid "Image host name is invalid."
+msgstr "A képkiszolgáló neve érvénytelen."
+
+#: ../GTIPTVPlayerPro/network_security.py:132
+msgid "Image download timed out."
+msgstr "A kép letöltése túllépte az időkorlátot."
+
+#: ../GTIPTVPlayerPro/network_security.py:161
+#: ../GTIPTVPlayerPro/network_security.py:184
+msgid "Image host name resolution timed out."
+msgstr "A képkiszolgáló nevének feloldása túllépte az időkorlátot."
+
+#: ../GTIPTVPlayerPro/network_security.py:194
+msgid "Image host name could not be resolved."
+msgstr "A képkiszolgáló neve nem oldható fel."
+
+#: ../GTIPTVPlayerPro/network_security.py:206
+msgid "Image host did not resolve to a public IP address."
+msgstr "A képkiszolgáló neve nem nyilvános IP-címre oldódott fel."
+
+#: ../GTIPTVPlayerPro/network_security.py:282
+msgid "Image response has conflicting size information."
+msgstr "A képet tartalmazó válasz ellentmondó méretadatokat tartalmaz."
+
+#: ../GTIPTVPlayerPro/network_security.py:336
+#, python-brace-format
+msgid "Image server returned HTTP {}."
+msgstr "A képkiszolgáló HTTP {} választ adott."
+
+#: ../GTIPTVPlayerPro/network_security.py:341
+msgid "Compressed image HTTP responses are not accepted."
+msgstr "A tömörített képeket tartalmazó HTTP-válaszok nem fogadhatók el."
+
+#: ../GTIPTVPlayerPro/network_security.py:349
+msgid "Image response size is invalid."
+msgstr "A képet tartalmazó válasz mérete érvénytelen."
+
+#: ../GTIPTVPlayerPro/network_security.py:353
+#: ../GTIPTVPlayerPro/network_security.py:371
+msgid "Image response exceeds the safe size limit."
+msgstr "A képet tartalmazó válasz túllépi a biztonságos méretkorlátot."
+
+#: ../GTIPTVPlayerPro/network_security.py:403
+#: ../GTIPTVPlayerPro/network_security.py:405
+msgid "Image download limits are invalid."
+msgstr "A képletöltési korlátok érvénytelenek."
+
+#: ../GTIPTVPlayerPro/network_security.py:419
+msgid "An HTTPS image request cannot be redirected to HTTP."
+msgstr "HTTPS-képkérés nem irányítható át HTTP-re."
+
+#: ../GTIPTVPlayerPro/network_security.py:452
+msgid "Could not establish a secure connection to the image server."
+msgstr "Nem sikerült biztonságos kapcsolatot létesíteni a képkiszolgálóval."
+
+#: ../GTIPTVPlayerPro/network_security.py:459
+msgid "Image redirect URL is missing."
+msgstr "Hiányzik a kép átirányítási URL-címe."
+
+#: ../GTIPTVPlayerPro/network_security.py:461
+msgid "Image request was redirected too many times."
+msgstr "A képkérést túl sokszor irányították át."
+
+#: ../GTIPTVPlayerPro/network_security.py:475
+msgid "Image redirection could not be completed."
+msgstr "A kép átirányítása nem fejezhető be."
+
+#: ../GTIPTVPlayerPro/playlist.py:41
+#, python-brace-format
+msgid ""
+"Latency: {} ms\n"
+"Account status: {}\n"
+"Active / Maximum: {}\n"
+"Expiry: {}\n"
+"Server time: {}\n"
+"Time zone: {}\n"
+"Protocol: {}\n"
+"Output format: {}\n"
+"Server version: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Késleltetés: {} ms\n"
+"Fiók állapota: {}\n"
+"Aktív / Maximum: {}\n"
+"Lejárat: {}\n"
+"Kiszolgáló ideje: {}\n"
+"Időzóna: {}\n"
+"Protokoll: {}\n"
+"Kimeneti formátum: {}\n"
+"Kiszolgáló verziója: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/playlist.py:171
+msgid "Invalid stream ID"
+msgstr "Érvénytelen streamazonosító"
+
+#: ../GTIPTVPlayerPro/playlist.py:390 ../GTIPTVPlayerPro/playlist.py:402
+#: ../GTIPTVPlayerPro/playlist.py:781
+msgid "Playlist file is too large"
+msgstr "A lejátszási lista fájlja túl nagy"
+
+#: ../GTIPTVPlayerPro/playlist.py:731
+msgid "Enter a valid Xtream URL"
+msgstr "Adjon meg érvényes Xtream URL-címet"
+
+#: ../GTIPTVPlayerPro/playlist.py:760
+msgid "The Xtream account limit was reached"
+msgstr "Elérte az Xtream-fiókok korlátját"
+
+#: ../GTIPTVPlayerPro/playlist.py:800
+msgid "Server URL, username and password are required"
+msgstr "A kiszolgáló URL-címe, a felhasználónév és a jelszó kötelező"
+
+#: ../GTIPTVPlayerPro/playlist.py:803
+msgid "Output format must be TS or M3U8"
+msgstr "A kimeneti formátumnak TS vagy M3U8 értékűnek kell lennie"
+
+#: ../GTIPTVPlayerPro/playlist.py:808
+msgid "Enter a valid server URL"
+msgstr "Adjon meg érvényes kiszolgáló URL-címet"
+
+#: ../GTIPTVPlayerPro/playlist.py:810
+msgid "Server URL must start with http:// or https://"
+msgstr "A kiszolgáló URL-címének http:// vagy https:// előtaggal kell kezdődnie"
+
+#: ../GTIPTVPlayerPro/playlist.py:813
+msgid "Do not include a username or password in the server URL"
+msgstr "Ne adjon meg felhasználónevet vagy jelszót a kiszolgáló URL-címében"
+
+#: ../GTIPTVPlayerPro/playlist.py:816
+msgid "Server URL port is invalid"
+msgstr "A kiszolgáló URL-portja érvénytelen"
+
+#: ../GTIPTVPlayerPro/playlist.py:879 ../GTIPTVPlayerPro/playlist.py:965
+#: ../GTIPTVPlayerPro/playlist.py:1591 ../GTIPTVPlayerPro/playlist.py:1603
+msgid "The account selected for deletion is invalid"
+msgstr "A törlésre kijelölt fiók érvénytelen"
+
+#: ../GTIPTVPlayerPro/playlist.py:941 ../GTIPTVPlayerPro/playlist.py:1010
+msgid "The selected account was not found in the account files"
+msgstr "A kiválasztott fiók nem található a fiókfájlokban"
+
+#: ../GTIPTVPlayerPro/playlist.py:1069
+msgid "playlists.txt was not found"
+msgstr "A playlists.txt nem található"
+
+#: ../GTIPTVPlayerPro/playlist.py:1071
+msgid "No valid Xtream account was found"
+msgstr "Nem található érvényes Xtream-fiók"
+
+#: ../GTIPTVPlayerPro/playlist.py:1119
+msgid "No saved IPTV source was found"
+msgstr "Nem található mentett IPTV-forrás"
+
+#: ../GTIPTVPlayerPro/playlist.py:1163
+msgid "The selected M3U source was not found"
+msgstr "A kiválasztott M3U-forrás nem található"
+
+#: ../GTIPTVPlayerPro/playlist.py:1237
+msgid "Never / unknown"
+msgstr "Soha / ismeretlen"
+
+#: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1255
+#: ../GTIPTVPlayerPro/playlist.py:1415 ../GTIPTVPlayerPro/playlist.py:1434
+#: ../GTIPTVPlayerPro/playlist.py:1445 ../GTIPTVPlayerPro/playlist.py:1493
+#: ../GTIPTVPlayerPro/playlist.py:1541 ../GTIPTVPlayerPro/stalker.py:8184
+msgid "ERROR"
+msgstr "HIBA"
+
+#: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1257
+msgid "API response is invalid"
+msgstr "Az API válasza érvénytelen"
+
+#: ../GTIPTVPlayerPro/playlist.py:1272 ../GTIPTVPlayerPro/stalker.py:8184
+msgid "INVALID"
+msgstr "ÉRVÉNYTELEN"
+
+#: ../GTIPTVPlayerPro/playlist.py:1273
+msgid "Server did not validate the account"
+msgstr "A kiszolgáló nem érvényesítette a fiókot"
+
+#: ../GTIPTVPlayerPro/playlist.py:1281
+msgid "DISABLED"
+msgstr "KIKAPCSOLVA"
+
+#: ../GTIPTVPlayerPro/playlist.py:1288 ../GTIPTVPlayerPro/stalker.py:8159
+msgid "BUSY"
+msgstr "FOGLALT"
+
+#: ../GTIPTVPlayerPro/playlist.py:1292
+msgid "API connection successful"
+msgstr "Az API-kapcsolat sikeres"
+
+#: ../GTIPTVPlayerPro/playlist.py:1415
+msgid "API response is too large"
+msgstr "Az API válasza túl nagy"
+
+#: ../GTIPTVPlayerPro/playlist.py:1426
+msgid "Server health check HTTP error"
+msgstr "HTTP-hiba a kiszolgáló állapotellenőrzésekor"
+
+#: ../GTIPTVPlayerPro/playlist.py:1443
+msgid "Server health check connection error"
+msgstr "Kapcsolati hiba a kiszolgáló állapotellenőrzésekor"
+
+#: ../GTIPTVPlayerPro/playlist.py:1445
+msgid "Could not connect to the server"
+msgstr "Nem sikerült csatlakozni a kiszolgálóhoz"
+
+#: ../GTIPTVPlayerPro/playlist.py:1454
+msgid "Not cached"
+msgstr "Nincs a gyorsítótárban"
+
+#: ../GTIPTVPlayerPro/playlist.py:1458
+msgid "Less than one minute"
+msgstr "Kevesebb mint egy perc"
+
+#: ../GTIPTVPlayerPro/playlist.py:1460
+#, python-brace-format
+msgid "{} minutes"
+msgstr "{} perc"
+
+#: ../GTIPTVPlayerPro/playlist.py:1524 ../GTIPTVPlayerPro/playlist.py:1544
+msgid "The M3U source could not be checked."
+msgstr "Az M3U-forrás nem ellenőrizhető."
+
+#: ../GTIPTVPlayerPro/playlist.py:1534
+msgid "M3U catalogue loaded from cache."
+msgstr "Az M3U-katalógus betöltve a gyorsítótárból."
+
+#: ../GTIPTVPlayerPro/playlist.py:1536
+msgid "M3U source is accessible."
+msgstr "Az M3U-forrás elérhető."
+
+#: ../GTIPTVPlayerPro/playlist.py:1539
+msgid "The source is unavailable; a stale cache is in use."
+msgstr "A forrás nem érhető el; elavult gyorsítótár van használatban."
+
+#: ../GTIPTVPlayerPro/plugin.py:91
+msgid "Modern Enigma2 IPTV player"
+msgstr "Modern Enigma2 IPTV-lejátszó"
+
+#: ../GTIPTVPlayerPro/portal_expiry.py:64
+#: ../GTIPTVPlayerPro/portal_expiry.py:148
+msgid "Unlimited"
+msgstr "Korlátlan"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:88
+msgid "Action"
+msgstr "Művelet"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:91
+msgid "Exit"
+msgstr "Kilépés"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:93
+#: ../GTIPTVPlayerPro/remote_footer.py:115
+#: ../GTIPTVPlayerPro/remote_footer.py:116
+msgid "Change"
+msgstr "Módosítás"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:96
+msgid "Continue"
+msgstr "Folytatás"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:98
+msgid "Test"
+msgstr "Teszt"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:104
+msgid "Navigate"
+msgstr "Navigálás"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:107
+msgid "Refresh"
+msgstr "Frissítés"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:108
+msgid "Back"
+msgstr "Vissza"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:110
+msgid "Play"
+msgstr "Lejátszás"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:112
+msgid "EPG settings"
+msgstr "EPG-beállítások"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:114
+msgid "Full screen"
+msgstr "Teljes képernyő"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:120
+#: ../GTIPTVPlayerPro/remote_footer.py:124
+msgid "Remove"
+msgstr "Eltávolítás"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:122
+msgid "Clear search"
+msgstr "Keresés törlése"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:125
+msgid "Filter"
+msgstr "Szűrő"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:126
+msgid "New"
+msgstr "Új"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:127
+msgid "Move"
+msgstr "Mozgatás"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:129
+msgid "Reset"
+msgstr "Alaphelyzet"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:130
+msgid "Show / Hide"
+msgstr "Megjelenítés / Elrejtés"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:131
+msgid "Mark"
+msgstr "Kijelölés"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:133
+msgid "Clear"
+msgstr "Törlés"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:135
+msgid "Rescan"
+msgstr "Újraolvasás"
+
+#: ../GTIPTVPlayerPro/stalker.py:556
+msgid "Portal URL must start with http:// or https://"
+msgstr "A portál URL-címének http:// vagy https:// előtaggal kell kezdődnie"
+
+#: ../GTIPTVPlayerPro/stalker.py:567
+msgid "Portal URL port is invalid"
+msgstr "A portál URL-címének portja érvénytelen"
+
+#: ../GTIPTVPlayerPro/stalker.py:569
+msgid "Do not include a query or fragment in the portal URL"
+msgstr "Ne adjon meg lekérdezést vagy töredéket a portál URL-címében"
+
+#: ../GTIPTVPlayerPro/stalker.py:1208 ../GTIPTVPlayerPro/stalker.py:1213
+msgid "The Stalker account directory could not be created"
+msgstr "A Stalker-fiók könyvtára nem hozható létre"
+
+#: ../GTIPTVPlayerPro/stalker.py:1220
+msgid "The Stalker account directory is unsafe"
+msgstr "A Stalker-fiók könyvtára nem biztonságos"
+
+#: ../GTIPTVPlayerPro/stalker.py:1232
+msgid "The Stalker account file is unsafe"
+msgstr "A Stalker-fiókfájl nem biztonságos"
+
+#: ../GTIPTVPlayerPro/stalker.py:1248 ../GTIPTVPlayerPro/stalker.py:1257
+msgid "The Stalker account file could not be created"
+msgstr "A Stalker-fiókfájl nem hozható létre"
+
+#: ../GTIPTVPlayerPro/stalker.py:1278 ../GTIPTVPlayerPro/stalker.py:1297
+#: ../GTIPTVPlayerPro/stalker.py:1410
+msgid "The Stalker account file is too large"
+msgstr "A Stalker-fiókfájl túl nagy"
+
+#: ../GTIPTVPlayerPro/stalker.py:1289
+msgid "The Stalker account file changed while opening"
+msgstr "A Stalker-fiókfájl megváltozott a megnyitás során"
+
+#: ../GTIPTVPlayerPro/stalker.py:1350 ../GTIPTVPlayerPro/stalker.py:1365
+msgid "No valid Stalker / MAC account was found"
+msgstr "Nem található érvényes Stalker / MAC-fiók"
+
+#: ../GTIPTVPlayerPro/stalker.py:1363 ../GTIPTVPlayerPro/stalker.py:1513
+msgid "The Stalker account file was not found"
+msgstr "A Stalker-fiókfájl nem található"
+
+#: ../GTIPTVPlayerPro/stalker.py:1434
+msgid "The Stalker account file could not be saved"
+msgstr "A Stalker-fiókfájl nem menthető"
+
+#: ../GTIPTVPlayerPro/stalker.py:1480
+msgid "This Stalker / MAC account already exists"
+msgstr "Ez a Stalker / MAC-fiók már létezik"
+
+#: ../GTIPTVPlayerPro/stalker.py:1482
+msgid "The Stalker / MAC account limit was reached"
+msgstr "A Stalker / MAC-fiókok korlátja elérve"
+
+#: ../GTIPTVPlayerPro/stalker.py:1500 ../GTIPTVPlayerPro/stalker.py:1551
+#: ../GTIPTVPlayerPro/stalker.py:1630
+msgid "Invalid Stalker / MAC account"
+msgstr "Érvénytelen Stalker / MAC-fiók"
+
+#: ../GTIPTVPlayerPro/stalker.py:1523 ../GTIPTVPlayerPro/stalker.py:1600
+msgid "The Stalker / MAC account was not found"
+msgstr "A Stalker / MAC-fiók nem található"
+
+#: ../GTIPTVPlayerPro/stalker.py:1810 ../GTIPTVPlayerPro/stalker.py:2487
+#: ../GTIPTVPlayerPro/stalker.py:2648 ../GTIPTVPlayerPro/stalker.py:2670
+msgid "Portal authentication failed"
+msgstr "A portál hitelesítése sikertelen"
+
+#: ../GTIPTVPlayerPro/stalker.py:1992 ../GTIPTVPlayerPro/stalker.py:1997
+msgid "Portal request cancelled"
+msgstr "A portálkérés megszakítva"
+
+#: ../GTIPTVPlayerPro/stalker.py:2002
+msgid "Portal request timed out"
+msgstr "A portálkérés időtúllépés miatt megszakadt"
+
+#: ../GTIPTVPlayerPro/stalker.py:2213
+msgid "Content type unavailable"
+msgstr "A tartalomtípus nem érhető el"
+
+#: ../GTIPTVPlayerPro/stalker.py:2335 ../GTIPTVPlayerPro/stalker.py:2524
+msgid "Invalid portal response"
+msgstr "Érvénytelen portálválasz"
+
+#: ../GTIPTVPlayerPro/stalker.py:2368 ../GTIPTVPlayerPro/stalker.py:5330
+#: ../GTIPTVPlayerPro/stalker.py:6222 ../GTIPTVPlayerPro/stalker.py:6236
+msgid "Portal request failed"
+msgstr "A portálkérés sikertelen"
+
+#: ../GTIPTVPlayerPro/stalker.py:2498
+msgid "Portal HTTP request failed"
+msgstr "A portál HTTP-kérése sikertelen"
+
+#: ../GTIPTVPlayerPro/stalker.py:2505
+msgid "Portal is unavailable"
+msgstr "A portál nem érhető el"
+
+#: ../GTIPTVPlayerPro/stalker.py:2514
+msgid "Portal response is too large"
+msgstr "A portál válasza túl nagy"
+
+#: ../GTIPTVPlayerPro/stalker.py:5192
+msgid "Portal catalogue did not make progress"
+msgstr "A portál katalógusa nem haladt előre"
+
+#: ../GTIPTVPlayerPro/stalker.py:6333 ../GTIPTVPlayerPro/stalker.py:6345
+#: ../GTIPTVPlayerPro/stalker.py:6354 ../GTIPTVPlayerPro/stalker.py:6661
+msgid "Invalid stream link"
+msgstr "Érvénytelen streamhivatkozás"
+
+#: ../GTIPTVPlayerPro/stalker.py:7200 ../GTIPTVPlayerPro/stalker.py:7318
+#: ../GTIPTVPlayerPro/stalker.py:7453 ../GTIPTVPlayerPro/stalker.py:7588
+msgid "Stream link unavailable"
+msgstr "A streamhivatkozás nem érhető el"
+
+#: ../GTIPTVPlayerPro/stalker.py:8168
+msgid "Portal connection successful"
+msgstr "Sikeres portálkapcsolat"
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:222
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:233
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:283
+#: ../GTIPTVPlayerPro/subtitles.py:672
+msgid "Could not open SubsSupport subtitle search."
+msgstr "A SubsSupport feliratkereső nem nyitható meg."
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:407
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:438
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:480
+#: ../GTIPTVPlayerPro/subtitles.py:717
+msgid "Could not load the downloaded subtitle."
+msgstr "A letöltött felirat nem tölthető be."
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:412
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:510
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:532
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:580
+#: ../GTIPTVPlayerPro/subtitles.py:636
+msgid "External subtitle synchronization is unavailable."
+msgstr "A külső feliratok szinkronizálása nem érhető el."
+
+#: ../GTIPTVPlayerPro/subtitles.py:11
+msgid "DVB"
+msgstr "DVB"
+
+#: ../GTIPTVPlayerPro/subtitles.py:12
+msgid "Teletext"
+msgstr "Teletext"
+
+#: ../GTIPTVPlayerPro/subtitles.py:17 ../GTIPTVPlayerPro/subtitles.py:51
+#: ../GTIPTVPlayerPro/subtitles.py:53
+msgid "Embedded"
+msgstr "Beágyazott"
+
+#: ../GTIPTVPlayerPro/subtitles.py:18
+msgid "SSA"
+msgstr "SSA"
+
+#: ../GTIPTVPlayerPro/subtitles.py:19
+msgid "ASS"
+msgstr "ASS"
+
+#: ../GTIPTVPlayerPro/subtitles.py:20
+msgid "SRT"
+msgstr "SRT"
+
+#: ../GTIPTVPlayerPro/subtitles.py:21
+msgid "VOB"
+msgstr "VOB"
+
+#: ../GTIPTVPlayerPro/subtitles.py:22
+msgid "PGS"
+msgstr "PGS"
+
+#: ../GTIPTVPlayerPro/subtitles.py:23
+msgid "WebVTT"
+msgstr "WebVTT"
+
+#: ../GTIPTVPlayerPro/subtitles.py:63
+msgid "Subtitle"
+msgstr "Felirat"
+
+#: ../GTIPTVPlayerPro/subtitles.py:178
+msgid "No embedded subtitles are available."
+msgstr "Nincsenek elérhető beágyazott feliratok."
+
+#: ../GTIPTVPlayerPro/subtitles.py:184 ../GTIPTVPlayerPro/subtitles.py:234
+#: ../GTIPTVPlayerPro/subtitles.py:237 ../GTIPTVPlayerPro/subtitles.py:288
+#: ../GTIPTVPlayerPro/subtitles.py:296 ../GTIPTVPlayerPro/subtitles.py:482
+msgid "Subtitle selection is unavailable on this image."
+msgstr "A feliratválasztás nem érhető el ezen az image-en."
+
+#: ../GTIPTVPlayerPro/subtitles.py:219 ../GTIPTVPlayerPro/subtitles.py:230
+#: ../GTIPTVPlayerPro/subtitles.py:607
+msgid "Subtitles"
+msgstr "Feliratok"
+
+#: ../GTIPTVPlayerPro/subtitles.py:313 ../GTIPTVPlayerPro/subtitles.py:352
+#: ../GTIPTVPlayerPro/subtitles.py:357
+msgid "Could not enable the selected subtitle."
+msgstr "A kiválasztott felirat nem kapcsolható be."
+
+#: ../GTIPTVPlayerPro/subtitles.py:579
+msgid "Search subtitles with SubsSupport"
+msgstr "Feliratkeresés a SubsSupporttal"
+
+#: ../GTIPTVPlayerPro/subtitles.py:581
+#, python-format
+msgid "Search subtitles with %s"
+msgstr "Feliratkeresés a(z) %s segítségével"
+
+#: ../GTIPTVPlayerPro/subtitles.py:584
+msgid "Embedded subtitles"
+msgstr "Beágyazott feliratok"
+
+#: ../GTIPTVPlayerPro/subtitles.py:589
+msgid "External subtitle synchronization"
+msgstr "Külső feliratok szinkronizálása"
+
+#: ../GTIPTVPlayerPro/subtitles.py:651
+msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
+msgstr "A feliratkereséshez a SubsSupport vagy a SubsSupportPro működő telepítése szükséges."
+
+#: ../GTIPTVPlayerPro/weather.py:435
+msgid "Could not save weather settings through Enigma2 config"
+msgstr "Az időjárási beállítások nem menthetők az Enigma2 konfigurációján keresztül"
+
+#: ../GTIPTVPlayerPro/weather.py:445
+msgid "Clear skies"
+msgstr "Derült égbolt"
+
+#: ../GTIPTVPlayerPro/weather.py:447
+msgid "Partly cloudy"
+msgstr "Részben felhős"
+
+#: ../GTIPTVPlayerPro/weather.py:449
+msgid "Cloudy"
+msgstr "Felhős"
+
+#: ../GTIPTVPlayerPro/weather.py:451
+msgid "Foggy"
+msgstr "Ködös"
+
+#: ../GTIPTVPlayerPro/weather.py:453
+msgid "Drizzle"
+msgstr "Szitálás"
+
+#: ../GTIPTVPlayerPro/weather.py:455
+msgid "Rainy"
+msgstr "Esős"
+
+#: ../GTIPTVPlayerPro/weather.py:457
+msgid "Snowy"
+msgstr "Havas"
+
+#: ../GTIPTVPlayerPro/weather.py:459
+msgid "Thunderstorms"
+msgstr "Zivatarok"
+
+#: ../GTIPTVPlayerPro/weather.py:460
+msgid "Variable"
+msgstr "Változó"
+
+#: ../GTIPTVPlayerPro/weather.py:495 ../GTIPTVPlayerPro/weather.py:844
+#: ../GTIPTVPlayerPro/weather.py:867
+msgid "Weather request cancelled"
+msgstr "Az időjárási kérés megszakítva"
+
+#: ../GTIPTVPlayerPro/weather.py:588
+msgid "Weather service response is too large"
+msgstr "Az időjárási szolgáltatás válasza túl nagy"
+
+#: ../GTIPTVPlayerPro/weather.py:599 ../GTIPTVPlayerPro/weather.py:602
+msgid "Open-Meteo request failed"
+msgstr "Az Open-Meteo kérése sikertelen"
+
+#: ../GTIPTVPlayerPro/weather.py:600 ../GTIPTVPlayerPro/weather.py:603
+msgid "Could not reach the weather service"
+msgstr "Az időjárási szolgáltatás nem érhető el"
+
+#: ../GTIPTVPlayerPro/weather.py:605 ../GTIPTVPlayerPro/weather.py:696
+msgid "Weather service returned an invalid response"
+msgstr "Az időjárási szolgáltatás érvénytelen választ adott"
+
+#: ../GTIPTVPlayerPro/weather.py:617
+msgid "City name cannot be empty"
+msgstr "A város neve nem lehet üres"
+
+#: ../GTIPTVPlayerPro/weather.py:661
+#, python-brace-format
+msgid "Could not find {}"
+msgstr "Nem található: {}"
+
+#: ../GTIPTVPlayerPro/weather.py:745
+msgid "Could not load the five-day forecast"
+msgstr "Az ötnapos előrejelzés nem tölthető be"
+
+#: ../GTIPTVPlayerPro/weather.py:886
+msgid "Not fetched yet"
+msgstr "Még nincs lekérve"

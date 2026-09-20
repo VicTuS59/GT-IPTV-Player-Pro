@@ -1,0 +1,3823 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GT IPTV Player Pro 1.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
+"POT-Creation-Date: 2023-11-14 22:13+0000\n"
+"PO-Revision-Date: 2026-09-16 00:00+0000\n"
+"Last-Translator: GT IPTV Player Pro contributors\n"
+"Language-Team: fi\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../GTIPTVPlayerPro/browser.py:155 ../GTIPTVPlayerPro/browser.py:7260
+#: ../GTIPTVPlayerPro/browser.py:7269 ../GTIPTVPlayerPro/browser.py:7339
+#: ../GTIPTVPlayerPro/browser.py:7364
+msgid "This source does not support the selected content type."
+msgstr "Tämä lähde ei tue valittua sisältötyyppiä."
+
+#: ../GTIPTVPlayerPro/browser.py:337
+msgid "NO RATING"
+msgstr "EI ARVOSANAA"
+
+#: ../GTIPTVPlayerPro/browser.py:739
+#, python-brace-format
+msgid "{} added to favorites."
+msgstr "{} lisättiin suosikkeihin."
+
+#: ../GTIPTVPlayerPro/browser.py:741 ../GTIPTVPlayerPro/browser.py:6566
+#, python-brace-format
+msgid "{} removed from favorites."
+msgstr "{} poistettiin suosikeista."
+
+#: ../GTIPTVPlayerPro/browser.py:742 ../GTIPTVPlayerPro/browser.py:6549
+msgid "Could not update favorites."
+msgstr "Suosikkeja ei voitu päivittää."
+
+#: ../GTIPTVPlayerPro/browser.py:4447
+msgid "CONTENT BROWSER"
+msgstr "SISÄLTÖSELAIN"
+
+#: ../GTIPTVPlayerPro/browser.py:4520 ../GTIPTVPlayerPro/browser.py:5476
+#: ../GTIPTVPlayerPro/browser.py:13098 ../GTIPTVPlayerPro/browser.py:13138
+msgid "No content found."
+msgstr "Sisältöä ei löytynyt."
+
+#: ../GTIPTVPlayerPro/browser.py:4538
+#: ../GTIPTVPlayerPro/category_filter_ui.py:175
+msgid "Loading content..."
+msgstr "Ladataan sisältöä..."
+
+#: ../GTIPTVPlayerPro/browser.py:4539 ../GTIPTVPlayerPro/browser.py:6948
+#: ../GTIPTVPlayerPro/browser.py:7272 ../GTIPTVPlayerPro/browser.py:7480
+#: ../GTIPTVPlayerPro/browser.py:7537 ../GTIPTVPlayerPro/browser.py:7626
+#: ../GTIPTVPlayerPro/browser.py:8706 ../GTIPTVPlayerPro/browser.py:9003
+#: ../GTIPTVPlayerPro/browser.py:9010 ../GTIPTVPlayerPro/browser.py:9013
+#: ../GTIPTVPlayerPro/browser.py:10900 ../GTIPTVPlayerPro/browser.py:11745
+#: ../GTIPTVPlayerPro/browser.py:12021 ../GTIPTVPlayerPro/browser.py:12985
+#: ../GTIPTVPlayerPro/browser.py:13066 ../GTIPTVPlayerPro/browser.py:13094
+#: ../GTIPTVPlayerPro/browser.py:13519 ../GTIPTVPlayerPro/browser.py:14291
+#: ../GTIPTVPlayerPro/browser.py:14629 ../GTIPTVPlayerPro/browser.py:14713
+#: ../GTIPTVPlayerPro/browser.py:16342 ../GTIPTVPlayerPro/browser.py:16360
+#: ../GTIPTVPlayerPro/browser.py:18208 ../GTIPTVPlayerPro/browser.py:19380
+#: ../GTIPTVPlayerPro/browser.py:21070 ../GTIPTVPlayerPro/browser.py:21335
+#: ../GTIPTVPlayerPro/category_filter_ui.py:177
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1295 ../GTIPTVPlayerPro/dvb_epg_ui.py:1920
+#: ../GTIPTVPlayerPro/main.py:5702 ../GTIPTVPlayerPro/main.py:5767
+#: ../GTIPTVPlayerPro/main.py:6363 ../GTIPTVPlayerPro/main.py:6393
+#: ../GTIPTVPlayerPro/main.py:6399 ../GTIPTVPlayerPro/main.py:6513
+#: ../GTIPTVPlayerPro/main.py:6590
+msgid "Please wait"
+msgstr "Odota"
+
+#: ../GTIPTVPlayerPro/browser.py:4568 ../GTIPTVPlayerPro/browser.py:4593
+#: ../GTIPTVPlayerPro/browser.py:7251 ../GTIPTVPlayerPro/browser.py:13652
+#: ../GTIPTVPlayerPro/catchup.py:192 ../GTIPTVPlayerPro/content.py:614
+#: ../GTIPTVPlayerPro/content.py:628 ../GTIPTVPlayerPro/m3u.py:405
+#: ../GTIPTVPlayerPro/m3u.py:1003 ../GTIPTVPlayerPro/m3u.py:1011
+#: ../GTIPTVPlayerPro/playlist.py:856 ../GTIPTVPlayerPro/stalker.py:1396
+msgid "Request timed out"
+msgstr "Pyyntö aikakatkaistiin"
+
+#: ../GTIPTVPlayerPro/browser.py:4570 ../GTIPTVPlayerPro/browser.py:7253
+#: ../GTIPTVPlayerPro/catchup.py:190 ../GTIPTVPlayerPro/catchup_m3u.py:198
+#: ../GTIPTVPlayerPro/content.py:609 ../GTIPTVPlayerPro/content.py:921
+#: ../GTIPTVPlayerPro/content.py:944 ../GTIPTVPlayerPro/content.py:990
+#: ../GTIPTVPlayerPro/content.py:1001 ../GTIPTVPlayerPro/content.py:1026
+#: ../GTIPTVPlayerPro/m3u.py:403 ../GTIPTVPlayerPro/m3u.py:998
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:526 ../GTIPTVPlayerPro/m3u_epg_ui.py:1177
+#: ../GTIPTVPlayerPro/main.py:6072 ../GTIPTVPlayerPro/playlist.py:848
+#: ../GTIPTVPlayerPro/playlist.py:1350 ../GTIPTVPlayerPro/playlist.py:1361
+#: ../GTIPTVPlayerPro/playlist.py:1396 ../GTIPTVPlayerPro/playlist.py:1494
+#: ../GTIPTVPlayerPro/stalker.py:1388
+msgid "Request cancelled"
+msgstr "Pyyntö peruutettiin"
+
+#: ../GTIPTVPlayerPro/browser.py:4575 ../GTIPTVPlayerPro/browser.py:13773
+msgid "Could not load content"
+msgstr "Sisältöä ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/browser.py:4605 ../GTIPTVPlayerPro/browser.py:6652
+#: ../GTIPTVPlayerPro/browser.py:8262 ../GTIPTVPlayerPro/browser.py:8582
+#: ../GTIPTVPlayerPro/browser.py:8594 ../GTIPTVPlayerPro/browser.py:9007
+#: ../GTIPTVPlayerPro/browser.py:9023 ../GTIPTVPlayerPro/browser.py:9057
+#: ../GTIPTVPlayerPro/browser.py:13011
+msgid "Could not open the content list."
+msgstr "Sisältöluetteloa ei voitu avata."
+
+#: ../GTIPTVPlayerPro/browser.py:4615
+msgid "Press GREEN to try again"
+msgstr "Yritä uudelleen painamalla VIHREÄÄ"
+
+#: ../GTIPTVPlayerPro/browser.py:4701
+msgid "LIVE TV CATEGORY SETTINGS"
+msgstr "SUORAN TV:N LUOKKA-ASETUKSET"
+
+#: ../GTIPTVPlayerPro/browser.py:4702
+msgid "MOVIE CATEGORY SETTINGS"
+msgstr "ELOKUVALUOKKIEN ASETUKSET"
+
+#: ../GTIPTVPlayerPro/browser.py:4703
+msgid "SERIES CATEGORY SETTINGS"
+msgstr "SARJALUOKKIEN ASETUKSET"
+
+#: ../GTIPTVPlayerPro/browser.py:4752
+#: ../GTIPTVPlayerPro/category_filter_ui.py:56
+msgid "Category Manager"
+msgstr "Luokkien hallinta"
+
+#: ../GTIPTVPlayerPro/browser.py:4753 ../GTIPTVPlayerPro/dvb_epg_ui.py:624
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:841 ../GTIPTVPlayerPro/main.py:4058
+#: ../GTIPTVPlayerPro/main.py:4381 ../GTIPTVPlayerPro/main.py:4512
+#: ../GTIPTVPlayerPro/remote_footer.py:90
+msgid "Settings"
+msgstr "Asetukset"
+
+#: ../GTIPTVPlayerPro/browser.py:4848 ../GTIPTVPlayerPro/browser.py:8246
+msgid "No category found."
+msgstr "Luokkaa ei löytynyt."
+
+#: ../GTIPTVPlayerPro/browser.py:4870 ../GTIPTVPlayerPro/content.py:130
+msgid "Category"
+msgstr "Luokka"
+
+#: ../GTIPTVPlayerPro/browser.py:4879 ../GTIPTVPlayerPro/browser.py:4926
+#: ../GTIPTVPlayerPro/category_filter_ui.py:193
+#: ../GTIPTVPlayerPro/category_filter_ui.py:226
+msgid "Hidden"
+msgstr "Piilotettu"
+
+#: ../GTIPTVPlayerPro/browser.py:4924
+#: ../GTIPTVPlayerPro/category_filter_ui.py:194
+#: ../GTIPTVPlayerPro/category_filter_ui.py:225
+msgid "Visible"
+msgstr "Näkyvä"
+
+#: ../GTIPTVPlayerPro/browser.py:4933 ../GTIPTVPlayerPro/browser.py:4936
+msgid "Marked"
+msgstr "Merkitty"
+
+#: ../GTIPTVPlayerPro/browser.py:5014
+#, python-brace-format
+msgid "{} is always visible."
+msgstr "{} näkyy aina."
+
+#: ../GTIPTVPlayerPro/browser.py:5022
+#: ../GTIPTVPlayerPro/category_filter_ui.py:53
+#: ../GTIPTVPlayerPro/category_filter_ui.py:58
+#: ../GTIPTVPlayerPro/category_filter_ui.py:220
+#: ../GTIPTVPlayerPro/category_filter_ui.py:301
+#: ../GTIPTVPlayerPro/remote_footer.py:132
+msgid "Filter Search"
+msgstr "Suodattimien haku"
+
+#: ../GTIPTVPlayerPro/browser.py:5023
+msgid "Category shown."
+msgstr "Luokka tuotu näkyviin."
+
+#: ../GTIPTVPlayerPro/browser.py:5027
+msgid "Category hidden."
+msgstr "Luokka piilotettu."
+
+#: ../GTIPTVPlayerPro/browser.py:5035
+msgid "Mark categories with RED first."
+msgstr "Merkitse ensin luokat PUNAISELLA painikkeella."
+
+#: ../GTIPTVPlayerPro/browser.py:5050
+msgid "Choose the destination with the arrows. OK places marked categories below the line; EXIT cancels."
+msgstr "Valitse kohde nuolinäppäimillä. OK sijoittaa merkityt luokat viivan alle; EXIT peruuttaa."
+
+#: ../GTIPTVPlayerPro/browser.py:5081
+msgid "Position updated. Press GREEN to save."
+msgstr "Sijainti päivitetty. Tallenna painamalla VIHREÄÄ."
+
+#: ../GTIPTVPlayerPro/browser.py:5098 ../GTIPTVPlayerPro/browser.py:6525
+msgid "Move cancelled."
+msgstr "Siirto peruutettu."
+
+#: ../GTIPTVPlayerPro/browser.py:5116
+msgid "Default order restored. Press GREEN to save."
+msgstr "Oletusjärjestys palautettu. Tallenna painamalla VIHREÄÄ."
+
+#: ../GTIPTVPlayerPro/browser.py:5237 ../GTIPTVPlayerPro/main.py:5114
+#: ../GTIPTVPlayerPro/playlist.py:38
+msgid "Settings could not be saved. Check the receiver storage."
+msgstr "Asetuksia ei voitu tallentaa. Tarkista vastaanottimen tallennustila."
+
+#: ../GTIPTVPlayerPro/browser.py:5251
+#, python-brace-format
+msgid "{} cannot be moved."
+msgstr "{} ei ole siirrettävissä."
+
+#: ../GTIPTVPlayerPro/browser.py:5294
+msgid "Filters updated. Press GREEN to save."
+msgstr "Suodattimet päivitetty. Tallenna painamalla VIHREÄÄ."
+
+#: ../GTIPTVPlayerPro/browser.py:5358
+msgid "Continue Watching"
+msgstr "Jatka katselua"
+
+#: ../GTIPTVPlayerPro/browser.py:5371
+msgid "Unfinished movies and series episodes"
+msgstr "Keskeneräiset elokuvat ja sarjajaksot"
+
+#: ../GTIPTVPlayerPro/browser.py:5544 ../GTIPTVPlayerPro/browser.py:6026
+#: ../GTIPTVPlayerPro/browser.py:6057 ../GTIPTVPlayerPro/browser.py:6268
+#: ../GTIPTVPlayerPro/content.py:43 ../GTIPTVPlayerPro/main.py:6683
+#: ../GTIPTVPlayerPro/main.py:6691 ../GTIPTVPlayerPro/main.py:6854
+#: ../GTIPTVPlayerPro/main.py:6866
+msgid "Movies"
+msgstr "Elokuvat"
+
+#: ../GTIPTVPlayerPro/browser.py:5544 ../GTIPTVPlayerPro/browser.py:6026
+#: ../GTIPTVPlayerPro/browser.py:6058 ../GTIPTVPlayerPro/browser.py:6269
+#: ../GTIPTVPlayerPro/browser.py:13077 ../GTIPTVPlayerPro/content.py:44
+#: ../GTIPTVPlayerPro/main.py:6684 ../GTIPTVPlayerPro/main.py:6692
+#: ../GTIPTVPlayerPro/main.py:6855 ../GTIPTVPlayerPro/main.py:6867
+msgid "Series"
+msgstr "Sarja"
+
+#: ../GTIPTVPlayerPro/browser.py:5552
+#, python-brace-format
+msgid "S{}  •  E{}"
+msgstr "K{}  •  J{}"
+
+#: ../GTIPTVPlayerPro/browser.py:5571
+#, python-brace-format
+msgid "%{} • {} min remaining"
+msgstr "%{} • {} min jäljellä"
+
+#: ../GTIPTVPlayerPro/browser.py:6055
+msgid "All"
+msgstr "Kaikki"
+
+#: ../GTIPTVPlayerPro/browser.py:6056 ../GTIPTVPlayerPro/browser.py:6267
+#: ../GTIPTVPlayerPro/content.py:42 ../GTIPTVPlayerPro/main.py:6682
+#: ../GTIPTVPlayerPro/main.py:6687 ../GTIPTVPlayerPro/main.py:6690
+#: ../GTIPTVPlayerPro/main.py:6839 ../GTIPTVPlayerPro/main.py:6853
+#: ../GTIPTVPlayerPro/main.py:6865 ../GTIPTVPlayerPro/main.py:6870
+msgid "Live TV"
+msgstr "Suora TV"
+
+#: ../GTIPTVPlayerPro/browser.py:6087 ../GTIPTVPlayerPro/browser.py:6110
+#: ../GTIPTVPlayerPro/browser.py:6336 ../GTIPTVPlayerPro/browser.py:6350
+#: ../GTIPTVPlayerPro/browser.py:6368
+msgid "Favorites"
+msgstr "Suosikit"
+
+#: ../GTIPTVPlayerPro/browser.py:6089
+msgid "Favorite channels, movies and series"
+msgstr "Suosikkikanavat, -elokuvat ja -sarjat"
+
+#: ../GTIPTVPlayerPro/browser.py:6148 ../GTIPTVPlayerPro/main.py:237
+#: ../GTIPTVPlayerPro/main.py:6095 ../GTIPTVPlayerPro/main.py:6747
+#: ../GTIPTVPlayerPro/main.py:8994 ../GTIPTVPlayerPro/remote_footer.py:87
+msgid "Source"
+msgstr "Lähde"
+
+#: ../GTIPTVPlayerPro/browser.py:6262
+msgid "No favorites have been added."
+msgstr "Suosikkeja ei ole lisätty."
+
+#: ../GTIPTVPlayerPro/browser.py:6271 ../GTIPTVPlayerPro/browser.py:19194
+#: ../GTIPTVPlayerPro/browser.py:21659 ../GTIPTVPlayerPro/remote_footer.py:123
+msgid "Favorite"
+msgstr "Suosikki"
+
+#: ../GTIPTVPlayerPro/browser.py:6336 ../GTIPTVPlayerPro/browser.py:6350
+#: ../GTIPTVPlayerPro/browser.py:6369 ../GTIPTVPlayerPro/browser.py:12219
+#: ../GTIPTVPlayerPro/main.py:5574 ../GTIPTVPlayerPro/main.py:6103
+#: ../GTIPTVPlayerPro/main.py:6109 ../GTIPTVPlayerPro/remote_footer.py:105
+#: ../GTIPTVPlayerPro/remote_footer.py:128
+msgid "Page"
+msgstr "Sivu"
+
+#: ../GTIPTVPlayerPro/browser.py:6509
+msgid "Could not save the favorite order."
+msgstr "Suosikkien järjestystä ei voitu tallentaa."
+
+#: ../GTIPTVPlayerPro/browser.py:6513
+msgid "Favorite order saved."
+msgstr "Suosikkien järjestys tallennettu."
+
+#: ../GTIPTVPlayerPro/browser.py:6577 ../GTIPTVPlayerPro/browser.py:6597
+msgid "This channel is no longer present in the M3U source."
+msgstr "Tätä kanavaa ei enää ole M3U-lähteessä."
+
+#: ../GTIPTVPlayerPro/browser.py:6735 ../GTIPTVPlayerPro/browser.py:6814
+#: ../GTIPTVPlayerPro/browser.py:6854 ../GTIPTVPlayerPro/browser.py:9288
+msgid "Search All Movies"
+msgstr "Hae kaikista elokuvista"
+
+#: ../GTIPTVPlayerPro/browser.py:6743 ../GTIPTVPlayerPro/browser.py:13116
+#: ../GTIPTVPlayerPro/browser.py:13155 ../GTIPTVPlayerPro/dvb_epg_ui.py:2147
+#: ../GTIPTVPlayerPro/main.py:3747 ../GTIPTVPlayerPro/main.py:3984
+#: ../GTIPTVPlayerPro/remote_footer.py:121
+msgid "Search"
+msgstr "Hae"
+
+#: ../GTIPTVPlayerPro/browser.py:6744 ../GTIPTVPlayerPro/browser.py:6762
+#: ../GTIPTVPlayerPro/browser.py:6763 ../GTIPTVPlayerPro/browser.py:6893
+#: ../GTIPTVPlayerPro/browser.py:7266 ../GTIPTVPlayerPro/browser.py:7371
+msgid "Enter a movie name."
+msgstr "Kirjoita elokuvan nimi."
+
+#: ../GTIPTVPlayerPro/browser.py:6747 ../GTIPTVPlayerPro/browser.py:9287
+#: ../GTIPTVPlayerPro/content.py:43
+msgid "All Movies"
+msgstr "Kaikki elokuvat"
+
+#: ../GTIPTVPlayerPro/browser.py:6757 ../GTIPTVPlayerPro/browser.py:7356
+#: ../GTIPTVPlayerPro/browser.py:8790 ../GTIPTVPlayerPro/browser.py:10205
+msgid "Selecting movie..."
+msgstr "Valitaan elokuvaa..."
+
+#: ../GTIPTVPlayerPro/browser.py:6761 ../GTIPTVPlayerPro/browser.py:8794
+msgid "MOVIE SUMMARY"
+msgstr "ELOKUVAN YHTEENVETO"
+
+#: ../GTIPTVPlayerPro/browser.py:6844 ../GTIPTVPlayerPro/browser.py:7632
+#: ../GTIPTVPlayerPro/browser.py:13104
+#: ../GTIPTVPlayerPro/category_filter_ui.py:292
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2229 ../GTIPTVPlayerPro/m3u_epg_ui.py:985
+#: ../GTIPTVPlayerPro/main.py:3976 ../GTIPTVPlayerPro/main.py:4171
+#: ../GTIPTVPlayerPro/main.py:4989 ../GTIPTVPlayerPro/main.py:7053
+#: ../GTIPTVPlayerPro/main.py:7703 ../GTIPTVPlayerPro/main.py:8163
+#: ../GTIPTVPlayerPro/main.py:8414
+msgid "The virtual keyboard is unavailable on this image."
+msgstr "Virtuaalinäppäimistö ei ole käytettävissä tässä imagessa."
+
+#: ../GTIPTVPlayerPro/browser.py:6849 ../GTIPTVPlayerPro/browser.py:7637
+#: ../GTIPTVPlayerPro/browser.py:13110
+#: ../GTIPTVPlayerPro/category_filter_ui.py:297
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2232 ../GTIPTVPlayerPro/m3u_epg_ui.py:989
+#: ../GTIPTVPlayerPro/main.py:3979 ../GTIPTVPlayerPro/main.py:4174
+#: ../GTIPTVPlayerPro/main.py:4992 ../GTIPTVPlayerPro/main.py:7057
+#: ../GTIPTVPlayerPro/main.py:7707 ../GTIPTVPlayerPro/main.py:8167
+#: ../GTIPTVPlayerPro/main.py:8417
+msgid "Could not open the virtual keyboard."
+msgstr "Virtuaalinäppäimistöä ei voitu avata."
+
+#: ../GTIPTVPlayerPro/browser.py:7255 ../GTIPTVPlayerPro/playlist.py:1429
+msgid "Server denied access"
+msgstr "Palvelin esti pääsyn"
+
+#: ../GTIPTVPlayerPro/browser.py:7257 ../GTIPTVPlayerPro/content.py:753
+#: ../GTIPTVPlayerPro/playlist.py:1431
+msgid "Server request limit reached"
+msgstr "Palvelinpyyntöjen raja saavutettu"
+
+#: ../GTIPTVPlayerPro/browser.py:7262 ../GTIPTVPlayerPro/browser.py:7344
+#: ../GTIPTVPlayerPro/browser.py:7367 ../GTIPTVPlayerPro/browser.py:9428
+#: ../GTIPTVPlayerPro/browser.py:9495
+msgid "Could not load movies"
+msgstr "Elokuvia ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/browser.py:7275
+#, python-brace-format
+msgid "{movies} movies • {results} results"
+msgstr "{movies} elokuvaa • {results} tulosta"
+
+#: ../GTIPTVPlayerPro/browser.py:7303 ../GTIPTVPlayerPro/browser.py:7388
+#: ../GTIPTVPlayerPro/content.py:230 ../GTIPTVPlayerPro/metadata.py:888
+msgid "Movie"
+msgstr "Elokuva"
+
+#: ../GTIPTVPlayerPro/browser.py:7346 ../GTIPTVPlayerPro/browser.py:7369
+msgid "No movies matched this search."
+msgstr "Hakua vastaavia elokuvia ei löytynyt."
+
+#: ../GTIPTVPlayerPro/browser.py:7407 ../GTIPTVPlayerPro/browser.py:10808
+#: ../GTIPTVPlayerPro/browser.py:10832 ../GTIPTVPlayerPro/browser.py:12712
+#: ../GTIPTVPlayerPro/browser.py:12748
+msgid "Information unavailable."
+msgstr "Tietoja ei ole saatavilla."
+
+#: ../GTIPTVPlayerPro/browser.py:7422 ../GTIPTVPlayerPro/browser.py:10841
+msgid "Movie summary unavailable."
+msgstr "Elokuvan yhteenvetoa ei ole saatavilla."
+
+#: ../GTIPTVPlayerPro/browser.py:7499 ../GTIPTVPlayerPro/browser.py:8146
+msgid "Select content before using favorites."
+msgstr "Valitse sisältö ennen suosikkien käyttöä."
+
+#: ../GTIPTVPlayerPro/browser.py:7588 ../GTIPTVPlayerPro/browser.py:7642
+msgid "Search All Channels"
+msgstr "Hae kaikista kanavista"
+
+#: ../GTIPTVPlayerPro/browser.py:7591 ../GTIPTVPlayerPro/content.py:42
+#: ../GTIPTVPlayerPro/m3u.py:1223
+msgid "All Channels"
+msgstr "Kaikki kanavat"
+
+#: ../GTIPTVPlayerPro/browser.py:7594
+msgid "M3U CHANNEL SEARCH"
+msgstr "M3U-KANAVAHAKU"
+
+#: ../GTIPTVPlayerPro/browser.py:7678
+msgid "No channels matched this search."
+msgstr "Hakua vastaavia kanavia ei löytynyt."
+
+#: ../GTIPTVPlayerPro/browser.py:7679
+msgid "Enter a channel name."
+msgstr "Anna kanavan nimi."
+
+#: ../GTIPTVPlayerPro/browser.py:7691
+#, python-brace-format
+msgid "First {} matching channels"
+msgstr "Ensimmäiset {} vastaavaa kanavaa"
+
+#: ../GTIPTVPlayerPro/browser.py:7695
+#, python-brace-format
+msgid "{} channels found"
+msgstr "{} kanavaa löytyi"
+
+#: ../GTIPTVPlayerPro/browser.py:8027
+#, python-brace-format
+msgid "{}  |  Select a category"
+msgstr "{}  |  Valitse luokka"
+
+#: ../GTIPTVPlayerPro/browser.py:8045
+msgid "LIVE TV CATEGORIES"
+msgstr "SUORAN TV:N LUOKAT"
+
+#: ../GTIPTVPlayerPro/browser.py:8052
+msgid "5-DAY WEATHER FORECAST"
+msgstr "5 VUOROKAUDEN SÄÄENNUSTE"
+
+#: ../GTIPTVPlayerPro/browser.py:8056
+msgid "TODAY"
+msgstr "TÄNÄÄN"
+
+#: ../GTIPTVPlayerPro/browser.py:8058 ../GTIPTVPlayerPro/browser.py:19199
+#: ../GTIPTVPlayerPro/browser.py:23060
+msgid "Loading weather data"
+msgstr "Ladataan säätietoja"
+
+#: ../GTIPTVPlayerPro/browser.py:8273
+msgid "No categories found; press GREEN to try again."
+msgstr "Luokkia ei löytynyt; yritä uudelleen painamalla VIHREÄÄ."
+
+#: ../GTIPTVPlayerPro/browser.py:8307 ../GTIPTVPlayerPro/browser.py:8967
+#: ../GTIPTVPlayerPro/browser.py:11329
+msgid "Categories"
+msgstr "Luokat"
+
+#: ../GTIPTVPlayerPro/browser.py:8382 ../GTIPTVPlayerPro/main.py:4751
+msgid "Category edit lock data is damaged. Remove and reinstall the plugin to reset only this lock."
+msgstr "Luokkien muokkauslukon tiedot ovat vioittuneet. Poista lisäosa ja asenna se uudelleen, jotta vain tämä lukko nollataan."
+
+#: ../GTIPTVPlayerPro/browser.py:8395
+msgid "Category editor locked"
+msgstr "Luokkamuokkain lukittu"
+
+#: ../GTIPTVPlayerPro/browser.py:8396
+msgid "Enter the 4-digit category edit PIN."
+msgstr "Anna luokkien muokkauksen 4-numeroinen PIN-koodi."
+
+#: ../GTIPTVPlayerPro/browser.py:8415 ../GTIPTVPlayerPro/browser.py:8436
+#: ../GTIPTVPlayerPro/main.py:4707 ../GTIPTVPlayerPro/main.py:4728
+msgid "The PIN entry screen is unavailable on this image."
+msgstr "PIN-koodin syöttönäyttö ei ole käytettävissä tässä järjestelmäkuvassa."
+
+#: ../GTIPTVPlayerPro/browser.py:8447 ../GTIPTVPlayerPro/main.py:4856
+msgid "Category lock recovery"
+msgstr "Luokkalukon palautus"
+
+#: ../GTIPTVPlayerPro/browser.py:8448 ../GTIPTVPlayerPro/main.py:4857
+msgid "Enter the 12-digit recovery code."
+msgstr "Anna 12-numeroinen palautuskoodi."
+
+#: ../GTIPTVPlayerPro/browser.py:8457
+msgid "Incorrect PIN. Category editor remains locked."
+msgstr "Virheellinen PIN-koodi. Luokkamuokkain pysyy lukittuna."
+
+#: ../GTIPTVPlayerPro/browser.py:8476
+msgid "Incorrect recovery code. Category editor remains locked."
+msgstr "Virheellinen palautuskoodi. Luokkamuokkain pysyy lukittuna."
+
+#: ../GTIPTVPlayerPro/browser.py:8487
+msgid "Create a new category edit PIN"
+msgstr "Luo uusi PIN-koodi luokkien muokkaukseen"
+
+#: ../GTIPTVPlayerPro/browser.py:8488 ../GTIPTVPlayerPro/main.py:4788
+msgid "Enter a new 4-digit PIN."
+msgstr "Anna uusi 4-numeroinen PIN-koodi."
+
+#: ../GTIPTVPlayerPro/browser.py:8497
+msgid "Confirm the new category edit PIN"
+msgstr "Vahvista uusi luokkien muokkauksen PIN-koodi"
+
+#: ../GTIPTVPlayerPro/browser.py:8498 ../GTIPTVPlayerPro/main.py:4798
+msgid "Enter the same 4-digit PIN again."
+msgstr "Anna sama 4-numeroinen PIN-koodi uudelleen."
+
+#: ../GTIPTVPlayerPro/browser.py:8509 ../GTIPTVPlayerPro/main.py:4810
+msgid "The PIN entries do not match. Nothing was changed."
+msgstr "PIN-koodit eivät täsmää. Mitään ei muutettu."
+
+#: ../GTIPTVPlayerPro/browser.py:8526
+msgid "The new PIN could not be saved. Category editor remains locked."
+msgstr "Uutta PIN-koodia ei voitu tallentaa. Luokkamuokkain pysyy lukittuna."
+
+#: ../GTIPTVPlayerPro/browser.py:8537
+#, python-brace-format
+msgid ""
+"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
+"\n"
+"{}"
+msgstr ""
+"Palautus onnistui. Kirjoita uusi palautuskoodi muistiin; se näytetään vain kerran:\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/browser.py:8540
+msgid "Category edit PIN renewed."
+msgstr "Luokkien muokkauksen PIN-koodi uusittu."
+
+#: ../GTIPTVPlayerPro/browser.py:8780
+msgid "MOVIE CATEGORIES"
+msgstr "ELOKUVALUOKAT"
+
+#: ../GTIPTVPlayerPro/browser.py:8786
+msgid ""
+"GT\n"
+"MOVIE"
+msgstr ""
+"GT\n"
+"ELOKUVA"
+
+#: ../GTIPTVPlayerPro/browser.py:8796
+msgid "The selected movie's details will be loaded from the server."
+msgstr "Valitun elokuvan tiedot ladataan palvelimelta."
+
+#: ../GTIPTVPlayerPro/browser.py:8804
+msgid "MOVIES IN THE SELECTED CATEGORY"
+msgstr "VALITUN LUOKAN ELOKUVAT"
+
+#: ../GTIPTVPlayerPro/browser.py:8908
+msgid "Movie category not found"
+msgstr "Elokuvaluokkaa ei löytynyt"
+
+#: ../GTIPTVPlayerPro/browser.py:9292
+msgid "Press BLUE to search all movies."
+msgstr "Hae kaikista elokuvista painamalla SINISTÄ painiketta."
+
+#: ../GTIPTVPlayerPro/browser.py:9391
+#, python-brace-format
+msgid "{} • LOADING MOVIES"
+msgstr "{} • LADATAAN ELOKUVIA"
+
+#: ../GTIPTVPlayerPro/browser.py:9525
+#, python-brace-format
+msgid "{} • {} MOVIES"
+msgstr "{} • {} ELOKUVAA"
+
+#: ../GTIPTVPlayerPro/browser.py:9603
+msgid "Movie request timed out"
+msgstr "Elokuvapyyntö aikakatkaistiin"
+
+#: ../GTIPTVPlayerPro/browser.py:10220
+msgid "Loading movie information from the server."
+msgstr "Ladataan elokuvan tietoja palvelimelta."
+
+#: ../GTIPTVPlayerPro/browser.py:10228
+msgid "COULD NOT LOAD MOVIES"
+msgstr "ELOKUVIEN LATAAMINEN EPÄONNISTUI"
+
+#: ../GTIPTVPlayerPro/browser.py:10233
+msgid "NO MOVIES FOUND IN THIS CATEGORY"
+msgstr "TÄSTÄ LUOKASTA EI LÖYTYNYT ELOKUVIA"
+
+#: ../GTIPTVPlayerPro/browser.py:10234
+msgid "Try another category."
+msgstr "Kokeile toista luokkaa."
+
+#: ../GTIPTVPlayerPro/browser.py:10811
+msgid "Movie information unavailable."
+msgstr "Elokuvan tietoja ei ole saatavilla."
+
+#: ../GTIPTVPlayerPro/browser.py:10837
+msgid "Genre unavailable"
+msgstr "Tyylilaji ei ole saatavilla"
+
+#: ../GTIPTVPlayerPro/browser.py:10846 ../GTIPTVPlayerPro/browser.py:12758
+#, python-brace-format
+msgid "Director: {}"
+msgstr "Ohjaaja: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:10850 ../GTIPTVPlayerPro/browser.py:12760
+#, python-brace-format
+msgid "Cast: {}"
+msgstr "Näyttelijät: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:11140
+#, python-brace-format
+msgid "{}   |   CONTENT BROWSER"
+msgstr "{}   |   SISÄLTÖSELAIN"
+
+#: ../GTIPTVPlayerPro/browser.py:11166
+msgid "CATEGORIES"
+msgstr "LUOKAT"
+
+#: ../GTIPTVPlayerPro/browser.py:11174
+msgid ""
+"GT\n"
+"SERIES"
+msgstr ""
+"GT\n"
+"SARJA"
+
+#: ../GTIPTVPlayerPro/browser.py:11176 ../GTIPTVPlayerPro/browser.py:19374
+#: ../GTIPTVPlayerPro/main.py:445 ../GTIPTVPlayerPro/main.py:9014
+msgid "SERIES"
+msgstr "SARJAT"
+
+#: ../GTIPTVPlayerPro/browser.py:11191 ../GTIPTVPlayerPro/browser.py:11983
+msgid "Selecting series..."
+msgstr "Valitaan sarjaa..."
+
+#: ../GTIPTVPlayerPro/browser.py:11194
+msgid "SERIES SUMMARY"
+msgstr "SARJAN YHTEENVETO"
+
+#: ../GTIPTVPlayerPro/browser.py:11195 ../GTIPTVPlayerPro/browser.py:11998
+msgid "Loading series information from the server."
+msgstr "Ladataan sarjan tietoja palvelimelta."
+
+#: ../GTIPTVPlayerPro/browser.py:11298
+msgid "Series category not found"
+msgstr "Sarjaluokkaa ei löytynyt"
+
+#: ../GTIPTVPlayerPro/browser.py:11491
+#, python-brace-format
+msgid "{} • LOADING SERIES"
+msgstr "{} • LADATAAN SARJOJA"
+
+#: ../GTIPTVPlayerPro/browser.py:11532 ../GTIPTVPlayerPro/browser.py:11606
+msgid "Could not load series"
+msgstr "Sarjoja ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/browser.py:11653
+#, python-brace-format
+msgid "Series scan • {} pages"
+msgstr "Sarjahaku • {} sivua"
+
+#: ../GTIPTVPlayerPro/browser.py:11696
+#, python-brace-format
+msgid "{} • {} SERIES"
+msgstr "{} • {} SARJAA"
+
+#: ../GTIPTVPlayerPro/browser.py:11800
+msgid "Series request timed out"
+msgstr "Sarjapyyntö aikakatkaistiin"
+
+#: ../GTIPTVPlayerPro/browser.py:12012
+msgid "COULD NOT LOAD SERIES"
+msgstr "SARJOJEN LATAAMINEN EPÄONNISTUI"
+
+#: ../GTIPTVPlayerPro/browser.py:12027
+msgid "SERIES DATA COULD NOT BE READ"
+msgstr "SARJATIETOJA EI VOITU LUKEA"
+
+#: ../GTIPTVPlayerPro/browser.py:12029
+msgid "The series response uses an unsupported format. Categories remain available."
+msgstr "Sarjavastaus käyttää tukematonta muotoa. Luokat ovat edelleen käytettävissä."
+
+#: ../GTIPTVPlayerPro/browser.py:12032
+msgid "SERIES DATA UNAVAILABLE"
+msgstr "SARJATIEDOT EIVÄT OLE SAATAVILLA"
+
+#: ../GTIPTVPlayerPro/browser.py:12034
+msgid "The server did not answer the series request. Categories remain available."
+msgstr "Palvelin ei vastannut sarjapyyntöön. Luokat ovat edelleen käytettävissä."
+
+#: ../GTIPTVPlayerPro/browser.py:12038
+msgid "NO SERIES FOUND IN THIS CATEGORY"
+msgstr "TÄSTÄ LUOKASTA EI LÖYTYNYT SARJOJA"
+
+#: ../GTIPTVPlayerPro/browser.py:12041
+msgid "No series were found on this server or in this category."
+msgstr "Tältä palvelimelta tai tästä luokasta ei löytynyt sarjoja."
+
+#: ../GTIPTVPlayerPro/browser.py:12716 ../GTIPTVPlayerPro/browser.py:12752
+msgid "Series summary unavailable."
+msgstr "Sarjan yhteenvetoa ei ole saatavilla."
+
+#: ../GTIPTVPlayerPro/browser.py:12740 ../GTIPTVPlayerPro/browser.py:12741
+msgid "Seasons"
+msgstr "Kaudet"
+
+#: ../GTIPTVPlayerPro/browser.py:13244 ../GTIPTVPlayerPro/browser.py:23057
+#: ../GTIPTVPlayerPro/browser.py:23077
+msgid "Weather is disabled"
+msgstr "Sää on pois käytöstä"
+
+#: ../GTIPTVPlayerPro/browser.py:13245
+msgid "You can enable it in Settings."
+msgstr "Voit ottaa sen käyttöön Asetuksissa."
+
+#: ../GTIPTVPlayerPro/browser.py:13248
+msgid "Loading forecast"
+msgstr "Ladataan ennustetta"
+
+#: ../GTIPTVPlayerPro/browser.py:13351 ../GTIPTVPlayerPro/weather.py:497
+#: ../GTIPTVPlayerPro/weather.py:539 ../GTIPTVPlayerPro/weather.py:573
+msgid "Weather request timed out"
+msgstr "Sääpyyntö aikakatkaistiin"
+
+#: ../GTIPTVPlayerPro/browser.py:13352 ../GTIPTVPlayerPro/browser.py:13364
+#: ../GTIPTVPlayerPro/main.py:3845 ../GTIPTVPlayerPro/main.py:3859
+#: ../GTIPTVPlayerPro/main.py:4202 ../GTIPTVPlayerPro/main.py:4268
+msgid "Weather data unavailable."
+msgstr "Säätietoja ei ole saatavilla."
+
+#: ../GTIPTVPlayerPro/browser.py:13389
+#, python-brace-format
+msgid "Humidity {}% • Wind {:.0f} km/h"
+msgstr "Ilmankosteus {}% • Tuuli {:.0f} km/h"
+
+#: ../GTIPTVPlayerPro/browser.py:13394
+msgid "  •  Cached"
+msgstr "  •  Välimuistissa"
+
+#: ../GTIPTVPlayerPro/browser.py:13396
+#, python-brace-format
+msgid "Updated: {}{}"
+msgstr "Päivitetty: {}{}"
+
+#: ../GTIPTVPlayerPro/browser.py:13406
+msgid "Today"
+msgstr "Tänään"
+
+#: ../GTIPTVPlayerPro/browser.py:13827
+#, python-brace-format
+msgid "%{}  •  {} MIN REMAINING"
+msgstr "%{}  •  {} MIN JÄLJELLÄ"
+
+#: ../GTIPTVPlayerPro/browser.py:14080
+msgid "CHANNEL LIST"
+msgstr "KANAVALUETTELO"
+
+#: ../GTIPTVPlayerPro/browser.py:14094 ../GTIPTVPlayerPro/browser.py:15960
+#: ../GTIPTVPlayerPro/browser.py:19184 ../GTIPTVPlayerPro/browser.py:21623
+msgid "NOW"
+msgstr "NYT"
+
+#: ../GTIPTVPlayerPro/browser.py:14095 ../GTIPTVPlayerPro/browser.py:14113
+#: ../GTIPTVPlayerPro/browser.py:14142 ../GTIPTVPlayerPro/browser.py:14185
+#: ../GTIPTVPlayerPro/browser.py:14617 ../GTIPTVPlayerPro/browser.py:14660
+msgid "SELECT A CHANNEL"
+msgstr "VALITSE KANAVA"
+
+#: ../GTIPTVPlayerPro/browser.py:14096 ../GTIPTVPlayerPro/browser.py:14125
+#: ../GTIPTVPlayerPro/browser.py:15900 ../GTIPTVPlayerPro/browser.py:15910
+msgid "Waiting for programme information"
+msgstr "Odotetaan ohjelmatietoja"
+
+#: ../GTIPTVPlayerPro/browser.py:14099 ../GTIPTVPlayerPro/browser.py:14116
+#: ../GTIPTVPlayerPro/browser.py:15902 ../GTIPTVPlayerPro/browser.py:15920
+#: ../GTIPTVPlayerPro/browser.py:15963 ../GTIPTVPlayerPro/browser.py:15987
+#: ../GTIPTVPlayerPro/browser.py:19186 ../GTIPTVPlayerPro/browser.py:19346
+#: ../GTIPTVPlayerPro/browser.py:21626
+msgid "NEXT"
+msgstr "SEURAAVA"
+
+#: ../GTIPTVPlayerPro/browser.py:14124
+msgid "PROGRAMME SUMMARY"
+msgstr "OHJELMAN YHTEENVETO"
+
+#: ../GTIPTVPlayerPro/browser.py:14326 ../GTIPTVPlayerPro/browser.py:14341
+#: ../GTIPTVPlayerPro/browser.py:14872 ../GTIPTVPlayerPro/browser.py:14874
+#: ../GTIPTVPlayerPro/browser.py:16389 ../GTIPTVPlayerPro/browser.py:16394
+#: ../GTIPTVPlayerPro/browser.py:16475 ../GTIPTVPlayerPro/browser.py:16487
+#: ../GTIPTVPlayerPro/browser.py:16496 ../GTIPTVPlayerPro/browser.py:18336
+#: ../GTIPTVPlayerPro/browser.py:20771 ../GTIPTVPlayerPro/browser.py:20843
+#: ../GTIPTVPlayerPro/browser.py:21506
+msgid "Could not open the stream."
+msgstr "Suoratoistoa ei voitu avata."
+
+#: ../GTIPTVPlayerPro/browser.py:14478
+msgid "No channels found; press GREEN to try again."
+msgstr "Kanavia ei löytynyt; yritä uudelleen painamalla VIHREÄÄ."
+
+#: ../GTIPTVPlayerPro/browser.py:15918 ../GTIPTVPlayerPro/browser.py:15923
+#: ../GTIPTVPlayerPro/browser.py:15943 ../GTIPTVPlayerPro/browser.py:15995
+#: ../GTIPTVPlayerPro/browser.py:20160 ../GTIPTVPlayerPro/browser.py:20171
+#: ../GTIPTVPlayerPro/browser.py:21630
+msgid "EPG information unavailable."
+msgstr "EPG-tietoja ei ole saatavilla."
+
+#: ../GTIPTVPlayerPro/browser.py:15934 ../GTIPTVPlayerPro/browser.py:16015
+msgid "No summary is available for this programme."
+msgstr "Tälle ohjelmalle ei ole saatavilla yhteenvetoa."
+
+#: ../GTIPTVPlayerPro/browser.py:15963
+msgid "LATER"
+msgstr "MYÖHEMMIN"
+
+#: ../GTIPTVPlayerPro/browser.py:16589 ../GTIPTVPlayerPro/browser.py:20008
+#: ../GTIPTVPlayerPro/browser.py:21192 ../GTIPTVPlayerPro/browser.py:21510
+#: ../GTIPTVPlayerPro/browser.py:22231 ../GTIPTVPlayerPro/browser.py:22272
+#: ../GTIPTVPlayerPro/browser.py:23860 ../GTIPTVPlayerPro/browser.py:23950
+msgid "Keeping the current stream"
+msgstr "Nykyinen suoratoisto säilytetään"
+
+#: ../GTIPTVPlayerPro/browser.py:16747
+#, python-brace-format
+msgid "{}  >  Series  >  Select season and episode"
+msgstr "{}  >  Sarjat  >  Valitse kausi ja jakso"
+
+#: ../GTIPTVPlayerPro/browser.py:16765 ../GTIPTVPlayerPro/browser.py:16768
+msgid "EPISODES"
+msgstr "JAKSOT"
+
+#: ../GTIPTVPlayerPro/browser.py:16859
+msgid "No episodes were found for this series."
+msgstr "Tälle sarjalle ei löytynyt jaksoja."
+
+#: ../GTIPTVPlayerPro/browser.py:16975
+msgid "Enigma2 player service support is unavailable"
+msgstr "Enigma2-soitinpalvelu ei ole käytettävissä"
+
+#: ../GTIPTVPlayerPro/browser.py:18063
+#, python-brace-format
+msgid ""
+"Resume playback from the saved position?\n"
+"\n"
+"Saved position: {}"
+msgstr ""
+"Jatketaanko toistoa tallennetusta kohdasta?\n"
+"\n"
+"Tallennettu kohta: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:18254 ../GTIPTVPlayerPro/browser.py:18268
+msgid "Stream link timed out"
+msgstr "Suoratoistolinkki aikakatkaistiin"
+
+#: ../GTIPTVPlayerPro/browser.py:18334 ../GTIPTVPlayerPro/catchup_ui.py:542
+msgid "Could not open the archived programme."
+msgstr "Arkistoidun ohjelman avaaminen epäonnistui."
+
+#: ../GTIPTVPlayerPro/browser.py:19178
+msgid "Player"
+msgstr "Soitin"
+
+#: ../GTIPTVPlayerPro/browser.py:19179 ../GTIPTVPlayerPro/browser.py:21617
+msgid "Reading resolution"
+msgstr "Luetaan tarkkuutta"
+
+#: ../GTIPTVPlayerPro/browser.py:19181 ../GTIPTVPlayerPro/browser.py:21619
+#: ../GTIPTVPlayerPro/browser.py:23514
+msgid "VIDEO: --"
+msgstr "VIDEO: --"
+
+#: ../GTIPTVPlayerPro/browser.py:19182 ../GTIPTVPlayerPro/browser.py:21620
+#: ../GTIPTVPlayerPro/browser.py:23522
+msgid "AUDIO: --"
+msgstr "ÄÄNI: --"
+
+#: ../GTIPTVPlayerPro/browser.py:19185 ../GTIPTVPlayerPro/browser.py:21632
+msgid "Loading EPG..."
+msgstr "Ladataan EPG:tä..."
+
+#: ../GTIPTVPlayerPro/browser.py:19330 ../GTIPTVPlayerPro/browser.py:19344
+#: ../GTIPTVPlayerPro/browser.py:19351 ../GTIPTVPlayerPro/browser.py:19360
+#: ../GTIPTVPlayerPro/browser.py:19369 ../GTIPTVPlayerPro/main.py:430
+msgid "LIVE TV"
+msgstr "SUORA TV"
+
+#: ../GTIPTVPlayerPro/browser.py:19330
+msgid "EPG information unavailable"
+msgstr "EPG-tietoja ei ole saatavilla"
+
+#: ../GTIPTVPlayerPro/browser.py:19366 ../GTIPTVPlayerPro/browser.py:19394
+#: ../GTIPTVPlayerPro/browser.py:21626
+msgid "REMAINING"
+msgstr "JÄLJELLÄ"
+
+#: ../GTIPTVPlayerPro/browser.py:19373 ../GTIPTVPlayerPro/catchup_ui.py:240
+#: ../GTIPTVPlayerPro/catchup_ui.py:481 ../GTIPTVPlayerPro/main.py:435
+msgid "TV Archive"
+msgstr "TV-arkisto"
+
+#: ../GTIPTVPlayerPro/browser.py:19374 ../GTIPTVPlayerPro/main.py:440
+#: ../GTIPTVPlayerPro/main.py:9013
+msgid "MOVIES"
+msgstr "ELOKUVAT"
+
+#: ../GTIPTVPlayerPro/browser.py:20687
+msgid "Could not start the player."
+msgstr "Soitinta ei voitu käynnistää."
+
+#: ../GTIPTVPlayerPro/browser.py:21068 ../GTIPTVPlayerPro/browser.py:21333
+msgid "Reconnecting the stream..."
+msgstr "Yhdistetään suoratoisto uudelleen..."
+
+#: ../GTIPTVPlayerPro/browser.py:21623
+msgid "PREVIOUS"
+msgstr "EDELLINEN"
+
+#: ../GTIPTVPlayerPro/browser.py:21637
+msgid "Reading duration..."
+msgstr "Luetaan kestoa..."
+
+#: ../GTIPTVPlayerPro/browser.py:21734
+msgid "Audio track"
+msgstr "Ääniraita"
+
+#: ../GTIPTVPlayerPro/browser.py:21824
+msgid "No audio tracks are available."
+msgstr "Ääniraitoja ei ole saatavilla."
+
+#: ../GTIPTVPlayerPro/browser.py:21828
+msgid "This content has only one audio track."
+msgstr "Tässä sisällössä on vain yksi ääniraita."
+
+#: ../GTIPTVPlayerPro/browser.py:21833 ../GTIPTVPlayerPro/browser.py:21843
+#: ../GTIPTVPlayerPro/browser.py:21897 ../GTIPTVPlayerPro/browser.py:21902
+#: ../GTIPTVPlayerPro/browser.py:21944
+msgid "Audio track selection is unavailable on this image."
+msgstr "Ääniraidan valinta ei ole käytettävissä tässä imagessa."
+
+#: ../GTIPTVPlayerPro/browser.py:21882 ../GTIPTVPlayerPro/browser.py:21891
+msgid "Audio tracks"
+msgstr "Ääniraidat"
+
+#: ../GTIPTVPlayerPro/browser.py:21911
+msgid "The playing service changed. Open audio selection again."
+msgstr "Toistettava palvelu vaihtui. Avaa ääniraidan valinta uudelleen."
+
+#: ../GTIPTVPlayerPro/browser.py:21929 ../GTIPTVPlayerPro/browser.py:21938
+msgid "Audio tracks changed. Open audio selection again."
+msgstr "Ääniraidat muuttuivat. Avaa ääniraidan valinta uudelleen."
+
+#: ../GTIPTVPlayerPro/browser.py:21954
+msgid "Could not select the requested audio track."
+msgstr "Pyydettyä ääniraitaa ei voitu valita."
+
+#: ../GTIPTVPlayerPro/browser.py:21966 ../GTIPTVPlayerPro/browser.py:23517
+#, python-brace-format
+msgid "AUDIO: {}"
+msgstr "ÄÄNI: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:22084
+msgid "Changing channel..."
+msgstr "Vaihdetaan kanavaa..."
+
+#: ../GTIPTVPlayerPro/browser.py:22227 ../GTIPTVPlayerPro/browser.py:22268
+msgid "Could not open the channel."
+msgstr "Kanavaa ei voitu avata."
+
+#: ../GTIPTVPlayerPro/browser.py:22366 ../GTIPTVPlayerPro/browser.py:22489
+#: ../GTIPTVPlayerPro/browser.py:22543 ../GTIPTVPlayerPro/browser.py:23001
+msgid "PAUSED"
+msgstr "TAUOLLA"
+
+#: ../GTIPTVPlayerPro/browser.py:22366
+msgid "SEEK MODE"
+msgstr "KELAUSTILA"
+
+#: ../GTIPTVPlayerPro/browser.py:22367
+msgid "LEFT / RIGHT to select time   •   OK to continue"
+msgstr "Valitse aika VASEMMALLA / OIKEALLA   •   OK jatkaa"
+
+#: ../GTIPTVPlayerPro/browser.py:22490 ../GTIPTVPlayerPro/browser.py:22544
+#: ../GTIPTVPlayerPro/browser.py:23002
+msgid "PLAY / PAUSE to continue   •   STOP to close the video"
+msgstr "PLAY / PAUSE jatkaa   •   STOP sulkee videon"
+
+#: ../GTIPTVPlayerPro/browser.py:22686
+msgid "THIS STREAM CANNOT BE SEEKED"
+msgstr "TÄTÄ SUORATOISTOA EI VOI KELATA"
+
+#: ../GTIPTVPlayerPro/browser.py:22687
+msgid "The server or playback format does not support seeking"
+msgstr "Palvelin tai toistomuoto ei tue kelaamista"
+
+#: ../GTIPTVPlayerPro/browser.py:22715
+msgid "SEEK FORWARD"
+msgstr "KELAUS ETEENPÄIN"
+
+#: ../GTIPTVPlayerPro/browser.py:22717
+msgid "SEEK BACKWARD"
+msgstr "KELAUS TAAKSEPÄIN"
+
+#: ../GTIPTVPlayerPro/browser.py:22721
+msgid "LEFT / RIGHT to select time   •   OK to continue   •   EXIT to cancel"
+msgstr "Valitse aika VASEMMALLA / OIKEALLA   •   OK jatkaa   •   EXIT peruuttaa"
+
+#: ../GTIPTVPlayerPro/browser.py:22983
+msgid "PAUSE IS NOT AVAILABLE"
+msgstr "TAUKO EI OLE KÄYTETTÄVISSÄ"
+
+#: ../GTIPTVPlayerPro/browser.py:22984
+msgid "This server or playback format does not support pausing"
+msgstr "Tämä palvelin tai toistomuoto ei tue taukoa"
+
+#: ../GTIPTVPlayerPro/browser.py:23079
+msgid "Weather information is not ready"
+msgstr "Säätiedot eivät ole vielä valmiit"
+
+#: ../GTIPTVPlayerPro/browser.py:23154
+msgid "Could not load the weather forecast"
+msgstr "Sääennustetta ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/browser.py:23179 ../GTIPTVPlayerPro/browser.py:23192
+msgid "Weather information unavailable."
+msgstr "Säätietoja ei ole saatavilla."
+
+#: ../GTIPTVPlayerPro/browser.py:23492
+msgid "Resolution: --"
+msgstr "Tarkkuus: --"
+
+#: ../GTIPTVPlayerPro/browser.py:23509
+#, python-brace-format
+msgid "VIDEO: {}"
+msgstr "VIDEO: {}"
+
+#: ../GTIPTVPlayerPro/catchup.py:91 ../GTIPTVPlayerPro/content.py:292
+msgid "No programme information"
+msgstr "Ei ohjelmatietoja"
+
+#: ../GTIPTVPlayerPro/catchup.py:122 ../GTIPTVPlayerPro/catchup.py:495
+#: ../GTIPTVPlayerPro/catchup.py:543 ../GTIPTVPlayerPro/catchup_m3u.py:200
+#: ../GTIPTVPlayerPro/catchup_ui.py:375 ../GTIPTVPlayerPro/catchup_ui.py:387
+msgid "Could not load the TV archive."
+msgstr "TV-arkiston lataaminen epäonnistui."
+
+#: ../GTIPTVPlayerPro/catchup.py:187 ../GTIPTVPlayerPro/catchup.py:356
+#: ../GTIPTVPlayerPro/catchup.py:363 ../GTIPTVPlayerPro/catchup.py:410
+#: ../GTIPTVPlayerPro/catchup.py:477 ../GTIPTVPlayerPro/content.py:1684
+#: ../GTIPTVPlayerPro/m3u.py:886 ../GTIPTVPlayerPro/m3u.py:892
+#: ../GTIPTVPlayerPro/stalker.py:7312 ../GTIPTVPlayerPro/stalker.py:7447
+#: ../GTIPTVPlayerPro/stalker.py:7534
+msgid "Invalid playback item"
+msgstr "Virheellinen toistokohde"
+
+#: ../GTIPTVPlayerPro/catchup.py:202 ../GTIPTVPlayerPro/catchup_stalker.py:116
+#: ../GTIPTVPlayerPro/catchup_ui.py:37
+msgid "TV archive is not supported by this source."
+msgstr "Tämä lähde ei tue TV-arkistoa."
+
+#: ../GTIPTVPlayerPro/catchup.py:242 ../GTIPTVPlayerPro/catchup.py:582
+#: ../GTIPTVPlayerPro/catchup_m3u.py:36
+#: ../GTIPTVPlayerPro/catchup_stalker.py:123
+msgid "Archive playback is unavailable for this channel."
+msgstr "Arkistotoisto ei ole saatavilla tälle kanavalle."
+
+#: ../GTIPTVPlayerPro/catchup.py:358 ../GTIPTVPlayerPro/catchup_m3u.py:230
+#: ../GTIPTVPlayerPro/catchup_stalker.py:130
+msgid "This programme is no longer available in the TV archive."
+msgstr "Tämä ohjelma ei ole enää saatavilla TV-arkistossa."
+
+#: ../GTIPTVPlayerPro/catchup_m3u.py:177 ../GTIPTVPlayerPro/catchup_ui.py:36
+msgid "Configure an XMLTV guide for this M3U source to use TV archive."
+msgstr "Määritä tälle M3U-lähteelle XMLTV-ohjelmaopas, jotta voit käyttää TV-arkistoa."
+
+#: ../GTIPTVPlayerPro/catchup_stalker.py:426 ../GTIPTVPlayerPro/stalker.py:2493
+msgid "Portal request limit reached"
+msgstr "Portaalin pyyntöraja saavutettiin"
+
+#: ../GTIPTVPlayerPro/catchup_stalker.py:430 ../GTIPTVPlayerPro/stalker.py:1808
+#: ../GTIPTVPlayerPro/stalker.py:2344 ../GTIPTVPlayerPro/stalker.py:2364
+#: ../GTIPTVPlayerPro/stalker.py:2378 ../GTIPTVPlayerPro/stalker.py:2479
+msgid "Portal access denied"
+msgstr "Pääsy portaaliin estettiin"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:482 ../GTIPTVPlayerPro/remote_footer.py:111
+msgid "Channels"
+msgstr "Kanavat"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:521
+#, python-brace-format
+msgid "{} min"
+msgstr "{} min"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:536
+msgid "Watch from archive"
+msgstr "Katso arkistosta"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:546
+msgid "Loading programmes..."
+msgstr "Ladataan ohjelmia..."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:546
+msgid "Loading TV archive..."
+msgstr "Ladataan TV-arkistoa..."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:548
+msgid "No archived channels are available for this account."
+msgstr "Tälle tilille ei ole saatavilla kanavia, joilla on arkisto."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:550
+msgid "No archived programmes are available for this day."
+msgstr "Tälle päivälle ei ole saatavilla arkistoituja ohjelmia."
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:54
+msgid "Filter rules: Show / Hide / Clear"
+msgstr "Suodatinsäännöt: Näytä / Piilota / Tyhjennä"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:199
+msgid "Hide"
+msgstr "Piilota"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:200
+msgid "Show"
+msgstr "Näytä"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:219
+msgid "No filters found."
+msgstr "Suodattimia ei löytynyt."
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:220
+#: ../GTIPTVPlayerPro/remote_footer.py:134
+msgid "Preview"
+msgstr "Esikatselu"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:125
+msgid "NUMBER KEYS: Enter  |  YELLOW: Delete  |  OK/GREEN: Confirm  |  BACK: Cancel"
+msgstr "NUMERONÄPPÄIMET: Syötä  |  KELTAINEN: Poista  |  OK/VIHREÄ: Vahvista  |  TAKAISIN: Peruuta"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:129
+msgid "BLUE: Recovery code"
+msgstr "SININEN: Palautuskoodi"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:168
+#, python-brace-format
+msgid "Digits entered: {}/{}"
+msgstr "Syötettyjä numeroita: {}/{}"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:191
+#, python-brace-format
+msgid "Enter exactly {} digits."
+msgstr "Anna täsmälleen {} numeroa."
+
+#: ../GTIPTVPlayerPro/content.py:44
+msgid "All Series"
+msgstr "Kaikki sarjat"
+
+#: ../GTIPTVPlayerPro/content.py:153 ../GTIPTVPlayerPro/content.py:877
+msgid "Untitled content"
+msgstr "Nimetön sisältö"
+
+#: ../GTIPTVPlayerPro/content.py:702 ../GTIPTVPlayerPro/playlist.py:168
+msgid "Unsupported content type"
+msgstr "Sisältötyyppiä ei tueta"
+
+#: ../GTIPTVPlayerPro/content.py:744
+#, python-brace-format
+msgid "API HTTP error action={}"
+msgstr "API:n HTTP-virhe, toiminto={}"
+
+#: ../GTIPTVPlayerPro/content.py:747
+msgid "Server denied access to content"
+msgstr "Palvelin esti pääsyn sisältöön"
+
+#: ../GTIPTVPlayerPro/content.py:758 ../GTIPTVPlayerPro/playlist.py:1433
+#, python-brace-format
+msgid "Server returned HTTP {}"
+msgstr "Palvelin palautti HTTP {}"
+
+#: ../GTIPTVPlayerPro/content.py:765
+#, python-brace-format
+msgid "API connection error action={}"
+msgstr "API-yhteysvirhe, toiminto={}"
+
+#: ../GTIPTVPlayerPro/content.py:769
+msgid "Could not connect to the content server"
+msgstr "Sisältöpalvelimeen ei voitu yhdistää"
+
+#: ../GTIPTVPlayerPro/content.py:778 ../GTIPTVPlayerPro/content.py:958
+#: ../GTIPTVPlayerPro/content.py:1335
+msgid "Server content list is too large"
+msgstr "Palvelimen sisältöluettelo on liian suuri"
+
+#: ../GTIPTVPlayerPro/content.py:787
+#, python-brace-format
+msgid "Invalid JSON action={}"
+msgstr "Virheellinen JSON-toiminto={}"
+
+#: ../GTIPTVPlayerPro/content.py:789
+msgid "Server returned an invalid content response"
+msgstr "Palvelin palautti virheellisen sisältövastauksen"
+
+#: ../GTIPTVPlayerPro/content.py:953 ../GTIPTVPlayerPro/content.py:1162
+#: ../GTIPTVPlayerPro/content.py:1297 ../GTIPTVPlayerPro/content.py:1330
+msgid "Could not load the content list"
+msgstr "Sisältöluetteloa ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/content.py:1103
+msgid "Could not load the category list"
+msgstr "Luokkaluetteloa ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/content.py:1383
+msgid "Invalid movie ID"
+msgstr "Virheellinen elokuvatunnus"
+
+#: ../GTIPTVPlayerPro/content.py:1389
+msgid "Could not load movie information"
+msgstr "Elokuvan tietoja ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/content.py:1439
+msgid "Invalid series ID"
+msgstr "Virheellinen sarjatunnus"
+
+#: ../GTIPTVPlayerPro/content.py:1445
+msgid "Could not load series information"
+msgstr "Sarjan tietoja ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/content.py:1454
+msgid "Could not load series episodes"
+msgstr "Sarjan jaksoja ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/content.py:1477 ../GTIPTVPlayerPro/stalker.py:5470
+#: ../GTIPTVPlayerPro/stalker.py:5864
+msgid "Episode"
+msgstr "Jakso"
+
+#: ../GTIPTVPlayerPro/content.py:1478 ../GTIPTVPlayerPro/stalker.py:5473
+#, python-brace-format
+msgid "S{} E{}"
+msgstr "K{} J{}"
+
+#: ../GTIPTVPlayerPro/content.py:1627 ../GTIPTVPlayerPro/content.py:1640
+msgid "Invalid channel ID"
+msgstr "Virheellinen kanavatunnus"
+
+#: ../GTIPTVPlayerPro/content.py:1695
+msgid "Could not create the stream URL"
+msgstr "Suoratoiston URL-osoitetta ei voitu luoda"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:409 ../GTIPTVPlayerPro/dvb_epg_ui.py:417
+msgid "Never"
+msgstr "Ei koskaan"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:582 ../GTIPTVPlayerPro/m3u_epg_ui.py:750
+msgid "Update mode"
+msgstr "Päivitystila"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:583 ../GTIPTVPlayerPro/m3u_epg_ui.py:751
+msgid "Update interval"
+msgstr "Päivitysväli"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:584
+msgid "Update on startup if overdue"
+msgstr "Päivitä käynnistyksen yhteydessä, jos päivitys on myöhässä."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:585
+msgid "Update in normal standby"
+msgstr "Päivitä tavallisessa valmiustilassa"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:586 ../GTIPTVPlayerPro/m3u_epg_ui.py:752
+#: ../GTIPTVPlayerPro/main.py:4010
+msgid "Last update"
+msgstr "Viimeisin päivitys"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:587
+msgid "Next update"
+msgstr "Seuraava päivitys"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:588 ../GTIPTVPlayerPro/dvb_epg_ui.py:740
+msgid "Deep standby wake"
+msgstr "Herätys syvästä valmiustilasta"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:625
+msgid "DVB EPG AUTOMATIC UPDATES"
+msgstr "AUTOMAATTISET DVB EPG -PÄIVITYKSET"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:632 ../GTIPTVPlayerPro/dvb_epg_ui.py:1467
+msgid "XMLTV offsets are converted to UTC automatically; no manual timezone is used."
+msgstr "XMLTV-aikapoikkeamat muunnetaan automaattisesti UTC-aikaan; manuaalista aikavyöhykettä ei käytetä."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:653 ../GTIPTVPlayerPro/dvb_epg_ui.py:875
+msgid "Settings - DVB EPG"
+msgstr "Asetukset – DVB EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:663
+msgid "Due now"
+msgstr "Suoritettava nyt"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:666
+#, python-brace-format
+msgid "Overdue: {}"
+msgstr "Myöhässä: {}"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:672 ../GTIPTVPlayerPro/dvb_epg_ui.py:975
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1796 ../GTIPTVPlayerPro/i18n.py:348
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:853
+msgid "Automatic"
+msgstr "Automaattinen"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:672 ../GTIPTVPlayerPro/dvb_epg_ui.py:979
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1788 ../GTIPTVPlayerPro/m3u_epg_ui.py:853
+msgid "Manual"
+msgstr "Manuaalinen"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:673 ../GTIPTVPlayerPro/dvb_epg_ui.py:977
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:854 ../GTIPTVPlayerPro/playlist.py:1461
+#, python-brace-format
+msgid "{} hours"
+msgstr "{} tuntia"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
+#: ../GTIPTVPlayerPro/main.py:733 ../GTIPTVPlayerPro/main.py:734
+#: ../GTIPTVPlayerPro/main.py:4094 ../GTIPTVPlayerPro/main.py:4386
+#: ../GTIPTVPlayerPro/main.py:4601 ../GTIPTVPlayerPro/main.py:4609
+msgid "On"
+msgstr "Päällä"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
+#: ../GTIPTVPlayerPro/main.py:738 ../GTIPTVPlayerPro/main.py:739
+#: ../GTIPTVPlayerPro/main.py:742 ../GTIPTVPlayerPro/main.py:4094
+#: ../GTIPTVPlayerPro/main.py:4386 ../GTIPTVPlayerPro/main.py:4603
+#: ../GTIPTVPlayerPro/main.py:4609 ../GTIPTVPlayerPro/main.py:9666
+#: ../GTIPTVPlayerPro/main.py:9672 ../GTIPTVPlayerPro/subtitles.py:189
+#: ../GTIPTVPlayerPro/subtitles.py:591
+msgid "Off"
+msgstr "Pois"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:682 ../GTIPTVPlayerPro/dvb_epg_ui.py:741
+msgid "Always off"
+msgstr "Aina pois käytöstä"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:708 ../GTIPTVPlayerPro/m3u_epg_ui.py:940
+msgid "Switch Update mode to Automatic to change this option."
+msgstr "Vaihda päivitystilaksi ”Automaattinen”, jotta voit muuttaa tätä asetusta."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:726 ../GTIPTVPlayerPro/m3u_epg_ui.py:953
+msgid "Status information is read-only."
+msgstr "Tilatietoja voi vain tarkastella."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:735
+msgid "Deep standby never wakes the receiver; an overdue update runs after the next startup."
+msgstr "Syvä valmiustila ei koskaan herätä vastaanotinta; myöhässä oleva päivitys suoritetaan seuraavan käynnistyksen jälkeen."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:745 ../GTIPTVPlayerPro/dvb_epg_ui.py:1062
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:955 ../GTIPTVPlayerPro/m3u_epg_ui.py:1012
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1031 ../GTIPTVPlayerPro/main.py:4528
+#: ../GTIPTVPlayerPro/main.py:4670 ../GTIPTVPlayerPro/main.py:4976
+msgid "Press GREEN to save the changes."
+msgstr "Tallenna muutokset painamalla VIHREÄÄ."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:765 ../GTIPTVPlayerPro/dvb_epg_ui.py:1096
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1110 ../GTIPTVPlayerPro/dvb_epg_ui.py:1974
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2021
+msgid "DVB EPG settings could not be saved. Check the receiver storage."
+msgstr "DVB EPG -asetuksia ei voitu tallentaa. Tarkista vastaanottimen tallennustila."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:771
+msgid "Automatic update settings saved."
+msgstr "Automaattisen päivityksen asetukset tallennettiin."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:779
+msgid "Enable DVB EPG"
+msgstr "Ota DVB EPG käyttöön"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:780
+msgid "Xtream XMLTV source"
+msgstr "Xtream XMLTV -lähde"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:781
+msgid "Target DVB bouquet"
+msgstr "DVB-kohdesuosikkilista"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:782
+msgid "EPG range"
+msgstr "EPG-aikaväli"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:783 ../GTIPTVPlayerPro/dvb_epg_ui.py:1552
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1592
+msgid "Manual channel mapping"
+msgstr "Kanavien manuaalinen kohdistus"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:784
+msgid "Automatic updates"
+msgstr "Automaattiset päivitykset"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:842
+msgid "DVB SATELLITE EPG"
+msgstr "DVB SATELLIITTI EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:951
+msgid "All TV bouquets"
+msgstr "Kaikki TV-suosikkilistat"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:956 ../GTIPTVPlayerPro/dvb_epg_ui.py:1041
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1147
+msgid "Scanning DVB bouquets..."
+msgstr "DVB-suosikkilistojen läpikäynti..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:957
+msgid "Selected bouquet is unavailable"
+msgstr "Valittu suosikkilista ei ole käytettävissä"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:961
+msgid "No Xtream source"
+msgstr "Ei Xtream-lähdettä"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:965
+msgid "No DVB EPG update has been completed yet."
+msgstr "Yhtään DVB EPG -päivitystä ei ole vielä suoritettu."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:966
+#, python-brace-format
+msgid "Last update: {}  •  {} channels  •  {} events"
+msgstr "Viimeisin päivitys: {}  •  {} kanavaa  •  {} tapahtumaa"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:985
+#, python-brace-format
+msgid "{} days"
+msgstr "{} päivää"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:986
+#, python-brace-format
+msgid "Open ({} mapped)"
+msgstr "Avaa ({} kohdistettu)"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1033
+msgid "No valid Xtream source was found."
+msgstr "Kelvollista Xtream-lähdettä ei löytynyt."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1136 ../GTIPTVPlayerPro/dvb_epg_ui.py:1144
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1166 ../GTIPTVPlayerPro/dvb_epg_ui.py:1407
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1436 ../GTIPTVPlayerPro/dvb_epg_ui.py:1473
+msgid "DVB EPG update is still running..."
+msgstr "DVB EPG -päivitys on yhä käynnissä..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1140
+msgid "DVB EPG settings saved."
+msgstr "DVB EPG -asetukset tallennettiin."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1150
+msgid "Enable DVB EPG before starting an update."
+msgstr "Ota DVB EPG käyttöön ennen päivityksen aloittamista."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1154 ../GTIPTVPlayerPro/dvb_epg_ui.py:1411
+msgid "Select a valid Xtream XMLTV source."
+msgstr "Valitse kelvollinen Xtream XMLTV -lähde."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1158
+msgid "The receiver clock is not ready. Check network time and try again."
+msgstr "Vastaanottimen kello ei ole valmis. Tarkista verkkoaika ja yritä uudelleen."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1170 ../GTIPTVPlayerPro/dvb_epg_ui.py:1608
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1831
+msgid "An automatic DVB EPG update is already running."
+msgstr "Automaattinen DVB EPG -päivitys on jo käynnissä."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1183
+msgid "Downloading and preparing the Xtream XMLTV guide..."
+msgstr "Xtream XMLTV -ohjelmaoppaan lataaminen ja valmistelu..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1197 ../GTIPTVPlayerPro/dvb_epg_ui.py:1275
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1344
+msgid "DVB EPG update failed. No existing EPG data was removed."
+msgstr "DVB EPG -päivitys epäonnistui. Olemassa olevia EPG-tietoja ei poistettu."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1287
+msgid "The native Enigma2 EPG cache rejected the update."
+msgstr "Enigma2 EPG:n natiivi välimuisti hylkäsi päivityksen."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1361
+#, python-brace-format
+msgid "DVB EPG updated: {} channels and {} events imported."
+msgstr "DVB EPG päivitetty: {} kanavaa ja {} ohjelmatapahtumaa tuotiin."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1384
+msgid "DVB bouquets could not be scanned."
+msgstr "DVB-suosikkilistoja ei voitu käydä läpi."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1399
+msgid "DVB EPG update timed out."
+msgstr "DVB EPG -päivitys aikakatkaistiin."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1414
+msgid "Manual channel mapping could not be opened."
+msgstr "Kanavien manuaalista kohdistusta ei voitu avata."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1440
+msgid "Automatic update settings could not be opened."
+msgstr "Automaattisen päivityksen asetuksia ei voitu avata."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1487
+msgid "DVB EPG update cancelled."
+msgstr "DVB EPG -päivitys peruttiin."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1564 ../GTIPTVPlayerPro/dvb_epg_ui.py:1624
+msgid "Loading DVB services and cached XMLTV channels..."
+msgstr "DVB-palvelujen ja välimuistissa olevien XMLTV-kanavien lataaminen..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1622
+msgid "Downloading the Xtream XMLTV guide..."
+msgstr "Xtream XMLTV -ohjelmaoppaan lataaminen..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1645 ../GTIPTVPlayerPro/dvb_epg_ui.py:1733
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1746
+msgid "Channel mapping data could not be loaded."
+msgstr "Kanavakohdistusten tietoja ei voitu ladata."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1755
+msgid "No real DVB service was found in the selected bouquet."
+msgstr "Valitusta suosikkilistasta ei löytynyt todellista DVB-palvelua."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1757
+msgid "No cached XMLTV guide was found. Press YELLOW to download it."
+msgstr "Välimuistista ei löytynyt XMLTV-ohjelmaopasta. Lataa se painamalla KELTAISTA."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1760
+msgid "Press OK to choose an XMLTV channel; RED blocks or restores automatic matching."
+msgstr "Valitse XMLTV-kanava painamalla OK; PUNAINEN estää tai palauttaa automaattisen kohdistuksen."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1783 ../GTIPTVPlayerPro/main.py:740
+#: ../GTIPTVPlayerPro/main.py:741 ../GTIPTVPlayerPro/main.py:8561
+#: ../GTIPTVPlayerPro/main.py:8684
+msgid "Blocked"
+msgstr "Estetty"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1799
+msgid "Unmatched"
+msgstr "Kohdistamaton"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1848
+#, python-brace-format
+msgid "{} DVB services  •  {} XMLTV channels  •  {} mapped"
+msgstr "{} DVB-palvelua  •  {} XMLTV-kanavaa  •  {} kohdistettu"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1928
+msgid "No real DVB service is available for mapping."
+msgstr "Kohdistusta varten ei ole käytettävissä todellista DVB-palvelua."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1931
+msgid "Press YELLOW to download the XMLTV channel list first."
+msgstr "Lataa ensin XMLTV-kanavaluettelo painamalla KELTAISTA."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1934
+msgid "The XMLTV channel list could not be opened."
+msgstr "XMLTV-kanavaluetteloa ei voitu avata."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1963
+msgid "That XMLTV channel is already assigned to another DVB service."
+msgstr "Tämä XMLTV-kanava on jo kohdistettu toiseen DVB-palveluun."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1967 ../GTIPTVPlayerPro/dvb_epg_ui.py:2014
+msgid "The manual channel mapping could not be saved."
+msgstr "Kanavien manuaalista kohdistusta ei voitu tallentaa."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1981
+#, python-brace-format
+msgid "Manual mapping saved: {} -> {}"
+msgstr "Manuaalinen kohdistus tallennettu: {} -> {}"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2001
+#, python-brace-format
+msgid "Automatic matching restored for {}."
+msgstr "Automaattinen kohdistus palautettiin: {}."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2009
+#, python-brace-format
+msgid "EPG mapping removed and automatic matching blocked for {}."
+msgstr "EPG-kohdistus poistettiin ja kohteen {} automaattinen kohdistus estettiin."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2047
+msgid "Channel mapping refresh cancelled."
+msgstr "Kanavakohdistusten päivitys peruttiin."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2096 ../GTIPTVPlayerPro/dvb_epg_ui.py:2134
+msgid "Select XMLTV channel"
+msgstr "Valitse XMLTV-kanava"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2109
+msgid "Press GREEN to filter the XMLTV channel list."
+msgstr "Suodata XMLTV-kanavaluettelo painamalla VIHREÄÄ."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2145
+#, python-brace-format
+msgid "{} XMLTV channels"
+msgstr "{} XMLTV-kanavaa"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2221
+msgid "No XMLTV channel matches the current filter."
+msgstr "Yksikään XMLTV-kanava ei vastaa nykyistä suodatinta."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2237
+msgid "Search XMLTV channels"
+msgstr "Hae XMLTV-kanavia"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2263
+msgid "XMLTV channel filter cleared."
+msgstr "XMLTV-kanavasuodatin tyhjennettiin."
+
+#: ../GTIPTVPlayerPro/i18n.py:147 ../GTIPTVPlayerPro/i18n.py:148
+msgid "Arabic"
+msgstr "Arabia"
+
+#: ../GTIPTVPlayerPro/i18n.py:149 ../GTIPTVPlayerPro/i18n.py:150
+#: ../GTIPTVPlayerPro/i18n.py:151
+msgid "Czech"
+msgstr "Tšekki"
+
+#: ../GTIPTVPlayerPro/i18n.py:152 ../GTIPTVPlayerPro/i18n.py:153
+#: ../GTIPTVPlayerPro/i18n.py:154
+msgid "German"
+msgstr "Saksa"
+
+#: ../GTIPTVPlayerPro/i18n.py:155 ../GTIPTVPlayerPro/i18n.py:156
+#: ../GTIPTVPlayerPro/i18n.py:157
+msgid "Greek"
+msgstr "Kreikka"
+
+#: ../GTIPTVPlayerPro/i18n.py:158 ../GTIPTVPlayerPro/i18n.py:159
+msgid "English"
+msgstr "Englanti"
+
+#: ../GTIPTVPlayerPro/i18n.py:160 ../GTIPTVPlayerPro/i18n.py:161
+msgid "Spanish"
+msgstr "Espanja"
+
+#: ../GTIPTVPlayerPro/i18n.py:162 ../GTIPTVPlayerPro/i18n.py:163
+msgid "Estonian"
+msgstr "Viro"
+
+#: ../GTIPTVPlayerPro/i18n.py:164 ../GTIPTVPlayerPro/i18n.py:165
+msgid "Finnish"
+msgstr "Suomi"
+
+#: ../GTIPTVPlayerPro/i18n.py:166 ../GTIPTVPlayerPro/i18n.py:167
+#: ../GTIPTVPlayerPro/i18n.py:168
+msgid "French"
+msgstr "Ranska"
+
+#: ../GTIPTVPlayerPro/i18n.py:169 ../GTIPTVPlayerPro/i18n.py:170
+msgid "Hungarian"
+msgstr "Unkari"
+
+#: ../GTIPTVPlayerPro/i18n.py:171 ../GTIPTVPlayerPro/i18n.py:172
+msgid "Italian"
+msgstr "Italia"
+
+#: ../GTIPTVPlayerPro/i18n.py:173 ../GTIPTVPlayerPro/i18n.py:174
+#: ../GTIPTVPlayerPro/i18n.py:175
+msgid "Dutch"
+msgstr "Hollanti"
+
+#: ../GTIPTVPlayerPro/i18n.py:176 ../GTIPTVPlayerPro/i18n.py:177
+msgid "Polish"
+msgstr "Puola"
+
+#: ../GTIPTVPlayerPro/i18n.py:178 ../GTIPTVPlayerPro/i18n.py:179
+msgid "Portuguese"
+msgstr "Portugali"
+
+#: ../GTIPTVPlayerPro/i18n.py:180 ../GTIPTVPlayerPro/i18n.py:181
+msgid "Russian"
+msgstr "Venäjä"
+
+#: ../GTIPTVPlayerPro/i18n.py:182 ../GTIPTVPlayerPro/i18n.py:183
+#: ../GTIPTVPlayerPro/i18n.py:184
+msgid "Slovak"
+msgstr "Slovakki"
+
+#: ../GTIPTVPlayerPro/i18n.py:185 ../GTIPTVPlayerPro/i18n.py:186
+#: ../GTIPTVPlayerPro/i18n.py:187
+msgid "Albanian"
+msgstr "Albania"
+
+#: ../GTIPTVPlayerPro/i18n.py:188 ../GTIPTVPlayerPro/i18n.py:189
+msgid "Serbian"
+msgstr "Serbia"
+
+#: ../GTIPTVPlayerPro/i18n.py:190 ../GTIPTVPlayerPro/i18n.py:191
+msgid "Swedish"
+msgstr "Ruotsi"
+
+#: ../GTIPTVPlayerPro/i18n.py:192 ../GTIPTVPlayerPro/i18n.py:193
+msgid "Turkish"
+msgstr "Turkki"
+
+#: ../GTIPTVPlayerPro/i18n.py:194 ../GTIPTVPlayerPro/i18n.py:195
+#: ../GTIPTVPlayerPro/i18n.py:196
+msgid "Chinese"
+msgstr "Kiina"
+
+#: ../GTIPTVPlayerPro/m3u.py:102
+msgid "M3U source ID is invalid."
+msgstr "M3U-lähteen tunnus on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:110
+msgid "M3U source type is invalid."
+msgstr "M3U-lähteen tyyppi on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:118
+msgid "M3U source location is invalid."
+msgstr "M3U-lähteen sijainti on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:121 ../GTIPTVPlayerPro/m3u.py:1730
+#: ../GTIPTVPlayerPro/main.py:7319 ../GTIPTVPlayerPro/main.py:7327
+#: ../GTIPTVPlayerPro/main.py:8151 ../GTIPTVPlayerPro/main.py:8183
+msgid "M3U file path is invalid."
+msgstr "M3U-tiedoston polku on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:136 ../GTIPTVPlayerPro/m3u_epg_ui.py:326
+msgid "M3U source"
+msgstr "M3U-lähde"
+
+#: ../GTIPTVPlayerPro/m3u.py:140
+msgid "FILE"
+msgstr "TIEDOSTO"
+
+#: ../GTIPTVPlayerPro/m3u.py:140
+msgid "WEB"
+msgstr "VERKKO"
+
+#: ../GTIPTVPlayerPro/m3u.py:146 ../GTIPTVPlayerPro/main.py:6860
+msgid "Local file"
+msgstr "Paikallinen tiedosto"
+
+#: ../GTIPTVPlayerPro/m3u.py:194 ../GTIPTVPlayerPro/m3u.py:199
+#: ../GTIPTVPlayerPro/m3u.py:206 ../GTIPTVPlayerPro/m3u.py:211
+#: ../GTIPTVPlayerPro/m3u.py:213
+msgid "M3U source file is invalid."
+msgstr "M3U-lähdetiedosto on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:196
+msgid "M3U source file version is not supported."
+msgstr "M3U-lähdetiedoston versiota ei tueta."
+
+#: ../GTIPTVPlayerPro/m3u.py:243 ../GTIPTVPlayerPro/m3u.py:627
+msgid "M3U source is invalid."
+msgstr "M3U-lähde on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:281
+msgid "Too many M3U sources are configured."
+msgstr "M3U-lähteitä on määritetty liian monta."
+
+#: ../GTIPTVPlayerPro/m3u.py:310 ../GTIPTVPlayerPro/m3u.py:332
+msgid "M3U source cache could not be deleted."
+msgstr "M3U-lähteen välimuistia ei voitu poistaa."
+
+#: ../GTIPTVPlayerPro/m3u.py:606
+msgid "M3U source file is too large."
+msgstr "M3U-lähdetiedosto on liian suuri."
+
+#: ../GTIPTVPlayerPro/m3u.py:631 ../GTIPTVPlayerPro/m3u.py:633
+msgid "M3U timeout is invalid."
+msgstr "M3U-aikakatkaisu on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:899
+msgid "Channel is no longer present in the M3U source."
+msgstr "Kanavaa ei enää ole M3U-lähteessä."
+
+#: ../GTIPTVPlayerPro/m3u.py:981
+msgid "This M3U source supports Live TV only."
+msgstr "Tämä M3U-lähde tukee vain Live TV:tä."
+
+#: ../GTIPTVPlayerPro/m3u.py:1132 ../GTIPTVPlayerPro/m3u.py:2988
+msgid "Could not load the M3U source."
+msgstr "M3U-lähdettä ei voitu ladata."
+
+#: ../GTIPTVPlayerPro/m3u.py:1151 ../GTIPTVPlayerPro/m3u.py:1312
+msgid "M3U source returned an invalid response."
+msgstr "M3U-lähde palautti virheellisen vastauksen."
+
+#: ../GTIPTVPlayerPro/m3u.py:1156 ../GTIPTVPlayerPro/m3u.py:1317
+#: ../GTIPTVPlayerPro/m3u.py:1807 ../GTIPTVPlayerPro/m3u.py:1846
+#: ../GTIPTVPlayerPro/m3u.py:2855 ../GTIPTVPlayerPro/m3u.py:2952
+msgid "M3U source exceeds the safe size limit."
+msgstr "M3U-lähde ylittää turvallisen kokorajan."
+
+#: ../GTIPTVPlayerPro/m3u.py:1233
+msgid "Uncategorized"
+msgstr "Luokittelematon"
+
+#: ../GTIPTVPlayerPro/m3u.py:1322
+msgid "M3U source contains invalid data."
+msgstr "M3U-lähde sisältää virheellisiä tietoja."
+
+#: ../GTIPTVPlayerPro/m3u.py:1337
+msgid "M3U source contains a line that is too long."
+msgstr "M3U-lähteessä on liian pitkä rivi."
+
+#: ../GTIPTVPlayerPro/m3u.py:1349
+msgid "The selected file is an HLS stream manifest, not a channel list."
+msgstr "Valittu tiedosto on HLS-suoratoiston manifesti, ei kanavaluettelo."
+
+#: ../GTIPTVPlayerPro/m3u.py:1355 ../GTIPTVPlayerPro/m3u.py:1402
+msgid "M3U source header is missing."
+msgstr "M3U-lähteen otsake puuttuu."
+
+#: ../GTIPTVPlayerPro/m3u.py:1396
+msgid "M3U source contains too many channels."
+msgstr "M3U-lähteessä on liian monta kanavaa."
+
+#: ../GTIPTVPlayerPro/m3u.py:1422
+msgid "M3U source contains too many categories."
+msgstr "M3U-lähteessä on liian monta luokkaa."
+
+#: ../GTIPTVPlayerPro/m3u.py:1459
+msgid "M3U source does not contain playable channels."
+msgstr "M3U-lähteessä ei ole toistettavia kanavia."
+
+#: ../GTIPTVPlayerPro/m3u.py:1736
+msgid "M3U file path traversal is not allowed."
+msgstr "M3U-tiedoston polun läpikäyntiä ei sallita."
+
+#: ../GTIPTVPlayerPro/m3u.py:1743
+msgid "Symbolic links cannot be used as M3U sources."
+msgstr "Symbolisia linkkejä ei voi käyttää M3U-lähteinä."
+
+#: ../GTIPTVPlayerPro/m3u.py:1757
+msgid "M3U file is outside the allowed directories."
+msgstr "M3U-tiedosto on sallittujen hakemistojen ulkopuolella."
+
+#: ../GTIPTVPlayerPro/m3u.py:1764 ../GTIPTVPlayerPro/m3u.py:1789
+msgid "M3U file could not be opened."
+msgstr "M3U-tiedostoa ei voitu avata."
+
+#: ../GTIPTVPlayerPro/m3u.py:1769 ../GTIPTVPlayerPro/m3u.py:1802
+msgid "M3U source must be a regular file."
+msgstr "M3U-lähteen on oltava tavallinen tiedosto."
+
+#: ../GTIPTVPlayerPro/m3u.py:1855
+msgid "M3U file changed while it was being read."
+msgstr "M3U-tiedosto muuttui lukemisen aikana."
+
+#: ../GTIPTVPlayerPro/m3u.py:2622 ../GTIPTVPlayerPro/m3u.py:2627
+msgid "M3U URL is invalid."
+msgstr "M3U-URL on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2636
+msgid "M3U URL is not safe."
+msgstr "M3U-URL ei ole turvallinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2638
+msgid "M3U URL port is invalid."
+msgstr "M3U-URL:n portti on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2642
+msgid "M3U host name is invalid."
+msgstr "M3U-palvelinnimi on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2666
+msgid "M3U host address is invalid."
+msgstr "M3U-palvelinosoite on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2677
+msgid "M3U host address is not allowed."
+msgstr "M3U-palvelinosoite ei ole sallittu."
+
+#: ../GTIPTVPlayerPro/m3u.py:2697
+msgid "M3U host name resolution is busy."
+msgstr "M3U-palvelinnimen selvitys on käynnissä."
+
+#: ../GTIPTVPlayerPro/m3u.py:2730
+msgid "M3U host name could not be resolved."
+msgstr "M3U-palvelinnimeä ei voitu selvittää."
+
+#: ../GTIPTVPlayerPro/m3u.py:2746
+msgid "M3U host resolved to an unsafe address set."
+msgstr "M3U-palvelinnimi ratkesi turvattomaan osoitejoukkoon."
+
+#: ../GTIPTVPlayerPro/m3u.py:2752
+msgid "M3U redirect changed the network scope."
+msgstr "M3U-uudelleenohjaus muutti verkkoaluetta."
+
+#: ../GTIPTVPlayerPro/m3u.py:2879
+msgid "An HTTPS M3U request cannot be redirected to HTTP."
+msgstr "HTTPS M3U -pyyntöä ei voi uudelleenohjata HTTP-osoitteeseen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2930
+#, python-brace-format
+msgid "M3U server returned HTTP {}."
+msgstr "M3U-palvelin palautti HTTP {}."
+
+#: ../GTIPTVPlayerPro/m3u.py:2938
+msgid "Compressed M3U responses are not accepted."
+msgstr "Pakattuja M3U-vastauksia ei hyväksytä."
+
+#: ../GTIPTVPlayerPro/m3u.py:2947
+msgid "M3U response size is invalid."
+msgstr "M3U-vastauksen koko on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:2996
+msgid "M3U redirect URL is missing."
+msgstr "M3U-uudelleenohjauksen URL puuttuu."
+
+#: ../GTIPTVPlayerPro/m3u.py:3001
+msgid "M3U request was redirected too many times."
+msgstr "M3U-pyyntö uudelleenohjattiin liian monta kertaa."
+
+#: ../GTIPTVPlayerPro/m3u.py:3009
+msgid "M3U redirect URL is invalid."
+msgstr "M3U-uudelleenohjauksen URL on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u.py:3013
+msgid "M3U redirection could not be completed."
+msgstr "M3U-uudelleenohjausta ei voitu suorittaa."
+
+#: ../GTIPTVPlayerPro/m3u.py:3026
+msgid "M3U response headers are invalid."
+msgstr "M3U-vastauksen otsakkeet ovat virheelliset."
+
+#: ../GTIPTVPlayerPro/m3u.py:3034
+msgid "M3U response has conflicting size information."
+msgstr "M3U-vastauksessa on ristiriitaiset kokotiedot."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:472 ../GTIPTVPlayerPro/m3u_epg_ui.py:663
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:718 ../GTIPTVPlayerPro/main.py:7193
+#: ../GTIPTVPlayerPro/main.py:7265 ../GTIPTVPlayerPro/main.py:7310
+#: ../GTIPTVPlayerPro/main.py:7823 ../GTIPTVPlayerPro/main.py:7891
+#: ../GTIPTVPlayerPro/main.py:7932 ../GTIPTVPlayerPro/remote_footer.py:119
+msgid "Storage"
+msgstr "Tallennustila"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:524 ../GTIPTVPlayerPro/m3u_epg_ui.py:538
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1161
+msgid "Background update requested"
+msgstr "Taustapäivitystä pyydetty"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:531 ../GTIPTVPlayerPro/m3u_epg_ui.py:1180
+msgid "Update failed; the previous guide remains available."
+msgstr "Päivitys epäonnistui; edellinen ohjelmaopas on edelleen käytettävissä."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:533
+#, python-brace-format
+msgid "Completed: {} channels, {} events"
+msgstr "Valmis: {} kanavaa, {} tapahtumaa"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:539
+msgid "No update has been completed yet."
+msgstr "Yhtään päivitystä ei ole vielä suoritettu loppuun."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:607 ../GTIPTVPlayerPro/m3u_epg_ui.py:652
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:749
+msgid "XMLTV source"
+msgstr "XMLTV-lähde"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:609
+msgid "Choose an XML, XML.GZ or GZ file from local or mounted storage."
+msgstr "Valitse XML-, XML.GZ- tai GZ-tiedosto paikallisesta tai liitetystä tallennustilasta."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:694
+msgid "This folder is outside the allowed storage locations."
+msgstr "Tämä kansio on sallittujen tallennussijaintien ulkopuolella."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:713
+msgid "No allowed storage location is available."
+msgstr "Sallittua tallennussijaintia ei ole käytettävissä."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:727 ../GTIPTVPlayerPro/m3u_epg_ui.py:735
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1005 ../GTIPTVPlayerPro/m3u_epg_ui.py:1010
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1047
+msgid "XMLTV file path is invalid."
+msgstr "XMLTV-tiedostopolku on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:747
+msgid "Enable external XMLTV EPG"
+msgstr "Ota ulkoinen XMLTV EPG käyttöön"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:748 ../GTIPTVPlayerPro/main.py:6742
+#: ../GTIPTVPlayerPro/main.py:6901 ../GTIPTVPlayerPro/main.py:7360
+#: ../GTIPTVPlayerPro/main.py:7407
+msgid "Source type"
+msgstr "Lähdetyyppi"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:753 ../GTIPTVPlayerPro/main.py:6267
+msgid "Status"
+msgstr "Tila"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:797 ../GTIPTVPlayerPro/m3u_epg_ui.py:835
+msgid "External XMLTV EPG"
+msgstr "Ulkoinen XMLTV EPG"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:806
+msgid "XMLTV settings could not be read; safe defaults are shown."
+msgstr "XMLTV-asetuksia ei voitu lukea; turvalliset oletusarvot näytetään."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:808
+msgid "Updates run in the background. Channel changes never download EPG data."
+msgstr "Päivitykset suoritetaan taustalla. Kanavanvaihto ei koskaan lataa EPG-tietoja."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:848 ../GTIPTVPlayerPro/main.py:4614
+msgid "Not configured"
+msgstr "Ei määritetty"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8009
+msgid "Local / NAS"
+msgstr "Paikallinen / NAS"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8010
+#: ../GTIPTVPlayerPro/main.py:8072 ../GTIPTVPlayerPro/playlist.py:1559
+msgid "Web URL"
+msgstr "Verkko-URL"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:915
+msgid "Choose an XMLTV source before enabling this option."
+msgstr "Valitse XMLTV-lähde ennen tämän asetuksen käyttöönottoa."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:973
+msgid "The XMLTV file browser is unavailable."
+msgstr "XMLTV-tiedostoselain ei ole käytettävissä."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:995
+msgid "Enter the XMLTV HTTP(S) URL"
+msgstr "Anna XMLTV:n HTTP(S)-URL-osoite"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1001
+msgid "File selection cancelled."
+msgstr "Tiedoston valinta peruutettu."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1018 ../GTIPTVPlayerPro/main.py:7069
+#: ../GTIPTVPlayerPro/main.py:8206 ../GTIPTVPlayerPro/main.py:8432
+msgid "Field entry cancelled."
+msgstr "Kentän syöttö peruutettiin."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1023 ../GTIPTVPlayerPro/m3u_epg_ui.py:1051
+msgid "XMLTV URL must start with http:// or https://."
+msgstr "XMLTV-URL-osoitteen on alettava http:// tai https://."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1029
+msgid "XMLTV URL is invalid."
+msgstr "XMLTV-URL-osoite on virheellinen."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1038
+msgid "Choose an XMLTV source before saving."
+msgstr "Valitse XMLTV-lähde ennen tallentamista."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1100
+msgid "XMLTV settings could not be saved. Check the receiver storage."
+msgstr "XMLTV-asetuksia ei voitu tallentaa. Tarkista vastaanottimen tallennustila."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1110
+msgid "External XMLTV EPG settings saved."
+msgstr "Ulkoisen XMLTV EPG:n asetukset tallennettu."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1220
+msgid "Enable external XMLTV EPG before requesting an update."
+msgstr "Ota ulkoinen XMLTV EPG käyttöön ennen päivityksen pyytämistä."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1235 ../GTIPTVPlayerPro/m3u_epg_ui.py:1261
+msgid "The XMLTV update was queued in the background."
+msgstr "XMLTV-päivitys lisättiin taustajonoon."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1270
+msgid "The XMLTV update could not be queued. Try again shortly."
+msgstr "XMLTV-päivitystä ei voitu lisätä jonoon. Yritä pian uudelleen."
+
+#: ../GTIPTVPlayerPro/main.py:304 ../GTIPTVPlayerPro/main.py:7106
+#: ../GTIPTVPlayerPro/main.py:7585 ../GTIPTVPlayerPro/main.py:8559
+#: ../GTIPTVPlayerPro/main.py:8678 ../GTIPTVPlayerPro/stalker.py:8161
+msgid "Active"
+msgstr "Aktiivinen"
+
+#: ../GTIPTVPlayerPro/main.py:305 ../GTIPTVPlayerPro/playlist.py:1289
+#: ../GTIPTVPlayerPro/stalker.py:8166
+msgid "Connection limit reached"
+msgstr "Yhteysraja saavutettu"
+
+#: ../GTIPTVPlayerPro/main.py:306 ../GTIPTVPlayerPro/main.py:5562
+#: ../GTIPTVPlayerPro/main.py:5579 ../GTIPTVPlayerPro/main.py:5631
+#: ../GTIPTVPlayerPro/main.py:6075
+msgid "Inactive"
+msgstr "Ei aktiivinen"
+
+#: ../GTIPTVPlayerPro/main.py:307 ../GTIPTVPlayerPro/main.py:311
+#: ../GTIPTVPlayerPro/main.py:317 ../GTIPTVPlayerPro/main.py:721
+#: ../GTIPTVPlayerPro/main.py:765 ../GTIPTVPlayerPro/main.py:6245
+#: ../GTIPTVPlayerPro/main.py:6246 ../GTIPTVPlayerPro/main.py:8542
+#: ../GTIPTVPlayerPro/main.py:8571 ../GTIPTVPlayerPro/main.py:8635
+#: ../GTIPTVPlayerPro/main.py:8655 ../GTIPTVPlayerPro/main.py:8687
+#: ../GTIPTVPlayerPro/main.py:8745 ../GTIPTVPlayerPro/main.py:8824
+#: ../GTIPTVPlayerPro/main.py:8829 ../GTIPTVPlayerPro/main.py:8841
+#: ../GTIPTVPlayerPro/main.py:8842 ../GTIPTVPlayerPro/main.py:8843
+#: ../GTIPTVPlayerPro/main.py:8861 ../GTIPTVPlayerPro/main.py:9355
+#: ../GTIPTVPlayerPro/main.py:9359 ../GTIPTVPlayerPro/main.py:9637
+#: ../GTIPTVPlayerPro/main.py:9650 ../GTIPTVPlayerPro/main.py:9676
+#: ../GTIPTVPlayerPro/main.py:9677 ../GTIPTVPlayerPro/main.py:9760
+#: ../GTIPTVPlayerPro/main.py:9761 ../GTIPTVPlayerPro/playlist.py:245
+#: ../GTIPTVPlayerPro/playlist.py:1241 ../GTIPTVPlayerPro/playlist.py:1297
+#: ../GTIPTVPlayerPro/playlist.py:1301 ../GTIPTVPlayerPro/playlist.py:1303
+#: ../GTIPTVPlayerPro/playlist.py:1304 ../GTIPTVPlayerPro/playlist.py:1305
+#: ../GTIPTVPlayerPro/playlist.py:1307 ../GTIPTVPlayerPro/playlist.py:1547
+#: ../GTIPTVPlayerPro/subtitles.py:16
+msgid "Unknown"
+msgstr "Tuntematon"
+
+#: ../GTIPTVPlayerPro/main.py:394
+msgid "No valid M3U source was found"
+msgstr "Kelvollista M3U-lähdettä ei löytynyt"
+
+#: ../GTIPTVPlayerPro/main.py:408
+msgid "Unsupported source type"
+msgstr "Lähdetyyppiä ei tueta"
+
+#: ../GTIPTVPlayerPro/main.py:431
+msgid "Access your channels quickly"
+msgstr "Käytä kanaviasi nopeasti"
+
+#: ../GTIPTVPlayerPro/main.py:436
+msgid "Watch programmes you missed"
+msgstr "Katso väliin jääneet ohjelmat"
+
+#: ../GTIPTVPlayerPro/main.py:441
+msgid "Explore your movie library"
+msgstr "Selaa elokuvakirjastoasi"
+
+#: ../GTIPTVPlayerPro/main.py:446
+msgid "Browse seasons and episodes"
+msgstr "Selaa kausia ja jaksoja"
+
+#: ../GTIPTVPlayerPro/main.py:450 ../GTIPTVPlayerPro/main.py:9015
+msgid "CONTINUE WATCHING"
+msgstr "JATKA KATSELUA"
+
+#: ../GTIPTVPlayerPro/main.py:451
+msgid "Resume unfinished movies and series episodes"
+msgstr "Jatka keskeneräisiä elokuvia ja sarjajaksoja"
+
+#: ../GTIPTVPlayerPro/main.py:455 ../GTIPTVPlayerPro/main.py:9025
+#: ../GTIPTVPlayerPro/main.py:9027
+msgid "FAVORITES"
+msgstr "SUOSIKIT"
+
+#: ../GTIPTVPlayerPro/main.py:456
+msgid "Favorite channels, movies and series in one place"
+msgstr "Suosikkikanavat, -elokuvat ja -sarjat yhdessä paikassa"
+
+#: ../GTIPTVPlayerPro/main.py:460
+msgid "SETTINGS"
+msgstr "ASETUKSET"
+
+#: ../GTIPTVPlayerPro/main.py:461
+msgid "Manage the player and appearance"
+msgstr "Hallitse soitinta ja ulkoasua"
+
+#: ../GTIPTVPlayerPro/main.py:468
+#, python-brace-format
+msgid ""
+"{} v{}\n"
+"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
+"\n"
+"DEVELOPER\n"
+"{}\n"
+"\n"
+"LEGAL NOTICE\n"
+"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
+"\n"
+"PRIVACY\n"
+"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr ""
+"{} v{}\n"
+"Avoimen lähdekoodin IPTV-soitin Enigma2:lle. Tukee Xtream Codes -tilejä sekä Live TV:tä tavallisista paikallisista, verkkoasemaan liitetyistä tai HTTP(S) M3U -soittolistoista. Tavalliset M3U-lähteet tarjoavat vain Live TV:tä.\n"
+"\n"
+"KEHITTÄJÄ\n"
+"{}\n"
+"\n"
+"OIKEUDELLINEN HUOMAUTUS\n"
+"Tämä laajennus ei tarjoa kanavia, suoratoistoja, tilejä tai soittolistoja. Käyttäjä vastaa siitä, että käyttää vain sisältöä, johon hänellä on käyttöoikeus.\n"
+"\n"
+"TIETOSUOJA\n"
+"Kun Open-Meteo on käytössä, valittu kaupunki ja sijainti lähetetään Open-Meteolle sääennustetta varten. Kun TMDb on käytössä, elokuvan tai sarjan nimi ja käyttäjän antama TMDb-avain tai -tunnus lähetetään TMDb:lle. IPTV-käyttäjänimeä ja -salasanaa ei lähetetä näihin palveluihin."
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "SOURCE CODE"
+msgstr "LÄHDEKOODI"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "REPORT AN ISSUE"
+msgstr "ILMOITA ONGELMASTA"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "LICENSE"
+msgstr "LISENSSI"
+
+#: ../GTIPTVPlayerPro/main.py:735
+msgid "Connected"
+msgstr "Yhdistetty"
+
+#: ../GTIPTVPlayerPro/main.py:736 ../GTIPTVPlayerPro/main.py:8561
+#: ../GTIPTVPlayerPro/main.py:8683
+msgid "Busy"
+msgstr "Varattu"
+
+#: ../GTIPTVPlayerPro/main.py:737 ../GTIPTVPlayerPro/main.py:8681
+msgid "Warning"
+msgstr "Varoitus"
+
+#: ../GTIPTVPlayerPro/main.py:743 ../GTIPTVPlayerPro/main.py:7641
+#: ../GTIPTVPlayerPro/main.py:7946 ../GTIPTVPlayerPro/main.py:7951
+#: ../GTIPTVPlayerPro/main.py:7955 ../GTIPTVPlayerPro/main.py:8686
+#: ../GTIPTVPlayerPro/stalker.py:8186
+msgid "Invalid"
+msgstr "Virheellinen"
+
+#: ../GTIPTVPlayerPro/main.py:747
+#, python-brace-format
+msgid ""
+"Read time: {} ms\n"
+"Source type: {}\n"
+"Size: {} bytes\n"
+"Channels: {}\n"
+"Categories: {}\n"
+"Cache age: {}\n"
+"Last modified: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Lukuaika: {} ms\n"
+"Lähteen tyyppi: {}\n"
+"Koko: {} tavua\n"
+"Kanavat: {}\n"
+"Luokat: {}\n"
+"Välimuistin ikä: {}\n"
+"Muokattu viimeksi: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/main.py:757
+#, python-brace-format
+msgid ""
+"Latency: {} ms\n"
+"Account status: {}\n"
+"Protocol: {}\n"
+"Output format: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Viive: {} ms\n"
+"Tilin tila: {}\n"
+"Protokolla: {}\n"
+"Tulostusmuoto: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/main.py:3746 ../GTIPTVPlayerPro/main.py:3782
+msgid "Weather"
+msgstr "Sää"
+
+#: ../GTIPTVPlayerPro/main.py:3909
+msgid "Loading..."
+msgstr "Ladataan..."
+
+#: ../GTIPTVPlayerPro/main.py:3918
+msgid "No items found."
+msgstr "Kohteita ei löytynyt."
+
+#: ../GTIPTVPlayerPro/main.py:3991 ../GTIPTVPlayerPro/remote_footer.py:109
+msgid "Cancel"
+msgstr "Peruuta"
+
+#: ../GTIPTVPlayerPro/main.py:4007
+msgid "Show weather"
+msgstr "Näytä sää"
+
+#: ../GTIPTVPlayerPro/main.py:4008 ../GTIPTVPlayerPro/main.py:4179
+msgid "City"
+msgstr "Kaupunki"
+
+#: ../GTIPTVPlayerPro/main.py:4009
+msgid "Temperature unit"
+msgstr "Lämpötilayksikkö"
+
+#: ../GTIPTVPlayerPro/main.py:4059
+msgid "WEATHER"
+msgstr "SÄÄ"
+
+#: ../GTIPTVPlayerPro/main.py:4066
+msgid "Press OK on the City row to open the keyboard."
+msgstr "Avaa näppäimistö painamalla OK Kaupunki-rivillä."
+
+#: ../GTIPTVPlayerPro/main.py:4090
+msgid "Settings - Weather"
+msgstr "Asetukset – Sää"
+
+#: ../GTIPTVPlayerPro/main.py:4132
+#, python-brace-format
+msgid "Settings could not be saved: {}"
+msgstr "Asetuksia ei voitu tallentaa: {}"
+
+#: ../GTIPTVPlayerPro/main.py:4145
+msgid "Weather display updated."
+msgstr "Säänäkymä päivitettiin."
+
+#: ../GTIPTVPlayerPro/main.py:4149
+msgid "Temperature unit updated."
+msgstr "Lämpötilayksikkö päivitettiin."
+
+#: ../GTIPTVPlayerPro/main.py:4162
+msgid "The last-update time refreshes when weather data is received."
+msgstr "Viimeisimmän päivityksen aika muuttuu, kun säätietoja vastaanotetaan."
+
+#: ../GTIPTVPlayerPro/main.py:4186
+msgid "City change cancelled."
+msgstr "Kaupungin vaihto peruutettiin."
+
+#: ../GTIPTVPlayerPro/main.py:4215
+#, python-brace-format
+msgid "Checking {}..."
+msgstr "Tarkistetaan {}..."
+
+#: ../GTIPTVPlayerPro/main.py:4280
+msgid "No weather forecast is available for this city."
+msgstr "Tälle kaupungille ei ole saatavilla sääennustetta."
+
+#: ../GTIPTVPlayerPro/main.py:4298
+#, python-brace-format
+msgid "{} was saved."
+msgstr "{} tallennettiin."
+
+#: ../GTIPTVPlayerPro/main.py:4323
+msgid "Standard"
+msgstr "Vakio"
+
+#: ../GTIPTVPlayerPro/main.py:4324
+msgid "Large"
+msgstr "Suuri"
+
+#: ../GTIPTVPlayerPro/main.py:4325
+msgid "Very large"
+msgstr "Erittäin suuri"
+
+#: ../GTIPTVPlayerPro/main.py:4327
+msgid "Text size"
+msgstr "Tekstin koko"
+
+#: ../GTIPTVPlayerPro/main.py:4327
+msgid "Cinematic view"
+msgstr "Elokuvamainen näkymä"
+
+#: ../GTIPTVPlayerPro/main.py:4347 ../GTIPTVPlayerPro/main.py:4350
+#: ../GTIPTVPlayerPro/main.py:4381 ../GTIPTVPlayerPro/main.py:4450
+msgid "Appearance"
+msgstr "Ulkoasu"
+
+#: ../GTIPTVPlayerPro/main.py:4358 ../GTIPTVPlayerPro/main.py:4651
+#: ../GTIPTVPlayerPro/main.py:4654 ../GTIPTVPlayerPro/main.py:4952
+#: ../GTIPTVPlayerPro/main.py:8081 ../GTIPTVPlayerPro/remote_footer.py:89
+#: ../GTIPTVPlayerPro/remote_footer.py:92
+msgid "Select"
+msgstr "Valitse"
+
+#: ../GTIPTVPlayerPro/main.py:4443
+msgid "Live TV service type"
+msgstr "Suoran TV:n palvelutyyppi"
+
+#: ../GTIPTVPlayerPro/main.py:4444
+msgid "Movie service type"
+msgstr "Elokuvien palvelutyyppi"
+
+#: ../GTIPTVPlayerPro/main.py:4445
+msgid "Series service type"
+msgstr "Sarjojen palvelutyyppi"
+
+#: ../GTIPTVPlayerPro/main.py:4446
+msgid "TMDb metadata enrichment"
+msgstr "TMDb-metatietojen rikastus"
+
+#: ../GTIPTVPlayerPro/main.py:4447
+msgid "TMDb API key / token"
+msgstr "TMDb API-avain / tunnus"
+
+#: ../GTIPTVPlayerPro/main.py:4448
+msgid "DVB EPG"
+msgstr "DVB EPG"
+
+#: ../GTIPTVPlayerPro/main.py:4449
+msgid "Category edit lock"
+msgstr "Luokkien muokkauslukko"
+
+#: ../GTIPTVPlayerPro/main.py:4451 ../GTIPTVPlayerPro/main.py:7359
+#: ../GTIPTVPlayerPro/main.py:7401 ../GTIPTVPlayerPro/main.py:7469
+#: ../GTIPTVPlayerPro/main.py:7508 ../GTIPTVPlayerPro/main.py:7839
+#: ../GTIPTVPlayerPro/main.py:7884
+msgid "Select playlist"
+msgstr "Valitse soittolista"
+
+#: ../GTIPTVPlayerPro/main.py:4516
+msgid "Player / Codec"
+msgstr "Soitin / Koodekki"
+
+#: ../GTIPTVPlayerPro/main.py:4518
+msgid "LANGUAGE"
+msgstr "KIELI"
+
+#: ../GTIPTVPlayerPro/main.py:4560
+msgid "Settings - Player / Codec"
+msgstr "Asetukset – Soitin / Koodekki"
+
+#: ../GTIPTVPlayerPro/main.py:4591 ../GTIPTVPlayerPro/remote_footer.py:106
+msgid "Open"
+msgstr "Avaa"
+
+#: ../GTIPTVPlayerPro/main.py:4604 ../GTIPTVPlayerPro/main.py:7535
+#: ../GTIPTVPlayerPro/main.py:7587 ../GTIPTVPlayerPro/main.py:7673
+#: ../GTIPTVPlayerPro/main.py:7729 ../GTIPTVPlayerPro/main.py:7766
+#: ../GTIPTVPlayerPro/main.py:8563 ../GTIPTVPlayerPro/main.py:8686
+#: ../GTIPTVPlayerPro/main.py:8795 ../GTIPTVPlayerPro/main.py:8797
+msgid "Error"
+msgstr "Virhe"
+
+#: ../GTIPTVPlayerPro/main.py:4612
+#, python-brace-format
+msgid "Configured ••••{}"
+msgstr "Määritetty ••••{}"
+
+#: ../GTIPTVPlayerPro/main.py:4642
+msgid "Press OK to open the DVB EPG settings."
+msgstr "Avaa DVB EPG -asetukset painamalla OK."
+
+#: ../GTIPTVPlayerPro/main.py:4647
+msgid "Press OK to turn the category edit lock on or off."
+msgstr "Paina OK ottaaksesi luokkien muokkauslukon käyttöön tai pois käytöstä."
+
+#: ../GTIPTVPlayerPro/main.py:4658
+msgid "Press OK to enter or change the TMDb key."
+msgstr "Syötä tai vaihda TMDb-avain painamalla OK."
+
+#: ../GTIPTVPlayerPro/main.py:4762 ../GTIPTVPlayerPro/main.py:4782
+#: ../GTIPTVPlayerPro/main.py:7743
+msgid "The confirmation screen is unavailable on this image."
+msgstr "Vahvistusnäyttö ei ole käytettävissä tässä järjestelmäkuvassa."
+
+#: ../GTIPTVPlayerPro/main.py:4775
+msgid "Disable the category edit lock?"
+msgstr "Poistetaanko luokkien muokkauslukko käytöstä?"
+
+#: ../GTIPTVPlayerPro/main.py:4787
+msgid "Create category edit PIN"
+msgstr "Luo luokkien muokkauksen PIN-koodi"
+
+#: ../GTIPTVPlayerPro/main.py:4797
+msgid "Confirm category edit PIN"
+msgstr "Vahvista luokkien muokkauksen PIN-koodi"
+
+#: ../GTIPTVPlayerPro/main.py:4823
+msgid "Category edit lock could not be saved. Check the receiver storage."
+msgstr "Luokkien muokkauslukkoa ei voitu tallentaa. Tarkista vastaanottimen tallennustila."
+
+#: ../GTIPTVPlayerPro/main.py:4831
+msgid "Category edit lock enabled."
+msgstr "Luokkien muokkauslukko otettu käyttöön."
+
+#: ../GTIPTVPlayerPro/main.py:4834
+#, python-brace-format
+msgid ""
+"Write down this recovery code. It is shown only once:\n"
+"\n"
+"{}\n"
+"\n"
+"If you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr ""
+"Kirjoita tämä palautuskoodi muistiin. Se näytetään vain kerran:\n"
+"\n"
+"{}\n"
+"\n"
+"Jos unohdat molemmat koodit, lisäosan poistaminen ja asentaminen uudelleen nollaa vain tämän lukon."
+
+#: ../GTIPTVPlayerPro/main.py:4845
+msgid "Disable category edit lock"
+msgstr "Poista luokkien muokkauslukko käytöstä"
+
+#: ../GTIPTVPlayerPro/main.py:4846
+msgid "Enter the current 4-digit PIN."
+msgstr "Anna nykyinen 4-numeroinen PIN-koodi."
+
+#: ../GTIPTVPlayerPro/main.py:4866
+msgid "Incorrect PIN. Lock unchanged."
+msgstr "Virheellinen PIN-koodi. Lukkoa ei muutettu."
+
+#: ../GTIPTVPlayerPro/main.py:4879
+msgid "Incorrect recovery code. Lock unchanged."
+msgstr "Virheellinen palautuskoodi. Lukkoa ei muutettu."
+
+#: ../GTIPTVPlayerPro/main.py:4892
+msgid "Category edit lock disabled."
+msgstr "Luokkien muokkauslukko poistettu käytöstä."
+
+#: ../GTIPTVPlayerPro/main.py:4897
+msgid "Category edit lock could not be removed. Check the receiver storage."
+msgstr "Luokkien muokkauslukkoa ei voitu poistaa. Tarkista vastaanottimen tallennustila."
+
+#: ../GTIPTVPlayerPro/main.py:4908
+msgid "DVB EPG settings are unavailable on this image."
+msgstr "DVB EPG -asetukset eivät ole käytettävissä tässä järjestelmässä."
+
+#: ../GTIPTVPlayerPro/main.py:4981
+msgid "DVB EPG settings closed."
+msgstr "DVB EPG -asetukset suljettiin."
+
+#: ../GTIPTVPlayerPro/main.py:4998
+msgid "Enter the TMDb API key or access token"
+msgstr "Anna TMDb API-avain tai käyttöoikeustunnus"
+
+#: ../GTIPTVPlayerPro/main.py:5005
+msgid "TMDb key change cancelled."
+msgstr "TMDb-avaimen vaihto peruutettiin."
+
+#: ../GTIPTVPlayerPro/main.py:5011
+msgid "TMDb key saved; press BLUE to test and GREEN to save."
+msgstr "TMDb-avain tallennettiin; testaa painamalla SINISTÄ ja tallenna painamalla VIHREÄÄ."
+
+#: ../GTIPTVPlayerPro/main.py:5013
+msgid "TMDb key cleared; press GREEN to save."
+msgstr "TMDb-avain tyhjennettiin; tallenna painamalla VIHREÄÄ."
+
+#: ../GTIPTVPlayerPro/main.py:5019
+msgid "The TMDb connection test is still running..."
+msgstr "TMDb-yhteystesti on edelleen käynnissä..."
+
+#: ../GTIPTVPlayerPro/main.py:5023
+msgid "No TMDb key is configured. Press OK on the key row."
+msgstr "TMDb-avainta ei ole määritetty. Paina OK avainrivillä."
+
+#: ../GTIPTVPlayerPro/main.py:5028
+msgid "Testing the TMDb connection and API key..."
+msgstr "Testataan TMDb-yhteyttä ja API-avainta..."
+
+#: ../GTIPTVPlayerPro/main.py:5057
+msgid "TMDb connection successful; the API key is valid."
+msgstr "TMDb-yhteys onnistui; API-avain on kelvollinen."
+
+#: ../GTIPTVPlayerPro/main.py:5061
+msgid " Metadata enrichment is currently disabled."
+msgstr " Metatietojen rikastus on tällä hetkellä pois käytöstä."
+
+#: ../GTIPTVPlayerPro/main.py:5067
+#, python-brace-format
+msgid "TMDb test failed: {}."
+msgstr "TMDb-testi epäonnistui: {}."
+
+#: ../GTIPTVPlayerPro/main.py:5070 ../GTIPTVPlayerPro/main.py:5088
+msgid "TMDb test failed: could not connect."
+msgstr "TMDb-testi epäonnistui: yhteyttä ei voitu muodostaa."
+
+#: ../GTIPTVPlayerPro/main.py:5188 ../GTIPTVPlayerPro/main.py:5204
+#: ../GTIPTVPlayerPro/main.py:5401 ../GTIPTVPlayerPro/main.py:8801
+msgid "The health check could not be completed."
+msgstr "Kuntotarkistusta ei voitu suorittaa loppuun."
+
+#: ../GTIPTVPlayerPro/main.py:5317 ../GTIPTVPlayerPro/main.py:5360
+#: ../GTIPTVPlayerPro/main.py:8835 ../GTIPTVPlayerPro/main.py:8876
+#: ../GTIPTVPlayerPro/main.py:8915
+msgid "Information"
+msgstr "Tiedot"
+
+#: ../GTIPTVPlayerPro/main.py:5477 ../GTIPTVPlayerPro/main.py:5565
+#: ../GTIPTVPlayerPro/main.py:5584 ../GTIPTVPlayerPro/main.py:5633
+#: ../GTIPTVPlayerPro/main.py:6064 ../GTIPTVPlayerPro/main.py:6094
+#: ../GTIPTVPlayerPro/remote_footer.py:117
+msgid "Accounts"
+msgstr "Tilit"
+
+#: ../GTIPTVPlayerPro/main.py:5478 ../GTIPTVPlayerPro/main.py:5489
+#: ../GTIPTVPlayerPro/main.py:8743 ../GTIPTVPlayerPro/main.py:9624
+msgid "TESTING..."
+msgstr "TESTATAAN..."
+
+#: ../GTIPTVPlayerPro/main.py:5503 ../GTIPTVPlayerPro/main.py:6095
+#: ../GTIPTVPlayerPro/main.py:6747 ../GTIPTVPlayerPro/remote_footer.py:86
+msgid "Account"
+msgstr "Tili"
+
+#: ../GTIPTVPlayerPro/main.py:5567 ../GTIPTVPlayerPro/main.py:5701
+#: ../GTIPTVPlayerPro/main.py:7779 ../GTIPTVPlayerPro/remote_footer.py:99
+#: ../GTIPTVPlayerPro/remote_footer.py:101
+msgid "Delete"
+msgstr "Poista"
+
+#: ../GTIPTVPlayerPro/main.py:5633 ../GTIPTVPlayerPro/main.py:6376
+#: ../GTIPTVPlayerPro/main.py:7750
+#, python-brace-format
+msgid "Delete {}?"
+msgstr "Poistetaanko {}?"
+
+#: ../GTIPTVPlayerPro/main.py:5739 ../GTIPTVPlayerPro/main.py:6457
+#: ../GTIPTVPlayerPro/main.py:7766
+#, python-brace-format
+msgid "Could not delete the source: {}"
+msgstr "Lähdettä ei voitu poistaa: {}"
+
+#: ../GTIPTVPlayerPro/main.py:5874
+msgid "SELECTED SOURCE"
+msgstr "VALITTU LÄHDE"
+
+#: ../GTIPTVPlayerPro/main.py:5884 ../GTIPTVPlayerPro/main.py:6295
+#: ../GTIPTVPlayerPro/remote_footer.py:100
+#: ../GTIPTVPlayerPro/remote_footer.py:102
+msgid "Connect"
+msgstr "Yhdistä"
+
+#: ../GTIPTVPlayerPro/main.py:5950 ../GTIPTVPlayerPro/main.py:6674
+msgid "Xtream Codes Accounts"
+msgstr "Xtream Codes -tilit"
+
+#: ../GTIPTVPlayerPro/main.py:5951 ../GTIPTVPlayerPro/main.py:6675
+msgid "M3U Sources"
+msgstr "M3U-lähteet"
+
+#: ../GTIPTVPlayerPro/main.py:5952 ../GTIPTVPlayerPro/main.py:6676
+msgid "Stalker / MAC Portal Accounts"
+msgstr "Stalker-/MAC-portaalitilit"
+
+#: ../GTIPTVPlayerPro/main.py:5953 ../GTIPTVPlayerPro/main.py:6094
+#: ../GTIPTVPlayerPro/main.py:9552 ../GTIPTVPlayerPro/remote_footer.py:118
+msgid "Sources"
+msgstr "Lähteet"
+
+#: ../GTIPTVPlayerPro/main.py:6063 ../GTIPTVPlayerPro/main.py:6478
+#, python-brace-format
+msgid "{} was deleted ({} records)."
+msgstr "{} poistettiin ({} tietuetta)."
+
+#: ../GTIPTVPlayerPro/main.py:6114
+msgid ""
+"No source was found.\n"
+"\n"
+"Create one from the ADD SOURCE panel on the home screen."
+msgstr ""
+"Lähdettä ei löytynyt.\n"
+"\n"
+"Luo se aloitusnäytön LISÄÄ LÄHDE -paneelissa."
+
+#: ../GTIPTVPlayerPro/main.py:6136 ../GTIPTVPlayerPro/main.py:6155
+#: ../GTIPTVPlayerPro/main.py:6825 ../GTIPTVPlayerPro/main.py:6894
+#: ../GTIPTVPlayerPro/main.py:6953 ../GTIPTVPlayerPro/main.py:7000
+msgid "Add Source"
+msgstr "Lisää lähde"
+
+#: ../GTIPTVPlayerPro/main.py:6235 ../GTIPTVPlayerPro/main.py:7644
+#: ../GTIPTVPlayerPro/main.py:7732 ../GTIPTVPlayerPro/main.py:9518
+msgid "Ready to connect"
+msgstr "Valmis yhdistämään"
+
+#: ../GTIPTVPlayerPro/main.py:6245 ../GTIPTVPlayerPro/main.py:6281
+#: ../GTIPTVPlayerPro/main.py:8890 ../GTIPTVPlayerPro/main.py:9627
+#: ../GTIPTVPlayerPro/main.py:9640 ../GTIPTVPlayerPro/main.py:9683
+#, python-brace-format
+msgid "Expiry: {}"
+msgstr "Voimassaolo päättyy: {}"
+
+#: ../GTIPTVPlayerPro/main.py:6351
+msgid "Choose a source type first."
+msgstr "Valitse ensin lähdetyyppi."
+
+#: ../GTIPTVPlayerPro/main.py:6366
+msgid "No source is selected for deletion."
+msgstr "Poistettavaa lähdettä ei ole valittu."
+
+#: ../GTIPTVPlayerPro/main.py:6370
+msgid "Could not open the deletion confirmation."
+msgstr "Poiston vahvistusta ei voitu avata."
+
+#: ../GTIPTVPlayerPro/main.py:6387
+msgid "Source deletion cancelled."
+msgstr "Lähteen poistaminen peruttiin."
+
+#: ../GTIPTVPlayerPro/main.py:6516 ../GTIPTVPlayerPro/main.py:6554
+#: ../GTIPTVPlayerPro/main.py:9835
+msgid "A source connection is already in progress."
+msgstr "Lähteen yhdistäminen on jo käynnissä."
+
+#: ../GTIPTVPlayerPro/main.py:6545 ../GTIPTVPlayerPro/main.py:8707
+msgid "XMLTV EPG settings could not be opened."
+msgstr "XMLTV EPG -asetuksia ei voitu avata."
+
+#: ../GTIPTVPlayerPro/main.py:6551 ../GTIPTVPlayerPro/main.py:7651
+msgid "No source is available to connect."
+msgstr "Yhdistettävää lähdettä ei ole."
+
+#: ../GTIPTVPlayerPro/main.py:6582 ../GTIPTVPlayerPro/main.py:9855
+msgid "CONNECTING..."
+msgstr "YHDISTETÄÄN..."
+
+#: ../GTIPTVPlayerPro/main.py:6596
+#, python-brace-format
+msgid "Connecting to {}, please wait."
+msgstr "Yhdistetään kohteeseen {}, odota."
+
+#: ../GTIPTVPlayerPro/main.py:6607 ../GTIPTVPlayerPro/main.py:9866
+msgid "CONNECTED"
+msgstr "YHDISTETTY"
+
+#: ../GTIPTVPlayerPro/main.py:6611
+msgid "OPENING MAIN PANEL"
+msgstr "AVATAAN PÄÄPANEELI"
+
+#: ../GTIPTVPlayerPro/main.py:6614
+#, python-brace-format
+msgid "Connected to {}."
+msgstr "Yhdistetty kohteeseen {}."
+
+#: ../GTIPTVPlayerPro/main.py:6630 ../GTIPTVPlayerPro/remote_footer.py:103
+msgid "Retry"
+msgstr "Uudelleen"
+
+#: ../GTIPTVPlayerPro/main.py:6634 ../GTIPTVPlayerPro/main.py:9883
+#, python-brace-format
+msgid "Could not connect to {}: {}"
+msgstr "Kohteeseen {} ei voitu yhdistää: {}"
+
+#: ../GTIPTVPlayerPro/main.py:6661 ../GTIPTVPlayerPro/main.py:6721
+msgid "Manage Sources"
+msgstr "Hallitse lähteitä"
+
+#: ../GTIPTVPlayerPro/main.py:6664 ../GTIPTVPlayerPro/main.py:7362
+msgid "Choose the source type you want to manage."
+msgstr "Valitse hallittava lähdetyyppi."
+
+#: ../GTIPTVPlayerPro/main.py:6677 ../GTIPTVPlayerPro/main.py:6843
+#: ../GTIPTVPlayerPro/main.py:7373
+msgid "Server URL, username and password"
+msgstr "Palvelimen URL, käyttäjänimi ja salasana"
+
+#: ../GTIPTVPlayerPro/main.py:6678 ../GTIPTVPlayerPro/main.py:6846
+msgid "Local file, NAS or web link"
+msgstr "Paikallinen tiedosto, NAS tai verkkolinkki"
+
+#: ../GTIPTVPlayerPro/main.py:6679 ../GTIPTVPlayerPro/main.py:6849
+#: ../GTIPTVPlayerPro/main.py:7376 ../GTIPTVPlayerPro/main.py:8996
+msgid "Portal"
+msgstr "Portaali"
+
+#: ../GTIPTVPlayerPro/main.py:6770
+msgid "Each source type is listed separately. Each section can contain up to 500 sources."
+msgstr "Jokainen lähdetyyppi näytetään erikseen. Kukin osio voi sisältää enintään 500 lähdettä."
+
+#: ../GTIPTVPlayerPro/main.py:6805
+msgid "Xtream Codes provides Live TV, Movies and Series."
+msgstr "Xtream Codes tarjoaa suoria TV-lähetyksiä, elokuvia ja sarjoja."
+
+#: ../GTIPTVPlayerPro/main.py:6807
+msgid "M3U sources provide Live TV only. Categories, search and favorites are supported."
+msgstr "M3U-lähteet tarjoavat vain suoria TV-lähetyksiä. Luokkia, hakua ja suosikkeja tuetaan."
+
+#: ../GTIPTVPlayerPro/main.py:6811 ../GTIPTVPlayerPro/main.py:6973
+#: ../GTIPTVPlayerPro/main.py:8550
+msgid "The Stalker / MAC portal will be checked automatically when this screen opens."
+msgstr "Stalker / MAC -portaali tarkistetaan automaattisesti tämän näytön avautuessa."
+
+#: ../GTIPTVPlayerPro/main.py:6828
+msgid "Choose the source type to add."
+msgstr "Valitse lisättävän lähteen tyyppi."
+
+#: ../GTIPTVPlayerPro/main.py:6935 ../GTIPTVPlayerPro/stalker.py:550
+#: ../GTIPTVPlayerPro/stalker.py:554 ../GTIPTVPlayerPro/stalker.py:563
+#: ../GTIPTVPlayerPro/stalker.py:565
+msgid "Enter a valid portal URL"
+msgstr "Anna kelvollinen portaalin URL-osoite"
+
+#: ../GTIPTVPlayerPro/main.py:6936 ../GTIPTVPlayerPro/stalker.py:543
+msgid "Enter a valid MAC address"
+msgstr "Anna kelvollinen MAC-osoite"
+
+#: ../GTIPTVPlayerPro/main.py:6956 ../GTIPTVPlayerPro/main.py:7993
+msgid "Source details"
+msgstr "Lähteen tiedot"
+
+#: ../GTIPTVPlayerPro/main.py:6960
+msgid "Portal URL / MAC"
+msgstr "Portaalin URL-osoite / MAC"
+
+#: ../GTIPTVPlayerPro/main.py:6961
+msgid "GREEN"
+msgstr "VIHREÄ"
+
+#: ../GTIPTVPlayerPro/main.py:6962 ../GTIPTVPlayerPro/remote_footer.py:97
+msgid "Save"
+msgstr "Tallenna"
+
+#: ../GTIPTVPlayerPro/main.py:7016
+msgid "Portal URL"
+msgstr "Portaalin URL-osoite"
+
+#: ../GTIPTVPlayerPro/main.py:7024
+msgid "MAC address"
+msgstr "MAC-osoite"
+
+#: ../GTIPTVPlayerPro/main.py:7079 ../GTIPTVPlayerPro/main.py:8199
+#: ../GTIPTVPlayerPro/main.py:8212 ../GTIPTVPlayerPro/main.py:8439
+msgid "Information received. Edit the next field or press GREEN to save."
+msgstr "Tiedot vastaanotettu. Muokkaa seuraavaa kenttää tai tallenna painamalla VIHREÄÄ."
+
+#: ../GTIPTVPlayerPro/main.py:7208 ../GTIPTVPlayerPro/main.py:7254
+#: ../GTIPTVPlayerPro/playlist.py:1557
+msgid "Local / NAS file"
+msgstr "Paikallinen / NAS-tiedosto"
+
+#: ../GTIPTVPlayerPro/main.py:7211 ../GTIPTVPlayerPro/main.py:7842
+#: ../GTIPTVPlayerPro/main.py:8012
+msgid "Device, USB or mounted network storage"
+msgstr "Laite, USB tai liitetty verkkotallennus"
+
+#: ../GTIPTVPlayerPro/main.py:7576
+msgid "Add playlist"
+msgstr "Lisää soittolista"
+
+#: ../GTIPTVPlayerPro/main.py:7627 ../GTIPTVPlayerPro/main.py:7656
+#: ../GTIPTVPlayerPro/main.py:7698 ../GTIPTVPlayerPro/main.py:7739
+#: ../GTIPTVPlayerPro/main.py:9301
+msgid "Not available"
+msgstr "Ei saatavilla"
+
+#: ../GTIPTVPlayerPro/main.py:7667 ../GTIPTVPlayerPro/playlist.py:1121
+msgid "No valid IPTV source was found"
+msgstr "Kelvollista IPTV-lähdettä ei löytynyt"
+
+#: ../GTIPTVPlayerPro/main.py:7713 ../GTIPTVPlayerPro/remote_footer.py:95
+msgid "Rename"
+msgstr "Nimeä uudelleen"
+
+#: ../GTIPTVPlayerPro/main.py:7970
+msgid "Enter a name for the M3U source"
+msgstr "Anna M3U-lähteelle nimi"
+
+#: ../GTIPTVPlayerPro/main.py:7972
+msgid "Enter the M3U file path or HTTP(S) URL"
+msgstr "Anna M3U-tiedoston polku tai HTTP(S)-URL"
+
+#: ../GTIPTVPlayerPro/main.py:7991 ../GTIPTVPlayerPro/main.py:8048
+msgid "Add M3U Source"
+msgstr "Lisää M3U-lähde"
+
+#: ../GTIPTVPlayerPro/main.py:7996
+msgid "Give the source a name and choose its location."
+msgstr "Anna lähteelle nimi ja valitse sen sijainti."
+
+#: ../GTIPTVPlayerPro/main.py:7999
+msgid "Source name"
+msgstr "Lähteen nimi"
+
+#: ../GTIPTVPlayerPro/main.py:8015
+msgid "Direct HTTP(S) M3U link"
+msgstr "Suora HTTP(S)-M3U-linkki"
+
+#: ../GTIPTVPlayerPro/main.py:8053
+msgid "M3U URL must start with http:// or https://."
+msgstr "M3U-URL-osoitteen alussa on oltava http:// tai https://."
+
+#: ../GTIPTVPlayerPro/main.py:8070
+msgid "Enter a source name"
+msgstr "Anna lähteen nimi"
+
+#: ../GTIPTVPlayerPro/main.py:8072
+msgid "File path"
+msgstr "Tiedostopolku"
+
+#: ../GTIPTVPlayerPro/main.py:8081 ../GTIPTVPlayerPro/remote_footer.py:94
+msgid "Edit"
+msgstr "Muokkaa"
+
+#: ../GTIPTVPlayerPro/main.py:8247
+#, python-brace-format
+msgid "Could not save the M3U source: {}"
+msgstr "M3U-lähdettä ei voitu tallentaa: {}"
+
+#: ../GTIPTVPlayerPro/main.py:8256
+#, python-brace-format
+msgid "{} was saved as an M3U Live TV source."
+msgstr "{} tallennettiin M3U Live TV -lähteeksi."
+
+#: ../GTIPTVPlayerPro/main.py:8269
+msgid "Enter the server URL"
+msgstr "Anna palvelimen URL"
+
+#: ../GTIPTVPlayerPro/main.py:8270 ../GTIPTVPlayerPro/main.py:8343
+msgid "Enter the username"
+msgstr "Anna käyttäjänimi"
+
+#: ../GTIPTVPlayerPro/main.py:8271 ../GTIPTVPlayerPro/main.py:8347
+msgid "Enter the password"
+msgstr "Anna salasana"
+
+#: ../GTIPTVPlayerPro/main.py:8293 ../GTIPTVPlayerPro/main.py:8330
+msgid "ADD NEW ACCOUNT"
+msgstr "LISÄÄ UUSI TILI"
+
+#: ../GTIPTVPlayerPro/main.py:8295 ../GTIPTVPlayerPro/main.py:8333
+msgid "Press OK in a text field; use LEFT / RIGHT on the output row."
+msgstr "Paina OK tekstikentässä; käytä tulostusrivillä VASENTA / OIKEAA."
+
+#: ../GTIPTVPlayerPro/main.py:8304
+msgid "Press GREEN to save  |  Select a TS or M3U8 output supported by the server."
+msgstr "Tallenna painamalla VIHREÄÄ  |  Valitse palvelimen tukema TS- tai M3U8-tulostus."
+
+#: ../GTIPTVPlayerPro/main.py:8327 ../GTIPTVPlayerPro/main.py:8331
+msgid "Add New Account"
+msgstr "Lisää uusi tili"
+
+#: ../GTIPTVPlayerPro/main.py:8350
+#, python-brace-format
+msgid "  SERVER URL        {}"
+msgstr "  PALVELIMEN URL    {}"
+
+#: ../GTIPTVPlayerPro/main.py:8355
+#, python-brace-format
+msgid "  USERNAME          {}"
+msgstr "  KÄYTTÄJÄNIMI      {}"
+
+#: ../GTIPTVPlayerPro/main.py:8359
+#, python-brace-format
+msgid "  PASSWORD          {}"
+msgstr "  SALASANA          {}"
+
+#: ../GTIPTVPlayerPro/main.py:8362
+#, python-brace-format
+msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
+msgstr "  TULOSTUSMUOTO     {}     Vaihda VASEMMALLA / OIKEALLA"
+
+#: ../GTIPTVPlayerPro/main.py:8395
+#, python-brace-format
+msgid "Live TV output selected: {}."
+msgstr "Suoran TV:n tulostus valittu: {}."
+
+#: ../GTIPTVPlayerPro/main.py:8454
+#, python-brace-format
+msgid "Could not save the account: {}"
+msgstr "Tiliä ei voitu tallentaa: {}"
+
+#: ../GTIPTVPlayerPro/main.py:8464
+#, python-brace-format
+msgid "{} was saved with {} output."
+msgstr "{} tallennettiin tulostuksella {}."
+
+#: ../GTIPTVPlayerPro/main.py:8522 ../GTIPTVPlayerPro/main.py:8595
+msgid "Source Health"
+msgstr "Lähteen tila"
+
+#: ../GTIPTVPlayerPro/main.py:8524 ../GTIPTVPlayerPro/main.py:8597
+msgid "Portal Health"
+msgstr "Portaalin tila"
+
+#: ../GTIPTVPlayerPro/main.py:8524 ../GTIPTVPlayerPro/main.py:8597
+msgid "Server Health"
+msgstr "Palvelimen tila"
+
+#: ../GTIPTVPlayerPro/main.py:8538 ../GTIPTVPlayerPro/main.py:8569
+msgid "WAITING FOR TEST"
+msgstr "ODOTETAAN TESTIÄ"
+
+#: ../GTIPTVPlayerPro/main.py:8546
+msgid "The M3U source will be checked automatically when this screen opens."
+msgstr "M3U-lähde tarkistetaan automaattisesti, kun tämä näyttö avautuu."
+
+#: ../GTIPTVPlayerPro/main.py:8554
+msgid "The Xtream API connection will be tested automatically when this screen opens."
+msgstr "Xtream API-yhteys testataan automaattisesti, kun tämä näyttö avataan."
+
+#: ../GTIPTVPlayerPro/main.py:8727
+msgid "XMLTV EPG is disabled for this M3U source."
+msgstr "XMLTV EPG on poistettu käytöstä tältä M3U-lähteeltä."
+
+#: ../GTIPTVPlayerPro/main.py:8731
+msgid "XMLTV EPG is ready from the local cache."
+msgstr "XMLTV EPG on käytettävissä paikallisesta välimuistista."
+
+#: ../GTIPTVPlayerPro/main.py:8733
+msgid "XMLTV EPG is enabled and waiting for its first update."
+msgstr "XMLTV EPG on käytössä ja odottaa ensimmäistä päivitystä."
+
+#: ../GTIPTVPlayerPro/main.py:8751
+msgid "Checking M3U access, catalogue size and cache status."
+msgstr "Tarkistetaan M3U-yhteys, luettelon koko ja välimuistin tila."
+
+#: ../GTIPTVPlayerPro/main.py:8754
+msgid "Checking portal authentication, categories and latency."
+msgstr "Tarkistetaan portaalin todennus, luokat ja viive."
+
+#: ../GTIPTVPlayerPro/main.py:8757
+msgid "Checking API access, account status, latency and connection limits."
+msgstr "Tarkistetaan API-käyttöoikeus, tilin tila, viive ja yhteysrajat."
+
+#: ../GTIPTVPlayerPro/main.py:8883 ../GTIPTVPlayerPro/stalker.py:1908
+#: ../GTIPTVPlayerPro/stalker.py:1911 ../GTIPTVPlayerPro/stalker.py:1914
+#: ../GTIPTVPlayerPro/stalker.py:1925 ../GTIPTVPlayerPro/stalker.py:1940
+#: ../GTIPTVPlayerPro/stalker.py:1944 ../GTIPTVPlayerPro/stalker.py:8114
+msgid "Server does not report expiry"
+msgstr "Palvelin ei ilmoita päättymispäivää"
+
+#: ../GTIPTVPlayerPro/main.py:8996
+msgid "Server"
+msgstr "Palvelin"
+
+#: ../GTIPTVPlayerPro/main.py:9302
+msgid "Standard M3U sources support Live TV only."
+msgstr "Tavalliset M3U-lähteet tukevat vain Live TV:tä."
+
+#: ../GTIPTVPlayerPro/main.py:9347 ../GTIPTVPlayerPro/remote_footer.py:136
+msgid "About"
+msgstr "Tietoja"
+
+#: ../GTIPTVPlayerPro/main.py:9420
+msgid "SECURE SOURCE CONNECTION"
+msgstr "SUOJATTU LÄHDEYHTEYS"
+
+#: ../GTIPTVPlayerPro/main.py:9421
+msgid "Welcome"
+msgstr "Tervetuloa"
+
+#: ../GTIPTVPlayerPro/main.py:9423
+msgid "Select and connect to a saved source to start watching."
+msgstr "Aloita katselu valitsemalla tallennettu lähde ja yhdistämällä siihen."
+
+#: ../GTIPTVPlayerPro/main.py:9426
+msgid "SAVED SOURCE"
+msgstr "TALLENNETTU LÄHDE"
+
+#: ../GTIPTVPlayerPro/main.py:9537
+msgid "Source status is checked automatically when connecting."
+msgstr "Lähteen tila tarkistetaan automaattisesti yhdistettäessä."
+
+#: ../GTIPTVPlayerPro/main.py:9541
+msgid "No saved source found"
+msgstr "Tallennettua lähdettä ei löytynyt"
+
+#: ../GTIPTVPlayerPro/main.py:9544
+msgid "Create a new source from the ADD SOURCE panel."
+msgstr "Luo uusi lähde LISÄÄ LÄHDE -paneelissa."
+
+#: ../GTIPTVPlayerPro/main.py:9554
+msgid "No saved source. Create one from the ADD SOURCE panel."
+msgstr "Tallennettua lähdettä ei ole. Luo se LISÄÄ LÄHDE -paneelissa."
+
+#: ../GTIPTVPlayerPro/main.py:9557
+msgid "CONNECT SOURCE"
+msgstr "YHDISTÄ LÄHDE"
+
+#: ../GTIPTVPlayerPro/main.py:9558
+msgid "MANAGE SOURCES"
+msgstr "HALLITSE LÄHTEITÄ"
+
+#: ../GTIPTVPlayerPro/main.py:9559
+msgid "ADD SOURCE"
+msgstr "LISÄÄ LÄHDE"
+
+#: ../GTIPTVPlayerPro/main.py:9671 ../GTIPTVPlayerPro/playlist.py:1282
+#, python-brace-format
+msgid "Account status: {}"
+msgstr "Tilin tila: {}"
+
+#: ../GTIPTVPlayerPro/main.py:9858
+#, python-brace-format
+msgid "Checking {}, please wait."
+msgstr "Tarkistetaan {}, odota."
+
+#: ../GTIPTVPlayerPro/main.py:9869
+#, python-brace-format
+msgid "Connected to {}; opening the dashboard."
+msgstr "Yhdistetty kohteeseen {}; avataan hallintapaneeli."
+
+#: ../GTIPTVPlayerPro/main.py:9902
+msgid "Close the open screen before opening another one."
+msgstr "Sulje avoin näyttö ennen toisen avaamista."
+
+#: ../GTIPTVPlayerPro/metadata.py:255
+msgid "TMDb request cancelled"
+msgstr "TMDb-pyyntö peruutettiin"
+
+#: ../GTIPTVPlayerPro/metadata.py:266 ../GTIPTVPlayerPro/metadata.py:284
+msgid "TMDb request timed out"
+msgstr "TMDb-pyyntö aikakatkaistiin"
+
+#: ../GTIPTVPlayerPro/metadata.py:354
+msgid "Could not load the TMDb configuration"
+msgstr "TMDb-määrityksiä ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/metadata.py:364 ../GTIPTVPlayerPro/metadata.py:754
+#: ../GTIPTVPlayerPro/metadata.py:822
+msgid "TMDb API key is not configured"
+msgstr "TMDb API-avainta ei ole määritetty"
+
+#: ../GTIPTVPlayerPro/metadata.py:398
+#, python-brace-format
+msgid "TMDb HTTP error path={}"
+msgstr "TMDb HTTP-virhe, polku={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:400 ../GTIPTVPlayerPro/metadata.py:421
+msgid "TMDb API key is invalid"
+msgstr "TMDb API-avain on virheellinen"
+
+#: ../GTIPTVPlayerPro/metadata.py:402
+msgid "TMDb request limit reached"
+msgstr "TMDb-pyyntöjen raja saavutettu"
+
+#: ../GTIPTVPlayerPro/metadata.py:403
+#, python-brace-format
+msgid "TMDb returned HTTP {}"
+msgstr "TMDb palautti HTTP {}"
+
+#: ../GTIPTVPlayerPro/metadata.py:405
+#, python-brace-format
+msgid "TMDb connection error path={}"
+msgstr "TMDb-yhteysvirhe, polku={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:406
+msgid "Could not connect to the TMDb service"
+msgstr "TMDb-palveluun ei voitu yhdistää"
+
+#: ../GTIPTVPlayerPro/metadata.py:408
+msgid "TMDb response is too large"
+msgstr "TMDb-vastaus on liian suuri"
+
+#: ../GTIPTVPlayerPro/metadata.py:414
+#, python-brace-format
+msgid "Invalid TMDb JSON path={}"
+msgstr "Virheellinen TMDb-JSON-polku={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:415 ../GTIPTVPlayerPro/metadata.py:417
+msgid "TMDb returned an invalid response"
+msgstr "TMDb palautti virheellisen vastauksen"
+
+#: ../GTIPTVPlayerPro/metadata.py:422
+msgid "TMDb request was rejected"
+msgstr "TMDb-pyyntö hylättiin"
+
+#: ../GTIPTVPlayerPro/metadata.py:752 ../GTIPTVPlayerPro/metadata.py:820
+msgid "TMDb metadata enrichment is disabled"
+msgstr "TMDb-metatietojen rikastus on pois käytöstä"
+
+#: ../GTIPTVPlayerPro/metadata.py:761 ../GTIPTVPlayerPro/metadata.py:828
+msgid "No valid title was found for TMDb"
+msgstr "TMDb:lle ei löytynyt kelvollista nimeä"
+
+#: ../GTIPTVPlayerPro/metadata.py:789 ../GTIPTVPlayerPro/metadata.py:808
+#: ../GTIPTVPlayerPro/metadata.py:857 ../GTIPTVPlayerPro/metadata.py:876
+msgid "No TMDb match was found"
+msgstr "TMDb-osumaa ei löytynyt"
+
+#: ../GTIPTVPlayerPro/metadata.py:798 ../GTIPTVPlayerPro/metadata.py:799
+#: ../GTIPTVPlayerPro/metadata.py:866 ../GTIPTVPlayerPro/metadata.py:867
+msgid "Could not load TMDb information"
+msgstr "TMDb-tietoja ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/network_security.py:45
+#: ../GTIPTVPlayerPro/network_security.py:53
+#: ../GTIPTVPlayerPro/network_security.py:55
+msgid "Image request headers are invalid."
+msgstr "Kuvapyynnön otsakkeet ovat virheelliset."
+
+#: ../GTIPTVPlayerPro/network_security.py:64
+msgid "Network address could not be resolved."
+msgstr "Verkko-osoitetta ei voitu ratkaista."
+
+#: ../GTIPTVPlayerPro/network_security.py:67
+msgid "Image requests to local, private or reserved network addresses are prohibited."
+msgstr "Kuvapyynnöt paikallisiin, yksityisiin tai varattuihin verkko-osoitteisiin on estetty."
+
+#: ../GTIPTVPlayerPro/network_security.py:79
+#: ../GTIPTVPlayerPro/network_security.py:84
+msgid "Image URL is invalid."
+msgstr "Kuvan URL on virheellinen."
+
+#: ../GTIPTVPlayerPro/network_security.py:94
+msgid "Image URL is not safe."
+msgstr "Kuvan URL ei ole turvallinen."
+
+#: ../GTIPTVPlayerPro/network_security.py:97
+msgid "Image URL port is invalid."
+msgstr "Kuvan URL-portti on virheellinen."
+
+#: ../GTIPTVPlayerPro/network_security.py:101
+#: ../GTIPTVPlayerPro/network_security.py:103
+msgid "Image host name is invalid."
+msgstr "Kuvapalvelimen nimi on virheellinen."
+
+#: ../GTIPTVPlayerPro/network_security.py:132
+msgid "Image download timed out."
+msgstr "Kuvan lataus aikakatkaistiin."
+
+#: ../GTIPTVPlayerPro/network_security.py:161
+#: ../GTIPTVPlayerPro/network_security.py:184
+msgid "Image host name resolution timed out."
+msgstr "Kuvapalvelimen nimen ratkaisu aikakatkaistiin."
+
+#: ../GTIPTVPlayerPro/network_security.py:194
+msgid "Image host name could not be resolved."
+msgstr "Kuvapalvelimen nimeä ei voitu ratkaista."
+
+#: ../GTIPTVPlayerPro/network_security.py:206
+msgid "Image host did not resolve to a public IP address."
+msgstr "Kuvapalvelinta ei ratkaistu julkiseksi IP-osoitteeksi."
+
+#: ../GTIPTVPlayerPro/network_security.py:282
+msgid "Image response has conflicting size information."
+msgstr "Kuvavastauksessa on ristiriitaisia kokotietoja."
+
+#: ../GTIPTVPlayerPro/network_security.py:336
+#, python-brace-format
+msgid "Image server returned HTTP {}."
+msgstr "Kuvapalvelin palautti HTTP {}."
+
+#: ../GTIPTVPlayerPro/network_security.py:341
+msgid "Compressed image HTTP responses are not accepted."
+msgstr "Pakattuja HTTP-kuvavastauksia ei hyväksytä."
+
+#: ../GTIPTVPlayerPro/network_security.py:349
+msgid "Image response size is invalid."
+msgstr "Kuvavastauksen koko on virheellinen."
+
+#: ../GTIPTVPlayerPro/network_security.py:353
+#: ../GTIPTVPlayerPro/network_security.py:371
+msgid "Image response exceeds the safe size limit."
+msgstr "Kuvavastaus ylittää turvallisen kokorajan."
+
+#: ../GTIPTVPlayerPro/network_security.py:403
+#: ../GTIPTVPlayerPro/network_security.py:405
+msgid "Image download limits are invalid."
+msgstr "Kuvien latausrajat ovat virheelliset."
+
+#: ../GTIPTVPlayerPro/network_security.py:419
+msgid "An HTTPS image request cannot be redirected to HTTP."
+msgstr "HTTPS-kuvapyyntöä ei voi ohjata HTTP-osoitteeseen."
+
+#: ../GTIPTVPlayerPro/network_security.py:452
+msgid "Could not establish a secure connection to the image server."
+msgstr "Suojattua yhteyttä kuvapalvelimeen ei voitu muodostaa."
+
+#: ../GTIPTVPlayerPro/network_security.py:459
+msgid "Image redirect URL is missing."
+msgstr "Kuvan uudelleenohjauksen URL puuttuu."
+
+#: ../GTIPTVPlayerPro/network_security.py:461
+msgid "Image request was redirected too many times."
+msgstr "Kuvapyyntö uudelleenohjattiin liian monta kertaa."
+
+#: ../GTIPTVPlayerPro/network_security.py:475
+msgid "Image redirection could not be completed."
+msgstr "Kuvan uudelleenohjausta ei voitu suorittaa."
+
+#: ../GTIPTVPlayerPro/playlist.py:41
+#, python-brace-format
+msgid ""
+"Latency: {} ms\n"
+"Account status: {}\n"
+"Active / Maximum: {}\n"
+"Expiry: {}\n"
+"Server time: {}\n"
+"Time zone: {}\n"
+"Protocol: {}\n"
+"Output format: {}\n"
+"Server version: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Viive: {} ms\n"
+"Tilin tila: {}\n"
+"Aktiivisia / Enintään: {}\n"
+"Vanheneminen: {}\n"
+"Palvelimen aika: {}\n"
+"Aikavyöhyke: {}\n"
+"Protokolla: {}\n"
+"Tulostusmuoto: {}\n"
+"Palvelinversio: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/playlist.py:171
+msgid "Invalid stream ID"
+msgstr "Virheellinen suoratoistotunnus"
+
+#: ../GTIPTVPlayerPro/playlist.py:390 ../GTIPTVPlayerPro/playlist.py:402
+#: ../GTIPTVPlayerPro/playlist.py:781
+msgid "Playlist file is too large"
+msgstr "Soittolistatiedosto on liian suuri"
+
+#: ../GTIPTVPlayerPro/playlist.py:731
+msgid "Enter a valid Xtream URL"
+msgstr "Anna kelvollinen Xtream-URL"
+
+#: ../GTIPTVPlayerPro/playlist.py:760
+msgid "The Xtream account limit was reached"
+msgstr "Xtream-tilien enimmäismäärä on saavutettu"
+
+#: ../GTIPTVPlayerPro/playlist.py:800
+msgid "Server URL, username and password are required"
+msgstr "Palvelimen URL, käyttäjänimi ja salasana vaaditaan"
+
+#: ../GTIPTVPlayerPro/playlist.py:803
+msgid "Output format must be TS or M3U8"
+msgstr "Tulostusmuodon on oltava TS tai M3U8"
+
+#: ../GTIPTVPlayerPro/playlist.py:808
+msgid "Enter a valid server URL"
+msgstr "Anna kelvollinen palvelimen URL"
+
+#: ../GTIPTVPlayerPro/playlist.py:810
+msgid "Server URL must start with http:// or https://"
+msgstr "Palvelimen URL-osoitteen on alettava http:// tai https://"
+
+#: ../GTIPTVPlayerPro/playlist.py:813
+msgid "Do not include a username or password in the server URL"
+msgstr "Älä sisällytä käyttäjänimeä tai salasanaa palvelimen URL-osoitteeseen"
+
+#: ../GTIPTVPlayerPro/playlist.py:816
+msgid "Server URL port is invalid"
+msgstr "Palvelimen URL-portti on virheellinen"
+
+#: ../GTIPTVPlayerPro/playlist.py:879 ../GTIPTVPlayerPro/playlist.py:965
+#: ../GTIPTVPlayerPro/playlist.py:1591 ../GTIPTVPlayerPro/playlist.py:1603
+msgid "The account selected for deletion is invalid"
+msgstr "Poistettavaksi valittu tili on virheellinen"
+
+#: ../GTIPTVPlayerPro/playlist.py:941 ../GTIPTVPlayerPro/playlist.py:1010
+msgid "The selected account was not found in the account files"
+msgstr "Valittua tiliä ei löytynyt tilitiedostoista"
+
+#: ../GTIPTVPlayerPro/playlist.py:1069
+msgid "playlists.txt was not found"
+msgstr "playlists.txt-tiedostoa ei löytynyt"
+
+#: ../GTIPTVPlayerPro/playlist.py:1071
+msgid "No valid Xtream account was found"
+msgstr "Kelvollista Xtream-tiliä ei löytynyt"
+
+#: ../GTIPTVPlayerPro/playlist.py:1119
+msgid "No saved IPTV source was found"
+msgstr "Tallennettua IPTV-lähdettä ei löytynyt"
+
+#: ../GTIPTVPlayerPro/playlist.py:1163
+msgid "The selected M3U source was not found"
+msgstr "Valittua M3U-lähdettä ei löytynyt"
+
+#: ../GTIPTVPlayerPro/playlist.py:1237
+msgid "Never / unknown"
+msgstr "Ei koskaan / tuntematon"
+
+#: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1255
+#: ../GTIPTVPlayerPro/playlist.py:1415 ../GTIPTVPlayerPro/playlist.py:1434
+#: ../GTIPTVPlayerPro/playlist.py:1445 ../GTIPTVPlayerPro/playlist.py:1493
+#: ../GTIPTVPlayerPro/playlist.py:1541 ../GTIPTVPlayerPro/stalker.py:8184
+msgid "ERROR"
+msgstr "VIRHE"
+
+#: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1257
+msgid "API response is invalid"
+msgstr "API-vastaus on virheellinen"
+
+#: ../GTIPTVPlayerPro/playlist.py:1272 ../GTIPTVPlayerPro/stalker.py:8184
+msgid "INVALID"
+msgstr "VIRHEELLINEN"
+
+#: ../GTIPTVPlayerPro/playlist.py:1273
+msgid "Server did not validate the account"
+msgstr "Palvelin ei vahvistanut tiliä"
+
+#: ../GTIPTVPlayerPro/playlist.py:1281
+msgid "DISABLED"
+msgstr "POIS KÄYTÖSTÄ"
+
+#: ../GTIPTVPlayerPro/playlist.py:1288 ../GTIPTVPlayerPro/stalker.py:8159
+msgid "BUSY"
+msgstr "VARATTU"
+
+#: ../GTIPTVPlayerPro/playlist.py:1292
+msgid "API connection successful"
+msgstr "API-yhteys onnistui"
+
+#: ../GTIPTVPlayerPro/playlist.py:1415
+msgid "API response is too large"
+msgstr "API-vastaus on liian suuri"
+
+#: ../GTIPTVPlayerPro/playlist.py:1426
+msgid "Server health check HTTP error"
+msgstr "HTTP-virhe palvelimen kuntotarkistuksessa"
+
+#: ../GTIPTVPlayerPro/playlist.py:1443
+msgid "Server health check connection error"
+msgstr "Yhteysvirhe palvelimen kuntotarkistuksessa"
+
+#: ../GTIPTVPlayerPro/playlist.py:1445
+msgid "Could not connect to the server"
+msgstr "Palvelimeen ei voitu yhdistää"
+
+#: ../GTIPTVPlayerPro/playlist.py:1454
+msgid "Not cached"
+msgstr "Ei välimuistissa"
+
+#: ../GTIPTVPlayerPro/playlist.py:1458
+msgid "Less than one minute"
+msgstr "Alle minuutti"
+
+#: ../GTIPTVPlayerPro/playlist.py:1460
+#, python-brace-format
+msgid "{} minutes"
+msgstr "{} minuuttia"
+
+#: ../GTIPTVPlayerPro/playlist.py:1524 ../GTIPTVPlayerPro/playlist.py:1544
+msgid "The M3U source could not be checked."
+msgstr "M3U-lähdettä ei voitu tarkistaa."
+
+#: ../GTIPTVPlayerPro/playlist.py:1534
+msgid "M3U catalogue loaded from cache."
+msgstr "M3U-luettelo ladattiin välimuistista."
+
+#: ../GTIPTVPlayerPro/playlist.py:1536
+msgid "M3U source is accessible."
+msgstr "M3U-lähde on käytettävissä."
+
+#: ../GTIPTVPlayerPro/playlist.py:1539
+msgid "The source is unavailable; a stale cache is in use."
+msgstr "Lähde ei ole käytettävissä; käytössä on vanhentunut välimuisti."
+
+#: ../GTIPTVPlayerPro/plugin.py:91
+msgid "Modern Enigma2 IPTV player"
+msgstr "Nykyaikainen IPTV-soitin Enigma2:lle"
+
+#: ../GTIPTVPlayerPro/portal_expiry.py:64
+#: ../GTIPTVPlayerPro/portal_expiry.py:148
+msgid "Unlimited"
+msgstr "Voimassa toistaiseksi"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:88
+msgid "Action"
+msgstr "Toiminto"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:91
+msgid "Exit"
+msgstr "Poistu"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:93
+#: ../GTIPTVPlayerPro/remote_footer.py:115
+#: ../GTIPTVPlayerPro/remote_footer.py:116
+msgid "Change"
+msgstr "Vaihda"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:96
+msgid "Continue"
+msgstr "Jatka"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:98
+msgid "Test"
+msgstr "Testi"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:104
+msgid "Navigate"
+msgstr "Selaa"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:107
+msgid "Refresh"
+msgstr "Päivitä"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:108
+msgid "Back"
+msgstr "Takaisin"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:110
+msgid "Play"
+msgstr "Toista"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:112
+msgid "EPG settings"
+msgstr "EPG-asetukset"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:114
+msgid "Full screen"
+msgstr "Koko näyttö"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:120
+#: ../GTIPTVPlayerPro/remote_footer.py:124
+msgid "Remove"
+msgstr "Poista"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:122
+msgid "Clear search"
+msgstr "Tyhjennä haku"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:125
+msgid "Filter"
+msgstr "Suodatin"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:126
+msgid "New"
+msgstr "Uusi"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:127
+msgid "Move"
+msgstr "Siirrä"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:129
+msgid "Reset"
+msgstr "Nollaa"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:130
+msgid "Show / Hide"
+msgstr "Näytä / piilota"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:131
+msgid "Mark"
+msgstr "Merkitse"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:133
+msgid "Clear"
+msgstr "Tyhjennä"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:135
+msgid "Rescan"
+msgstr "Hae uudelleen"
+
+#: ../GTIPTVPlayerPro/stalker.py:556
+msgid "Portal URL must start with http:// or https://"
+msgstr "Portaalin URL-osoitteen on alettava http:// tai https://"
+
+#: ../GTIPTVPlayerPro/stalker.py:567
+msgid "Portal URL port is invalid"
+msgstr "Portaalin URL-osoitteen portti on virheellinen"
+
+#: ../GTIPTVPlayerPro/stalker.py:569
+msgid "Do not include a query or fragment in the portal URL"
+msgstr "Älä sisällytä kyselyä tai osaa portaalin URL-osoitteeseen"
+
+#: ../GTIPTVPlayerPro/stalker.py:1208 ../GTIPTVPlayerPro/stalker.py:1213
+msgid "The Stalker account directory could not be created"
+msgstr "Stalker-tilihakemistoa ei voitu luoda"
+
+#: ../GTIPTVPlayerPro/stalker.py:1220
+msgid "The Stalker account directory is unsafe"
+msgstr "Stalker-tilihakemisto ei ole turvallinen"
+
+#: ../GTIPTVPlayerPro/stalker.py:1232
+msgid "The Stalker account file is unsafe"
+msgstr "Stalker-tilitiedosto ei ole turvallinen"
+
+#: ../GTIPTVPlayerPro/stalker.py:1248 ../GTIPTVPlayerPro/stalker.py:1257
+msgid "The Stalker account file could not be created"
+msgstr "Stalker-tilitiedostoa ei voitu luoda"
+
+#: ../GTIPTVPlayerPro/stalker.py:1278 ../GTIPTVPlayerPro/stalker.py:1297
+#: ../GTIPTVPlayerPro/stalker.py:1410
+msgid "The Stalker account file is too large"
+msgstr "Stalker-tilitiedosto on liian suuri"
+
+#: ../GTIPTVPlayerPro/stalker.py:1289
+msgid "The Stalker account file changed while opening"
+msgstr "Stalker-tilitiedosto muuttui avaamisen aikana"
+
+#: ../GTIPTVPlayerPro/stalker.py:1350 ../GTIPTVPlayerPro/stalker.py:1365
+msgid "No valid Stalker / MAC account was found"
+msgstr "Kelvollista Stalker / MAC -tiliä ei löytynyt"
+
+#: ../GTIPTVPlayerPro/stalker.py:1363 ../GTIPTVPlayerPro/stalker.py:1513
+msgid "The Stalker account file was not found"
+msgstr "Stalker-tilitiedostoa ei löytynyt"
+
+#: ../GTIPTVPlayerPro/stalker.py:1434
+msgid "The Stalker account file could not be saved"
+msgstr "Stalker-tilitiedostoa ei voitu tallentaa"
+
+#: ../GTIPTVPlayerPro/stalker.py:1480
+msgid "This Stalker / MAC account already exists"
+msgstr "Tämä Stalker / MAC -tili on jo olemassa"
+
+#: ../GTIPTVPlayerPro/stalker.py:1482
+msgid "The Stalker / MAC account limit was reached"
+msgstr "Stalker / MAC -tilien raja saavutettiin"
+
+#: ../GTIPTVPlayerPro/stalker.py:1500 ../GTIPTVPlayerPro/stalker.py:1551
+#: ../GTIPTVPlayerPro/stalker.py:1630
+msgid "Invalid Stalker / MAC account"
+msgstr "Virheellinen Stalker / MAC -tili"
+
+#: ../GTIPTVPlayerPro/stalker.py:1523 ../GTIPTVPlayerPro/stalker.py:1600
+msgid "The Stalker / MAC account was not found"
+msgstr "Stalker / MAC -tiliä ei löytynyt"
+
+#: ../GTIPTVPlayerPro/stalker.py:1810 ../GTIPTVPlayerPro/stalker.py:2487
+#: ../GTIPTVPlayerPro/stalker.py:2648 ../GTIPTVPlayerPro/stalker.py:2670
+msgid "Portal authentication failed"
+msgstr "Portaalin todennus epäonnistui"
+
+#: ../GTIPTVPlayerPro/stalker.py:1992 ../GTIPTVPlayerPro/stalker.py:1997
+msgid "Portal request cancelled"
+msgstr "Portaalipyyntö peruutettiin"
+
+#: ../GTIPTVPlayerPro/stalker.py:2002
+msgid "Portal request timed out"
+msgstr "Portaalipyyntö aikakatkaistiin"
+
+#: ../GTIPTVPlayerPro/stalker.py:2213
+msgid "Content type unavailable"
+msgstr "Sisältötyyppi ei ole käytettävissä"
+
+#: ../GTIPTVPlayerPro/stalker.py:2335 ../GTIPTVPlayerPro/stalker.py:2524
+msgid "Invalid portal response"
+msgstr "Virheellinen portaalivastaus"
+
+#: ../GTIPTVPlayerPro/stalker.py:2368 ../GTIPTVPlayerPro/stalker.py:5330
+#: ../GTIPTVPlayerPro/stalker.py:6222 ../GTIPTVPlayerPro/stalker.py:6236
+msgid "Portal request failed"
+msgstr "Portaalipyyntö epäonnistui"
+
+#: ../GTIPTVPlayerPro/stalker.py:2498
+msgid "Portal HTTP request failed"
+msgstr "Portaalin HTTP-pyyntö epäonnistui"
+
+#: ../GTIPTVPlayerPro/stalker.py:2505
+msgid "Portal is unavailable"
+msgstr "Portaali ei ole käytettävissä"
+
+#: ../GTIPTVPlayerPro/stalker.py:2514
+msgid "Portal response is too large"
+msgstr "Portaalivastaus on liian suuri"
+
+#: ../GTIPTVPlayerPro/stalker.py:5192
+msgid "Portal catalogue did not make progress"
+msgstr "Portaaliluettelo ei edennyt"
+
+#: ../GTIPTVPlayerPro/stalker.py:6333 ../GTIPTVPlayerPro/stalker.py:6345
+#: ../GTIPTVPlayerPro/stalker.py:6354 ../GTIPTVPlayerPro/stalker.py:6661
+msgid "Invalid stream link"
+msgstr "Virheellinen suoratoistolinkki"
+
+#: ../GTIPTVPlayerPro/stalker.py:7200 ../GTIPTVPlayerPro/stalker.py:7318
+#: ../GTIPTVPlayerPro/stalker.py:7453 ../GTIPTVPlayerPro/stalker.py:7588
+msgid "Stream link unavailable"
+msgstr "Suoratoistolinkki ei ole käytettävissä"
+
+#: ../GTIPTVPlayerPro/stalker.py:8168
+msgid "Portal connection successful"
+msgstr "Yhteys portaaliin onnistui"
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:222
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:233
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:283
+#: ../GTIPTVPlayerPro/subtitles.py:672
+msgid "Could not open SubsSupport subtitle search."
+msgstr "SubsSupportin tekstityshakua ei voitu avata."
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:407
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:438
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:480
+#: ../GTIPTVPlayerPro/subtitles.py:717
+msgid "Could not load the downloaded subtitle."
+msgstr "Ladattua tekstitystä ei voitu ladata."
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:412
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:510
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:532
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:580
+#: ../GTIPTVPlayerPro/subtitles.py:636
+msgid "External subtitle synchronization is unavailable."
+msgstr "Ulkoisen tekstityksen synkronointi ei ole käytettävissä."
+
+#: ../GTIPTVPlayerPro/subtitles.py:11
+msgid "DVB"
+msgstr "DVB"
+
+#: ../GTIPTVPlayerPro/subtitles.py:12
+msgid "Teletext"
+msgstr "Teksti-TV"
+
+#: ../GTIPTVPlayerPro/subtitles.py:17 ../GTIPTVPlayerPro/subtitles.py:51
+#: ../GTIPTVPlayerPro/subtitles.py:53
+msgid "Embedded"
+msgstr "Upotettu"
+
+#: ../GTIPTVPlayerPro/subtitles.py:18
+msgid "SSA"
+msgstr "SSA"
+
+#: ../GTIPTVPlayerPro/subtitles.py:19
+msgid "ASS"
+msgstr "ASS"
+
+#: ../GTIPTVPlayerPro/subtitles.py:20
+msgid "SRT"
+msgstr "SRT"
+
+#: ../GTIPTVPlayerPro/subtitles.py:21
+msgid "VOB"
+msgstr "VOB"
+
+#: ../GTIPTVPlayerPro/subtitles.py:22
+msgid "PGS"
+msgstr "PGS"
+
+#: ../GTIPTVPlayerPro/subtitles.py:23
+msgid "WebVTT"
+msgstr "WebVTT"
+
+#: ../GTIPTVPlayerPro/subtitles.py:63
+msgid "Subtitle"
+msgstr "Tekstitys"
+
+#: ../GTIPTVPlayerPro/subtitles.py:178
+msgid "No embedded subtitles are available."
+msgstr "Upotettuja tekstityksiä ei ole saatavilla."
+
+#: ../GTIPTVPlayerPro/subtitles.py:184 ../GTIPTVPlayerPro/subtitles.py:234
+#: ../GTIPTVPlayerPro/subtitles.py:237 ../GTIPTVPlayerPro/subtitles.py:288
+#: ../GTIPTVPlayerPro/subtitles.py:296 ../GTIPTVPlayerPro/subtitles.py:482
+msgid "Subtitle selection is unavailable on this image."
+msgstr "Tekstityksen valinta ei ole käytettävissä tässä imagessa."
+
+#: ../GTIPTVPlayerPro/subtitles.py:219 ../GTIPTVPlayerPro/subtitles.py:230
+#: ../GTIPTVPlayerPro/subtitles.py:607
+msgid "Subtitles"
+msgstr "Tekstitykset"
+
+#: ../GTIPTVPlayerPro/subtitles.py:313 ../GTIPTVPlayerPro/subtitles.py:352
+#: ../GTIPTVPlayerPro/subtitles.py:357
+msgid "Could not enable the selected subtitle."
+msgstr "Valittua tekstitystä ei voitu ottaa käyttöön."
+
+#: ../GTIPTVPlayerPro/subtitles.py:579
+msgid "Search subtitles with SubsSupport"
+msgstr "Hae tekstityksiä SubsSupportilla"
+
+#: ../GTIPTVPlayerPro/subtitles.py:581
+#, python-format
+msgid "Search subtitles with %s"
+msgstr "Hae tekstityksiä ohjelmalla %s"
+
+#: ../GTIPTVPlayerPro/subtitles.py:584
+msgid "Embedded subtitles"
+msgstr "Upotetut tekstitykset"
+
+#: ../GTIPTVPlayerPro/subtitles.py:589
+msgid "External subtitle synchronization"
+msgstr "Ulkoisen tekstityksen synkronointi"
+
+#: ../GTIPTVPlayerPro/subtitles.py:651
+msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
+msgstr "Tekstitysten haku edellyttää toimivaa SubsSupport- tai SubsSupportPro-asennusta."
+
+#: ../GTIPTVPlayerPro/weather.py:435
+msgid "Could not save weather settings through Enigma2 config"
+msgstr "Sääasetuksia ei voitu tallentaa Enigma2-määritysten kautta"
+
+#: ../GTIPTVPlayerPro/weather.py:445
+msgid "Clear skies"
+msgstr "Selkeä taivas"
+
+#: ../GTIPTVPlayerPro/weather.py:447
+msgid "Partly cloudy"
+msgstr "Puolipilvistä"
+
+#: ../GTIPTVPlayerPro/weather.py:449
+msgid "Cloudy"
+msgstr "Pilvistä"
+
+#: ../GTIPTVPlayerPro/weather.py:451
+msgid "Foggy"
+msgstr "Sumuista"
+
+#: ../GTIPTVPlayerPro/weather.py:453
+msgid "Drizzle"
+msgstr "Tihkusadetta"
+
+#: ../GTIPTVPlayerPro/weather.py:455
+msgid "Rainy"
+msgstr "Sateista"
+
+#: ../GTIPTVPlayerPro/weather.py:457
+msgid "Snowy"
+msgstr "Lumista"
+
+#: ../GTIPTVPlayerPro/weather.py:459
+msgid "Thunderstorms"
+msgstr "Ukkosmyrskyjä"
+
+#: ../GTIPTVPlayerPro/weather.py:460
+msgid "Variable"
+msgstr "Muuttuva"
+
+#: ../GTIPTVPlayerPro/weather.py:495 ../GTIPTVPlayerPro/weather.py:844
+#: ../GTIPTVPlayerPro/weather.py:867
+msgid "Weather request cancelled"
+msgstr "Sääpyyntö peruutettiin"
+
+#: ../GTIPTVPlayerPro/weather.py:588
+msgid "Weather service response is too large"
+msgstr "Sääpalvelun vastaus on liian suuri"
+
+#: ../GTIPTVPlayerPro/weather.py:599 ../GTIPTVPlayerPro/weather.py:602
+msgid "Open-Meteo request failed"
+msgstr "Open-Meteo-pyyntö epäonnistui"
+
+#: ../GTIPTVPlayerPro/weather.py:600 ../GTIPTVPlayerPro/weather.py:603
+msgid "Could not reach the weather service"
+msgstr "Sääpalvelua ei tavoitettu"
+
+#: ../GTIPTVPlayerPro/weather.py:605 ../GTIPTVPlayerPro/weather.py:696
+msgid "Weather service returned an invalid response"
+msgstr "Sääpalvelu palautti virheellisen vastauksen"
+
+#: ../GTIPTVPlayerPro/weather.py:617
+msgid "City name cannot be empty"
+msgstr "Kaupungin nimi ei voi olla tyhjä"
+
+#: ../GTIPTVPlayerPro/weather.py:661
+#, python-brace-format
+msgid "Could not find {}"
+msgstr "Kohdetta {} ei löytynyt"
+
+#: ../GTIPTVPlayerPro/weather.py:745
+msgid "Could not load the five-day forecast"
+msgstr "Viiden vuorokauden ennustetta ei voitu ladata"
+
+#: ../GTIPTVPlayerPro/weather.py:886
+msgid "Not fetched yet"
+msgstr "Ei vielä haettu"

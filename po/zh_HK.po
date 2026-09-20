@@ -1,0 +1,3823 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GT IPTV Player Pro 1.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
+"POT-Creation-Date: 2023-11-14 22:13+0000\n"
+"PO-Revision-Date: 2026-09-16 00:00+0000\n"
+"Last-Translator: GT IPTV Player Pro contributors\n"
+"Language-Team: zh_HK\n"
+"Language: zh_HK\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../GTIPTVPlayerPro/browser.py:155 ../GTIPTVPlayerPro/browser.py:7260
+#: ../GTIPTVPlayerPro/browser.py:7269 ../GTIPTVPlayerPro/browser.py:7339
+#: ../GTIPTVPlayerPro/browser.py:7364
+msgid "This source does not support the selected content type."
+msgstr "此來源不支援所選內容類型。"
+
+#: ../GTIPTVPlayerPro/browser.py:337
+msgid "NO RATING"
+msgstr "暫無評分"
+
+#: ../GTIPTVPlayerPro/browser.py:739
+#, python-brace-format
+msgid "{} added to favorites."
+msgstr "已將 {} 加入我的最愛。"
+
+#: ../GTIPTVPlayerPro/browser.py:741 ../GTIPTVPlayerPro/browser.py:6566
+#, python-brace-format
+msgid "{} removed from favorites."
+msgstr "已將 {} 從我的最愛移除。"
+
+#: ../GTIPTVPlayerPro/browser.py:742 ../GTIPTVPlayerPro/browser.py:6549
+msgid "Could not update favorites."
+msgstr "無法更新我的最愛。"
+
+#: ../GTIPTVPlayerPro/browser.py:4447
+msgid "CONTENT BROWSER"
+msgstr "內容瀏覽器"
+
+#: ../GTIPTVPlayerPro/browser.py:4520 ../GTIPTVPlayerPro/browser.py:5476
+#: ../GTIPTVPlayerPro/browser.py:13098 ../GTIPTVPlayerPro/browser.py:13138
+msgid "No content found."
+msgstr "找不到內容。"
+
+#: ../GTIPTVPlayerPro/browser.py:4538
+#: ../GTIPTVPlayerPro/category_filter_ui.py:175
+msgid "Loading content..."
+msgstr "正在載入內容..."
+
+#: ../GTIPTVPlayerPro/browser.py:4539 ../GTIPTVPlayerPro/browser.py:6948
+#: ../GTIPTVPlayerPro/browser.py:7272 ../GTIPTVPlayerPro/browser.py:7480
+#: ../GTIPTVPlayerPro/browser.py:7537 ../GTIPTVPlayerPro/browser.py:7626
+#: ../GTIPTVPlayerPro/browser.py:8706 ../GTIPTVPlayerPro/browser.py:9003
+#: ../GTIPTVPlayerPro/browser.py:9010 ../GTIPTVPlayerPro/browser.py:9013
+#: ../GTIPTVPlayerPro/browser.py:10900 ../GTIPTVPlayerPro/browser.py:11745
+#: ../GTIPTVPlayerPro/browser.py:12021 ../GTIPTVPlayerPro/browser.py:12985
+#: ../GTIPTVPlayerPro/browser.py:13066 ../GTIPTVPlayerPro/browser.py:13094
+#: ../GTIPTVPlayerPro/browser.py:13519 ../GTIPTVPlayerPro/browser.py:14291
+#: ../GTIPTVPlayerPro/browser.py:14629 ../GTIPTVPlayerPro/browser.py:14713
+#: ../GTIPTVPlayerPro/browser.py:16342 ../GTIPTVPlayerPro/browser.py:16360
+#: ../GTIPTVPlayerPro/browser.py:18208 ../GTIPTVPlayerPro/browser.py:19380
+#: ../GTIPTVPlayerPro/browser.py:21070 ../GTIPTVPlayerPro/browser.py:21335
+#: ../GTIPTVPlayerPro/category_filter_ui.py:177
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1295 ../GTIPTVPlayerPro/dvb_epg_ui.py:1920
+#: ../GTIPTVPlayerPro/main.py:5702 ../GTIPTVPlayerPro/main.py:5767
+#: ../GTIPTVPlayerPro/main.py:6363 ../GTIPTVPlayerPro/main.py:6393
+#: ../GTIPTVPlayerPro/main.py:6399 ../GTIPTVPlayerPro/main.py:6513
+#: ../GTIPTVPlayerPro/main.py:6590
+msgid "Please wait"
+msgstr "請稍候"
+
+#: ../GTIPTVPlayerPro/browser.py:4568 ../GTIPTVPlayerPro/browser.py:4593
+#: ../GTIPTVPlayerPro/browser.py:7251 ../GTIPTVPlayerPro/browser.py:13652
+#: ../GTIPTVPlayerPro/catchup.py:192 ../GTIPTVPlayerPro/content.py:614
+#: ../GTIPTVPlayerPro/content.py:628 ../GTIPTVPlayerPro/m3u.py:405
+#: ../GTIPTVPlayerPro/m3u.py:1003 ../GTIPTVPlayerPro/m3u.py:1011
+#: ../GTIPTVPlayerPro/playlist.py:856 ../GTIPTVPlayerPro/stalker.py:1396
+msgid "Request timed out"
+msgstr "請求逾時"
+
+#: ../GTIPTVPlayerPro/browser.py:4570 ../GTIPTVPlayerPro/browser.py:7253
+#: ../GTIPTVPlayerPro/catchup.py:190 ../GTIPTVPlayerPro/catchup_m3u.py:198
+#: ../GTIPTVPlayerPro/content.py:609 ../GTIPTVPlayerPro/content.py:921
+#: ../GTIPTVPlayerPro/content.py:944 ../GTIPTVPlayerPro/content.py:990
+#: ../GTIPTVPlayerPro/content.py:1001 ../GTIPTVPlayerPro/content.py:1026
+#: ../GTIPTVPlayerPro/m3u.py:403 ../GTIPTVPlayerPro/m3u.py:998
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:526 ../GTIPTVPlayerPro/m3u_epg_ui.py:1177
+#: ../GTIPTVPlayerPro/main.py:6072 ../GTIPTVPlayerPro/playlist.py:848
+#: ../GTIPTVPlayerPro/playlist.py:1350 ../GTIPTVPlayerPro/playlist.py:1361
+#: ../GTIPTVPlayerPro/playlist.py:1396 ../GTIPTVPlayerPro/playlist.py:1494
+#: ../GTIPTVPlayerPro/stalker.py:1388
+msgid "Request cancelled"
+msgstr "請求已取消"
+
+#: ../GTIPTVPlayerPro/browser.py:4575 ../GTIPTVPlayerPro/browser.py:13773
+msgid "Could not load content"
+msgstr "無法載入內容"
+
+#: ../GTIPTVPlayerPro/browser.py:4605 ../GTIPTVPlayerPro/browser.py:6652
+#: ../GTIPTVPlayerPro/browser.py:8262 ../GTIPTVPlayerPro/browser.py:8582
+#: ../GTIPTVPlayerPro/browser.py:8594 ../GTIPTVPlayerPro/browser.py:9007
+#: ../GTIPTVPlayerPro/browser.py:9023 ../GTIPTVPlayerPro/browser.py:9057
+#: ../GTIPTVPlayerPro/browser.py:13011
+msgid "Could not open the content list."
+msgstr "無法開啟內容清單。"
+
+#: ../GTIPTVPlayerPro/browser.py:4615
+msgid "Press GREEN to try again"
+msgstr "按綠鍵重試"
+
+#: ../GTIPTVPlayerPro/browser.py:4701
+msgid "LIVE TV CATEGORY SETTINGS"
+msgstr "直播類別設定"
+
+#: ../GTIPTVPlayerPro/browser.py:4702
+msgid "MOVIE CATEGORY SETTINGS"
+msgstr "電影類別設定"
+
+#: ../GTIPTVPlayerPro/browser.py:4703
+msgid "SERIES CATEGORY SETTINGS"
+msgstr "劇集類別設定"
+
+#: ../GTIPTVPlayerPro/browser.py:4752
+#: ../GTIPTVPlayerPro/category_filter_ui.py:56
+msgid "Category Manager"
+msgstr "類別管理"
+
+#: ../GTIPTVPlayerPro/browser.py:4753 ../GTIPTVPlayerPro/dvb_epg_ui.py:624
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:841 ../GTIPTVPlayerPro/main.py:4058
+#: ../GTIPTVPlayerPro/main.py:4381 ../GTIPTVPlayerPro/main.py:4512
+#: ../GTIPTVPlayerPro/remote_footer.py:90
+msgid "Settings"
+msgstr "設定"
+
+#: ../GTIPTVPlayerPro/browser.py:4848 ../GTIPTVPlayerPro/browser.py:8246
+msgid "No category found."
+msgstr "找不到類別。"
+
+#: ../GTIPTVPlayerPro/browser.py:4870 ../GTIPTVPlayerPro/content.py:130
+msgid "Category"
+msgstr "類別"
+
+#: ../GTIPTVPlayerPro/browser.py:4879 ../GTIPTVPlayerPro/browser.py:4926
+#: ../GTIPTVPlayerPro/category_filter_ui.py:193
+#: ../GTIPTVPlayerPro/category_filter_ui.py:226
+msgid "Hidden"
+msgstr "已隱藏"
+
+#: ../GTIPTVPlayerPro/browser.py:4924
+#: ../GTIPTVPlayerPro/category_filter_ui.py:194
+#: ../GTIPTVPlayerPro/category_filter_ui.py:225
+msgid "Visible"
+msgstr "可見"
+
+#: ../GTIPTVPlayerPro/browser.py:4933 ../GTIPTVPlayerPro/browser.py:4936
+msgid "Marked"
+msgstr "已標記"
+
+#: ../GTIPTVPlayerPro/browser.py:5014
+#, python-brace-format
+msgid "{} is always visible."
+msgstr "{} 永遠可見。"
+
+#: ../GTIPTVPlayerPro/browser.py:5022
+#: ../GTIPTVPlayerPro/category_filter_ui.py:53
+#: ../GTIPTVPlayerPro/category_filter_ui.py:58
+#: ../GTIPTVPlayerPro/category_filter_ui.py:220
+#: ../GTIPTVPlayerPro/category_filter_ui.py:301
+#: ../GTIPTVPlayerPro/remote_footer.py:132
+msgid "Filter Search"
+msgstr "搜尋篩選項目"
+
+#: ../GTIPTVPlayerPro/browser.py:5023
+msgid "Category shown."
+msgstr "類別已顯示。"
+
+#: ../GTIPTVPlayerPro/browser.py:5027
+msgid "Category hidden."
+msgstr "類別已隱藏。"
+
+#: ../GTIPTVPlayerPro/browser.py:5035
+msgid "Mark categories with RED first."
+msgstr "請先用紅色鍵標記分類。"
+
+#: ../GTIPTVPlayerPro/browser.py:5050
+msgid "Choose the destination with the arrows. OK places marked categories below the line; EXIT cancels."
+msgstr "用方向鍵選擇目標位置。OK 將已標記的分類放到線條下方；EXIT 取消。"
+
+#: ../GTIPTVPlayerPro/browser.py:5081
+msgid "Position updated. Press GREEN to save."
+msgstr "位置已更新。按綠鍵儲存。"
+
+#: ../GTIPTVPlayerPro/browser.py:5098 ../GTIPTVPlayerPro/browser.py:6525
+msgid "Move cancelled."
+msgstr "已取消移動。"
+
+#: ../GTIPTVPlayerPro/browser.py:5116
+msgid "Default order restored. Press GREEN to save."
+msgstr "已恢復預設順序。按綠鍵儲存。"
+
+#: ../GTIPTVPlayerPro/browser.py:5237 ../GTIPTVPlayerPro/main.py:5114
+#: ../GTIPTVPlayerPro/playlist.py:38
+msgid "Settings could not be saved. Check the receiver storage."
+msgstr "無法儲存設定。請檢查接收器儲存空間。"
+
+#: ../GTIPTVPlayerPro/browser.py:5251
+#, python-brace-format
+msgid "{} cannot be moved."
+msgstr "{} 無法移動。"
+
+#: ../GTIPTVPlayerPro/browser.py:5294
+msgid "Filters updated. Press GREEN to save."
+msgstr "篩選項目已更新。按綠色鍵儲存。"
+
+#: ../GTIPTVPlayerPro/browser.py:5358
+msgid "Continue Watching"
+msgstr "繼續觀看"
+
+#: ../GTIPTVPlayerPro/browser.py:5371
+msgid "Unfinished movies and series episodes"
+msgstr "未看完的電影和劇集集數"
+
+#: ../GTIPTVPlayerPro/browser.py:5544 ../GTIPTVPlayerPro/browser.py:6026
+#: ../GTIPTVPlayerPro/browser.py:6057 ../GTIPTVPlayerPro/browser.py:6268
+#: ../GTIPTVPlayerPro/content.py:43 ../GTIPTVPlayerPro/main.py:6683
+#: ../GTIPTVPlayerPro/main.py:6691 ../GTIPTVPlayerPro/main.py:6854
+#: ../GTIPTVPlayerPro/main.py:6866
+msgid "Movies"
+msgstr "電影"
+
+#: ../GTIPTVPlayerPro/browser.py:5544 ../GTIPTVPlayerPro/browser.py:6026
+#: ../GTIPTVPlayerPro/browser.py:6058 ../GTIPTVPlayerPro/browser.py:6269
+#: ../GTIPTVPlayerPro/browser.py:13077 ../GTIPTVPlayerPro/content.py:44
+#: ../GTIPTVPlayerPro/main.py:6684 ../GTIPTVPlayerPro/main.py:6692
+#: ../GTIPTVPlayerPro/main.py:6855 ../GTIPTVPlayerPro/main.py:6867
+msgid "Series"
+msgstr "劇集"
+
+#: ../GTIPTVPlayerPro/browser.py:5552
+#, python-brace-format
+msgid "S{}  •  E{}"
+msgstr "第{}季  •  第{}集"
+
+#: ../GTIPTVPlayerPro/browser.py:5571
+#, python-brace-format
+msgid "%{} • {} min remaining"
+msgstr "%{} • 剩餘 {} 分鐘"
+
+#: ../GTIPTVPlayerPro/browser.py:6055
+msgid "All"
+msgstr "全部"
+
+#: ../GTIPTVPlayerPro/browser.py:6056 ../GTIPTVPlayerPro/browser.py:6267
+#: ../GTIPTVPlayerPro/content.py:42 ../GTIPTVPlayerPro/main.py:6682
+#: ../GTIPTVPlayerPro/main.py:6687 ../GTIPTVPlayerPro/main.py:6690
+#: ../GTIPTVPlayerPro/main.py:6839 ../GTIPTVPlayerPro/main.py:6853
+#: ../GTIPTVPlayerPro/main.py:6865 ../GTIPTVPlayerPro/main.py:6870
+msgid "Live TV"
+msgstr "直播電視"
+
+#: ../GTIPTVPlayerPro/browser.py:6087 ../GTIPTVPlayerPro/browser.py:6110
+#: ../GTIPTVPlayerPro/browser.py:6336 ../GTIPTVPlayerPro/browser.py:6350
+#: ../GTIPTVPlayerPro/browser.py:6368
+msgid "Favorites"
+msgstr "我的最愛"
+
+#: ../GTIPTVPlayerPro/browser.py:6089
+msgid "Favorite channels, movies and series"
+msgstr "我的最愛頻道、電影及劇集"
+
+#: ../GTIPTVPlayerPro/browser.py:6148 ../GTIPTVPlayerPro/main.py:237
+#: ../GTIPTVPlayerPro/main.py:6095 ../GTIPTVPlayerPro/main.py:6747
+#: ../GTIPTVPlayerPro/main.py:8994 ../GTIPTVPlayerPro/remote_footer.py:87
+msgid "Source"
+msgstr "來源"
+
+#: ../GTIPTVPlayerPro/browser.py:6262
+msgid "No favorites have been added."
+msgstr "尚未加入任何我的最愛。"
+
+#: ../GTIPTVPlayerPro/browser.py:6271 ../GTIPTVPlayerPro/browser.py:19194
+#: ../GTIPTVPlayerPro/browser.py:21659 ../GTIPTVPlayerPro/remote_footer.py:123
+msgid "Favorite"
+msgstr "收藏"
+
+#: ../GTIPTVPlayerPro/browser.py:6336 ../GTIPTVPlayerPro/browser.py:6350
+#: ../GTIPTVPlayerPro/browser.py:6369 ../GTIPTVPlayerPro/browser.py:12219
+#: ../GTIPTVPlayerPro/main.py:5574 ../GTIPTVPlayerPro/main.py:6103
+#: ../GTIPTVPlayerPro/main.py:6109 ../GTIPTVPlayerPro/remote_footer.py:105
+#: ../GTIPTVPlayerPro/remote_footer.py:128
+msgid "Page"
+msgstr "頁面"
+
+#: ../GTIPTVPlayerPro/browser.py:6509
+msgid "Could not save the favorite order."
+msgstr "無法儲存我的最愛排序。"
+
+#: ../GTIPTVPlayerPro/browser.py:6513
+msgid "Favorite order saved."
+msgstr "已儲存我的最愛排序。"
+
+#: ../GTIPTVPlayerPro/browser.py:6577 ../GTIPTVPlayerPro/browser.py:6597
+msgid "This channel is no longer present in the M3U source."
+msgstr "此頻道已不在 M3U 來源中。"
+
+#: ../GTIPTVPlayerPro/browser.py:6735 ../GTIPTVPlayerPro/browser.py:6814
+#: ../GTIPTVPlayerPro/browser.py:6854 ../GTIPTVPlayerPro/browser.py:9288
+msgid "Search All Movies"
+msgstr "搜尋所有電影"
+
+#: ../GTIPTVPlayerPro/browser.py:6743 ../GTIPTVPlayerPro/browser.py:13116
+#: ../GTIPTVPlayerPro/browser.py:13155 ../GTIPTVPlayerPro/dvb_epg_ui.py:2147
+#: ../GTIPTVPlayerPro/main.py:3747 ../GTIPTVPlayerPro/main.py:3984
+#: ../GTIPTVPlayerPro/remote_footer.py:121
+msgid "Search"
+msgstr "搜尋"
+
+#: ../GTIPTVPlayerPro/browser.py:6744 ../GTIPTVPlayerPro/browser.py:6762
+#: ../GTIPTVPlayerPro/browser.py:6763 ../GTIPTVPlayerPro/browser.py:6893
+#: ../GTIPTVPlayerPro/browser.py:7266 ../GTIPTVPlayerPro/browser.py:7371
+msgid "Enter a movie name."
+msgstr "輸入電影名稱。"
+
+#: ../GTIPTVPlayerPro/browser.py:6747 ../GTIPTVPlayerPro/browser.py:9287
+#: ../GTIPTVPlayerPro/content.py:43
+msgid "All Movies"
+msgstr "所有電影"
+
+#: ../GTIPTVPlayerPro/browser.py:6757 ../GTIPTVPlayerPro/browser.py:7356
+#: ../GTIPTVPlayerPro/browser.py:8790 ../GTIPTVPlayerPro/browser.py:10205
+msgid "Selecting movie..."
+msgstr "正在選擇電影..."
+
+#: ../GTIPTVPlayerPro/browser.py:6761 ../GTIPTVPlayerPro/browser.py:8794
+msgid "MOVIE SUMMARY"
+msgstr "電影摘要"
+
+#: ../GTIPTVPlayerPro/browser.py:6844 ../GTIPTVPlayerPro/browser.py:7632
+#: ../GTIPTVPlayerPro/browser.py:13104
+#: ../GTIPTVPlayerPro/category_filter_ui.py:292
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2229 ../GTIPTVPlayerPro/m3u_epg_ui.py:985
+#: ../GTIPTVPlayerPro/main.py:3976 ../GTIPTVPlayerPro/main.py:4171
+#: ../GTIPTVPlayerPro/main.py:4989 ../GTIPTVPlayerPro/main.py:7053
+#: ../GTIPTVPlayerPro/main.py:7703 ../GTIPTVPlayerPro/main.py:8163
+#: ../GTIPTVPlayerPro/main.py:8414
+msgid "The virtual keyboard is unavailable on this image."
+msgstr "此映像版本不提供虛擬鍵盤。"
+
+#: ../GTIPTVPlayerPro/browser.py:6849 ../GTIPTVPlayerPro/browser.py:7637
+#: ../GTIPTVPlayerPro/browser.py:13110
+#: ../GTIPTVPlayerPro/category_filter_ui.py:297
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2232 ../GTIPTVPlayerPro/m3u_epg_ui.py:989
+#: ../GTIPTVPlayerPro/main.py:3979 ../GTIPTVPlayerPro/main.py:4174
+#: ../GTIPTVPlayerPro/main.py:4992 ../GTIPTVPlayerPro/main.py:7057
+#: ../GTIPTVPlayerPro/main.py:7707 ../GTIPTVPlayerPro/main.py:8167
+#: ../GTIPTVPlayerPro/main.py:8417
+msgid "Could not open the virtual keyboard."
+msgstr "無法開啟虛擬鍵盤。"
+
+#: ../GTIPTVPlayerPro/browser.py:7255 ../GTIPTVPlayerPro/playlist.py:1429
+msgid "Server denied access"
+msgstr "伺服器拒絕存取"
+
+#: ../GTIPTVPlayerPro/browser.py:7257 ../GTIPTVPlayerPro/content.py:753
+#: ../GTIPTVPlayerPro/playlist.py:1431
+msgid "Server request limit reached"
+msgstr "已達到伺服器請求上限"
+
+#: ../GTIPTVPlayerPro/browser.py:7262 ../GTIPTVPlayerPro/browser.py:7344
+#: ../GTIPTVPlayerPro/browser.py:7367 ../GTIPTVPlayerPro/browser.py:9428
+#: ../GTIPTVPlayerPro/browser.py:9495
+msgid "Could not load movies"
+msgstr "無法載入電影"
+
+#: ../GTIPTVPlayerPro/browser.py:7275
+#, python-brace-format
+msgid "{movies} movies • {results} results"
+msgstr "{movies} 部電影 • {results} 個結果"
+
+#: ../GTIPTVPlayerPro/browser.py:7303 ../GTIPTVPlayerPro/browser.py:7388
+#: ../GTIPTVPlayerPro/content.py:230 ../GTIPTVPlayerPro/metadata.py:888
+msgid "Movie"
+msgstr "電影"
+
+#: ../GTIPTVPlayerPro/browser.py:7346 ../GTIPTVPlayerPro/browser.py:7369
+msgid "No movies matched this search."
+msgstr "沒有與此搜尋配對的電影。"
+
+#: ../GTIPTVPlayerPro/browser.py:7407 ../GTIPTVPlayerPro/browser.py:10808
+#: ../GTIPTVPlayerPro/browser.py:10832 ../GTIPTVPlayerPro/browser.py:12712
+#: ../GTIPTVPlayerPro/browser.py:12748
+msgid "Information unavailable."
+msgstr "資訊無法使用。"
+
+#: ../GTIPTVPlayerPro/browser.py:7422 ../GTIPTVPlayerPro/browser.py:10841
+msgid "Movie summary unavailable."
+msgstr "電影摘要無法使用。"
+
+#: ../GTIPTVPlayerPro/browser.py:7499 ../GTIPTVPlayerPro/browser.py:8146
+msgid "Select content before using favorites."
+msgstr "使用我的最愛前，請先選擇內容。"
+
+#: ../GTIPTVPlayerPro/browser.py:7588 ../GTIPTVPlayerPro/browser.py:7642
+msgid "Search All Channels"
+msgstr "搜尋所有頻道"
+
+#: ../GTIPTVPlayerPro/browser.py:7591 ../GTIPTVPlayerPro/content.py:42
+#: ../GTIPTVPlayerPro/m3u.py:1223
+msgid "All Channels"
+msgstr "所有頻道"
+
+#: ../GTIPTVPlayerPro/browser.py:7594
+msgid "M3U CHANNEL SEARCH"
+msgstr "M3U 頻道搜尋"
+
+#: ../GTIPTVPlayerPro/browser.py:7678
+msgid "No channels matched this search."
+msgstr "沒有與此搜尋配對的頻道。"
+
+#: ../GTIPTVPlayerPro/browser.py:7679
+msgid "Enter a channel name."
+msgstr "請輸入頻道名稱。"
+
+#: ../GTIPTVPlayerPro/browser.py:7691
+#, python-brace-format
+msgid "First {} matching channels"
+msgstr "前 {} 個配對頻道"
+
+#: ../GTIPTVPlayerPro/browser.py:7695
+#, python-brace-format
+msgid "{} channels found"
+msgstr "找到 {} 個頻道"
+
+#: ../GTIPTVPlayerPro/browser.py:8027
+#, python-brace-format
+msgid "{}  |  Select a category"
+msgstr "{}  |  選擇類別"
+
+#: ../GTIPTVPlayerPro/browser.py:8045
+msgid "LIVE TV CATEGORIES"
+msgstr "直播電視類別"
+
+#: ../GTIPTVPlayerPro/browser.py:8052
+msgid "5-DAY WEATHER FORECAST"
+msgstr "5 日天氣預報"
+
+#: ../GTIPTVPlayerPro/browser.py:8056
+msgid "TODAY"
+msgstr "今天"
+
+#: ../GTIPTVPlayerPro/browser.py:8058 ../GTIPTVPlayerPro/browser.py:19199
+#: ../GTIPTVPlayerPro/browser.py:23060
+msgid "Loading weather data"
+msgstr "正在載入天氣資料"
+
+#: ../GTIPTVPlayerPro/browser.py:8273
+msgid "No categories found; press GREEN to try again."
+msgstr "找不到類別；請按綠鍵重試。"
+
+#: ../GTIPTVPlayerPro/browser.py:8307 ../GTIPTVPlayerPro/browser.py:8967
+#: ../GTIPTVPlayerPro/browser.py:11329
+msgid "Categories"
+msgstr "類別"
+
+#: ../GTIPTVPlayerPro/browser.py:8382 ../GTIPTVPlayerPro/main.py:4751
+msgid "Category edit lock data is damaged. Remove and reinstall the plugin to reset only this lock."
+msgstr "類別編輯鎖資料已損壞。請移除並重新安裝外掛程式，只重設此鎖。"
+
+#: ../GTIPTVPlayerPro/browser.py:8395
+msgid "Category editor locked"
+msgstr "類別編輯器已鎖定"
+
+#: ../GTIPTVPlayerPro/browser.py:8396
+msgid "Enter the 4-digit category edit PIN."
+msgstr "請輸入4位數類別編輯PIN。"
+
+#: ../GTIPTVPlayerPro/browser.py:8415 ../GTIPTVPlayerPro/browser.py:8436
+#: ../GTIPTVPlayerPro/main.py:4707 ../GTIPTVPlayerPro/main.py:4728
+msgid "The PIN entry screen is unavailable on this image."
+msgstr "此映像不支援PIN輸入畫面。"
+
+#: ../GTIPTVPlayerPro/browser.py:8447 ../GTIPTVPlayerPro/main.py:4856
+msgid "Category lock recovery"
+msgstr "類別鎖復原"
+
+#: ../GTIPTVPlayerPro/browser.py:8448 ../GTIPTVPlayerPro/main.py:4857
+msgid "Enter the 12-digit recovery code."
+msgstr "請輸入12位數復原碼。"
+
+#: ../GTIPTVPlayerPro/browser.py:8457
+msgid "Incorrect PIN. Category editor remains locked."
+msgstr "PIN錯誤。類別編輯器仍保持鎖定。"
+
+#: ../GTIPTVPlayerPro/browser.py:8476
+msgid "Incorrect recovery code. Category editor remains locked."
+msgstr "復原碼錯誤。類別編輯器仍保持鎖定。"
+
+#: ../GTIPTVPlayerPro/browser.py:8487
+msgid "Create a new category edit PIN"
+msgstr "建立新的類別編輯PIN"
+
+#: ../GTIPTVPlayerPro/browser.py:8488 ../GTIPTVPlayerPro/main.py:4788
+msgid "Enter a new 4-digit PIN."
+msgstr "請輸入新的4位數PIN。"
+
+#: ../GTIPTVPlayerPro/browser.py:8497
+msgid "Confirm the new category edit PIN"
+msgstr "確認新的類別編輯PIN"
+
+#: ../GTIPTVPlayerPro/browser.py:8498 ../GTIPTVPlayerPro/main.py:4798
+msgid "Enter the same 4-digit PIN again."
+msgstr "再次輸入相同的4位數PIN。"
+
+#: ../GTIPTVPlayerPro/browser.py:8509 ../GTIPTVPlayerPro/main.py:4810
+msgid "The PIN entries do not match. Nothing was changed."
+msgstr "兩次輸入的PIN不相符。未作任何變更。"
+
+#: ../GTIPTVPlayerPro/browser.py:8526
+msgid "The new PIN could not be saved. Category editor remains locked."
+msgstr "無法儲存新PIN。類別編輯器仍保持鎖定。"
+
+#: ../GTIPTVPlayerPro/browser.py:8537
+#, python-brace-format
+msgid ""
+"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
+"\n"
+"{}"
+msgstr ""
+"復原成功。請記下新的復原碼；此復原碼只會顯示一次：\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/browser.py:8540
+msgid "Category edit PIN renewed."
+msgstr "類別編輯PIN已更新。"
+
+#: ../GTIPTVPlayerPro/browser.py:8780
+msgid "MOVIE CATEGORIES"
+msgstr "電影類別"
+
+#: ../GTIPTVPlayerPro/browser.py:8786
+msgid ""
+"GT\n"
+"MOVIE"
+msgstr ""
+"GT\n"
+"電影"
+
+#: ../GTIPTVPlayerPro/browser.py:8796
+msgid "The selected movie's details will be loaded from the server."
+msgstr "將從伺服器載入所選電影的詳細資訊。"
+
+#: ../GTIPTVPlayerPro/browser.py:8804
+msgid "MOVIES IN THE SELECTED CATEGORY"
+msgstr "所選類別中的電影"
+
+#: ../GTIPTVPlayerPro/browser.py:8908
+msgid "Movie category not found"
+msgstr "找不到電影類別"
+
+#: ../GTIPTVPlayerPro/browser.py:9292
+msgid "Press BLUE to search all movies."
+msgstr "按藍色鍵搜尋所有電影。"
+
+#: ../GTIPTVPlayerPro/browser.py:9391
+#, python-brace-format
+msgid "{} • LOADING MOVIES"
+msgstr "{} • 正在載入電影"
+
+#: ../GTIPTVPlayerPro/browser.py:9525
+#, python-brace-format
+msgid "{} • {} MOVIES"
+msgstr "{} • {} 部電影"
+
+#: ../GTIPTVPlayerPro/browser.py:9603
+msgid "Movie request timed out"
+msgstr "電影請求逾時"
+
+#: ../GTIPTVPlayerPro/browser.py:10220
+msgid "Loading movie information from the server."
+msgstr "正在從伺服器載入電影資訊。"
+
+#: ../GTIPTVPlayerPro/browser.py:10228
+msgid "COULD NOT LOAD MOVIES"
+msgstr "無法載入電影"
+
+#: ../GTIPTVPlayerPro/browser.py:10233
+msgid "NO MOVIES FOUND IN THIS CATEGORY"
+msgstr "此類別中沒有電影"
+
+#: ../GTIPTVPlayerPro/browser.py:10234
+msgid "Try another category."
+msgstr "請嘗試其他類別。"
+
+#: ../GTIPTVPlayerPro/browser.py:10811
+msgid "Movie information unavailable."
+msgstr "電影資訊無法使用。"
+
+#: ../GTIPTVPlayerPro/browser.py:10837
+msgid "Genre unavailable"
+msgstr "類型無法使用"
+
+#: ../GTIPTVPlayerPro/browser.py:10846 ../GTIPTVPlayerPro/browser.py:12758
+#, python-brace-format
+msgid "Director: {}"
+msgstr "導演：{}"
+
+#: ../GTIPTVPlayerPro/browser.py:10850 ../GTIPTVPlayerPro/browser.py:12760
+#, python-brace-format
+msgid "Cast: {}"
+msgstr "演員：{}"
+
+#: ../GTIPTVPlayerPro/browser.py:11140
+#, python-brace-format
+msgid "{}   |   CONTENT BROWSER"
+msgstr "{}   |   內容瀏覽器"
+
+#: ../GTIPTVPlayerPro/browser.py:11166
+msgid "CATEGORIES"
+msgstr "類別"
+
+#: ../GTIPTVPlayerPro/browser.py:11174
+msgid ""
+"GT\n"
+"SERIES"
+msgstr ""
+"GT\n"
+"劇集"
+
+#: ../GTIPTVPlayerPro/browser.py:11176 ../GTIPTVPlayerPro/browser.py:19374
+#: ../GTIPTVPlayerPro/main.py:445 ../GTIPTVPlayerPro/main.py:9014
+msgid "SERIES"
+msgstr "劇集"
+
+#: ../GTIPTVPlayerPro/browser.py:11191 ../GTIPTVPlayerPro/browser.py:11983
+msgid "Selecting series..."
+msgstr "正在選擇劇集..."
+
+#: ../GTIPTVPlayerPro/browser.py:11194
+msgid "SERIES SUMMARY"
+msgstr "劇集摘要"
+
+#: ../GTIPTVPlayerPro/browser.py:11195 ../GTIPTVPlayerPro/browser.py:11998
+msgid "Loading series information from the server."
+msgstr "正在從伺服器載入劇集資訊。"
+
+#: ../GTIPTVPlayerPro/browser.py:11298
+msgid "Series category not found"
+msgstr "找不到劇集類別"
+
+#: ../GTIPTVPlayerPro/browser.py:11491
+#, python-brace-format
+msgid "{} • LOADING SERIES"
+msgstr "{} • 正在載入劇集"
+
+#: ../GTIPTVPlayerPro/browser.py:11532 ../GTIPTVPlayerPro/browser.py:11606
+msgid "Could not load series"
+msgstr "無法載入劇集"
+
+#: ../GTIPTVPlayerPro/browser.py:11653
+#, python-brace-format
+msgid "Series scan • {} pages"
+msgstr "劇集掃描 • {} 頁"
+
+#: ../GTIPTVPlayerPro/browser.py:11696
+#, python-brace-format
+msgid "{} • {} SERIES"
+msgstr "{} • {} 部劇集"
+
+#: ../GTIPTVPlayerPro/browser.py:11800
+msgid "Series request timed out"
+msgstr "劇集請求逾時"
+
+#: ../GTIPTVPlayerPro/browser.py:12012
+msgid "COULD NOT LOAD SERIES"
+msgstr "無法載入劇集"
+
+#: ../GTIPTVPlayerPro/browser.py:12027
+msgid "SERIES DATA COULD NOT BE READ"
+msgstr "無法讀取劇集資料"
+
+#: ../GTIPTVPlayerPro/browser.py:12029
+msgid "The series response uses an unsupported format. Categories remain available."
+msgstr "劇集回應使用了不支援的格式。類別仍然可用。"
+
+#: ../GTIPTVPlayerPro/browser.py:12032
+msgid "SERIES DATA UNAVAILABLE"
+msgstr "劇集資料無法使用"
+
+#: ../GTIPTVPlayerPro/browser.py:12034
+msgid "The server did not answer the series request. Categories remain available."
+msgstr "伺服器未回應劇集請求。類別仍然可用。"
+
+#: ../GTIPTVPlayerPro/browser.py:12038
+msgid "NO SERIES FOUND IN THIS CATEGORY"
+msgstr "此類別中沒有劇集"
+
+#: ../GTIPTVPlayerPro/browser.py:12041
+msgid "No series were found on this server or in this category."
+msgstr "此伺服器或類別中沒有劇集。"
+
+#: ../GTIPTVPlayerPro/browser.py:12716 ../GTIPTVPlayerPro/browser.py:12752
+msgid "Series summary unavailable."
+msgstr "劇集摘要無法使用。"
+
+#: ../GTIPTVPlayerPro/browser.py:12740 ../GTIPTVPlayerPro/browser.py:12741
+msgid "Seasons"
+msgstr "季"
+
+#: ../GTIPTVPlayerPro/browser.py:13244 ../GTIPTVPlayerPro/browser.py:23057
+#: ../GTIPTVPlayerPro/browser.py:23077
+msgid "Weather is disabled"
+msgstr "天氣已停用"
+
+#: ../GTIPTVPlayerPro/browser.py:13245
+msgid "You can enable it in Settings."
+msgstr "您可以在「設定」中啟用它。"
+
+#: ../GTIPTVPlayerPro/browser.py:13248
+msgid "Loading forecast"
+msgstr "正在載入天氣預報"
+
+#: ../GTIPTVPlayerPro/browser.py:13351 ../GTIPTVPlayerPro/weather.py:497
+#: ../GTIPTVPlayerPro/weather.py:539 ../GTIPTVPlayerPro/weather.py:573
+msgid "Weather request timed out"
+msgstr "天氣請求逾時"
+
+#: ../GTIPTVPlayerPro/browser.py:13352 ../GTIPTVPlayerPro/browser.py:13364
+#: ../GTIPTVPlayerPro/main.py:3845 ../GTIPTVPlayerPro/main.py:3859
+#: ../GTIPTVPlayerPro/main.py:4202 ../GTIPTVPlayerPro/main.py:4268
+msgid "Weather data unavailable."
+msgstr "天氣資料無法使用。"
+
+#: ../GTIPTVPlayerPro/browser.py:13389
+#, python-brace-format
+msgid "Humidity {}% • Wind {:.0f} km/h"
+msgstr "濕度 {}% • 風速 {:.0f} 公里/小時"
+
+#: ../GTIPTVPlayerPro/browser.py:13394
+msgid "  •  Cached"
+msgstr "  •  已快取"
+
+#: ../GTIPTVPlayerPro/browser.py:13396
+#, python-brace-format
+msgid "Updated: {}{}"
+msgstr "已更新：{}{}"
+
+#: ../GTIPTVPlayerPro/browser.py:13406
+msgid "Today"
+msgstr "今天"
+
+#: ../GTIPTVPlayerPro/browser.py:13827
+#, python-brace-format
+msgid "%{}  •  {} MIN REMAINING"
+msgstr "%{}  •  剩餘 {} 分鐘"
+
+#: ../GTIPTVPlayerPro/browser.py:14080
+msgid "CHANNEL LIST"
+msgstr "頻道清單"
+
+#: ../GTIPTVPlayerPro/browser.py:14094 ../GTIPTVPlayerPro/browser.py:15960
+#: ../GTIPTVPlayerPro/browser.py:19184 ../GTIPTVPlayerPro/browser.py:21623
+msgid "NOW"
+msgstr "現在"
+
+#: ../GTIPTVPlayerPro/browser.py:14095 ../GTIPTVPlayerPro/browser.py:14113
+#: ../GTIPTVPlayerPro/browser.py:14142 ../GTIPTVPlayerPro/browser.py:14185
+#: ../GTIPTVPlayerPro/browser.py:14617 ../GTIPTVPlayerPro/browser.py:14660
+msgid "SELECT A CHANNEL"
+msgstr "選擇頻道"
+
+#: ../GTIPTVPlayerPro/browser.py:14096 ../GTIPTVPlayerPro/browser.py:14125
+#: ../GTIPTVPlayerPro/browser.py:15900 ../GTIPTVPlayerPro/browser.py:15910
+msgid "Waiting for programme information"
+msgstr "正在等待節目資訊"
+
+#: ../GTIPTVPlayerPro/browser.py:14099 ../GTIPTVPlayerPro/browser.py:14116
+#: ../GTIPTVPlayerPro/browser.py:15902 ../GTIPTVPlayerPro/browser.py:15920
+#: ../GTIPTVPlayerPro/browser.py:15963 ../GTIPTVPlayerPro/browser.py:15987
+#: ../GTIPTVPlayerPro/browser.py:19186 ../GTIPTVPlayerPro/browser.py:19346
+#: ../GTIPTVPlayerPro/browser.py:21626
+msgid "NEXT"
+msgstr "下一個"
+
+#: ../GTIPTVPlayerPro/browser.py:14124
+msgid "PROGRAMME SUMMARY"
+msgstr "節目摘要"
+
+#: ../GTIPTVPlayerPro/browser.py:14326 ../GTIPTVPlayerPro/browser.py:14341
+#: ../GTIPTVPlayerPro/browser.py:14872 ../GTIPTVPlayerPro/browser.py:14874
+#: ../GTIPTVPlayerPro/browser.py:16389 ../GTIPTVPlayerPro/browser.py:16394
+#: ../GTIPTVPlayerPro/browser.py:16475 ../GTIPTVPlayerPro/browser.py:16487
+#: ../GTIPTVPlayerPro/browser.py:16496 ../GTIPTVPlayerPro/browser.py:18336
+#: ../GTIPTVPlayerPro/browser.py:20771 ../GTIPTVPlayerPro/browser.py:20843
+#: ../GTIPTVPlayerPro/browser.py:21506
+msgid "Could not open the stream."
+msgstr "無法開啟串流。"
+
+#: ../GTIPTVPlayerPro/browser.py:14478
+msgid "No channels found; press GREEN to try again."
+msgstr "找不到頻道；請按綠鍵重試。"
+
+#: ../GTIPTVPlayerPro/browser.py:15918 ../GTIPTVPlayerPro/browser.py:15923
+#: ../GTIPTVPlayerPro/browser.py:15943 ../GTIPTVPlayerPro/browser.py:15995
+#: ../GTIPTVPlayerPro/browser.py:20160 ../GTIPTVPlayerPro/browser.py:20171
+#: ../GTIPTVPlayerPro/browser.py:21630
+msgid "EPG information unavailable."
+msgstr "EPG 資訊無法使用。"
+
+#: ../GTIPTVPlayerPro/browser.py:15934 ../GTIPTVPlayerPro/browser.py:16015
+msgid "No summary is available for this programme."
+msgstr "此節目沒有可用的摘要。"
+
+#: ../GTIPTVPlayerPro/browser.py:15963
+msgid "LATER"
+msgstr "稍後"
+
+#: ../GTIPTVPlayerPro/browser.py:16589 ../GTIPTVPlayerPro/browser.py:20008
+#: ../GTIPTVPlayerPro/browser.py:21192 ../GTIPTVPlayerPro/browser.py:21510
+#: ../GTIPTVPlayerPro/browser.py:22231 ../GTIPTVPlayerPro/browser.py:22272
+#: ../GTIPTVPlayerPro/browser.py:23860 ../GTIPTVPlayerPro/browser.py:23950
+msgid "Keeping the current stream"
+msgstr "保留目前串流"
+
+#: ../GTIPTVPlayerPro/browser.py:16747
+#, python-brace-format
+msgid "{}  >  Series  >  Select season and episode"
+msgstr "{}  >  劇集  >  選擇季和集數"
+
+#: ../GTIPTVPlayerPro/browser.py:16765 ../GTIPTVPlayerPro/browser.py:16768
+msgid "EPISODES"
+msgstr "集數"
+
+#: ../GTIPTVPlayerPro/browser.py:16859
+msgid "No episodes were found for this series."
+msgstr "找不到此劇集的集數。"
+
+#: ../GTIPTVPlayerPro/browser.py:16975
+msgid "Enigma2 player service support is unavailable"
+msgstr "Enigma2 播放器服務支援無法使用"
+
+#: ../GTIPTVPlayerPro/browser.py:18063
+#, python-brace-format
+msgid ""
+"Resume playback from the saved position?\n"
+"\n"
+"Saved position: {}"
+msgstr ""
+"是否從已儲存的位置繼續播放？\n"
+"\n"
+"已儲存的位置：{}"
+
+#: ../GTIPTVPlayerPro/browser.py:18254 ../GTIPTVPlayerPro/browser.py:18268
+msgid "Stream link timed out"
+msgstr "串流鏈接請求逾時"
+
+#: ../GTIPTVPlayerPro/browser.py:18334 ../GTIPTVPlayerPro/catchup_ui.py:542
+msgid "Could not open the archived programme."
+msgstr "無法開啟重溫節目。"
+
+#: ../GTIPTVPlayerPro/browser.py:19178
+msgid "Player"
+msgstr "播放器"
+
+#: ../GTIPTVPlayerPro/browser.py:19179 ../GTIPTVPlayerPro/browser.py:21617
+msgid "Reading resolution"
+msgstr "正在讀取分辨率"
+
+#: ../GTIPTVPlayerPro/browser.py:19181 ../GTIPTVPlayerPro/browser.py:21619
+#: ../GTIPTVPlayerPro/browser.py:23514
+msgid "VIDEO: --"
+msgstr "影片：--"
+
+#: ../GTIPTVPlayerPro/browser.py:19182 ../GTIPTVPlayerPro/browser.py:21620
+#: ../GTIPTVPlayerPro/browser.py:23522
+msgid "AUDIO: --"
+msgstr "音訊：--"
+
+#: ../GTIPTVPlayerPro/browser.py:19185 ../GTIPTVPlayerPro/browser.py:21632
+msgid "Loading EPG..."
+msgstr "正在載入 EPG..."
+
+#: ../GTIPTVPlayerPro/browser.py:19330 ../GTIPTVPlayerPro/browser.py:19344
+#: ../GTIPTVPlayerPro/browser.py:19351 ../GTIPTVPlayerPro/browser.py:19360
+#: ../GTIPTVPlayerPro/browser.py:19369 ../GTIPTVPlayerPro/main.py:430
+msgid "LIVE TV"
+msgstr "直播電視"
+
+#: ../GTIPTVPlayerPro/browser.py:19330
+msgid "EPG information unavailable"
+msgstr "EPG 資訊無法使用"
+
+#: ../GTIPTVPlayerPro/browser.py:19366 ../GTIPTVPlayerPro/browser.py:19394
+#: ../GTIPTVPlayerPro/browser.py:21626
+msgid "REMAINING"
+msgstr "剩餘"
+
+#: ../GTIPTVPlayerPro/browser.py:19373 ../GTIPTVPlayerPro/catchup_ui.py:240
+#: ../GTIPTVPlayerPro/catchup_ui.py:481 ../GTIPTVPlayerPro/main.py:435
+msgid "TV Archive"
+msgstr "電視重溫"
+
+#: ../GTIPTVPlayerPro/browser.py:19374 ../GTIPTVPlayerPro/main.py:440
+#: ../GTIPTVPlayerPro/main.py:9013
+msgid "MOVIES"
+msgstr "電影"
+
+#: ../GTIPTVPlayerPro/browser.py:20687
+msgid "Could not start the player."
+msgstr "無法啟動播放器。"
+
+#: ../GTIPTVPlayerPro/browser.py:21068 ../GTIPTVPlayerPro/browser.py:21333
+msgid "Reconnecting the stream..."
+msgstr "正在重新連線串流..."
+
+#: ../GTIPTVPlayerPro/browser.py:21623
+msgid "PREVIOUS"
+msgstr "上一個"
+
+#: ../GTIPTVPlayerPro/browser.py:21637
+msgid "Reading duration..."
+msgstr "正在讀取時長..."
+
+#: ../GTIPTVPlayerPro/browser.py:21734
+msgid "Audio track"
+msgstr "音軌"
+
+#: ../GTIPTVPlayerPro/browser.py:21824
+msgid "No audio tracks are available."
+msgstr "沒有可用的音軌。"
+
+#: ../GTIPTVPlayerPro/browser.py:21828
+msgid "This content has only one audio track."
+msgstr "此內容只有一條音軌。"
+
+#: ../GTIPTVPlayerPro/browser.py:21833 ../GTIPTVPlayerPro/browser.py:21843
+#: ../GTIPTVPlayerPro/browser.py:21897 ../GTIPTVPlayerPro/browser.py:21902
+#: ../GTIPTVPlayerPro/browser.py:21944
+msgid "Audio track selection is unavailable on this image."
+msgstr "此映像版本不支援音軌選擇。"
+
+#: ../GTIPTVPlayerPro/browser.py:21882 ../GTIPTVPlayerPro/browser.py:21891
+msgid "Audio tracks"
+msgstr "音軌"
+
+#: ../GTIPTVPlayerPro/browser.py:21911
+msgid "The playing service changed. Open audio selection again."
+msgstr "播放服務已變更。請重新開啟音軌選擇。"
+
+#: ../GTIPTVPlayerPro/browser.py:21929 ../GTIPTVPlayerPro/browser.py:21938
+msgid "Audio tracks changed. Open audio selection again."
+msgstr "音軌已變更。請重新開啟音軌選擇。"
+
+#: ../GTIPTVPlayerPro/browser.py:21954
+msgid "Could not select the requested audio track."
+msgstr "無法選擇要求的音軌。"
+
+#: ../GTIPTVPlayerPro/browser.py:21966 ../GTIPTVPlayerPro/browser.py:23517
+#, python-brace-format
+msgid "AUDIO: {}"
+msgstr "音訊：{}"
+
+#: ../GTIPTVPlayerPro/browser.py:22084
+msgid "Changing channel..."
+msgstr "正在切換頻道..."
+
+#: ../GTIPTVPlayerPro/browser.py:22227 ../GTIPTVPlayerPro/browser.py:22268
+msgid "Could not open the channel."
+msgstr "無法開啟頻道。"
+
+#: ../GTIPTVPlayerPro/browser.py:22366 ../GTIPTVPlayerPro/browser.py:22489
+#: ../GTIPTVPlayerPro/browser.py:22543 ../GTIPTVPlayerPro/browser.py:23001
+msgid "PAUSED"
+msgstr "已暫停"
+
+#: ../GTIPTVPlayerPro/browser.py:22366
+msgid "SEEK MODE"
+msgstr "跳轉模式"
+
+#: ../GTIPTVPlayerPro/browser.py:22367
+msgid "LEFT / RIGHT to select time   •   OK to continue"
+msgstr "左/右選擇時間   •   OK 繼續"
+
+#: ../GTIPTVPlayerPro/browser.py:22490 ../GTIPTVPlayerPro/browser.py:22544
+#: ../GTIPTVPlayerPro/browser.py:23002
+msgid "PLAY / PAUSE to continue   •   STOP to close the video"
+msgstr "PLAY / PAUSE 繼續   •   STOP 關閉影片"
+
+#: ../GTIPTVPlayerPro/browser.py:22686
+msgid "THIS STREAM CANNOT BE SEEKED"
+msgstr "此串流無法跳轉"
+
+#: ../GTIPTVPlayerPro/browser.py:22687
+msgid "The server or playback format does not support seeking"
+msgstr "伺服器或播放格式不支援跳轉"
+
+#: ../GTIPTVPlayerPro/browser.py:22715
+msgid "SEEK FORWARD"
+msgstr "快進"
+
+#: ../GTIPTVPlayerPro/browser.py:22717
+msgid "SEEK BACKWARD"
+msgstr "快退"
+
+#: ../GTIPTVPlayerPro/browser.py:22721
+msgid "LEFT / RIGHT to select time   •   OK to continue   •   EXIT to cancel"
+msgstr "左/右選擇時間   •   OK 繼續   •   EXIT 取消"
+
+#: ../GTIPTVPlayerPro/browser.py:22983
+msgid "PAUSE IS NOT AVAILABLE"
+msgstr "暫停無法使用"
+
+#: ../GTIPTVPlayerPro/browser.py:22984
+msgid "This server or playback format does not support pausing"
+msgstr "此伺服器或播放格式不支援暫停"
+
+#: ../GTIPTVPlayerPro/browser.py:23079
+msgid "Weather information is not ready"
+msgstr "天氣資訊尚未就緒"
+
+#: ../GTIPTVPlayerPro/browser.py:23154
+msgid "Could not load the weather forecast"
+msgstr "無法載入天氣預報"
+
+#: ../GTIPTVPlayerPro/browser.py:23179 ../GTIPTVPlayerPro/browser.py:23192
+msgid "Weather information unavailable."
+msgstr "天氣資訊無法使用。"
+
+#: ../GTIPTVPlayerPro/browser.py:23492
+msgid "Resolution: --"
+msgstr "分辨率：--"
+
+#: ../GTIPTVPlayerPro/browser.py:23509
+#, python-brace-format
+msgid "VIDEO: {}"
+msgstr "影片：{}"
+
+#: ../GTIPTVPlayerPro/catchup.py:91 ../GTIPTVPlayerPro/content.py:292
+msgid "No programme information"
+msgstr "沒有節目資訊"
+
+#: ../GTIPTVPlayerPro/catchup.py:122 ../GTIPTVPlayerPro/catchup.py:495
+#: ../GTIPTVPlayerPro/catchup.py:543 ../GTIPTVPlayerPro/catchup_m3u.py:200
+#: ../GTIPTVPlayerPro/catchup_ui.py:375 ../GTIPTVPlayerPro/catchup_ui.py:387
+msgid "Could not load the TV archive."
+msgstr "無法載入電視重溫。"
+
+#: ../GTIPTVPlayerPro/catchup.py:187 ../GTIPTVPlayerPro/catchup.py:356
+#: ../GTIPTVPlayerPro/catchup.py:363 ../GTIPTVPlayerPro/catchup.py:410
+#: ../GTIPTVPlayerPro/catchup.py:477 ../GTIPTVPlayerPro/content.py:1684
+#: ../GTIPTVPlayerPro/m3u.py:886 ../GTIPTVPlayerPro/m3u.py:892
+#: ../GTIPTVPlayerPro/stalker.py:7312 ../GTIPTVPlayerPro/stalker.py:7447
+#: ../GTIPTVPlayerPro/stalker.py:7534
+msgid "Invalid playback item"
+msgstr "無效的播放項目"
+
+#: ../GTIPTVPlayerPro/catchup.py:202 ../GTIPTVPlayerPro/catchup_stalker.py:116
+#: ../GTIPTVPlayerPro/catchup_ui.py:37
+msgid "TV archive is not supported by this source."
+msgstr "此來源不支援電視重溫。"
+
+#: ../GTIPTVPlayerPro/catchup.py:242 ../GTIPTVPlayerPro/catchup.py:582
+#: ../GTIPTVPlayerPro/catchup_m3u.py:36
+#: ../GTIPTVPlayerPro/catchup_stalker.py:123
+msgid "Archive playback is unavailable for this channel."
+msgstr "此頻道無法重溫。"
+
+#: ../GTIPTVPlayerPro/catchup.py:358 ../GTIPTVPlayerPro/catchup_m3u.py:230
+#: ../GTIPTVPlayerPro/catchup_stalker.py:130
+msgid "This programme is no longer available in the TV archive."
+msgstr "此節目已無法重溫。"
+
+#: ../GTIPTVPlayerPro/catchup_m3u.py:177 ../GTIPTVPlayerPro/catchup_ui.py:36
+msgid "Configure an XMLTV guide for this M3U source to use TV archive."
+msgstr "請為此 M3U 來源設定 XMLTV 節目指南，以使用電視重溫功能。"
+
+#: ../GTIPTVPlayerPro/catchup_stalker.py:426 ../GTIPTVPlayerPro/stalker.py:2493
+msgid "Portal request limit reached"
+msgstr "已達到 Portal 請求限制"
+
+#: ../GTIPTVPlayerPro/catchup_stalker.py:430 ../GTIPTVPlayerPro/stalker.py:1808
+#: ../GTIPTVPlayerPro/stalker.py:2344 ../GTIPTVPlayerPro/stalker.py:2364
+#: ../GTIPTVPlayerPro/stalker.py:2378 ../GTIPTVPlayerPro/stalker.py:2479
+msgid "Portal access denied"
+msgstr "Portal 存取被拒絕"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:482 ../GTIPTVPlayerPro/remote_footer.py:111
+msgid "Channels"
+msgstr "頻道"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:521
+#, python-brace-format
+msgid "{} min"
+msgstr "{} 分鐘"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:536
+msgid "Watch from archive"
+msgstr "重溫節目"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:546
+msgid "Loading programmes..."
+msgstr "正在載入節目..."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:546
+msgid "Loading TV archive..."
+msgstr "正在載入電視重溫..."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:548
+msgid "No archived channels are available for this account."
+msgstr "此帳戶沒有可重溫的頻道。"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:550
+msgid "No archived programmes are available for this day."
+msgstr "所選日期沒有可重溫的節目。"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:54
+msgid "Filter rules: Show / Hide / Clear"
+msgstr "篩選規則：顯示 / 隱藏 / 清除"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:199
+msgid "Hide"
+msgstr "隱藏"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:200
+msgid "Show"
+msgstr "顯示"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:219
+msgid "No filters found."
+msgstr "找不到篩選項目。"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:220
+#: ../GTIPTVPlayerPro/remote_footer.py:134
+msgid "Preview"
+msgstr "預覽"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:125
+msgid "NUMBER KEYS: Enter  |  YELLOW: Delete  |  OK/GREEN: Confirm  |  BACK: Cancel"
+msgstr "數字鍵: 輸入  |  YELLOW: 刪除  |  OK/GREEN: 確認  |  BACK: 取消"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:129
+msgid "BLUE: Recovery code"
+msgstr "BLUE: 復原碼"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:168
+#, python-brace-format
+msgid "Digits entered: {}/{}"
+msgstr "已輸入位數: {}/{}"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:191
+#, python-brace-format
+msgid "Enter exactly {} digits."
+msgstr "請準確輸入{}位數字。"
+
+#: ../GTIPTVPlayerPro/content.py:44
+msgid "All Series"
+msgstr "所有劇集"
+
+#: ../GTIPTVPlayerPro/content.py:153 ../GTIPTVPlayerPro/content.py:877
+msgid "Untitled content"
+msgstr "無標題內容"
+
+#: ../GTIPTVPlayerPro/content.py:702 ../GTIPTVPlayerPro/playlist.py:168
+msgid "Unsupported content type"
+msgstr "不支援的內容類型"
+
+#: ../GTIPTVPlayerPro/content.py:744
+#, python-brace-format
+msgid "API HTTP error action={}"
+msgstr "API HTTP 錯誤，操作={}"
+
+#: ../GTIPTVPlayerPro/content.py:747
+msgid "Server denied access to content"
+msgstr "伺服器拒絕存取內容"
+
+#: ../GTIPTVPlayerPro/content.py:758 ../GTIPTVPlayerPro/playlist.py:1433
+#, python-brace-format
+msgid "Server returned HTTP {}"
+msgstr "伺服器傳回 HTTP {}"
+
+#: ../GTIPTVPlayerPro/content.py:765
+#, python-brace-format
+msgid "API connection error action={}"
+msgstr "API 連線錯誤，操作={}"
+
+#: ../GTIPTVPlayerPro/content.py:769
+msgid "Could not connect to the content server"
+msgstr "無法連線到內容伺服器"
+
+#: ../GTIPTVPlayerPro/content.py:778 ../GTIPTVPlayerPro/content.py:958
+#: ../GTIPTVPlayerPro/content.py:1335
+msgid "Server content list is too large"
+msgstr "伺服器內容清單過大"
+
+#: ../GTIPTVPlayerPro/content.py:787
+#, python-brace-format
+msgid "Invalid JSON action={}"
+msgstr "無效的 JSON 操作={}"
+
+#: ../GTIPTVPlayerPro/content.py:789
+msgid "Server returned an invalid content response"
+msgstr "伺服器傳回無效的內容回應"
+
+#: ../GTIPTVPlayerPro/content.py:953 ../GTIPTVPlayerPro/content.py:1162
+#: ../GTIPTVPlayerPro/content.py:1297 ../GTIPTVPlayerPro/content.py:1330
+msgid "Could not load the content list"
+msgstr "無法載入內容清單"
+
+#: ../GTIPTVPlayerPro/content.py:1103
+msgid "Could not load the category list"
+msgstr "無法載入類別清單"
+
+#: ../GTIPTVPlayerPro/content.py:1383
+msgid "Invalid movie ID"
+msgstr "無效的電影 ID"
+
+#: ../GTIPTVPlayerPro/content.py:1389
+msgid "Could not load movie information"
+msgstr "無法載入電影資訊"
+
+#: ../GTIPTVPlayerPro/content.py:1439
+msgid "Invalid series ID"
+msgstr "無效的劇集 ID"
+
+#: ../GTIPTVPlayerPro/content.py:1445
+msgid "Could not load series information"
+msgstr "無法載入劇集資訊"
+
+#: ../GTIPTVPlayerPro/content.py:1454
+msgid "Could not load series episodes"
+msgstr "無法載入劇集集數"
+
+#: ../GTIPTVPlayerPro/content.py:1477 ../GTIPTVPlayerPro/stalker.py:5470
+#: ../GTIPTVPlayerPro/stalker.py:5864
+msgid "Episode"
+msgstr "集數"
+
+#: ../GTIPTVPlayerPro/content.py:1478 ../GTIPTVPlayerPro/stalker.py:5473
+#, python-brace-format
+msgid "S{} E{}"
+msgstr "第{}季 第{}集"
+
+#: ../GTIPTVPlayerPro/content.py:1627 ../GTIPTVPlayerPro/content.py:1640
+msgid "Invalid channel ID"
+msgstr "無效的頻道 ID"
+
+#: ../GTIPTVPlayerPro/content.py:1695
+msgid "Could not create the stream URL"
+msgstr "無法建立串流網址"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:409 ../GTIPTVPlayerPro/dvb_epg_ui.py:417
+msgid "Never"
+msgstr "從未"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:582 ../GTIPTVPlayerPro/m3u_epg_ui.py:750
+msgid "Update mode"
+msgstr "更新模式"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:583 ../GTIPTVPlayerPro/m3u_epg_ui.py:751
+msgid "Update interval"
+msgstr "更新間隔"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:584
+msgid "Update on startup if overdue"
+msgstr "若已逾期，則在啟動時更新。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:585
+msgid "Update in normal standby"
+msgstr "在普通待機狀態下更新"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:586 ../GTIPTVPlayerPro/m3u_epg_ui.py:752
+#: ../GTIPTVPlayerPro/main.py:4010
+msgid "Last update"
+msgstr "最後更新"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:587
+msgid "Next update"
+msgstr "下次更新"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:588 ../GTIPTVPlayerPro/dvb_epg_ui.py:740
+msgid "Deep standby wake"
+msgstr "深度待機喚醒"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:625
+msgid "DVB EPG AUTOMATIC UPDATES"
+msgstr "DVB EPG 自動更新"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:632 ../GTIPTVPlayerPro/dvb_epg_ui.py:1467
+msgid "XMLTV offsets are converted to UTC automatically; no manual timezone is used."
+msgstr "XMLTV 時差會自動轉換為 UTC；不使用手動時區。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:653 ../GTIPTVPlayerPro/dvb_epg_ui.py:875
+msgid "Settings - DVB EPG"
+msgstr "設定 - DVB EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:663
+msgid "Due now"
+msgstr "現已到期"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:666
+#, python-brace-format
+msgid "Overdue: {}"
+msgstr "已逾期：{}"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:672 ../GTIPTVPlayerPro/dvb_epg_ui.py:975
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1796 ../GTIPTVPlayerPro/i18n.py:348
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:853
+msgid "Automatic"
+msgstr "自動"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:672 ../GTIPTVPlayerPro/dvb_epg_ui.py:979
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1788 ../GTIPTVPlayerPro/m3u_epg_ui.py:853
+msgid "Manual"
+msgstr "手動"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:673 ../GTIPTVPlayerPro/dvb_epg_ui.py:977
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:854 ../GTIPTVPlayerPro/playlist.py:1461
+#, python-brace-format
+msgid "{} hours"
+msgstr "{} 小時"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
+#: ../GTIPTVPlayerPro/main.py:733 ../GTIPTVPlayerPro/main.py:734
+#: ../GTIPTVPlayerPro/main.py:4094 ../GTIPTVPlayerPro/main.py:4386
+#: ../GTIPTVPlayerPro/main.py:4601 ../GTIPTVPlayerPro/main.py:4609
+msgid "On"
+msgstr "開"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
+#: ../GTIPTVPlayerPro/main.py:738 ../GTIPTVPlayerPro/main.py:739
+#: ../GTIPTVPlayerPro/main.py:742 ../GTIPTVPlayerPro/main.py:4094
+#: ../GTIPTVPlayerPro/main.py:4386 ../GTIPTVPlayerPro/main.py:4603
+#: ../GTIPTVPlayerPro/main.py:4609 ../GTIPTVPlayerPro/main.py:9666
+#: ../GTIPTVPlayerPro/main.py:9672 ../GTIPTVPlayerPro/subtitles.py:189
+#: ../GTIPTVPlayerPro/subtitles.py:591
+msgid "Off"
+msgstr "關"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:682 ../GTIPTVPlayerPro/dvb_epg_ui.py:741
+msgid "Always off"
+msgstr "始終關閉"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:708 ../GTIPTVPlayerPro/m3u_epg_ui.py:940
+msgid "Switch Update mode to Automatic to change this option."
+msgstr "若要更改此選項，請將更新模式切換為「自動」。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:726 ../GTIPTVPlayerPro/m3u_epg_ui.py:953
+msgid "Status information is read-only."
+msgstr "狀態資訊為只讀。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:735
+msgid "Deep standby never wakes the receiver; an overdue update runs after the next startup."
+msgstr "深度待機不會喚醒接收器；逾期的更新將在下次啟動後執行。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:745 ../GTIPTVPlayerPro/dvb_epg_ui.py:1062
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:955 ../GTIPTVPlayerPro/m3u_epg_ui.py:1012
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1031 ../GTIPTVPlayerPro/main.py:4528
+#: ../GTIPTVPlayerPro/main.py:4670 ../GTIPTVPlayerPro/main.py:4976
+msgid "Press GREEN to save the changes."
+msgstr "按綠鍵儲存更改。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:765 ../GTIPTVPlayerPro/dvb_epg_ui.py:1096
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1110 ../GTIPTVPlayerPro/dvb_epg_ui.py:1974
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2021
+msgid "DVB EPG settings could not be saved. Check the receiver storage."
+msgstr "無法儲存 DVB EPG 設定。請檢查接收器儲存空間。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:771
+msgid "Automatic update settings saved."
+msgstr "自動更新設定已儲存。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:779
+msgid "Enable DVB EPG"
+msgstr "啟用 DVB EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:780
+msgid "Xtream XMLTV source"
+msgstr "Xtream XMLTV 來源"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:781
+msgid "Target DVB bouquet"
+msgstr "目標 DVB 頻道群組"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:782
+msgid "EPG range"
+msgstr "EPG 範圍"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:783 ../GTIPTVPlayerPro/dvb_epg_ui.py:1552
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1592
+msgid "Manual channel mapping"
+msgstr "手動頻道對應"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:784
+msgid "Automatic updates"
+msgstr "自動更新"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:842
+msgid "DVB SATELLITE EPG"
+msgstr "DVB 衛星 EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:951
+msgid "All TV bouquets"
+msgstr "所有 TV 頻道群組"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:956 ../GTIPTVPlayerPro/dvb_epg_ui.py:1041
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1147
+msgid "Scanning DVB bouquets..."
+msgstr "正在掃描 DVB 頻道群組..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:957
+msgid "Selected bouquet is unavailable"
+msgstr "所選頻道群組無法使用"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:961
+msgid "No Xtream source"
+msgstr "無 Xtream 來源"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:965
+msgid "No DVB EPG update has been completed yet."
+msgstr "尚未完成任何 DVB EPG 更新。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:966
+#, python-brace-format
+msgid "Last update: {}  •  {} channels  •  {} events"
+msgstr "最後更新：{}  •  {} 個頻道  •  {} 個事件"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:985
+#, python-brace-format
+msgid "{} days"
+msgstr "{} 天"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:986
+#, python-brace-format
+msgid "Open ({} mapped)"
+msgstr "開啟（已對應 {} 個）"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1033
+msgid "No valid Xtream source was found."
+msgstr "未找到有效的 Xtream 來源。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1136 ../GTIPTVPlayerPro/dvb_epg_ui.py:1144
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1166 ../GTIPTVPlayerPro/dvb_epg_ui.py:1407
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1436 ../GTIPTVPlayerPro/dvb_epg_ui.py:1473
+msgid "DVB EPG update is still running..."
+msgstr "DVB EPG 更新仍在進行中..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1140
+msgid "DVB EPG settings saved."
+msgstr "已儲存 DVB EPG 設定。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1150
+msgid "Enable DVB EPG before starting an update."
+msgstr "請先啟用 DVB EPG，再開始更新。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1154 ../GTIPTVPlayerPro/dvb_epg_ui.py:1411
+msgid "Select a valid Xtream XMLTV source."
+msgstr "請選擇有效的 Xtream XMLTV 來源。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1158
+msgid "The receiver clock is not ready. Check network time and try again."
+msgstr "接收器時鐘尚未就緒。請檢查網絡時間並重試。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1170 ../GTIPTVPlayerPro/dvb_epg_ui.py:1608
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1831
+msgid "An automatic DVB EPG update is already running."
+msgstr "自動 DVB EPG 更新已在執行。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1183
+msgid "Downloading and preparing the Xtream XMLTV guide..."
+msgstr "正在下載並準備 Xtream XMLTV 節目指南..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1197 ../GTIPTVPlayerPro/dvb_epg_ui.py:1275
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1344
+msgid "DVB EPG update failed. No existing EPG data was removed."
+msgstr "DVB EPG 更新失敗。現有 EPG 資料未被刪除。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1287
+msgid "The native Enigma2 EPG cache rejected the update."
+msgstr "Enigma2 原生 EPG 快取拒絕了更新。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1361
+#, python-brace-format
+msgid "DVB EPG updated: {} channels and {} events imported."
+msgstr "DVB EPG 已更新：已導入 {} 個頻道和 {} 個事件。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1384
+msgid "DVB bouquets could not be scanned."
+msgstr "無法掃描 DVB 頻道群組。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1399
+msgid "DVB EPG update timed out."
+msgstr "DVB EPG 更新逾時。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1414
+msgid "Manual channel mapping could not be opened."
+msgstr "無法開啟手動頻道對應。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1440
+msgid "Automatic update settings could not be opened."
+msgstr "無法開啟自動更新設定。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1487
+msgid "DVB EPG update cancelled."
+msgstr "已取消 DVB EPG 更新。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1564 ../GTIPTVPlayerPro/dvb_epg_ui.py:1624
+msgid "Loading DVB services and cached XMLTV channels..."
+msgstr "正在載入 DVB 服務和快取的 XMLTV 頻道..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1622
+msgid "Downloading the Xtream XMLTV guide..."
+msgstr "正在下載 Xtream XMLTV 節目指南..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1645 ../GTIPTVPlayerPro/dvb_epg_ui.py:1733
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1746
+msgid "Channel mapping data could not be loaded."
+msgstr "無法載入頻道對應資料。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1755
+msgid "No real DVB service was found in the selected bouquet."
+msgstr "在所選頻道群組中未找到真實 DVB 服務。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1757
+msgid "No cached XMLTV guide was found. Press YELLOW to download it."
+msgstr "未找到快取的 XMLTV 節目指南。請按黃鍵下載。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1760
+msgid "Press OK to choose an XMLTV channel; RED blocks or restores automatic matching."
+msgstr "按 OK 選擇 XMLTV 頻道；紅鍵可屏蔽或恢復自動配對。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1783 ../GTIPTVPlayerPro/main.py:740
+#: ../GTIPTVPlayerPro/main.py:741 ../GTIPTVPlayerPro/main.py:8561
+#: ../GTIPTVPlayerPro/main.py:8684
+msgid "Blocked"
+msgstr "已屏蔽"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1799
+msgid "Unmatched"
+msgstr "未配對"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1848
+#, python-brace-format
+msgid "{} DVB services  •  {} XMLTV channels  •  {} mapped"
+msgstr "{} 個 DVB 服務  •  {} 個 XMLTV 頻道  •  已對應 {} 個"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1928
+msgid "No real DVB service is available for mapping."
+msgstr "沒有可用於對應的真實 DVB 服務。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1931
+msgid "Press YELLOW to download the XMLTV channel list first."
+msgstr "請先按黃鍵下載 XMLTV 頻道清單。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1934
+msgid "The XMLTV channel list could not be opened."
+msgstr "無法開啟 XMLTV 頻道清單。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1963
+msgid "That XMLTV channel is already assigned to another DVB service."
+msgstr "該 XMLTV 頻道已分配給其他 DVB 服務。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1967 ../GTIPTVPlayerPro/dvb_epg_ui.py:2014
+msgid "The manual channel mapping could not be saved."
+msgstr "無法儲存手動頻道對應。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1981
+#, python-brace-format
+msgid "Manual mapping saved: {} -> {}"
+msgstr "已儲存手動對應：{} -> {}"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2001
+#, python-brace-format
+msgid "Automatic matching restored for {}."
+msgstr "已恢復 {} 的自動配對。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2009
+#, python-brace-format
+msgid "EPG mapping removed and automatic matching blocked for {}."
+msgstr "已移除 EPG 對應，並已屏蔽 {} 的自動配對。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2047
+msgid "Channel mapping refresh cancelled."
+msgstr "已取消重新整理頻道對應。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2096 ../GTIPTVPlayerPro/dvb_epg_ui.py:2134
+msgid "Select XMLTV channel"
+msgstr "選擇 XMLTV 頻道"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2109
+msgid "Press GREEN to filter the XMLTV channel list."
+msgstr "按綠鍵篩選 XMLTV 頻道清單。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2145
+#, python-brace-format
+msgid "{} XMLTV channels"
+msgstr "{} 個 XMLTV 頻道"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2221
+msgid "No XMLTV channel matches the current filter."
+msgstr "沒有 XMLTV 頻道符合目前篩選條件。"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2237
+msgid "Search XMLTV channels"
+msgstr "搜尋 XMLTV 頻道"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2263
+msgid "XMLTV channel filter cleared."
+msgstr "已清除 XMLTV 頻道篩選條件。"
+
+#: ../GTIPTVPlayerPro/i18n.py:147 ../GTIPTVPlayerPro/i18n.py:148
+msgid "Arabic"
+msgstr "阿拉伯文"
+
+#: ../GTIPTVPlayerPro/i18n.py:149 ../GTIPTVPlayerPro/i18n.py:150
+#: ../GTIPTVPlayerPro/i18n.py:151
+msgid "Czech"
+msgstr "捷克文"
+
+#: ../GTIPTVPlayerPro/i18n.py:152 ../GTIPTVPlayerPro/i18n.py:153
+#: ../GTIPTVPlayerPro/i18n.py:154
+msgid "German"
+msgstr "德文"
+
+#: ../GTIPTVPlayerPro/i18n.py:155 ../GTIPTVPlayerPro/i18n.py:156
+#: ../GTIPTVPlayerPro/i18n.py:157
+msgid "Greek"
+msgstr "希臘文"
+
+#: ../GTIPTVPlayerPro/i18n.py:158 ../GTIPTVPlayerPro/i18n.py:159
+msgid "English"
+msgstr "英文"
+
+#: ../GTIPTVPlayerPro/i18n.py:160 ../GTIPTVPlayerPro/i18n.py:161
+msgid "Spanish"
+msgstr "西班牙文"
+
+#: ../GTIPTVPlayerPro/i18n.py:162 ../GTIPTVPlayerPro/i18n.py:163
+msgid "Estonian"
+msgstr "愛沙尼亞文"
+
+#: ../GTIPTVPlayerPro/i18n.py:164 ../GTIPTVPlayerPro/i18n.py:165
+msgid "Finnish"
+msgstr "芬蘭文"
+
+#: ../GTIPTVPlayerPro/i18n.py:166 ../GTIPTVPlayerPro/i18n.py:167
+#: ../GTIPTVPlayerPro/i18n.py:168
+msgid "French"
+msgstr "法文"
+
+#: ../GTIPTVPlayerPro/i18n.py:169 ../GTIPTVPlayerPro/i18n.py:170
+msgid "Hungarian"
+msgstr "匈牙利文"
+
+#: ../GTIPTVPlayerPro/i18n.py:171 ../GTIPTVPlayerPro/i18n.py:172
+msgid "Italian"
+msgstr "意大利文"
+
+#: ../GTIPTVPlayerPro/i18n.py:173 ../GTIPTVPlayerPro/i18n.py:174
+#: ../GTIPTVPlayerPro/i18n.py:175
+msgid "Dutch"
+msgstr "荷蘭文"
+
+#: ../GTIPTVPlayerPro/i18n.py:176 ../GTIPTVPlayerPro/i18n.py:177
+msgid "Polish"
+msgstr "波蘭文"
+
+#: ../GTIPTVPlayerPro/i18n.py:178 ../GTIPTVPlayerPro/i18n.py:179
+msgid "Portuguese"
+msgstr "葡萄牙文"
+
+#: ../GTIPTVPlayerPro/i18n.py:180 ../GTIPTVPlayerPro/i18n.py:181
+msgid "Russian"
+msgstr "俄文"
+
+#: ../GTIPTVPlayerPro/i18n.py:182 ../GTIPTVPlayerPro/i18n.py:183
+#: ../GTIPTVPlayerPro/i18n.py:184
+msgid "Slovak"
+msgstr "斯洛伐克文"
+
+#: ../GTIPTVPlayerPro/i18n.py:185 ../GTIPTVPlayerPro/i18n.py:186
+#: ../GTIPTVPlayerPro/i18n.py:187
+msgid "Albanian"
+msgstr "阿爾巴尼亞文"
+
+#: ../GTIPTVPlayerPro/i18n.py:188 ../GTIPTVPlayerPro/i18n.py:189
+msgid "Serbian"
+msgstr "塞爾維亞文"
+
+#: ../GTIPTVPlayerPro/i18n.py:190 ../GTIPTVPlayerPro/i18n.py:191
+msgid "Swedish"
+msgstr "瑞典文"
+
+#: ../GTIPTVPlayerPro/i18n.py:192 ../GTIPTVPlayerPro/i18n.py:193
+msgid "Turkish"
+msgstr "土耳其文"
+
+#: ../GTIPTVPlayerPro/i18n.py:194 ../GTIPTVPlayerPro/i18n.py:195
+#: ../GTIPTVPlayerPro/i18n.py:196
+msgid "Chinese"
+msgstr "中文"
+
+#: ../GTIPTVPlayerPro/m3u.py:102
+msgid "M3U source ID is invalid."
+msgstr "M3U 來源 ID 無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:110
+msgid "M3U source type is invalid."
+msgstr "M3U 來源類型無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:118
+msgid "M3U source location is invalid."
+msgstr "M3U 來源位置無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:121 ../GTIPTVPlayerPro/m3u.py:1730
+#: ../GTIPTVPlayerPro/main.py:7319 ../GTIPTVPlayerPro/main.py:7327
+#: ../GTIPTVPlayerPro/main.py:8151 ../GTIPTVPlayerPro/main.py:8183
+msgid "M3U file path is invalid."
+msgstr "M3U 檔案路徑無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:136 ../GTIPTVPlayerPro/m3u_epg_ui.py:326
+msgid "M3U source"
+msgstr "M3U 來源"
+
+#: ../GTIPTVPlayerPro/m3u.py:140
+msgid "FILE"
+msgstr "檔案"
+
+#: ../GTIPTVPlayerPro/m3u.py:140
+msgid "WEB"
+msgstr "網絡"
+
+#: ../GTIPTVPlayerPro/m3u.py:146 ../GTIPTVPlayerPro/main.py:6860
+msgid "Local file"
+msgstr "本地檔案"
+
+#: ../GTIPTVPlayerPro/m3u.py:194 ../GTIPTVPlayerPro/m3u.py:199
+#: ../GTIPTVPlayerPro/m3u.py:206 ../GTIPTVPlayerPro/m3u.py:211
+#: ../GTIPTVPlayerPro/m3u.py:213
+msgid "M3U source file is invalid."
+msgstr "M3U 來源檔案無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:196
+msgid "M3U source file version is not supported."
+msgstr "不支援此 M3U 來源檔案版本。"
+
+#: ../GTIPTVPlayerPro/m3u.py:243 ../GTIPTVPlayerPro/m3u.py:627
+msgid "M3U source is invalid."
+msgstr "M3U 來源無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:281
+msgid "Too many M3U sources are configured."
+msgstr "設定的 M3U 來源過多。"
+
+#: ../GTIPTVPlayerPro/m3u.py:310 ../GTIPTVPlayerPro/m3u.py:332
+msgid "M3U source cache could not be deleted."
+msgstr "無法刪除 M3U 來源快取。"
+
+#: ../GTIPTVPlayerPro/m3u.py:606
+msgid "M3U source file is too large."
+msgstr "M3U 來源檔案過大。"
+
+#: ../GTIPTVPlayerPro/m3u.py:631 ../GTIPTVPlayerPro/m3u.py:633
+msgid "M3U timeout is invalid."
+msgstr "M3U 逾時設定無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:899
+msgid "Channel is no longer present in the M3U source."
+msgstr "該頻道已不在 M3U 來源中。"
+
+#: ../GTIPTVPlayerPro/m3u.py:981
+msgid "This M3U source supports Live TV only."
+msgstr "此 M3U 來源僅支援直播電視。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1132 ../GTIPTVPlayerPro/m3u.py:2988
+msgid "Could not load the M3U source."
+msgstr "無法載入 M3U 來源。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1151 ../GTIPTVPlayerPro/m3u.py:1312
+msgid "M3U source returned an invalid response."
+msgstr "M3U 來源傳回無效回應。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1156 ../GTIPTVPlayerPro/m3u.py:1317
+#: ../GTIPTVPlayerPro/m3u.py:1807 ../GTIPTVPlayerPro/m3u.py:1846
+#: ../GTIPTVPlayerPro/m3u.py:2855 ../GTIPTVPlayerPro/m3u.py:2952
+msgid "M3U source exceeds the safe size limit."
+msgstr "M3U 來源超過安全大小限制。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1233
+msgid "Uncategorized"
+msgstr "未類別"
+
+#: ../GTIPTVPlayerPro/m3u.py:1322
+msgid "M3U source contains invalid data."
+msgstr "M3U 來源包含無效資料。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1337
+msgid "M3U source contains a line that is too long."
+msgstr "M3U 來源包含過長的行。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1349
+msgid "The selected file is an HLS stream manifest, not a channel list."
+msgstr "所選檔案是 HLS 串流資訊清單，而不是頻道清單。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1355 ../GTIPTVPlayerPro/m3u.py:1402
+msgid "M3U source header is missing."
+msgstr "缺少 M3U 來源標頭。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1396
+msgid "M3U source contains too many channels."
+msgstr "M3U 來源包含過多頻道。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1422
+msgid "M3U source contains too many categories."
+msgstr "M3U 來源包含過多類別。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1459
+msgid "M3U source does not contain playable channels."
+msgstr "M3U 來源不包含可播放的頻道。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1736
+msgid "M3U file path traversal is not allowed."
+msgstr "M3U 檔案路徑不允許目錄遍歷。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1743
+msgid "Symbolic links cannot be used as M3U sources."
+msgstr "符號鏈接不能用作 M3U 來源。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1757
+msgid "M3U file is outside the allowed directories."
+msgstr "M3U 檔案不在允許的目錄中。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1764 ../GTIPTVPlayerPro/m3u.py:1789
+msgid "M3U file could not be opened."
+msgstr "無法開啟 M3U 檔案。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1769 ../GTIPTVPlayerPro/m3u.py:1802
+msgid "M3U source must be a regular file."
+msgstr "M3U 來源必須是常規檔案。"
+
+#: ../GTIPTVPlayerPro/m3u.py:1855
+msgid "M3U file changed while it was being read."
+msgstr "M3U 檔案在讀取期間已更改。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2622 ../GTIPTVPlayerPro/m3u.py:2627
+msgid "M3U URL is invalid."
+msgstr "M3U 網址無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2636
+msgid "M3U URL is not safe."
+msgstr "M3U 網址不安全。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2638
+msgid "M3U URL port is invalid."
+msgstr "M3U 網址連接埠無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2642
+msgid "M3U host name is invalid."
+msgstr "M3U 主機名無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2666
+msgid "M3U host address is invalid."
+msgstr "M3U 主機地址無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2677
+msgid "M3U host address is not allowed."
+msgstr "不允許使用 M3U 主機地址。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2697
+msgid "M3U host name resolution is busy."
+msgstr "M3U 主機名解析服務繁忙。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2730
+msgid "M3U host name could not be resolved."
+msgstr "無法解析 M3U 主機名。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2746
+msgid "M3U host resolved to an unsafe address set."
+msgstr "M3U 主機解析到了不安全的地址集。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2752
+msgid "M3U redirect changed the network scope."
+msgstr "M3U 重定向更改了網絡範圍。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2879
+msgid "An HTTPS M3U request cannot be redirected to HTTP."
+msgstr "HTTPS M3U 請求不能重定向到 HTTP。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2930
+#, python-brace-format
+msgid "M3U server returned HTTP {}."
+msgstr "M3U 伺服器傳回 HTTP {}。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2938
+msgid "Compressed M3U responses are not accepted."
+msgstr "不接受壓縮的 M3U 回應。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2947
+msgid "M3U response size is invalid."
+msgstr "M3U 回應大小無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:2996
+msgid "M3U redirect URL is missing."
+msgstr "缺少 M3U 重定向網址。"
+
+#: ../GTIPTVPlayerPro/m3u.py:3001
+msgid "M3U request was redirected too many times."
+msgstr "M3U 請求重定向次數過多。"
+
+#: ../GTIPTVPlayerPro/m3u.py:3009
+msgid "M3U redirect URL is invalid."
+msgstr "M3U 重定向網址無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:3013
+msgid "M3U redirection could not be completed."
+msgstr "無法完成 M3U 重定向。"
+
+#: ../GTIPTVPlayerPro/m3u.py:3026
+msgid "M3U response headers are invalid."
+msgstr "M3U 回應標頭無效。"
+
+#: ../GTIPTVPlayerPro/m3u.py:3034
+msgid "M3U response has conflicting size information."
+msgstr "M3U 回應包含相互衝突的大小資訊。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:472 ../GTIPTVPlayerPro/m3u_epg_ui.py:663
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:718 ../GTIPTVPlayerPro/main.py:7193
+#: ../GTIPTVPlayerPro/main.py:7265 ../GTIPTVPlayerPro/main.py:7310
+#: ../GTIPTVPlayerPro/main.py:7823 ../GTIPTVPlayerPro/main.py:7891
+#: ../GTIPTVPlayerPro/main.py:7932 ../GTIPTVPlayerPro/remote_footer.py:119
+msgid "Storage"
+msgstr "儲存"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:524 ../GTIPTVPlayerPro/m3u_epg_ui.py:538
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1161
+msgid "Background update requested"
+msgstr "已請求背景更新"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:531 ../GTIPTVPlayerPro/m3u_epg_ui.py:1180
+msgid "Update failed; the previous guide remains available."
+msgstr "更新失敗；仍可使用之前的節目單。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:533
+#, python-brace-format
+msgid "Completed: {} channels, {} events"
+msgstr "完成：{} 個頻道，{} 個節目"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:539
+msgid "No update has been completed yet."
+msgstr "尚未完成任何更新。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:607 ../GTIPTVPlayerPro/m3u_epg_ui.py:652
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:749
+msgid "XMLTV source"
+msgstr "XMLTV 來源"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:609
+msgid "Choose an XML, XML.GZ or GZ file from local or mounted storage."
+msgstr "從本地或已掛載儲存中選擇 XML、XML.GZ 或 GZ 檔案。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:694
+msgid "This folder is outside the allowed storage locations."
+msgstr "此資料夾不在允許的儲存位置內。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:713
+msgid "No allowed storage location is available."
+msgstr "沒有可用的授權儲存位置。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:727 ../GTIPTVPlayerPro/m3u_epg_ui.py:735
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1005 ../GTIPTVPlayerPro/m3u_epg_ui.py:1010
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1047
+msgid "XMLTV file path is invalid."
+msgstr "XMLTV 檔案路徑無效。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:747
+msgid "Enable external XMLTV EPG"
+msgstr "啟用外部 XMLTV EPG"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:748 ../GTIPTVPlayerPro/main.py:6742
+#: ../GTIPTVPlayerPro/main.py:6901 ../GTIPTVPlayerPro/main.py:7360
+#: ../GTIPTVPlayerPro/main.py:7407
+msgid "Source type"
+msgstr "來源類型"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:753 ../GTIPTVPlayerPro/main.py:6267
+msgid "Status"
+msgstr "狀態"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:797 ../GTIPTVPlayerPro/m3u_epg_ui.py:835
+msgid "External XMLTV EPG"
+msgstr "外部 XMLTV EPG"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:806
+msgid "XMLTV settings could not be read; safe defaults are shown."
+msgstr "無法讀取 XMLTV 設定，目前顯示安全預設值。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:808
+msgid "Updates run in the background. Channel changes never download EPG data."
+msgstr "更新在背景執行，切換頻道不會下載 EPG 資料。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:848 ../GTIPTVPlayerPro/main.py:4614
+msgid "Not configured"
+msgstr "未設定"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8009
+msgid "Local / NAS"
+msgstr "本地 / NAS"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8010
+#: ../GTIPTVPlayerPro/main.py:8072 ../GTIPTVPlayerPro/playlist.py:1559
+msgid "Web URL"
+msgstr "網絡網址"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:915
+msgid "Choose an XMLTV source before enabling this option."
+msgstr "啟用此選項前請選擇 XMLTV 來源。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:973
+msgid "The XMLTV file browser is unavailable."
+msgstr "XMLTV 檔案瀏覽器無法使用。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:995
+msgid "Enter the XMLTV HTTP(S) URL"
+msgstr "輸入 XMLTV HTTP(S) URL"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1001
+msgid "File selection cancelled."
+msgstr "已取消檔案選擇。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1018 ../GTIPTVPlayerPro/main.py:7069
+#: ../GTIPTVPlayerPro/main.py:8206 ../GTIPTVPlayerPro/main.py:8432
+msgid "Field entry cancelled."
+msgstr "已取消欄位輸入。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1023 ../GTIPTVPlayerPro/m3u_epg_ui.py:1051
+msgid "XMLTV URL must start with http:// or https://."
+msgstr "XMLTV URL 必須以 http:// 或 https:// 開頭。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1029
+msgid "XMLTV URL is invalid."
+msgstr "XMLTV URL 無效。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1038
+msgid "Choose an XMLTV source before saving."
+msgstr "儲存前請選擇 XMLTV 來源。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1100
+msgid "XMLTV settings could not be saved. Check the receiver storage."
+msgstr "無法儲存 XMLTV 設定。請檢查接收機儲存空間。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1110
+msgid "External XMLTV EPG settings saved."
+msgstr "外部 XMLTV EPG 設定已儲存。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1220
+msgid "Enable external XMLTV EPG before requesting an update."
+msgstr "請求更新前請啟用外部 XMLTV EPG。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1235 ../GTIPTVPlayerPro/m3u_epg_ui.py:1261
+msgid "The XMLTV update was queued in the background."
+msgstr "XMLTV 更新已加入背景隊列。"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1270
+msgid "The XMLTV update could not be queued. Try again shortly."
+msgstr "無法將 XMLTV 更新加入隊列。請稍後重試。"
+
+#: ../GTIPTVPlayerPro/main.py:304 ../GTIPTVPlayerPro/main.py:7106
+#: ../GTIPTVPlayerPro/main.py:7585 ../GTIPTVPlayerPro/main.py:8559
+#: ../GTIPTVPlayerPro/main.py:8678 ../GTIPTVPlayerPro/stalker.py:8161
+msgid "Active"
+msgstr "啟用"
+
+#: ../GTIPTVPlayerPro/main.py:305 ../GTIPTVPlayerPro/playlist.py:1289
+#: ../GTIPTVPlayerPro/stalker.py:8166
+msgid "Connection limit reached"
+msgstr "已達到連線上限"
+
+#: ../GTIPTVPlayerPro/main.py:306 ../GTIPTVPlayerPro/main.py:5562
+#: ../GTIPTVPlayerPro/main.py:5579 ../GTIPTVPlayerPro/main.py:5631
+#: ../GTIPTVPlayerPro/main.py:6075
+msgid "Inactive"
+msgstr "未啟用"
+
+#: ../GTIPTVPlayerPro/main.py:307 ../GTIPTVPlayerPro/main.py:311
+#: ../GTIPTVPlayerPro/main.py:317 ../GTIPTVPlayerPro/main.py:721
+#: ../GTIPTVPlayerPro/main.py:765 ../GTIPTVPlayerPro/main.py:6245
+#: ../GTIPTVPlayerPro/main.py:6246 ../GTIPTVPlayerPro/main.py:8542
+#: ../GTIPTVPlayerPro/main.py:8571 ../GTIPTVPlayerPro/main.py:8635
+#: ../GTIPTVPlayerPro/main.py:8655 ../GTIPTVPlayerPro/main.py:8687
+#: ../GTIPTVPlayerPro/main.py:8745 ../GTIPTVPlayerPro/main.py:8824
+#: ../GTIPTVPlayerPro/main.py:8829 ../GTIPTVPlayerPro/main.py:8841
+#: ../GTIPTVPlayerPro/main.py:8842 ../GTIPTVPlayerPro/main.py:8843
+#: ../GTIPTVPlayerPro/main.py:8861 ../GTIPTVPlayerPro/main.py:9355
+#: ../GTIPTVPlayerPro/main.py:9359 ../GTIPTVPlayerPro/main.py:9637
+#: ../GTIPTVPlayerPro/main.py:9650 ../GTIPTVPlayerPro/main.py:9676
+#: ../GTIPTVPlayerPro/main.py:9677 ../GTIPTVPlayerPro/main.py:9760
+#: ../GTIPTVPlayerPro/main.py:9761 ../GTIPTVPlayerPro/playlist.py:245
+#: ../GTIPTVPlayerPro/playlist.py:1241 ../GTIPTVPlayerPro/playlist.py:1297
+#: ../GTIPTVPlayerPro/playlist.py:1301 ../GTIPTVPlayerPro/playlist.py:1303
+#: ../GTIPTVPlayerPro/playlist.py:1304 ../GTIPTVPlayerPro/playlist.py:1305
+#: ../GTIPTVPlayerPro/playlist.py:1307 ../GTIPTVPlayerPro/playlist.py:1547
+#: ../GTIPTVPlayerPro/subtitles.py:16
+msgid "Unknown"
+msgstr "未知"
+
+#: ../GTIPTVPlayerPro/main.py:394
+msgid "No valid M3U source was found"
+msgstr "未找到有效的 M3U 來源"
+
+#: ../GTIPTVPlayerPro/main.py:408
+msgid "Unsupported source type"
+msgstr "不支援的來源類型"
+
+#: ../GTIPTVPlayerPro/main.py:431
+msgid "Access your channels quickly"
+msgstr "快速存取您的頻道"
+
+#: ../GTIPTVPlayerPro/main.py:436
+msgid "Watch programmes you missed"
+msgstr "收看錯過的節目"
+
+#: ../GTIPTVPlayerPro/main.py:441
+msgid "Explore your movie library"
+msgstr "探索您的電影庫"
+
+#: ../GTIPTVPlayerPro/main.py:446
+msgid "Browse seasons and episodes"
+msgstr "瀏覽季和集數"
+
+#: ../GTIPTVPlayerPro/main.py:450 ../GTIPTVPlayerPro/main.py:9015
+msgid "CONTINUE WATCHING"
+msgstr "繼續觀看"
+
+#: ../GTIPTVPlayerPro/main.py:451
+msgid "Resume unfinished movies and series episodes"
+msgstr "繼續未看完的電影和劇集集數"
+
+#: ../GTIPTVPlayerPro/main.py:455 ../GTIPTVPlayerPro/main.py:9025
+#: ../GTIPTVPlayerPro/main.py:9027
+msgid "FAVORITES"
+msgstr "我的最愛"
+
+#: ../GTIPTVPlayerPro/main.py:456
+msgid "Favorite channels, movies and series in one place"
+msgstr "在同一頁檢視我的最愛頻道、電影及劇集"
+
+#: ../GTIPTVPlayerPro/main.py:460
+msgid "SETTINGS"
+msgstr "設定"
+
+#: ../GTIPTVPlayerPro/main.py:461
+msgid "Manage the player and appearance"
+msgstr "管理播放器和外觀"
+
+#: ../GTIPTVPlayerPro/main.py:468
+#, python-brace-format
+msgid ""
+"{} v{}\n"
+"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
+"\n"
+"DEVELOPER\n"
+"{}\n"
+"\n"
+"LEGAL NOTICE\n"
+"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
+"\n"
+"PRIVACY\n"
+"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr ""
+"{} v{}\n"
+"適用於 Enigma2 的開放原始碼 IPTV 播放器。支援 Xtream Codes 帳戶，以及來自標準本地、掛載網絡或 HTTP(S) M3U 播放清單的直播電視。普通 M3U 來源僅提供直播電視。\n"
+"\n"
+"開發者\n"
+"{}\n"
+"\n"
+"法律聲明\n"
+"此外掛程式不提供頻道、流、帳戶或播放清單。使用者有責任僅使用自己擁有存取權和使用權的內容。\n"
+"\n"
+"隱私\n"
+"啟用 Open-Meteo 時，所選城市和位置會發送到 Open-Meteo 以獲取天氣預報。啟用 TMDb 時，電影或劇集標題以及使用者輸入的 TMDb 金鑰或權杖會發送到 TMDb。IPTV 使用者名稱和密碼不會發送到這些服務。"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "SOURCE CODE"
+msgstr "原始碼"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "REPORT AN ISSUE"
+msgstr "報告問題"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "LICENSE"
+msgstr "許可證"
+
+#: ../GTIPTVPlayerPro/main.py:735
+msgid "Connected"
+msgstr "已連線"
+
+#: ../GTIPTVPlayerPro/main.py:736 ../GTIPTVPlayerPro/main.py:8561
+#: ../GTIPTVPlayerPro/main.py:8683
+msgid "Busy"
+msgstr "忙碌"
+
+#: ../GTIPTVPlayerPro/main.py:737 ../GTIPTVPlayerPro/main.py:8681
+msgid "Warning"
+msgstr "警告"
+
+#: ../GTIPTVPlayerPro/main.py:743 ../GTIPTVPlayerPro/main.py:7641
+#: ../GTIPTVPlayerPro/main.py:7946 ../GTIPTVPlayerPro/main.py:7951
+#: ../GTIPTVPlayerPro/main.py:7955 ../GTIPTVPlayerPro/main.py:8686
+#: ../GTIPTVPlayerPro/stalker.py:8186
+msgid "Invalid"
+msgstr "無效"
+
+#: ../GTIPTVPlayerPro/main.py:747
+#, python-brace-format
+msgid ""
+"Read time: {} ms\n"
+"Source type: {}\n"
+"Size: {} bytes\n"
+"Channels: {}\n"
+"Categories: {}\n"
+"Cache age: {}\n"
+"Last modified: {}\n"
+"\n"
+"{}"
+msgstr ""
+"讀取時間：{} 毫秒\n"
+"來源類型：{}\n"
+"大小：{} 字節\n"
+"頻道：{}\n"
+"類別：{}\n"
+"快取時間：{}\n"
+"最後修改：{}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/main.py:757
+#, python-brace-format
+msgid ""
+"Latency: {} ms\n"
+"Account status: {}\n"
+"Protocol: {}\n"
+"Output format: {}\n"
+"\n"
+"{}"
+msgstr ""
+"延遲：{} 毫秒\n"
+"帳戶狀態：{}\n"
+"協議：{}\n"
+"輸出格式：{}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/main.py:3746 ../GTIPTVPlayerPro/main.py:3782
+msgid "Weather"
+msgstr "天氣"
+
+#: ../GTIPTVPlayerPro/main.py:3909
+msgid "Loading..."
+msgstr "正在載入..."
+
+#: ../GTIPTVPlayerPro/main.py:3918
+msgid "No items found."
+msgstr "找不到項目。"
+
+#: ../GTIPTVPlayerPro/main.py:3991 ../GTIPTVPlayerPro/remote_footer.py:109
+msgid "Cancel"
+msgstr "取消"
+
+#: ../GTIPTVPlayerPro/main.py:4007
+msgid "Show weather"
+msgstr "顯示天氣"
+
+#: ../GTIPTVPlayerPro/main.py:4008 ../GTIPTVPlayerPro/main.py:4179
+msgid "City"
+msgstr "城市"
+
+#: ../GTIPTVPlayerPro/main.py:4009
+msgid "Temperature unit"
+msgstr "溫度單位"
+
+#: ../GTIPTVPlayerPro/main.py:4059
+msgid "WEATHER"
+msgstr "天氣"
+
+#: ../GTIPTVPlayerPro/main.py:4066
+msgid "Press OK on the City row to open the keyboard."
+msgstr "在「城市」行按 OK 開啟鍵盤。"
+
+#: ../GTIPTVPlayerPro/main.py:4090
+msgid "Settings - Weather"
+msgstr "設定 – 天氣"
+
+#: ../GTIPTVPlayerPro/main.py:4132
+#, python-brace-format
+msgid "Settings could not be saved: {}"
+msgstr "無法儲存設定：{}"
+
+#: ../GTIPTVPlayerPro/main.py:4145
+msgid "Weather display updated."
+msgstr "天氣顯示已更新。"
+
+#: ../GTIPTVPlayerPro/main.py:4149
+msgid "Temperature unit updated."
+msgstr "溫度單位已更新。"
+
+#: ../GTIPTVPlayerPro/main.py:4162
+msgid "The last-update time refreshes when weather data is received."
+msgstr "收到天氣資料時會重新整理最後更新時間。"
+
+#: ../GTIPTVPlayerPro/main.py:4186
+msgid "City change cancelled."
+msgstr "已取消更改城市。"
+
+#: ../GTIPTVPlayerPro/main.py:4215
+#, python-brace-format
+msgid "Checking {}..."
+msgstr "正在檢查 {}..."
+
+#: ../GTIPTVPlayerPro/main.py:4280
+msgid "No weather forecast is available for this city."
+msgstr "沒有此城市的天氣預報。"
+
+#: ../GTIPTVPlayerPro/main.py:4298
+#, python-brace-format
+msgid "{} was saved."
+msgstr "已儲存 {}。"
+
+#: ../GTIPTVPlayerPro/main.py:4323
+msgid "Standard"
+msgstr "標準"
+
+#: ../GTIPTVPlayerPro/main.py:4324
+msgid "Large"
+msgstr "大"
+
+#: ../GTIPTVPlayerPro/main.py:4325
+msgid "Very large"
+msgstr "特大"
+
+#: ../GTIPTVPlayerPro/main.py:4327
+msgid "Text size"
+msgstr "文字大小"
+
+#: ../GTIPTVPlayerPro/main.py:4327
+msgid "Cinematic view"
+msgstr "電影式檢視"
+
+#: ../GTIPTVPlayerPro/main.py:4347 ../GTIPTVPlayerPro/main.py:4350
+#: ../GTIPTVPlayerPro/main.py:4381 ../GTIPTVPlayerPro/main.py:4450
+msgid "Appearance"
+msgstr "外觀"
+
+#: ../GTIPTVPlayerPro/main.py:4358 ../GTIPTVPlayerPro/main.py:4651
+#: ../GTIPTVPlayerPro/main.py:4654 ../GTIPTVPlayerPro/main.py:4952
+#: ../GTIPTVPlayerPro/main.py:8081 ../GTIPTVPlayerPro/remote_footer.py:89
+#: ../GTIPTVPlayerPro/remote_footer.py:92
+msgid "Select"
+msgstr "選擇"
+
+#: ../GTIPTVPlayerPro/main.py:4443
+msgid "Live TV service type"
+msgstr "直播電視服務類型"
+
+#: ../GTIPTVPlayerPro/main.py:4444
+msgid "Movie service type"
+msgstr "電影服務類型"
+
+#: ../GTIPTVPlayerPro/main.py:4445
+msgid "Series service type"
+msgstr "劇集服務類型"
+
+#: ../GTIPTVPlayerPro/main.py:4446
+msgid "TMDb metadata enrichment"
+msgstr "TMDb 元資料增強"
+
+#: ../GTIPTVPlayerPro/main.py:4447
+msgid "TMDb API key / token"
+msgstr "TMDb API 金鑰 / 權杖"
+
+#: ../GTIPTVPlayerPro/main.py:4448
+msgid "DVB EPG"
+msgstr "DVB EPG"
+
+#: ../GTIPTVPlayerPro/main.py:4449
+msgid "Category edit lock"
+msgstr "類別編輯鎖"
+
+#: ../GTIPTVPlayerPro/main.py:4451 ../GTIPTVPlayerPro/main.py:7359
+#: ../GTIPTVPlayerPro/main.py:7401 ../GTIPTVPlayerPro/main.py:7469
+#: ../GTIPTVPlayerPro/main.py:7508 ../GTIPTVPlayerPro/main.py:7839
+#: ../GTIPTVPlayerPro/main.py:7884
+msgid "Select playlist"
+msgstr "選擇播放清單"
+
+#: ../GTIPTVPlayerPro/main.py:4516
+msgid "Player / Codec"
+msgstr "播放器 / 編解碼器"
+
+#: ../GTIPTVPlayerPro/main.py:4518
+msgid "LANGUAGE"
+msgstr "語言"
+
+#: ../GTIPTVPlayerPro/main.py:4560
+msgid "Settings - Player / Codec"
+msgstr "設定 – 播放器 / 編解碼器"
+
+#: ../GTIPTVPlayerPro/main.py:4591 ../GTIPTVPlayerPro/remote_footer.py:106
+msgid "Open"
+msgstr "開啟"
+
+#: ../GTIPTVPlayerPro/main.py:4604 ../GTIPTVPlayerPro/main.py:7535
+#: ../GTIPTVPlayerPro/main.py:7587 ../GTIPTVPlayerPro/main.py:7673
+#: ../GTIPTVPlayerPro/main.py:7729 ../GTIPTVPlayerPro/main.py:7766
+#: ../GTIPTVPlayerPro/main.py:8563 ../GTIPTVPlayerPro/main.py:8686
+#: ../GTIPTVPlayerPro/main.py:8795 ../GTIPTVPlayerPro/main.py:8797
+msgid "Error"
+msgstr "錯誤"
+
+#: ../GTIPTVPlayerPro/main.py:4612
+#, python-brace-format
+msgid "Configured ••••{}"
+msgstr "已設定 ••••{}"
+
+#: ../GTIPTVPlayerPro/main.py:4642
+msgid "Press OK to open the DVB EPG settings."
+msgstr "按 OK 開啟 DVB EPG 設定。"
+
+#: ../GTIPTVPlayerPro/main.py:4647
+msgid "Press OK to turn the category edit lock on or off."
+msgstr "按OK開啟或關閉類別編輯鎖。"
+
+#: ../GTIPTVPlayerPro/main.py:4658
+msgid "Press OK to enter or change the TMDb key."
+msgstr "按 OK 輸入或更改 TMDb 金鑰。"
+
+#: ../GTIPTVPlayerPro/main.py:4762 ../GTIPTVPlayerPro/main.py:4782
+#: ../GTIPTVPlayerPro/main.py:7743
+msgid "The confirmation screen is unavailable on this image."
+msgstr "此映像不支援確認畫面。"
+
+#: ../GTIPTVPlayerPro/main.py:4775
+msgid "Disable the category edit lock?"
+msgstr "要關閉類別編輯鎖嗎？"
+
+#: ../GTIPTVPlayerPro/main.py:4787
+msgid "Create category edit PIN"
+msgstr "建立類別編輯PIN"
+
+#: ../GTIPTVPlayerPro/main.py:4797
+msgid "Confirm category edit PIN"
+msgstr "確認類別編輯PIN"
+
+#: ../GTIPTVPlayerPro/main.py:4823
+msgid "Category edit lock could not be saved. Check the receiver storage."
+msgstr "無法儲存類別編輯鎖。請檢查接收器儲存空間。"
+
+#: ../GTIPTVPlayerPro/main.py:4831
+msgid "Category edit lock enabled."
+msgstr "類別編輯鎖已開啟。"
+
+#: ../GTIPTVPlayerPro/main.py:4834
+#, python-brace-format
+msgid ""
+"Write down this recovery code. It is shown only once:\n"
+"\n"
+"{}\n"
+"\n"
+"If you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr ""
+"請記下此復原碼。它只會顯示一次：\n"
+"\n"
+"{}\n"
+"\n"
+"如果兩個代碼都忘記了，移除並重新安裝外掛程式只會重設此鎖。"
+
+#: ../GTIPTVPlayerPro/main.py:4845
+msgid "Disable category edit lock"
+msgstr "關閉類別編輯鎖"
+
+#: ../GTIPTVPlayerPro/main.py:4846
+msgid "Enter the current 4-digit PIN."
+msgstr "請輸入目前的4位數PIN。"
+
+#: ../GTIPTVPlayerPro/main.py:4866
+msgid "Incorrect PIN. Lock unchanged."
+msgstr "PIN錯誤。鎖定狀態未變更。"
+
+#: ../GTIPTVPlayerPro/main.py:4879
+msgid "Incorrect recovery code. Lock unchanged."
+msgstr "復原碼錯誤。鎖定狀態未變更。"
+
+#: ../GTIPTVPlayerPro/main.py:4892
+msgid "Category edit lock disabled."
+msgstr "類別編輯鎖已關閉。"
+
+#: ../GTIPTVPlayerPro/main.py:4897
+msgid "Category edit lock could not be removed. Check the receiver storage."
+msgstr "無法移除類別編輯鎖。請檢查接收器儲存空間。"
+
+#: ../GTIPTVPlayerPro/main.py:4908
+msgid "DVB EPG settings are unavailable on this image."
+msgstr "此映像版本不提供 DVB EPG 設定。"
+
+#: ../GTIPTVPlayerPro/main.py:4981
+msgid "DVB EPG settings closed."
+msgstr "已關閉 DVB EPG 設定。"
+
+#: ../GTIPTVPlayerPro/main.py:4998
+msgid "Enter the TMDb API key or access token"
+msgstr "請輸入 TMDb API 金鑰或存取權杖"
+
+#: ../GTIPTVPlayerPro/main.py:5005
+msgid "TMDb key change cancelled."
+msgstr "已取消更改 TMDb 金鑰。"
+
+#: ../GTIPTVPlayerPro/main.py:5011
+msgid "TMDb key saved; press BLUE to test and GREEN to save."
+msgstr "TMDb 金鑰已儲存；按藍鍵測試，按綠鍵儲存。"
+
+#: ../GTIPTVPlayerPro/main.py:5013
+msgid "TMDb key cleared; press GREEN to save."
+msgstr "TMDb 金鑰已清除；按綠鍵儲存。"
+
+#: ../GTIPTVPlayerPro/main.py:5019
+msgid "The TMDb connection test is still running..."
+msgstr "TMDb 連線測試仍在執行..."
+
+#: ../GTIPTVPlayerPro/main.py:5023
+msgid "No TMDb key is configured. Press OK on the key row."
+msgstr "尚未設定 TMDb 金鑰。請在金鑰行按 OK。"
+
+#: ../GTIPTVPlayerPro/main.py:5028
+msgid "Testing the TMDb connection and API key..."
+msgstr "正在測試 TMDb 連線和 API 金鑰..."
+
+#: ../GTIPTVPlayerPro/main.py:5057
+msgid "TMDb connection successful; the API key is valid."
+msgstr "TMDb 連線成功；API 金鑰有效。"
+
+#: ../GTIPTVPlayerPro/main.py:5061
+msgid " Metadata enrichment is currently disabled."
+msgstr " 元資料增強目前已停用。"
+
+#: ../GTIPTVPlayerPro/main.py:5067
+#, python-brace-format
+msgid "TMDb test failed: {}."
+msgstr "TMDb 測試失敗：{}。"
+
+#: ../GTIPTVPlayerPro/main.py:5070 ../GTIPTVPlayerPro/main.py:5088
+msgid "TMDb test failed: could not connect."
+msgstr "TMDb 測試失敗：無法連線。"
+
+#: ../GTIPTVPlayerPro/main.py:5188 ../GTIPTVPlayerPro/main.py:5204
+#: ../GTIPTVPlayerPro/main.py:5401 ../GTIPTVPlayerPro/main.py:8801
+msgid "The health check could not be completed."
+msgstr "無法完成運作狀態檢查。"
+
+#: ../GTIPTVPlayerPro/main.py:5317 ../GTIPTVPlayerPro/main.py:5360
+#: ../GTIPTVPlayerPro/main.py:8835 ../GTIPTVPlayerPro/main.py:8876
+#: ../GTIPTVPlayerPro/main.py:8915
+msgid "Information"
+msgstr "資訊"
+
+#: ../GTIPTVPlayerPro/main.py:5477 ../GTIPTVPlayerPro/main.py:5565
+#: ../GTIPTVPlayerPro/main.py:5584 ../GTIPTVPlayerPro/main.py:5633
+#: ../GTIPTVPlayerPro/main.py:6064 ../GTIPTVPlayerPro/main.py:6094
+#: ../GTIPTVPlayerPro/remote_footer.py:117
+msgid "Accounts"
+msgstr "帳戶"
+
+#: ../GTIPTVPlayerPro/main.py:5478 ../GTIPTVPlayerPro/main.py:5489
+#: ../GTIPTVPlayerPro/main.py:8743 ../GTIPTVPlayerPro/main.py:9624
+msgid "TESTING..."
+msgstr "正在測試..."
+
+#: ../GTIPTVPlayerPro/main.py:5503 ../GTIPTVPlayerPro/main.py:6095
+#: ../GTIPTVPlayerPro/main.py:6747 ../GTIPTVPlayerPro/remote_footer.py:86
+msgid "Account"
+msgstr "帳戶"
+
+#: ../GTIPTVPlayerPro/main.py:5567 ../GTIPTVPlayerPro/main.py:5701
+#: ../GTIPTVPlayerPro/main.py:7779 ../GTIPTVPlayerPro/remote_footer.py:99
+#: ../GTIPTVPlayerPro/remote_footer.py:101
+msgid "Delete"
+msgstr "刪除"
+
+#: ../GTIPTVPlayerPro/main.py:5633 ../GTIPTVPlayerPro/main.py:6376
+#: ../GTIPTVPlayerPro/main.py:7750
+#, python-brace-format
+msgid "Delete {}?"
+msgstr "刪除 {}？"
+
+#: ../GTIPTVPlayerPro/main.py:5739 ../GTIPTVPlayerPro/main.py:6457
+#: ../GTIPTVPlayerPro/main.py:7766
+#, python-brace-format
+msgid "Could not delete the source: {}"
+msgstr "無法刪除來源：{}"
+
+#: ../GTIPTVPlayerPro/main.py:5874
+msgid "SELECTED SOURCE"
+msgstr "所選來源"
+
+#: ../GTIPTVPlayerPro/main.py:5884 ../GTIPTVPlayerPro/main.py:6295
+#: ../GTIPTVPlayerPro/remote_footer.py:100
+#: ../GTIPTVPlayerPro/remote_footer.py:102
+msgid "Connect"
+msgstr "連線"
+
+#: ../GTIPTVPlayerPro/main.py:5950 ../GTIPTVPlayerPro/main.py:6674
+msgid "Xtream Codes Accounts"
+msgstr "Xtream Codes 帳戶"
+
+#: ../GTIPTVPlayerPro/main.py:5951 ../GTIPTVPlayerPro/main.py:6675
+msgid "M3U Sources"
+msgstr "M3U 來源"
+
+#: ../GTIPTVPlayerPro/main.py:5952 ../GTIPTVPlayerPro/main.py:6676
+msgid "Stalker / MAC Portal Accounts"
+msgstr "Stalker / MAC Portal 帳戶"
+
+#: ../GTIPTVPlayerPro/main.py:5953 ../GTIPTVPlayerPro/main.py:6094
+#: ../GTIPTVPlayerPro/main.py:9552 ../GTIPTVPlayerPro/remote_footer.py:118
+msgid "Sources"
+msgstr "來源"
+
+#: ../GTIPTVPlayerPro/main.py:6063 ../GTIPTVPlayerPro/main.py:6478
+#, python-brace-format
+msgid "{} was deleted ({} records)."
+msgstr "已刪除 {}（{} 條記錄）。"
+
+#: ../GTIPTVPlayerPro/main.py:6114
+msgid ""
+"No source was found.\n"
+"\n"
+"Create one from the ADD SOURCE panel on the home screen."
+msgstr ""
+"找不到來源。\n"
+"\n"
+"請從主畫面的「新增來源」面板建立一個來源。"
+
+#: ../GTIPTVPlayerPro/main.py:6136 ../GTIPTVPlayerPro/main.py:6155
+#: ../GTIPTVPlayerPro/main.py:6825 ../GTIPTVPlayerPro/main.py:6894
+#: ../GTIPTVPlayerPro/main.py:6953 ../GTIPTVPlayerPro/main.py:7000
+msgid "Add Source"
+msgstr "新增來源"
+
+#: ../GTIPTVPlayerPro/main.py:6235 ../GTIPTVPlayerPro/main.py:7644
+#: ../GTIPTVPlayerPro/main.py:7732 ../GTIPTVPlayerPro/main.py:9518
+msgid "Ready to connect"
+msgstr "可以連線"
+
+#: ../GTIPTVPlayerPro/main.py:6245 ../GTIPTVPlayerPro/main.py:6281
+#: ../GTIPTVPlayerPro/main.py:8890 ../GTIPTVPlayerPro/main.py:9627
+#: ../GTIPTVPlayerPro/main.py:9640 ../GTIPTVPlayerPro/main.py:9683
+#, python-brace-format
+msgid "Expiry: {}"
+msgstr "到期時間：{}"
+
+#: ../GTIPTVPlayerPro/main.py:6351
+msgid "Choose a source type first."
+msgstr "請先選擇來源類型。"
+
+#: ../GTIPTVPlayerPro/main.py:6366
+msgid "No source is selected for deletion."
+msgstr "未選擇要刪除的來源。"
+
+#: ../GTIPTVPlayerPro/main.py:6370
+msgid "Could not open the deletion confirmation."
+msgstr "無法開啟刪除確認框。"
+
+#: ../GTIPTVPlayerPro/main.py:6387
+msgid "Source deletion cancelled."
+msgstr "已取消刪除來源。"
+
+#: ../GTIPTVPlayerPro/main.py:6516 ../GTIPTVPlayerPro/main.py:6554
+#: ../GTIPTVPlayerPro/main.py:9835
+msgid "A source connection is already in progress."
+msgstr "來源連線已在進行中。"
+
+#: ../GTIPTVPlayerPro/main.py:6545 ../GTIPTVPlayerPro/main.py:8707
+msgid "XMLTV EPG settings could not be opened."
+msgstr "無法開啟 XMLTV EPG 設定。"
+
+#: ../GTIPTVPlayerPro/main.py:6551 ../GTIPTVPlayerPro/main.py:7651
+msgid "No source is available to connect."
+msgstr "沒有可連線的來源。"
+
+#: ../GTIPTVPlayerPro/main.py:6582 ../GTIPTVPlayerPro/main.py:9855
+msgid "CONNECTING..."
+msgstr "正在連線..."
+
+#: ../GTIPTVPlayerPro/main.py:6596
+#, python-brace-format
+msgid "Connecting to {}, please wait."
+msgstr "正在連線到 {}，請稍候。"
+
+#: ../GTIPTVPlayerPro/main.py:6607 ../GTIPTVPlayerPro/main.py:9866
+msgid "CONNECTED"
+msgstr "已連線"
+
+#: ../GTIPTVPlayerPro/main.py:6611
+msgid "OPENING MAIN PANEL"
+msgstr "正在開啟主面板"
+
+#: ../GTIPTVPlayerPro/main.py:6614
+#, python-brace-format
+msgid "Connected to {}."
+msgstr "已連線到 {}。"
+
+#: ../GTIPTVPlayerPro/main.py:6630 ../GTIPTVPlayerPro/remote_footer.py:103
+msgid "Retry"
+msgstr "重試"
+
+#: ../GTIPTVPlayerPro/main.py:6634 ../GTIPTVPlayerPro/main.py:9883
+#, python-brace-format
+msgid "Could not connect to {}: {}"
+msgstr "無法連線到 {}：{}"
+
+#: ../GTIPTVPlayerPro/main.py:6661 ../GTIPTVPlayerPro/main.py:6721
+msgid "Manage Sources"
+msgstr "管理來源"
+
+#: ../GTIPTVPlayerPro/main.py:6664 ../GTIPTVPlayerPro/main.py:7362
+msgid "Choose the source type you want to manage."
+msgstr "請選擇要管理的來源類型。"
+
+#: ../GTIPTVPlayerPro/main.py:6677 ../GTIPTVPlayerPro/main.py:6843
+#: ../GTIPTVPlayerPro/main.py:7373
+msgid "Server URL, username and password"
+msgstr "伺服器網址、使用者名稱和密碼"
+
+#: ../GTIPTVPlayerPro/main.py:6678 ../GTIPTVPlayerPro/main.py:6846
+msgid "Local file, NAS or web link"
+msgstr "本地檔案、NAS 或網絡鏈接"
+
+#: ../GTIPTVPlayerPro/main.py:6679 ../GTIPTVPlayerPro/main.py:6849
+#: ../GTIPTVPlayerPro/main.py:7376 ../GTIPTVPlayerPro/main.py:8996
+msgid "Portal"
+msgstr "Portal"
+
+#: ../GTIPTVPlayerPro/main.py:6770
+msgid "Each source type is listed separately. Each section can contain up to 500 sources."
+msgstr "各類來源單獨列出，每個分區最多可包含 500 個來源。"
+
+#: ../GTIPTVPlayerPro/main.py:6805
+msgid "Xtream Codes provides Live TV, Movies and Series."
+msgstr "Xtream Codes 提供直播電視、電影和劇集。"
+
+#: ../GTIPTVPlayerPro/main.py:6807
+msgid "M3U sources provide Live TV only. Categories, search and favorites are supported."
+msgstr "M3U 來源僅提供直播電視。支援類別、搜尋和收藏。"
+
+#: ../GTIPTVPlayerPro/main.py:6811 ../GTIPTVPlayerPro/main.py:6973
+#: ../GTIPTVPlayerPro/main.py:8550
+msgid "The Stalker / MAC portal will be checked automatically when this screen opens."
+msgstr "開啟此介面時將自動檢查 Stalker / MAC Portal。"
+
+#: ../GTIPTVPlayerPro/main.py:6828
+msgid "Choose the source type to add."
+msgstr "選擇要新增的來源類型。"
+
+#: ../GTIPTVPlayerPro/main.py:6935 ../GTIPTVPlayerPro/stalker.py:550
+#: ../GTIPTVPlayerPro/stalker.py:554 ../GTIPTVPlayerPro/stalker.py:563
+#: ../GTIPTVPlayerPro/stalker.py:565
+msgid "Enter a valid portal URL"
+msgstr "請輸入有效的 Portal URL"
+
+#: ../GTIPTVPlayerPro/main.py:6936 ../GTIPTVPlayerPro/stalker.py:543
+msgid "Enter a valid MAC address"
+msgstr "請輸入有效的 MAC 地址"
+
+#: ../GTIPTVPlayerPro/main.py:6956 ../GTIPTVPlayerPro/main.py:7993
+msgid "Source details"
+msgstr "來源詳細資訊"
+
+#: ../GTIPTVPlayerPro/main.py:6960
+msgid "Portal URL / MAC"
+msgstr "Portal 網址 / MAC"
+
+#: ../GTIPTVPlayerPro/main.py:6961
+msgid "GREEN"
+msgstr "綠鍵"
+
+#: ../GTIPTVPlayerPro/main.py:6962 ../GTIPTVPlayerPro/remote_footer.py:97
+msgid "Save"
+msgstr "儲存"
+
+#: ../GTIPTVPlayerPro/main.py:7016
+msgid "Portal URL"
+msgstr "Portal 網址"
+
+#: ../GTIPTVPlayerPro/main.py:7024
+msgid "MAC address"
+msgstr "MAC 地址"
+
+#: ../GTIPTVPlayerPro/main.py:7079 ../GTIPTVPlayerPro/main.py:8199
+#: ../GTIPTVPlayerPro/main.py:8212 ../GTIPTVPlayerPro/main.py:8439
+msgid "Information received. Edit the next field or press GREEN to save."
+msgstr "已收到資訊。請編輯下一個欄位，或按綠鍵儲存。"
+
+#: ../GTIPTVPlayerPro/main.py:7208 ../GTIPTVPlayerPro/main.py:7254
+#: ../GTIPTVPlayerPro/playlist.py:1557
+msgid "Local / NAS file"
+msgstr "本地 / NAS 檔案"
+
+#: ../GTIPTVPlayerPro/main.py:7211 ../GTIPTVPlayerPro/main.py:7842
+#: ../GTIPTVPlayerPro/main.py:8012
+msgid "Device, USB or mounted network storage"
+msgstr "設備、USB 或已掛載的網絡儲存"
+
+#: ../GTIPTVPlayerPro/main.py:7576
+msgid "Add playlist"
+msgstr "新增播放清單"
+
+#: ../GTIPTVPlayerPro/main.py:7627 ../GTIPTVPlayerPro/main.py:7656
+#: ../GTIPTVPlayerPro/main.py:7698 ../GTIPTVPlayerPro/main.py:7739
+#: ../GTIPTVPlayerPro/main.py:9301
+msgid "Not available"
+msgstr "無法使用"
+
+#: ../GTIPTVPlayerPro/main.py:7667 ../GTIPTVPlayerPro/playlist.py:1121
+msgid "No valid IPTV source was found"
+msgstr "找不到有效的 IPTV 來源"
+
+#: ../GTIPTVPlayerPro/main.py:7713 ../GTIPTVPlayerPro/remote_footer.py:95
+msgid "Rename"
+msgstr "重新命名"
+
+#: ../GTIPTVPlayerPro/main.py:7970
+msgid "Enter a name for the M3U source"
+msgstr "請輸入 M3U 來源名稱"
+
+#: ../GTIPTVPlayerPro/main.py:7972
+msgid "Enter the M3U file path or HTTP(S) URL"
+msgstr "請輸入 M3U 檔案路徑或 HTTP(S) 網址"
+
+#: ../GTIPTVPlayerPro/main.py:7991 ../GTIPTVPlayerPro/main.py:8048
+msgid "Add M3U Source"
+msgstr "新增 M3U 來源"
+
+#: ../GTIPTVPlayerPro/main.py:7996
+msgid "Give the source a name and choose its location."
+msgstr "為來源命名並選擇其位置。"
+
+#: ../GTIPTVPlayerPro/main.py:7999
+msgid "Source name"
+msgstr "來源名稱"
+
+#: ../GTIPTVPlayerPro/main.py:8015
+msgid "Direct HTTP(S) M3U link"
+msgstr "直接 HTTP(S) M3U 鏈接"
+
+#: ../GTIPTVPlayerPro/main.py:8053
+msgid "M3U URL must start with http:// or https://."
+msgstr "M3U 網址必須以 http:// 或 https:// 開頭。"
+
+#: ../GTIPTVPlayerPro/main.py:8070
+msgid "Enter a source name"
+msgstr "請輸入來源名稱"
+
+#: ../GTIPTVPlayerPro/main.py:8072
+msgid "File path"
+msgstr "檔案路徑"
+
+#: ../GTIPTVPlayerPro/main.py:8081 ../GTIPTVPlayerPro/remote_footer.py:94
+msgid "Edit"
+msgstr "編輯"
+
+#: ../GTIPTVPlayerPro/main.py:8247
+#, python-brace-format
+msgid "Could not save the M3U source: {}"
+msgstr "無法儲存 M3U 來源：{}"
+
+#: ../GTIPTVPlayerPro/main.py:8256
+#, python-brace-format
+msgid "{} was saved as an M3U Live TV source."
+msgstr "{} 已儲存為 M3U 直播來源。"
+
+#: ../GTIPTVPlayerPro/main.py:8269
+msgid "Enter the server URL"
+msgstr "請輸入伺服器網址"
+
+#: ../GTIPTVPlayerPro/main.py:8270 ../GTIPTVPlayerPro/main.py:8343
+msgid "Enter the username"
+msgstr "請輸入使用者名稱"
+
+#: ../GTIPTVPlayerPro/main.py:8271 ../GTIPTVPlayerPro/main.py:8347
+msgid "Enter the password"
+msgstr "請輸入密碼"
+
+#: ../GTIPTVPlayerPro/main.py:8293 ../GTIPTVPlayerPro/main.py:8330
+msgid "ADD NEW ACCOUNT"
+msgstr "新增新帳戶"
+
+#: ../GTIPTVPlayerPro/main.py:8295 ../GTIPTVPlayerPro/main.py:8333
+msgid "Press OK in a text field; use LEFT / RIGHT on the output row."
+msgstr "在文字欄位中按 OK；在輸出列使用左/右鍵。"
+
+#: ../GTIPTVPlayerPro/main.py:8304
+msgid "Press GREEN to save  |  Select a TS or M3U8 output supported by the server."
+msgstr "按綠鍵儲存  |  請選擇伺服器支援的 TS 或 M3U8 輸出。"
+
+#: ../GTIPTVPlayerPro/main.py:8327 ../GTIPTVPlayerPro/main.py:8331
+msgid "Add New Account"
+msgstr "新增新帳戶"
+
+#: ../GTIPTVPlayerPro/main.py:8350
+#, python-brace-format
+msgid "  SERVER URL        {}"
+msgstr "  伺服器網址   {}"
+
+#: ../GTIPTVPlayerPro/main.py:8355
+#, python-brace-format
+msgid "  USERNAME          {}"
+msgstr "  使用者名稱       {}"
+
+#: ../GTIPTVPlayerPro/main.py:8359
+#, python-brace-format
+msgid "  PASSWORD          {}"
+msgstr "  密碼         {}"
+
+#: ../GTIPTVPlayerPro/main.py:8362
+#, python-brace-format
+msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
+msgstr "  輸出格式     {}     使用左/右鍵更改"
+
+#: ../GTIPTVPlayerPro/main.py:8395
+#, python-brace-format
+msgid "Live TV output selected: {}."
+msgstr "已選擇直播電視輸出：{}。"
+
+#: ../GTIPTVPlayerPro/main.py:8454
+#, python-brace-format
+msgid "Could not save the account: {}"
+msgstr "無法儲存帳戶：{}"
+
+#: ../GTIPTVPlayerPro/main.py:8464
+#, python-brace-format
+msgid "{} was saved with {} output."
+msgstr "已儲存 {}，輸出格式為 {}。"
+
+#: ../GTIPTVPlayerPro/main.py:8522 ../GTIPTVPlayerPro/main.py:8595
+msgid "Source Health"
+msgstr "來源狀態"
+
+#: ../GTIPTVPlayerPro/main.py:8524 ../GTIPTVPlayerPro/main.py:8597
+msgid "Portal Health"
+msgstr "Portal 狀態"
+
+#: ../GTIPTVPlayerPro/main.py:8524 ../GTIPTVPlayerPro/main.py:8597
+msgid "Server Health"
+msgstr "伺服器運作狀態"
+
+#: ../GTIPTVPlayerPro/main.py:8538 ../GTIPTVPlayerPro/main.py:8569
+msgid "WAITING FOR TEST"
+msgstr "等待測試"
+
+#: ../GTIPTVPlayerPro/main.py:8546
+msgid "The M3U source will be checked automatically when this screen opens."
+msgstr "開啟此畫面時將自動檢查 M3U 來源。"
+
+#: ../GTIPTVPlayerPro/main.py:8554
+msgid "The Xtream API connection will be tested automatically when this screen opens."
+msgstr "開啟此畫面時將自動測試 Xtream API 連線。"
+
+#: ../GTIPTVPlayerPro/main.py:8727
+msgid "XMLTV EPG is disabled for this M3U source."
+msgstr "此 M3U 來源已停用 XMLTV EPG。"
+
+#: ../GTIPTVPlayerPro/main.py:8731
+msgid "XMLTV EPG is ready from the local cache."
+msgstr "本地快取中的 XMLTV EPG 已就緒。"
+
+#: ../GTIPTVPlayerPro/main.py:8733
+msgid "XMLTV EPG is enabled and waiting for its first update."
+msgstr "此 M3U 來源已啟用 XMLTV EPG，正在等待首次更新。"
+
+#: ../GTIPTVPlayerPro/main.py:8751
+msgid "Checking M3U access, catalogue size and cache status."
+msgstr "正在檢查 M3U 存取、目錄大小和快取狀態。"
+
+#: ../GTIPTVPlayerPro/main.py:8754
+msgid "Checking portal authentication, categories and latency."
+msgstr "正在檢查 Portal 認證、類別和延遲。"
+
+#: ../GTIPTVPlayerPro/main.py:8757
+msgid "Checking API access, account status, latency and connection limits."
+msgstr "正在檢查 API 存取、帳戶狀態、延遲和連線限制。"
+
+#: ../GTIPTVPlayerPro/main.py:8883 ../GTIPTVPlayerPro/stalker.py:1908
+#: ../GTIPTVPlayerPro/stalker.py:1911 ../GTIPTVPlayerPro/stalker.py:1914
+#: ../GTIPTVPlayerPro/stalker.py:1925 ../GTIPTVPlayerPro/stalker.py:1940
+#: ../GTIPTVPlayerPro/stalker.py:1944 ../GTIPTVPlayerPro/stalker.py:8114
+msgid "Server does not report expiry"
+msgstr "伺服器未提供到期日期"
+
+#: ../GTIPTVPlayerPro/main.py:8996
+msgid "Server"
+msgstr "伺服器"
+
+#: ../GTIPTVPlayerPro/main.py:9302
+msgid "Standard M3U sources support Live TV only."
+msgstr "標準 M3U 來源僅支援直播電視。"
+
+#: ../GTIPTVPlayerPro/main.py:9347 ../GTIPTVPlayerPro/remote_footer.py:136
+msgid "About"
+msgstr "關於"
+
+#: ../GTIPTVPlayerPro/main.py:9420
+msgid "SECURE SOURCE CONNECTION"
+msgstr "安全來源連線"
+
+#: ../GTIPTVPlayerPro/main.py:9421
+msgid "Welcome"
+msgstr "歡迎"
+
+#: ../GTIPTVPlayerPro/main.py:9423
+msgid "Select and connect to a saved source to start watching."
+msgstr "選擇並連線已儲存的來源以開始觀看。"
+
+#: ../GTIPTVPlayerPro/main.py:9426
+msgid "SAVED SOURCE"
+msgstr "已儲存的來源"
+
+#: ../GTIPTVPlayerPro/main.py:9537
+msgid "Source status is checked automatically when connecting."
+msgstr "連線時會自動檢查來源狀態。"
+
+#: ../GTIPTVPlayerPro/main.py:9541
+msgid "No saved source found"
+msgstr "找不到已儲存的來源"
+
+#: ../GTIPTVPlayerPro/main.py:9544
+msgid "Create a new source from the ADD SOURCE panel."
+msgstr "請從「新增來源」面板建立新來源。"
+
+#: ../GTIPTVPlayerPro/main.py:9554
+msgid "No saved source. Create one from the ADD SOURCE panel."
+msgstr "沒有已儲存的來源。請從「新增來源」面板建立一個來源。"
+
+#: ../GTIPTVPlayerPro/main.py:9557
+msgid "CONNECT SOURCE"
+msgstr "連線來源"
+
+#: ../GTIPTVPlayerPro/main.py:9558
+msgid "MANAGE SOURCES"
+msgstr "管理來源"
+
+#: ../GTIPTVPlayerPro/main.py:9559
+msgid "ADD SOURCE"
+msgstr "新增來源"
+
+#: ../GTIPTVPlayerPro/main.py:9671 ../GTIPTVPlayerPro/playlist.py:1282
+#, python-brace-format
+msgid "Account status: {}"
+msgstr "帳戶狀態：{}"
+
+#: ../GTIPTVPlayerPro/main.py:9858
+#, python-brace-format
+msgid "Checking {}, please wait."
+msgstr "正在檢查 {}，請稍候。"
+
+#: ../GTIPTVPlayerPro/main.py:9869
+#, python-brace-format
+msgid "Connected to {}; opening the dashboard."
+msgstr "已連線到 {}；正在開啟主面板。"
+
+#: ../GTIPTVPlayerPro/main.py:9902
+msgid "Close the open screen before opening another one."
+msgstr "請先關閉目前畫面，再開啟另一個畫面。"
+
+#: ../GTIPTVPlayerPro/metadata.py:255
+msgid "TMDb request cancelled"
+msgstr "TMDb 請求已取消"
+
+#: ../GTIPTVPlayerPro/metadata.py:266 ../GTIPTVPlayerPro/metadata.py:284
+msgid "TMDb request timed out"
+msgstr "TMDb 請求逾時"
+
+#: ../GTIPTVPlayerPro/metadata.py:354
+msgid "Could not load the TMDb configuration"
+msgstr "無法載入 TMDb 設定"
+
+#: ../GTIPTVPlayerPro/metadata.py:364 ../GTIPTVPlayerPro/metadata.py:754
+#: ../GTIPTVPlayerPro/metadata.py:822
+msgid "TMDb API key is not configured"
+msgstr "未設定 TMDb API 金鑰"
+
+#: ../GTIPTVPlayerPro/metadata.py:398
+#, python-brace-format
+msgid "TMDb HTTP error path={}"
+msgstr "TMDb HTTP 錯誤，路徑={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:400 ../GTIPTVPlayerPro/metadata.py:421
+msgid "TMDb API key is invalid"
+msgstr "TMDb API 金鑰無效"
+
+#: ../GTIPTVPlayerPro/metadata.py:402
+msgid "TMDb request limit reached"
+msgstr "已達到 TMDb 請求上限"
+
+#: ../GTIPTVPlayerPro/metadata.py:403
+#, python-brace-format
+msgid "TMDb returned HTTP {}"
+msgstr "TMDb 傳回 HTTP {}"
+
+#: ../GTIPTVPlayerPro/metadata.py:405
+#, python-brace-format
+msgid "TMDb connection error path={}"
+msgstr "TMDb 連線錯誤，路徑={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:406
+msgid "Could not connect to the TMDb service"
+msgstr "無法連線到 TMDb 服務"
+
+#: ../GTIPTVPlayerPro/metadata.py:408
+msgid "TMDb response is too large"
+msgstr "TMDb 回應過大"
+
+#: ../GTIPTVPlayerPro/metadata.py:414
+#, python-brace-format
+msgid "Invalid TMDb JSON path={}"
+msgstr "無效的 TMDb JSON 路徑={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:415 ../GTIPTVPlayerPro/metadata.py:417
+msgid "TMDb returned an invalid response"
+msgstr "TMDb 傳回無效回應"
+
+#: ../GTIPTVPlayerPro/metadata.py:422
+msgid "TMDb request was rejected"
+msgstr "TMDb 請求被拒絕"
+
+#: ../GTIPTVPlayerPro/metadata.py:752 ../GTIPTVPlayerPro/metadata.py:820
+msgid "TMDb metadata enrichment is disabled"
+msgstr "TMDb 元資料增強已停用"
+
+#: ../GTIPTVPlayerPro/metadata.py:761 ../GTIPTVPlayerPro/metadata.py:828
+msgid "No valid title was found for TMDb"
+msgstr "找不到用於 TMDb 的有效標題"
+
+#: ../GTIPTVPlayerPro/metadata.py:789 ../GTIPTVPlayerPro/metadata.py:808
+#: ../GTIPTVPlayerPro/metadata.py:857 ../GTIPTVPlayerPro/metadata.py:876
+msgid "No TMDb match was found"
+msgstr "在 TMDb 中找不到配對項"
+
+#: ../GTIPTVPlayerPro/metadata.py:798 ../GTIPTVPlayerPro/metadata.py:799
+#: ../GTIPTVPlayerPro/metadata.py:866 ../GTIPTVPlayerPro/metadata.py:867
+msgid "Could not load TMDb information"
+msgstr "無法載入 TMDb 資訊"
+
+#: ../GTIPTVPlayerPro/network_security.py:45
+#: ../GTIPTVPlayerPro/network_security.py:53
+#: ../GTIPTVPlayerPro/network_security.py:55
+msgid "Image request headers are invalid."
+msgstr "圖片請求標頭無效。"
+
+#: ../GTIPTVPlayerPro/network_security.py:64
+msgid "Network address could not be resolved."
+msgstr "無法解析網絡地址。"
+
+#: ../GTIPTVPlayerPro/network_security.py:67
+msgid "Image requests to local, private or reserved network addresses are prohibited."
+msgstr "禁止向本地、私有或保留網絡地址請求圖片。"
+
+#: ../GTIPTVPlayerPro/network_security.py:79
+#: ../GTIPTVPlayerPro/network_security.py:84
+msgid "Image URL is invalid."
+msgstr "圖片網址無效。"
+
+#: ../GTIPTVPlayerPro/network_security.py:94
+msgid "Image URL is not safe."
+msgstr "圖片網址不安全。"
+
+#: ../GTIPTVPlayerPro/network_security.py:97
+msgid "Image URL port is invalid."
+msgstr "圖片網址連接埠無效。"
+
+#: ../GTIPTVPlayerPro/network_security.py:101
+#: ../GTIPTVPlayerPro/network_security.py:103
+msgid "Image host name is invalid."
+msgstr "圖片主機名無效。"
+
+#: ../GTIPTVPlayerPro/network_security.py:132
+msgid "Image download timed out."
+msgstr "圖片下載逾時。"
+
+#: ../GTIPTVPlayerPro/network_security.py:161
+#: ../GTIPTVPlayerPro/network_security.py:184
+msgid "Image host name resolution timed out."
+msgstr "解析圖片主機名逾時。"
+
+#: ../GTIPTVPlayerPro/network_security.py:194
+msgid "Image host name could not be resolved."
+msgstr "無法解析圖片主機名。"
+
+#: ../GTIPTVPlayerPro/network_security.py:206
+msgid "Image host did not resolve to a public IP address."
+msgstr "圖片主機未解析到公共 IP 地址。"
+
+#: ../GTIPTVPlayerPro/network_security.py:282
+msgid "Image response has conflicting size information."
+msgstr "圖片回應包含相互衝突的大小資訊。"
+
+#: ../GTIPTVPlayerPro/network_security.py:336
+#, python-brace-format
+msgid "Image server returned HTTP {}."
+msgstr "圖片伺服器傳回 HTTP {}。"
+
+#: ../GTIPTVPlayerPro/network_security.py:341
+msgid "Compressed image HTTP responses are not accepted."
+msgstr "不接受壓縮的圖片 HTTP 回應。"
+
+#: ../GTIPTVPlayerPro/network_security.py:349
+msgid "Image response size is invalid."
+msgstr "圖片回應大小無效。"
+
+#: ../GTIPTVPlayerPro/network_security.py:353
+#: ../GTIPTVPlayerPro/network_security.py:371
+msgid "Image response exceeds the safe size limit."
+msgstr "圖片回應超過安全大小限制。"
+
+#: ../GTIPTVPlayerPro/network_security.py:403
+#: ../GTIPTVPlayerPro/network_security.py:405
+msgid "Image download limits are invalid."
+msgstr "圖片下載限制無效。"
+
+#: ../GTIPTVPlayerPro/network_security.py:419
+msgid "An HTTPS image request cannot be redirected to HTTP."
+msgstr "HTTPS 圖片請求不能重定向到 HTTP。"
+
+#: ../GTIPTVPlayerPro/network_security.py:452
+msgid "Could not establish a secure connection to the image server."
+msgstr "無法與圖片伺服器建立安全連線。"
+
+#: ../GTIPTVPlayerPro/network_security.py:459
+msgid "Image redirect URL is missing."
+msgstr "缺少圖片重定向網址。"
+
+#: ../GTIPTVPlayerPro/network_security.py:461
+msgid "Image request was redirected too many times."
+msgstr "圖片請求重定向次數過多。"
+
+#: ../GTIPTVPlayerPro/network_security.py:475
+msgid "Image redirection could not be completed."
+msgstr "無法完成圖片重定向。"
+
+#: ../GTIPTVPlayerPro/playlist.py:41
+#, python-brace-format
+msgid ""
+"Latency: {} ms\n"
+"Account status: {}\n"
+"Active / Maximum: {}\n"
+"Expiry: {}\n"
+"Server time: {}\n"
+"Time zone: {}\n"
+"Protocol: {}\n"
+"Output format: {}\n"
+"Server version: {}\n"
+"\n"
+"{}"
+msgstr ""
+"延遲：{} 毫秒\n"
+"帳戶狀態：{}\n"
+"活動數 / 最大數：{}\n"
+"到期時間：{}\n"
+"伺服器時間：{}\n"
+"時區：{}\n"
+"協議：{}\n"
+"輸出格式：{}\n"
+"伺服器版本：{}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/playlist.py:171
+msgid "Invalid stream ID"
+msgstr "無效的串流 ID"
+
+#: ../GTIPTVPlayerPro/playlist.py:390 ../GTIPTVPlayerPro/playlist.py:402
+#: ../GTIPTVPlayerPro/playlist.py:781
+msgid "Playlist file is too large"
+msgstr "播放清單檔案過大"
+
+#: ../GTIPTVPlayerPro/playlist.py:731
+msgid "Enter a valid Xtream URL"
+msgstr "請輸入有效的 Xtream 網址"
+
+#: ../GTIPTVPlayerPro/playlist.py:760
+msgid "The Xtream account limit was reached"
+msgstr "已達到 Xtream 帳戶上限"
+
+#: ../GTIPTVPlayerPro/playlist.py:800
+msgid "Server URL, username and password are required"
+msgstr "必須提供伺服器網址、使用者名稱和密碼"
+
+#: ../GTIPTVPlayerPro/playlist.py:803
+msgid "Output format must be TS or M3U8"
+msgstr "輸出格式必須為 TS 或 M3U8"
+
+#: ../GTIPTVPlayerPro/playlist.py:808
+msgid "Enter a valid server URL"
+msgstr "請輸入有效的伺服器網址"
+
+#: ../GTIPTVPlayerPro/playlist.py:810
+msgid "Server URL must start with http:// or https://"
+msgstr "伺服器網址必須以 http:// 或 https:// 開頭"
+
+#: ../GTIPTVPlayerPro/playlist.py:813
+msgid "Do not include a username or password in the server URL"
+msgstr "請勿在伺服器網址中包含使用者名稱或密碼"
+
+#: ../GTIPTVPlayerPro/playlist.py:816
+msgid "Server URL port is invalid"
+msgstr "伺服器網址連接埠無效"
+
+#: ../GTIPTVPlayerPro/playlist.py:879 ../GTIPTVPlayerPro/playlist.py:965
+#: ../GTIPTVPlayerPro/playlist.py:1591 ../GTIPTVPlayerPro/playlist.py:1603
+msgid "The account selected for deletion is invalid"
+msgstr "所選的待刪除帳戶無效"
+
+#: ../GTIPTVPlayerPro/playlist.py:941 ../GTIPTVPlayerPro/playlist.py:1010
+msgid "The selected account was not found in the account files"
+msgstr "在帳戶檔案中找不到所選帳戶"
+
+#: ../GTIPTVPlayerPro/playlist.py:1069
+msgid "playlists.txt was not found"
+msgstr "找不到 playlists.txt"
+
+#: ../GTIPTVPlayerPro/playlist.py:1071
+msgid "No valid Xtream account was found"
+msgstr "找不到有效的 Xtream 帳戶"
+
+#: ../GTIPTVPlayerPro/playlist.py:1119
+msgid "No saved IPTV source was found"
+msgstr "找不到已儲存的 IPTV 來源"
+
+#: ../GTIPTVPlayerPro/playlist.py:1163
+msgid "The selected M3U source was not found"
+msgstr "找不到所選 M3U 來源"
+
+#: ../GTIPTVPlayerPro/playlist.py:1237
+msgid "Never / unknown"
+msgstr "從不 / 未知"
+
+#: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1255
+#: ../GTIPTVPlayerPro/playlist.py:1415 ../GTIPTVPlayerPro/playlist.py:1434
+#: ../GTIPTVPlayerPro/playlist.py:1445 ../GTIPTVPlayerPro/playlist.py:1493
+#: ../GTIPTVPlayerPro/playlist.py:1541 ../GTIPTVPlayerPro/stalker.py:8184
+msgid "ERROR"
+msgstr "錯誤"
+
+#: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1257
+msgid "API response is invalid"
+msgstr "API 回應無效"
+
+#: ../GTIPTVPlayerPro/playlist.py:1272 ../GTIPTVPlayerPro/stalker.py:8184
+msgid "INVALID"
+msgstr "無效"
+
+#: ../GTIPTVPlayerPro/playlist.py:1273
+msgid "Server did not validate the account"
+msgstr "伺服器未驗證帳戶"
+
+#: ../GTIPTVPlayerPro/playlist.py:1281
+msgid "DISABLED"
+msgstr "已停用"
+
+#: ../GTIPTVPlayerPro/playlist.py:1288 ../GTIPTVPlayerPro/stalker.py:8159
+msgid "BUSY"
+msgstr "忙碌"
+
+#: ../GTIPTVPlayerPro/playlist.py:1292
+msgid "API connection successful"
+msgstr "API 連線成功"
+
+#: ../GTIPTVPlayerPro/playlist.py:1415
+msgid "API response is too large"
+msgstr "API 回應過大"
+
+#: ../GTIPTVPlayerPro/playlist.py:1426
+msgid "Server health check HTTP error"
+msgstr "伺服器運作狀態檢查出現 HTTP 錯誤"
+
+#: ../GTIPTVPlayerPro/playlist.py:1443
+msgid "Server health check connection error"
+msgstr "伺服器運作狀態檢查出現連線錯誤"
+
+#: ../GTIPTVPlayerPro/playlist.py:1445
+msgid "Could not connect to the server"
+msgstr "無法連線到伺服器"
+
+#: ../GTIPTVPlayerPro/playlist.py:1454
+msgid "Not cached"
+msgstr "未快取"
+
+#: ../GTIPTVPlayerPro/playlist.py:1458
+msgid "Less than one minute"
+msgstr "不到一分鐘"
+
+#: ../GTIPTVPlayerPro/playlist.py:1460
+#, python-brace-format
+msgid "{} minutes"
+msgstr "{} 分鐘"
+
+#: ../GTIPTVPlayerPro/playlist.py:1524 ../GTIPTVPlayerPro/playlist.py:1544
+msgid "The M3U source could not be checked."
+msgstr "無法檢查 M3U 來源。"
+
+#: ../GTIPTVPlayerPro/playlist.py:1534
+msgid "M3U catalogue loaded from cache."
+msgstr "已從快取載入 M3U 目錄。"
+
+#: ../GTIPTVPlayerPro/playlist.py:1536
+msgid "M3U source is accessible."
+msgstr "可以存取 M3U 來源。"
+
+#: ../GTIPTVPlayerPro/playlist.py:1539
+msgid "The source is unavailable; a stale cache is in use."
+msgstr "來源無法使用；正在使用過期快取。"
+
+#: ../GTIPTVPlayerPro/plugin.py:91
+msgid "Modern Enigma2 IPTV player"
+msgstr "適用於 Enigma2 的現代 IPTV 播放器"
+
+#: ../GTIPTVPlayerPro/portal_expiry.py:64
+#: ../GTIPTVPlayerPro/portal_expiry.py:148
+msgid "Unlimited"
+msgstr "無期限"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:88
+msgid "Action"
+msgstr "操作"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:91
+msgid "Exit"
+msgstr "退出"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:93
+#: ../GTIPTVPlayerPro/remote_footer.py:115
+#: ../GTIPTVPlayerPro/remote_footer.py:116
+msgid "Change"
+msgstr "更改"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:96
+msgid "Continue"
+msgstr "繼續"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:98
+msgid "Test"
+msgstr "測試"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:104
+msgid "Navigate"
+msgstr "導航"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:107
+msgid "Refresh"
+msgstr "重新整理"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:108
+msgid "Back"
+msgstr "返回"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:110
+msgid "Play"
+msgstr "播放"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:112
+msgid "EPG settings"
+msgstr "EPG 設定"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:114
+msgid "Full screen"
+msgstr "全屏"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:120
+#: ../GTIPTVPlayerPro/remote_footer.py:124
+msgid "Remove"
+msgstr "移除"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:122
+msgid "Clear search"
+msgstr "清除搜尋"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:125
+msgid "Filter"
+msgstr "篩選"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:126
+msgid "New"
+msgstr "新建"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:127
+msgid "Move"
+msgstr "移動"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:129
+msgid "Reset"
+msgstr "重置"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:130
+msgid "Show / Hide"
+msgstr "顯示 / 隱藏"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:131
+msgid "Mark"
+msgstr "標記"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:133
+msgid "Clear"
+msgstr "清除"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:135
+msgid "Rescan"
+msgstr "重新掃描"
+
+#: ../GTIPTVPlayerPro/stalker.py:556
+msgid "Portal URL must start with http:// or https://"
+msgstr "Portal URL 必須以 http:// 或 https:// 開頭"
+
+#: ../GTIPTVPlayerPro/stalker.py:567
+msgid "Portal URL port is invalid"
+msgstr "Portal URL 連接埠無效"
+
+#: ../GTIPTVPlayerPro/stalker.py:569
+msgid "Do not include a query or fragment in the portal URL"
+msgstr "Portal URL 中不要包含查詢參數或片段"
+
+#: ../GTIPTVPlayerPro/stalker.py:1208 ../GTIPTVPlayerPro/stalker.py:1213
+msgid "The Stalker account directory could not be created"
+msgstr "無法建立 Stalker 帳戶目錄"
+
+#: ../GTIPTVPlayerPro/stalker.py:1220
+msgid "The Stalker account directory is unsafe"
+msgstr "Stalker 帳戶目錄不安全"
+
+#: ../GTIPTVPlayerPro/stalker.py:1232
+msgid "The Stalker account file is unsafe"
+msgstr "Stalker 帳戶檔案不安全"
+
+#: ../GTIPTVPlayerPro/stalker.py:1248 ../GTIPTVPlayerPro/stalker.py:1257
+msgid "The Stalker account file could not be created"
+msgstr "無法建立 Stalker 帳戶檔案"
+
+#: ../GTIPTVPlayerPro/stalker.py:1278 ../GTIPTVPlayerPro/stalker.py:1297
+#: ../GTIPTVPlayerPro/stalker.py:1410
+msgid "The Stalker account file is too large"
+msgstr "Stalker 帳戶檔案過大"
+
+#: ../GTIPTVPlayerPro/stalker.py:1289
+msgid "The Stalker account file changed while opening"
+msgstr "Stalker 帳戶檔案在開啟時發生變化"
+
+#: ../GTIPTVPlayerPro/stalker.py:1350 ../GTIPTVPlayerPro/stalker.py:1365
+msgid "No valid Stalker / MAC account was found"
+msgstr "未找到有效的 Stalker / MAC 帳戶"
+
+#: ../GTIPTVPlayerPro/stalker.py:1363 ../GTIPTVPlayerPro/stalker.py:1513
+msgid "The Stalker account file was not found"
+msgstr "未找到 Stalker 帳戶檔案"
+
+#: ../GTIPTVPlayerPro/stalker.py:1434
+msgid "The Stalker account file could not be saved"
+msgstr "無法儲存 Stalker 帳戶檔案"
+
+#: ../GTIPTVPlayerPro/stalker.py:1480
+msgid "This Stalker / MAC account already exists"
+msgstr "此 Stalker / MAC 帳戶已存在"
+
+#: ../GTIPTVPlayerPro/stalker.py:1482
+msgid "The Stalker / MAC account limit was reached"
+msgstr "已達到 Stalker / MAC 帳戶上限"
+
+#: ../GTIPTVPlayerPro/stalker.py:1500 ../GTIPTVPlayerPro/stalker.py:1551
+#: ../GTIPTVPlayerPro/stalker.py:1630
+msgid "Invalid Stalker / MAC account"
+msgstr "Stalker / MAC 帳戶無效"
+
+#: ../GTIPTVPlayerPro/stalker.py:1523 ../GTIPTVPlayerPro/stalker.py:1600
+msgid "The Stalker / MAC account was not found"
+msgstr "未找到 Stalker / MAC 帳戶"
+
+#: ../GTIPTVPlayerPro/stalker.py:1810 ../GTIPTVPlayerPro/stalker.py:2487
+#: ../GTIPTVPlayerPro/stalker.py:2648 ../GTIPTVPlayerPro/stalker.py:2670
+msgid "Portal authentication failed"
+msgstr "Portal 認證失敗"
+
+#: ../GTIPTVPlayerPro/stalker.py:1992 ../GTIPTVPlayerPro/stalker.py:1997
+msgid "Portal request cancelled"
+msgstr "Portal 請求已取消"
+
+#: ../GTIPTVPlayerPro/stalker.py:2002
+msgid "Portal request timed out"
+msgstr "Portal 請求逾時"
+
+#: ../GTIPTVPlayerPro/stalker.py:2213
+msgid "Content type unavailable"
+msgstr "內容類型無法使用"
+
+#: ../GTIPTVPlayerPro/stalker.py:2335 ../GTIPTVPlayerPro/stalker.py:2524
+msgid "Invalid portal response"
+msgstr "Portal 回應無效"
+
+#: ../GTIPTVPlayerPro/stalker.py:2368 ../GTIPTVPlayerPro/stalker.py:5330
+#: ../GTIPTVPlayerPro/stalker.py:6222 ../GTIPTVPlayerPro/stalker.py:6236
+msgid "Portal request failed"
+msgstr "Portal 請求失敗"
+
+#: ../GTIPTVPlayerPro/stalker.py:2498
+msgid "Portal HTTP request failed"
+msgstr "Portal HTTP 請求失敗"
+
+#: ../GTIPTVPlayerPro/stalker.py:2505
+msgid "Portal is unavailable"
+msgstr "Portal 無法使用"
+
+#: ../GTIPTVPlayerPro/stalker.py:2514
+msgid "Portal response is too large"
+msgstr "Portal 回應過大"
+
+#: ../GTIPTVPlayerPro/stalker.py:5192
+msgid "Portal catalogue did not make progress"
+msgstr "Portal 目錄沒有進展"
+
+#: ../GTIPTVPlayerPro/stalker.py:6333 ../GTIPTVPlayerPro/stalker.py:6345
+#: ../GTIPTVPlayerPro/stalker.py:6354 ../GTIPTVPlayerPro/stalker.py:6661
+msgid "Invalid stream link"
+msgstr "串流鏈接無效"
+
+#: ../GTIPTVPlayerPro/stalker.py:7200 ../GTIPTVPlayerPro/stalker.py:7318
+#: ../GTIPTVPlayerPro/stalker.py:7453 ../GTIPTVPlayerPro/stalker.py:7588
+msgid "Stream link unavailable"
+msgstr "串流鏈接無法使用"
+
+#: ../GTIPTVPlayerPro/stalker.py:8168
+msgid "Portal connection successful"
+msgstr "Portal 連線成功"
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:222
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:233
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:283
+#: ../GTIPTVPlayerPro/subtitles.py:672
+msgid "Could not open SubsSupport subtitle search."
+msgstr "無法開啟 SubsSupport 字幕搜尋。"
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:407
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:438
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:480
+#: ../GTIPTVPlayerPro/subtitles.py:717
+msgid "Could not load the downloaded subtitle."
+msgstr "無法載入已下載的字幕。"
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:412
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:510
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:532
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:580
+#: ../GTIPTVPlayerPro/subtitles.py:636
+msgid "External subtitle synchronization is unavailable."
+msgstr "外掛字幕同步無法使用。"
+
+#: ../GTIPTVPlayerPro/subtitles.py:11
+msgid "DVB"
+msgstr "DVB"
+
+#: ../GTIPTVPlayerPro/subtitles.py:12
+msgid "Teletext"
+msgstr "圖文電視"
+
+#: ../GTIPTVPlayerPro/subtitles.py:17 ../GTIPTVPlayerPro/subtitles.py:51
+#: ../GTIPTVPlayerPro/subtitles.py:53
+msgid "Embedded"
+msgstr "內置"
+
+#: ../GTIPTVPlayerPro/subtitles.py:18
+msgid "SSA"
+msgstr "SSA"
+
+#: ../GTIPTVPlayerPro/subtitles.py:19
+msgid "ASS"
+msgstr "ASS"
+
+#: ../GTIPTVPlayerPro/subtitles.py:20
+msgid "SRT"
+msgstr "SRT"
+
+#: ../GTIPTVPlayerPro/subtitles.py:21
+msgid "VOB"
+msgstr "VOB"
+
+#: ../GTIPTVPlayerPro/subtitles.py:22
+msgid "PGS"
+msgstr "PGS"
+
+#: ../GTIPTVPlayerPro/subtitles.py:23
+msgid "WebVTT"
+msgstr "WebVTT"
+
+#: ../GTIPTVPlayerPro/subtitles.py:63
+msgid "Subtitle"
+msgstr "字幕"
+
+#: ../GTIPTVPlayerPro/subtitles.py:178
+msgid "No embedded subtitles are available."
+msgstr "沒有可用的內嵌字幕。"
+
+#: ../GTIPTVPlayerPro/subtitles.py:184 ../GTIPTVPlayerPro/subtitles.py:234
+#: ../GTIPTVPlayerPro/subtitles.py:237 ../GTIPTVPlayerPro/subtitles.py:288
+#: ../GTIPTVPlayerPro/subtitles.py:296 ../GTIPTVPlayerPro/subtitles.py:482
+msgid "Subtitle selection is unavailable on this image."
+msgstr "此映像版本不支援字幕選擇。"
+
+#: ../GTIPTVPlayerPro/subtitles.py:219 ../GTIPTVPlayerPro/subtitles.py:230
+#: ../GTIPTVPlayerPro/subtitles.py:607
+msgid "Subtitles"
+msgstr "字幕"
+
+#: ../GTIPTVPlayerPro/subtitles.py:313 ../GTIPTVPlayerPro/subtitles.py:352
+#: ../GTIPTVPlayerPro/subtitles.py:357
+msgid "Could not enable the selected subtitle."
+msgstr "無法啟用所選字幕。"
+
+#: ../GTIPTVPlayerPro/subtitles.py:579
+msgid "Search subtitles with SubsSupport"
+msgstr "使用 SubsSupport 搜尋字幕"
+
+#: ../GTIPTVPlayerPro/subtitles.py:581
+#, python-format
+msgid "Search subtitles with %s"
+msgstr "使用 %s 搜尋字幕"
+
+#: ../GTIPTVPlayerPro/subtitles.py:584
+msgid "Embedded subtitles"
+msgstr "內嵌字幕"
+
+#: ../GTIPTVPlayerPro/subtitles.py:589
+msgid "External subtitle synchronization"
+msgstr "外掛字幕同步"
+
+#: ../GTIPTVPlayerPro/subtitles.py:651
+msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
+msgstr "搜尋字幕需要已安裝且正常運作的 SubsSupport 或 SubsSupportPro。"
+
+#: ../GTIPTVPlayerPro/weather.py:435
+msgid "Could not save weather settings through Enigma2 config"
+msgstr "無法通過 Enigma2 設定儲存天氣設定"
+
+#: ../GTIPTVPlayerPro/weather.py:445
+msgid "Clear skies"
+msgstr "晴空"
+
+#: ../GTIPTVPlayerPro/weather.py:447
+msgid "Partly cloudy"
+msgstr "局部多雲"
+
+#: ../GTIPTVPlayerPro/weather.py:449
+msgid "Cloudy"
+msgstr "多雲"
+
+#: ../GTIPTVPlayerPro/weather.py:451
+msgid "Foggy"
+msgstr "有霧"
+
+#: ../GTIPTVPlayerPro/weather.py:453
+msgid "Drizzle"
+msgstr "毛毛雨"
+
+#: ../GTIPTVPlayerPro/weather.py:455
+msgid "Rainy"
+msgstr "有雨"
+
+#: ../GTIPTVPlayerPro/weather.py:457
+msgid "Snowy"
+msgstr "有雪"
+
+#: ../GTIPTVPlayerPro/weather.py:459
+msgid "Thunderstorms"
+msgstr "雷暴"
+
+#: ../GTIPTVPlayerPro/weather.py:460
+msgid "Variable"
+msgstr "多變"
+
+#: ../GTIPTVPlayerPro/weather.py:495 ../GTIPTVPlayerPro/weather.py:844
+#: ../GTIPTVPlayerPro/weather.py:867
+msgid "Weather request cancelled"
+msgstr "天氣請求已取消"
+
+#: ../GTIPTVPlayerPro/weather.py:588
+msgid "Weather service response is too large"
+msgstr "天氣服務回應過大"
+
+#: ../GTIPTVPlayerPro/weather.py:599 ../GTIPTVPlayerPro/weather.py:602
+msgid "Open-Meteo request failed"
+msgstr "Open-Meteo 請求失敗"
+
+#: ../GTIPTVPlayerPro/weather.py:600 ../GTIPTVPlayerPro/weather.py:603
+msgid "Could not reach the weather service"
+msgstr "無法存取天氣服務"
+
+#: ../GTIPTVPlayerPro/weather.py:605 ../GTIPTVPlayerPro/weather.py:696
+msgid "Weather service returned an invalid response"
+msgstr "天氣服務傳回無效回應"
+
+#: ../GTIPTVPlayerPro/weather.py:617
+msgid "City name cannot be empty"
+msgstr "城市名稱不能為空"
+
+#: ../GTIPTVPlayerPro/weather.py:661
+#, python-brace-format
+msgid "Could not find {}"
+msgstr "找不到 {}"
+
+#: ../GTIPTVPlayerPro/weather.py:745
+msgid "Could not load the five-day forecast"
+msgstr "無法載入五日預報"
+
+#: ../GTIPTVPlayerPro/weather.py:886
+msgid "Not fetched yet"
+msgstr "尚未獲取"

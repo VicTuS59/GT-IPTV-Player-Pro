@@ -1,0 +1,3823 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GT IPTV Player Pro 1.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
+"POT-Creation-Date: 2023-11-14 22:13+0000\n"
+"PO-Revision-Date: 2026-09-16 00:00+0000\n"
+"Last-Translator: GT IPTV Player Pro contributors\n"
+"Language-Team: pt\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../GTIPTVPlayerPro/browser.py:155 ../GTIPTVPlayerPro/browser.py:7260
+#: ../GTIPTVPlayerPro/browser.py:7269 ../GTIPTVPlayerPro/browser.py:7339
+#: ../GTIPTVPlayerPro/browser.py:7364
+msgid "This source does not support the selected content type."
+msgstr "Esta fonte não suporta o tipo de conteúdo selecionado."
+
+#: ../GTIPTVPlayerPro/browser.py:337
+msgid "NO RATING"
+msgstr "SEM CLASSIFICAÇÃO"
+
+#: ../GTIPTVPlayerPro/browser.py:739
+#, python-brace-format
+msgid "{} added to favorites."
+msgstr "{} foi adicionado aos favoritos."
+
+#: ../GTIPTVPlayerPro/browser.py:741 ../GTIPTVPlayerPro/browser.py:6566
+#, python-brace-format
+msgid "{} removed from favorites."
+msgstr "{} foi removido dos favoritos."
+
+#: ../GTIPTVPlayerPro/browser.py:742 ../GTIPTVPlayerPro/browser.py:6549
+msgid "Could not update favorites."
+msgstr "Não foi possível atualizar os favoritos."
+
+#: ../GTIPTVPlayerPro/browser.py:4447
+msgid "CONTENT BROWSER"
+msgstr "NAVEGADOR DE CONTEÚDO"
+
+#: ../GTIPTVPlayerPro/browser.py:4520 ../GTIPTVPlayerPro/browser.py:5476
+#: ../GTIPTVPlayerPro/browser.py:13098 ../GTIPTVPlayerPro/browser.py:13138
+msgid "No content found."
+msgstr "Nenhum conteúdo encontrado."
+
+#: ../GTIPTVPlayerPro/browser.py:4538
+#: ../GTIPTVPlayerPro/category_filter_ui.py:175
+msgid "Loading content..."
+msgstr "A carregar conteúdo..."
+
+#: ../GTIPTVPlayerPro/browser.py:4539 ../GTIPTVPlayerPro/browser.py:6948
+#: ../GTIPTVPlayerPro/browser.py:7272 ../GTIPTVPlayerPro/browser.py:7480
+#: ../GTIPTVPlayerPro/browser.py:7537 ../GTIPTVPlayerPro/browser.py:7626
+#: ../GTIPTVPlayerPro/browser.py:8706 ../GTIPTVPlayerPro/browser.py:9003
+#: ../GTIPTVPlayerPro/browser.py:9010 ../GTIPTVPlayerPro/browser.py:9013
+#: ../GTIPTVPlayerPro/browser.py:10900 ../GTIPTVPlayerPro/browser.py:11745
+#: ../GTIPTVPlayerPro/browser.py:12021 ../GTIPTVPlayerPro/browser.py:12985
+#: ../GTIPTVPlayerPro/browser.py:13066 ../GTIPTVPlayerPro/browser.py:13094
+#: ../GTIPTVPlayerPro/browser.py:13519 ../GTIPTVPlayerPro/browser.py:14291
+#: ../GTIPTVPlayerPro/browser.py:14629 ../GTIPTVPlayerPro/browser.py:14713
+#: ../GTIPTVPlayerPro/browser.py:16342 ../GTIPTVPlayerPro/browser.py:16360
+#: ../GTIPTVPlayerPro/browser.py:18208 ../GTIPTVPlayerPro/browser.py:19380
+#: ../GTIPTVPlayerPro/browser.py:21070 ../GTIPTVPlayerPro/browser.py:21335
+#: ../GTIPTVPlayerPro/category_filter_ui.py:177
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1295 ../GTIPTVPlayerPro/dvb_epg_ui.py:1920
+#: ../GTIPTVPlayerPro/main.py:5702 ../GTIPTVPlayerPro/main.py:5767
+#: ../GTIPTVPlayerPro/main.py:6363 ../GTIPTVPlayerPro/main.py:6393
+#: ../GTIPTVPlayerPro/main.py:6399 ../GTIPTVPlayerPro/main.py:6513
+#: ../GTIPTVPlayerPro/main.py:6590
+msgid "Please wait"
+msgstr "Aguarde"
+
+#: ../GTIPTVPlayerPro/browser.py:4568 ../GTIPTVPlayerPro/browser.py:4593
+#: ../GTIPTVPlayerPro/browser.py:7251 ../GTIPTVPlayerPro/browser.py:13652
+#: ../GTIPTVPlayerPro/catchup.py:192 ../GTIPTVPlayerPro/content.py:614
+#: ../GTIPTVPlayerPro/content.py:628 ../GTIPTVPlayerPro/m3u.py:405
+#: ../GTIPTVPlayerPro/m3u.py:1003 ../GTIPTVPlayerPro/m3u.py:1011
+#: ../GTIPTVPlayerPro/playlist.py:856 ../GTIPTVPlayerPro/stalker.py:1396
+msgid "Request timed out"
+msgstr "O pedido excedeu o tempo limite"
+
+#: ../GTIPTVPlayerPro/browser.py:4570 ../GTIPTVPlayerPro/browser.py:7253
+#: ../GTIPTVPlayerPro/catchup.py:190 ../GTIPTVPlayerPro/catchup_m3u.py:198
+#: ../GTIPTVPlayerPro/content.py:609 ../GTIPTVPlayerPro/content.py:921
+#: ../GTIPTVPlayerPro/content.py:944 ../GTIPTVPlayerPro/content.py:990
+#: ../GTIPTVPlayerPro/content.py:1001 ../GTIPTVPlayerPro/content.py:1026
+#: ../GTIPTVPlayerPro/m3u.py:403 ../GTIPTVPlayerPro/m3u.py:998
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:526 ../GTIPTVPlayerPro/m3u_epg_ui.py:1177
+#: ../GTIPTVPlayerPro/main.py:6072 ../GTIPTVPlayerPro/playlist.py:848
+#: ../GTIPTVPlayerPro/playlist.py:1350 ../GTIPTVPlayerPro/playlist.py:1361
+#: ../GTIPTVPlayerPro/playlist.py:1396 ../GTIPTVPlayerPro/playlist.py:1494
+#: ../GTIPTVPlayerPro/stalker.py:1388
+msgid "Request cancelled"
+msgstr "Pedido cancelado"
+
+#: ../GTIPTVPlayerPro/browser.py:4575 ../GTIPTVPlayerPro/browser.py:13773
+msgid "Could not load content"
+msgstr "Não foi possível carregar o conteúdo"
+
+#: ../GTIPTVPlayerPro/browser.py:4605 ../GTIPTVPlayerPro/browser.py:6652
+#: ../GTIPTVPlayerPro/browser.py:8262 ../GTIPTVPlayerPro/browser.py:8582
+#: ../GTIPTVPlayerPro/browser.py:8594 ../GTIPTVPlayerPro/browser.py:9007
+#: ../GTIPTVPlayerPro/browser.py:9023 ../GTIPTVPlayerPro/browser.py:9057
+#: ../GTIPTVPlayerPro/browser.py:13011
+msgid "Could not open the content list."
+msgstr "Não foi possível abrir a lista de conteúdo."
+
+#: ../GTIPTVPlayerPro/browser.py:4615
+msgid "Press GREEN to try again"
+msgstr "Prima VERDE para tentar novamente"
+
+#: ../GTIPTVPlayerPro/browser.py:4701
+msgid "LIVE TV CATEGORY SETTINGS"
+msgstr "DEFINIÇÕES DAS CATEGORIAS DE TV EM DIRETO"
+
+#: ../GTIPTVPlayerPro/browser.py:4702
+msgid "MOVIE CATEGORY SETTINGS"
+msgstr "DEFINIÇÕES DAS CATEGORIAS DE FILMES"
+
+#: ../GTIPTVPlayerPro/browser.py:4703
+msgid "SERIES CATEGORY SETTINGS"
+msgstr "DEFINIÇÕES DAS CATEGORIAS DE SÉRIES"
+
+#: ../GTIPTVPlayerPro/browser.py:4752
+#: ../GTIPTVPlayerPro/category_filter_ui.py:56
+msgid "Category Manager"
+msgstr "Gestor de categorias"
+
+#: ../GTIPTVPlayerPro/browser.py:4753 ../GTIPTVPlayerPro/dvb_epg_ui.py:624
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:841 ../GTIPTVPlayerPro/main.py:4058
+#: ../GTIPTVPlayerPro/main.py:4381 ../GTIPTVPlayerPro/main.py:4512
+#: ../GTIPTVPlayerPro/remote_footer.py:90
+msgid "Settings"
+msgstr "Definições"
+
+#: ../GTIPTVPlayerPro/browser.py:4848 ../GTIPTVPlayerPro/browser.py:8246
+msgid "No category found."
+msgstr "Nenhuma categoria encontrada."
+
+#: ../GTIPTVPlayerPro/browser.py:4870 ../GTIPTVPlayerPro/content.py:130
+msgid "Category"
+msgstr "Categoria"
+
+#: ../GTIPTVPlayerPro/browser.py:4879 ../GTIPTVPlayerPro/browser.py:4926
+#: ../GTIPTVPlayerPro/category_filter_ui.py:193
+#: ../GTIPTVPlayerPro/category_filter_ui.py:226
+msgid "Hidden"
+msgstr "Oculta"
+
+#: ../GTIPTVPlayerPro/browser.py:4924
+#: ../GTIPTVPlayerPro/category_filter_ui.py:194
+#: ../GTIPTVPlayerPro/category_filter_ui.py:225
+msgid "Visible"
+msgstr "Visível"
+
+#: ../GTIPTVPlayerPro/browser.py:4933 ../GTIPTVPlayerPro/browser.py:4936
+msgid "Marked"
+msgstr "Marcados"
+
+#: ../GTIPTVPlayerPro/browser.py:5014
+#, python-brace-format
+msgid "{} is always visible."
+msgstr "{} está sempre visível."
+
+#: ../GTIPTVPlayerPro/browser.py:5022
+#: ../GTIPTVPlayerPro/category_filter_ui.py:53
+#: ../GTIPTVPlayerPro/category_filter_ui.py:58
+#: ../GTIPTVPlayerPro/category_filter_ui.py:220
+#: ../GTIPTVPlayerPro/category_filter_ui.py:301
+#: ../GTIPTVPlayerPro/remote_footer.py:132
+msgid "Filter Search"
+msgstr "Procurar filtros"
+
+#: ../GTIPTVPlayerPro/browser.py:5023
+msgid "Category shown."
+msgstr "Categoria visível."
+
+#: ../GTIPTVPlayerPro/browser.py:5027
+msgid "Category hidden."
+msgstr "Categoria oculta."
+
+#: ../GTIPTVPlayerPro/browser.py:5035
+msgid "Mark categories with RED first."
+msgstr "Primeiro marque as categorias com o botão VERMELHO."
+
+#: ../GTIPTVPlayerPro/browser.py:5050
+msgid "Choose the destination with the arrows. OK places marked categories below the line; EXIT cancels."
+msgstr "Escolha o destino com as setas. OK coloca as categorias marcadas abaixo da linha; EXIT cancela."
+
+#: ../GTIPTVPlayerPro/browser.py:5081
+msgid "Position updated. Press GREEN to save."
+msgstr "Posição atualizada. Prima VERDE para guardar."
+
+#: ../GTIPTVPlayerPro/browser.py:5098 ../GTIPTVPlayerPro/browser.py:6525
+msgid "Move cancelled."
+msgstr "Deslocação cancelada."
+
+#: ../GTIPTVPlayerPro/browser.py:5116
+msgid "Default order restored. Press GREEN to save."
+msgstr "Ordem predefinida restaurada. Prima VERDE para guardar."
+
+#: ../GTIPTVPlayerPro/browser.py:5237 ../GTIPTVPlayerPro/main.py:5114
+#: ../GTIPTVPlayerPro/playlist.py:38
+msgid "Settings could not be saved. Check the receiver storage."
+msgstr "Não foi possível guardar as definições. Verifique o armazenamento do recetor."
+
+#: ../GTIPTVPlayerPro/browser.py:5251
+#, python-brace-format
+msgid "{} cannot be moved."
+msgstr "Não é possível mover {}."
+
+#: ../GTIPTVPlayerPro/browser.py:5294
+msgid "Filters updated. Press GREEN to save."
+msgstr "Filtros atualizados. Prima o botão VERDE para guardar."
+
+#: ../GTIPTVPlayerPro/browser.py:5358
+msgid "Continue Watching"
+msgstr "Continuar a ver"
+
+#: ../GTIPTVPlayerPro/browser.py:5371
+msgid "Unfinished movies and series episodes"
+msgstr "Filmes e episódios de séries inacabados"
+
+#: ../GTIPTVPlayerPro/browser.py:5544 ../GTIPTVPlayerPro/browser.py:6026
+#: ../GTIPTVPlayerPro/browser.py:6057 ../GTIPTVPlayerPro/browser.py:6268
+#: ../GTIPTVPlayerPro/content.py:43 ../GTIPTVPlayerPro/main.py:6683
+#: ../GTIPTVPlayerPro/main.py:6691 ../GTIPTVPlayerPro/main.py:6854
+#: ../GTIPTVPlayerPro/main.py:6866
+msgid "Movies"
+msgstr "Filmes"
+
+#: ../GTIPTVPlayerPro/browser.py:5544 ../GTIPTVPlayerPro/browser.py:6026
+#: ../GTIPTVPlayerPro/browser.py:6058 ../GTIPTVPlayerPro/browser.py:6269
+#: ../GTIPTVPlayerPro/browser.py:13077 ../GTIPTVPlayerPro/content.py:44
+#: ../GTIPTVPlayerPro/main.py:6684 ../GTIPTVPlayerPro/main.py:6692
+#: ../GTIPTVPlayerPro/main.py:6855 ../GTIPTVPlayerPro/main.py:6867
+msgid "Series"
+msgstr "Série"
+
+#: ../GTIPTVPlayerPro/browser.py:5552
+#, python-brace-format
+msgid "S{}  •  E{}"
+msgstr "T{}  •  E{}"
+
+#: ../GTIPTVPlayerPro/browser.py:5571
+#, python-brace-format
+msgid "%{} • {} min remaining"
+msgstr "%{} • {} min restantes"
+
+#: ../GTIPTVPlayerPro/browser.py:6055
+msgid "All"
+msgstr "Todos"
+
+#: ../GTIPTVPlayerPro/browser.py:6056 ../GTIPTVPlayerPro/browser.py:6267
+#: ../GTIPTVPlayerPro/content.py:42 ../GTIPTVPlayerPro/main.py:6682
+#: ../GTIPTVPlayerPro/main.py:6687 ../GTIPTVPlayerPro/main.py:6690
+#: ../GTIPTVPlayerPro/main.py:6839 ../GTIPTVPlayerPro/main.py:6853
+#: ../GTIPTVPlayerPro/main.py:6865 ../GTIPTVPlayerPro/main.py:6870
+msgid "Live TV"
+msgstr "TV em direto"
+
+#: ../GTIPTVPlayerPro/browser.py:6087 ../GTIPTVPlayerPro/browser.py:6110
+#: ../GTIPTVPlayerPro/browser.py:6336 ../GTIPTVPlayerPro/browser.py:6350
+#: ../GTIPTVPlayerPro/browser.py:6368
+msgid "Favorites"
+msgstr "Favoritos"
+
+#: ../GTIPTVPlayerPro/browser.py:6089
+msgid "Favorite channels, movies and series"
+msgstr "Canais, filmes e séries favoritos"
+
+#: ../GTIPTVPlayerPro/browser.py:6148 ../GTIPTVPlayerPro/main.py:237
+#: ../GTIPTVPlayerPro/main.py:6095 ../GTIPTVPlayerPro/main.py:6747
+#: ../GTIPTVPlayerPro/main.py:8994 ../GTIPTVPlayerPro/remote_footer.py:87
+msgid "Source"
+msgstr "Fonte"
+
+#: ../GTIPTVPlayerPro/browser.py:6262
+msgid "No favorites have been added."
+msgstr "Ainda não foram adicionados favoritos."
+
+#: ../GTIPTVPlayerPro/browser.py:6271 ../GTIPTVPlayerPro/browser.py:19194
+#: ../GTIPTVPlayerPro/browser.py:21659 ../GTIPTVPlayerPro/remote_footer.py:123
+msgid "Favorite"
+msgstr "Favorito"
+
+#: ../GTIPTVPlayerPro/browser.py:6336 ../GTIPTVPlayerPro/browser.py:6350
+#: ../GTIPTVPlayerPro/browser.py:6369 ../GTIPTVPlayerPro/browser.py:12219
+#: ../GTIPTVPlayerPro/main.py:5574 ../GTIPTVPlayerPro/main.py:6103
+#: ../GTIPTVPlayerPro/main.py:6109 ../GTIPTVPlayerPro/remote_footer.py:105
+#: ../GTIPTVPlayerPro/remote_footer.py:128
+msgid "Page"
+msgstr "Página"
+
+#: ../GTIPTVPlayerPro/browser.py:6509
+msgid "Could not save the favorite order."
+msgstr "Não foi possível guardar a ordem dos favoritos."
+
+#: ../GTIPTVPlayerPro/browser.py:6513
+msgid "Favorite order saved."
+msgstr "Ordem dos favoritos guardada."
+
+#: ../GTIPTVPlayerPro/browser.py:6577 ../GTIPTVPlayerPro/browser.py:6597
+msgid "This channel is no longer present in the M3U source."
+msgstr "Este canal já não está presente na fonte M3U."
+
+#: ../GTIPTVPlayerPro/browser.py:6735 ../GTIPTVPlayerPro/browser.py:6814
+#: ../GTIPTVPlayerPro/browser.py:6854 ../GTIPTVPlayerPro/browser.py:9288
+msgid "Search All Movies"
+msgstr "Pesquisar em todos os filmes"
+
+#: ../GTIPTVPlayerPro/browser.py:6743 ../GTIPTVPlayerPro/browser.py:13116
+#: ../GTIPTVPlayerPro/browser.py:13155 ../GTIPTVPlayerPro/dvb_epg_ui.py:2147
+#: ../GTIPTVPlayerPro/main.py:3747 ../GTIPTVPlayerPro/main.py:3984
+#: ../GTIPTVPlayerPro/remote_footer.py:121
+msgid "Search"
+msgstr "Pesquisar"
+
+#: ../GTIPTVPlayerPro/browser.py:6744 ../GTIPTVPlayerPro/browser.py:6762
+#: ../GTIPTVPlayerPro/browser.py:6763 ../GTIPTVPlayerPro/browser.py:6893
+#: ../GTIPTVPlayerPro/browser.py:7266 ../GTIPTVPlayerPro/browser.py:7371
+msgid "Enter a movie name."
+msgstr "Introduza o nome de um filme."
+
+#: ../GTIPTVPlayerPro/browser.py:6747 ../GTIPTVPlayerPro/browser.py:9287
+#: ../GTIPTVPlayerPro/content.py:43
+msgid "All Movies"
+msgstr "Todos os filmes"
+
+#: ../GTIPTVPlayerPro/browser.py:6757 ../GTIPTVPlayerPro/browser.py:7356
+#: ../GTIPTVPlayerPro/browser.py:8790 ../GTIPTVPlayerPro/browser.py:10205
+msgid "Selecting movie..."
+msgstr "A selecionar filme..."
+
+#: ../GTIPTVPlayerPro/browser.py:6761 ../GTIPTVPlayerPro/browser.py:8794
+msgid "MOVIE SUMMARY"
+msgstr "RESUMO DO FILME"
+
+#: ../GTIPTVPlayerPro/browser.py:6844 ../GTIPTVPlayerPro/browser.py:7632
+#: ../GTIPTVPlayerPro/browser.py:13104
+#: ../GTIPTVPlayerPro/category_filter_ui.py:292
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2229 ../GTIPTVPlayerPro/m3u_epg_ui.py:985
+#: ../GTIPTVPlayerPro/main.py:3976 ../GTIPTVPlayerPro/main.py:4171
+#: ../GTIPTVPlayerPro/main.py:4989 ../GTIPTVPlayerPro/main.py:7053
+#: ../GTIPTVPlayerPro/main.py:7703 ../GTIPTVPlayerPro/main.py:8163
+#: ../GTIPTVPlayerPro/main.py:8414
+msgid "The virtual keyboard is unavailable on this image."
+msgstr "O teclado virtual não está disponível nesta imagem."
+
+#: ../GTIPTVPlayerPro/browser.py:6849 ../GTIPTVPlayerPro/browser.py:7637
+#: ../GTIPTVPlayerPro/browser.py:13110
+#: ../GTIPTVPlayerPro/category_filter_ui.py:297
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2232 ../GTIPTVPlayerPro/m3u_epg_ui.py:989
+#: ../GTIPTVPlayerPro/main.py:3979 ../GTIPTVPlayerPro/main.py:4174
+#: ../GTIPTVPlayerPro/main.py:4992 ../GTIPTVPlayerPro/main.py:7057
+#: ../GTIPTVPlayerPro/main.py:7707 ../GTIPTVPlayerPro/main.py:8167
+#: ../GTIPTVPlayerPro/main.py:8417
+msgid "Could not open the virtual keyboard."
+msgstr "Não foi possível abrir o teclado virtual."
+
+#: ../GTIPTVPlayerPro/browser.py:7255 ../GTIPTVPlayerPro/playlist.py:1429
+msgid "Server denied access"
+msgstr "O servidor negou o acesso"
+
+#: ../GTIPTVPlayerPro/browser.py:7257 ../GTIPTVPlayerPro/content.py:753
+#: ../GTIPTVPlayerPro/playlist.py:1431
+msgid "Server request limit reached"
+msgstr "Limite de pedidos do servidor atingido"
+
+#: ../GTIPTVPlayerPro/browser.py:7262 ../GTIPTVPlayerPro/browser.py:7344
+#: ../GTIPTVPlayerPro/browser.py:7367 ../GTIPTVPlayerPro/browser.py:9428
+#: ../GTIPTVPlayerPro/browser.py:9495
+msgid "Could not load movies"
+msgstr "Não foi possível carregar os filmes"
+
+#: ../GTIPTVPlayerPro/browser.py:7275
+#, python-brace-format
+msgid "{movies} movies • {results} results"
+msgstr "{movies} filmes • {results} resultados"
+
+#: ../GTIPTVPlayerPro/browser.py:7303 ../GTIPTVPlayerPro/browser.py:7388
+#: ../GTIPTVPlayerPro/content.py:230 ../GTIPTVPlayerPro/metadata.py:888
+msgid "Movie"
+msgstr "Filme"
+
+#: ../GTIPTVPlayerPro/browser.py:7346 ../GTIPTVPlayerPro/browser.py:7369
+msgid "No movies matched this search."
+msgstr "Nenhum filme corresponde a esta pesquisa."
+
+#: ../GTIPTVPlayerPro/browser.py:7407 ../GTIPTVPlayerPro/browser.py:10808
+#: ../GTIPTVPlayerPro/browser.py:10832 ../GTIPTVPlayerPro/browser.py:12712
+#: ../GTIPTVPlayerPro/browser.py:12748
+msgid "Information unavailable."
+msgstr "Informações indisponíveis."
+
+#: ../GTIPTVPlayerPro/browser.py:7422 ../GTIPTVPlayerPro/browser.py:10841
+msgid "Movie summary unavailable."
+msgstr "Resumo do filme indisponível."
+
+#: ../GTIPTVPlayerPro/browser.py:7499 ../GTIPTVPlayerPro/browser.py:8146
+msgid "Select content before using favorites."
+msgstr "Selecione conteúdo antes de usar os favoritos."
+
+#: ../GTIPTVPlayerPro/browser.py:7588 ../GTIPTVPlayerPro/browser.py:7642
+msgid "Search All Channels"
+msgstr "Pesquisar em todos os canais"
+
+#: ../GTIPTVPlayerPro/browser.py:7591 ../GTIPTVPlayerPro/content.py:42
+#: ../GTIPTVPlayerPro/m3u.py:1223
+msgid "All Channels"
+msgstr "Todos os canais"
+
+#: ../GTIPTVPlayerPro/browser.py:7594
+msgid "M3U CHANNEL SEARCH"
+msgstr "PESQUISA DE CANAIS M3U"
+
+#: ../GTIPTVPlayerPro/browser.py:7678
+msgid "No channels matched this search."
+msgstr "Nenhum canal corresponde a esta pesquisa."
+
+#: ../GTIPTVPlayerPro/browser.py:7679
+msgid "Enter a channel name."
+msgstr "Introduza o nome de um canal."
+
+#: ../GTIPTVPlayerPro/browser.py:7691
+#, python-brace-format
+msgid "First {} matching channels"
+msgstr "Primeiros {} canais correspondentes"
+
+#: ../GTIPTVPlayerPro/browser.py:7695
+#, python-brace-format
+msgid "{} channels found"
+msgstr "{} canais encontrados"
+
+#: ../GTIPTVPlayerPro/browser.py:8027
+#, python-brace-format
+msgid "{}  |  Select a category"
+msgstr "{}  |  Selecionar uma categoria"
+
+#: ../GTIPTVPlayerPro/browser.py:8045
+msgid "LIVE TV CATEGORIES"
+msgstr "CATEGORIAS DE TV EM DIRETO"
+
+#: ../GTIPTVPlayerPro/browser.py:8052
+msgid "5-DAY WEATHER FORECAST"
+msgstr "PREVISÃO METEOROLÓGICA DE 5 DIAS"
+
+#: ../GTIPTVPlayerPro/browser.py:8056
+msgid "TODAY"
+msgstr "HOJE"
+
+#: ../GTIPTVPlayerPro/browser.py:8058 ../GTIPTVPlayerPro/browser.py:19199
+#: ../GTIPTVPlayerPro/browser.py:23060
+msgid "Loading weather data"
+msgstr "A carregar dados meteorológicos"
+
+#: ../GTIPTVPlayerPro/browser.py:8273
+msgid "No categories found; press GREEN to try again."
+msgstr "Nenhuma categoria encontrada; prima VERDE para tentar novamente."
+
+#: ../GTIPTVPlayerPro/browser.py:8307 ../GTIPTVPlayerPro/browser.py:8967
+#: ../GTIPTVPlayerPro/browser.py:11329
+msgid "Categories"
+msgstr "Categorias"
+
+#: ../GTIPTVPlayerPro/browser.py:8382 ../GTIPTVPlayerPro/main.py:4751
+msgid "Category edit lock data is damaged. Remove and reinstall the plugin to reset only this lock."
+msgstr "Os dados do bloqueio da edição de categorias estão danificados. Remova e reinstale o plugin para repor apenas este bloqueio."
+
+#: ../GTIPTVPlayerPro/browser.py:8395
+msgid "Category editor locked"
+msgstr "Editor de categorias bloqueado"
+
+#: ../GTIPTVPlayerPro/browser.py:8396
+msgid "Enter the 4-digit category edit PIN."
+msgstr "Introduza o PIN de 4 dígitos da edição de categorias."
+
+#: ../GTIPTVPlayerPro/browser.py:8415 ../GTIPTVPlayerPro/browser.py:8436
+#: ../GTIPTVPlayerPro/main.py:4707 ../GTIPTVPlayerPro/main.py:4728
+msgid "The PIN entry screen is unavailable on this image."
+msgstr "O ecrã de introdução do PIN não está disponível nesta imagem."
+
+#: ../GTIPTVPlayerPro/browser.py:8447 ../GTIPTVPlayerPro/main.py:4856
+msgid "Category lock recovery"
+msgstr "Recuperação do bloqueio de categorias"
+
+#: ../GTIPTVPlayerPro/browser.py:8448 ../GTIPTVPlayerPro/main.py:4857
+msgid "Enter the 12-digit recovery code."
+msgstr "Introduza o código de recuperação de 12 dígitos."
+
+#: ../GTIPTVPlayerPro/browser.py:8457
+msgid "Incorrect PIN. Category editor remains locked."
+msgstr "PIN incorreto. O editor de categorias permanece bloqueado."
+
+#: ../GTIPTVPlayerPro/browser.py:8476
+msgid "Incorrect recovery code. Category editor remains locked."
+msgstr "Código de recuperação incorreto. O editor de categorias permanece bloqueado."
+
+#: ../GTIPTVPlayerPro/browser.py:8487
+msgid "Create a new category edit PIN"
+msgstr "Criar um novo PIN de edição de categorias"
+
+#: ../GTIPTVPlayerPro/browser.py:8488 ../GTIPTVPlayerPro/main.py:4788
+msgid "Enter a new 4-digit PIN."
+msgstr "Introduza um novo PIN de 4 dígitos."
+
+#: ../GTIPTVPlayerPro/browser.py:8497
+msgid "Confirm the new category edit PIN"
+msgstr "Confirmar o novo PIN de edição de categorias"
+
+#: ../GTIPTVPlayerPro/browser.py:8498 ../GTIPTVPlayerPro/main.py:4798
+msgid "Enter the same 4-digit PIN again."
+msgstr "Volte a introduzir o mesmo PIN de 4 dígitos."
+
+#: ../GTIPTVPlayerPro/browser.py:8509 ../GTIPTVPlayerPro/main.py:4810
+msgid "The PIN entries do not match. Nothing was changed."
+msgstr "Os PIN introduzidos não coincidem. Nada foi alterado."
+
+#: ../GTIPTVPlayerPro/browser.py:8526
+msgid "The new PIN could not be saved. Category editor remains locked."
+msgstr "Não foi possível guardar o novo PIN. O editor de categorias permanece bloqueado."
+
+#: ../GTIPTVPlayerPro/browser.py:8537
+#, python-brace-format
+msgid ""
+"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
+"\n"
+"{}"
+msgstr ""
+"A recuperação foi concluída. Anote o novo código de recuperação; este é mostrado apenas uma vez:\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/browser.py:8540
+msgid "Category edit PIN renewed."
+msgstr "O PIN de edição de categorias foi renovado."
+
+#: ../GTIPTVPlayerPro/browser.py:8780
+msgid "MOVIE CATEGORIES"
+msgstr "CATEGORIAS DE FILMES"
+
+#: ../GTIPTVPlayerPro/browser.py:8786
+msgid ""
+"GT\n"
+"MOVIE"
+msgstr ""
+"GT\n"
+"FILME"
+
+#: ../GTIPTVPlayerPro/browser.py:8796
+msgid "The selected movie's details will be loaded from the server."
+msgstr "Os detalhes do filme selecionado serão carregados do servidor."
+
+#: ../GTIPTVPlayerPro/browser.py:8804
+msgid "MOVIES IN THE SELECTED CATEGORY"
+msgstr "FILMES NA CATEGORIA SELECIONADA"
+
+#: ../GTIPTVPlayerPro/browser.py:8908
+msgid "Movie category not found"
+msgstr "Categoria de filmes não encontrada"
+
+#: ../GTIPTVPlayerPro/browser.py:9292
+msgid "Press BLUE to search all movies."
+msgstr "Prima o botão AZUL para pesquisar em todos os filmes."
+
+#: ../GTIPTVPlayerPro/browser.py:9391
+#, python-brace-format
+msgid "{} • LOADING MOVIES"
+msgstr "{} • A CARREGAR FILMES"
+
+#: ../GTIPTVPlayerPro/browser.py:9525
+#, python-brace-format
+msgid "{} • {} MOVIES"
+msgstr "{} • {} FILMES"
+
+#: ../GTIPTVPlayerPro/browser.py:9603
+msgid "Movie request timed out"
+msgstr "O pedido do filme excedeu o tempo limite"
+
+#: ../GTIPTVPlayerPro/browser.py:10220
+msgid "Loading movie information from the server."
+msgstr "A carregar informações do filme do servidor."
+
+#: ../GTIPTVPlayerPro/browser.py:10228
+msgid "COULD NOT LOAD MOVIES"
+msgstr "NÃO FOI POSSÍVEL CARREGAR OS FILMES"
+
+#: ../GTIPTVPlayerPro/browser.py:10233
+msgid "NO MOVIES FOUND IN THIS CATEGORY"
+msgstr "NENHUM FILME ENCONTRADO NESTA CATEGORIA"
+
+#: ../GTIPTVPlayerPro/browser.py:10234
+msgid "Try another category."
+msgstr "Tente outra categoria."
+
+#: ../GTIPTVPlayerPro/browser.py:10811
+msgid "Movie information unavailable."
+msgstr "Informações do filme indisponíveis."
+
+#: ../GTIPTVPlayerPro/browser.py:10837
+msgid "Genre unavailable"
+msgstr "Género indisponível"
+
+#: ../GTIPTVPlayerPro/browser.py:10846 ../GTIPTVPlayerPro/browser.py:12758
+#, python-brace-format
+msgid "Director: {}"
+msgstr "Realizador: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:10850 ../GTIPTVPlayerPro/browser.py:12760
+#, python-brace-format
+msgid "Cast: {}"
+msgstr "Elenco: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:11140
+#, python-brace-format
+msgid "{}   |   CONTENT BROWSER"
+msgstr "{}   |   NAVEGADOR DE CONTEÚDO"
+
+#: ../GTIPTVPlayerPro/browser.py:11166
+msgid "CATEGORIES"
+msgstr "CATEGORIAS"
+
+#: ../GTIPTVPlayerPro/browser.py:11174
+msgid ""
+"GT\n"
+"SERIES"
+msgstr ""
+"GT\n"
+"SÉRIE"
+
+#: ../GTIPTVPlayerPro/browser.py:11176 ../GTIPTVPlayerPro/browser.py:19374
+#: ../GTIPTVPlayerPro/main.py:445 ../GTIPTVPlayerPro/main.py:9014
+msgid "SERIES"
+msgstr "SÉRIES"
+
+#: ../GTIPTVPlayerPro/browser.py:11191 ../GTIPTVPlayerPro/browser.py:11983
+msgid "Selecting series..."
+msgstr "A selecionar série..."
+
+#: ../GTIPTVPlayerPro/browser.py:11194
+msgid "SERIES SUMMARY"
+msgstr "RESUMO DA SÉRIE"
+
+#: ../GTIPTVPlayerPro/browser.py:11195 ../GTIPTVPlayerPro/browser.py:11998
+msgid "Loading series information from the server."
+msgstr "A carregar informações da série do servidor."
+
+#: ../GTIPTVPlayerPro/browser.py:11298
+msgid "Series category not found"
+msgstr "Categoria de séries não encontrada"
+
+#: ../GTIPTVPlayerPro/browser.py:11491
+#, python-brace-format
+msgid "{} • LOADING SERIES"
+msgstr "{} • A CARREGAR SÉRIES"
+
+#: ../GTIPTVPlayerPro/browser.py:11532 ../GTIPTVPlayerPro/browser.py:11606
+msgid "Could not load series"
+msgstr "Não foi possível carregar as séries"
+
+#: ../GTIPTVPlayerPro/browser.py:11653
+#, python-brace-format
+msgid "Series scan • {} pages"
+msgstr "Pesquisa de séries • {} páginas"
+
+#: ../GTIPTVPlayerPro/browser.py:11696
+#, python-brace-format
+msgid "{} • {} SERIES"
+msgstr "{} • {} SÉRIES"
+
+#: ../GTIPTVPlayerPro/browser.py:11800
+msgid "Series request timed out"
+msgstr "O pedido da série excedeu o tempo limite"
+
+#: ../GTIPTVPlayerPro/browser.py:12012
+msgid "COULD NOT LOAD SERIES"
+msgstr "NÃO FOI POSSÍVEL CARREGAR AS SÉRIES"
+
+#: ../GTIPTVPlayerPro/browser.py:12027
+msgid "SERIES DATA COULD NOT BE READ"
+msgstr "NÃO FOI POSSÍVEL LER OS DADOS DA SÉRIE"
+
+#: ../GTIPTVPlayerPro/browser.py:12029
+msgid "The series response uses an unsupported format. Categories remain available."
+msgstr "A resposta de séries usa um formato não suportado. As categorias permanecem disponíveis."
+
+#: ../GTIPTVPlayerPro/browser.py:12032
+msgid "SERIES DATA UNAVAILABLE"
+msgstr "DADOS DA SÉRIE INDISPONÍVEIS"
+
+#: ../GTIPTVPlayerPro/browser.py:12034
+msgid "The server did not answer the series request. Categories remain available."
+msgstr "O servidor não respondeu ao pedido de séries. As categorias permanecem disponíveis."
+
+#: ../GTIPTVPlayerPro/browser.py:12038
+msgid "NO SERIES FOUND IN THIS CATEGORY"
+msgstr "NENHUMA SÉRIE ENCONTRADA NESTA CATEGORIA"
+
+#: ../GTIPTVPlayerPro/browser.py:12041
+msgid "No series were found on this server or in this category."
+msgstr "Não foram encontradas séries neste servidor ou categoria."
+
+#: ../GTIPTVPlayerPro/browser.py:12716 ../GTIPTVPlayerPro/browser.py:12752
+msgid "Series summary unavailable."
+msgstr "Resumo da série indisponível."
+
+#: ../GTIPTVPlayerPro/browser.py:12740 ../GTIPTVPlayerPro/browser.py:12741
+msgid "Seasons"
+msgstr "Temporadas"
+
+#: ../GTIPTVPlayerPro/browser.py:13244 ../GTIPTVPlayerPro/browser.py:23057
+#: ../GTIPTVPlayerPro/browser.py:23077
+msgid "Weather is disabled"
+msgstr "A meteorologia está desativada"
+
+#: ../GTIPTVPlayerPro/browser.py:13245
+msgid "You can enable it in Settings."
+msgstr "Pode ativá-lo nas Definições."
+
+#: ../GTIPTVPlayerPro/browser.py:13248
+msgid "Loading forecast"
+msgstr "A carregar previsão"
+
+#: ../GTIPTVPlayerPro/browser.py:13351 ../GTIPTVPlayerPro/weather.py:497
+#: ../GTIPTVPlayerPro/weather.py:539 ../GTIPTVPlayerPro/weather.py:573
+msgid "Weather request timed out"
+msgstr "O pedido meteorológico excedeu o tempo limite"
+
+#: ../GTIPTVPlayerPro/browser.py:13352 ../GTIPTVPlayerPro/browser.py:13364
+#: ../GTIPTVPlayerPro/main.py:3845 ../GTIPTVPlayerPro/main.py:3859
+#: ../GTIPTVPlayerPro/main.py:4202 ../GTIPTVPlayerPro/main.py:4268
+msgid "Weather data unavailable."
+msgstr "Dados meteorológicos indisponíveis."
+
+#: ../GTIPTVPlayerPro/browser.py:13389
+#, python-brace-format
+msgid "Humidity {}% • Wind {:.0f} km/h"
+msgstr "Humidade {}% • Vento {:.0f} km/h"
+
+#: ../GTIPTVPlayerPro/browser.py:13394
+msgid "  •  Cached"
+msgstr "  •  Em cache"
+
+#: ../GTIPTVPlayerPro/browser.py:13396
+#, python-brace-format
+msgid "Updated: {}{}"
+msgstr "Atualizado: {}{}"
+
+#: ../GTIPTVPlayerPro/browser.py:13406
+msgid "Today"
+msgstr "Hoje"
+
+#: ../GTIPTVPlayerPro/browser.py:13827
+#, python-brace-format
+msgid "%{}  •  {} MIN REMAINING"
+msgstr "%{}  •  {} MIN RESTANTES"
+
+#: ../GTIPTVPlayerPro/browser.py:14080
+msgid "CHANNEL LIST"
+msgstr "LISTA DE CANAIS"
+
+#: ../GTIPTVPlayerPro/browser.py:14094 ../GTIPTVPlayerPro/browser.py:15960
+#: ../GTIPTVPlayerPro/browser.py:19184 ../GTIPTVPlayerPro/browser.py:21623
+msgid "NOW"
+msgstr "AGORA"
+
+#: ../GTIPTVPlayerPro/browser.py:14095 ../GTIPTVPlayerPro/browser.py:14113
+#: ../GTIPTVPlayerPro/browser.py:14142 ../GTIPTVPlayerPro/browser.py:14185
+#: ../GTIPTVPlayerPro/browser.py:14617 ../GTIPTVPlayerPro/browser.py:14660
+msgid "SELECT A CHANNEL"
+msgstr "SELECIONAR UM CANAL"
+
+#: ../GTIPTVPlayerPro/browser.py:14096 ../GTIPTVPlayerPro/browser.py:14125
+#: ../GTIPTVPlayerPro/browser.py:15900 ../GTIPTVPlayerPro/browser.py:15910
+msgid "Waiting for programme information"
+msgstr "A aguardar informações do programa"
+
+#: ../GTIPTVPlayerPro/browser.py:14099 ../GTIPTVPlayerPro/browser.py:14116
+#: ../GTIPTVPlayerPro/browser.py:15902 ../GTIPTVPlayerPro/browser.py:15920
+#: ../GTIPTVPlayerPro/browser.py:15963 ../GTIPTVPlayerPro/browser.py:15987
+#: ../GTIPTVPlayerPro/browser.py:19186 ../GTIPTVPlayerPro/browser.py:19346
+#: ../GTIPTVPlayerPro/browser.py:21626
+msgid "NEXT"
+msgstr "SEGUINTE"
+
+#: ../GTIPTVPlayerPro/browser.py:14124
+msgid "PROGRAMME SUMMARY"
+msgstr "RESUMO DO PROGRAMA"
+
+#: ../GTIPTVPlayerPro/browser.py:14326 ../GTIPTVPlayerPro/browser.py:14341
+#: ../GTIPTVPlayerPro/browser.py:14872 ../GTIPTVPlayerPro/browser.py:14874
+#: ../GTIPTVPlayerPro/browser.py:16389 ../GTIPTVPlayerPro/browser.py:16394
+#: ../GTIPTVPlayerPro/browser.py:16475 ../GTIPTVPlayerPro/browser.py:16487
+#: ../GTIPTVPlayerPro/browser.py:16496 ../GTIPTVPlayerPro/browser.py:18336
+#: ../GTIPTVPlayerPro/browser.py:20771 ../GTIPTVPlayerPro/browser.py:20843
+#: ../GTIPTVPlayerPro/browser.py:21506
+msgid "Could not open the stream."
+msgstr "Não foi possível abrir a transmissão."
+
+#: ../GTIPTVPlayerPro/browser.py:14478
+msgid "No channels found; press GREEN to try again."
+msgstr "Nenhum canal encontrado; prima VERDE para tentar novamente."
+
+#: ../GTIPTVPlayerPro/browser.py:15918 ../GTIPTVPlayerPro/browser.py:15923
+#: ../GTIPTVPlayerPro/browser.py:15943 ../GTIPTVPlayerPro/browser.py:15995
+#: ../GTIPTVPlayerPro/browser.py:20160 ../GTIPTVPlayerPro/browser.py:20171
+#: ../GTIPTVPlayerPro/browser.py:21630
+msgid "EPG information unavailable."
+msgstr "Informações EPG indisponíveis."
+
+#: ../GTIPTVPlayerPro/browser.py:15934 ../GTIPTVPlayerPro/browser.py:16015
+msgid "No summary is available for this programme."
+msgstr "Não existe resumo disponível para este programa."
+
+#: ../GTIPTVPlayerPro/browser.py:15963
+msgid "LATER"
+msgstr "MAIS TARDE"
+
+#: ../GTIPTVPlayerPro/browser.py:16589 ../GTIPTVPlayerPro/browser.py:20008
+#: ../GTIPTVPlayerPro/browser.py:21192 ../GTIPTVPlayerPro/browser.py:21510
+#: ../GTIPTVPlayerPro/browser.py:22231 ../GTIPTVPlayerPro/browser.py:22272
+#: ../GTIPTVPlayerPro/browser.py:23860 ../GTIPTVPlayerPro/browser.py:23950
+msgid "Keeping the current stream"
+msgstr "A manter a transmissão atual"
+
+#: ../GTIPTVPlayerPro/browser.py:16747
+#, python-brace-format
+msgid "{}  >  Series  >  Select season and episode"
+msgstr "{}  >  Séries  >  Selecionar temporada e episódio"
+
+#: ../GTIPTVPlayerPro/browser.py:16765 ../GTIPTVPlayerPro/browser.py:16768
+msgid "EPISODES"
+msgstr "EPISÓDIOS"
+
+#: ../GTIPTVPlayerPro/browser.py:16859
+msgid "No episodes were found for this series."
+msgstr "Não foram encontrados episódios para esta série."
+
+#: ../GTIPTVPlayerPro/browser.py:16975
+msgid "Enigma2 player service support is unavailable"
+msgstr "O serviço do leitor Enigma2 não está disponível"
+
+#: ../GTIPTVPlayerPro/browser.py:18063
+#, python-brace-format
+msgid ""
+"Resume playback from the saved position?\n"
+"\n"
+"Saved position: {}"
+msgstr ""
+"Retomar a reprodução a partir da posição guardada?\n"
+"\n"
+"Posição guardada: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:18254 ../GTIPTVPlayerPro/browser.py:18268
+msgid "Stream link timed out"
+msgstr "A ligação de transmissão excedeu o tempo limite"
+
+#: ../GTIPTVPlayerPro/browser.py:18334 ../GTIPTVPlayerPro/catchup_ui.py:542
+msgid "Could not open the archived programme."
+msgstr "Não foi possível abrir o programa arquivado."
+
+#: ../GTIPTVPlayerPro/browser.py:19178
+msgid "Player"
+msgstr "Leitor"
+
+#: ../GTIPTVPlayerPro/browser.py:19179 ../GTIPTVPlayerPro/browser.py:21617
+msgid "Reading resolution"
+msgstr "A ler resolução"
+
+#: ../GTIPTVPlayerPro/browser.py:19181 ../GTIPTVPlayerPro/browser.py:21619
+#: ../GTIPTVPlayerPro/browser.py:23514
+msgid "VIDEO: --"
+msgstr "VÍDEO: --"
+
+#: ../GTIPTVPlayerPro/browser.py:19182 ../GTIPTVPlayerPro/browser.py:21620
+#: ../GTIPTVPlayerPro/browser.py:23522
+msgid "AUDIO: --"
+msgstr "ÁUDIO: --"
+
+#: ../GTIPTVPlayerPro/browser.py:19185 ../GTIPTVPlayerPro/browser.py:21632
+msgid "Loading EPG..."
+msgstr "A carregar EPG..."
+
+#: ../GTIPTVPlayerPro/browser.py:19330 ../GTIPTVPlayerPro/browser.py:19344
+#: ../GTIPTVPlayerPro/browser.py:19351 ../GTIPTVPlayerPro/browser.py:19360
+#: ../GTIPTVPlayerPro/browser.py:19369 ../GTIPTVPlayerPro/main.py:430
+msgid "LIVE TV"
+msgstr "TV EM DIRETO"
+
+#: ../GTIPTVPlayerPro/browser.py:19330
+msgid "EPG information unavailable"
+msgstr "Informações EPG indisponíveis"
+
+#: ../GTIPTVPlayerPro/browser.py:19366 ../GTIPTVPlayerPro/browser.py:19394
+#: ../GTIPTVPlayerPro/browser.py:21626
+msgid "REMAINING"
+msgstr "RESTANTE"
+
+#: ../GTIPTVPlayerPro/browser.py:19373 ../GTIPTVPlayerPro/catchup_ui.py:240
+#: ../GTIPTVPlayerPro/catchup_ui.py:481 ../GTIPTVPlayerPro/main.py:435
+msgid "TV Archive"
+msgstr "Arquivo de TV"
+
+#: ../GTIPTVPlayerPro/browser.py:19374 ../GTIPTVPlayerPro/main.py:440
+#: ../GTIPTVPlayerPro/main.py:9013
+msgid "MOVIES"
+msgstr "FILMES"
+
+#: ../GTIPTVPlayerPro/browser.py:20687
+msgid "Could not start the player."
+msgstr "Não foi possível iniciar o leitor."
+
+#: ../GTIPTVPlayerPro/browser.py:21068 ../GTIPTVPlayerPro/browser.py:21333
+msgid "Reconnecting the stream..."
+msgstr "A restabelecer a transmissão..."
+
+#: ../GTIPTVPlayerPro/browser.py:21623
+msgid "PREVIOUS"
+msgstr "ANTERIOR"
+
+#: ../GTIPTVPlayerPro/browser.py:21637
+msgid "Reading duration..."
+msgstr "A ler duração..."
+
+#: ../GTIPTVPlayerPro/browser.py:21734
+msgid "Audio track"
+msgstr "Faixa de áudio"
+
+#: ../GTIPTVPlayerPro/browser.py:21824
+msgid "No audio tracks are available."
+msgstr "Não estão disponíveis faixas de áudio."
+
+#: ../GTIPTVPlayerPro/browser.py:21828
+msgid "This content has only one audio track."
+msgstr "Este conteúdo tem apenas uma faixa de áudio."
+
+#: ../GTIPTVPlayerPro/browser.py:21833 ../GTIPTVPlayerPro/browser.py:21843
+#: ../GTIPTVPlayerPro/browser.py:21897 ../GTIPTVPlayerPro/browser.py:21902
+#: ../GTIPTVPlayerPro/browser.py:21944
+msgid "Audio track selection is unavailable on this image."
+msgstr "A seleção de faixas de áudio não está disponível nesta imagem."
+
+#: ../GTIPTVPlayerPro/browser.py:21882 ../GTIPTVPlayerPro/browser.py:21891
+msgid "Audio tracks"
+msgstr "Faixas de áudio"
+
+#: ../GTIPTVPlayerPro/browser.py:21911
+msgid "The playing service changed. Open audio selection again."
+msgstr "O serviço em reprodução foi alterado. Abra novamente a seleção de áudio."
+
+#: ../GTIPTVPlayerPro/browser.py:21929 ../GTIPTVPlayerPro/browser.py:21938
+msgid "Audio tracks changed. Open audio selection again."
+msgstr "As faixas de áudio foram alteradas. Abra novamente a seleção de áudio."
+
+#: ../GTIPTVPlayerPro/browser.py:21954
+msgid "Could not select the requested audio track."
+msgstr "Não foi possível selecionar a faixa de áudio pedida."
+
+#: ../GTIPTVPlayerPro/browser.py:21966 ../GTIPTVPlayerPro/browser.py:23517
+#, python-brace-format
+msgid "AUDIO: {}"
+msgstr "ÁUDIO: {}"
+
+#: ../GTIPTVPlayerPro/browser.py:22084
+msgid "Changing channel..."
+msgstr "A mudar de canal..."
+
+#: ../GTIPTVPlayerPro/browser.py:22227 ../GTIPTVPlayerPro/browser.py:22268
+msgid "Could not open the channel."
+msgstr "Não foi possível abrir o canal."
+
+#: ../GTIPTVPlayerPro/browser.py:22366 ../GTIPTVPlayerPro/browser.py:22489
+#: ../GTIPTVPlayerPro/browser.py:22543 ../GTIPTVPlayerPro/browser.py:23001
+msgid "PAUSED"
+msgstr "EM PAUSA"
+
+#: ../GTIPTVPlayerPro/browser.py:22366
+msgid "SEEK MODE"
+msgstr "MODO DE PESQUISA"
+
+#: ../GTIPTVPlayerPro/browser.py:22367
+msgid "LEFT / RIGHT to select time   •   OK to continue"
+msgstr "ESQUERDA / DIREITA para selecionar o tempo   •   OK para continuar"
+
+#: ../GTIPTVPlayerPro/browser.py:22490 ../GTIPTVPlayerPro/browser.py:22544
+#: ../GTIPTVPlayerPro/browser.py:23002
+msgid "PLAY / PAUSE to continue   •   STOP to close the video"
+msgstr "PLAY / PAUSE para continuar   •   STOP para fechar o vídeo"
+
+#: ../GTIPTVPlayerPro/browser.py:22686
+msgid "THIS STREAM CANNOT BE SEEKED"
+msgstr "NÃO É POSSÍVEL AVANÇAR NESTA TRANSMISSÃO"
+
+#: ../GTIPTVPlayerPro/browser.py:22687
+msgid "The server or playback format does not support seeking"
+msgstr "O servidor ou o formato de reprodução não suporta avanço"
+
+#: ../GTIPTVPlayerPro/browser.py:22715
+msgid "SEEK FORWARD"
+msgstr "AVANÇAR"
+
+#: ../GTIPTVPlayerPro/browser.py:22717
+msgid "SEEK BACKWARD"
+msgstr "RECUAR"
+
+#: ../GTIPTVPlayerPro/browser.py:22721
+msgid "LEFT / RIGHT to select time   •   OK to continue   •   EXIT to cancel"
+msgstr "ESQUERDA / DIREITA para selecionar o tempo   •   OK para continuar   •   EXIT para cancelar"
+
+#: ../GTIPTVPlayerPro/browser.py:22983
+msgid "PAUSE IS NOT AVAILABLE"
+msgstr "A PAUSA NÃO ESTÁ DISPONÍVEL"
+
+#: ../GTIPTVPlayerPro/browser.py:22984
+msgid "This server or playback format does not support pausing"
+msgstr "Este servidor ou formato de reprodução não suporta pausa"
+
+#: ../GTIPTVPlayerPro/browser.py:23079
+msgid "Weather information is not ready"
+msgstr "As informações meteorológicas ainda não estão prontas"
+
+#: ../GTIPTVPlayerPro/browser.py:23154
+msgid "Could not load the weather forecast"
+msgstr "Não foi possível carregar a previsão meteorológica"
+
+#: ../GTIPTVPlayerPro/browser.py:23179 ../GTIPTVPlayerPro/browser.py:23192
+msgid "Weather information unavailable."
+msgstr "Informações meteorológicas indisponíveis."
+
+#: ../GTIPTVPlayerPro/browser.py:23492
+msgid "Resolution: --"
+msgstr "Resolução: --"
+
+#: ../GTIPTVPlayerPro/browser.py:23509
+#, python-brace-format
+msgid "VIDEO: {}"
+msgstr "VÍDEO: {}"
+
+#: ../GTIPTVPlayerPro/catchup.py:91 ../GTIPTVPlayerPro/content.py:292
+msgid "No programme information"
+msgstr "Sem informações do programa"
+
+#: ../GTIPTVPlayerPro/catchup.py:122 ../GTIPTVPlayerPro/catchup.py:495
+#: ../GTIPTVPlayerPro/catchup.py:543 ../GTIPTVPlayerPro/catchup_m3u.py:200
+#: ../GTIPTVPlayerPro/catchup_ui.py:375 ../GTIPTVPlayerPro/catchup_ui.py:387
+msgid "Could not load the TV archive."
+msgstr "Não foi possível carregar o arquivo de TV."
+
+#: ../GTIPTVPlayerPro/catchup.py:187 ../GTIPTVPlayerPro/catchup.py:356
+#: ../GTIPTVPlayerPro/catchup.py:363 ../GTIPTVPlayerPro/catchup.py:410
+#: ../GTIPTVPlayerPro/catchup.py:477 ../GTIPTVPlayerPro/content.py:1684
+#: ../GTIPTVPlayerPro/m3u.py:886 ../GTIPTVPlayerPro/m3u.py:892
+#: ../GTIPTVPlayerPro/stalker.py:7312 ../GTIPTVPlayerPro/stalker.py:7447
+#: ../GTIPTVPlayerPro/stalker.py:7534
+msgid "Invalid playback item"
+msgstr "Item de reprodução inválido"
+
+#: ../GTIPTVPlayerPro/catchup.py:202 ../GTIPTVPlayerPro/catchup_stalker.py:116
+#: ../GTIPTVPlayerPro/catchup_ui.py:37
+msgid "TV archive is not supported by this source."
+msgstr "Esta fonte não suporta o arquivo de TV."
+
+#: ../GTIPTVPlayerPro/catchup.py:242 ../GTIPTVPlayerPro/catchup.py:582
+#: ../GTIPTVPlayerPro/catchup_m3u.py:36
+#: ../GTIPTVPlayerPro/catchup_stalker.py:123
+msgid "Archive playback is unavailable for this channel."
+msgstr "A reprodução a partir do arquivo não está disponível para este canal."
+
+#: ../GTIPTVPlayerPro/catchup.py:358 ../GTIPTVPlayerPro/catchup_m3u.py:230
+#: ../GTIPTVPlayerPro/catchup_stalker.py:130
+msgid "This programme is no longer available in the TV archive."
+msgstr "Este programa já não está disponível no arquivo de TV."
+
+#: ../GTIPTVPlayerPro/catchup_m3u.py:177 ../GTIPTVPlayerPro/catchup_ui.py:36
+msgid "Configure an XMLTV guide for this M3U source to use TV archive."
+msgstr "Configure um guia XMLTV para esta fonte M3U para utilizar o arquivo de TV."
+
+#: ../GTIPTVPlayerPro/catchup_stalker.py:426 ../GTIPTVPlayerPro/stalker.py:2493
+msgid "Portal request limit reached"
+msgstr "Foi atingido o limite de pedidos do portal"
+
+#: ../GTIPTVPlayerPro/catchup_stalker.py:430 ../GTIPTVPlayerPro/stalker.py:1808
+#: ../GTIPTVPlayerPro/stalker.py:2344 ../GTIPTVPlayerPro/stalker.py:2364
+#: ../GTIPTVPlayerPro/stalker.py:2378 ../GTIPTVPlayerPro/stalker.py:2479
+msgid "Portal access denied"
+msgstr "Acesso ao portal negado"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:482 ../GTIPTVPlayerPro/remote_footer.py:111
+msgid "Channels"
+msgstr "Canais"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:521
+#, python-brace-format
+msgid "{} min"
+msgstr "{} min"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:536
+msgid "Watch from archive"
+msgstr "Ver a partir do arquivo"
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:546
+msgid "Loading programmes..."
+msgstr "A carregar os programas..."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:546
+msgid "Loading TV archive..."
+msgstr "A carregar o arquivo de TV..."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:548
+msgid "No archived channels are available for this account."
+msgstr "Não há canais com arquivo disponíveis para esta conta."
+
+#: ../GTIPTVPlayerPro/catchup_ui.py:550
+msgid "No archived programmes are available for this day."
+msgstr "Não há programas arquivados disponíveis para este dia."
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:54
+msgid "Filter rules: Show / Hide / Clear"
+msgstr "Regras dos filtros: Mostrar / Ocultar / Limpar"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:199
+msgid "Hide"
+msgstr "Ocultar"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:200
+msgid "Show"
+msgstr "Mostrar"
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:219
+msgid "No filters found."
+msgstr "Nenhum filtro encontrado."
+
+#: ../GTIPTVPlayerPro/category_filter_ui.py:220
+#: ../GTIPTVPlayerPro/remote_footer.py:134
+msgid "Preview"
+msgstr "Pré-visualização"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:125
+msgid "NUMBER KEYS: Enter  |  YELLOW: Delete  |  OK/GREEN: Confirm  |  BACK: Cancel"
+msgstr "NUMBER KEYS: Introduzir  |  YELLOW: Eliminar  |  OK/GREEN: Confirmar  |  BACK: Cancelar"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:129
+msgid "BLUE: Recovery code"
+msgstr "BLUE: Código de recuperação"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:168
+#, python-brace-format
+msgid "Digits entered: {}/{}"
+msgstr "Dígitos introduzidos: {}/{}"
+
+#: ../GTIPTVPlayerPro/category_lock_ui.py:191
+#, python-brace-format
+msgid "Enter exactly {} digits."
+msgstr "Introduza exatamente {} dígitos."
+
+#: ../GTIPTVPlayerPro/content.py:44
+msgid "All Series"
+msgstr "Todas as séries"
+
+#: ../GTIPTVPlayerPro/content.py:153 ../GTIPTVPlayerPro/content.py:877
+msgid "Untitled content"
+msgstr "Conteúdo sem título"
+
+#: ../GTIPTVPlayerPro/content.py:702 ../GTIPTVPlayerPro/playlist.py:168
+msgid "Unsupported content type"
+msgstr "Tipo de conteúdo não suportado"
+
+#: ../GTIPTVPlayerPro/content.py:744
+#, python-brace-format
+msgid "API HTTP error action={}"
+msgstr "Erro HTTP da API, ação={}"
+
+#: ../GTIPTVPlayerPro/content.py:747
+msgid "Server denied access to content"
+msgstr "O servidor negou o acesso ao conteúdo"
+
+#: ../GTIPTVPlayerPro/content.py:758 ../GTIPTVPlayerPro/playlist.py:1433
+#, python-brace-format
+msgid "Server returned HTTP {}"
+msgstr "O servidor devolveu HTTP {}"
+
+#: ../GTIPTVPlayerPro/content.py:765
+#, python-brace-format
+msgid "API connection error action={}"
+msgstr "Erro de ligação à API, ação={}"
+
+#: ../GTIPTVPlayerPro/content.py:769
+msgid "Could not connect to the content server"
+msgstr "Não foi possível ligar ao servidor de conteúdo"
+
+#: ../GTIPTVPlayerPro/content.py:778 ../GTIPTVPlayerPro/content.py:958
+#: ../GTIPTVPlayerPro/content.py:1335
+msgid "Server content list is too large"
+msgstr "A lista de conteúdo do servidor é demasiado grande"
+
+#: ../GTIPTVPlayerPro/content.py:787
+#, python-brace-format
+msgid "Invalid JSON action={}"
+msgstr "Ação JSON inválida={}"
+
+#: ../GTIPTVPlayerPro/content.py:789
+msgid "Server returned an invalid content response"
+msgstr "O servidor devolveu uma resposta de conteúdo inválida"
+
+#: ../GTIPTVPlayerPro/content.py:953 ../GTIPTVPlayerPro/content.py:1162
+#: ../GTIPTVPlayerPro/content.py:1297 ../GTIPTVPlayerPro/content.py:1330
+msgid "Could not load the content list"
+msgstr "Não foi possível carregar a lista de conteúdo"
+
+#: ../GTIPTVPlayerPro/content.py:1103
+msgid "Could not load the category list"
+msgstr "Não foi possível carregar a lista de categorias"
+
+#: ../GTIPTVPlayerPro/content.py:1383
+msgid "Invalid movie ID"
+msgstr "ID de filme inválido"
+
+#: ../GTIPTVPlayerPro/content.py:1389
+msgid "Could not load movie information"
+msgstr "Não foi possível carregar as informações do filme"
+
+#: ../GTIPTVPlayerPro/content.py:1439
+msgid "Invalid series ID"
+msgstr "ID de série inválido"
+
+#: ../GTIPTVPlayerPro/content.py:1445
+msgid "Could not load series information"
+msgstr "Não foi possível carregar as informações da série"
+
+#: ../GTIPTVPlayerPro/content.py:1454
+msgid "Could not load series episodes"
+msgstr "Não foi possível carregar os episódios da série"
+
+#: ../GTIPTVPlayerPro/content.py:1477 ../GTIPTVPlayerPro/stalker.py:5470
+#: ../GTIPTVPlayerPro/stalker.py:5864
+msgid "Episode"
+msgstr "Episódio"
+
+#: ../GTIPTVPlayerPro/content.py:1478 ../GTIPTVPlayerPro/stalker.py:5473
+#, python-brace-format
+msgid "S{} E{}"
+msgstr "T{} E{}"
+
+#: ../GTIPTVPlayerPro/content.py:1627 ../GTIPTVPlayerPro/content.py:1640
+msgid "Invalid channel ID"
+msgstr "ID de canal inválido"
+
+#: ../GTIPTVPlayerPro/content.py:1695
+msgid "Could not create the stream URL"
+msgstr "Não foi possível criar o URL da transmissão"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:409 ../GTIPTVPlayerPro/dvb_epg_ui.py:417
+msgid "Never"
+msgstr "Nunca"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:582 ../GTIPTVPlayerPro/m3u_epg_ui.py:750
+msgid "Update mode"
+msgstr "Modo de atualização"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:583 ../GTIPTVPlayerPro/m3u_epg_ui.py:751
+msgid "Update interval"
+msgstr "Intervalo de atualização"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:584
+msgid "Update on startup if overdue"
+msgstr "Atualizar no arranque se estiver em atraso."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:585
+msgid "Update in normal standby"
+msgstr "Atualizar no modo de espera normal"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:586 ../GTIPTVPlayerPro/m3u_epg_ui.py:752
+#: ../GTIPTVPlayerPro/main.py:4010
+msgid "Last update"
+msgstr "Última atualização"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:587
+msgid "Next update"
+msgstr "Próxima atualização"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:588 ../GTIPTVPlayerPro/dvb_epg_ui.py:740
+msgid "Deep standby wake"
+msgstr "Reativação no modo de espera profundo"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:625
+msgid "DVB EPG AUTOMATIC UPDATES"
+msgstr "ATUALIZAÇÕES AUTOMÁTICAS DO DVB EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:632 ../GTIPTVPlayerPro/dvb_epg_ui.py:1467
+msgid "XMLTV offsets are converted to UTC automatically; no manual timezone is used."
+msgstr "Os desvios XMLTV são convertidos automaticamente para UTC; não é utilizado nenhum fuso horário manual."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:653 ../GTIPTVPlayerPro/dvb_epg_ui.py:875
+msgid "Settings - DVB EPG"
+msgstr "Definições - DVB EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:663
+msgid "Due now"
+msgstr "Prevista para agora"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:666
+#, python-brace-format
+msgid "Overdue: {}"
+msgstr "Em atraso: {}"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:672 ../GTIPTVPlayerPro/dvb_epg_ui.py:975
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1796 ../GTIPTVPlayerPro/i18n.py:348
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:853
+msgid "Automatic"
+msgstr "Automático"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:672 ../GTIPTVPlayerPro/dvb_epg_ui.py:979
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1788 ../GTIPTVPlayerPro/m3u_epg_ui.py:853
+msgid "Manual"
+msgstr "Manual"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:673 ../GTIPTVPlayerPro/dvb_epg_ui.py:977
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:854 ../GTIPTVPlayerPro/playlist.py:1461
+#, python-brace-format
+msgid "{} hours"
+msgstr "{} horas"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
+#: ../GTIPTVPlayerPro/main.py:733 ../GTIPTVPlayerPro/main.py:734
+#: ../GTIPTVPlayerPro/main.py:4094 ../GTIPTVPlayerPro/main.py:4386
+#: ../GTIPTVPlayerPro/main.py:4601 ../GTIPTVPlayerPro/main.py:4609
+msgid "On"
+msgstr "Ativado"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
+#: ../GTIPTVPlayerPro/main.py:738 ../GTIPTVPlayerPro/main.py:739
+#: ../GTIPTVPlayerPro/main.py:742 ../GTIPTVPlayerPro/main.py:4094
+#: ../GTIPTVPlayerPro/main.py:4386 ../GTIPTVPlayerPro/main.py:4603
+#: ../GTIPTVPlayerPro/main.py:4609 ../GTIPTVPlayerPro/main.py:9666
+#: ../GTIPTVPlayerPro/main.py:9672 ../GTIPTVPlayerPro/subtitles.py:189
+#: ../GTIPTVPlayerPro/subtitles.py:591
+msgid "Off"
+msgstr "Desativado"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:682 ../GTIPTVPlayerPro/dvb_epg_ui.py:741
+msgid "Always off"
+msgstr "Sempre desativado"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:708 ../GTIPTVPlayerPro/m3u_epg_ui.py:940
+msgid "Switch Update mode to Automatic to change this option."
+msgstr "Mude o Modo de atualização para Automático para alterar esta opção."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:726 ../GTIPTVPlayerPro/m3u_epg_ui.py:953
+msgid "Status information is read-only."
+msgstr "As informações de estado são só de leitura."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:735
+msgid "Deep standby never wakes the receiver; an overdue update runs after the next startup."
+msgstr "O modo de espera profundo nunca reativa o recetor; uma atualização em atraso é executada após o próximo arranque."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:745 ../GTIPTVPlayerPro/dvb_epg_ui.py:1062
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:955 ../GTIPTVPlayerPro/m3u_epg_ui.py:1012
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1031 ../GTIPTVPlayerPro/main.py:4528
+#: ../GTIPTVPlayerPro/main.py:4670 ../GTIPTVPlayerPro/main.py:4976
+msgid "Press GREEN to save the changes."
+msgstr "Prima VERDE para guardar as alterações."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:765 ../GTIPTVPlayerPro/dvb_epg_ui.py:1096
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1110 ../GTIPTVPlayerPro/dvb_epg_ui.py:1974
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2021
+msgid "DVB EPG settings could not be saved. Check the receiver storage."
+msgstr "Não foi possível guardar as definições de DVB EPG. Verifique o armazenamento do recetor."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:771
+msgid "Automatic update settings saved."
+msgstr "As definições das atualizações automáticas foram guardadas."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:779
+msgid "Enable DVB EPG"
+msgstr "Ativar DVB EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:780
+msgid "Xtream XMLTV source"
+msgstr "Fonte Xtream XMLTV"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:781
+msgid "Target DVB bouquet"
+msgstr "Bouquet DVB de destino"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:782
+msgid "EPG range"
+msgstr "Intervalo EPG"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:783 ../GTIPTVPlayerPro/dvb_epg_ui.py:1552
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1592
+msgid "Manual channel mapping"
+msgstr "Mapeamento manual de canais"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:784
+msgid "Automatic updates"
+msgstr "Atualizações automáticas"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:842
+msgid "DVB SATELLITE EPG"
+msgstr "EPG DVB POR SATÉLITE"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:951
+msgid "All TV bouquets"
+msgstr "Todos os bouquets de TV"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:956 ../GTIPTVPlayerPro/dvb_epg_ui.py:1041
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1147
+msgid "Scanning DVB bouquets..."
+msgstr "A analisar bouquets DVB..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:957
+msgid "Selected bouquet is unavailable"
+msgstr "O bouquet selecionado não está disponível"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:961
+msgid "No Xtream source"
+msgstr "Sem fonte Xtream"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:965
+msgid "No DVB EPG update has been completed yet."
+msgstr "Ainda não foi concluída nenhuma atualização de DVB EPG."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:966
+#, python-brace-format
+msgid "Last update: {}  •  {} channels  •  {} events"
+msgstr "Última atualização: {}  •  {} canais  •  {} eventos"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:985
+#, python-brace-format
+msgid "{} days"
+msgstr "{} dias"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:986
+#, python-brace-format
+msgid "Open ({} mapped)"
+msgstr "Abrir ({} mapeados)"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1033
+msgid "No valid Xtream source was found."
+msgstr "Não foi encontrada nenhuma fonte Xtream válida."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1136 ../GTIPTVPlayerPro/dvb_epg_ui.py:1144
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1166 ../GTIPTVPlayerPro/dvb_epg_ui.py:1407
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1436 ../GTIPTVPlayerPro/dvb_epg_ui.py:1473
+msgid "DVB EPG update is still running..."
+msgstr "A atualização de DVB EPG ainda está em curso..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1140
+msgid "DVB EPG settings saved."
+msgstr "Definições de DVB EPG guardadas."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1150
+msgid "Enable DVB EPG before starting an update."
+msgstr "Ative o DVB EPG antes de iniciar uma atualização."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1154 ../GTIPTVPlayerPro/dvb_epg_ui.py:1411
+msgid "Select a valid Xtream XMLTV source."
+msgstr "Selecione uma fonte Xtream XMLTV válida."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1158
+msgid "The receiver clock is not ready. Check network time and try again."
+msgstr "O relógio do recetor ainda não está pronto. Verifique a hora da rede e tente novamente."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1170 ../GTIPTVPlayerPro/dvb_epg_ui.py:1608
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1831
+msgid "An automatic DVB EPG update is already running."
+msgstr "Já está em curso uma atualização automática do DVB EPG."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1183
+msgid "Downloading and preparing the Xtream XMLTV guide..."
+msgstr "A transferir e preparar o guia Xtream XMLTV..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1197 ../GTIPTVPlayerPro/dvb_epg_ui.py:1275
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1344
+msgid "DVB EPG update failed. No existing EPG data was removed."
+msgstr "Falha na atualização de DVB EPG. Os dados EPG existentes não foram removidos."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1287
+msgid "The native Enigma2 EPG cache rejected the update."
+msgstr "A cache EPG nativa do Enigma2 rejeitou a atualização."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1361
+#, python-brace-format
+msgid "DVB EPG updated: {} channels and {} events imported."
+msgstr "DVB EPG atualizado: {} canais e {} eventos importados."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1384
+msgid "DVB bouquets could not be scanned."
+msgstr "Não foi possível analisar os bouquets DVB."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1399
+msgid "DVB EPG update timed out."
+msgstr "A atualização de DVB EPG excedeu o tempo limite."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1414
+msgid "Manual channel mapping could not be opened."
+msgstr "Não foi possível abrir o mapeamento manual de canais."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1440
+msgid "Automatic update settings could not be opened."
+msgstr "Não foi possível abrir as definições das atualizações automáticas."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1487
+msgid "DVB EPG update cancelled."
+msgstr "Atualização de DVB EPG cancelada."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1564 ../GTIPTVPlayerPro/dvb_epg_ui.py:1624
+msgid "Loading DVB services and cached XMLTV channels..."
+msgstr "A carregar serviços DVB e canais XMLTV em cache..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1622
+msgid "Downloading the Xtream XMLTV guide..."
+msgstr "A transferir o guia Xtream XMLTV..."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1645 ../GTIPTVPlayerPro/dvb_epg_ui.py:1733
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1746
+msgid "Channel mapping data could not be loaded."
+msgstr "Não foi possível carregar os dados de mapeamento de canais."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1755
+msgid "No real DVB service was found in the selected bouquet."
+msgstr "Não foi encontrado nenhum serviço DVB real no bouquet selecionado."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1757
+msgid "No cached XMLTV guide was found. Press YELLOW to download it."
+msgstr "Não foi encontrado nenhum guia XMLTV em cache. Prima AMARELO para o transferir."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1760
+msgid "Press OK to choose an XMLTV channel; RED blocks or restores automatic matching."
+msgstr "Prima OK para escolher um canal XMLTV; VERMELHO bloqueia ou restaura o mapeamento automático."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1783 ../GTIPTVPlayerPro/main.py:740
+#: ../GTIPTVPlayerPro/main.py:741 ../GTIPTVPlayerPro/main.py:8561
+#: ../GTIPTVPlayerPro/main.py:8684
+msgid "Blocked"
+msgstr "Bloqueado"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1799
+msgid "Unmatched"
+msgstr "Sem correspondência"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1848
+#, python-brace-format
+msgid "{} DVB services  •  {} XMLTV channels  •  {} mapped"
+msgstr "{} serviços DVB  •  {} canais XMLTV  •  {} mapeados"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1928
+msgid "No real DVB service is available for mapping."
+msgstr "Não está disponível nenhum serviço DVB real para mapeamento."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1931
+msgid "Press YELLOW to download the XMLTV channel list first."
+msgstr "Primeiro, prima AMARELO para transferir a lista de canais XMLTV."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1934
+msgid "The XMLTV channel list could not be opened."
+msgstr "Não foi possível abrir a lista de canais XMLTV."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1963
+msgid "That XMLTV channel is already assigned to another DVB service."
+msgstr "Esse canal XMLTV já está atribuído a outro serviço DVB."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1967 ../GTIPTVPlayerPro/dvb_epg_ui.py:2014
+msgid "The manual channel mapping could not be saved."
+msgstr "Não foi possível guardar o mapeamento manual de canais."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1981
+#, python-brace-format
+msgid "Manual mapping saved: {} -> {}"
+msgstr "Mapeamento manual guardado: {} -> {}"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2001
+#, python-brace-format
+msgid "Automatic matching restored for {}."
+msgstr "Mapeamento automático restaurado para {}."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2009
+#, python-brace-format
+msgid "EPG mapping removed and automatic matching blocked for {}."
+msgstr "Mapeamento EPG removido e mapeamento automático bloqueado para {}."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2047
+msgid "Channel mapping refresh cancelled."
+msgstr "Atualização do mapeamento de canais cancelada."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2096 ../GTIPTVPlayerPro/dvb_epg_ui.py:2134
+msgid "Select XMLTV channel"
+msgstr "Selecionar canal XMLTV"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2109
+msgid "Press GREEN to filter the XMLTV channel list."
+msgstr "Prima VERDE para filtrar a lista de canais XMLTV."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2145
+#, python-brace-format
+msgid "{} XMLTV channels"
+msgstr "{} canais XMLTV"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2221
+msgid "No XMLTV channel matches the current filter."
+msgstr "Nenhum canal XMLTV corresponde ao filtro atual."
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2237
+msgid "Search XMLTV channels"
+msgstr "Pesquisar canais XMLTV"
+
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:2263
+msgid "XMLTV channel filter cleared."
+msgstr "Filtro de canais XMLTV limpo."
+
+#: ../GTIPTVPlayerPro/i18n.py:147 ../GTIPTVPlayerPro/i18n.py:148
+msgid "Arabic"
+msgstr "Árabe"
+
+#: ../GTIPTVPlayerPro/i18n.py:149 ../GTIPTVPlayerPro/i18n.py:150
+#: ../GTIPTVPlayerPro/i18n.py:151
+msgid "Czech"
+msgstr "Checo"
+
+#: ../GTIPTVPlayerPro/i18n.py:152 ../GTIPTVPlayerPro/i18n.py:153
+#: ../GTIPTVPlayerPro/i18n.py:154
+msgid "German"
+msgstr "Alemão"
+
+#: ../GTIPTVPlayerPro/i18n.py:155 ../GTIPTVPlayerPro/i18n.py:156
+#: ../GTIPTVPlayerPro/i18n.py:157
+msgid "Greek"
+msgstr "Grego"
+
+#: ../GTIPTVPlayerPro/i18n.py:158 ../GTIPTVPlayerPro/i18n.py:159
+msgid "English"
+msgstr "Inglês"
+
+#: ../GTIPTVPlayerPro/i18n.py:160 ../GTIPTVPlayerPro/i18n.py:161
+msgid "Spanish"
+msgstr "Espanhol"
+
+#: ../GTIPTVPlayerPro/i18n.py:162 ../GTIPTVPlayerPro/i18n.py:163
+msgid "Estonian"
+msgstr "Estónio"
+
+#: ../GTIPTVPlayerPro/i18n.py:164 ../GTIPTVPlayerPro/i18n.py:165
+msgid "Finnish"
+msgstr "Finlandês"
+
+#: ../GTIPTVPlayerPro/i18n.py:166 ../GTIPTVPlayerPro/i18n.py:167
+#: ../GTIPTVPlayerPro/i18n.py:168
+msgid "French"
+msgstr "Francês"
+
+#: ../GTIPTVPlayerPro/i18n.py:169 ../GTIPTVPlayerPro/i18n.py:170
+msgid "Hungarian"
+msgstr "Húngaro"
+
+#: ../GTIPTVPlayerPro/i18n.py:171 ../GTIPTVPlayerPro/i18n.py:172
+msgid "Italian"
+msgstr "Italiano"
+
+#: ../GTIPTVPlayerPro/i18n.py:173 ../GTIPTVPlayerPro/i18n.py:174
+#: ../GTIPTVPlayerPro/i18n.py:175
+msgid "Dutch"
+msgstr "Neerlandês"
+
+#: ../GTIPTVPlayerPro/i18n.py:176 ../GTIPTVPlayerPro/i18n.py:177
+msgid "Polish"
+msgstr "Polaco"
+
+#: ../GTIPTVPlayerPro/i18n.py:178 ../GTIPTVPlayerPro/i18n.py:179
+msgid "Portuguese"
+msgstr "Português"
+
+#: ../GTIPTVPlayerPro/i18n.py:180 ../GTIPTVPlayerPro/i18n.py:181
+msgid "Russian"
+msgstr "Russo"
+
+#: ../GTIPTVPlayerPro/i18n.py:182 ../GTIPTVPlayerPro/i18n.py:183
+#: ../GTIPTVPlayerPro/i18n.py:184
+msgid "Slovak"
+msgstr "Eslovaco"
+
+#: ../GTIPTVPlayerPro/i18n.py:185 ../GTIPTVPlayerPro/i18n.py:186
+#: ../GTIPTVPlayerPro/i18n.py:187
+msgid "Albanian"
+msgstr "Albanês"
+
+#: ../GTIPTVPlayerPro/i18n.py:188 ../GTIPTVPlayerPro/i18n.py:189
+msgid "Serbian"
+msgstr "Sérvio"
+
+#: ../GTIPTVPlayerPro/i18n.py:190 ../GTIPTVPlayerPro/i18n.py:191
+msgid "Swedish"
+msgstr "Sueco"
+
+#: ../GTIPTVPlayerPro/i18n.py:192 ../GTIPTVPlayerPro/i18n.py:193
+msgid "Turkish"
+msgstr "Turco"
+
+#: ../GTIPTVPlayerPro/i18n.py:194 ../GTIPTVPlayerPro/i18n.py:195
+#: ../GTIPTVPlayerPro/i18n.py:196
+msgid "Chinese"
+msgstr "Chinês"
+
+#: ../GTIPTVPlayerPro/m3u.py:102
+msgid "M3U source ID is invalid."
+msgstr "O ID da fonte M3U é inválido."
+
+#: ../GTIPTVPlayerPro/m3u.py:110
+msgid "M3U source type is invalid."
+msgstr "O tipo de fonte M3U é inválido."
+
+#: ../GTIPTVPlayerPro/m3u.py:118
+msgid "M3U source location is invalid."
+msgstr "A localização da fonte M3U é inválida."
+
+#: ../GTIPTVPlayerPro/m3u.py:121 ../GTIPTVPlayerPro/m3u.py:1730
+#: ../GTIPTVPlayerPro/main.py:7319 ../GTIPTVPlayerPro/main.py:7327
+#: ../GTIPTVPlayerPro/main.py:8151 ../GTIPTVPlayerPro/main.py:8183
+msgid "M3U file path is invalid."
+msgstr "O caminho do ficheiro M3U é inválido."
+
+#: ../GTIPTVPlayerPro/m3u.py:136 ../GTIPTVPlayerPro/m3u_epg_ui.py:326
+msgid "M3U source"
+msgstr "Fonte M3U"
+
+#: ../GTIPTVPlayerPro/m3u.py:140
+msgid "FILE"
+msgstr "FICHEIRO"
+
+#: ../GTIPTVPlayerPro/m3u.py:140
+msgid "WEB"
+msgstr "WEB"
+
+#: ../GTIPTVPlayerPro/m3u.py:146 ../GTIPTVPlayerPro/main.py:6860
+msgid "Local file"
+msgstr "Ficheiro local"
+
+#: ../GTIPTVPlayerPro/m3u.py:194 ../GTIPTVPlayerPro/m3u.py:199
+#: ../GTIPTVPlayerPro/m3u.py:206 ../GTIPTVPlayerPro/m3u.py:211
+#: ../GTIPTVPlayerPro/m3u.py:213
+msgid "M3U source file is invalid."
+msgstr "O ficheiro de fontes M3U é inválido."
+
+#: ../GTIPTVPlayerPro/m3u.py:196
+msgid "M3U source file version is not supported."
+msgstr "A versão do ficheiro de fontes M3U não é suportada."
+
+#: ../GTIPTVPlayerPro/m3u.py:243 ../GTIPTVPlayerPro/m3u.py:627
+msgid "M3U source is invalid."
+msgstr "A fonte M3U é inválida."
+
+#: ../GTIPTVPlayerPro/m3u.py:281
+msgid "Too many M3U sources are configured."
+msgstr "Estão configuradas demasiadas fontes M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:310 ../GTIPTVPlayerPro/m3u.py:332
+msgid "M3U source cache could not be deleted."
+msgstr "Não foi possível eliminar a cache da fonte M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:606
+msgid "M3U source file is too large."
+msgstr "O ficheiro de fontes M3U é demasiado grande."
+
+#: ../GTIPTVPlayerPro/m3u.py:631 ../GTIPTVPlayerPro/m3u.py:633
+msgid "M3U timeout is invalid."
+msgstr "O tempo limite M3U é inválido."
+
+#: ../GTIPTVPlayerPro/m3u.py:899
+msgid "Channel is no longer present in the M3U source."
+msgstr "O canal já não está presente na fonte M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:981
+msgid "This M3U source supports Live TV only."
+msgstr "Esta fonte M3U suporta apenas TV em direto."
+
+#: ../GTIPTVPlayerPro/m3u.py:1132 ../GTIPTVPlayerPro/m3u.py:2988
+msgid "Could not load the M3U source."
+msgstr "Não foi possível carregar a fonte M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:1151 ../GTIPTVPlayerPro/m3u.py:1312
+msgid "M3U source returned an invalid response."
+msgstr "A fonte M3U devolveu uma resposta inválida."
+
+#: ../GTIPTVPlayerPro/m3u.py:1156 ../GTIPTVPlayerPro/m3u.py:1317
+#: ../GTIPTVPlayerPro/m3u.py:1807 ../GTIPTVPlayerPro/m3u.py:1846
+#: ../GTIPTVPlayerPro/m3u.py:2855 ../GTIPTVPlayerPro/m3u.py:2952
+msgid "M3U source exceeds the safe size limit."
+msgstr "A fonte M3U excede o limite de tamanho seguro."
+
+#: ../GTIPTVPlayerPro/m3u.py:1233
+msgid "Uncategorized"
+msgstr "Sem categoria"
+
+#: ../GTIPTVPlayerPro/m3u.py:1322
+msgid "M3U source contains invalid data."
+msgstr "A fonte M3U contém dados inválidos."
+
+#: ../GTIPTVPlayerPro/m3u.py:1337
+msgid "M3U source contains a line that is too long."
+msgstr "A fonte M3U contém uma linha demasiado longa."
+
+#: ../GTIPTVPlayerPro/m3u.py:1349
+msgid "The selected file is an HLS stream manifest, not a channel list."
+msgstr "O ficheiro selecionado é um manifesto de transmissão HLS, não uma lista de canais."
+
+#: ../GTIPTVPlayerPro/m3u.py:1355 ../GTIPTVPlayerPro/m3u.py:1402
+msgid "M3U source header is missing."
+msgstr "Falta o cabeçalho da fonte M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:1396
+msgid "M3U source contains too many channels."
+msgstr "A fonte M3U contém demasiados canais."
+
+#: ../GTIPTVPlayerPro/m3u.py:1422
+msgid "M3U source contains too many categories."
+msgstr "A fonte M3U contém demasiadas categorias."
+
+#: ../GTIPTVPlayerPro/m3u.py:1459
+msgid "M3U source does not contain playable channels."
+msgstr "A fonte M3U não contém canais reproduzíveis."
+
+#: ../GTIPTVPlayerPro/m3u.py:1736
+msgid "M3U file path traversal is not allowed."
+msgstr "Não é permitido percorrer diretórios no caminho M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:1743
+msgid "Symbolic links cannot be used as M3U sources."
+msgstr "As ligações simbólicas não podem ser usadas como fontes M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:1757
+msgid "M3U file is outside the allowed directories."
+msgstr "O ficheiro M3U está fora dos diretórios permitidos."
+
+#: ../GTIPTVPlayerPro/m3u.py:1764 ../GTIPTVPlayerPro/m3u.py:1789
+msgid "M3U file could not be opened."
+msgstr "Não foi possível abrir o ficheiro M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:1769 ../GTIPTVPlayerPro/m3u.py:1802
+msgid "M3U source must be a regular file."
+msgstr "A fonte M3U tem de ser um ficheiro normal."
+
+#: ../GTIPTVPlayerPro/m3u.py:1855
+msgid "M3U file changed while it was being read."
+msgstr "O ficheiro M3U mudou durante a leitura."
+
+#: ../GTIPTVPlayerPro/m3u.py:2622 ../GTIPTVPlayerPro/m3u.py:2627
+msgid "M3U URL is invalid."
+msgstr "O URL M3U é inválido."
+
+#: ../GTIPTVPlayerPro/m3u.py:2636
+msgid "M3U URL is not safe."
+msgstr "O URL M3U não é seguro."
+
+#: ../GTIPTVPlayerPro/m3u.py:2638
+msgid "M3U URL port is invalid."
+msgstr "A porta do URL M3U é inválida."
+
+#: ../GTIPTVPlayerPro/m3u.py:2642
+msgid "M3U host name is invalid."
+msgstr "O nome do anfitrião M3U é inválido."
+
+#: ../GTIPTVPlayerPro/m3u.py:2666
+msgid "M3U host address is invalid."
+msgstr "O endereço do anfitrião M3U é inválido."
+
+#: ../GTIPTVPlayerPro/m3u.py:2677
+msgid "M3U host address is not allowed."
+msgstr "O endereço do anfitrião M3U não é permitido."
+
+#: ../GTIPTVPlayerPro/m3u.py:2697
+msgid "M3U host name resolution is busy."
+msgstr "O serviço de resolução do anfitrião M3U está ocupado."
+
+#: ../GTIPTVPlayerPro/m3u.py:2730
+msgid "M3U host name could not be resolved."
+msgstr "Não foi possível resolver o nome do anfitrião M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:2746
+msgid "M3U host resolved to an unsafe address set."
+msgstr "O anfitrião M3U foi resolvido para um conjunto de endereços não seguro."
+
+#: ../GTIPTVPlayerPro/m3u.py:2752
+msgid "M3U redirect changed the network scope."
+msgstr "O redirecionamento M3U alterou o âmbito da rede."
+
+#: ../GTIPTVPlayerPro/m3u.py:2879
+msgid "An HTTPS M3U request cannot be redirected to HTTP."
+msgstr "Um pedido M3U HTTPS não pode ser redirecionado para HTTP."
+
+#: ../GTIPTVPlayerPro/m3u.py:2930
+#, python-brace-format
+msgid "M3U server returned HTTP {}."
+msgstr "O servidor M3U devolveu HTTP {}."
+
+#: ../GTIPTVPlayerPro/m3u.py:2938
+msgid "Compressed M3U responses are not accepted."
+msgstr "Não são aceites respostas M3U comprimidas."
+
+#: ../GTIPTVPlayerPro/m3u.py:2947
+msgid "M3U response size is invalid."
+msgstr "O tamanho da resposta M3U é inválido."
+
+#: ../GTIPTVPlayerPro/m3u.py:2996
+msgid "M3U redirect URL is missing."
+msgstr "Falta o URL de redirecionamento M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:3001
+msgid "M3U request was redirected too many times."
+msgstr "O pedido M3U foi redirecionado demasiadas vezes."
+
+#: ../GTIPTVPlayerPro/m3u.py:3009
+msgid "M3U redirect URL is invalid."
+msgstr "O URL de redirecionamento M3U é inválido."
+
+#: ../GTIPTVPlayerPro/m3u.py:3013
+msgid "M3U redirection could not be completed."
+msgstr "Não foi possível concluir o redirecionamento M3U."
+
+#: ../GTIPTVPlayerPro/m3u.py:3026
+msgid "M3U response headers are invalid."
+msgstr "Os cabeçalhos da resposta M3U são inválidos."
+
+#: ../GTIPTVPlayerPro/m3u.py:3034
+msgid "M3U response has conflicting size information."
+msgstr "A resposta M3U contém informações de tamanho contraditórias."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:472 ../GTIPTVPlayerPro/m3u_epg_ui.py:663
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:718 ../GTIPTVPlayerPro/main.py:7193
+#: ../GTIPTVPlayerPro/main.py:7265 ../GTIPTVPlayerPro/main.py:7310
+#: ../GTIPTVPlayerPro/main.py:7823 ../GTIPTVPlayerPro/main.py:7891
+#: ../GTIPTVPlayerPro/main.py:7932 ../GTIPTVPlayerPro/remote_footer.py:119
+msgid "Storage"
+msgstr "Armazenamento"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:524 ../GTIPTVPlayerPro/m3u_epg_ui.py:538
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1161
+msgid "Background update requested"
+msgstr "Atualização em segundo plano solicitada"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:531 ../GTIPTVPlayerPro/m3u_epg_ui.py:1180
+msgid "Update failed; the previous guide remains available."
+msgstr "A atualização falhou; o guia anterior continua disponível."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:533
+#, python-brace-format
+msgid "Completed: {} channels, {} events"
+msgstr "Concluído: {} canais, {} eventos"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:539
+msgid "No update has been completed yet."
+msgstr "Ainda não foi concluída nenhuma atualização."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:607 ../GTIPTVPlayerPro/m3u_epg_ui.py:652
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:749
+msgid "XMLTV source"
+msgstr "Fonte XMLTV"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:609
+msgid "Choose an XML, XML.GZ or GZ file from local or mounted storage."
+msgstr "Escolha um ficheiro XML, XML.GZ ou GZ no armazenamento local ou montado."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:694
+msgid "This folder is outside the allowed storage locations."
+msgstr "Esta pasta encontra-se fora dos locais de armazenamento permitidos."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:713
+msgid "No allowed storage location is available."
+msgstr "Não está disponível nenhum local de armazenamento permitido."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:727 ../GTIPTVPlayerPro/m3u_epg_ui.py:735
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1005 ../GTIPTVPlayerPro/m3u_epg_ui.py:1010
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1047
+msgid "XMLTV file path is invalid."
+msgstr "O caminho do ficheiro XMLTV é inválido."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:747
+msgid "Enable external XMLTV EPG"
+msgstr "Ativar EPG XMLTV externo"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:748 ../GTIPTVPlayerPro/main.py:6742
+#: ../GTIPTVPlayerPro/main.py:6901 ../GTIPTVPlayerPro/main.py:7360
+#: ../GTIPTVPlayerPro/main.py:7407
+msgid "Source type"
+msgstr "Tipo de fonte"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:753 ../GTIPTVPlayerPro/main.py:6267
+msgid "Status"
+msgstr "Estado"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:797 ../GTIPTVPlayerPro/m3u_epg_ui.py:835
+msgid "External XMLTV EPG"
+msgstr "EPG XMLTV externo"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:806
+msgid "XMLTV settings could not be read; safe defaults are shown."
+msgstr "Não foi possível ler as definições XMLTV; são apresentados valores predefinidos seguros."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:808
+msgid "Updates run in the background. Channel changes never download EPG data."
+msgstr "As atualizações são executadas em segundo plano. As mudanças de canal nunca transferem dados EPG."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:848 ../GTIPTVPlayerPro/main.py:4614
+msgid "Not configured"
+msgstr "Não configurado"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8009
+msgid "Local / NAS"
+msgstr "Local / NAS"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8010
+#: ../GTIPTVPlayerPro/main.py:8072 ../GTIPTVPlayerPro/playlist.py:1559
+msgid "Web URL"
+msgstr "URL web"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:915
+msgid "Choose an XMLTV source before enabling this option."
+msgstr "Escolha uma fonte XMLTV antes de ativar esta opção."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:973
+msgid "The XMLTV file browser is unavailable."
+msgstr "O navegador de ficheiros XMLTV não está disponível."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:995
+msgid "Enter the XMLTV HTTP(S) URL"
+msgstr "Introduza o URL HTTP(S) do XMLTV"
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1001
+msgid "File selection cancelled."
+msgstr "Seleção do ficheiro cancelada."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1018 ../GTIPTVPlayerPro/main.py:7069
+#: ../GTIPTVPlayerPro/main.py:8206 ../GTIPTVPlayerPro/main.py:8432
+msgid "Field entry cancelled."
+msgstr "Introdução do campo cancelada."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1023 ../GTIPTVPlayerPro/m3u_epg_ui.py:1051
+msgid "XMLTV URL must start with http:// or https://."
+msgstr "O URL XMLTV deve começar por http:// ou https://."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1029
+msgid "XMLTV URL is invalid."
+msgstr "O URL XMLTV é inválido."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1038
+msgid "Choose an XMLTV source before saving."
+msgstr "Escolha uma fonte XMLTV antes de guardar."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1100
+msgid "XMLTV settings could not be saved. Check the receiver storage."
+msgstr "Não foi possível guardar as definições XMLTV. Verifique o armazenamento do recetor."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1110
+msgid "External XMLTV EPG settings saved."
+msgstr "Definições do EPG XMLTV externo guardadas."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1220
+msgid "Enable external XMLTV EPG before requesting an update."
+msgstr "Ative o EPG XMLTV externo antes de pedir uma atualização."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1235 ../GTIPTVPlayerPro/m3u_epg_ui.py:1261
+msgid "The XMLTV update was queued in the background."
+msgstr "A atualização XMLTV foi colocada em fila em segundo plano."
+
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1270
+msgid "The XMLTV update could not be queued. Try again shortly."
+msgstr "Não foi possível colocar a atualização XMLTV em fila. Tente novamente dentro de instantes."
+
+#: ../GTIPTVPlayerPro/main.py:304 ../GTIPTVPlayerPro/main.py:7106
+#: ../GTIPTVPlayerPro/main.py:7585 ../GTIPTVPlayerPro/main.py:8559
+#: ../GTIPTVPlayerPro/main.py:8678 ../GTIPTVPlayerPro/stalker.py:8161
+msgid "Active"
+msgstr "Ativo"
+
+#: ../GTIPTVPlayerPro/main.py:305 ../GTIPTVPlayerPro/playlist.py:1289
+#: ../GTIPTVPlayerPro/stalker.py:8166
+msgid "Connection limit reached"
+msgstr "Limite de ligações atingido"
+
+#: ../GTIPTVPlayerPro/main.py:306 ../GTIPTVPlayerPro/main.py:5562
+#: ../GTIPTVPlayerPro/main.py:5579 ../GTIPTVPlayerPro/main.py:5631
+#: ../GTIPTVPlayerPro/main.py:6075
+msgid "Inactive"
+msgstr "Inativo"
+
+#: ../GTIPTVPlayerPro/main.py:307 ../GTIPTVPlayerPro/main.py:311
+#: ../GTIPTVPlayerPro/main.py:317 ../GTIPTVPlayerPro/main.py:721
+#: ../GTIPTVPlayerPro/main.py:765 ../GTIPTVPlayerPro/main.py:6245
+#: ../GTIPTVPlayerPro/main.py:6246 ../GTIPTVPlayerPro/main.py:8542
+#: ../GTIPTVPlayerPro/main.py:8571 ../GTIPTVPlayerPro/main.py:8635
+#: ../GTIPTVPlayerPro/main.py:8655 ../GTIPTVPlayerPro/main.py:8687
+#: ../GTIPTVPlayerPro/main.py:8745 ../GTIPTVPlayerPro/main.py:8824
+#: ../GTIPTVPlayerPro/main.py:8829 ../GTIPTVPlayerPro/main.py:8841
+#: ../GTIPTVPlayerPro/main.py:8842 ../GTIPTVPlayerPro/main.py:8843
+#: ../GTIPTVPlayerPro/main.py:8861 ../GTIPTVPlayerPro/main.py:9355
+#: ../GTIPTVPlayerPro/main.py:9359 ../GTIPTVPlayerPro/main.py:9637
+#: ../GTIPTVPlayerPro/main.py:9650 ../GTIPTVPlayerPro/main.py:9676
+#: ../GTIPTVPlayerPro/main.py:9677 ../GTIPTVPlayerPro/main.py:9760
+#: ../GTIPTVPlayerPro/main.py:9761 ../GTIPTVPlayerPro/playlist.py:245
+#: ../GTIPTVPlayerPro/playlist.py:1241 ../GTIPTVPlayerPro/playlist.py:1297
+#: ../GTIPTVPlayerPro/playlist.py:1301 ../GTIPTVPlayerPro/playlist.py:1303
+#: ../GTIPTVPlayerPro/playlist.py:1304 ../GTIPTVPlayerPro/playlist.py:1305
+#: ../GTIPTVPlayerPro/playlist.py:1307 ../GTIPTVPlayerPro/playlist.py:1547
+#: ../GTIPTVPlayerPro/subtitles.py:16
+msgid "Unknown"
+msgstr "Desconhecido"
+
+#: ../GTIPTVPlayerPro/main.py:394
+msgid "No valid M3U source was found"
+msgstr "Não foi encontrada nenhuma fonte M3U válida"
+
+#: ../GTIPTVPlayerPro/main.py:408
+msgid "Unsupported source type"
+msgstr "Tipo de fonte não suportado"
+
+#: ../GTIPTVPlayerPro/main.py:431
+msgid "Access your channels quickly"
+msgstr "Aceda rapidamente aos seus canais"
+
+#: ../GTIPTVPlayerPro/main.py:436
+msgid "Watch programmes you missed"
+msgstr "Veja os programas que perdeu"
+
+#: ../GTIPTVPlayerPro/main.py:441
+msgid "Explore your movie library"
+msgstr "Explore a sua biblioteca de filmes"
+
+#: ../GTIPTVPlayerPro/main.py:446
+msgid "Browse seasons and episodes"
+msgstr "Explorar temporadas e episódios"
+
+#: ../GTIPTVPlayerPro/main.py:450 ../GTIPTVPlayerPro/main.py:9015
+msgid "CONTINUE WATCHING"
+msgstr "CONTINUAR A VER"
+
+#: ../GTIPTVPlayerPro/main.py:451
+msgid "Resume unfinished movies and series episodes"
+msgstr "Retomar filmes e episódios de séries inacabados"
+
+#: ../GTIPTVPlayerPro/main.py:455 ../GTIPTVPlayerPro/main.py:9025
+#: ../GTIPTVPlayerPro/main.py:9027
+msgid "FAVORITES"
+msgstr "FAVORITOS"
+
+#: ../GTIPTVPlayerPro/main.py:456
+msgid "Favorite channels, movies and series in one place"
+msgstr "Canais, filmes e séries favoritos num só lugar"
+
+#: ../GTIPTVPlayerPro/main.py:460
+msgid "SETTINGS"
+msgstr "DEFINIÇÕES"
+
+#: ../GTIPTVPlayerPro/main.py:461
+msgid "Manage the player and appearance"
+msgstr "Gerir o leitor e o aspeto"
+
+#: ../GTIPTVPlayerPro/main.py:468
+#, python-brace-format
+msgid ""
+"{} v{}\n"
+"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
+"\n"
+"DEVELOPER\n"
+"{}\n"
+"\n"
+"LEGAL NOTICE\n"
+"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
+"\n"
+"PRIVACY\n"
+"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr ""
+"{} v{}\n"
+"Leitor IPTV de código aberto para Enigma2. Suporta contas Xtream Codes e TV em direto a partir de listas M3U locais, de rede montada ou HTTP(S). As fontes M3U simples fornecem apenas TV em direto.\n"
+"\n"
+"PROGRAMADOR\n"
+"{}\n"
+"\n"
+"AVISO LEGAL\n"
+"Este plugin não fornece canais, transmissões, contas ou listas. O utilizador é responsável por usar apenas conteúdos para os quais tenha direitos de acesso e utilização.\n"
+"\n"
+"PRIVACIDADE\n"
+"Quando o Open-Meteo está ativado, a cidade e a localização selecionadas são enviadas ao Open-Meteo para a previsão meteorológica. Quando o TMDb está ativado, o título do filme/série e a chave ou token do TMDb introduzidos pelo utilizador são enviados ao TMDb. O nome de utilizador e a palavra-passe IPTV não são enviados a estes serviços."
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "SOURCE CODE"
+msgstr "CÓDIGO-FONTE"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "REPORT AN ISSUE"
+msgstr "COMUNICAR UM PROBLEMA"
+
+#: ../GTIPTVPlayerPro/main.py:498
+msgid "LICENSE"
+msgstr "LICENÇA"
+
+#: ../GTIPTVPlayerPro/main.py:735
+msgid "Connected"
+msgstr "Ligado"
+
+#: ../GTIPTVPlayerPro/main.py:736 ../GTIPTVPlayerPro/main.py:8561
+#: ../GTIPTVPlayerPro/main.py:8683
+msgid "Busy"
+msgstr "Ocupado"
+
+#: ../GTIPTVPlayerPro/main.py:737 ../GTIPTVPlayerPro/main.py:8681
+msgid "Warning"
+msgstr "Aviso"
+
+#: ../GTIPTVPlayerPro/main.py:743 ../GTIPTVPlayerPro/main.py:7641
+#: ../GTIPTVPlayerPro/main.py:7946 ../GTIPTVPlayerPro/main.py:7951
+#: ../GTIPTVPlayerPro/main.py:7955 ../GTIPTVPlayerPro/main.py:8686
+#: ../GTIPTVPlayerPro/stalker.py:8186
+msgid "Invalid"
+msgstr "Inválido"
+
+#: ../GTIPTVPlayerPro/main.py:747
+#, python-brace-format
+msgid ""
+"Read time: {} ms\n"
+"Source type: {}\n"
+"Size: {} bytes\n"
+"Channels: {}\n"
+"Categories: {}\n"
+"Cache age: {}\n"
+"Last modified: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Tempo de leitura: {} ms\n"
+"Tipo de fonte: {}\n"
+"Tamanho: {} bytes\n"
+"Canais: {}\n"
+"Categorias: {}\n"
+"Idade da cache: {}\n"
+"Última modificação: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/main.py:757
+#, python-brace-format
+msgid ""
+"Latency: {} ms\n"
+"Account status: {}\n"
+"Protocol: {}\n"
+"Output format: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Latência: {} ms\n"
+"Estado da conta: {}\n"
+"Protocolo: {}\n"
+"Formato de saída: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/main.py:3746 ../GTIPTVPlayerPro/main.py:3782
+msgid "Weather"
+msgstr "Meteorologia"
+
+#: ../GTIPTVPlayerPro/main.py:3909
+msgid "Loading..."
+msgstr "A carregar..."
+
+#: ../GTIPTVPlayerPro/main.py:3918
+msgid "No items found."
+msgstr "Nenhum item encontrado."
+
+#: ../GTIPTVPlayerPro/main.py:3991 ../GTIPTVPlayerPro/remote_footer.py:109
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: ../GTIPTVPlayerPro/main.py:4007
+msgid "Show weather"
+msgstr "Mostrar meteorologia"
+
+#: ../GTIPTVPlayerPro/main.py:4008 ../GTIPTVPlayerPro/main.py:4179
+msgid "City"
+msgstr "Cidade"
+
+#: ../GTIPTVPlayerPro/main.py:4009
+msgid "Temperature unit"
+msgstr "Unidade de temperatura"
+
+#: ../GTIPTVPlayerPro/main.py:4059
+msgid "WEATHER"
+msgstr "METEOROLOGIA"
+
+#: ../GTIPTVPlayerPro/main.py:4066
+msgid "Press OK on the City row to open the keyboard."
+msgstr "Prima OK na linha Cidade para abrir o teclado."
+
+#: ../GTIPTVPlayerPro/main.py:4090
+msgid "Settings - Weather"
+msgstr "Definições – Meteorologia"
+
+#: ../GTIPTVPlayerPro/main.py:4132
+#, python-brace-format
+msgid "Settings could not be saved: {}"
+msgstr "Não foi possível guardar as definições: {}"
+
+#: ../GTIPTVPlayerPro/main.py:4145
+msgid "Weather display updated."
+msgstr "Apresentação meteorológica atualizada."
+
+#: ../GTIPTVPlayerPro/main.py:4149
+msgid "Temperature unit updated."
+msgstr "Unidade de temperatura atualizada."
+
+#: ../GTIPTVPlayerPro/main.py:4162
+msgid "The last-update time refreshes when weather data is received."
+msgstr "A hora da última atualização muda quando são recebidos dados meteorológicos."
+
+#: ../GTIPTVPlayerPro/main.py:4186
+msgid "City change cancelled."
+msgstr "Alteração da cidade cancelada."
+
+#: ../GTIPTVPlayerPro/main.py:4215
+#, python-brace-format
+msgid "Checking {}..."
+msgstr "A verificar {}..."
+
+#: ../GTIPTVPlayerPro/main.py:4280
+msgid "No weather forecast is available for this city."
+msgstr "Não existe previsão meteorológica disponível para esta cidade."
+
+#: ../GTIPTVPlayerPro/main.py:4298
+#, python-brace-format
+msgid "{} was saved."
+msgstr "{} foi guardado."
+
+#: ../GTIPTVPlayerPro/main.py:4323
+msgid "Standard"
+msgstr "Padrão"
+
+#: ../GTIPTVPlayerPro/main.py:4324
+msgid "Large"
+msgstr "Grande"
+
+#: ../GTIPTVPlayerPro/main.py:4325
+msgid "Very large"
+msgstr "Muito grande"
+
+#: ../GTIPTVPlayerPro/main.py:4327
+msgid "Text size"
+msgstr "Tamanho do texto"
+
+#: ../GTIPTVPlayerPro/main.py:4327
+msgid "Cinematic view"
+msgstr "Vista cinematográfica"
+
+#: ../GTIPTVPlayerPro/main.py:4347 ../GTIPTVPlayerPro/main.py:4350
+#: ../GTIPTVPlayerPro/main.py:4381 ../GTIPTVPlayerPro/main.py:4450
+msgid "Appearance"
+msgstr "Aspeto"
+
+#: ../GTIPTVPlayerPro/main.py:4358 ../GTIPTVPlayerPro/main.py:4651
+#: ../GTIPTVPlayerPro/main.py:4654 ../GTIPTVPlayerPro/main.py:4952
+#: ../GTIPTVPlayerPro/main.py:8081 ../GTIPTVPlayerPro/remote_footer.py:89
+#: ../GTIPTVPlayerPro/remote_footer.py:92
+msgid "Select"
+msgstr "Selecionar"
+
+#: ../GTIPTVPlayerPro/main.py:4443
+msgid "Live TV service type"
+msgstr "Tipo de serviço de TV em direto"
+
+#: ../GTIPTVPlayerPro/main.py:4444
+msgid "Movie service type"
+msgstr "Tipo de serviço de filmes"
+
+#: ../GTIPTVPlayerPro/main.py:4445
+msgid "Series service type"
+msgstr "Tipo de serviço de séries"
+
+#: ../GTIPTVPlayerPro/main.py:4446
+msgid "TMDb metadata enrichment"
+msgstr "Enriquecimento de metadados do TMDb"
+
+#: ../GTIPTVPlayerPro/main.py:4447
+msgid "TMDb API key / token"
+msgstr "Chave da API / token do TMDb"
+
+#: ../GTIPTVPlayerPro/main.py:4448
+msgid "DVB EPG"
+msgstr "DVB EPG"
+
+#: ../GTIPTVPlayerPro/main.py:4449
+msgid "Category edit lock"
+msgstr "Bloqueio da edição de categorias"
+
+#: ../GTIPTVPlayerPro/main.py:4451 ../GTIPTVPlayerPro/main.py:7359
+#: ../GTIPTVPlayerPro/main.py:7401 ../GTIPTVPlayerPro/main.py:7469
+#: ../GTIPTVPlayerPro/main.py:7508 ../GTIPTVPlayerPro/main.py:7839
+#: ../GTIPTVPlayerPro/main.py:7884
+msgid "Select playlist"
+msgstr "Selecionar lista de reprodução"
+
+#: ../GTIPTVPlayerPro/main.py:4516
+msgid "Player / Codec"
+msgstr "Leitor / Codec"
+
+#: ../GTIPTVPlayerPro/main.py:4518
+msgid "LANGUAGE"
+msgstr "IDIOMA"
+
+#: ../GTIPTVPlayerPro/main.py:4560
+msgid "Settings - Player / Codec"
+msgstr "Definições – Leitor / Codec"
+
+#: ../GTIPTVPlayerPro/main.py:4591 ../GTIPTVPlayerPro/remote_footer.py:106
+msgid "Open"
+msgstr "Abrir"
+
+#: ../GTIPTVPlayerPro/main.py:4604 ../GTIPTVPlayerPro/main.py:7535
+#: ../GTIPTVPlayerPro/main.py:7587 ../GTIPTVPlayerPro/main.py:7673
+#: ../GTIPTVPlayerPro/main.py:7729 ../GTIPTVPlayerPro/main.py:7766
+#: ../GTIPTVPlayerPro/main.py:8563 ../GTIPTVPlayerPro/main.py:8686
+#: ../GTIPTVPlayerPro/main.py:8795 ../GTIPTVPlayerPro/main.py:8797
+msgid "Error"
+msgstr "Erro"
+
+#: ../GTIPTVPlayerPro/main.py:4612
+#, python-brace-format
+msgid "Configured ••••{}"
+msgstr "Configurado ••••{}"
+
+#: ../GTIPTVPlayerPro/main.py:4642
+msgid "Press OK to open the DVB EPG settings."
+msgstr "Prima OK para abrir as definições de DVB EPG."
+
+#: ../GTIPTVPlayerPro/main.py:4647
+msgid "Press OK to turn the category edit lock on or off."
+msgstr "Prima OK para ativar ou desativar o bloqueio da edição de categorias."
+
+#: ../GTIPTVPlayerPro/main.py:4658
+msgid "Press OK to enter or change the TMDb key."
+msgstr "Prima OK para introduzir ou alterar a chave TMDb."
+
+#: ../GTIPTVPlayerPro/main.py:4762 ../GTIPTVPlayerPro/main.py:4782
+#: ../GTIPTVPlayerPro/main.py:7743
+msgid "The confirmation screen is unavailable on this image."
+msgstr "O ecrã de confirmação não está disponível nesta imagem."
+
+#: ../GTIPTVPlayerPro/main.py:4775
+msgid "Disable the category edit lock?"
+msgstr "Desativar o bloqueio da edição de categorias?"
+
+#: ../GTIPTVPlayerPro/main.py:4787
+msgid "Create category edit PIN"
+msgstr "Criar PIN de edição de categorias"
+
+#: ../GTIPTVPlayerPro/main.py:4797
+msgid "Confirm category edit PIN"
+msgstr "Confirmar PIN de edição de categorias"
+
+#: ../GTIPTVPlayerPro/main.py:4823
+msgid "Category edit lock could not be saved. Check the receiver storage."
+msgstr "Não foi possível guardar o bloqueio da edição de categorias. Verifique o armazenamento do recetor."
+
+#: ../GTIPTVPlayerPro/main.py:4831
+msgid "Category edit lock enabled."
+msgstr "Bloqueio da edição de categorias ativado."
+
+#: ../GTIPTVPlayerPro/main.py:4834
+#, python-brace-format
+msgid ""
+"Write down this recovery code. It is shown only once:\n"
+"\n"
+"{}\n"
+"\n"
+"If you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr ""
+"Anote este código de recuperação. É mostrado apenas uma vez:\n"
+"\n"
+"{}\n"
+"\n"
+"Se esquecer ambos os códigos, remover e reinstalar o plugin repõe apenas este bloqueio."
+
+#: ../GTIPTVPlayerPro/main.py:4845
+msgid "Disable category edit lock"
+msgstr "Desativar bloqueio da edição de categorias"
+
+#: ../GTIPTVPlayerPro/main.py:4846
+msgid "Enter the current 4-digit PIN."
+msgstr "Introduza o PIN atual de 4 dígitos."
+
+#: ../GTIPTVPlayerPro/main.py:4866
+msgid "Incorrect PIN. Lock unchanged."
+msgstr "PIN incorreto. O bloqueio não foi alterado."
+
+#: ../GTIPTVPlayerPro/main.py:4879
+msgid "Incorrect recovery code. Lock unchanged."
+msgstr "Código de recuperação incorreto. O bloqueio não foi alterado."
+
+#: ../GTIPTVPlayerPro/main.py:4892
+msgid "Category edit lock disabled."
+msgstr "Bloqueio da edição de categorias desativado."
+
+#: ../GTIPTVPlayerPro/main.py:4897
+msgid "Category edit lock could not be removed. Check the receiver storage."
+msgstr "Não foi possível remover o bloqueio da edição de categorias. Verifique o armazenamento do recetor."
+
+#: ../GTIPTVPlayerPro/main.py:4908
+msgid "DVB EPG settings are unavailable on this image."
+msgstr "As definições de DVB EPG não estão disponíveis nesta imagem."
+
+#: ../GTIPTVPlayerPro/main.py:4981
+msgid "DVB EPG settings closed."
+msgstr "Definições de DVB EPG fechadas."
+
+#: ../GTIPTVPlayerPro/main.py:4998
+msgid "Enter the TMDb API key or access token"
+msgstr "Introduza a chave da API ou o token de acesso do TMDb"
+
+#: ../GTIPTVPlayerPro/main.py:5005
+msgid "TMDb key change cancelled."
+msgstr "Alteração da chave TMDb cancelada."
+
+#: ../GTIPTVPlayerPro/main.py:5011
+msgid "TMDb key saved; press BLUE to test and GREEN to save."
+msgstr "Chave TMDb guardada; prima AZUL para testar e VERDE para guardar."
+
+#: ../GTIPTVPlayerPro/main.py:5013
+msgid "TMDb key cleared; press GREEN to save."
+msgstr "Chave TMDb limpa; prima VERDE para guardar."
+
+#: ../GTIPTVPlayerPro/main.py:5019
+msgid "The TMDb connection test is still running..."
+msgstr "O teste de ligação ao TMDb ainda está em curso..."
+
+#: ../GTIPTVPlayerPro/main.py:5023
+msgid "No TMDb key is configured. Press OK on the key row."
+msgstr "Nenhuma chave TMDb está configurada. Prima OK na linha da chave."
+
+#: ../GTIPTVPlayerPro/main.py:5028
+msgid "Testing the TMDb connection and API key..."
+msgstr "A testar a ligação ao TMDb e a chave da API..."
+
+#: ../GTIPTVPlayerPro/main.py:5057
+msgid "TMDb connection successful; the API key is valid."
+msgstr "Ligação ao TMDb bem-sucedida; a chave da API é válida."
+
+#: ../GTIPTVPlayerPro/main.py:5061
+msgid " Metadata enrichment is currently disabled."
+msgstr " O enriquecimento de metadados está atualmente desativado."
+
+#: ../GTIPTVPlayerPro/main.py:5067
+#, python-brace-format
+msgid "TMDb test failed: {}."
+msgstr "O teste do TMDb falhou: {}."
+
+#: ../GTIPTVPlayerPro/main.py:5070 ../GTIPTVPlayerPro/main.py:5088
+msgid "TMDb test failed: could not connect."
+msgstr "O teste do TMDb falhou: não foi possível ligar."
+
+#: ../GTIPTVPlayerPro/main.py:5188 ../GTIPTVPlayerPro/main.py:5204
+#: ../GTIPTVPlayerPro/main.py:5401 ../GTIPTVPlayerPro/main.py:8801
+msgid "The health check could not be completed."
+msgstr "Não foi possível concluir a verificação do estado."
+
+#: ../GTIPTVPlayerPro/main.py:5317 ../GTIPTVPlayerPro/main.py:5360
+#: ../GTIPTVPlayerPro/main.py:8835 ../GTIPTVPlayerPro/main.py:8876
+#: ../GTIPTVPlayerPro/main.py:8915
+msgid "Information"
+msgstr "Informação"
+
+#: ../GTIPTVPlayerPro/main.py:5477 ../GTIPTVPlayerPro/main.py:5565
+#: ../GTIPTVPlayerPro/main.py:5584 ../GTIPTVPlayerPro/main.py:5633
+#: ../GTIPTVPlayerPro/main.py:6064 ../GTIPTVPlayerPro/main.py:6094
+#: ../GTIPTVPlayerPro/remote_footer.py:117
+msgid "Accounts"
+msgstr "Contas"
+
+#: ../GTIPTVPlayerPro/main.py:5478 ../GTIPTVPlayerPro/main.py:5489
+#: ../GTIPTVPlayerPro/main.py:8743 ../GTIPTVPlayerPro/main.py:9624
+msgid "TESTING..."
+msgstr "A TESTAR..."
+
+#: ../GTIPTVPlayerPro/main.py:5503 ../GTIPTVPlayerPro/main.py:6095
+#: ../GTIPTVPlayerPro/main.py:6747 ../GTIPTVPlayerPro/remote_footer.py:86
+msgid "Account"
+msgstr "Conta"
+
+#: ../GTIPTVPlayerPro/main.py:5567 ../GTIPTVPlayerPro/main.py:5701
+#: ../GTIPTVPlayerPro/main.py:7779 ../GTIPTVPlayerPro/remote_footer.py:99
+#: ../GTIPTVPlayerPro/remote_footer.py:101
+msgid "Delete"
+msgstr "Eliminar"
+
+#: ../GTIPTVPlayerPro/main.py:5633 ../GTIPTVPlayerPro/main.py:6376
+#: ../GTIPTVPlayerPro/main.py:7750
+#, python-brace-format
+msgid "Delete {}?"
+msgstr "Eliminar {}?"
+
+#: ../GTIPTVPlayerPro/main.py:5739 ../GTIPTVPlayerPro/main.py:6457
+#: ../GTIPTVPlayerPro/main.py:7766
+#, python-brace-format
+msgid "Could not delete the source: {}"
+msgstr "Não foi possível eliminar a fonte: {}"
+
+#: ../GTIPTVPlayerPro/main.py:5874
+msgid "SELECTED SOURCE"
+msgstr "FONTE SELECIONADA"
+
+#: ../GTIPTVPlayerPro/main.py:5884 ../GTIPTVPlayerPro/main.py:6295
+#: ../GTIPTVPlayerPro/remote_footer.py:100
+#: ../GTIPTVPlayerPro/remote_footer.py:102
+msgid "Connect"
+msgstr "Conectar"
+
+#: ../GTIPTVPlayerPro/main.py:5950 ../GTIPTVPlayerPro/main.py:6674
+msgid "Xtream Codes Accounts"
+msgstr "Contas Xtream Codes"
+
+#: ../GTIPTVPlayerPro/main.py:5951 ../GTIPTVPlayerPro/main.py:6675
+msgid "M3U Sources"
+msgstr "Fontes M3U"
+
+#: ../GTIPTVPlayerPro/main.py:5952 ../GTIPTVPlayerPro/main.py:6676
+msgid "Stalker / MAC Portal Accounts"
+msgstr "Contas de portal Stalker / MAC"
+
+#: ../GTIPTVPlayerPro/main.py:5953 ../GTIPTVPlayerPro/main.py:6094
+#: ../GTIPTVPlayerPro/main.py:9552 ../GTIPTVPlayerPro/remote_footer.py:118
+msgid "Sources"
+msgstr "Fontes"
+
+#: ../GTIPTVPlayerPro/main.py:6063 ../GTIPTVPlayerPro/main.py:6478
+#, python-brace-format
+msgid "{} was deleted ({} records)."
+msgstr "{} foi eliminado ({} registos)."
+
+#: ../GTIPTVPlayerPro/main.py:6114
+msgid ""
+"No source was found.\n"
+"\n"
+"Create one from the ADD SOURCE panel on the home screen."
+msgstr ""
+"Nenhuma fonte encontrada.\n"
+"\n"
+"Crie uma no painel ADICIONAR FONTE do ecrã inicial."
+
+#: ../GTIPTVPlayerPro/main.py:6136 ../GTIPTVPlayerPro/main.py:6155
+#: ../GTIPTVPlayerPro/main.py:6825 ../GTIPTVPlayerPro/main.py:6894
+#: ../GTIPTVPlayerPro/main.py:6953 ../GTIPTVPlayerPro/main.py:7000
+msgid "Add Source"
+msgstr "Adicionar fonte"
+
+#: ../GTIPTVPlayerPro/main.py:6235 ../GTIPTVPlayerPro/main.py:7644
+#: ../GTIPTVPlayerPro/main.py:7732 ../GTIPTVPlayerPro/main.py:9518
+msgid "Ready to connect"
+msgstr "Pronto para ligar"
+
+#: ../GTIPTVPlayerPro/main.py:6245 ../GTIPTVPlayerPro/main.py:6281
+#: ../GTIPTVPlayerPro/main.py:8890 ../GTIPTVPlayerPro/main.py:9627
+#: ../GTIPTVPlayerPro/main.py:9640 ../GTIPTVPlayerPro/main.py:9683
+#, python-brace-format
+msgid "Expiry: {}"
+msgstr "Validade: {}"
+
+#: ../GTIPTVPlayerPro/main.py:6351
+msgid "Choose a source type first."
+msgstr "Escolha primeiro um tipo de fonte."
+
+#: ../GTIPTVPlayerPro/main.py:6366
+msgid "No source is selected for deletion."
+msgstr "Nenhuma fonte selecionada para eliminar."
+
+#: ../GTIPTVPlayerPro/main.py:6370
+msgid "Could not open the deletion confirmation."
+msgstr "Não foi possível abrir a confirmação de eliminação."
+
+#: ../GTIPTVPlayerPro/main.py:6387
+msgid "Source deletion cancelled."
+msgstr "Eliminação da fonte cancelada."
+
+#: ../GTIPTVPlayerPro/main.py:6516 ../GTIPTVPlayerPro/main.py:6554
+#: ../GTIPTVPlayerPro/main.py:9835
+msgid "A source connection is already in progress."
+msgstr "Já está em curso uma ligação a uma fonte."
+
+#: ../GTIPTVPlayerPro/main.py:6545 ../GTIPTVPlayerPro/main.py:8707
+msgid "XMLTV EPG settings could not be opened."
+msgstr "Não foi possível abrir as definições do EPG XMLTV."
+
+#: ../GTIPTVPlayerPro/main.py:6551 ../GTIPTVPlayerPro/main.py:7651
+msgid "No source is available to connect."
+msgstr "Nenhuma fonte disponível para ligar."
+
+#: ../GTIPTVPlayerPro/main.py:6582 ../GTIPTVPlayerPro/main.py:9855
+msgid "CONNECTING..."
+msgstr "A LIGAR..."
+
+#: ../GTIPTVPlayerPro/main.py:6596
+#, python-brace-format
+msgid "Connecting to {}, please wait."
+msgstr "A ligar a {}, aguarde."
+
+#: ../GTIPTVPlayerPro/main.py:6607 ../GTIPTVPlayerPro/main.py:9866
+msgid "CONNECTED"
+msgstr "LIGADO"
+
+#: ../GTIPTVPlayerPro/main.py:6611
+msgid "OPENING MAIN PANEL"
+msgstr "A ABRIR O PAINEL PRINCIPAL"
+
+#: ../GTIPTVPlayerPro/main.py:6614
+#, python-brace-format
+msgid "Connected to {}."
+msgstr "Ligado a {}."
+
+#: ../GTIPTVPlayerPro/main.py:6630 ../GTIPTVPlayerPro/remote_footer.py:103
+msgid "Retry"
+msgstr "Repetir"
+
+#: ../GTIPTVPlayerPro/main.py:6634 ../GTIPTVPlayerPro/main.py:9883
+#, python-brace-format
+msgid "Could not connect to {}: {}"
+msgstr "Não foi possível ligar a {}: {}"
+
+#: ../GTIPTVPlayerPro/main.py:6661 ../GTIPTVPlayerPro/main.py:6721
+msgid "Manage Sources"
+msgstr "Gerir fontes"
+
+#: ../GTIPTVPlayerPro/main.py:6664 ../GTIPTVPlayerPro/main.py:7362
+msgid "Choose the source type you want to manage."
+msgstr "Escolha o tipo de fonte que pretende gerir."
+
+#: ../GTIPTVPlayerPro/main.py:6677 ../GTIPTVPlayerPro/main.py:6843
+#: ../GTIPTVPlayerPro/main.py:7373
+msgid "Server URL, username and password"
+msgstr "URL do servidor, nome de utilizador e palavra-passe"
+
+#: ../GTIPTVPlayerPro/main.py:6678 ../GTIPTVPlayerPro/main.py:6846
+msgid "Local file, NAS or web link"
+msgstr "Ficheiro local, NAS ou ligação web"
+
+#: ../GTIPTVPlayerPro/main.py:6679 ../GTIPTVPlayerPro/main.py:6849
+#: ../GTIPTVPlayerPro/main.py:7376 ../GTIPTVPlayerPro/main.py:8996
+msgid "Portal"
+msgstr "Portal"
+
+#: ../GTIPTVPlayerPro/main.py:6770
+msgid "Each source type is listed separately. Each section can contain up to 500 sources."
+msgstr "Cada tipo de fonte é apresentado separadamente. Cada secção pode conter até 500 fontes."
+
+#: ../GTIPTVPlayerPro/main.py:6805
+msgid "Xtream Codes provides Live TV, Movies and Series."
+msgstr "Xtream Codes fornece TV em direto, filmes e séries."
+
+#: ../GTIPTVPlayerPro/main.py:6807
+msgid "M3U sources provide Live TV only. Categories, search and favorites are supported."
+msgstr "As fontes M3U fornecem apenas TV em direto. Há suporte para categorias, pesquisa e favoritos."
+
+#: ../GTIPTVPlayerPro/main.py:6811 ../GTIPTVPlayerPro/main.py:6973
+#: ../GTIPTVPlayerPro/main.py:8550
+msgid "The Stalker / MAC portal will be checked automatically when this screen opens."
+msgstr "O portal Stalker / MAC será verificado automaticamente ao abrir este ecrã."
+
+#: ../GTIPTVPlayerPro/main.py:6828
+msgid "Choose the source type to add."
+msgstr "Escolha o tipo de fonte a adicionar."
+
+#: ../GTIPTVPlayerPro/main.py:6935 ../GTIPTVPlayerPro/stalker.py:550
+#: ../GTIPTVPlayerPro/stalker.py:554 ../GTIPTVPlayerPro/stalker.py:563
+#: ../GTIPTVPlayerPro/stalker.py:565
+msgid "Enter a valid portal URL"
+msgstr "Introduza um URL de portal válido"
+
+#: ../GTIPTVPlayerPro/main.py:6936 ../GTIPTVPlayerPro/stalker.py:543
+msgid "Enter a valid MAC address"
+msgstr "Introduza um endereço MAC válido"
+
+#: ../GTIPTVPlayerPro/main.py:6956 ../GTIPTVPlayerPro/main.py:7993
+msgid "Source details"
+msgstr "Detalhes da fonte"
+
+#: ../GTIPTVPlayerPro/main.py:6960
+msgid "Portal URL / MAC"
+msgstr "URL do portal / MAC"
+
+#: ../GTIPTVPlayerPro/main.py:6961
+msgid "GREEN"
+msgstr "VERDE"
+
+#: ../GTIPTVPlayerPro/main.py:6962 ../GTIPTVPlayerPro/remote_footer.py:97
+msgid "Save"
+msgstr "Guardar"
+
+#: ../GTIPTVPlayerPro/main.py:7016
+msgid "Portal URL"
+msgstr "URL do portal"
+
+#: ../GTIPTVPlayerPro/main.py:7024
+msgid "MAC address"
+msgstr "Endereço MAC"
+
+#: ../GTIPTVPlayerPro/main.py:7079 ../GTIPTVPlayerPro/main.py:8199
+#: ../GTIPTVPlayerPro/main.py:8212 ../GTIPTVPlayerPro/main.py:8439
+msgid "Information received. Edit the next field or press GREEN to save."
+msgstr "Informações recebidas. Edite o campo seguinte ou prima VERDE para guardar."
+
+#: ../GTIPTVPlayerPro/main.py:7208 ../GTIPTVPlayerPro/main.py:7254
+#: ../GTIPTVPlayerPro/playlist.py:1557
+msgid "Local / NAS file"
+msgstr "Ficheiro local / NAS"
+
+#: ../GTIPTVPlayerPro/main.py:7211 ../GTIPTVPlayerPro/main.py:7842
+#: ../GTIPTVPlayerPro/main.py:8012
+msgid "Device, USB or mounted network storage"
+msgstr "Dispositivo, USB ou armazenamento de rede montado"
+
+#: ../GTIPTVPlayerPro/main.py:7576
+msgid "Add playlist"
+msgstr "Adicionar lista de reprodução"
+
+#: ../GTIPTVPlayerPro/main.py:7627 ../GTIPTVPlayerPro/main.py:7656
+#: ../GTIPTVPlayerPro/main.py:7698 ../GTIPTVPlayerPro/main.py:7739
+#: ../GTIPTVPlayerPro/main.py:9301
+msgid "Not available"
+msgstr "Indisponível"
+
+#: ../GTIPTVPlayerPro/main.py:7667 ../GTIPTVPlayerPro/playlist.py:1121
+msgid "No valid IPTV source was found"
+msgstr "Nenhuma fonte IPTV válida encontrada"
+
+#: ../GTIPTVPlayerPro/main.py:7713 ../GTIPTVPlayerPro/remote_footer.py:95
+msgid "Rename"
+msgstr "Mudar o nome"
+
+#: ../GTIPTVPlayerPro/main.py:7970
+msgid "Enter a name for the M3U source"
+msgstr "Introduza um nome para a fonte M3U"
+
+#: ../GTIPTVPlayerPro/main.py:7972
+msgid "Enter the M3U file path or HTTP(S) URL"
+msgstr "Introduza o caminho do ficheiro M3U ou o URL HTTP(S)"
+
+#: ../GTIPTVPlayerPro/main.py:7991 ../GTIPTVPlayerPro/main.py:8048
+msgid "Add M3U Source"
+msgstr "Adicionar fonte M3U"
+
+#: ../GTIPTVPlayerPro/main.py:7996
+msgid "Give the source a name and choose its location."
+msgstr "Dê um nome à fonte e escolha a sua localização."
+
+#: ../GTIPTVPlayerPro/main.py:7999
+msgid "Source name"
+msgstr "Nome da fonte"
+
+#: ../GTIPTVPlayerPro/main.py:8015
+msgid "Direct HTTP(S) M3U link"
+msgstr "Ligação M3U HTTP(S) direta"
+
+#: ../GTIPTVPlayerPro/main.py:8053
+msgid "M3U URL must start with http:// or https://."
+msgstr "O URL M3U deve começar por http:// ou https://."
+
+#: ../GTIPTVPlayerPro/main.py:8070
+msgid "Enter a source name"
+msgstr "Introduza um nome de fonte"
+
+#: ../GTIPTVPlayerPro/main.py:8072
+msgid "File path"
+msgstr "Caminho do ficheiro"
+
+#: ../GTIPTVPlayerPro/main.py:8081 ../GTIPTVPlayerPro/remote_footer.py:94
+msgid "Edit"
+msgstr "Editar"
+
+#: ../GTIPTVPlayerPro/main.py:8247
+#, python-brace-format
+msgid "Could not save the M3U source: {}"
+msgstr "Não foi possível guardar a fonte M3U: {}"
+
+#: ../GTIPTVPlayerPro/main.py:8256
+#, python-brace-format
+msgid "{} was saved as an M3U Live TV source."
+msgstr "{} foi guardado como fonte M3U de TV em direto."
+
+#: ../GTIPTVPlayerPro/main.py:8269
+msgid "Enter the server URL"
+msgstr "Introduza o URL do servidor"
+
+#: ../GTIPTVPlayerPro/main.py:8270 ../GTIPTVPlayerPro/main.py:8343
+msgid "Enter the username"
+msgstr "Introduza o nome de utilizador"
+
+#: ../GTIPTVPlayerPro/main.py:8271 ../GTIPTVPlayerPro/main.py:8347
+msgid "Enter the password"
+msgstr "Introduza a palavra-passe"
+
+#: ../GTIPTVPlayerPro/main.py:8293 ../GTIPTVPlayerPro/main.py:8330
+msgid "ADD NEW ACCOUNT"
+msgstr "ADICIONAR NOVA CONTA"
+
+#: ../GTIPTVPlayerPro/main.py:8295 ../GTIPTVPlayerPro/main.py:8333
+msgid "Press OK in a text field; use LEFT / RIGHT on the output row."
+msgstr "Prima OK num campo de texto; use ESQUERDA / DIREITA na linha de saída."
+
+#: ../GTIPTVPlayerPro/main.py:8304
+msgid "Press GREEN to save  |  Select a TS or M3U8 output supported by the server."
+msgstr "Prima VERDE para guardar  |  Selecione uma saída TS ou M3U8 suportada pelo servidor."
+
+#: ../GTIPTVPlayerPro/main.py:8327 ../GTIPTVPlayerPro/main.py:8331
+msgid "Add New Account"
+msgstr "Adicionar nova conta"
+
+#: ../GTIPTVPlayerPro/main.py:8350
+#, python-brace-format
+msgid "  SERVER URL        {}"
+msgstr "  URL DO SERVIDOR      {}"
+
+#: ../GTIPTVPlayerPro/main.py:8355
+#, python-brace-format
+msgid "  USERNAME          {}"
+msgstr "  NOME DE UTILIZADOR   {}"
+
+#: ../GTIPTVPlayerPro/main.py:8359
+#, python-brace-format
+msgid "  PASSWORD          {}"
+msgstr "  PALAVRA-PASSE        {}"
+
+#: ../GTIPTVPlayerPro/main.py:8362
+#, python-brace-format
+msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
+msgstr "  FORMATO DE SAÍDA     {}     Alterar com ESQUERDA / DIREITA"
+
+#: ../GTIPTVPlayerPro/main.py:8395
+#, python-brace-format
+msgid "Live TV output selected: {}."
+msgstr "Saída de TV em direto selecionada: {}."
+
+#: ../GTIPTVPlayerPro/main.py:8454
+#, python-brace-format
+msgid "Could not save the account: {}"
+msgstr "Não foi possível guardar a conta: {}"
+
+#: ../GTIPTVPlayerPro/main.py:8464
+#, python-brace-format
+msgid "{} was saved with {} output."
+msgstr "{} foi guardado com a saída {}."
+
+#: ../GTIPTVPlayerPro/main.py:8522 ../GTIPTVPlayerPro/main.py:8595
+msgid "Source Health"
+msgstr "Estado da fonte"
+
+#: ../GTIPTVPlayerPro/main.py:8524 ../GTIPTVPlayerPro/main.py:8597
+msgid "Portal Health"
+msgstr "Estado do portal"
+
+#: ../GTIPTVPlayerPro/main.py:8524 ../GTIPTVPlayerPro/main.py:8597
+msgid "Server Health"
+msgstr "Estado do servidor"
+
+#: ../GTIPTVPlayerPro/main.py:8538 ../GTIPTVPlayerPro/main.py:8569
+msgid "WAITING FOR TEST"
+msgstr "A AGUARDAR TESTE"
+
+#: ../GTIPTVPlayerPro/main.py:8546
+msgid "The M3U source will be checked automatically when this screen opens."
+msgstr "A fonte M3U será verificada automaticamente ao abrir este ecrã."
+
+#: ../GTIPTVPlayerPro/main.py:8554
+msgid "The Xtream API connection will be tested automatically when this screen opens."
+msgstr "A ligação à API Xtream será testada automaticamente ao abrir este ecrã."
+
+#: ../GTIPTVPlayerPro/main.py:8727
+msgid "XMLTV EPG is disabled for this M3U source."
+msgstr "O EPG XMLTV está desativado para esta fonte M3U."
+
+#: ../GTIPTVPlayerPro/main.py:8731
+msgid "XMLTV EPG is ready from the local cache."
+msgstr "O EPG XMLTV está disponível a partir da cache local."
+
+#: ../GTIPTVPlayerPro/main.py:8733
+msgid "XMLTV EPG is enabled and waiting for its first update."
+msgstr "O EPG XMLTV está ativado e aguarda a primeira atualização."
+
+#: ../GTIPTVPlayerPro/main.py:8751
+msgid "Checking M3U access, catalogue size and cache status."
+msgstr "A verificar acesso M3U, tamanho do catálogo e estado da cache."
+
+#: ../GTIPTVPlayerPro/main.py:8754
+msgid "Checking portal authentication, categories and latency."
+msgstr "A verificar a autenticação do portal, as categorias e a latência."
+
+#: ../GTIPTVPlayerPro/main.py:8757
+msgid "Checking API access, account status, latency and connection limits."
+msgstr "A verificar o acesso à API, o estado da conta, a latência e os limites de ligação."
+
+#: ../GTIPTVPlayerPro/main.py:8883 ../GTIPTVPlayerPro/stalker.py:1908
+#: ../GTIPTVPlayerPro/stalker.py:1911 ../GTIPTVPlayerPro/stalker.py:1914
+#: ../GTIPTVPlayerPro/stalker.py:1925 ../GTIPTVPlayerPro/stalker.py:1940
+#: ../GTIPTVPlayerPro/stalker.py:1944 ../GTIPTVPlayerPro/stalker.py:8114
+msgid "Server does not report expiry"
+msgstr "O servidor não indica a data de validade"
+
+#: ../GTIPTVPlayerPro/main.py:8996
+msgid "Server"
+msgstr "Servidor"
+
+#: ../GTIPTVPlayerPro/main.py:9302
+msgid "Standard M3U sources support Live TV only."
+msgstr "As fontes M3U padrão suportam apenas TV em direto."
+
+#: ../GTIPTVPlayerPro/main.py:9347 ../GTIPTVPlayerPro/remote_footer.py:136
+msgid "About"
+msgstr "Sobre"
+
+#: ../GTIPTVPlayerPro/main.py:9420
+msgid "SECURE SOURCE CONNECTION"
+msgstr "LIGAÇÃO SEGURA À FONTE"
+
+#: ../GTIPTVPlayerPro/main.py:9421
+msgid "Welcome"
+msgstr "Bem-vindo"
+
+#: ../GTIPTVPlayerPro/main.py:9423
+msgid "Select and connect to a saved source to start watching."
+msgstr "Selecione e ligue uma fonte guardada para começar a ver."
+
+#: ../GTIPTVPlayerPro/main.py:9426
+msgid "SAVED SOURCE"
+msgstr "FONTE GUARDADA"
+
+#: ../GTIPTVPlayerPro/main.py:9537
+msgid "Source status is checked automatically when connecting."
+msgstr "O estado da fonte é verificado automaticamente ao ligar."
+
+#: ../GTIPTVPlayerPro/main.py:9541
+msgid "No saved source found"
+msgstr "Nenhuma fonte guardada encontrada"
+
+#: ../GTIPTVPlayerPro/main.py:9544
+msgid "Create a new source from the ADD SOURCE panel."
+msgstr "Crie uma nova fonte no painel ADICIONAR FONTE."
+
+#: ../GTIPTVPlayerPro/main.py:9554
+msgid "No saved source. Create one from the ADD SOURCE panel."
+msgstr "Nenhuma fonte guardada. Crie uma no painel ADICIONAR FONTE."
+
+#: ../GTIPTVPlayerPro/main.py:9557
+msgid "CONNECT SOURCE"
+msgstr "LIGAR FONTE"
+
+#: ../GTIPTVPlayerPro/main.py:9558
+msgid "MANAGE SOURCES"
+msgstr "GERIR FONTES"
+
+#: ../GTIPTVPlayerPro/main.py:9559
+msgid "ADD SOURCE"
+msgstr "ADICIONAR FONTE"
+
+#: ../GTIPTVPlayerPro/main.py:9671 ../GTIPTVPlayerPro/playlist.py:1282
+#, python-brace-format
+msgid "Account status: {}"
+msgstr "Estado da conta: {}"
+
+#: ../GTIPTVPlayerPro/main.py:9858
+#, python-brace-format
+msgid "Checking {}, please wait."
+msgstr "A verificar {}, aguarde."
+
+#: ../GTIPTVPlayerPro/main.py:9869
+#, python-brace-format
+msgid "Connected to {}; opening the dashboard."
+msgstr "Ligado a {}; a abrir o painel."
+
+#: ../GTIPTVPlayerPro/main.py:9902
+msgid "Close the open screen before opening another one."
+msgstr "Feche o ecrã aberto antes de abrir outro."
+
+#: ../GTIPTVPlayerPro/metadata.py:255
+msgid "TMDb request cancelled"
+msgstr "Pedido ao TMDb cancelado"
+
+#: ../GTIPTVPlayerPro/metadata.py:266 ../GTIPTVPlayerPro/metadata.py:284
+msgid "TMDb request timed out"
+msgstr "O pedido ao TMDb excedeu o tempo limite"
+
+#: ../GTIPTVPlayerPro/metadata.py:354
+msgid "Could not load the TMDb configuration"
+msgstr "Não foi possível carregar a configuração do TMDb"
+
+#: ../GTIPTVPlayerPro/metadata.py:364 ../GTIPTVPlayerPro/metadata.py:754
+#: ../GTIPTVPlayerPro/metadata.py:822
+msgid "TMDb API key is not configured"
+msgstr "A chave da API do TMDb não está configurada"
+
+#: ../GTIPTVPlayerPro/metadata.py:398
+#, python-brace-format
+msgid "TMDb HTTP error path={}"
+msgstr "Erro HTTP do TMDb, caminho={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:400 ../GTIPTVPlayerPro/metadata.py:421
+msgid "TMDb API key is invalid"
+msgstr "A chave da API do TMDb é inválida"
+
+#: ../GTIPTVPlayerPro/metadata.py:402
+msgid "TMDb request limit reached"
+msgstr "Limite de pedidos ao TMDb atingido"
+
+#: ../GTIPTVPlayerPro/metadata.py:403
+#, python-brace-format
+msgid "TMDb returned HTTP {}"
+msgstr "O TMDb devolveu HTTP {}"
+
+#: ../GTIPTVPlayerPro/metadata.py:405
+#, python-brace-format
+msgid "TMDb connection error path={}"
+msgstr "Erro de ligação ao TMDb, caminho={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:406
+msgid "Could not connect to the TMDb service"
+msgstr "Não foi possível ligar ao serviço TMDb"
+
+#: ../GTIPTVPlayerPro/metadata.py:408
+msgid "TMDb response is too large"
+msgstr "A resposta do TMDb é demasiado grande"
+
+#: ../GTIPTVPlayerPro/metadata.py:414
+#, python-brace-format
+msgid "Invalid TMDb JSON path={}"
+msgstr "Caminho JSON do TMDb inválido={}"
+
+#: ../GTIPTVPlayerPro/metadata.py:415 ../GTIPTVPlayerPro/metadata.py:417
+msgid "TMDb returned an invalid response"
+msgstr "O TMDb devolveu uma resposta inválida"
+
+#: ../GTIPTVPlayerPro/metadata.py:422
+msgid "TMDb request was rejected"
+msgstr "O pedido ao TMDb foi rejeitado"
+
+#: ../GTIPTVPlayerPro/metadata.py:752 ../GTIPTVPlayerPro/metadata.py:820
+msgid "TMDb metadata enrichment is disabled"
+msgstr "O enriquecimento de metadados do TMDb está desativado"
+
+#: ../GTIPTVPlayerPro/metadata.py:761 ../GTIPTVPlayerPro/metadata.py:828
+msgid "No valid title was found for TMDb"
+msgstr "Nenhum título válido encontrado para o TMDb"
+
+#: ../GTIPTVPlayerPro/metadata.py:789 ../GTIPTVPlayerPro/metadata.py:808
+#: ../GTIPTVPlayerPro/metadata.py:857 ../GTIPTVPlayerPro/metadata.py:876
+msgid "No TMDb match was found"
+msgstr "Nenhuma correspondência encontrada no TMDb"
+
+#: ../GTIPTVPlayerPro/metadata.py:798 ../GTIPTVPlayerPro/metadata.py:799
+#: ../GTIPTVPlayerPro/metadata.py:866 ../GTIPTVPlayerPro/metadata.py:867
+msgid "Could not load TMDb information"
+msgstr "Não foi possível carregar as informações do TMDb"
+
+#: ../GTIPTVPlayerPro/network_security.py:45
+#: ../GTIPTVPlayerPro/network_security.py:53
+#: ../GTIPTVPlayerPro/network_security.py:55
+msgid "Image request headers are invalid."
+msgstr "Os cabeçalhos do pedido de imagem são inválidos."
+
+#: ../GTIPTVPlayerPro/network_security.py:64
+msgid "Network address could not be resolved."
+msgstr "Não foi possível resolver o endereço de rede."
+
+#: ../GTIPTVPlayerPro/network_security.py:67
+msgid "Image requests to local, private or reserved network addresses are prohibited."
+msgstr "São proibidos pedidos de imagens para endereços de rede locais, privados ou reservados."
+
+#: ../GTIPTVPlayerPro/network_security.py:79
+#: ../GTIPTVPlayerPro/network_security.py:84
+msgid "Image URL is invalid."
+msgstr "O URL da imagem é inválido."
+
+#: ../GTIPTVPlayerPro/network_security.py:94
+msgid "Image URL is not safe."
+msgstr "O URL da imagem não é seguro."
+
+#: ../GTIPTVPlayerPro/network_security.py:97
+msgid "Image URL port is invalid."
+msgstr "A porta do URL da imagem é inválida."
+
+#: ../GTIPTVPlayerPro/network_security.py:101
+#: ../GTIPTVPlayerPro/network_security.py:103
+msgid "Image host name is invalid."
+msgstr "O nome do anfitrião da imagem é inválido."
+
+#: ../GTIPTVPlayerPro/network_security.py:132
+msgid "Image download timed out."
+msgstr "A transferência da imagem excedeu o tempo limite."
+
+#: ../GTIPTVPlayerPro/network_security.py:161
+#: ../GTIPTVPlayerPro/network_security.py:184
+msgid "Image host name resolution timed out."
+msgstr "A resolução do nome do anfitrião da imagem excedeu o tempo limite."
+
+#: ../GTIPTVPlayerPro/network_security.py:194
+msgid "Image host name could not be resolved."
+msgstr "Não foi possível resolver o nome do anfitrião da imagem."
+
+#: ../GTIPTVPlayerPro/network_security.py:206
+msgid "Image host did not resolve to a public IP address."
+msgstr "O anfitrião da imagem não foi resolvido para um endereço IP público."
+
+#: ../GTIPTVPlayerPro/network_security.py:282
+msgid "Image response has conflicting size information."
+msgstr "A resposta da imagem contém informações de tamanho contraditórias."
+
+#: ../GTIPTVPlayerPro/network_security.py:336
+#, python-brace-format
+msgid "Image server returned HTTP {}."
+msgstr "O servidor de imagens devolveu HTTP {}."
+
+#: ../GTIPTVPlayerPro/network_security.py:341
+msgid "Compressed image HTTP responses are not accepted."
+msgstr "Não são aceites respostas HTTP de imagens comprimidas."
+
+#: ../GTIPTVPlayerPro/network_security.py:349
+msgid "Image response size is invalid."
+msgstr "O tamanho da resposta da imagem é inválido."
+
+#: ../GTIPTVPlayerPro/network_security.py:353
+#: ../GTIPTVPlayerPro/network_security.py:371
+msgid "Image response exceeds the safe size limit."
+msgstr "A resposta da imagem excede o limite de tamanho seguro."
+
+#: ../GTIPTVPlayerPro/network_security.py:403
+#: ../GTIPTVPlayerPro/network_security.py:405
+msgid "Image download limits are invalid."
+msgstr "Os limites de transferência de imagens são inválidos."
+
+#: ../GTIPTVPlayerPro/network_security.py:419
+msgid "An HTTPS image request cannot be redirected to HTTP."
+msgstr "Um pedido de imagem HTTPS não pode ser redirecionado para HTTP."
+
+#: ../GTIPTVPlayerPro/network_security.py:452
+msgid "Could not establish a secure connection to the image server."
+msgstr "Não foi possível estabelecer uma ligação segura ao servidor de imagens."
+
+#: ../GTIPTVPlayerPro/network_security.py:459
+msgid "Image redirect URL is missing."
+msgstr "Falta o URL de redirecionamento da imagem."
+
+#: ../GTIPTVPlayerPro/network_security.py:461
+msgid "Image request was redirected too many times."
+msgstr "O pedido de imagem foi redirecionado demasiadas vezes."
+
+#: ../GTIPTVPlayerPro/network_security.py:475
+msgid "Image redirection could not be completed."
+msgstr "Não foi possível concluir o redirecionamento da imagem."
+
+#: ../GTIPTVPlayerPro/playlist.py:41
+#, python-brace-format
+msgid ""
+"Latency: {} ms\n"
+"Account status: {}\n"
+"Active / Maximum: {}\n"
+"Expiry: {}\n"
+"Server time: {}\n"
+"Time zone: {}\n"
+"Protocol: {}\n"
+"Output format: {}\n"
+"Server version: {}\n"
+"\n"
+"{}"
+msgstr ""
+"Latência: {} ms\n"
+"Estado da conta: {}\n"
+"Ativas / Máximo: {}\n"
+"Validade: {}\n"
+"Hora do servidor: {}\n"
+"Fuso horário: {}\n"
+"Protocolo: {}\n"
+"Formato de saída: {}\n"
+"Versão do servidor: {}\n"
+"\n"
+"{}"
+
+#: ../GTIPTVPlayerPro/playlist.py:171
+msgid "Invalid stream ID"
+msgstr "ID de transmissão inválido"
+
+#: ../GTIPTVPlayerPro/playlist.py:390 ../GTIPTVPlayerPro/playlist.py:402
+#: ../GTIPTVPlayerPro/playlist.py:781
+msgid "Playlist file is too large"
+msgstr "O ficheiro da lista de reprodução é demasiado grande"
+
+#: ../GTIPTVPlayerPro/playlist.py:731
+msgid "Enter a valid Xtream URL"
+msgstr "Introduza um URL Xtream válido"
+
+#: ../GTIPTVPlayerPro/playlist.py:760
+msgid "The Xtream account limit was reached"
+msgstr "Foi atingido o limite de contas Xtream"
+
+#: ../GTIPTVPlayerPro/playlist.py:800
+msgid "Server URL, username and password are required"
+msgstr "São necessários o URL do servidor, o nome de utilizador e a palavra-passe"
+
+#: ../GTIPTVPlayerPro/playlist.py:803
+msgid "Output format must be TS or M3U8"
+msgstr "O formato de saída deve ser TS ou M3U8"
+
+#: ../GTIPTVPlayerPro/playlist.py:808
+msgid "Enter a valid server URL"
+msgstr "Introduza um URL de servidor válido"
+
+#: ../GTIPTVPlayerPro/playlist.py:810
+msgid "Server URL must start with http:// or https://"
+msgstr "O URL do servidor deve começar por http:// ou https://"
+
+#: ../GTIPTVPlayerPro/playlist.py:813
+msgid "Do not include a username or password in the server URL"
+msgstr "Não inclua o nome de utilizador nem a palavra-passe no URL do servidor"
+
+#: ../GTIPTVPlayerPro/playlist.py:816
+msgid "Server URL port is invalid"
+msgstr "A porta do URL do servidor é inválida"
+
+#: ../GTIPTVPlayerPro/playlist.py:879 ../GTIPTVPlayerPro/playlist.py:965
+#: ../GTIPTVPlayerPro/playlist.py:1591 ../GTIPTVPlayerPro/playlist.py:1603
+msgid "The account selected for deletion is invalid"
+msgstr "A conta selecionada para eliminação é inválida"
+
+#: ../GTIPTVPlayerPro/playlist.py:941 ../GTIPTVPlayerPro/playlist.py:1010
+msgid "The selected account was not found in the account files"
+msgstr "A conta selecionada não foi encontrada nos ficheiros de contas"
+
+#: ../GTIPTVPlayerPro/playlist.py:1069
+msgid "playlists.txt was not found"
+msgstr "playlists.txt não foi encontrado"
+
+#: ../GTIPTVPlayerPro/playlist.py:1071
+msgid "No valid Xtream account was found"
+msgstr "Nenhuma conta Xtream válida encontrada"
+
+#: ../GTIPTVPlayerPro/playlist.py:1119
+msgid "No saved IPTV source was found"
+msgstr "Nenhuma fonte IPTV guardada encontrada"
+
+#: ../GTIPTVPlayerPro/playlist.py:1163
+msgid "The selected M3U source was not found"
+msgstr "A fonte M3U selecionada não foi encontrada"
+
+#: ../GTIPTVPlayerPro/playlist.py:1237
+msgid "Never / unknown"
+msgstr "Nunca / desconhecido"
+
+#: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1255
+#: ../GTIPTVPlayerPro/playlist.py:1415 ../GTIPTVPlayerPro/playlist.py:1434
+#: ../GTIPTVPlayerPro/playlist.py:1445 ../GTIPTVPlayerPro/playlist.py:1493
+#: ../GTIPTVPlayerPro/playlist.py:1541 ../GTIPTVPlayerPro/stalker.py:8184
+msgid "ERROR"
+msgstr "ERRO"
+
+#: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1257
+msgid "API response is invalid"
+msgstr "A resposta da API é inválida"
+
+#: ../GTIPTVPlayerPro/playlist.py:1272 ../GTIPTVPlayerPro/stalker.py:8184
+msgid "INVALID"
+msgstr "INVÁLIDO"
+
+#: ../GTIPTVPlayerPro/playlist.py:1273
+msgid "Server did not validate the account"
+msgstr "O servidor não validou a conta"
+
+#: ../GTIPTVPlayerPro/playlist.py:1281
+msgid "DISABLED"
+msgstr "DESATIVADO"
+
+#: ../GTIPTVPlayerPro/playlist.py:1288 ../GTIPTVPlayerPro/stalker.py:8159
+msgid "BUSY"
+msgstr "OCUPADO"
+
+#: ../GTIPTVPlayerPro/playlist.py:1292
+msgid "API connection successful"
+msgstr "Ligação à API bem-sucedida"
+
+#: ../GTIPTVPlayerPro/playlist.py:1415
+msgid "API response is too large"
+msgstr "A resposta da API é demasiado grande"
+
+#: ../GTIPTVPlayerPro/playlist.py:1426
+msgid "Server health check HTTP error"
+msgstr "Erro HTTP na verificação do servidor"
+
+#: ../GTIPTVPlayerPro/playlist.py:1443
+msgid "Server health check connection error"
+msgstr "Erro de ligação na verificação do servidor"
+
+#: ../GTIPTVPlayerPro/playlist.py:1445
+msgid "Could not connect to the server"
+msgstr "Não foi possível ligar ao servidor"
+
+#: ../GTIPTVPlayerPro/playlist.py:1454
+msgid "Not cached"
+msgstr "Não está em cache"
+
+#: ../GTIPTVPlayerPro/playlist.py:1458
+msgid "Less than one minute"
+msgstr "Menos de um minuto"
+
+#: ../GTIPTVPlayerPro/playlist.py:1460
+#, python-brace-format
+msgid "{} minutes"
+msgstr "{} minutos"
+
+#: ../GTIPTVPlayerPro/playlist.py:1524 ../GTIPTVPlayerPro/playlist.py:1544
+msgid "The M3U source could not be checked."
+msgstr "Não foi possível verificar a fonte M3U."
+
+#: ../GTIPTVPlayerPro/playlist.py:1534
+msgid "M3U catalogue loaded from cache."
+msgstr "Catálogo M3U carregado da cache."
+
+#: ../GTIPTVPlayerPro/playlist.py:1536
+msgid "M3U source is accessible."
+msgstr "A fonte M3U está acessível."
+
+#: ../GTIPTVPlayerPro/playlist.py:1539
+msgid "The source is unavailable; a stale cache is in use."
+msgstr "A fonte está indisponível; está a ser usada uma cache desatualizada."
+
+#: ../GTIPTVPlayerPro/plugin.py:91
+msgid "Modern Enigma2 IPTV player"
+msgstr "Leitor IPTV moderno para Enigma2"
+
+#: ../GTIPTVPlayerPro/portal_expiry.py:64
+#: ../GTIPTVPlayerPro/portal_expiry.py:148
+msgid "Unlimited"
+msgstr "Sem prazo de validade"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:88
+msgid "Action"
+msgstr "Ação"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:91
+msgid "Exit"
+msgstr "Sair"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:93
+#: ../GTIPTVPlayerPro/remote_footer.py:115
+#: ../GTIPTVPlayerPro/remote_footer.py:116
+msgid "Change"
+msgstr "Alterar"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:96
+msgid "Continue"
+msgstr "Continuar"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:98
+msgid "Test"
+msgstr "Teste"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:104
+msgid "Navigate"
+msgstr "Navegar"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:107
+msgid "Refresh"
+msgstr "Atualizar"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:108
+msgid "Back"
+msgstr "Voltar"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:110
+msgid "Play"
+msgstr "Reproduzir"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:112
+msgid "EPG settings"
+msgstr "Definições de EPG"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:114
+msgid "Full screen"
+msgstr "Ecrã inteiro"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:120
+#: ../GTIPTVPlayerPro/remote_footer.py:124
+msgid "Remove"
+msgstr "Remover"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:122
+msgid "Clear search"
+msgstr "Limpar pesquisa"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:125
+msgid "Filter"
+msgstr "Filtro"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:126
+msgid "New"
+msgstr "Novo"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:127
+msgid "Move"
+msgstr "Mover"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:129
+msgid "Reset"
+msgstr "Repor"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:130
+msgid "Show / Hide"
+msgstr "Mostrar / Ocultar"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:131
+msgid "Mark"
+msgstr "Marcar"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:133
+msgid "Clear"
+msgstr "Limpar"
+
+#: ../GTIPTVPlayerPro/remote_footer.py:135
+msgid "Rescan"
+msgstr "Pesquisar novamente"
+
+#: ../GTIPTVPlayerPro/stalker.py:556
+msgid "Portal URL must start with http:// or https://"
+msgstr "O URL do portal deve começar por http:// ou https://"
+
+#: ../GTIPTVPlayerPro/stalker.py:567
+msgid "Portal URL port is invalid"
+msgstr "A porta do URL do portal é inválida"
+
+#: ../GTIPTVPlayerPro/stalker.py:569
+msgid "Do not include a query or fragment in the portal URL"
+msgstr "Não inclua uma consulta ou fragmento no URL do portal"
+
+#: ../GTIPTVPlayerPro/stalker.py:1208 ../GTIPTVPlayerPro/stalker.py:1213
+msgid "The Stalker account directory could not be created"
+msgstr "Não foi possível criar o diretório da conta Stalker"
+
+#: ../GTIPTVPlayerPro/stalker.py:1220
+msgid "The Stalker account directory is unsafe"
+msgstr "O diretório da conta Stalker não é seguro"
+
+#: ../GTIPTVPlayerPro/stalker.py:1232
+msgid "The Stalker account file is unsafe"
+msgstr "O ficheiro da conta Stalker não é seguro"
+
+#: ../GTIPTVPlayerPro/stalker.py:1248 ../GTIPTVPlayerPro/stalker.py:1257
+msgid "The Stalker account file could not be created"
+msgstr "Não foi possível criar o ficheiro da conta Stalker"
+
+#: ../GTIPTVPlayerPro/stalker.py:1278 ../GTIPTVPlayerPro/stalker.py:1297
+#: ../GTIPTVPlayerPro/stalker.py:1410
+msgid "The Stalker account file is too large"
+msgstr "O ficheiro da conta Stalker é demasiado grande"
+
+#: ../GTIPTVPlayerPro/stalker.py:1289
+msgid "The Stalker account file changed while opening"
+msgstr "O ficheiro da conta Stalker mudou durante a abertura"
+
+#: ../GTIPTVPlayerPro/stalker.py:1350 ../GTIPTVPlayerPro/stalker.py:1365
+msgid "No valid Stalker / MAC account was found"
+msgstr "Não foi encontrada uma conta Stalker / MAC válida"
+
+#: ../GTIPTVPlayerPro/stalker.py:1363 ../GTIPTVPlayerPro/stalker.py:1513
+msgid "The Stalker account file was not found"
+msgstr "O ficheiro da conta Stalker não foi encontrado"
+
+#: ../GTIPTVPlayerPro/stalker.py:1434
+msgid "The Stalker account file could not be saved"
+msgstr "Não foi possível guardar o ficheiro da conta Stalker"
+
+#: ../GTIPTVPlayerPro/stalker.py:1480
+msgid "This Stalker / MAC account already exists"
+msgstr "Esta conta Stalker / MAC já existe"
+
+#: ../GTIPTVPlayerPro/stalker.py:1482
+msgid "The Stalker / MAC account limit was reached"
+msgstr "Foi atingido o limite de contas Stalker / MAC"
+
+#: ../GTIPTVPlayerPro/stalker.py:1500 ../GTIPTVPlayerPro/stalker.py:1551
+#: ../GTIPTVPlayerPro/stalker.py:1630
+msgid "Invalid Stalker / MAC account"
+msgstr "Conta Stalker / MAC inválida"
+
+#: ../GTIPTVPlayerPro/stalker.py:1523 ../GTIPTVPlayerPro/stalker.py:1600
+msgid "The Stalker / MAC account was not found"
+msgstr "A conta Stalker / MAC não foi encontrada"
+
+#: ../GTIPTVPlayerPro/stalker.py:1810 ../GTIPTVPlayerPro/stalker.py:2487
+#: ../GTIPTVPlayerPro/stalker.py:2648 ../GTIPTVPlayerPro/stalker.py:2670
+msgid "Portal authentication failed"
+msgstr "A autenticação do portal falhou"
+
+#: ../GTIPTVPlayerPro/stalker.py:1992 ../GTIPTVPlayerPro/stalker.py:1997
+msgid "Portal request cancelled"
+msgstr "Pedido do portal cancelado"
+
+#: ../GTIPTVPlayerPro/stalker.py:2002
+msgid "Portal request timed out"
+msgstr "O pedido do portal excedeu o tempo limite"
+
+#: ../GTIPTVPlayerPro/stalker.py:2213
+msgid "Content type unavailable"
+msgstr "Tipo de conteúdo indisponível"
+
+#: ../GTIPTVPlayerPro/stalker.py:2335 ../GTIPTVPlayerPro/stalker.py:2524
+msgid "Invalid portal response"
+msgstr "Resposta do portal inválida"
+
+#: ../GTIPTVPlayerPro/stalker.py:2368 ../GTIPTVPlayerPro/stalker.py:5330
+#: ../GTIPTVPlayerPro/stalker.py:6222 ../GTIPTVPlayerPro/stalker.py:6236
+msgid "Portal request failed"
+msgstr "O pedido do portal falhou"
+
+#: ../GTIPTVPlayerPro/stalker.py:2498
+msgid "Portal HTTP request failed"
+msgstr "O pedido HTTP do portal falhou"
+
+#: ../GTIPTVPlayerPro/stalker.py:2505
+msgid "Portal is unavailable"
+msgstr "O portal não está disponível"
+
+#: ../GTIPTVPlayerPro/stalker.py:2514
+msgid "Portal response is too large"
+msgstr "A resposta do portal é demasiado grande"
+
+#: ../GTIPTVPlayerPro/stalker.py:5192
+msgid "Portal catalogue did not make progress"
+msgstr "O catálogo do portal não avançou"
+
+#: ../GTIPTVPlayerPro/stalker.py:6333 ../GTIPTVPlayerPro/stalker.py:6345
+#: ../GTIPTVPlayerPro/stalker.py:6354 ../GTIPTVPlayerPro/stalker.py:6661
+msgid "Invalid stream link"
+msgstr "Ligação de transmissão inválida"
+
+#: ../GTIPTVPlayerPro/stalker.py:7200 ../GTIPTVPlayerPro/stalker.py:7318
+#: ../GTIPTVPlayerPro/stalker.py:7453 ../GTIPTVPlayerPro/stalker.py:7588
+msgid "Stream link unavailable"
+msgstr "A ligação de transmissão não está disponível"
+
+#: ../GTIPTVPlayerPro/stalker.py:8168
+msgid "Portal connection successful"
+msgstr "Ligação ao portal bem-sucedida"
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:222
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:233
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:283
+#: ../GTIPTVPlayerPro/subtitles.py:672
+msgid "Could not open SubsSupport subtitle search."
+msgstr "Não foi possível abrir a pesquisa de legendas do SubsSupport."
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:407
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:438
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:480
+#: ../GTIPTVPlayerPro/subtitles.py:717
+msgid "Could not load the downloaded subtitle."
+msgstr "Não foi possível carregar a legenda transferida."
+
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:412
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:510
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:532
+#: ../GTIPTVPlayerPro/subssupport_bridge.py:580
+#: ../GTIPTVPlayerPro/subtitles.py:636
+msgid "External subtitle synchronization is unavailable."
+msgstr "A sincronização de legendas externas não está disponível."
+
+#: ../GTIPTVPlayerPro/subtitles.py:11
+msgid "DVB"
+msgstr "DVB"
+
+#: ../GTIPTVPlayerPro/subtitles.py:12
+msgid "Teletext"
+msgstr "Teletexto"
+
+#: ../GTIPTVPlayerPro/subtitles.py:17 ../GTIPTVPlayerPro/subtitles.py:51
+#: ../GTIPTVPlayerPro/subtitles.py:53
+msgid "Embedded"
+msgstr "Incorporado"
+
+#: ../GTIPTVPlayerPro/subtitles.py:18
+msgid "SSA"
+msgstr "SSA"
+
+#: ../GTIPTVPlayerPro/subtitles.py:19
+msgid "ASS"
+msgstr "ASS"
+
+#: ../GTIPTVPlayerPro/subtitles.py:20
+msgid "SRT"
+msgstr "SRT"
+
+#: ../GTIPTVPlayerPro/subtitles.py:21
+msgid "VOB"
+msgstr "VOB"
+
+#: ../GTIPTVPlayerPro/subtitles.py:22
+msgid "PGS"
+msgstr "PGS"
+
+#: ../GTIPTVPlayerPro/subtitles.py:23
+msgid "WebVTT"
+msgstr "WebVTT"
+
+#: ../GTIPTVPlayerPro/subtitles.py:63
+msgid "Subtitle"
+msgstr "Legenda"
+
+#: ../GTIPTVPlayerPro/subtitles.py:178
+msgid "No embedded subtitles are available."
+msgstr "Não estão disponíveis legendas incorporadas."
+
+#: ../GTIPTVPlayerPro/subtitles.py:184 ../GTIPTVPlayerPro/subtitles.py:234
+#: ../GTIPTVPlayerPro/subtitles.py:237 ../GTIPTVPlayerPro/subtitles.py:288
+#: ../GTIPTVPlayerPro/subtitles.py:296 ../GTIPTVPlayerPro/subtitles.py:482
+msgid "Subtitle selection is unavailable on this image."
+msgstr "A seleção de legendas não está disponível nesta imagem."
+
+#: ../GTIPTVPlayerPro/subtitles.py:219 ../GTIPTVPlayerPro/subtitles.py:230
+#: ../GTIPTVPlayerPro/subtitles.py:607
+msgid "Subtitles"
+msgstr "Legendas"
+
+#: ../GTIPTVPlayerPro/subtitles.py:313 ../GTIPTVPlayerPro/subtitles.py:352
+#: ../GTIPTVPlayerPro/subtitles.py:357
+msgid "Could not enable the selected subtitle."
+msgstr "Não foi possível ativar a legenda selecionada."
+
+#: ../GTIPTVPlayerPro/subtitles.py:579
+msgid "Search subtitles with SubsSupport"
+msgstr "Procurar legendas com o SubsSupport"
+
+#: ../GTIPTVPlayerPro/subtitles.py:581
+#, python-format
+msgid "Search subtitles with %s"
+msgstr "Procurar legendas com o %s"
+
+#: ../GTIPTVPlayerPro/subtitles.py:584
+msgid "Embedded subtitles"
+msgstr "Legendas incorporadas"
+
+#: ../GTIPTVPlayerPro/subtitles.py:589
+msgid "External subtitle synchronization"
+msgstr "Sincronização de legendas externas"
+
+#: ../GTIPTVPlayerPro/subtitles.py:651
+msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
+msgstr "A pesquisa de legendas requer uma instalação funcional do SubsSupport ou do SubsSupportPro."
+
+#: ../GTIPTVPlayerPro/weather.py:435
+msgid "Could not save weather settings through Enigma2 config"
+msgstr "Não foi possível guardar as definições meteorológicas através da configuração do Enigma2"
+
+#: ../GTIPTVPlayerPro/weather.py:445
+msgid "Clear skies"
+msgstr "Céu limpo"
+
+#: ../GTIPTVPlayerPro/weather.py:447
+msgid "Partly cloudy"
+msgstr "Parcialmente nublado"
+
+#: ../GTIPTVPlayerPro/weather.py:449
+msgid "Cloudy"
+msgstr "Nublado"
+
+#: ../GTIPTVPlayerPro/weather.py:451
+msgid "Foggy"
+msgstr "Nevoeiro"
+
+#: ../GTIPTVPlayerPro/weather.py:453
+msgid "Drizzle"
+msgstr "Chuvisco"
+
+#: ../GTIPTVPlayerPro/weather.py:455
+msgid "Rainy"
+msgstr "Chuvoso"
+
+#: ../GTIPTVPlayerPro/weather.py:457
+msgid "Snowy"
+msgstr "Neve"
+
+#: ../GTIPTVPlayerPro/weather.py:459
+msgid "Thunderstorms"
+msgstr "Trovoadas"
+
+#: ../GTIPTVPlayerPro/weather.py:460
+msgid "Variable"
+msgstr "Variável"
+
+#: ../GTIPTVPlayerPro/weather.py:495 ../GTIPTVPlayerPro/weather.py:844
+#: ../GTIPTVPlayerPro/weather.py:867
+msgid "Weather request cancelled"
+msgstr "Pedido meteorológico cancelado"
+
+#: ../GTIPTVPlayerPro/weather.py:588
+msgid "Weather service response is too large"
+msgstr "A resposta do serviço meteorológico é demasiado grande"
+
+#: ../GTIPTVPlayerPro/weather.py:599 ../GTIPTVPlayerPro/weather.py:602
+msgid "Open-Meteo request failed"
+msgstr "O pedido ao Open-Meteo falhou"
+
+#: ../GTIPTVPlayerPro/weather.py:600 ../GTIPTVPlayerPro/weather.py:603
+msgid "Could not reach the weather service"
+msgstr "Não foi possível contactar o serviço meteorológico"
+
+#: ../GTIPTVPlayerPro/weather.py:605 ../GTIPTVPlayerPro/weather.py:696
+msgid "Weather service returned an invalid response"
+msgstr "O serviço meteorológico devolveu uma resposta inválida"
+
+#: ../GTIPTVPlayerPro/weather.py:617
+msgid "City name cannot be empty"
+msgstr "O nome da cidade não pode estar vazio"
+
+#: ../GTIPTVPlayerPro/weather.py:661
+#, python-brace-format
+msgid "Could not find {}"
+msgstr "Não foi possível encontrar {}"
+
+#: ../GTIPTVPlayerPro/weather.py:745
+msgid "Could not load the five-day forecast"
+msgstr "Não foi possível carregar a previsão de cinco dias"
+
+#: ../GTIPTVPlayerPro/weather.py:886
+msgid "Not fetched yet"
+msgstr "Ainda não obtido"

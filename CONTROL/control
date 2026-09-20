@@ -1,0 +1,60 @@
+Package: enigma2-plugin-extensions-gtiptvplayerpro
+Version: 1.1.0-r0
+Section: extra
+Priority: optional
+Architecture: all
+Maintainer: VicTuS59
+Depends: enigma2, python3-core, python3-compression, python3-crypt, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-math, python3-netclient, python3-stringold, python3-threading, python3-xml
+Installed-Size: 7507
+Homepage: https://github.com/VicTuS59/GT-IPTV-Player-Pro
+License: GPL-2.0-or-later
+Description: Enigma2 IPTV player with provider TV archive and XMLTV EPG
+ Native Enigma2 interface for Xtream Codes, local or HTTP(S) M3U playlists,
+ and Stalker/MAC portals. M3U sources support optional background XMLTV EPG;
+ Xtream XMLTV data can also be mapped safely to native DVB services.
+ Selectable TXT banks support up to 100 arbitrary file paths each for Xtream
+ and Stalker/MAC, with remote-controlled browsing and immediate activation.
+ The source manager automatically checks Xtream and Stalker/MAC accounts,
+ reports expiry and connection usage with coloured status lines, and offers
+ confirmed inactive accounts for explicit bulk-deletion approval.
+ The yellow key opens the existing traffic-light health screen for only the
+ selected Xtream, Stalker/MAC or M3U source. Automatic account testing and its
+ EXIT cancellation remain available; OK connects and M3U blue opens XMLTV EPG.
+ Traffic-light artwork retains transparent edges without black rectangles.
+ Stalker Live TV requests native short EPG with the real channel ID; empty
+ channels do not disable later EPG discovery. Bounded fallback queries and
+ per-channel caching preserve responsive preview and fullscreen playback.
+ Current programmes retain valid duration/next-start end times; portal date
+ pairs and decimal Unix timestamps are normalized before NOW/NEXT selection.
+ Future-only responses permit one bounded alternative query for current EPG.
+ Stalker EPG starts after a shorter playback settling interval. Fullscreen
+ CH+/CH- refreshes native Stalker and Xtream EPG in the background and updates
+ the infobar; cancelled or late replies cannot replace another channel's EPG.
+ TV archive first-open testing releases the previous service and waits 500 ms
+ before resolving its archive link. The selected playback engine is retained;
+ cancellation or link failure restores the previous service when still owned.
+ M3U blue-key EPG settings guidance is localized in all 43 UI catalogs.
+ The welcome card also checks the selected account expiry and connection usage
+ in the background with a strict three-second budget.
+ The fullscreen OK key toggles the information bar without changing playback.
+ Movies and series optionally use the same cinematic layout with twelve
+ category rows, one continuous full-bleed hero, a five-card rail and slowly
+ scrolling long summaries. Detail text now uses change-only native updates,
+ avoiding duplicate transparent-layer repaints while provider information is
+ loading. SF8008-family receivers render one-pixel/200 ms synopsis motion on a
+ fixed software canvas instead of moving a native child widget; other receivers
+ retain the approved one-pixel/80 ms native motion. Bounded text gradients
+ preserve faces without dimming the complete artwork.
+ Stalker/MAC artwork uses
+ portal detail, explicit wide aliases and verified TMDb enrichment: generic
+ catalogue numbers are ignored, while explicit IDs must match the selected
+ title/year before their hero can be displayed. Portrait posters remain cards.
+ If no verified wide hero exists, the transparent hero surface reveals the
+ normal application background under bounded alpha text shadows; posters are
+ never enlarged. Movie and Series category paint reaches the physical left
+ edge and meets the hero without a visible seam.
+ Explicit background layers prevent the active DVB service from showing
+ through; the appearance setting restores the classic VOD layout.
+ TV Archive replays available provider recordings through Xtream Codes,
+ native Stalker/MAC archive APIs, or declared M3U catchup with XMLTV history.
+ The neon interface follows the receiver language through 43 catalogs.

@@ -1,0 +1,156 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+set -eu
+TARGET_ROOT=${D:-${IPKG_INSTROOT:-}}
+case "$TARGET_ROOT" in
+  ""|/)
+    TARGET_ROOT=''
+    ;;
+  /*)
+    TARGET_ROOT=${TARGET_ROOT%/}
+    ;;
+  *)
+    echo 'GT IPTV Player Pro: invalid package root.' >&2
+    exit 1
+    ;;
+esac
+PLUGIN_DIR="$TARGET_ROOT/usr/lib/enigma2/python/Plugins/Extensions/GTIPTVPlayerPro"
+USER_DATA_DIR="$TARGET_ROOT/etc/enigma2/gtiptvplayer"
+CATEGORY_LOCK_FILE="$USER_DATA_DIR/category-edit-lock.json"
+CATEGORY_LOCK_MUTEX="$USER_DATA_DIR/category-edit-lock.json.lock"
+CACHE_DIR="$TARGET_ROOT/etc/enigma2/gtiptvplayer/vod-catalog"
+M3U_CACHE_DIR="$TARGET_ROOT/etc/enigma2/gtiptvplayer/m3u-cache"
+M3U_EPG_CACHE_DIR="$TARGET_ROOT/etc/enigma2/gtiptvplayer/m3u-epg-cache"
+EPGIMPORT_DIR="$TARGET_ROOT/etc/epgimport"
+EPGIMPORT_CHANNELS_FILE="$EPGIMPORT_DIR/gtiptvplayerpro.channels.xml"
+EPGIMPORT_SOURCES_FILE="$EPGIMPORT_DIR/gtiptvplayerpro.sources.xml"
+ACTION="${1:-remove}"
+case "$ACTION" in
+  remove|purge)
+    # The category editor PIN is intentionally the only user preference reset
+    # by a real uninstall.  Upgrades do not enter this branch, so an installed
+    # PIN survives package updates.  Never follow a replaced data-directory
+    # symlink and never touch playlists, accounts or category preferences.
+    if [ -L "$USER_DATA_DIR" ]; then
+      echo 'GT IPTV Player Pro: user-data directory is a symlink; category lock cleanup skipped.' >&2
+    elif [ -e "$USER_DATA_DIR" ] && [ ! -d "$USER_DATA_DIR" ]; then
+      echo 'GT IPTV Player Pro: user-data path is not a directory; category lock cleanup skipped.' >&2
+    elif [ -d "$USER_DATA_DIR" ]; then
+      for LOCK_FILE in \
+        "$CATEGORY_LOCK_FILE" \
+        "$CATEGORY_LOCK_MUTEX" \
+        "$USER_DATA_DIR"/.category-edit-lock.json.tmp-*
+      do
+        if [ -L "$LOCK_FILE" ] || [ -f "$LOCK_FILE" ]; then
+          if ! rm -f "$LOCK_FILE"; then
+            echo 'GT IPTV Player Pro: category lock data could not be removed.' >&2
+          fi
+        elif [ -e "$LOCK_FILE" ]; then
+          echo 'GT IPTV Player Pro: a category lock path is not a file; left unchanged.' >&2
+        fi
+      done
+      rmdir "$USER_DATA_DIR" 2>/dev/null || true
+    fi
+
+    # These two files are optional, reproducible exports.  The canonical DVB
+    # settings and manual mappings remain below /etc/enigma2/gtiptvplayer and
+    # must survive upgrades, removals and purges just like the existing user
+    # playlists.  Never follow a replaced /etc/epgimport directory symlink or
+    # touch EPGImport's own configuration and third-party source files.
+    if [ -L "$EPGIMPORT_DIR" ]; then
+      echo 'GT IPTV Player Pro: EPGImport directory is a symlink; export cleanup skipped.' >&2
+    elif [ -e "$EPGIMPORT_DIR" ] && [ ! -d "$EPGIMPORT_DIR" ]; then
+      echo 'GT IPTV Player Pro: EPGImport path is not a directory; export cleanup skipped.' >&2
+    elif [ -d "$EPGIMPORT_DIR" ]; then
+      for EPGIMPORT_FILE in \
+        "$EPGIMPORT_CHANNELS_FILE" \
+        "$EPGIMPORT_SOURCES_FILE"
+      do
+        if [ -L "$EPGIMPORT_FILE" ] || [ -f "$EPGIMPORT_FILE" ]; then
+          if ! rm -f "$EPGIMPORT_FILE"; then
+            echo 'GT IPTV Player Pro: an EPGImport export could not be removed.' >&2
+          fi
+        elif [ -e "$EPGIMPORT_FILE" ]; then
+          echo 'GT IPTV Player Pro: an EPGImport export path is not a file; left unchanged.' >&2
+        fi
+      done
+    fi
+
+    if [ -L "$PLUGIN_DIR" ]; then
+      echo 'GT IPTV Player Pro: plugin path is a symlink; cleanup skipped.' >&2
+      exit 0
+    fi
+    if [ -L "$PLUGIN_DIR/__pycache__" ]; then
+      rm -f "$PLUGIN_DIR/__pycache__"
+    elif [ -d "$PLUGIN_DIR/__pycache__" ]; then
+      for CACHE_FILE in "$PLUGIN_DIR/__pycache__"/*.pyc "$PLUGIN_DIR/__pycache__"/*.pyo; do
+        if [ -e "$CACHE_FILE" ] || [ -L "$CACHE_FILE" ]; then
+          rm -f "$CACHE_FILE"
+        fi
+      done
+      rmdir "$PLUGIN_DIR/__pycache__" 2>/dev/null || true
+    fi
+    for CACHE_FILE in "$PLUGIN_DIR"/*.pyc "$PLUGIN_DIR"/*.pyo; do
+      if [ -e "$CACHE_FILE" ] || [ -L "$CACHE_FILE" ]; then
+        rm -f "$CACHE_FILE"
+      fi
+    done
+    rmdir "$PLUGIN_DIR" 2>/dev/null || true
+    echo 'GT IPTV Player Pro removed; restart the Enigma2 GUI.'
+    ;;
+esac
+
+# The movie catalogue is disposable runtime data.  Keep it across upgrades
+# and ordinary removals; purge only the files owned by this cache format.
+if [ "$ACTION" = purge ]; then
+  if [ -L "$CACHE_DIR" ]; then
+    echo 'GT IPTV Player Pro: catalogue cache path is a symlink; cleanup skipped.' >&2
+  elif [ -d "$CACHE_DIR" ]; then
+    for CACHE_FILE in \
+      "$CACHE_DIR"/*.jsonl \
+      "$CACHE_DIR"/*.jsonl.tmp \
+      "$CACHE_DIR"/*.jsonl.tmp-* \
+      "$CACHE_DIR"/.*.jsonl.tmp-* \
+      "$CACHE_DIR"/*.tmp
+    do
+      if [ -f "$CACHE_FILE" ] && [ ! -L "$CACHE_FILE" ]; then
+        rm -f "$CACHE_FILE"
+      fi
+    done
+    rmdir "$CACHE_DIR" 2>/dev/null || true
+    rmdir "$TARGET_ROOT/etc/enigma2/gtiptvplayer" 2>/dev/null || true
+  fi
+  if [ -L "$M3U_CACHE_DIR" ]; then
+    echo 'GT IPTV Player Pro: M3U cache path is a symlink; cleanup skipped.' >&2
+  elif [ -d "$M3U_CACHE_DIR" ]; then
+    for CACHE_FILE in \
+      "$M3U_CACHE_DIR"/*.jsonl \
+      "$M3U_CACHE_DIR"/.*.jsonl.*.tmp \
+      "$M3U_CACHE_DIR"/.m3u-cache.lock
+    do
+      if [ -f "$CACHE_FILE" ] && [ ! -L "$CACHE_FILE" ]; then
+        rm -f "$CACHE_FILE"
+      fi
+    done
+    rmdir "$M3U_CACHE_DIR" 2>/dev/null || true
+    # Preserve playlists.txt, m3u-sources.json and every user-created M3U.
+    rmdir "$TARGET_ROOT/etc/enigma2/gtiptvplayer" 2>/dev/null || true
+  fi
+  if [ -L "$M3U_EPG_CACHE_DIR" ]; then
+    echo 'GT IPTV Player Pro: M3U EPG cache path is a symlink; cleanup skipped.' >&2
+  elif [ -d "$M3U_EPG_CACHE_DIR" ]; then
+    for CACHE_FILE in \
+      "$M3U_EPG_CACHE_DIR"/*.snapshot \
+      "$M3U_EPG_CACHE_DIR"/.*.snapshot.*.tmp
+    do
+      if [ -f "$CACHE_FILE" ] && [ ! -L "$CACHE_FILE" ]; then
+        rm -f "$CACHE_FILE"
+      fi
+    done
+    rmdir "$M3U_EPG_CACHE_DIR" 2>/dev/null || true
+    # Preserve m3u-xmltv.json and every user-provided XMLTV document.
+    rmdir "$TARGET_ROOT/etc/enigma2/gtiptvplayer" 2>/dev/null || true
+  fi
+fi
+exit 0
