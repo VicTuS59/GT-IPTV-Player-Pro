@@ -1,6 +1,6 @@
 DOMAIN := GTIPTVPlayerPro
 PACKAGE_NAME := GT IPTV Player Pro
-PACKAGE_VERSION := 1.1.0
+PACKAGE_VERSION := 1.2.0
 BUGS_ADDRESS := https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues
 SOURCE_DATE_EPOCH ?= 1700000000
 export SOURCE_DATE_EPOCH
@@ -21,7 +21,7 @@ POT := $(DOMAIN).pot
 FORMAT_TOOL := format_flags.py
 LANGUAGES := ar bg ca cs da de el es et fa fi fr_FR fy gl he hr hu id is it ku lt lv mk nb nl nn pl pt ro ru sk sl sq_AL sr sv ta th tr uk vi zh zh_HK
 PO_FILES := $(addsuffix .po,$(LANGUAGES))
-PYTHON_SOURCES := $(sort $(wildcard $(PLUGIN_ROOT)/*.py))
+PYTHON_SOURCES := $(sort $(wildcard $(PLUGIN_ROOT)/*.py) $(wildcard catalog_messages.py) $(wildcard catalog_messages.py))
 
 .PHONY: all pot update compile check FORCE
 

@@ -129,3 +129,4 @@ def hide_scrollbar(screen, prefix):
             screen["{}_{}".format(prefix, suffix)].hide()
         except Exception:
             pass
+

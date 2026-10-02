@@ -42,3 +42,4 @@ def runtime_is_busy(excluding=None):
     """Return whether another DVB EPG update currently owns the pipeline."""
     with _LOCK:
         return _OWNER is not None and _OWNER is not excluding
+

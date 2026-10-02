@@ -3102,3 +3102,4 @@ def _set_response_socket_timeout(response, timeout):
         except (OSError, TypeError, ValueError) as error:
             last_error = error
     raise OSError("XMLTV response socket timeout could not be set") from last_error
+

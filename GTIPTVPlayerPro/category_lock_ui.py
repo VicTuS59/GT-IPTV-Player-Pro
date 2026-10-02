@@ -201,3 +201,4 @@ class GTCategoryCodeInputScreen(Screen):
 
     def cancel(self):
         self.close(None)
+

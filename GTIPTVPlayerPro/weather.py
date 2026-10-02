@@ -884,3 +884,4 @@ class WeatherService(object):
 def last_weather_update(cache_path=None):
     data = _read_json(cache_path or CACHE_PATH) or {}
     return str(data.get("updated_at") or N_("Not fetched yet"))
+

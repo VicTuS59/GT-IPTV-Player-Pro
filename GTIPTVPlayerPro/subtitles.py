@@ -4,6 +4,7 @@
 """Small, image-compatible controller for embedded VOD subtitles."""
 
 from .i18n import N_, _, localized_language_name
+from .subtitle_runtime import OnlineSubtitleController
 from .subssupport_bridge import SubsSupportBridge, subtitle_search_titles
 
 
@@ -91,6 +92,15 @@ def _subtitle_display_class():
         from Screens.SubtitleDisplay import SubtitleDisplay
 
         return SubtitleDisplay
+    except Exception:
+        return None
+
+
+def _online_subtitle_browser_class():
+    try:
+        from .subtitle_browser import GTOnlineSubtitleBrowserScreen
+
+        return GTOnlineSubtitleBrowserScreen
     except Exception:
         return None
 
@@ -407,6 +417,8 @@ class MovieSubtitleController(object):
         pause_for_search=None,
         resume_after_search=None,
         bridge=None,
+        online=None,
+        position_provider=None,
         on_menu_open=None,
         on_menu_close=None,
     ):
@@ -428,6 +440,15 @@ class MovieSubtitleController(object):
             on_message=on_message,
             on_changed=on_changed,
             on_before_enable=self._before_embedded_enable,
+        )
+        self.online = online or OnlineSubtitleController(
+            session,
+            metadata_provider=self._search_metadata,
+            position_provider=position_provider,
+            on_message=on_message,
+            on_changed=on_changed,
+            before_activate=self._before_online_enable,
+            is_paused=self._paused,
         )
         self._search_generation = 0
         self._search_paused_by_us = False
@@ -492,7 +513,15 @@ class MovieSubtitleController(object):
 
     @property
     def external_loaded(self):
-        return self.bridge.is_loaded
+        return bool(self.bridge.is_loaded or self.online.is_loaded)
+
+    def set_infobar_visible(self, visible):
+        setter = getattr(self.online, "set_infobar_visible", None)
+        if callable(setter):
+            try:
+                setter(visible)
+            except Exception:
+                pass
 
     def _changed(self, value):
         callback = self.on_changed
@@ -537,6 +566,13 @@ class MovieSubtitleController(object):
                 "episode": value.get("episode", ""),
                 "content_type": content_type,
                 "episode_title": value.get("episode_title", ""),
+                "tmdb_id": value.get("tmdb_id", ""),
+                "imdb_id": value.get("imdb_id", ""),
+                "sd_id": value.get("sd_id", ""),
+                "release_hint": value.get("release_hint", ""),
+                "fps": value.get("fps", 0),
+                "resolution": value.get("resolution", 0),
+                "duration_seconds": value.get("duration_seconds", 0),
             }
         if isinstance(value, (tuple, list)):
             title = value[0] if value else "Movie"
@@ -548,6 +584,13 @@ class MovieSubtitleController(object):
                 "episode": value[3] if len(value) > 3 else "",
                 "content_type": value[4] if len(value) > 4 else "movie",
                 "episode_title": value[5] if len(value) > 5 else "",
+                "tmdb_id": value[6] if len(value) > 6 else "",
+                "imdb_id": value[7] if len(value) > 7 else "",
+                "sd_id": value[8] if len(value) > 8 else "",
+                "release_hint": value[9] if len(value) > 9 else "",
+                "fps": value[10] if len(value) > 10 else 0,
+                "resolution": value[11] if len(value) > 11 else 0,
+                "duration_seconds": value[12] if len(value) > 12 else 0,
             }
         return {
             "title": getattr(value, "name", value) or "Movie",
@@ -556,6 +599,13 @@ class MovieSubtitleController(object):
             "episode": getattr(value, "episode", ""),
             "content_type": getattr(value, "content_type", "movie"),
             "episode_title": getattr(value, "episode_title", ""),
+            "tmdb_id": getattr(value, "tmdb_id", ""),
+            "imdb_id": getattr(value, "imdb_id", ""),
+            "sd_id": getattr(value, "sd_id", ""),
+            "release_hint": getattr(value, "release_hint", ""),
+            "fps": getattr(value, "fps", 0),
+            "resolution": getattr(value, "resolution", 0),
+            "duration_seconds": getattr(value, "duration_seconds", 0),
         }
 
     def _movie_title_and_year(self):
@@ -582,8 +632,13 @@ class MovieSubtitleController(object):
         )
         choices = [
             (_("Embedded subtitles"), "embedded"),
-            (search_label, "search"),
+            ("GT IPTV PLAYER PRO • " + _("Subtitles"), "online_browser"),
         ]
+        choices.append((search_label, "search"))
+        if self.online.is_loaded:
+            choices.append(
+                (_("Independent subtitle synchronization"), "online_synchronize")
+            )
         if self.bridge.is_loaded:
             choices.append(
                 (_("External subtitle synchronization"), "synchronize")
@@ -624,8 +679,30 @@ class MovieSubtitleController(object):
             # The unified menu owns the single Off action.  Canceling this
             # submenu therefore leaves an active external subtitle untouched.
             self._open_embedded_selection(include_off=False)
+        elif action == "online_browser":
+            self._open_online_browser()
+        elif (
+            isinstance(action, (tuple, list))
+            and len(action) == 2
+            and action[0] == "online_search"
+        ):
+            self._open_online_search(action[1])
+        elif action == "online_search":
+            # Retain compatibility with an already-open pre-R106 ChoiceBox.
+            self._open_online_search()
         elif action == "search":
             self._open_external_search()
+        elif action == "online_synchronize":
+            generation = self._menu_generation
+            try:
+                opened = self.online.open_sync(
+                    on_finished=lambda: self._end_menu(generation)
+                )
+            except Exception:
+                self._notify(N_("Subtitle synchronization is unavailable on this image."))
+                opened = False
+            if not opened:
+                self._end_menu(generation)
         elif action == "synchronize":
             generation = self._menu_generation
             try:
@@ -642,6 +719,102 @@ class MovieSubtitleController(object):
             self._end_menu()
         else:
             self._end_menu()
+
+    def _open_online_browser(self):
+        if self._closed:
+            return False
+        browser_class = _online_subtitle_browser_class()
+        opener = getattr(self.session, "openWithCallback", None)
+        if browser_class is None or not callable(opener):
+            self._notify(N_("Subtitle result selection is unavailable on this image."))
+            self._end_menu()
+            return False
+        self._search_generation += 1
+        generation = self._search_generation
+        menu_generation = self._menu_generation
+        self._search_paused_by_us = False
+        if callable(self.pause_for_search):
+            try:
+                self._search_paused_by_us = bool(self.pause_for_search())
+            except Exception:
+                self._search_paused_by_us = False
+        obscurer = getattr(self.online, "set_ui_obscured", None)
+        if callable(obscurer):
+            try:
+                obscurer(True)
+            except Exception:
+                pass
+        completed = False
+
+        def finished(unused_result=None):
+            nonlocal completed
+            if completed:
+                return
+            completed = True
+            self._resume_after_search(generation)
+            if (
+                not self._closed
+                and generation == self._search_generation
+                and callable(obscurer)
+            ):
+                try:
+                    obscurer(False)
+                except Exception:
+                    pass
+            if generation == self._search_generation:
+                self._search_generation += 1
+            self._end_menu(menu_generation)
+
+        try:
+            opener(
+                finished,
+                browser_class,
+                self.online,
+                self._search_metadata(),
+            )
+            return True
+        except Exception:
+            self._notify(N_("Subtitle result selection is unavailable on this image."))
+            finished()
+            return False
+
+    def _open_online_search(self, provider=None):
+        if self._closed:
+            return False
+        self._search_generation += 1
+        generation = self._search_generation
+        menu_generation = self._menu_generation
+        self._search_paused_by_us = False
+        if callable(self.pause_for_search):
+            try:
+                self._search_paused_by_us = bool(self.pause_for_search())
+            except Exception:
+                self._search_paused_by_us = False
+
+        completed = False
+
+        def finished():
+            nonlocal completed
+            if completed:
+                return
+            completed = True
+            self._resume_after_search(generation)
+            if generation == self._search_generation:
+                self._search_generation += 1
+            self._end_menu(menu_generation)
+
+        try:
+            opened = self.online.search(
+                automatic=False,
+                on_finished=finished,
+                provider=provider,
+            )
+        except Exception:
+            self._notify(N_("Could not start the online subtitle search."))
+            opened = False
+        if not opened:
+            finished()
+        return opened
 
     def _open_external_search(self):
         if self._closed:
@@ -661,7 +834,14 @@ class MovieSubtitleController(object):
             except Exception:
                 self._search_paused_by_us = False
         metadata = self._search_metadata()
-        titles = subtitle_search_titles(**metadata)
+        titles = subtitle_search_titles(
+            title=metadata.get("title", ""),
+            year=metadata.get("year", ""),
+            season=metadata.get("season", ""),
+            episode=metadata.get("episode", ""),
+            content_type=metadata.get("content_type", "movie"),
+            episode_title=metadata.get("episode_title", ""),
+        )
 
         def finished(path):
             self._external_search_finished(generation, path)
@@ -701,10 +881,13 @@ class MovieSubtitleController(object):
         try:
             if path:
                 previous_embedded = self.embedded.selected_track
+                previous_online = self.online.snapshot()
 
                 def before_activate():
                     if previous_embedded is not None:
-                        return self.embedded.disable()
+                        self.embedded.disable()
+                    if previous_online is not None:
+                        self.online.disable(notify=False)
                     return True
 
                 try:
@@ -718,9 +901,12 @@ class MovieSubtitleController(object):
                     loaded = False
                 if loaded:
                     self._changed(("external", path))
-                elif previous_embedded is not None:
-                    # Construction can hide the embedded window before load.
-                    self.embedded.restore(previous_embedded)
+                else:
+                    if previous_online is not None:
+                        self.online.restore(previous_online)
+                    elif previous_embedded is not None:
+                        # Construction can hide the embedded window before load.
+                        self.embedded.restore(previous_embedded)
         finally:
             self._resume_after_search(generation)
             if generation == self._search_generation:
@@ -730,27 +916,58 @@ class MovieSubtitleController(object):
     def _before_embedded_enable(self):
         """Turn off external rendering and return a failure rollback hook."""
         path = self.bridge.loaded_path
-        if not path:
+        online_state = self.online.snapshot()
+        if not path and online_state is None:
             return None
         paused = self._paused()
         service_generation = self._service_generation
         self.bridge.disable()
+        self.online.disable(notify=False)
 
         def restore_external():
             if (
                 self._closed
                 or service_generation != self._service_generation
                 or self.bridge.is_loaded
+                or self.online.is_loaded
             ):
                 return
-            if self.bridge.load(path, paused=paused, notify=False):
+            if online_state is not None and self.online.restore(online_state):
+                self._changed(("online", online_state.get("path")))
+            elif path and self.bridge.load(path, paused=paused, notify=False):
                 self._changed(("external", path))
 
         return restore_external
 
-    def disable(self):
-        had_external = self.bridge.is_loaded
+    def _before_online_enable(self):
+        """Disable native/SubsSupport rendering and provide atomic rollback."""
+        embedded_track = self.embedded.selected_track
+        external_path = self.bridge.loaded_path
+        paused = self._paused()
+        service_generation = self._service_generation
+        self.embedded.disable()
         self.bridge.disable()
+
+        def restore_previous():
+            if (
+                self._closed
+                or service_generation != self._service_generation
+                or self.online.is_loaded
+            ):
+                return
+            if external_path and self.bridge.load(
+                external_path, paused=paused, notify=False
+            ):
+                self._changed(("external", external_path))
+            elif embedded_track is not None:
+                self.embedded.restore(embedded_track)
+
+        return restore_previous
+
+    def disable(self):
+        had_external = self.bridge.is_loaded or self.online.is_loaded
+        self.bridge.disable()
+        self.online.disable(notify=False)
         self.embedded.disable()
         if had_external:
             self._changed(None)
@@ -760,14 +977,24 @@ class MovieSubtitleController(object):
         return {
             "embedded": self.embedded.selected_track,
             "external": self.bridge.loaded_path,
+            "online": self.online.snapshot(),
         }
 
     def restore_state(self, state):
         if self._closed or not isinstance(state, dict):
             return False
         external_path = state.get("external")
+        online_state = state.get("online")
+        if online_state:
+            self.embedded.disable()
+            self.bridge.disable()
+            if self.online.restore(online_state):
+                self._changed(("online", online_state.get("path")))
+                return True
+            return False
         if external_path:
             self.embedded.disable()
+            self.online.disable(notify=False)
             if self.bridge.load(external_path, paused=self._paused()):
                 self._changed(("external", external_path))
                 return True
@@ -779,12 +1006,27 @@ class MovieSubtitleController(object):
 
     def pause(self):
         self.bridge.pause()
+        self.online.pause()
 
     def resume(self):
         self.bridge.resume()
+        self.online.resume()
 
-    def after_seek(self):
+    def prepare_seek(self, target_seconds, origin_seconds=None):
+        return self.online.prepare_seek(target_seconds, origin_seconds=origin_seconds)
+
+    def after_seek(self, position_seconds=None):
         self.bridge.after_seek()
+        self.online.after_seek(position_seconds)
+
+    def cancel_seek(self):
+        self.bridge.after_seek()
+        self.online.cancel_seek()
+
+    def start_automatic_search(self):
+        if self._closed:
+            return False
+        return self.online.start_automatic_search()
 
     def reset_for_service_change(self, resume_search=False):
         if (
@@ -805,6 +1047,7 @@ class MovieSubtitleController(object):
         self._search_generation += 1
         self._search_paused_by_us = False
         self.bridge.reset_for_service_change()
+        self.online.reset_for_service_change()
         self.embedded.reset_for_service_change()
         self._end_menu()
 
@@ -815,5 +1058,6 @@ class MovieSubtitleController(object):
         self._service_generation += 1
         self._search_generation += 1
         self.bridge.close()
+        self.online.close()
         self.embedded.close()
         self._end_menu()

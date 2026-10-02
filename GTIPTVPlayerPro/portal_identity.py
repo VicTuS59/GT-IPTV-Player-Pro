@@ -44,3 +44,4 @@ def safe_series_id(value):
 
 def is_composite_id(value):
     return bool(safe_composite_id(value))
+

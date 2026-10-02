@@ -756,3 +756,4 @@ def delete_m3u_epg_binding(source_id, path=M3U_XMLTV_SETTINGS_PATH):
             return False
         _write_unlocked(directory_descriptor, filename, M3UEPGSettings(output))
     return True
+

@@ -34,3 +34,4 @@ def plugin_path(*parts):
     if not base:
         base = _SOURCE_PLUGIN_PATH
     return os.path.join(base, *parts) if parts else base
+

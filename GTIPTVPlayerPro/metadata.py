@@ -899,6 +899,10 @@ class TMDbMetadataClient(object):
             getattr(info, "tmdb_id", "")
             or getattr(item, "tmdb_id", "")
         )
+        imdb_id = (
+            getattr(info, "imdb_id", "")
+            or getattr(item, "imdb_id", "")
+        )
         external = None
         missing = (
             bool(force_cover_fallback)
@@ -955,6 +959,7 @@ class TMDbMetadataClient(object):
             cover=completed_cover,
             backdrop=backdrop or external.get("backdrop"),
             tmdb_id=tmdb_id or external.get("tmdb_id"),
+            imdb_id=imdb_id or external.get("imdb_id"),
         )
         external_backdrop = str(external.get("backdrop") or "").strip()
         completed.fallback_backdrop = (
@@ -992,6 +997,10 @@ class TMDbMetadataClient(object):
         tmdb_id = (
             getattr(info, "tmdb_id", "")
             or getattr(item, "tmdb_id", "")
+        )
+        imdb_id = (
+            getattr(info, "imdb_id", "")
+            or getattr(item, "imdb_id", "")
         )
         external = None
         missing = (
@@ -1049,6 +1058,7 @@ class TMDbMetadataClient(object):
             episodes=getattr(info, "episodes", []) or [],
             backdrop=backdrop or external.get("backdrop"),
             tmdb_id=tmdb_id or external.get("tmdb_id"),
+            imdb_id=imdb_id or external.get("imdb_id"),
         )
         external_backdrop = str(external.get("backdrop") or "").strip()
         completed.fallback_backdrop = (

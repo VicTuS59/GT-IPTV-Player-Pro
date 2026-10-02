@@ -1468,3 +1468,4 @@ def load_vod_catalog(
         categories_total,
     )
     return _finished_event(callback, result)
+

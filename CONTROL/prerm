@@ -1,0 +1,17 @@
+#!/bin/sh
+# Stop the detached R128 worker before package files are replaced or removed.
+# Offline image construction must never stop a host process.
+case "${D:-${IPKG_INSTROOT:-}}" in
+    ""|/) ;;
+    *) exit 0 ;;
+esac
+case "$1" in
+    remove|upgrade|deconfigure)
+        WORKER_PATH="/usr/lib/enigma2/python/Plugins/Extensions/GTIPTVPlayerPro/download_worker.py"
+        if [ -f "$WORKER_PATH" ] && command -v python3 >/dev/null 2>&1; then
+            python3 "$WORKER_PATH" stop >/dev/null 2>&1 || true
+        fi
+        ;;
+esac
+exit 0
+

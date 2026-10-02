@@ -147,6 +147,7 @@ class ContentItem(object):
         plot="",
         parent_id="",
         tmdb_id="",
+        imdb_id="",
     ):
         self.content_type = str(content_type or "").strip().lower()
         self.stream_id = str(stream_id or "").strip()
@@ -161,6 +162,7 @@ class ContentItem(object):
         self.duration = _clean_text(duration)
         self.plot = _decode_epg_description(plot)
         self.tmdb_id = str(tmdb_id or "").strip()[:32]
+        self.imdb_id = _imdb_id(imdb_id)
         raw_parent_id = str(parent_id or "")
         numeric_parent_id = raw_parent_id.strip()
         if numeric_parent_id.isdigit():
@@ -226,6 +228,7 @@ class MovieInfo(object):
         cover="",
         backdrop="",
         tmdb_id="",
+        imdb_id="",
     ):
         self.title = _clean_text(title, _("Movie"))
         self.plot = _decode_epg_description(plot)
@@ -238,6 +241,7 @@ class MovieInfo(object):
         self.cover = str(cover or "").strip()
         self.backdrop = str(backdrop or "").strip()
         self.tmdb_id = str(tmdb_id or "").strip()[:32]
+        self.imdb_id = _imdb_id(imdb_id)
 
 
 class SeriesInfo(object):
@@ -256,6 +260,7 @@ class SeriesInfo(object):
         episodes=None,
         backdrop="",
         tmdb_id="",
+        imdb_id="",
     ):
         self.title = _clean_text(title)
         self.plot = _decode_epg_description(plot)
@@ -268,6 +273,7 @@ class SeriesInfo(object):
         self.episodes = list(episodes or [])
         self.backdrop = str(backdrop or "").strip()
         self.tmdb_id = str(tmdb_id or "").strip()[:32]
+        self.imdb_id = _imdb_id(imdb_id)
 
     @property
     def seasons(self):
@@ -386,6 +392,14 @@ def _normalise_media_url(value, account=None):
 def _numeric_id(value):
     candidate = str(value or "").strip()
     return candidate if candidate.isdigit() else ""
+
+
+def _imdb_id(value):
+    """Return one public IMDb title identifier in its canonical form."""
+    candidate = str(value or "").strip().lower()
+    if candidate.isdigit():
+        candidate = "tt" + candidate
+    return candidate if re.fullmatch(r"tt\d{5,12}", candidate) else ""
 
 
 def _decode_epg_text(value):
@@ -894,6 +908,7 @@ class XtreamContentClient(object):
             icon,
             entry.get("rating") or entry.get("rating_5based"),
             entry.get("year") or entry.get("releaseDate"),
+            str(entry.get("tmdb_id") or entry.get("tmdb") or "")[:32],
         )
 
     def _movie_search_item(self, record):
@@ -908,6 +923,7 @@ class XtreamContentClient(object):
                 "stream_icon": record[5],
                 "rating": record[6],
                 "year": record[7],
+                "tmdb_id": record[8] if len(record) > 8 else "",
             },
         )
 
@@ -1092,6 +1108,42 @@ class XtreamContentClient(object):
             supported=True,
         )
 
+    def search_discovery_movies(self, movie, page=1, page_size=14, hidden_category_ids=None):
+        """Match TMDB IDs or either title against the same bounded VOD cache."""
+        page, page_size = max(1, int(page)), max(1, min(100, int(page_size)))
+        with self._movie_search_lock:
+            generation = self._movie_search_generation
+        catalog = self._movie_search_catalog_for(generation)
+        titles = [_movie_search_text(movie.get(key, ""))[:120]
+                  for key in ("title", "original_title")]
+        titles = [title for title in titles if title]
+        target_id = str(movie.get("id") or "")
+        year = str(movie.get("year") or "")
+        hidden = hidden_category_match_ids((), hidden_category_ids)
+        matches = []
+        for index, record in enumerate(catalog):
+            if index % 128 == 0:
+                self._check_request_limits()
+            if not category_ids_visible((record[3],), hidden):
+                continue
+            same_id = bool(target_id and len(record) > 8 and record[8] == target_id)
+            title_match = any(all(term in record[0] for term in title.split()) for title in titles)
+            if not same_id and not title_match:
+                continue
+            same_year = bool(year and (year in str(record[7] or "") or year in record[2]))
+            matches.append((not same_id, not same_year, index))
+        matches.sort()
+        start = (page - 1) * page_size
+        items = [self._movie_search_item(catalog[value[2]])
+                 for value in matches[start:start + page_size]]
+        self._check_request_limits()
+        with self._movie_search_lock:
+            if generation != self._movie_search_generation:
+                raise ContentError(N_("Request cancelled"), ContentError.CANCELLED)
+        return MovieSearchPage(items=[item for item in items if item is not None],
+                               page=page, page_size=page_size, total_items=len(matches),
+                               has_more=start + page_size < len(matches), source="xtream-local")
+
     def load_categories(self, content_type):
         content_type = self._validate_type(content_type)
         cached = self._cached_value(self._category_cache, content_type)
@@ -1148,6 +1200,11 @@ class XtreamContentClient(object):
             rating=entry.get("rating") or entry.get("rating_5based"),
             year=entry.get("year") or entry.get("releaseDate"),
             tmdb_id=entry.get("tmdb_id") or entry.get("tmdb"),
+            imdb_id=(
+                entry.get("imdb_id")
+                or entry.get("imdbId")
+                or entry.get("imdb")
+            ),
         )
         item.catalog_category_id = str(catalog_category_id or "")
         return item
@@ -1430,6 +1487,7 @@ class XtreamContentClient(object):
                 self.account,
             ),
             tmdb_id=first("tmdb_id", "tmdb"),
+            imdb_id=first("imdb_id", "imdbId", "imdb"),
         )
 
     def load_series_info(self, series_id):
@@ -1547,6 +1605,7 @@ class XtreamContentClient(object):
                 self.account,
             ),
             tmdb_id=first("tmdb_id", "tmdb"),
+            imdb_id=first("imdb_id", "imdbId", "imdb"),
         )
 
     def load_episodes(self, series_id):

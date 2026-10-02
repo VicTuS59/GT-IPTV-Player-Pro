@@ -336,8 +336,42 @@ def _(value):
     return _catalog(_ui_language_code()).gettext(text) if text else text
 
 
+def normalize_language(value, fallback="en"):
+    """Return one public, browser-safe language code.
+
+    The web interface receives BCP-47 values such as ``tr-TR`` or ``de-DE``
+    from the browser.  Keep the normalization rules in one place so the web
+    UI and the native Enigma2 UI always select the same catalog.
+    """
+    return _normalise_language(value, fallback=fallback)
+
+
+def translate_for_language(value, language_code):
+    """Translate ``value`` without changing the receiver's active language."""
+    if value is None:
+        return ""
+    text = str(value)
+    if not text:
+        return text
+    code = _normalise_language(language_code)
+    return _catalog(code).gettext(text)
+
+
+def supported_language_names():
+    """Return the advertised web-language choices in stable display order."""
+    return tuple(
+        (code, _NATIVE_LANGUAGE_NAMES.get(code, code))
+        for code in SUPPORTED_LANGUAGE_CODES
+    )
+
+
 def metadata_language():
     return _METADATA_LOCALES.get(device_language(), "en-US")
+
+
+def locale_for_language(value):
+    """Return the usual region for a supported language when none was given."""
+    return _METADATA_LOCALES.get(_normalise_language(value, fallback=""), "en-US")
 
 
 def device_language_label():
@@ -422,3 +456,4 @@ def locale_init(*unused_args, **unused_kwargs):
 
 
 locale_init()
+

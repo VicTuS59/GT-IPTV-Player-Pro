@@ -1388,3 +1388,4 @@ def is_busy():
     """Return whether XMLTV or the shared DVB EPG runtime is occupied."""
     instance = _INSTANCE
     return runtime_is_busy() or bool(instance is not None and instance.busy())
+

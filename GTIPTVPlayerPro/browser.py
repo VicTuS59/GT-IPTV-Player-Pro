@@ -44,7 +44,17 @@ from .i18n import (
     metadata_language,
 )
 from .live_recovery import media_snapshot as _decoder_media_snapshot
-from .background import attach_background, attach_pixmap
+from .background import (
+    attach_background,
+    attach_native_alpha_pixmap,
+    attach_pixmap,
+)
+from .channel_highlight import (
+    DEFAULT_CHANNEL_HIGHLIGHT,
+    channel_highlight_art,
+    channel_highlight_colors,
+    normalize_channel_highlight,
+)
 from .category_filters import (
     category_filter_ids,
 )
@@ -100,6 +110,8 @@ from .settings import (
 )
 from .subtitles import MovieSubtitleController
 from .typography import (
+    _grapheme_boundaries,
+    _text_units,
     clean_dynamic_text,
     ellipsize_dynamic_text,
     fit_dynamic_text,
@@ -120,22 +132,30 @@ from .weather import (
 )
 
 
+from .download_guard import protect_client as _protect_download_client
+from .download_guard import allow as _allow_account_playback
+from .download_guard import remember as _remember_account_url
+from .download_guard import play_service as _guarded_play_service
+from .download_guard import cancel_pending as _cancel_download_pending
+from .downloads import DownloadError as _DownloadError
+
+
 def content_client_for(account):
     """Create the content adapter for a unified IPTV source."""
     source_type = str(
         getattr(account, "source_type", "xtream") or "xtream"
     ).lower()
     if source_type == "stalker":
-        from .stalker import StalkerPortalClient
+        from .stalker import StalkerContentClient
 
-        return StalkerPortalClient(account)
+        return _protect_download_client(StalkerContentClient(account))
     if source_type == "m3u":
         from .m3u import M3UContentClient
 
         # Leave a small margin before the 30-second Enigma2 list-worker
         # deadline so completion cannot lose a race with the GUI poll timer.
         return M3UContentClient(account, timeout=28)
-    return XtreamContentClient(account)
+    return _protect_download_client(XtreamContentClient(account))
 
 
 def _client_supports(client, capability):
@@ -192,7 +212,25 @@ def _debug_identifier(value):
     return raw_value
 
 
+def _stream_diag_pts_progress(previous, current):
+    """Accept only forward progress on a 33-bit decoder clock, including wrap."""
+    limit = 1 << 33
+    try:
+        before, after = int(previous), int(current)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    if (
+        not (0 <= before < limit and 0 <= after < limit)
+        or before == 0xFFFFFFFF
+        or after == 0xFFFFFFFF
+    ):
+        return False
+    delta = (after - before) % limit
+    return 0 < delta < limit // 2
+
+
 INFO_TIMEOUT_MS = 3000
+DIRECTION_HOLD_MS = 650
 NAVIGATION_DEBOUNCE_MS = 250
 MAX_AUDIO_TRACKS = 64
 BLUE_LONG_SHORT_SUPPRESS_SECONDS = 1.5
@@ -219,10 +257,17 @@ LIVE_DETAIL_PREFETCH_CHANNELS = 4
 LIVE_DETAIL_EPG_TIMEOUT_SECONDS = 10
 LIVE_DETAIL_PREFETCH_TIMEOUT_SECONDS = 12
 LIVE_DETAIL_PROGRESS_INTERVAL_MS = 10000
+# Populate all ten visible NOW rows after the first page has settled. Requests
+# run serially and are cancelled when the page, account or playback changes.
+LIVE_PAGE_EPG_DWELL_MS = 180
+STALKER_LIVE_PAGE_EPG_DWELL_MS = 450
+LIVE_PAGE_EPG_POLL_MS = 100
+LIVE_PAGE_EPG_REQUEST_PAUSE_MS = 100
 LIVE_METADATA_INITIAL_DELAY_MS = 550
 LIVE_INFO_METADATA_INITIAL_DELAY_MS = 450
 LIVE_METADATA_RETRY_DELAY_MS = 250
 LIVE_METADATA_MAX_SAMPLES = 4
+SUBTITLE_AUTO_MATCH_DELAY_MS = 1400
 LIVE_INFO_READY_MIN_SAMPLES = 2
 LIVE_INFO_SETTLE_MS = 700
 LIVE_INFO_FALLBACK_MS = 900
@@ -241,6 +286,8 @@ CHANNEL_LINK_POLL_MS = 25
 CHANNEL_LINK_TIMEOUT_SECONDS = 5
 SEEK_VERIFY_DELAY_MS = 650
 SEEK_VERIFY_MAX_CHECKS = 2
+SEEK_ASYNC_VERIFY_TIMEOUT_SECONDS = 12.0
+SEEK_STARTUP_GRACE_SECONDS = 12.0
 RESUME_INITIAL_DELAY_MS = 700
 RESUME_RETRY_DELAY_MS = 300
 RESUME_MAX_ATTEMPTS = 30
@@ -304,7 +351,10 @@ CINEMATIC_CANDIDATE_TIMEOUT_SECONDS = 3
 WORKER_WEATHER_TIMEOUT_SECONDS = 10
 WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS = 16
 SERIES_PROGRESSIVE_SCAN_DELAY_MS = 120
-LIVE_STREAM_PAGE_SIZE = 12
+LIVE_STREAM_PAGE_SIZE = 10
+LIVE_PICON_PREFETCH_WORKERS = 2
+LIVE_PICON_PREFETCH_POLL_MS = 100
+LIVE_PICON_PREFETCH_MAX_ITEMS = PICON_CACHE_MAX_FILES
 LIVE_PREVIEW_LINK_POLL_MS = 50
 LIVE_PREVIEW_VIDEO_INITIAL_MS = 40
 LIVE_PREVIEW_VIDEO_RETRY_MS = 180
@@ -398,6 +448,27 @@ APP_BACKGROUND_PATH = os.path.join(
     "images",
     "global-neon-v0912.png",
 )
+LIVE_GUIDE_BACKGROUND_PATH = os.path.join(
+    PLUGIN_PATH,
+    "skin",
+    "images",
+    "live-guide-background-r83.png",
+)
+LIVE_CATEGORY_BACKGROUND_PATH = os.path.join(
+    PLUGIN_PATH,
+    "skin",
+    "images",
+    "live-category-background-r84.png",
+)
+CINEMATIC_GLASS_BACKGROUND_PATH = os.path.join(
+    PLUGIN_PATH, "skin", "images", "screen-cinematic-glass-r90.png",
+)
+CONTINUE_GLASS_BACKGROUND_PATH = os.path.join(
+    PLUGIN_PATH, "skin", "images", "screen-continue-glass-r91.png",
+)
+FAVORITES_GLASS_BACKGROUND_PATH = os.path.join(
+    PLUGIN_PATH, "skin", "images", "screen-favorites-glass-r91.png",
+)
 CINEMATIC_SCRIM_PATH = os.path.join(
     PLUGIN_PATH,
     "skin",
@@ -478,6 +549,7 @@ MOVIE_FOOTER_ITEMS = (
     footer_item("green", "refresh", 0.85),
     footer_item("yellow", "edit", 0.85),
     footer_item("blue", "search", 0.90),
+    footer_item("menu", "download", 1.00),
     footer_item("exit", "back", 0.86),
 )
 ALL_MOVIES_SEARCH_FOOTER_ITEMS = (
@@ -486,6 +558,7 @@ ALL_MOVIES_SEARCH_FOOTER_ITEMS = (
     footer_item("red", "favorite", 0.92),
     footer_item("green", "refresh", 0.88),
     footer_item("blue", "search", 0.88),
+    footer_item("menu", "download", 1.00),
     footer_item("exit", "back", 0.86),
 )
 SERIES_FOOTER_ITEMS = (
@@ -496,6 +569,7 @@ SERIES_FOOTER_ITEMS = (
     footer_item("green", "continue"),
     footer_item("yellow", "edit"),
     footer_item("blue", "search"),
+    footer_item("menu", "download"),
     footer_item("exit", "back"),
 )
 EPISODE_FOOTER_ITEMS = (
@@ -504,7 +578,14 @@ EPISODE_FOOTER_ITEMS = (
     footer_item("ok", "play"),
     footer_item("red", "favorite"),
     footer_item("green", "refresh"),
+    footer_item("menu", "download"),
     footer_item("exit", "back"),
+)
+# MENU on a series opens the episode picker in download mode, where OK
+# already requests a download. Keep its guide aligned with that action.
+EPISODE_DOWNLOAD_FOOTER_ITEMS = tuple(
+    footer_item(key, "download" if key == "ok" else action, weight)
+    for key, action, weight in EPISODE_FOOTER_ITEMS
 )
 LIVE_STREAM_FOOTER_ITEMS = (
     footer_item("up_down", "select"),
@@ -537,7 +618,7 @@ CATEGORY_MANAGER_FOOTER_ITEMS = (
     footer_item("yellow", "move", 0.85),
     footer_item("green", "save", 0.85),
     footer_item("blue", "reset", 0.82),
-    footer_item("menu", "filter_search", 1.30),
+    footer_item("menu", "hide_all", 1.30),
     footer_item("exit", "cancel", 0.78),
 )
 CATEGORY_MANAGER_MOVE_FOOTER_ITEMS = (
@@ -549,16 +630,6 @@ CATEGORY_MANAGER_MOVE_FOOTER_ITEMS = (
     footer_item("", "", 0.82),
     footer_item("exit", "cancel", 0.78),
 )
-CATEGORY_FILTER_FOOTER_ITEMS = (
-    footer_item("ok", "visibility", 1.00),
-    footer_item("red", "clear", 0.85),
-    footer_item("green", "save", 0.85),
-    footer_item("yellow", "preview", 1.00),
-    footer_item("blue", "search", 0.85),
-    footer_item("menu", "rescan", 0.95),
-    footer_item("exit", "cancel", 0.85),
-)
-
 VIDEO_CODECS = {
     0: "MPEG-2",
     1: "H.264",
@@ -625,6 +696,47 @@ def _movie_item_search_text(item):
     return search_text
 
 
+def _attach_subtitle_detail_metadata(item, info):
+    """Attach provider/TMDb detail identity without changing UI labels.
+
+    The Stalker browser renders a completed ``MovieInfo``/``SeriesInfo`` but
+    playback keeps the original catalogue ``ContentItem``.  Store a bounded
+    subtitle-only view on that item so the player can use the better title,
+    year and public IDs while preserving the portal's displayed name.
+    """
+    if item is None or info is None:
+        return False
+    values = {
+        "subtitle_title": " ".join(
+            str(getattr(info, "title", "") or "").split()
+        )[:180],
+        "subtitle_year": str(
+            getattr(info, "year", "") or ""
+        ).strip()[:12],
+        "subtitle_tmdb_id": str(
+            getattr(info, "tmdb_id", "") or ""
+        ).strip()[:32],
+        "subtitle_imdb_id": str(
+            getattr(info, "imdb_id", "") or ""
+        ).strip().lower()[:32],
+    }
+    if values["subtitle_title"] in {
+        str(N_("Movie")), str(_("Movie")),
+        str(N_("Series")), str(_("Series")),
+    }:
+        values["subtitle_title"] = ""
+    if values["subtitle_imdb_id"].isdigit():
+        values["subtitle_imdb_id"] = "tt" + values["subtitle_imdb_id"]
+    changed = False
+    for name, value in values.items():
+        if not value:
+            continue
+        if getattr(item, name, "") != value:
+            setattr(item, name, value)
+            changed = True
+    return changed
+
+
 class _WorkerCancelled(RuntimeError):
     pass
 
@@ -681,7 +793,36 @@ def _set_component_visible(component, visible):
     return True
 
 
-class _FavoriteSupport(object):
+class _DownloadSupport(object):
+    """Download actions shared by search, history and favorite screens."""
+
+    def request_selected_download(self):
+        if getattr(self, "_closed", True) or getattr(self, "_loading", False):
+            return
+        entries = getattr(self, "_results", None) or getattr(self, "_entries", None) or []
+        index = getattr(self, "selected_index", 0)
+        if not entries or index >= len(entries):
+            return
+        item = entries[index]
+        if getattr(item, "content_type", "") not in ("movie", "series"):
+            return
+        if item.content_type == "series" and not getattr(item, "episode", ""):
+            parent = getattr(item, "parent_id", "") or item.stream_id
+            series = ContentItem("series", parent, item.name, icon=getattr(item, "icon", ""))
+            self.session.open(
+                GTEpisodeListScreen,
+                self.account,
+                series,
+                self.client,
+                favorite_store=getattr(self, "favorite_store", None),
+                download_mode=True,
+            )
+            return
+        from .downloads_ui import request_download
+        request_download(self.session, self.client, item)
+
+
+class _FavoriteSupport(_DownloadSupport):
     """Shared O(1) favorite checks for browser and player screens."""
 
     def _init_favorite_support(self, favorite_store=None, favorite_keys=None):
@@ -1308,6 +1449,12 @@ def _episode_list_skin():
 def _continue_watching_skin(screen_name="GTContinueWatchingScreen"):
     """Poster-card grid for every unfinished movie and series episode."""
     width, height, px = _scale()
+    variant = {(720, 576): "sd576", (720, 480): "sd480",
+               (640, 480): "sd640"}.get((width, height))
+    if variant is None:
+        variant = ("720" if width <= 1280 and height <= 720 else
+                   "1080" if width <= 1920 and height <= 1080 else "2160")
+    art_dir = APP_BACKGROUND_PATH.rsplit("/", 1)[0]
     favorite_star = FAVORITE_STAR_PATH.replace("&", "&amp;").replace(
         '"', "&quot;"
     )
@@ -1333,12 +1480,12 @@ def _continue_watching_skin(screen_name="GTContinueWatchingScreen"):
         cards.append(
             """
     <widget name="continue_card_{index}" position="{card_x},{card_y}"
-            size="{card_w},{card_h}" font="Regular;1"
-            backgroundColor="#101A2D" transparent="0" zPosition="2" />
+            size="{card_w},{card_h}" pixmap="{card_pixmap}"
+            scale="1" zPosition="2" />
     <widget name="continue_poster_placeholder_{index}"
             position="{poster_x},{poster_y}" size="{poster_w},{poster_h}"
             font="Regular;{placeholder_font}" foregroundColor="#4B6485"
-            backgroundColor="#0B1425" transparent="0" zPosition="3"
+            transparent="1" zPosition="3"
             valign="center" halign="center" />
     <widget name="continue_poster_{index}"
             position="{poster_x},{poster_y}" size="{poster_w},{poster_h}"
@@ -1391,6 +1538,8 @@ def _continue_watching_skin(screen_name="GTContinueWatchingScreen"):
                 card_y=card_y,
                 card_w=card_w,
                 card_h=card_h,
+                card_pixmap=("{}/screen-continue-glass-r91-tile-{}-{:02d}.png"
+                             .format(art_dir, variant, index)).replace("&", "&amp;"),
                 poster_x=card_x + px(6),
                 poster_y=card_y + px(6),
                 poster_w=card_w - px(12),
@@ -1445,7 +1594,7 @@ def _continue_watching_skin(screen_name="GTContinueWatchingScreen"):
             valign="center" halign="right" />
     <widget name="content_panel" position="{margin},{panel_y}"
             size="{panel_w},{panel_h}" font="Regular;1"
-            backgroundColor="#0A1120" transparent="0" zPosition="1" />
+            transparent="1" zPosition="1" />
     <widget name="list_accent" position="{margin},{panel_y}"
             size="{accent_w},{panel_h}" font="Regular;1"
             backgroundColor="#8B5CF6" transparent="0" zPosition="2" />
@@ -1519,6 +1668,12 @@ def _continue_watching_skin(screen_name="GTContinueWatchingScreen"):
 def _favorites_skin():
     """Favorites-only 5×3 poster grid; Continue Watching stays 4×2."""
     width, height, px = _scale()
+    variant = {(720, 576): "sd576", (720, 480): "sd480",
+               (640, 480): "sd640"}.get((width, height))
+    if variant is None:
+        variant = ("720" if width <= 1280 and height <= 720 else
+                   "1080" if width <= 1920 and height <= 1080 else "2160")
+    art_dir = APP_BACKGROUND_PATH.rsplit("/", 1)[0]
     margin = px(54)
     footer_y = height - px(92)
     panel_y = px(104)
@@ -1543,12 +1698,12 @@ def _favorites_skin():
         cards.append(
             """
     <widget name="continue_card_{index}" position="{card_x},{card_y}"
-            size="{card_w},{card_h}" font="Regular;1"
-            backgroundColor="#101A2D" transparent="0" zPosition="2" />
+            size="{card_w},{card_h}" pixmap="{card_pixmap}"
+            scale="1" zPosition="2" />
     <widget name="continue_poster_placeholder_{index}"
             position="{poster_x},{poster_y}" size="{poster_w},{poster_h}"
             font="Regular;{placeholder_font}" foregroundColor="#4B6485"
-            backgroundColor="#0B1425" transparent="0" zPosition="3"
+            transparent="1" zPosition="3"
             valign="center" halign="center" />
     <widget name="continue_poster_{index}"
             position="{poster_x},{poster_y}" size="{poster_w},{poster_h}"
@@ -1559,8 +1714,8 @@ def _favorites_skin():
             transparent="0" zPosition="6" valign="center" halign="center" />
     <widget name="continue_title_{index}" position="{title_x},{title_y}"
             size="{title_w},{title_h}" font="Regular;{title_font}"
-            foregroundColor="#FFFFFF" backgroundColor="#101A2D"
-            transparent="0" zPosition="5" valign="center" halign="left"
+            foregroundColor="#FFFFFF" transparent="1" zPosition="5"
+            valign="center" halign="left"
             noWrap="1" />
     <widget name="continue_favorite_{index}" position="0,0"
             size="{hidden},{hidden}" zPosition="1" />
@@ -1601,6 +1756,8 @@ def _favorites_skin():
                 card_y=card_y,
                 card_w=card_w,
                 card_h=card_h,
+                card_pixmap=("{}/screen-favorites-glass-r91-tile-{}-{:02d}.png"
+                             .format(art_dir, variant, index)).replace("&", "&amp;"),
                 poster_x=card_x + px(5),
                 poster_y=card_y + px(5),
                 poster_w=card_w - px(10),
@@ -1632,8 +1789,8 @@ def _favorites_skin():
             transparent="0" zPosition="3" />
     <widget name="favorite_filter_{index}" position="{inner_x},{inner_y}"
             size="{inner_w},{inner_h}" font="Regular;{font}"
-            foregroundColor="#FFFFFF" backgroundColor="#101A2D"
-            transparent="0" zPosition="4" valign="center" halign="center" />""".format(
+            foregroundColor="#FFFFFF" transparent="1" zPosition="4"
+            valign="center" halign="center" />""".format(
                 index=index,
                 x=tab_x,
                 y=tab_y,
@@ -1660,7 +1817,7 @@ def _favorites_skin():
             foregroundColor="#FFFFFF" transparent="1" valign="center" halign="right" />
     <widget name="content_panel" position="{margin},{panel_y}"
             size="{panel_w},{panel_h}" font="Regular;1"
-            backgroundColor="#0A1120" transparent="0" zPosition="1" />
+            transparent="1" zPosition="1" />
     <widget name="list_accent" position="{margin},{panel_y}" size="{accent_w},{panel_h}"
             font="Regular;1" backgroundColor="#8B5CF6" transparent="0" zPosition="2" />
     <widget name="breadcrumb" position="{margin},{crumb_y}" size="{crumb_w},{crumb_h}"
@@ -1672,8 +1829,8 @@ def _favorites_skin():
     {cards}
     <widget name="favorite_info" position="{info_x},{info_y}"
             size="{info_w},{info_h}" font="Regular;{info_font}"
-            foregroundColor="#60A5FA" backgroundColor="#081426"
-            transparent="0" zPosition="4" valign="center" halign="left"
+            foregroundColor="#60A5FA" transparent="1" zPosition="4"
+            valign="center" halign="left"
             noWrap="1" />
     <widget name="list_scroll_track" position="{scroll_x},{scroll_y}"
             size="{scroll_w},{scroll_h}" font="Regular;1"
@@ -1725,60 +1882,89 @@ def _favorites_skin():
 
 def _live_category_skin():
     width, height, px = _scale()
-    margin = px(64)
+    theme_dir = globals().get(
+        "APP_BACKGROUND_PATH",
+        "/usr/lib/enigma2/python/Plugins/Extensions/GTIPTVPlayerPro/skin/images/global-neon-v0912.png",
+    ).rsplit("/", 1)[0]
+    margin = px(50)
     footer_y = height - px(92)
     left_x = margin
-    left_w = px(990)
-    right_x = left_x + left_w + px(28)
+    left_w = px(945)
+    right_x = left_x + left_w + px(22)
     right_w = width - right_x - margin
-    panel_y = px(135)
-    panel_h = px(805)
-    row_y = (252, 332, 412, 492, 572, 652, 732, 812)
+    panel_y = px(60)
+    panel_h = px(875)
+    row_y = tuple(145 + (index * 91) for index in range(8))
     rows = []
     for index, y_value in enumerate(row_y):
         rows.append(
             """
+    <widget name="category_row_art_{index}" position="{focus_x},{focus_y}"
+            size="{focus_w},{focus_box_h}" pixmap="{row_art}"
+            alphatest="blend" scale="1" zPosition="2" />
+    <widget name="category_focus_art_{index}" position="{focus_x},{focus_y}"
+            size="{focus_w},{focus_box_h}" pixmap="{focus_art}"
+            alphatest="blend" scale="1" zPosition="4" />
+    <widget name="category_icon_{index}" position="{icon_x},{icon_y}"
+            size="{icon_w},{icon_h}" pixmap="{category_icon}"
+            alphatest="blend" scale="1" zPosition="8" />
     <widget name="category_row_{index}" position="{row_x},{row_y}"
             size="{row_w},{row_h}" font="Regular;{row_font}"
-            foregroundColor="#F8FAFC" transparent="1" zPosition="4"
+            foregroundColor="#F8FAFC" transparent="1" zPosition="6"
             valign="center" halign="left" noWrap="1" />
     <widget name="category_focus_{index}_fill" position="{focus_x},{focus_y}"
             size="{focus_w},{focus_box_h}" font="Regular;1"
-            backgroundColor="#172A45" transparent="0" zPosition="2" />
+            backgroundColor="#172A45" transparent="0" zPosition="3" />
     <widget name="category_focus_{index}_top" position="{focus_x},{focus_y}"
             size="{focus_w},{focus_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="3" />
+            backgroundColor="#00E5FF" transparent="0" zPosition="7" />
     <widget name="category_focus_{index}_bottom" position="{focus_x},{focus_bottom_y}"
             size="{focus_w},{focus_h}" font="Regular;1"
-            backgroundColor="#D946EF" transparent="0" zPosition="3" />
+            backgroundColor="#D946EF" transparent="0" zPosition="7" />
     <widget name="category_focus_{index}_left" position="{focus_x},{focus_y}"
             size="{focus_h},{focus_box_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="3" />
+            backgroundColor="#00E5FF" transparent="0" zPosition="7" />
     <widget name="category_focus_{index}_right" position="{focus_right_x},{focus_y}"
             size="{focus_h},{focus_box_h}" font="Regular;1"
-            backgroundColor="#D946EF" transparent="0" zPosition="3" />""".format(
+            backgroundColor="#D946EF" transparent="0" zPosition="7" />""".format(
                 index=index,
-                row_x=left_x + px(42),
+                row_art=theme_dir + "/category-glass-row-r84.png",
+                focus_art=theme_dir + "/focus-r64.png",
+                category_icon=theme_dir + "/category-icon-r64.png",
+                icon_x=left_x + px(34),
+                icon_y=px(y_value + 7),
+                icon_w=px(62), icon_h=px(62),
+                row_x=left_x + px(113),
                 row_y=px(y_value),
-                row_w=left_w - px(90),
-                row_h=px(66),
-                row_font=px(27),
+                row_w=left_w - px(162),
+                row_h=px(76),
+                row_font=font_px(px, 33, max_height=76, vertical_padding=8),
                 focus_x=left_x + px(20),
-                focus_y=px(y_value - 4),
+                focus_y=px(y_value - 3),
                 focus_w=left_w - px(40),
-                focus_h=px(4),
-                focus_bottom_y=px(y_value + 66),
-                focus_box_h=px(74),
-                focus_right_x=left_x + left_w - px(24),
+                focus_h=max(1, px(3)),
+                focus_bottom_y=px(y_value + 77),
+                focus_box_h=px(80),
+                focus_right_x=left_x + left_w - px(23),
             )
         )
-    weather_x = right_x + px(32)
-    weather_w = right_w - px(64)
+    weather_x = right_x + px(29)
+    weather_w = right_w - px(58)
     day_gap = px(8)
     day_w = int((weather_w - (day_gap * 4)) / 5)
     weather_days = []
     for index in range(5):
         day_x = weather_x + (index * (day_w + day_gap))
+        if index:
+            weather_days.append(
+                '<widget name="weather_day_separator_{}" '
+                'position="{},{}" size="{},{}" font="Regular;1" '
+                'backgroundColor="#123B75" transparent="0" '
+                'zPosition="3" />'.format(
+                    index, day_x - px(5), px(586),
+                    max(1, px(2)), px(242),
+                )
+            )
         weather_days.append(
             """
     <widget name="weather_day_card_{index}" position="{day_x},{day_y}"
@@ -1801,22 +1987,22 @@ def _live_category_skin():
             valign="center" halign="center" />""".format(
                 index=index,
                 day_x=day_x,
-                day_y=px(510),
+                day_y=px(570),
                 day_w=day_w,
-                day_h=px(285),
-                day_label_y=px(520),
+                day_h=px(265),
+                day_label_y=px(570),
                 day_label_h=px(42),
-                day_label_font=px(18),
+                day_label_font=font_px(px, 21, max_height=42, vertical_padding=3),
                 day_icon_x=day_x + int((day_w - px(92)) / 2),
-                day_icon_y=px(575),
+                day_icon_y=px(632),
                 day_icon_w=px(92),
                 day_icon_h=px(92),
-                day_high_y=px(682),
+                day_high_y=px(740),
                 day_high_h=px(48),
-                day_high_font=px(27),
-                day_low_y=px(730),
+                day_high_font=font_px(px, 30, max_height=48, vertical_padding=3),
+                day_low_y=px(786),
                 day_low_h=px(42),
-                day_low_font=px(21),
+                day_low_font=font_px(px, 25, max_height=42, vertical_padding=3),
             )
         )
     return """
@@ -1826,24 +2012,24 @@ def _live_category_skin():
             zPosition="0" />
     <widget name="top_accent" position="0,0" size="{width},{accent_h}"
             font="Regular;1" backgroundColor="#8B5CF6" transparent="0" />
-    <widget name="header" position="{margin},{header_y}"
-            size="{header_w},{header_h}" font="Regular;{title_font}"
-            foregroundColor="#FFFFFF" transparent="1"
-            valign="center" halign="left" />
-    <widget name="server" position="{server_x},{header_y}"
-            size="{server_w},{header_h}" font="Regular;{server_font}"
-            foregroundColor="#22D3EE" transparent="1"
-            valign="center" halign="right" />
-    <widget name="clock" position="{clock_x},{header_y}"
-            size="{clock_w},{header_h}" font="Regular;{clock_font}"
-            foregroundColor="#FFFFFF" transparent="1"
-            valign="center" halign="right" />
+    <widget name="header" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="server" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="clock" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
     <widget name="left_panel" position="{left_x},{panel_y}"
             size="{left_w},{panel_h}" font="Regular;1"
-            backgroundColor="#0D1729" transparent="0" />
+            transparent="1" />
     <widget name="right_panel" position="{right_x},{panel_y}"
             size="{right_w},{panel_h}" font="Regular;1"
-            backgroundColor="#0D1729" transparent="0" />
+            transparent="1" />
+    <widget name="left_panel_art" position="{left_x},{panel_y}"
+            size="{left_w},{panel_h}" pixmap="{panel_art}"
+            alphatest="blend" scale="1" zPosition="1" />
+    <widget name="right_panel_art" position="{right_x},{panel_y}"
+            size="{right_w},{panel_h}" pixmap="{panel_art}"
+            alphatest="blend" scale="1" zPosition="1" />
     <widget name="left_panel_accent_cyan" position="{left_x},{panel_y}"
             size="{left_accent_w},{panel_accent_h}" font="Regular;1"
             backgroundColor="#22D3EE" transparent="0" zPosition="2" />
@@ -1856,13 +2042,11 @@ def _live_category_skin():
     <widget name="right_panel_accent_magenta" position="{right_accent_x},{panel_y}"
             size="{right_accent_w},{panel_accent_h}" font="Regular;1"
             backgroundColor="#D946EF" transparent="0" zPosition="2" />
-    <widget name="breadcrumb" position="{crumb_x},{crumb_y}"
-            size="{crumb_w},{crumb_h}" font="Regular;{crumb_font}"
-            foregroundColor="#22D3EE" transparent="1"
-            valign="center" halign="left" />
+    <widget name="breadcrumb" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
     <widget name="categories_caption" position="{crumb_x},{caption_y}"
             size="{crumb_w},{caption_h}" font="Regular;{caption_font}"
-            foregroundColor="#FFFFFF" transparent="1"
+            foregroundColor="#20DDF4" transparent="1" zPosition="5"
             valign="center" halign="left" />
     {rows}
     <widget name="list_scroll_track" position="{category_scroll_x},{category_scroll_y}"
@@ -1873,11 +2057,14 @@ def _live_category_skin():
             backgroundColor="#22D3EE" transparent="0" zPosition="6" />
     <widget name="weather_caption" position="{weather_x},{weather_caption_y}"
             size="{weather_w},{weather_caption_h}" font="Regular;{caption_font}"
-            foregroundColor="#A78BFA" transparent="1"
+            foregroundColor="#20DDF4" transparent="1" zPosition="5"
             valign="center" halign="left" />
+    <widget name="weather_header_divider" position="{weather_x},{weather_divider_y}"
+            size="{weather_w},{weather_divider_h}" font="Regular;1"
+            backgroundColor="#123C78" transparent="0" zPosition="3" />
     <widget name="weather_city" position="{weather_x},{weather_city_y}"
             size="{weather_w},{weather_city_h}" font="Regular;{weather_city_font}"
-            foregroundColor="#22D3EE" transparent="1"
+            foregroundColor="#22D3EE" transparent="1" zPosition="5"
             valign="center" halign="left" />
     <widget name="weather_today_card" position="{weather_x},{weather_card_y}"
             size="{weather_w},{weather_card_h}" font="Regular;1"
@@ -1897,19 +2084,25 @@ def _live_category_skin():
             size="{today_text_w},{weather_desc_h}" font="Regular;{weather_desc_font}"
             foregroundColor="#22D3EE" transparent="1" zPosition="4"
             valign="center" halign="left" />
+    <widget name="weather_forecast_divider" position="{weather_x},{forecast_divider_y}"
+            size="{weather_w},{weather_divider_h}" font="Regular;1"
+            backgroundColor="#123C78" transparent="0" zPosition="3" />
     {weather_days}
     <widget name="weather_metrics" position="{weather_x},{metrics_y}"
             size="{weather_w},{metrics_h}" font="Regular;{metrics_font}"
-            foregroundColor="#9FB0C8" transparent="1"
+            foregroundColor="#9FB0C8" transparent="1" zPosition="5"
             valign="center" halign="center" />
     <widget name="weather_updated" position="{weather_x},{updated_y}"
             size="{weather_w},{updated_h}" font="Regular;{updated_font}"
-            foregroundColor="#64748B" transparent="1"
+            foregroundColor="#64748B" transparent="1" zPosition="5"
             valign="center" halign="center" />
     <widget name="message" position="{crumb_x},{message_y}"
             size="{crumb_w},{message_h}" font="Regular;{message_font}"
-            foregroundColor="#9AA8BE" transparent="1"
+            foregroundColor="#9AA8BE" transparent="1" zPosition="5"
             valign="center" halign="right" />
+    <widget name="category_footer_art" position="{footer_panel_x},{footer_panel_y}"
+            size="{footer_panel_w},{footer_panel_h}" pixmap="{panel_art}"
+            alphatest="blend" scale="1" zPosition="29" />
     <widget name="footer" position="0,{footer_y}" size="{width},{footer_h}"
             font="Regular;{footer_font}" foregroundColor="#C8D2E3"
             backgroundColor="#080E1A" transparent="0"
@@ -1928,16 +2121,7 @@ def _live_category_skin():
         height=height,
         accent_h=px(5),
         margin=margin,
-        header_y=px(28),
-        header_w=px(630),
-        header_h=px(70),
-        title_font=px(37),
-        server_x=px(730),
-        server_w=px(780),
-        server_font=px(19),
-        clock_x=width - margin - px(230),
-        clock_w=px(230),
-        clock_font=px(28),
+        panel_art=theme_dir + "/category-glass-panel-r84.png",
         left_x=left_x,
         left_w=left_w,
         right_x=right_x,
@@ -1949,54 +2133,58 @@ def _live_category_skin():
         panel_accent_h=px(3),
         panel_y=panel_y,
         panel_h=panel_h,
-        crumb_x=left_x + px(38),
-        crumb_y=px(155),
-        crumb_w=left_w - px(76),
-        crumb_h=px(45),
-        crumb_font=px(19),
-        caption_y=px(200),
-        caption_h=px(48),
-        caption_font=px(23),
+        crumb_x=left_x + px(34),
+        crumb_w=left_w - px(68),
+        caption_y=px(78),
+        caption_h=px(56),
+        caption_font=font_px(px, 36, role="title", max_height=56, vertical_padding=5),
         rows="".join(rows),
-        category_scroll_x=left_x + left_w - px(18),
-        category_scroll_y=px(252),
-        category_scroll_w=px(8),
-        category_scroll_h=px(626),
+        category_scroll_x=left_x + left_w - px(15),
+        category_scroll_y=px(145),
+        category_scroll_w=px(10),
+        category_scroll_h=px(716),
         weather_x=weather_x,
         weather_w=weather_w,
-        weather_caption_y=px(158),
-        weather_caption_h=px(38),
-        weather_city_y=px(198),
-        weather_city_h=px(45),
-        weather_city_font=px(25),
-        weather_card_y=px(255),
-        weather_card_h=px(230),
-        current_icon_x=weather_x + px(18),
-        current_icon_y=px(278),
-        current_icon_w=px(185),
-        current_icon_h=px(185),
-        today_text_x=weather_x + px(225),
-        today_text_w=weather_w - px(250),
-        today_label_y=px(272),
+        weather_caption_y=px(78),
+        weather_caption_h=px(56),
+        weather_divider_y=px(139),
+        weather_divider_h=max(1, px(2)),
+        forecast_divider_y=px(550),
+        weather_city_y=px(158),
+        weather_city_h=px(52),
+        weather_city_font=font_px(px, 31, max_height=52, vertical_padding=5),
+        weather_card_y=px(235),
+        weather_card_h=px(295),
+        current_icon_x=weather_x + px(34),
+        current_icon_y=px(275),
+        current_icon_w=px(220),
+        current_icon_h=px(220),
+        today_text_x=weather_x + px(335),
+        today_text_w=weather_w - px(355),
+        today_label_y=px(263),
         today_label_h=px(35),
-        today_label_font=px(17),
-        weather_temp_y=px(302),
-        weather_temp_h=px(92),
-        weather_temp_font=px(72),
-        temp_w=weather_w - px(250),
-        weather_desc_y=px(392),
+        today_label_font=font_px(px, 23, max_height=35, vertical_padding=2),
+        weather_temp_y=px(309),
+        weather_temp_h=px(100),
+        weather_temp_font=px(91),
+        temp_w=weather_w - px(355),
+        weather_desc_y=px(426),
         weather_desc_h=px(50),
-        weather_desc_font=px(23),
+        weather_desc_font=font_px(px, 30, max_height=50, vertical_padding=4),
         weather_days="".join(weather_days),
-        metrics_y=px(815),
-        metrics_h=px(48),
-        metrics_font=px(18),
-        updated_y=px(858),
-        updated_h=px(34),
-        updated_font=px(15),
-        message_y=px(885),
-        message_h=px(42),
-        message_font=px(18),
+        metrics_y=px(844),
+        metrics_h=px(34),
+        metrics_font=font_px(px, 17, max_height=34, vertical_padding=4),
+        updated_y=px(877),
+        updated_h=px(29),
+        updated_font=font_px(px, 14, max_height=29, vertical_padding=4),
+        message_y=px(877),
+        message_h=px(35),
+        message_font=font_px(px, 17, max_height=35, vertical_padding=4),
+        footer_panel_x=px(45),
+        footer_panel_y=height - px(112),
+        footer_panel_w=px(1820),
+        footer_panel_h=px(100),
         footer_y=footer_y,
         footer_h=height - footer_y,
         footer_font=px(19),
@@ -2189,339 +2377,474 @@ def _live_category_manager_skin():
     )
 
 
-def _live_stream_skin():
-    """Unified live-channel list with a decoder-0 PIG preview."""
+def _wrap_live_summary(text, capacity):
+    """Wrap an EPG synopsis for the native Label without dropping words."""
+    capacity = max(8, int(capacity))
+    lines = []
+    current = ""
+    for word in str(text or "").split():
+        if current and _text_units(current + " " + word) <= capacity:
+            current += " " + word
+            continue
+        if current:
+            lines.append(current)
+            current = ""
+        if _text_units(word) <= capacity:
+            current = word
+            continue
+        boundaries = _grapheme_boundaries(word)
+        segment = ""
+        units = 0.0
+        for index in range(len(boundaries) - 1):
+            cluster = word[boundaries[index]:boundaries[index + 1]]
+            cluster_units = _text_units(cluster)
+            if segment and units + cluster_units > capacity:
+                lines.append(segment)
+                segment = ""
+                units = 0.0
+            segment += cluster
+            units += cluster_units
+        current = segment
+    if current:
+        lines.append(current)
+    return tuple(lines)
+
+
+def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
+    """Opaque full-screen Enigma2 live guide with one decoder-0 PIG."""
     width, height, px = _scale()
+    channel_highlight = normalize_channel_highlight(channel_highlight)
+    focus_fill, focus_edge = channel_highlight_colors(channel_highlight)
     favorite_star = FAVORITE_STAR_PATH.replace("&", "&amp;").replace(
         '"', "&quot;"
     )
-    margin = px(64)
-    footer_y = height - px(92)
-    panel_y = px(65)
-    panel_h = px(875)
-    left_x = margin
-    left_w = px(865)
-    right_x = left_x + left_w + px(26)
-    right_w = width - right_x - margin
-    row_y = tuple(128 + (index * 62) for index in range(LIVE_STREAM_PAGE_SIZE))
+
+    top_h = px(88)
+    footer_y = height - px(112)
+    panel_y = top_h
+    panel_h = max(1, footer_y - panel_y - px(8))
+    gap = px(10)
+    left_x, left_w = px(8), px(414)
+    list_x, list_w = left_x + left_w + gap, px(952)
+    right_x = list_x + list_w + gap
+    right_w = width - right_x - px(8)
+    row_x = list_x + px(14)
+    row_w = list_w - px(28)
+    row_h = px(72)
+    row_step = px(78)
+    row_first_y = px(166)
     rows = []
-    for index, y_value in enumerate(row_y):
-        y = px(y_value)
+    for index in range(LIVE_STREAM_PAGE_SIZE):
+        y = row_first_y + (index * row_step)
         rows.append(
             """
     <widget name="stream_row_bg_{index}" position="{row_x},{row_y}"
             size="{row_w},{row_h}" font="Regular;1"
-            backgroundColor="#111D31" transparent="0" zPosition="1" />
-    <widget name="stream_picon_{index}" position="{picon_x},{picon_y}"
-            size="{picon_w},{picon_h}" alphatest="blend" scale="1"
-            zPosition="6" />
+            backgroundColor="#FF000000" transparent="1" zPosition="2" />
+    <widget name="stream_row_art_{index}" position="0,0" size="1,1"
+            transparent="1" zPosition="1" />
+    <widget name="stream_focus_art_{index}" position="0,0" size="1,1"
+            transparent="1" zPosition="1" />
+    <widget name="stream_focus_{index}_fill" position="{row_x},{row_y}"
+            size="{row_w},{row_h}" font="Regular;1"
+            backgroundColor="{focus_fill}" transparent="0" zPosition="3" />
+    <widget name="stream_focus_{index}_top" position="{row_x},{row_y}"
+            size="{row_w},{edge_h}" font="Regular;1"
+            backgroundColor="{focus_edge}" transparent="0" zPosition="7" />
+    <widget name="stream_focus_{index}_bottom" position="{row_x},{bottom_y}"
+            size="{row_w},{edge_h}" font="Regular;1"
+            backgroundColor="{focus_edge}" transparent="0" zPosition="7" />
+    <widget name="stream_focus_{index}_left" position="{row_x},{row_y}"
+            size="{marker_w},{row_h}" font="Regular;1"
+            backgroundColor="{focus_edge}" transparent="0" zPosition="8" />
+    <widget name="stream_focus_{index}_right" position="{right_edge_x},{row_y}"
+            size="{edge_h},{row_h}" font="Regular;1"
+            backgroundColor="{focus_edge}" transparent="0" zPosition="7" />
+    <widget name="stream_separator_{index}" position="{row_x},{separator_y}"
+            size="{row_w},{separator_h}" font="Regular;1"
+            backgroundColor="#8A48B9ED" transparent="0" zPosition="4" />
     <widget name="stream_number_{index}" position="{number_x},{row_y}"
             size="{number_w},{row_h}" font="Regular;{number_font}"
-            foregroundColor="#D9E2F1" transparent="1" zPosition="3"
-            valign="center" halign="right" />
+            foregroundColor="#D7DEE8" transparent="1" zPosition="9"
+            valign="center" halign="left" noWrap="1" />
+    <widget name="stream_picon_{index}" position="{picon_x},{picon_y}"
+            size="{picon_w},{picon_h}" backgroundColor="transparent"
+            transparent="1" alphatest="blend" scale="1" zPosition="9" />
     <widget name="stream_name_{index}" position="{name_x},{row_y}"
             size="{name_w},{row_h}" font="Regular;{name_font}"
-            foregroundColor="#F8FAFC" transparent="1" zPosition="3"
+            foregroundColor="#F8FAFC" transparent="1" zPosition="9"
             valign="center" halign="left" noWrap="1" />
-    <widget name="stream_favorite_{index}"
-            position="{favorite_x},{favorite_y}"
-            size="{favorite_size},{favorite_size}"
-            pixmap="{favorite_star}" alphatest="blend" scale="1"
-            zPosition="6" />
-    <widget name="stream_focus_{index}_fill" position="{focus_x},{focus_y}"
-            size="{focus_w},{focus_box_h}" font="Regular;1"
-            backgroundColor="#172A45" transparent="0" zPosition="2" />
-    <widget name="stream_focus_{index}_top" position="{focus_x},{focus_y}"
-            size="{focus_w},{focus_h}" font="Regular;1"
-            backgroundColor="#8B5CF6" transparent="0" zPosition="4" />
-    <widget name="stream_focus_{index}_bottom" position="{focus_x},{focus_bottom_y}"
-            size="{focus_w},{focus_h}" font="Regular;1"
-            backgroundColor="#8B5CF6" transparent="0" zPosition="4" />
-    <widget name="stream_focus_{index}_left" position="{focus_x},{focus_y}"
-            size="{focus_h},{focus_box_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="stream_focus_{index}_right" position="{focus_right_x},{focus_y}"
-            size="{focus_h},{focus_box_h}" font="Regular;1"
-            backgroundColor="#D946EF" transparent="0" zPosition="4" />""".format(
+    <widget name="stream_program_{index}" position="{program_x},{row_y}"
+            size="{program_w},{row_h}" font="Regular;{program_font}"
+            foregroundColor="#CCD3DD" transparent="1" zPosition="9"
+            valign="center" halign="left" noWrap="1" />
+    <widget name="stream_progress_bg_{index}" position="{progress_x},{progress_y}"
+            size="{progress_w},{progress_h}" font="Regular;1"
+            backgroundColor="#222B35" transparent="0" zPosition="8" />
+    <widget name="stream_progress_fill_{index}" position="{progress_x},{progress_y}"
+            size="{progress_w},{progress_h}" font="Regular;1"
+            backgroundColor="#25A9F2" transparent="0" zPosition="9" />
+    <widget name="stream_favorite_{index}" position="{favorite_x},{favorite_y}"
+            size="{favorite_size},{favorite_size}" pixmap="{favorite_star}"
+            alphatest="blend" scale="1" zPosition="10" />""".format(
                 index=index,
-                row_x=left_x + px(30),
+                row_x=row_x,
                 row_y=y,
-                row_w=left_w - px(60),
-                row_h=px(55),
-                picon_x=left_x + px(39),
+                row_w=row_w,
+                row_h=row_h,
+                focus_fill=focus_fill,
+                focus_edge=focus_edge,
+                edge_h=max(1, px(2)),
+                bottom_y=y + row_h - max(1, px(2)),
+                marker_w=px(7),
+                right_edge_x=row_x + row_w - max(1, px(2)),
+                separator_y=y + row_h - max(1, px(1)),
+                separator_h=max(1, px(1)),
+                number_x=row_x + px(12),
+                number_w=px(102),
+                number_font=font_px(px, 27, max_height=72, vertical_padding=12),
+                picon_x=row_x + px(118),
                 picon_y=y + px(6),
-                picon_w=px(43),
-                picon_h=px(43),
-                number_x=left_x + px(88),
-                number_w=px(80),
-                number_font=px(19),
-                name_x=left_x + px(175),
-                name_w=left_w - px(270),
-                name_font=px(22),
-                favorite_x=left_x + left_w - px(72),
-                favorite_y=y + px(13),
-                favorite_size=px(28),
+                picon_w=px(110),
+                picon_h=px(60),
+                name_x=row_x + px(239),
+                name_w=px(310),
+                name_font=font_px(px, 29, role="title", max_height=72, vertical_padding=12),
+                program_x=row_x + px(560),
+                program_w=px(238),
+                program_font=font_px(px, 22, max_height=72, vertical_padding=14),
+                progress_x=row_x + px(812),
+                progress_y=y + px(31),
+                progress_w=px(96),
+                progress_h=px(10),
+                favorite_x=row_x + px(207),
+                favorite_y=y + px(5),
+                favorite_size=px(22),
                 favorite_star=favorite_star,
-                focus_x=left_x + px(28),
-                focus_y=y - px(2),
-                focus_w=left_w - px(56),
-                focus_h=px(3),
-                focus_bottom_y=y + px(54),
-                focus_box_h=px(59),
-                focus_right_x=left_x + left_w - px(31),
             )
         )
 
-    preview_x = right_x + px(24)
-    preview_w = right_w - px(48)
+    preview_x = right_x + px(14)
+    preview_w = right_w - px(28)
+    preview_h = max(1, int(round(preview_w * 9.0 / 16.0)))
+    schedule_rows = []
+    for offset, row in enumerate(("next", "third", "fourth", "fifth")):
+        y = px(610 + (offset * 74))
+        schedule_rows.append(
+            """
+    <widget name="epg_{row}_time" position="{time_x},{row_y}"
+            size="{time_w},{row_h}" font="Regular;{time_font}"
+            foregroundColor="#DCE3EB" transparent="1" zPosition="7"
+            valign="center" halign="left" noWrap="1" />
+    <widget name="epg_{row}_title" position="{title_x},{row_y}"
+            size="{title_w},{row_h}" font="Regular;{title_font}"
+            foregroundColor="#F5F7FA" transparent="1" zPosition="7"
+            valign="center" halign="left" noWrap="1" />
+    <widget name="epg_{row}_status" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />""".format(
+                row=row,
+                time_x=right_x + px(22),
+                row_y=y,
+                time_w=px(112),
+                row_h=px(56),
+                time_font=font_px(px, 22, max_height=56, vertical_padding=10),
+                title_x=right_x + px(138),
+                title_w=right_w - px(160),
+                title_font=font_px(px, 22, max_height=56, vertical_padding=10),
+            )
+        )
+
     return """
 <screen name="GTStreamListScreen" position="0,0" size="{width},{height}"
-        flags="wfNoBorder" backgroundColor="#020617">
-    <widget name="app_bg" position="0,0" size="{width},{height}"
+        flags="wfNoBorder" backgroundColor="#05080D" transparent="0">
+    <widget name="root_fill" position="0,0" size="{width},{height}"
+            font="Regular;1" backgroundColor="#05080D" transparent="0"
             zPosition="0" />
-    <widget name="top_accent" position="0,0" size="{width},{accent_h}"
-            font="Regular;1" backgroundColor="#8B5CF6" transparent="0" />
-    <widget name="header" position="0,0" size="1,1" font="Regular;1"
+    <widget name="app_bg" position="0,0" size="{width},{height}"
+            transparent="0" scale="1" zPosition="1" />
+    <widget name="top_accent" position="0,0" size="{width},{top_line_h}"
+            font="Regular;1" backgroundColor="#173547" transparent="0"
+            zPosition="2" />
+    <widget name="clock_time" position="{clock_x},{clock_y}"
+            size="{clock_w},{clock_h}" font="Regular;{clock_font}"
+            foregroundColor="#5CC7FF" transparent="1" zPosition="5"
+            valign="center" halign="center" noWrap="1" />
+    <widget name="clock_date" position="{clock_x},{date_y}"
+            size="{clock_w},{date_h}" font="Regular;{date_font}"
+            foregroundColor="#68D8FF" transparent="1" zPosition="5"
+            valign="top" halign="center" />
+    <widget name="header" position="{header_x},{header_y}"
+            size="{header_w},{header_h}" font="Regular;{header_font}"
+            foregroundColor="#74C9FF" transparent="1" zPosition="5"
+            valign="center" halign="center" noWrap="1" />
+    <widget name="screen_label" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="breadcrumb" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="left_panel" position="{left_x},{panel_y}"
+            size="{left_w},{panel_h}" font="Regular;1"
+            backgroundColor="#071019" transparent="1" zPosition="2" />
+    <widget name="center_panel" position="{list_x},{panel_y}"
+            size="{list_w},{panel_h}" font="Regular;1"
+            backgroundColor="#FF000000" transparent="1" zPosition="2" />
+    <widget name="right_panel" position="{right_x},{panel_y}"
+            size="{right_w},{panel_h}" font="Regular;1"
+            backgroundColor="#071019" transparent="1" zPosition="2" />
+    <widget name="left_panel_art" position="0,0" size="1,1"
             transparent="1" />
-    <widget name="screen_label" position="0,0" size="1,1" font="Regular;1"
+    <widget name="right_panel_art" position="0,0" size="1,1"
             transparent="1" />
-    <widget name="left_panel" position="{left_x},{panel_y}" size="{left_w},{panel_h}"
-            font="Regular;1" backgroundColor="#0D1729" transparent="0" />
-    <widget name="right_panel" position="{right_x},{panel_y}" size="{right_w},{panel_h}"
-            font="Regular;1" backgroundColor="#0D1729" transparent="0" />
     <widget name="left_panel_accent_cyan" position="{left_x},{panel_y}"
-            size="{left_accent_w},{panel_accent_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="2" />
-    <widget name="left_panel_accent_magenta" position="{left_accent_x},{panel_y}"
-            size="{left_accent_w},{panel_accent_h}" font="Regular;1"
-            backgroundColor="#D946EF" transparent="0" zPosition="2" />
+            size="{left_w},{panel_border_h}" font="Regular;1"
+            backgroundColor="#244050" transparent="0" zPosition="3" />
+    <widget name="left_panel_accent_magenta" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
     <widget name="right_panel_accent_cyan" position="{right_x},{panel_y}"
-            size="{right_accent_w},{panel_accent_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="2" />
-    <widget name="right_panel_accent_magenta" position="{right_accent_x},{panel_y}"
-            size="{right_accent_w},{panel_accent_h}" font="Regular;1"
-            backgroundColor="#D946EF" transparent="0" zPosition="2" />
-    <widget name="list_accent" position="{left_x},{panel_y}" size="{accent_w},{panel_h}"
-            font="Regular;1" backgroundColor="#8B5CF6" transparent="0" />
-    <widget name="breadcrumb" position="0,0" size="1,1" font="Regular;1"
-            transparent="1" />
-    <widget name="list_caption" position="{crumb_x},{caption_y}"
-            size="{crumb_w},{caption_h}" font="Regular;{caption_font}"
-            foregroundColor="#22D3EE" transparent="1"
+            size="{right_w},{panel_border_h}" font="Regular;1"
+            backgroundColor="#244050" transparent="0" zPosition="3" />
+    <widget name="right_panel_accent_magenta" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="list_accent" position="{list_x},{panel_y}"
+            size="{list_w},{panel_border_h}" font="Regular;1"
+            backgroundColor="#244050" transparent="0" zPosition="3" />
+    <widget name="detail_picon" position="{detail_picon_x},{detail_picon_y}"
+            size="{detail_picon_w},{detail_picon_h}"
+            backgroundColor="transparent" transparent="1" alphatest="blend"
+            scale="1" zPosition="6" />
+    <widget name="ribbon_channel" position="{detail_text_x},{channel_y}"
+            size="{detail_text_w},{channel_h}" font="Regular;{channel_font}"
+            foregroundColor="#F8FAFC" transparent="1" zPosition="6"
+            valign="center" halign="center" noWrap="1" />
+    <widget name="ribbon_divider" position="{detail_text_x},{divider_y}"
+            size="{detail_text_w},{divider_h}" font="Regular;1"
+            backgroundColor="#253440" transparent="0" zPosition="4" />
+    <widget name="ribbon_now_caption" position="{detail_text_x},{now_caption_y}"
+            size="{detail_text_w},{now_caption_h}" font="Regular;{now_caption_font}"
+            foregroundColor="#3EB8FF" transparent="1" zPosition="6"
             valign="center" halign="left" />
-    <widget name="list_caption_accent" position="{crumb_x},{caption_accent_y}"
-            size="{caption_accent_w},{caption_accent_h}" font="Regular;1"
-            backgroundColor="#A855F7" transparent="0" />
+    <widget name="ribbon_now_title" position="{detail_text_x},{now_title_y}"
+            size="{detail_text_w},{now_title_h}" font="Regular;{now_title_font}"
+            foregroundColor="#FFFFFF" transparent="1" zPosition="6"
+            valign="center" halign="left" noWrap="1" />
+    <widget name="ribbon_now_time" position="{detail_text_x},{now_time_y}"
+            size="{now_time_w},{now_time_h}" font="Regular;{now_time_font}"
+            foregroundColor="#D7DEE8" transparent="1" zPosition="6"
+            valign="center" halign="left" noWrap="1" />
+    <widget name="epg_progress" position="{progress_label_x},{now_time_y}"
+            size="{progress_label_w},{now_time_h}" font="Regular;{progress_font}"
+            foregroundColor="#D7DEE8" transparent="1" zPosition="6"
+            valign="center" halign="right" noWrap="1" />
+    <widget name="epg_progress_bg" position="{detail_text_x},{detail_progress_y}"
+            size="{detail_progress_w},{detail_progress_h}" font="Regular;1"
+            backgroundColor="#26313A" transparent="0" zPosition="5" />
+    <widget name="epg_progress_fill" position="{detail_text_x},{detail_progress_y}"
+            size="{detail_progress_w},{detail_progress_h}" font="Regular;1"
+            backgroundColor="#24A9F2" transparent="0" zPosition="6" />
+    <widget name="summary_separator" position="{detail_text_x},{summary_line_y}"
+            size="{detail_text_w},{divider_h}" font="Regular;1"
+            backgroundColor="#1D2A34" transparent="0" zPosition="4" />
+    <widget name="summary" position="{detail_text_x},{summary_y}"
+            size="{summary_w},{summary_h}" font="Regular;{summary_font}"
+            foregroundColor="#D2D9E1" transparent="1" zPosition="6"
+            valign="top" halign="left" />
+    <widget name="summary_scroll" position="{summary_scroll_x},{summary_y}"
+            size="{summary_scroll_w},{summary_h}" font="Regular;{summary_scroll_font}"
+            foregroundColor="#718091" transparent="1" zPosition="7"
+            valign="bottom" halign="right" />
+    <widget name="summary_scrollbar_track" position="{summary_bar_x},{summary_y}"
+            size="{summary_bar_w},{summary_h}" font="Regular;1"
+            backgroundColor="#172733" transparent="0" zPosition="5" />
+    <widget name="summary_scrollbar_thumb" position="{summary_bar_x},{summary_y}"
+            size="{summary_bar_w},{summary_h}" font="Regular;1"
+            backgroundColor="#2DB8F7" transparent="0" zPosition="6" />
+    <widget name="summary_caption" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="list_caption" position="{caption_x},{caption_y}"
+            size="{caption_w},{caption_h}" font="Regular;{caption_font}"
+            foregroundColor="#63C7FF" transparent="1" zPosition="6"
+            valign="center" halign="left" noWrap="1" />
+    <widget name="message" position="{message_x},{caption_y}"
+            size="{message_w},{caption_h}" font="Regular;{message_font}"
+            foregroundColor="#E1E6ED" transparent="1" zPosition="6"
+            valign="center" halign="right" noWrap="1" />
+    <widget name="list_caption_accent" position="{caption_x},{caption_line_y}"
+            size="{caption_line_w},{divider_h}" font="Regular;1"
+            backgroundColor="#26343F" transparent="0" zPosition="5" />
     {rows}
-    <widget name="list_scroll_track" position="{list_scroll_x},{list_scroll_y}"
+    <widget name="list_scroll_track" position="{list_scroll_x},{row_first_y}"
             size="{list_scroll_w},{list_scroll_h}" font="Regular;1"
-            backgroundColor="#26344E" transparent="0" zPosition="5" />
-    <widget name="list_scroll_thumb" position="{list_scroll_x},{list_scroll_y}"
+            backgroundColor="#1C2A35" transparent="0" zPosition="8" />
+    <widget name="list_scroll_thumb" position="{list_scroll_x},{row_first_y}"
             size="{list_scroll_w},{list_scroll_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="6" />
-    <widget name="epg_ribbon" position="{preview_x},{ribbon_y}"
-            size="{preview_w},{ribbon_h}" font="Regular;1"
-            backgroundColor="#0F1D33" transparent="0" zPosition="1" />
-    <widget name="ribbon_now_caption" position="{ribbon_now_x},{ribbon_caption_y}"
-            size="{ribbon_caption_w},{ribbon_caption_h}" font="Regular;{ribbon_caption_font}"
-            foregroundColor="#22D3EE" transparent="1"
-            valign="center" halign="left" zPosition="3" />
-    <widget name="ribbon_channel" position="{ribbon_now_x},{ribbon_channel_y}"
-            size="{ribbon_channel_w},{ribbon_title_h}" font="Regular;{ribbon_channel_font}"
-            foregroundColor="#A855F7" transparent="1"
-            valign="center" halign="left" noWrap="1" zPosition="3" />
-    <widget name="ribbon_now_title" position="{ribbon_title_x},{ribbon_title_y}"
-            size="{ribbon_title_w},{ribbon_title_h}" font="Regular;{ribbon_title_font}"
-            foregroundColor="#F8FAFC" transparent="1"
-            valign="center" halign="left" noWrap="1" zPosition="3" />
-    <widget name="ribbon_now_time" position="{ribbon_time_x},{ribbon_time_y}"
-            size="{ribbon_time_w},{ribbon_time_h}" font="Regular;{ribbon_time_font}"
-            foregroundColor="#CBD5E1" transparent="1"
-            valign="center" halign="left" zPosition="3" />
-    <widget name="epg_progress_bg" position="{progress_x},{progress_y}"
-            size="{progress_w},{progress_h}" font="Regular;1"
-            backgroundColor="#334155" transparent="0" zPosition="2" />
-    <widget name="epg_progress_fill" position="{progress_x},{progress_y}"
-            size="{progress_w},{progress_h}" font="Regular;1"
-            backgroundColor="#A855F7" transparent="0" zPosition="3" />
-    <widget name="epg_progress" position="{progress_x},{progress_text_y}"
-            size="{progress_w},{progress_text_h}" font="Regular;{progress_font}"
-            foregroundColor="#C084FC" transparent="1"
-            valign="center" halign="right" zPosition="4" />
-    <widget name="ribbon_divider" position="{ribbon_divider_x},{ribbon_divider_y}"
-            size="{ribbon_divider_w},{ribbon_divider_h}" font="Regular;1"
-            backgroundColor="#334155" transparent="0" zPosition="2" />
-    <widget name="ribbon_next_caption" position="{ribbon_next_x},{ribbon_next_caption_y}"
-            size="{ribbon_caption_w},{ribbon_caption_h}" font="Regular;{ribbon_caption_font}"
-            foregroundColor="#D946EF" transparent="1"
-            valign="center" halign="left" zPosition="3" />
-    <widget name="ribbon_clock" position="{ribbon_clock_x},{ribbon_channel_y}"
-            size="{ribbon_clock_w},{ribbon_caption_h}" font="Regular;{ribbon_clock_font}"
-            foregroundColor="#94A3B8" transparent="1"
-            valign="center" halign="right" zPosition="3" />
-    <widget name="ribbon_next_title" position="{ribbon_next_title_x},{ribbon_next_title_y}"
-            size="{ribbon_next_title_w},{ribbon_next_title_h}" font="Regular;{ribbon_next_title_font}"
-            foregroundColor="#F8FAFC" transparent="1"
-            valign="center" halign="left" noWrap="1" zPosition="3" />
-    <widget name="ribbon_next_time" position="{ribbon_next_time_x},{ribbon_next_time_y}"
-            size="{ribbon_time_w},{ribbon_next_time_h}" font="Regular;{ribbon_time_font}"
-            foregroundColor="#CBD5E1" transparent="1"
-            valign="center" halign="left" zPosition="3" />
+            backgroundColor="#32B8F2" transparent="0" zPosition="9" />
     <widget name="preview_frame" position="{preview_frame_x},{preview_frame_y}"
             size="{preview_frame_w},{preview_frame_h}" font="Regular;1"
-            backgroundColor="#26344E" transparent="0" zPosition="1" />
-    <widget name="preview_video" position="{preview_video_x},{preview_video_y}"
-            size="{preview_video_w},{preview_video_h}"
-            backgroundColor="transparent" zPosition="2" />
-    <widget name="preview_mask" position="{preview_video_x},{preview_video_y}"
-            size="{preview_video_w},{preview_video_h}" font="Regular;1"
-            backgroundColor="#07101F" transparent="0" zPosition="4" />
-    <widget name="preview_hint" position="{preview_video_x},{preview_hint_y}"
-            size="{preview_video_w},{preview_hint_h}" font="Regular;{preview_hint_font}"
-            foregroundColor="#94A3B8" transparent="1"
-            valign="bottom" halign="center" zPosition="9" />
-    <widget name="epg_panel" position="{preview_x},{epg_y}"
-            size="{preview_w},{epg_h}" font="Regular;1"
-            backgroundColor="#0F1D33" transparent="0" zPosition="1" />
-    <widget name="epg_title" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#FFFFFF" transparent="1" valign="center" halign="left" zPosition="3" />
-    <widget name="epg_now_time" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#E2E8F0" transparent="1" valign="center" halign="left" zPosition="3" />
-    <widget name="epg_now_title" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#F8FAFC" transparent="1" valign="center" halign="left" zPosition="3" />
-    <widget name="epg_now_status" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#A855F7" transparent="1" valign="center" halign="right" zPosition="3" />
-    <widget name="epg_next_time" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#E2E8F0" transparent="1" valign="center" halign="left" zPosition="3" />
-    <widget name="epg_next_title" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#F8FAFC" transparent="1" valign="center" halign="left" zPosition="3" />
-    <widget name="epg_next_status" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#94A3B8" transparent="1" valign="center" halign="right" zPosition="3" />
-    <widget name="epg_third_time" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#E2E8F0" transparent="1" valign="center" halign="left" zPosition="3" />
-    <widget name="epg_third_title" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#F8FAFC" transparent="1" valign="center" halign="left" zPosition="3" />
-    <widget name="epg_third_status" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#64748B" transparent="1" valign="center" halign="right" zPosition="3" />
-    <widget name="epg_fourth_time" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#E2E8F0" transparent="1" valign="center" halign="left" zPosition="3" />
-    <widget name="epg_fourth_title" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#F8FAFC" transparent="1" valign="center" halign="left" zPosition="3" />
-    <widget name="epg_fourth_status" position="0,0"
-            size="1,1" font="Regular;1"
-            foregroundColor="#64748B" transparent="1" valign="center" halign="right" zPosition="3" />
-    <widget name="summary_caption" position="{summary_x},{summary_caption_y}"
-            size="{epg_inner_w},{summary_caption_h}" font="Regular;{summary_caption_font}"
-            foregroundColor="#38BDF8" transparent="1" valign="center" halign="left" zPosition="3" />
-    <widget name="summary" position="{summary_x},{summary_y}"
-            size="{summary_w},{summary_h}" font="Regular;{summary_font}"
-            foregroundColor="#CBD5E1" transparent="1" valign="top" halign="left" zPosition="3" />
-    <widget name="summary_scroll" position="{scroll_x},{summary_y}"
-            size="{scroll_w},{summary_h}" font="Regular;{scroll_font}"
-            foregroundColor="#94A3B8" transparent="1" valign="center" halign="center" zPosition="3" />
-    <widget name="output_badge" position="{output_badge_x},{badge_y}"
-            size="{output_badge_w},{badge_h}" font="Regular;{badge_font}"
-            foregroundColor="#CBD5E1" backgroundColor="#111D31" transparent="0"
-            valign="center" halign="center" zPosition="3" />
-    <widget name="engine_badge" position="{engine_badge_x},{badge_y}"
-            size="{engine_badge_w},{badge_h}" font="Regular;{badge_font}"
-            foregroundColor="#CBD5E1" backgroundColor="#111D31" transparent="0"
-            valign="center" halign="center" zPosition="3" />
-    <widget name="message" position="{message_x},{message_y}" size="{message_w},{message_h}"
-            font="Regular;{message_font}" foregroundColor="#9AA8BE" transparent="1"
-            valign="center" halign="right" />
+            backgroundColor="#3C718A" transparent="0" zPosition="4" />
+    <widget name="preview_video" position="{preview_x},{preview_y}"
+            size="{preview_w},{preview_h}" backgroundColor="transparent"
+            zPosition="5" />
+    <widget name="preview_mask" position="{preview_x},{preview_y}"
+            size="{preview_w},{preview_h}" font="Regular;1"
+            backgroundColor="#03070B" transparent="0" zPosition="7" />
+    <widget name="preview_hint" position="{preview_x},{preview_hint_y}"
+            size="{preview_w},{preview_hint_h}" font="Regular;{preview_hint_font}"
+            foregroundColor="#8092A3" transparent="1" zPosition="9"
+            valign="center" halign="center" />
+    <widget name="epg_now_time" position="{right_now_time_x},{right_now_y}"
+            size="{right_now_time_w},{right_now_h}" font="Regular;{right_now_font}"
+            foregroundColor="#E3E8EE" transparent="1" zPosition="6"
+            valign="center" halign="left" noWrap="1" />
+    <widget name="epg_now_title" position="{right_now_title_x},{right_now_y}"
+            size="{right_now_title_w},{right_now_h}" font="Regular;{right_now_font}"
+            foregroundColor="#FFFFFF" transparent="1" zPosition="6"
+            valign="center" halign="left" noWrap="1" />
+    <widget name="epg_now_status" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="epg_panel" position="{right_inner_x},{right_sep_y}"
+            size="{right_inner_w},{divider_h}" font="Regular;1"
+            backgroundColor="#26343F" transparent="0" zPosition="4" />
+    <widget name="epg_title" position="{right_inner_x},{right_title_y}"
+            size="{right_inner_w},{right_title_h}" font="Regular;{right_title_font}"
+            foregroundColor="#49BFFF" transparent="1" zPosition="6"
+            valign="center" halign="left" />
+    {schedule_rows}
+    <widget name="right_separator_bottom" position="{right_inner_x},{right_bottom_y}"
+            size="{right_inner_w},{divider_h}" font="Regular;1"
+            backgroundColor="#26343F" transparent="0" zPosition="4" />
+    <widget name="epg_ribbon" position="0,0" size="1,1" font="Regular;1"
+            transparent="1" />
+    <widget name="ribbon_next_caption" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="ribbon_clock" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="ribbon_next_title" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="ribbon_next_time" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="summary_panel_art" position="0,0" size="1,1"
+            transparent="1" />
+    <widget name="output_badge" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="engine_badge" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="footer_backdrop" position="0,{footer_backdrop_y}"
+            size="{width},{footer_backdrop_h}" font="Regular;1"
+            backgroundColor="#FF000000" transparent="1" zPosition="2" />
     <widget name="footer" position="0,{footer_y}" size="{width},{footer_h}"
-            font="Regular;{footer_font}" foregroundColor="#C8D2E3"
-            backgroundColor="#080E1A" transparent="0" valign="center" halign="center" />
-    <widget name="content_panel" position="0,0" size="1,1" font="Regular;1" transparent="1" />
-    <widget name="items" position="0,0" size="1,1" font="Regular;1" transparent="1" />
+            font="Regular;1" backgroundColor="#FF000000" transparent="1" />
+    <widget name="content_panel" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="items" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
 </screen>
 """.format(
-        width=width, height=height,
-        accent_h=px(5),
-        left_x=left_x, left_w=left_w, right_x=right_x, right_w=right_w,
-        left_accent_w=int(left_w / 2),
-        left_accent_x=left_x + int(left_w / 2),
-        right_accent_w=int(right_w / 2),
-        right_accent_x=right_x + int(right_w / 2),
-        panel_accent_h=px(3),
-        panel_y=panel_y, panel_h=panel_h, accent_w=px(7),
-        crumb_x=left_x + px(46), crumb_w=left_w - px(80),
-        caption_y=px(76), caption_h=px(38), caption_font=px(25),
-        caption_accent_y=px(116), caption_accent_w=px(190),
-        caption_accent_h=px(3), rows="".join(rows),
-        list_scroll_x=left_x + left_w - px(18),
-        list_scroll_y=px(128), list_scroll_w=px(8), list_scroll_h=px(737),
-        ribbon_y=px(65), ribbon_h=px(112),
-        ribbon_now_x=preview_x + px(18), ribbon_caption_y=px(96),
-        ribbon_caption_w=px(95), ribbon_caption_h=px(28),
-        ribbon_caption_font=px(18), ribbon_channel_w=preview_w - px(150),
-        ribbon_channel_font=px(18), ribbon_channel_y=px(68),
-        ribbon_title_y=px(96),
-        ribbon_title_h=px(28), ribbon_title_x=preview_x + px(255),
-        ribbon_title_w=preview_w - px(280), ribbon_title_font=px(21),
-        ribbon_time_x=preview_x + px(120), ribbon_time_y=px(96),
-        ribbon_time_w=px(120),
-        ribbon_time_h=px(28), ribbon_time_font=px(18),
-        ribbon_divider_x=preview_x + px(18),
-        ribbon_divider_y=px(127), ribbon_divider_w=preview_w - px(36),
-        ribbon_divider_h=px(1),
-        ribbon_next_x=preview_x + px(18),
-        ribbon_next_w=preview_w - px(36),
-        ribbon_clock_x=preview_x + preview_w - px(105),
-        ribbon_clock_w=px(85), ribbon_clock_font=px(18),
-        ribbon_next_caption_y=px(136),
-        ribbon_next_title_x=preview_x + px(255),
-        ribbon_next_title_w=preview_w - px(280),
-        ribbon_next_title_y=px(136), ribbon_next_title_h=px(28),
-        ribbon_next_title_font=px(20),
-        ribbon_next_time_x=preview_x + px(120), ribbon_next_time_y=px(136),
-        ribbon_next_time_h=px(28),
-        preview_frame_x=preview_x + px(18), preview_frame_y=px(185),
-        preview_frame_w=preview_w - px(36), preview_frame_h=px(463),
-        preview_video_x=preview_x + px(24), preview_video_y=px(190),
-        preview_video_w=preview_w - px(48), preview_video_h=px(453),
-        preview_hint_y=px(553), preview_hint_h=px(60),
-        preview_hint_font=px(19),
-        preview_x=preview_x, preview_w=preview_w,
-        epg_y=px(690), epg_h=px(178),
-        epg_inner_x=preview_x + px(285), epg_inner_w=preview_w - px(315),
-        epg_title_y=px(655), epg_title_h=px(35), epg_title_font=px(23),
-        epg_now_y=px(220), epg_next_y=px(705), epg_third_y=px(755),
-        epg_fourth_y=px(805), epg_time_w=px(110), epg_row_h=px(40),
-        epg_font=px(21), epg_title_x=preview_x + px(405),
-        epg_name_w=preview_w - px(560),
-        epg_status_x=preview_x + preview_w - px(145), epg_status_w=px(120),
-        epg_status_font=px(18),
-        upcoming_time_x=preview_x + px(26),
-        upcoming_title_x=preview_x + px(145),
-        upcoming_status_x=preview_x + preview_w - px(145),
-        progress_x=preview_x + px(24), progress_y=px(655),
-        progress_w=preview_w - px(48), progress_h=px(9),
-        progress_text_y=px(667), progress_text_h=px(23), progress_font=px(17),
-        summary_x=preview_x + px(24), summary_caption_y=px(700),
-        summary_caption_h=px(27), summary_caption_font=px(23),
-        summary_y=px(738), summary_w=preview_w - px(90), summary_h=px(112),
-        summary_font=px(24), scroll_x=preview_x + preview_w - px(62),
-        scroll_w=px(42), scroll_font=px(23),
-        output_badge_x=preview_x + px(24), output_badge_w=px(85),
-        engine_badge_x=preview_x + px(130), engine_badge_w=px(245),
-        badge_y=px(895), badge_h=px(36), badge_font=px(18),
-        message_x=left_x + px(40), message_y=px(870), message_w=left_w - px(80),
-        message_h=px(42), message_font=px(18), footer_y=footer_y,
-        footer_h=height - footer_y, footer_font=px(18),
+        width=width,
+        height=height,
+        top_line_h=max(1, px(2)),
+        clock_x=px(28),
+        clock_y=px(5),
+        clock_w=px(300),
+        clock_h=px(38),
+        clock_font=font_px(px, 29, role="title", max_height=38, vertical_padding=3),
+        date_y=px(40),
+        date_h=px(46),
+        date_font=font_px(px, 17, max_height=46, vertical_padding=3),
+        header_x=px(390),
+        header_y=px(8),
+        header_w=px(1140),
+        header_h=px(68),
+        header_font=font_px(px, 38, role="title", max_height=68, vertical_padding=8),
+        left_x=left_x,
+        left_w=left_w,
+        list_x=list_x,
+        list_w=list_w,
+        right_x=right_x,
+        right_w=right_w,
+        panel_y=panel_y,
+        panel_h=panel_h,
+        panel_border_h=max(1, px(2)),
+        detail_picon_x=left_x + px(34),
+        detail_picon_y=px(112),
+        detail_picon_w=left_w - px(68),
+        detail_picon_h=px(226),
+        detail_text_x=left_x + px(26),
+        detail_text_w=left_w - px(52),
+        channel_y=px(342),
+        channel_h=px(64),
+        channel_font=font_px(px, 30, role="title", max_height=64, vertical_padding=9),
+        divider_y=px(414),
+        divider_h=max(1, px(2)),
+        now_caption_y=px(426),
+        now_caption_h=px(43),
+        now_caption_font=font_px(px, 25, role="title", max_height=43, vertical_padding=7),
+        now_title_y=px(470),
+        now_title_h=px(57),
+        now_title_font=font_px(px, 29, role="title", max_height=57, vertical_padding=8),
+        now_time_y=px(531),
+        now_time_w=px(232),
+        now_time_h=px(42),
+        now_time_font=font_px(px, 21, max_height=42, vertical_padding=7),
+        progress_label_x=left_x + left_w - px(136),
+        progress_label_w=px(110),
+        progress_font=font_px(px, 20, max_height=42, vertical_padding=7),
+        detail_progress_y=px(578),
+        detail_progress_w=left_w - px(52),
+        detail_progress_h=px(10),
+        summary_line_y=px(612),
+        summary_y=px(633),
+        summary_w=left_w - px(64),
+        summary_h=px(282),
+        summary_font=font_px(px, 23, max_height=282, vertical_padding=5),
+        summary_scroll_x=left_x + left_w - px(52),
+        summary_scroll_w=px(22),
+        summary_scroll_font=font_px(px, 14, max_height=282, vertical_padding=4),
+        summary_bar_x=left_x + left_w - px(20),
+        summary_bar_w=px(5),
+        caption_x=list_x + px(22),
+        caption_y=px(98),
+        caption_w=px(560),
+        caption_h=px(55),
+        caption_font=font_px(px, 34, role="title", max_height=55, vertical_padding=7),
+        message_x=list_x + list_w - px(252),
+        message_w=px(225),
+        message_font=font_px(px, 26, max_height=55, vertical_padding=8),
+        caption_line_y=px(157),
+        caption_line_w=list_w - px(44),
+        rows="".join(rows),
+        row_first_y=row_first_y,
+        list_scroll_x=list_x + list_w - px(9),
+        list_scroll_w=px(4),
+        list_scroll_h=(LIVE_STREAM_PAGE_SIZE * row_step) - px(6),
+        preview_frame_x=preview_x - px(3),
+        preview_frame_y=px(111),
+        preview_frame_w=preview_w + px(6),
+        preview_frame_h=preview_h + px(6),
+        preview_x=preview_x,
+        preview_y=px(114),
+        preview_w=preview_w,
+        preview_h=preview_h,
+        preview_hint_y=px(114) + max(1, preview_h - px(72)),
+        preview_hint_h=px(58),
+        preview_hint_font=font_px(px, 19, max_height=58, vertical_padding=8),
+        right_now_time_x=right_x + px(22),
+        right_now_y=px(405),
+        right_now_time_w=px(105),
+        right_now_h=px(64),
+        right_now_font=font_px(px, 23, max_height=64, vertical_padding=10),
+        right_now_title_x=right_x + px(132),
+        right_now_title_w=right_w - px(154),
+        right_inner_x=right_x + px(20),
+        right_inner_w=right_w - px(40),
+        right_sep_y=px(482),
+        right_title_y=px(501),
+        right_title_h=px(72),
+        right_title_font=font_px(px, 29, role="title", max_height=72, vertical_padding=12),
+        schedule_rows="".join(schedule_rows),
+        right_bottom_y=px(918),
+        footer_backdrop_y=footer_y - px(5),
+        footer_backdrop_h=height - footer_y + px(5),
+        footer_y=footer_y,
+        footer_h=height - footer_y,
     )
 
 
@@ -2532,6 +2855,49 @@ def _player_skin():
         flags="wfNoBorder" backgroundColor="#FF000000" transparent="1"
         zPosition="-1" />
 """.format(width=width, height=height)
+
+
+def _minute_seek_skin():
+    """Compact opaque fallback when the image has no native input dialog."""
+    screen_width, screen_height, px = _scale()
+    width, height = px(910), px(380)
+    x, y = (screen_width - width) // 2, (screen_height - height) // 2
+    return """
+<screen name="GTMinuteSeekScreen" position="{x},{y}" size="{w},{h}"
+        flags="wfNoBorder" backgroundColor="#101A2D"
+        zPosition="110">
+    <widget name="panel" position="0,0" size="{w},{h}"
+            font="Regular;1" backgroundColor="#3008131F" transparent="0" zPosition="0" />
+    <widget name="accent" position="0,0" size="{w},{accent}"
+            font="Regular;1" backgroundColor="#8B5CF6" transparent="0" zPosition="1" />
+    <widget name="title" position="{pad},{title_y}" size="{inner},{title_h}"
+            font="Regular;{title_font}" foregroundColor="#FFFFFF"
+            transparent="1" zPosition="2" halign="left" valign="center" />
+    <widget name="input_bg" position="{pad},{input_y}" size="{inner},{input_h}"
+            font="Regular;1" backgroundColor="#14294A" transparent="0" zPosition="1" />
+    <widget name="minutes" position="{input_x},{input_y}" size="{digits_w},{input_h}"
+            font="Regular;{digit_font}" foregroundColor="#FFFFFF"
+            transparent="1" zPosition="2" halign="left" valign="center" />
+    <widget name="unit" position="{unit_x},{input_y}" size="{unit_w},{input_h}"
+            font="Regular;{unit_font}" foregroundColor="#22D3EE"
+            transparent="1" zPosition="2" halign="right" valign="center" />
+    <widget name="position" position="{pad},{position_y}" size="{inner},{position_h}"
+            font="Regular;{position_font}" foregroundColor="#CBD5E1"
+            transparent="1" zPosition="2" halign="center" valign="center" />
+    <widget name="footer" position="{pad},{footer_y}" size="{inner},{footer_h}"
+            font="Regular;{footer_font}" foregroundColor="#CBD5E1"
+            transparent="1" zPosition="2" halign="center" valign="center" />
+</screen>
+""".format(
+        x=x, y=y, w=width, h=height, accent=px(4),
+        pad=px(42), inner=width - px(84),
+        title_y=px(32), title_h=px(65), title_font=px(38),
+        input_y=px(112), input_h=px(105), input_x=px(64),
+        digits_w=px(560), digit_font=px(70),
+        unit_x=width - px(255), unit_w=px(190), unit_font=px(28),
+        position_y=px(239), position_h=px(48), position_font=px(26),
+        footer_y=px(319), footer_h=px(45), footer_font=px(22),
+    )
 
 
 def _cinematic_scroll_geometries(width, height, px):
@@ -2548,7 +2914,8 @@ def _cinematic_scroll_geometries(width, height, px):
     rail_x = px(365)
     poster_geometry = (
         rail_x,
-        height - px(90) - px(18),
+        # Keep the 6px track above the stacked footer keys, below the cards.
+        height - px(90) - px(28),
         width - rail_x,
         px(6),
     )
@@ -2573,7 +2940,8 @@ def _movie_browser_skin(cinematic=False):
         # meet on exactly the same physical column at every resolution.
         category_panel_x = 0
         category_panel_w = hero_x
-        category_h = footer_y - category_y - px(4)
+        # End the panel at the poster-card baseline, above the remote guide.
+        category_h = footer_y - category_y - px(30)
         category_row_h = px(CINEMATIC_CATEGORY_ROW_HEIGHT)
         category_list_y = category_y + px(54)
         category_scroll_h = (
@@ -2790,7 +3158,7 @@ def _movie_browser_skin(cinematic=False):
 
     <widget name="movie_category_panel" position="{category_panel_x},{category_y}"
             size="{category_panel_w},{category_h}" font="Regular;1"
-            backgroundColor="#0D1729" transparent="0" />
+            transparent="1" />
     <widget name="movie_category_accent" position="{category_panel_x},{category_y}"
             size="{category_panel_w},{line_h}" font="Regular;1"
             backgroundColor="#22D3EE" transparent="0" zPosition="2" />
@@ -2929,7 +3297,8 @@ def _movie_browser_skin(cinematic=False):
             message_w=category_w - px(28),
             message_h=max(
                 px(24),
-                footer_y - category_list_y - category_scroll_h - px(8),
+                category_y + category_h
+                - category_list_y - category_scroll_h - px(4),
             ),
             message_font=px(17),
             rail_x=rail_x,
@@ -2937,7 +3306,7 @@ def _movie_browser_skin(cinematic=False):
             rail_caption_y=rail_caption_y,
             rail_caption_h=px(36),
             poster_tiles="".join(poster_tiles),
-            scroll_y=footer_y - px(18),
+            scroll_y=_cinematic_scroll_geometries(width, height, px)[1][1],
             scroll_h=px(6),
         )
     footer_y = height - px(82)
@@ -3398,7 +3767,8 @@ def _series_browser_skin(cinematic=False):
         # The paint now ends exactly where the common hero begins.
         category_panel_x = 0
         category_panel_w = hero_x
-        category_h = footer_y - category_y - px(4)
+        # Match the Movie panel baseline and leave the remote guide clear.
+        category_h = footer_y - category_y - px(30)
         category_row_h = px(CINEMATIC_CATEGORY_ROW_HEIGHT)
         category_list_y = category_y + px(54)
         category_scroll_h = (
@@ -3635,7 +4005,7 @@ def _series_browser_skin(cinematic=False):
 
     <widget name="series_category_panel" position="{category_panel_x},{category_y}"
             size="{category_panel_w},{category_h}" font="Regular;1"
-            backgroundColor="#0D1729" transparent="0" />
+            transparent="1" />
     <widget name="series_category_accent"
             position="{category_panel_x},{category_y}"
             size="{category_panel_w},{line_h}" font="Regular;1"
@@ -3774,7 +4144,8 @@ def _series_browser_skin(cinematic=False):
             message_w=category_w - px(28),
             message_h=max(
                 px(24),
-                footer_y - category_list_y - category_scroll_h - px(8),
+                category_y + category_h
+                - category_list_y - category_scroll_h - px(4),
             ),
             message_font=px(17),
             rail_x=rail_x,
@@ -3782,7 +4153,7 @@ def _series_browser_skin(cinematic=False):
             rail_caption_y=rail_caption_y,
             rail_caption_h=px(36),
             series_tiles="".join(series_tiles),
-            scroll_y=footer_y - px(18),
+            scroll_y=_cinematic_scroll_geometries(width, height, px)[1][1],
             scroll_h=px(6),
         )
     footer_y = height - px(85)
@@ -4410,12 +4781,35 @@ class GTAsyncListScreen(Screen):
             "_footer_layout_alternate_items",
             (),
         )
+        footer_stacked = bool(getattr(self, "_footer_layout_stacked", False))
+        footer_transparent_panel = bool(
+            getattr(self, "_footer_transparent_panel", bool(frameless_footer))
+        )
+        footer_show_dividers = bool(
+            getattr(
+                self,
+                "_footer_show_dividers",
+                not bool(frameless_footer),
+            )
+        )
         self.skin = decorate_remote_footer(
             self.skin,
             footer_items,
             alternate_items=footer_alternate_items,
-            transparent_panel=bool(frameless_footer),
-            show_dividers=not bool(frameless_footer),
+            transparent_panel=footer_transparent_panel,
+            show_dividers=footer_show_dividers,
+            skin_fonts_scaled=(
+                screen_name == "GTStreamListScreen"
+                or (
+                    screen_name == "GTContentBrowserScreen"
+                    and getattr(self, "content_type", None) == "live"
+                )
+            ),
+            stacked=footer_stacked,
+            panel_height=getattr(self, "_footer_panel_height", None),
+            bottom_padding=getattr(self, "_footer_bottom_padding", None),
+            side_padding=getattr(self, "_footer_side_padding", None),
+            content_y_offset=getattr(self, "_footer_content_y_offset", 0),
         )
         if not getattr(self, "_list_scroll_geometry", None):
             width, height, px = _scale()
@@ -4426,9 +4820,28 @@ class GTAsyncListScreen(Screen):
                 px(205),
                 px(8),
                 px(650),
-            )
+        )
         Screen.__init__(self, session)
-        attach_background(self, "app_bg", APP_BACKGROUND_PATH)
+        screen_background_path = str(
+            getattr(self, "_screen_background_path", "") or ""
+        ).strip()
+        if screen_background_path:
+            # A screen-specific opaque theme sits above the solid fallback.
+            # The fallback still blocks the DVB plane until decoding finishes.
+            attach_background(
+                self,
+                "app_bg",
+                screen_background_path,
+                stretch_to_widget=True,
+            )
+        elif getattr(self, "_opaque_background", False):
+            # Live TV owns a solid full-screen surface.  Do not even decode
+            # the shared wallpaper for this screen: besides matching the
+            # native guide design, this removes one full-HD pixmap from RAM.
+            self["app_bg"] = Pixmap()
+            self["app_bg"].hide()
+        else:
+            attach_background(self, "app_bg", APP_BACKGROUND_PATH)
         # Screen is dict-like and OpenATV calls self.items() while destroying
         # its GUI. Never shadow that method with the loaded content list.
         self._entries = []
@@ -4461,6 +4874,7 @@ class GTAsyncListScreen(Screen):
             self,
             footer_items,
             slot_count=max(len(footer_items), len(footer_alternate_items)),
+            stacked=footer_stacked,
         )
         self["actions"] = ActionMap(
             ["OkCancelActions", "DirectionActions", "ColorActions"],
@@ -4774,14 +5188,20 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._hidden = set(self._stored_preferences.hidden)
         current_ids = set(self._current_ids())
         self._hidden.intersection_update(current_ids)
+        # Carry old Filter Search results into the editable hidden set. Once
+        # saved, only explicit hidden IDs remain and the retired rules go away.
+        if (
+            self._stored_preferences.include_terms
+            or self._stored_preferences.exclude_terms
+        ):
+            allowed, unused_excluded = category_filter_ids(
+                self._provider_entries,
+                self._stored_preferences.include_terms,
+                self._stored_preferences.exclude_terms,
+            )
+            self._hidden.update(current_ids.difference(allowed))
         self._initial_ids = tuple(self._current_ids())
         self._initial_hidden = frozenset(self._hidden)
-        self._include_terms = tuple(self._stored_preferences.include_terms)
-        self._exclude_terms = tuple(self._stored_preferences.exclude_terms)
-        self._initial_include_terms = self._include_terms
-        self._initial_exclude_terms = self._exclude_terms
-        self._filter_excluded = set()
-        self._update_filter_excluded()
         self._provider_ids = tuple(
             self._entry_id(entry)
             for entry in self._provider_entries
@@ -4808,7 +5228,7 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
                 "rightRepeated": self.page_down,
                 "yellow": self.start_move,
                 "red": self.toggle_mark,
-                "menu": self.open_filter_search,
+                "menu": self.hide_all_categories,
                 "green": self.save_and_close,
                 "blue": self.restore_defaults,
             },
@@ -4873,7 +5293,6 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
                 hidden = bool(
                     category_id and (
                         category_id in self._hidden
-                        or category_id in self._filter_excluded
                     )
                 )
                 state_text = localized_upper(_("Hidden")) if hidden else ""
@@ -4918,7 +5337,7 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
                 else:
                     focus.hide()
         self["items"].setText("\n".join(plain_lines))
-        hidden_count = len(self._hidden.union(self._filter_excluded))
+        hidden_count = len(self._hidden)
         visible_count = len(self._entries) - hidden_count
         status = "{}: {}  |  {}: {}  |  {}/{}".format(
             _("Visible"),
@@ -5018,13 +5437,17 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
             return
         if category_id in self._hidden:
             self._hidden.discard(category_id)
-            self._notice = (
-                _("Filter Search") if category_id in self._filter_excluded
-                else _("Category shown.")
-            )
+            self._notice = _("Category shown.")
         else:
             self._hidden.add(category_id)
             self._notice = _("Category hidden.")
+        self._refresh()
+
+    def hide_all_categories(self):
+        if self._move_mode:
+            return
+        self._hidden.update(self._current_ids())
+        self._notice = _("Category hidden.")
         self._refresh()
 
     def start_move(self):
@@ -5108,9 +5531,6 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._entries = list(self._provider_entries)
         self._hidden.clear()
         self._marked.clear()
-        self._include_terms = ()
-        self._exclude_terms = ()
-        self._update_filter_excluded()
         self._reset_requested = True
         self._select_category_id(selected_id)
         self._notice = _("Default order restored. Press GREEN to save.")
@@ -5127,8 +5547,8 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         return bool(
             tuple(self._current_ids()) != self._initial_ids
             or frozenset(self._hidden) != self._initial_hidden
-            or self._include_terms != self._initial_include_terms
-            or self._exclude_terms != self._initial_exclude_terms
+            or self._stored_preferences.include_terms
+            or self._stored_preferences.exclude_terms
         )
 
     def save_and_close(self):
@@ -5220,8 +5640,6 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
             self._reset_requested
             and tuple(ordered_ids) == self._provider_ids
             and not hidden_ids
-            and not self._include_terms
-            and not self._exclude_terms
         ):
             saved = self.category_store.reset(self.account_scope)
         else:
@@ -5229,8 +5647,8 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
                 self.account_scope,
                 ordered_ids,
                 hidden_ids,
-                include_terms=self._include_terms,
-                exclude_terms=self._exclude_terms,
+                include_terms=(),
+                exclude_terms=(),
             )
         if not saved:
             self._notice = _(
@@ -5240,7 +5658,7 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
             return
         self.close(
             True, ordered_ids, hidden_ids,
-            self._include_terms, self._exclude_terms,
+            (), (),
         )
 
     def toggle_mark(self):
@@ -5259,43 +5677,7 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
             self._notice = ""
         self._refresh()
 
-    def _update_filter_excluded(self):
-        allowed, unused_excluded = category_filter_ids(
-            self._provider_entries, self._include_terms, self._exclude_terms
-        )
-        self._filter_excluded = set(
-            self._entry_id(entry) for entry in self._provider_entries
-            if self._entry_id(entry)
-        ).difference(allowed)
-
-    def open_filter_search(self):
-        if self._move_mode:
-            return
-        from .category_filter_ui import GTCategoryFilterScreen
-        opener = getattr(self.session, "openWithCallback", None)
-        if not callable(opener):
-            return
-        opener(
-            self._filter_search_closed,
-            GTCategoryFilterScreen,
-            self._provider_entries,
-            self._include_terms,
-            self._exclude_terms,
-            tuple(self._hidden),
-        )
-
-    def _filter_search_closed(self, result=None):
-        if result is None or self._closed:
-            return
-        self._include_terms, self._exclude_terms = result
-        self._include_terms = tuple(self._include_terms)
-        self._exclude_terms = tuple(self._exclude_terms)
-        self._update_filter_excluded()
-        self._notice = _("Filters updated. Press GREEN to save.")
-        self._refresh()
-
-
-class GTContinueWatchingScreen(GTAsyncListScreen):
+class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
     """Poster grid for every unfinished movie and series episode."""
 
     page_size = 8
@@ -5348,6 +5730,11 @@ class GTContinueWatchingScreen(GTAsyncListScreen):
         self._footer_layout_alternate_items = tuple(
             grid_footer_alternate_items or ()
         )
+        self._screen_background_path = (
+            FAVORITES_GLASS_BACKGROUND_PATH if grid_screen_name == "GTFavoritesScreen"
+            else CONTINUE_GLASS_BACKGROUND_PATH
+        )
+        self._footer_transparent_panel = True
         self.skin = grid_skin or _continue_watching_skin(grid_screen_name)
         width, height, px = _scale()
         self._continue_progress_width = px(384)
@@ -5371,7 +5758,7 @@ class GTContinueWatchingScreen(GTAsyncListScreen):
             _(grid_subtitle or N_("Unfinished movies and series episodes"))
         )
         for slot in range(self.page_size):
-            self["continue_card_{}".format(slot)] = Label("")
+            self["continue_card_{}".format(slot)] = Pixmap()
             self["continue_poster_placeholder_{}".format(slot)] = Label("")
             self["continue_poster_{}".format(slot)] = Pixmap()
             self["continue_favorite_{}".format(slot)] = Pixmap()
@@ -5387,6 +5774,9 @@ class GTContinueWatchingScreen(GTAsyncListScreen):
                 ] = Label("")
         self._poster_timer = eTimer()
         _connect_timer(self._poster_timer, self._poll_continue_posters)
+        self["download_actions"] = ActionMap(
+            ["MenuActions"], {"menu": self.request_selected_download}, -1,
+        )
         self["actions"] = ActionMap(
             ["OkCancelActions", "DirectionActions", "ColorActions"],
             {
@@ -5662,6 +6052,7 @@ class GTContinueWatchingScreen(GTAsyncListScreen):
                             error.__class__.__name__,
                         )
                     )
+        _attach_subtitle_detail_metadata(item, info)
         return candidates, info
 
     def _continue_metadata_candidates(self, item, info, token=None):
@@ -5693,6 +6084,7 @@ class GTContinueWatchingScreen(GTAsyncListScreen):
                 )
             else:
                 return candidates
+            _attach_subtitle_detail_metadata(item, completed)
             self._continue_candidate(
                 candidates,
                 getattr(completed, "cover", ""),
@@ -6684,12 +7076,14 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         client=None,
         favorite_store=None,
         hidden_category_ids=None,
+        initial_query=None,
     ):
         self.skin = decorate_remote_footer(
             _all_movies_search_skin(),
             ALL_MOVIES_SEARCH_FOOTER_ITEMS,
             transparent_panel=True,
             show_dividers=False,
+            stacked=True,
         )
         Screen.__init__(self, session)
         self.account = account
@@ -6725,10 +7119,11 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._provider_workers_idle = threading.Event()
         self._provider_workers_idle.set()
         self._keyboard_requested = False
+        self._initial_query = initial_query
         self._poll_timer = eTimer()
         _connect_timer(self._poll_timer, self._poll_search)
         self._keyboard_timer = eTimer()
-        _connect_timer(self._keyboard_timer, self.open_keyboard)
+        _connect_timer(self._keyboard_timer, self._open_initial_search)
 
         attach_background(self, "app_bg", APP_BACKGROUND_PATH)
         self["top_accent"] = Label("")
@@ -6763,7 +7158,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self["status"] = Label(_("Enter a movie name."))
         self["message"] = Label("")
         self["footer"] = Label("")
-        install_remote_footer(self, ALL_MOVIES_SEARCH_FOOTER_ITEMS)
+        install_remote_footer(self, ALL_MOVIES_SEARCH_FOOTER_ITEMS, stacked=True)
         width, height, px = _scale()
         self._search_title_preferred_font = font_px(
             px,
@@ -6785,6 +7180,9 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             row_y,
             px(8),
             (row_h * self.page_size) - px(7),
+        )
+        self["download_actions"] = ActionMap(
+            ["MenuActions"], {"menu": self.request_selected_download}, -1,
         )
         self["actions"] = ActionMap(
             ["OkCancelActions", "DirectionActions", "ColorActions"],
@@ -6829,6 +7227,15 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         if not self._keyboard_requested:
             self._keyboard_requested = True
             self._keyboard_timer.start(40, True)
+
+    def _open_initial_search(self):
+        if self._closed:
+            return
+        if self._initial_query is not None:
+            query, self._initial_query = self._initial_query, None
+            self._query_entered(query)
+        else:
+            self.open_keyboard()
 
     def open_keyboard(self):
         if self._closed:
@@ -7744,6 +8151,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self.account = account
         self.client = client or content_client_for(account)
         self.content_type = _validated_content_type(self.client, content_type)
+        self._footer_layout_stacked = self.content_type in ("movie", "series")
+        self._footer_content_y_offset = (
+            14 if self.content_type in ("movie", "series") else 0
+        )
         self._init_favorite_support(favorite_store)
         source_type = str(
             getattr(self.client, "source_type", "xtream") or "xtream"
@@ -7842,14 +8253,18 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 and _is_m3u_client(self.client)
                 else LIVE_CATEGORY_FOOTER_ITEMS
             )
+            self._screen_background_path = LIVE_CATEGORY_BACKGROUND_PATH
+            self._footer_transparent_panel = True
             self.skin = _live_category_skin()
             self.page_size = 8
             width, height, px = _scale()
             self._list_scroll_geometry = (
-                px(64 + 990 - 18), px(252), px(8), px(626)
+                px(50 + 945 - 15), px(145), px(10), px(716)
             )
         elif self.content_type == "movie":
             self._footer_layout_items = MOVIE_FOOTER_ITEMS
+            if self._cinematic_enabled:
+                self._screen_background_path = CINEMATIC_GLASS_BACKGROUND_PATH
             self.skin = _movie_browser_skin(self._cinematic_enabled)
             self.page_size = (
                 CINEMATIC_CATEGORY_PAGE_SIZE
@@ -7939,6 +8354,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             )
         elif self.content_type == "series":
             self._footer_layout_items = SERIES_FOOTER_ITEMS
+            if self._cinematic_enabled:
+                self._screen_background_path = CINEMATIC_GLASS_BACKGROUND_PATH
             self.skin = _series_browser_skin(self._cinematic_enabled)
             self.page_size = (
                 CINEMATIC_CATEGORY_PAGE_SIZE
@@ -8028,6 +8445,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             frameless_footer=self.content_type in ("movie", "series"),
         )
         if self.content_type == "live":
+            self["category_footer_art"] = Pixmap()
             self["server"] = Label("")
             self._dynamic_server_widget = "server"
             self._dynamic_server_text = account.host or account.display_name
@@ -8039,17 +8457,27 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self["clock"] = Label(datetime.datetime.now().strftime("%H:%M"))
             self["left_panel"] = Label("")
             self["right_panel"] = Label("")
+            self["left_panel_art"] = Pixmap()
+            self["right_panel_art"] = Pixmap()
             for panel in ("left", "right"):
                 for color in ("cyan", "magenta"):
                     self["{}_panel_accent_{}".format(panel, color)] = Label("")
             self["categories_caption"] = Label(_("LIVE TV CATEGORIES"))
             for index in range(8):
+                self["category_row_art_{}".format(index)] = Pixmap()
+                self["category_row_art_{}".format(index)].hide()
+                self["category_focus_art_{}".format(index)] = Pixmap()
+                self["category_focus_art_{}".format(index)].hide()
+                self["category_icon_{}".format(index)] = Pixmap()
+                self["category_icon_{}".format(index)].hide()
                 self["category_row_{}".format(index)] = Label("")
                 for edge in ("fill", "top", "bottom", "left", "right"):
                     self[
                         "category_focus_{}_{}".format(index, edge)
                     ] = Label("")
             self["weather_caption"] = Label(_("5-DAY WEATHER FORECAST"))
+            self["weather_header_divider"] = Label("")
+            self["weather_forecast_divider"] = Label("")
             self["weather_city"] = Label("")
             self["weather_today_card"] = Label("")
             self["weather_current_icon"] = Pixmap()
@@ -8059,6 +8487,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self["weather_metrics"] = Label("")
             self["weather_updated"] = Label("")
             for index in range(5):
+                if index:
+                    self["weather_day_separator_{}".format(index)] = Label("")
                 self["weather_day_card_{}".format(index)] = Label("")
                 self["weather_day_{}".format(index)] = Label("--")
                 self["weather_day_icon_{}".format(index)] = Pixmap()
@@ -8284,14 +8714,24 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 absolute_index = page_start + row_index
                 rendered_row = ellipsize_dynamic_text(
                     self["category_row_{}".format(row_index)],
-                    "{:02d}.  {}".format(absolute_index + 1, item.name),
-                    fallback_chars=48,
+                    "{:02d}   {}".format(absolute_index + 1, item.name),
+                    fallback_chars=35,
                 )
                 plain_lines.append(rendered_row)
                 selected = absolute_index == self.selected_index
             else:
                 self["category_row_{}".format(row_index)].setText("")
                 selected = False
+            if row_index < len(page_items):
+                self["category_row_art_{}".format(row_index)].show()
+            else:
+                self["category_row_art_{}".format(row_index)].hide()
+            for suffix in ("focus_art", "icon"):
+                component = self["category_{}_{}".format(suffix, row_index)]
+                if selected:
+                    component.show()
+                else:
+                    component.hide()
             for edge in ("fill", "top", "bottom", "left", "right"):
                 focus = self[
                     "category_focus_{}_{}".format(row_index, edge)
@@ -8318,6 +8758,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
     def _clear_live_rows(self):
         for row_index in range(8):
             self["category_row_{}".format(row_index)].setText("")
+            for suffix in ("row_art", "focus_art", "icon"):
+                self["category_{}_{}".format(suffix, row_index)].hide()
             for edge in ("fill", "top", "bottom", "left", "right"):
                 self[
                     "category_focus_{}_{}".format(row_index, edge)
@@ -8823,9 +9265,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 "DirectionActions",
                 "ColorActions",
                 "MoviePlayerActions",
+                "MenuActions",
             ],
             {
                 "ok": self.open_selected,
+                "menu": self.download_selected,
                 "cancel": self.close,
                 "up": self.move_up,
                 "down": self.move_down,
@@ -10781,6 +11225,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     component.setText(text)
 
         item = self._movie_entries[self._movie_selected_index]
+        _attach_subtitle_detail_metadata(item, info)
         poster_url = _safe_picon_url(poster_url)
         catalogue_poster_url = _safe_picon_url(catalogue_poster_url)
         current_poster_url = _safe_picon_url(getattr(item, "icon", ""))
@@ -11206,9 +11651,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 "DirectionActions",
                 "ColorActions",
                 "MoviePlayerActions",
+                "MenuActions",
             ],
             {
                 "ok": self.open_selected,
+                "menu": self.download_selected,
                 "cancel": self.close,
                 "up": self.move_up,
                 "down": self.move_down,
@@ -12683,6 +13130,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             )
 
         item = self._series_entries[self._series_selected_index]
+        _attach_subtitle_detail_metadata(item, info)
         poster_url = _safe_picon_url(poster_url)
         catalogue_poster_url = _safe_picon_url(catalogue_poster_url)
         current_poster_url = _safe_picon_url(getattr(item, "icon", ""))
@@ -13030,7 +13478,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if self._series_entries:
             self._schedule_series_scan()
 
-    def open_series_episode_list(self):
+    def download_selected(self):
+        if self.content_type == "series":
+            self.open_series_episode_list(download_mode=True)
+            return
+        if self.content_type != "movie" or self._movie_loading or not self._movie_entries:
+            return
+        from .downloads_ui import request_download
+        request_download(self.session, self.client, self._movie_entries[self._movie_selected_index])
+
+    def open_series_episode_list(self, download_mode=False):
         if (
             self.content_type != "series"
             or self._series_loading
@@ -13049,6 +13506,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             series,
             episode_client,
             favorite_store=self.favorite_store,
+            download_mode=download_mode,
         )
 
     def open_series_continue(self):
@@ -13830,6 +14288,192 @@ class _GTStreamListBase(GTAsyncListScreen):
         )
 
 
+class _StalkerStreamProbe(object):
+    """Observe one live start locally; never fetch, replay or change a service.
+
+    Service events and decoder clocks can show a tune failure or advancing
+    media, but they cannot prove that the TV displays non-black pixels. A
+    missing clock also cannot prove a geographical block or a dead stream.
+    """
+
+    SAMPLE_DELAYS_MS = (550, 2000, 6000)
+    EVENT_NAMES = (
+        "evStart", "evUpdatedInfo", "evVideoSizeChanged",
+        "evTuneFailed", "evEOF", "evStopped",
+    )
+
+    def __init__(self, navigation, reference, play_id, started_at=None, phase="player"):
+        self.navigation = navigation
+        self.reference = reference
+        candidate_id = str(play_id or "").lower()
+        self.play_id = (
+            candidate_id if re.fullmatch(r"[0-9a-f]{10}", candidate_id)
+            else uuid.uuid4().hex[:10]
+        )
+        self.phase = "preview" if phase == "preview" else "player"
+        self.started_at = started_at or time.monotonic()
+        self.service_started_at = time.monotonic()
+        self.engine = reference_service_type(reference, 4097)
+        self._sample_index = 0
+        self._previous = None
+        self._seen_events = set()
+        self._closed = False
+        self._events_attached = False
+        self.timer = None
+
+    def _log(self, detail):
+        elapsed = max(0, int((time.monotonic() - self.started_at) * 1000))
+        log_event(
+            "stream_diag",
+            "play_id={} phase={} engine={} elapsed_ms={} {} geo=unknown".format(
+                self.play_id, self.phase, self.engine, elapsed, detail,
+            ),
+        )
+
+    def start(self):
+        try:
+            events = getattr(self.navigation, "event", None)
+            if events is not None:
+                events.append(self.service_event)
+                self._events_attached = True
+        except Exception:
+            pass
+        try:
+            self.timer = eTimer()
+            _connect_timer(self.timer, self._sample)
+            self.timer.start(self.SAMPLE_DELAYS_MS[0], True)
+        except Exception:
+            self.stop()
+
+    def stop(self):
+        self._closed = True
+        if self.timer is not None:
+            try:
+                self.timer.stop()
+            except Exception:
+                pass
+        if self._events_attached:
+            try:
+                self.navigation.event.remove(self.service_event)
+            except (AttributeError, ValueError):
+                pass
+            except Exception:
+                pass
+            self._events_attached = False
+
+    def _reference_active(self):
+        getter = getattr(self.navigation, "getCurrentlyPlayingServiceReference", None)
+        if not callable(getter):
+            return False
+        try:
+            current = getter()
+            if current is self.reference:
+                return True
+            if current is None or self.reference is None:
+                return False
+            current_text = current.toString()
+            expected_text = self.reference.toString()
+            return bool(current_text and current_text == expected_text)
+        except Exception:
+            return False
+
+    def service_event(self, event):
+        if self._closed or _PlayableServiceEvents is None or event is None:
+            return
+        # A delayed event from the previous service can arrive during a zap.
+        if not self._reference_active():
+            return
+        for name in self.EVENT_NAMES:
+            if event != getattr(_PlayableServiceEvents, name, None):
+                continue
+            if (
+                name in ("evTuneFailed", "evEOF", "evStopped")
+                and time.monotonic() - self.service_started_at < 0.25
+            ):
+                return
+            if name not in self._seen_events:
+                self._seen_events.add(name)
+                self._log("stage=service-event event={}".format(name))
+            return
+        base = getattr(_PlayableServiceEvents, "evUser", None)
+        if isinstance(base, int):
+            for offset in (10, 11, 12):
+                name = "evUser+{}".format(offset)
+                if event == base + offset and name not in self._seen_events:
+                    self._seen_events.add(name)
+                    self._log("stage=service-event event={}".format(name))
+                    return
+
+    def _sample(self):
+        if self._closed:
+            return
+        index = self._sample_index
+        if index >= len(self.SAMPLE_DELAYS_MS):
+            self.stop()
+            return
+        self._sample_index += 1
+        if not self._reference_active():
+            self._log("stage=decoder outcome=reference-changed")
+            self.stop()
+            return
+        getter = getattr(self.navigation, "getCurrentService", None)
+        try:
+            service = getter() if callable(getter) else None
+            snapshot = _decoder_media_snapshot(service, iServiceInformation)
+        except Exception:
+            snapshot = {}
+        previous = self._previous or {}
+        video = snapshot.get("video_pts")
+        audio = snapshot.get("audio_pts")
+        video_progress = bool(
+            snapshot.get("video_pts_source") == previous.get("video_pts_source")
+            and _stream_diag_pts_progress(previous.get("video_pts"), video)
+        )
+        audio_progress = _stream_diag_pts_progress(
+            previous.get("audio_pts"), audio,
+        )
+        self._previous = snapshot
+        width = snapshot.get("width")
+        height = snapshot.get("height")
+        tracks = snapshot.get("audio_tracks")
+        geometry = (
+            "{}x{}".format(width, height)
+            if isinstance(width, int) and isinstance(height, int)
+            and 0 < width <= 8192 and 0 < height <= 8192
+            else "unknown"
+        )
+        track_count = tracks if isinstance(tracks, int) and 0 <= tracks <= 64 else "unknown"
+        if video_progress:
+            outcome = "video-pts-advancing"
+        elif audio_progress:
+            outcome = "audio-pts-advancing-video-unconfirmed"
+        elif index == len(self.SAMPLE_DELAYS_MS) - 1:
+            outcome = (
+                "pts-unavailable"
+                if video is None and audio is None
+                else "no-pts-progress-observed"
+            )
+        else:
+            outcome = "waiting-for-media"
+        self._log(
+            "stage=decoder checkpoint_ms={} outcome={} video_size={} "
+            "audio_tracks={} pts_source={}".format(
+                self.SAMPLE_DELAYS_MS[index], outcome, geometry,
+                track_count, snapshot.get("video_pts_source") or "none",
+            )
+        )
+        if video_progress or index == len(self.SAMPLE_DELAYS_MS) - 1:
+            self.stop()
+            return
+        next_delay = (
+            self.SAMPLE_DELAYS_MS[index + 1] - self.SAMPLE_DELAYS_MS[index]
+        )
+        try:
+            self.timer.start(next_delay, True)
+        except Exception:
+            self.stop()
+
+
 class _LiveStartupRecoverySupport(object):
     """Compatibility hooks for the retired automatic live recovery.
 
@@ -13889,14 +14533,24 @@ class GTStreamListScreen(
         )
         self._weather_forecast_snapshot = weather_forecast
         self._fullscreen_active = False
+        self._live_modal_active = False
+        # This screen deliberately has no shared PNG background.  A fully
+        # opaque native surface prevents the service that was playing before
+        # the list opened from bleeding through anywhere outside the PIG.
+        self._opaque_background = True
+        self._screen_background_path = LIVE_GUIDE_BACKGROUND_PATH
         self._active_live_service_type = None
         try:
             settings = load_player_settings()
             self._active_live_service_type = int(
                 settings.service_type_for("live")
             )
+            self._channel_highlight = normalize_channel_highlight(
+                getattr(settings, "channel_highlight", DEFAULT_CHANNEL_HIGHLIGHT)
+            )
         except Exception:
             self._active_live_service_type = 4097
+            self._channel_highlight = DEFAULT_CHANNEL_HIGHLIGHT
 
         # Keep incremental provider pagination without taking decoder
         # ownership or starting row-artwork workers.
@@ -13919,6 +14573,18 @@ class GTStreamListScreen(
         self._live_active_picon_fetch_deadline = 0.0
         self._live_active_picon_fetch_state = None
         self._live_active_picon_reload_pending = False
+        self._live_row_picon_generation = 0
+        self._live_row_picon_signature = None
+        self._live_selected_picon_generation = 0
+        self._live_selected_picon_signature = None
+        self._live_picon_prefetch_generation = 0
+        self._live_picon_prefetch_lock = threading.RLock()
+        self._live_picon_prefetch_queue = deque()
+        self._live_picon_prefetch_jobs = {}
+        self._live_picon_prefetch_known = set()
+        self._live_picon_prefetch_completed = set()
+        self._live_picon_prefetch_tokens = set()
+        self._live_picon_prefetch_worker_counts = {}
 
         self._preview_item = None
         self._preview_epg_events = []
@@ -13934,6 +14600,11 @@ class GTStreamListScreen(
         self._detail_store = {}
         self._detail_store_lock = threading.Lock()
         self._detail_store_epoch = 0
+        self._live_page_epg_generation = 0
+        self._live_page_epg_signature = None
+        self._live_page_epg_pending = ()
+        self._live_page_epg_state = None
+        self._live_page_epg_worker_lock = threading.Lock()
         self._detail_foreground_state = None
         self._detail_prefetch_state = None
         self._detail_prefetch_deadline = 0.0
@@ -13963,6 +14634,9 @@ class GTStreamListScreen(
         self._preview_link_deadline = 0.0
         self._preview_link_token = None
         self._preview_fullscreen_requested = False
+        self._stream_diag_play_id = ""
+        self._stream_diag_started_at = 0.0
+        self._stream_diag_probe = None
         self._preview_video_attempts = 0
         self._preview_video_geometry = None
         self._preview_fallback_visible = True
@@ -13973,17 +14647,32 @@ class GTStreamListScreen(
         self._detail_poll_timer = eTimer()
         self._detail_prefetch_timer = eTimer()
         self._detail_progress_timer = eTimer()
+        self._summary_scroll_timer = eTimer()
+        self._summary_text = ""
+        self._summary_selection_key = None
+        self._summary_lines = ()
+        self._summary_line_offset = 0
+        self._live_clock_minute = ""
         self._epg_clock_timer = eTimer()
+        self._live_page_epg_dwell_timer = eTimer()
+        self._live_page_epg_poll_timer = eTimer()
         self._preview_dwell_timer = eTimer()
         self._preview_link_timer = eTimer()
         self._preview_video_timer = eTimer()
         self._live_active_picon_timer = eTimer()
         self._live_active_picon_poll_timer = eTimer()
+        self._live_picon_prefetch_poll_timer = eTimer()
         _connect_timer(self._detail_dwell_timer, self._detail_dwell_fired)
         _connect_timer(self._detail_poll_timer, self._detail_poll)
         _connect_timer(self._detail_prefetch_timer, self._detail_prefetch_fired)
         _connect_timer(self._detail_progress_timer, self._detail_progress_tick)
+        _connect_timer(
+            self._summary_scroll_timer,
+            self._summary_scroll_tick,
+        )
         _connect_timer(self._epg_clock_timer, self._epg_clock_tick)
+        _connect_timer(self._live_page_epg_dwell_timer, self._live_page_epg_start)
+        _connect_timer(self._live_page_epg_poll_timer, self._live_page_epg_poll)
         _connect_timer(self._preview_dwell_timer, self._preview_dwell_fired)
         _connect_timer(self._preview_link_timer, self._preview_link_tick)
         _connect_timer(self._preview_video_timer, self._preview_video_tick)
@@ -13995,40 +14684,61 @@ class GTStreamListScreen(
             self._live_active_picon_poll_timer,
             self._live_active_picon_poll,
         )
-
-        self._footer_layout_items = (
-            M3U_LIVE_STREAM_FOOTER_ITEMS
-            if _client_supports(self.client, "search")
-            and _is_m3u_client(self.client)
-            else LIVE_STREAM_FOOTER_ITEMS
+        _connect_timer(
+            self._live_picon_prefetch_poll_timer,
+            self._live_picon_prefetch_poll,
         )
-        self.skin = _live_stream_skin()
+
+        # Keep the approved six-key guide identical for every source.  M3U
+        # search remains bound to BLUE, but is intentionally an expert action
+        # rather than a seventh item squeezed into the footer.
+        self._footer_layout_items = LIVE_STREAM_FOOTER_ITEMS
+        # The Live TV guide exposes its wallpaper beneath the remote keys.
+        # Suppress the shared panel, retain the native separators and spread
+        # the six approved keys across the transparent footer area.
+        self._footer_transparent_panel = True
+        self._footer_show_dividers = True
+        self._footer_side_padding = 16
+        self.skin = _live_stream_skin(self._channel_highlight)
         self.page_size = LIVE_STREAM_PAGE_SIZE
         width, height, px = _scale()
         self._ribbon_now_preferred_font = font_px(
             px,
-            21,
+            29,
             role="title",
         )
         self._ribbon_now_min_font = font_px(
             px,
-            21,
+            25,
             role="title",
             value="standard",
         )
         self._ribbon_next_preferred_font = font_px(
             px,
-            20,
+            24,
             role="title",
         )
         self._ribbon_next_min_font = font_px(
             px,
-            20,
+            21,
             role="title",
             value="standard",
         )
         self._list_scroll_geometry = (
-            px(64 + 865 - 18), px(128), px(8), px(737)
+            px(432 + 952 - 9), px(166), px(4), px(774)
+        )
+        self._summary_scrollbar_geometry = (
+            px(8 + 414 - 20), px(633), px(5), px(282)
+        )
+        summary_width = px(414 - 64)
+        self._summary_font_size = font_px(
+            px, 23, max_height=282, vertical_padding=5
+        )
+        self._summary_line_capacity = max(
+            8, int(summary_width / max(1, self._summary_font_size * 0.66))
+        )
+        self._summary_visible_lines = max(
+            1, int(px(282) / max(1, self._summary_font_size * 1.22))
         )
         title = CONTENT_LABELS[self.content_type][0]
         GTAsyncListScreen.__init__(
@@ -14040,6 +14750,9 @@ class GTStreamListScreen(
         )
         self._capture_pre_list_service()
         self._setup_live_widgets(px)
+        self["header"].setText(
+            "GT IPTV PLAYER PRO  •  {}".format(localized_upper(_("LIVE TV")))
+        )
         self["actions"] = ActionMap(
             [
                 "OkCancelActions",
@@ -14070,10 +14783,21 @@ class GTStreamListScreen(
             self.onShown.append(self._favorite_stream_list_shown)
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._preview_layout_ready)
+            self.onLayoutFinish.append(self._refresh_summary_scroll_indicator)
 
     def _setup_live_widgets(self, px):
+        self["root_fill"] = Label("")
         self["left_panel"] = Label("")
+        self["center_panel"] = Label("")
         self["right_panel"] = Label("")
+        self["footer_backdrop"] = Label("")
+        self["right_separator_bottom"] = Label("")
+        self["clock_time"] = Label("")
+        self["clock_date"] = Label("")
+        self["detail_picon"] = Pixmap()
+        self["detail_picon"].hide()
+        self["left_panel_art"] = Pixmap()
+        self["right_panel_art"] = Pixmap()
         for panel in ("left", "right"):
             for color in ("cyan", "magenta"):
                 self["{}_panel_accent_{}".format(panel, color)] = Label("")
@@ -14081,10 +14805,22 @@ class GTStreamListScreen(
         self["list_caption_accent"] = Label("")
         for index in range(LIVE_STREAM_PAGE_SIZE):
             self["stream_row_bg_{}".format(index)] = Label("")
+            self["stream_row_bg_{}".format(index)].hide()
+            self["stream_row_art_{}".format(index)] = Pixmap()
+            self["stream_row_art_{}".format(index)].hide()
+            self["stream_focus_art_{}".format(index)] = Pixmap()
+            self["stream_focus_art_{}".format(index)].hide()
             self["stream_picon_{}".format(index)] = Pixmap()
             self["stream_picon_{}".format(index)].hide()
             self["stream_number_{}".format(index)] = Label("")
             self["stream_name_{}".format(index)] = Label("")
+            self["stream_program_{}".format(index)] = Label("")
+            self["stream_progress_bg_{}".format(index)] = Label("")
+            self["stream_progress_fill_{}".format(index)] = Label("")
+            self["stream_progress_bg_{}".format(index)].hide()
+            self["stream_progress_fill_{}".format(index)].hide()
+            self["stream_separator_{}".format(index)] = Label("")
+            self["stream_separator_{}".format(index)].hide()
             self["stream_favorite_{}".format(index)] = Pixmap()
             self["stream_favorite_{}".format(index)].hide()
             for edge in ("fill", "top", "bottom", "left", "right"):
@@ -14113,8 +14849,10 @@ class GTStreamListScreen(
         self["preview_hint"] = Label(_("SELECT A CHANNEL"))
 
         self["epg_panel"] = Label("")
+        self["summary_panel_art"] = Pixmap()
+        self["summary_separator"] = Label("")
         self["epg_title"] = Label(_("NEXT"))
-        for row in ("now", "next", "third", "fourth"):
+        for row in ("now", "next", "third", "fourth", "fifth"):
             self["epg_{}_time".format(row)] = Label("")
             self["epg_{}_title".format(row)] = Label("")
             self["epg_{}_status".format(row)] = Label("")
@@ -14124,6 +14862,9 @@ class GTStreamListScreen(
         self["summary_caption"] = Label(_("PROGRAMME SUMMARY"))
         self["summary"] = Label(_("Waiting for programme information"))
         self["summary_scroll"] = Label("")
+        self["summary_scrollbar_track"] = Label("")
+        self["summary_scrollbar_thumb"] = Label("")
+        hide_scrollbar(self, "summary_scrollbar")
         output_format = (
             "M3U"
             if _is_m3u_client(self.client)
@@ -14135,8 +14876,10 @@ class GTStreamListScreen(
         self["engine_badge"] = Label(
             service_engine_label(self._active_live_service_type)
         )
-        self._progress_width = max(1, px(805))
-        self._progress_height = max(1, px(9))
+        self._progress_width = max(1, px(362))
+        self._progress_height = max(1, px(10))
+        self._row_progress_width = max(1, px(96))
+        self._row_progress_height = max(1, px(10))
         self._clear_epg_progress()
         self._clear_live_active_picon()
         self._show_preview_fallback(_("SELECT A CHANNEL"))
@@ -14371,6 +15114,11 @@ class GTStreamListScreen(
         with self._preview_link_lock:
             self._preview_generation += 1
         self._cancel_preview_resolution(clear_target=True)
+        self._live_modal_active = True
+        self._cancel_live_page_epg()
+        cancel_prefetch = getattr(self, "_cancel_live_picon_prefetch", None)
+        if callable(cancel_prefetch):
+            cancel_prefetch(clear_render=True)
         self._suspend_preview_pig()
         self._cancel_selected_detail(clear_selection=False)
         try:
@@ -14402,6 +15150,7 @@ class GTStreamListScreen(
     def _m3u_search_closed(self, *args):
         if self._closed:
             return
+        self._live_modal_active = False
         self._reload_favorite_keys()
         self._live_render_page_key = None
         self._refresh_live_streams()
@@ -14450,6 +15199,10 @@ class GTStreamListScreen(
             self._preview_generation += 1
         self._cancel_preview_resolution(clear_target=True)
         self._cancel_live_active_picon_fetch(clear_target=True)
+        cancel_prefetch = getattr(self, "_cancel_live_picon_prefetch", None)
+        if callable(cancel_prefetch):
+            cancel_prefetch(clear_render=True)
+        self._cancel_live_page_epg()
         self._cancel_selected_detail(clear_selection=True)
         with self._live_more_worker_events_lock:
             tokens = tuple(self._live_more_worker_tokens)
@@ -14503,13 +15256,15 @@ class GTStreamListScreen(
                 if present:
                     item = page_items[row_index]
                     absolute_index = page_start + row_index
+                    self["stream_row_bg_{}".format(row_index)].show()
+                    self["stream_separator_{}".format(row_index)].show()
                     self["stream_number_{}".format(row_index)].setText(
-                        "{:04d}.".format(absolute_index + 1)
+                        "{:04d}".format(absolute_index + 1)
                     )
                     rendered_name = ellipsize_dynamic_text(
                         self["stream_name_{}".format(row_index)],
                         str(item.name or ""),
-                        fallback_chars=38,
+                        fallback_chars=25,
                     )
                     plain_lines.append(rendered_name)
                     if self._is_favorite(item):
@@ -14517,8 +15272,14 @@ class GTStreamListScreen(
                     else:
                         self["stream_favorite_{}".format(row_index)].hide()
                 else:
+                    self["stream_row_bg_{}".format(row_index)].hide()
+                    self["stream_separator_{}".format(row_index)].hide()
                     self["stream_number_{}".format(row_index)].setText("")
                     self["stream_name_{}".format(row_index)].setText("")
+                    self["stream_program_{}".format(row_index)].setText("")
+                    self["stream_progress_bg_{}".format(row_index)].hide()
+                    self["stream_progress_fill_{}".format(row_index)].hide()
+                    self["stream_row_art_{}".format(row_index)].hide()
                     self["stream_favorite_{}".format(row_index)].hide()
             self["items"].setText("\n".join(plain_lines))
         if page_changed or selected_row != self._live_render_selected_row:
@@ -14530,22 +15291,25 @@ class GTStreamListScreen(
                 if row_index < 0 or row_index >= self.page_size:
                     continue
                 selected = row_index == selected_row
+                self["stream_focus_art_{}".format(row_index)].hide()
                 for edge in ("fill", "top", "bottom", "left", "right"):
                     focus = self["stream_focus_{}_{}".format(row_index, edge)]
-                    if selected:
+                    if selected and row_index < len(page_items):
                         focus.show()
                     else:
                         focus.hide()
         self._live_render_page_key = page_key
         self._live_render_selected_row = selected_row
+        self._refresh_live_row_epg(page_start, page_items)
+        self._schedule_live_page_epg(page_start, page_items)
+        self._queue_live_category_picons(page_start, page_items)
         self._refresh_live_active_picon(
             page_start=page_start,
             page_items=page_items,
         )
+        self._refresh_selected_picon()
         self["message"].setText(
-            "{}  |  {}/{}".format(
-                len(self._entries), self.selected_index + 1, len(self._entries)
-            )
+            "{} / {}".format(self.selected_index + 1, len(self._entries))
         )
         update_scrollbar(
             self, "list_scroll", len(self._entries), self.selected_index,
@@ -14554,14 +15318,42 @@ class GTStreamListScreen(
         self._schedule_selected_detail()
         self._schedule_preview_for_selection()
         self._maybe_load_more_live()
+        self._prefetch_remaining_live_catalog()
+
+    def _prefetch_remaining_live_catalog(self):
+        """Drain the active category in bounded batches for its picon queue."""
+        if (
+            self._closed
+            or self._fullscreen_active
+            or getattr(self, "_live_modal_active", False)
+            or self._loading
+            or self._live_more_loading
+            or not self._live_has_more
+            or self._live_empty_more_batches >= 3
+            or len(self._entries) >= LIVE_PICON_PREFETCH_MAX_ITEMS
+        ):
+            return False
+        # _start_live_more already permits only one catalogue worker and each
+        # client returns a bounded batch.  _poll_result calls the normal list
+        # refresh, which queues the new picons and advances one further batch.
+        return self._start_live_more(force=True)
 
     def _clear_live_stream_rows(self):
         self._clear_live_active_picon()
+        self._clear_live_visible_picons()
+        self._clear_live_selected_picon()
         self._live_render_page_key = None
         self._live_render_selected_row = -1
         for row_index in range(LIVE_STREAM_PAGE_SIZE):
             self["stream_number_{}".format(row_index)].setText("")
             self["stream_name_{}".format(row_index)].setText("")
+            self["stream_program_{}".format(row_index)].setText("")
+            self["stream_row_bg_{}".format(row_index)].hide()
+            self["stream_separator_{}".format(row_index)].hide()
+            self["stream_progress_bg_{}".format(row_index)].hide()
+            self["stream_progress_fill_{}".format(row_index)].hide()
+            self["stream_row_art_{}".format(row_index)].hide()
+            self["stream_focus_art_{}".format(row_index)].hide()
             self["stream_picon_{}".format(row_index)].hide()
             self["stream_favorite_{}".format(row_index)].hide()
             for edge in ("fill", "top", "bottom", "left", "right"):
@@ -14601,6 +15393,7 @@ class GTStreamListScreen(
                 self._preview_target_key = ""
                 self._preview_target_index = -1
         _cancel_worker_token(token)
+        _cancel_download_pending(self.client)
 
     def _schedule_preview_for_selection(self):
         """Keep explicit OK work aligned; highlight movement never tunes."""
@@ -14663,11 +15456,42 @@ class GTStreamListScreen(
         """Legacy timer callback kept inert: explicit previews require OK."""
         return
 
+    def _stop_preview_stream_diag(self):
+        probe = getattr(self, "_stream_diag_probe", None)
+        self._stream_diag_probe = None
+        if probe is not None:
+            probe.stop()
+
+    def _preview_stream_diag(
+        self, stage, detail="", play_id=None, started_at=None,
+    ):
+        if not _is_stalker_client(self.client):
+            return
+        play_id = play_id or self._stream_diag_play_id
+        if not play_id:
+            return
+        started_at = started_at or self._stream_diag_started_at
+        elapsed_ms = max(
+            0, int((time.monotonic() - started_at) * 1000),
+        )
+        log_event(
+            "stream_diag",
+            "play_id={} phase=preview engine={} elapsed_ms={} stage={} {} "
+            "geo=unknown".format(
+                play_id, self._active_live_service_type, elapsed_ms,
+                stage, detail,
+            ),
+        )
+
     def _begin_preview_link(self, item, index, request_fullscreen=False):
         """Start one resolver with an immutable mini-TV/fullscreen intent."""
+        if not _allow_account_playback(self.session, self.client):
+            return
         key = self._selection_key(item)
         if not key:
             return
+        # Explicit OK must take the provider lane ahead of optional page EPG.
+        self._cancel_live_page_epg()
         try:
             timeout = max(3, min(15, int(getattr(self.client, "timeout", 12))))
         except (TypeError, ValueError, OverflowError):
@@ -14698,6 +15522,12 @@ class GTStreamListScreen(
             self._preview_link_result = None
             self._preview_link_token = token
             self._preview_link_deadline = token.deadline
+            if _is_stalker_client(self.client):
+                self._stream_diag_play_id = uuid.uuid4().hex[:10]
+                self._stream_diag_started_at = time.monotonic()
+        if _is_stalker_client(self.client):
+            self._stop_preview_stream_diag()
+            self._preview_stream_diag("link-request", "outcome=started")
         _cancel_worker_token(old_token)
         for timer in (self._preview_dwell_timer, self._preview_link_timer):
             try:
@@ -14740,8 +15570,12 @@ class GTStreamListScreen(
                 if callable(resolver)
                 else ""
             )
-        except Exception:
+        except Exception as error:
             url = ""
+            error_type = error.__class__.__name__
+        else:
+            error_type = "none"
+        diagnostic = None
         with self._preview_link_lock:
             if (
                 self._closed
@@ -14757,6 +15591,18 @@ class GTStreamListScreen(
                 int(index),
                 key,
                 url,
+            )
+            if _is_stalker_client(self.client):
+                diagnostic = (
+                    self._stream_diag_play_id, self._stream_diag_started_at,
+                )
+        if diagnostic is not None:
+            self._preview_stream_diag(
+                "link-result",
+                "outcome={} error_type={}".format(
+                    "ready" if url else "empty", error_type,
+                ),
+                play_id=diagnostic[0], started_at=diagnostic[1],
             )
 
     def _preview_link_tick(self):
@@ -14805,16 +15651,16 @@ class GTStreamListScreen(
             self._preview_link_timer.start(LIVE_PREVIEW_LINK_POLL_MS, True)
             return
         if failed:
-            self._preview_link_failed()
+            self._preview_link_failed("timeout")
             return
         if consumed is None:
             return
         generation, item, index, key, url, request_fullscreen = consumed
         if not url:
-            self._preview_link_failed()
+            self._preview_link_failed("empty-link")
             return
         if VideoWindow is None and not request_fullscreen:
-            self._preview_link_failed()
+            self._preview_link_failed("preview-unavailable")
             return
         try:
             reference = build_extplayer_reference(
@@ -14823,18 +15669,35 @@ class GTStreamListScreen(
                 getattr(item, "content_type", "live"),
                 service_type=self._active_live_service_type,
             )
-        except Exception:
-            self._preview_link_failed()
+        except Exception as error:
+            self._preview_link_failed("reference-error", error)
             return
         navigation = getattr(self.session, "nav", None)
         if navigation is None:
-            self._preview_link_failed()
+            self._preview_link_failed("navigation-unavailable")
             return
+        self._preview_stream_diag(
+            "service-reference",
+            "outcome=built actual_engine={}".format(
+                reference_service_type(reference, 4097),
+            ),
+        )
         try:
             _play_service(navigation, reference)
-        except Exception:
-            self._preview_link_failed()
+        except Exception as error:
+            self._preview_link_failed("play-service-error", error)
             return
+        self._preview_stream_diag(
+            "play-service", "outcome=accepted",
+        )
+        if _is_stalker_client(self.client):
+            self._stop_preview_stream_diag()
+            self._stream_diag_probe = _StalkerStreamProbe(
+                navigation, reference, self._stream_diag_play_id,
+                started_at=self._stream_diag_started_at,
+                phase="preview",
+            )
+            self._stream_diag_probe.start()
 
         self._pre_list_restored = False
         self._preview_auto_suspended_key = ""
@@ -14853,7 +15716,7 @@ class GTStreamListScreen(
             self._preview_fullscreen_requested = False
         _debug(
             "live preview started selected={} engine={} reason={}".format(
-                key,
+                _debug_identifier(key),
                 reference_service_type(reference, 4097),
                 "ok_fullscreen" if request_fullscreen else "ok_mini_tv",
             )
@@ -14865,11 +15728,19 @@ class GTStreamListScreen(
         # may the optional EPG worker enter a provider lane.
         self._schedule_selected_detail()
         self._resume_preview_pig()
+        self._schedule_live_page_epg()
 
-    def _preview_link_failed(self):
+    def _preview_link_failed(self, reason="unavailable", error=None):
+        self._preview_stream_diag(
+            "start-failed",
+            "reason={} error_type={}".format(
+                reason, error.__class__.__name__ if error is not None else "none",
+            ),
+        )
         requested = self._preview_fullscreen_requested
         self._cancel_preview_resolution(clear_target=False)
         self._show_preview_fallback(_("Could not open the stream."))
+        self._schedule_live_page_epg()
         if requested:
             self["message"].setText(_("Could not open the stream."))
 
@@ -15275,11 +16146,15 @@ class GTStreamListScreen(
             self._detail_poll_timer,
             self._detail_prefetch_timer,
             self._detail_progress_timer,
+            self._summary_scroll_timer,
         ):
             try:
                 timer.stop()
             except Exception:
                 pass
+        self._summary_selection_key = None
+        hide_scrollbar(self, "summary_scrollbar")
+        self["summary_scroll"].setText("")
         self._detail_generation += 1
         self._cancel_detail_state(self._detail_foreground_state)
         self._cancel_detail_state(self._detail_prefetch_state)
@@ -15396,8 +16271,8 @@ class GTStreamListScreen(
         )
 
     def _selected_epg_loader(self):
-        # Expose provider EPG only for the service already playing in the PIG.
-        # UP/DOWN and provider-link creation therefore remain network-silent.
+        # The selected-detail worker only fetches after playback has started.
+        # Visible-page EPG uses its own sequential background worker.
         if not self._selected_detail_preview_ready(
             self._detail_selection_key
         ):
@@ -15458,6 +16333,620 @@ class GTStreamListScreen(
             item,
             worker_token=worker_token,
         )
+
+    @staticmethod
+    def _current_live_row_event(events, now=None):
+        """Return the programme airing now without starting provider work."""
+        now = int(time.time() if now is None else now)
+        fallback = None
+        for event in tuple(events or ()):
+            try:
+                start = int(getattr(event, "start_timestamp", 0) or 0)
+                end = int(getattr(event, "end_timestamp", 0) or 0)
+            except (TypeError, ValueError, OverflowError):
+                start, end = 0, 0
+            if start and end and start <= now < end:
+                return event
+            if fallback is None and (not start or start <= now) and not (
+                end and end <= now
+            ):
+                fallback = event
+        return fallback
+
+    def _refresh_live_row_epg(self, page_start=None, page_items=None):
+        """Paint current titles/progress from RAM only for visible rows."""
+        if (
+            self._closed
+            or self._fullscreen_active
+            or getattr(self, "_live_modal_active", False)
+        ):
+            return
+        if page_start is None:
+            page_start = int(self.selected_index / self.page_size) * self.page_size
+        if page_items is None:
+            page_items = self._entries[page_start : page_start + self.page_size]
+        now = int(time.time())
+        for row_index in range(self.page_size):
+            program = self["stream_program_{}".format(row_index)]
+            progress_bg = self["stream_progress_bg_{}".format(row_index)]
+            progress_fill = self["stream_progress_fill_{}".format(row_index)]
+            if row_index >= len(page_items):
+                program.setText("")
+                progress_bg.hide()
+                progress_fill.hide()
+                continue
+            item = page_items[row_index]
+            key = self._selection_key(item)
+            cached = self._detail_store_snapshot(key, item=item)
+            event = self._current_live_row_event(cached.get("events"), now=now)
+            if event is None:
+                program.setText("")
+                progress_bg.hide()
+                progress_fill.hide()
+                continue
+            ellipsize_dynamic_text(
+                program,
+                str(getattr(event, "title", "") or ""),
+                fallback_chars=21,
+            )
+            ratio, unused_label = self._progress_details(event)
+            if ratio <= 0.0:
+                progress_bg.hide()
+                progress_fill.hide()
+                continue
+            try:
+                progress_fill.instance.resize(
+                    eSize(
+                        max(1, int(round(self._row_progress_width * ratio))),
+                        self._row_progress_height,
+                    )
+                )
+            except Exception:
+                pass
+            progress_bg.show()
+            progress_fill.show()
+
+    def _cancel_live_page_epg(self):
+        self._live_page_epg_generation += 1
+        self._live_page_epg_signature = None
+        self._live_page_epg_pending = ()
+        for timer in (self._live_page_epg_dwell_timer,
+                      self._live_page_epg_poll_timer):
+            try:
+                timer.stop()
+            except Exception:
+                pass
+        state = self._live_page_epg_state
+        self._live_page_epg_state = None
+        if state is not None:
+            with state["lock"]:
+                state["cancelled"].set()
+                _cancel_worker_token(state.get("token"))
+                state["results"].clear()
+
+    def _schedule_live_page_epg(self, page_start=None, page_items=None):
+        """Queue missing EPG for the visible page, keeping navigation local."""
+        if (self._closed or self._fullscreen_active or self._loading
+                or self._live_modal_active or self._preview_link_pending):
+            return
+        if page_start is None:
+            page_start = int(self.selected_index / self.page_size) * self.page_size
+        if page_items is None:
+            page_items = self._entries[page_start:page_start + self.page_size]
+        signature = (page_start, tuple(self._selection_key(item)
+                                       for item in page_items))
+        if signature == self._live_page_epg_signature:
+            return
+        self._cancel_live_page_epg()
+        self._live_page_epg_signature = signature
+        if not page_items or self._provider_epg_loader() is None:
+            return
+        missing = []
+        seen = set()
+        for item in page_items:
+            key = self._selection_key(item)
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            if not self._detail_store_snapshot(key, item=item).get("epg_checked"):
+                missing.append(key)
+        if not missing:
+            return
+        selected_key = self._selection_key(self._entries[self.selected_index])
+        if selected_key in missing and missing[0] != selected_key:
+            missing.remove(selected_key)
+            missing.insert(0, selected_key)
+        self._live_page_epg_pending = tuple(missing)
+        dwell = (STALKER_LIVE_PAGE_EPG_DWELL_MS
+                 if _is_stalker_client(self.client) else LIVE_PAGE_EPG_DWELL_MS)
+        self._live_page_epg_dwell_timer.start(dwell, True)
+
+    def _live_page_epg_start(self):
+        if self._closed or self._fullscreen_active or self._loading:
+            return
+        if self._live_modal_active or self._preview_link_pending:
+            self._live_page_epg_dwell_timer.start(500, True)
+            return
+        pending = self._live_page_epg_pending
+        if not pending or self._provider_epg_loader() is None:
+            return
+        if _is_stalker_client(self.client) and self._preview_service_active:
+            elapsed_ms = int(1000 * max(0.0, time.monotonic()
+                                        - self._preview_service_started_at))
+            remaining = STALKER_LIVE_EPG_QUIET_MS - elapsed_ms
+            if remaining > 0:
+                self._live_page_epg_dwell_timer.start(remaining, True)
+                return
+        with self._detail_store_lock:
+            store_epoch = self._detail_store_epoch
+        state = {
+            "generation": self._live_page_epg_generation,
+            "signature": self._live_page_epg_signature,
+            "keys": pending,
+            "epoch": store_epoch,
+            "cancelled": threading.Event(),
+            "done": threading.Event(),
+            "lock": threading.Lock(),
+            "token": None,
+            "results": deque(),
+        }
+        self._live_page_epg_pending = ()
+        self._live_page_epg_state = state
+        worker = threading.Thread(target=self._load_live_page_epg_worker,
+                                  args=(state,))
+        worker.daemon = True
+        worker.start()
+        self._live_page_epg_poll_timer.start(LIVE_PAGE_EPG_POLL_MS, True)
+
+    def _load_live_page_epg_worker(self, state):
+        try:
+            # A quick page flip can leave a request in progress. New page jobs
+            # wait here rather than entering the provider with another batch.
+            with self._live_page_epg_worker_lock:
+                for key in state["keys"]:
+                    if state["cancelled"].is_set():
+                        break
+                    token = _WorkerToken(LIVE_DETAIL_EPG_TIMEOUT_SECONDS)
+                    with state["lock"]:
+                        if state["cancelled"].is_set():
+                            break
+                        state["token"] = token
+                    try:
+                        loader = self._provider_epg_loader()
+                        events = _bounded_client_call(
+                            self.client, token,
+                            lambda sid=key, fetch=loader: _load_shared_live_epg(
+                                self.client, sid, LIVE_EPG_FETCH_LIMIT, fetch,
+                                token=token,
+                            ),
+                        ) if loader is not None else []
+                    except Exception:
+                        events = []
+                    finally:
+                        with state["lock"]:
+                            if state["token"] is token:
+                                state["token"] = None
+                    if state["cancelled"].is_set():
+                        break
+                    with state["lock"]:
+                        state["results"].append((key, list(events or [])))
+                    if state["cancelled"].wait(
+                            LIVE_PAGE_EPG_REQUEST_PAUSE_MS / 1000.0):
+                        break
+        finally:
+            state["done"].set()
+
+    def _live_page_epg_poll(self):
+        state = self._live_page_epg_state
+        if (state is None or self._closed or self._fullscreen_active
+                or state["generation"] != self._live_page_epg_generation
+                or state["signature"] != self._live_page_epg_signature):
+            return
+        with state["lock"]:
+            results = list(state["results"])
+            state["results"].clear()
+            finished = state["done"].is_set()
+        changed = False
+        for key, events in results:
+            if not self._store_detail_component(
+                    key, "events", events, expected_epoch=state["epoch"]):
+                continue
+            changed = True
+            if (self._entries and key == self._detail_selection_key
+                    and key == self._selection_key(self._entries[self.selected_index])):
+                self._show_selected_local_detail(self._entries[self.selected_index], key)
+        if changed:
+            self._refresh_live_row_epg()
+        if finished:
+            self._live_page_epg_state = None
+        else:
+            self._live_page_epg_poll_timer.start(LIVE_PAGE_EPG_POLL_MS, True)
+
+    @staticmethod
+    def _close_live_pixmap_loader(screen, key):
+        try:
+            loader = getattr(screen, "_gt_pixmap_loaders", {}).pop(key, None)
+            if loader is not None:
+                loader.close()
+        except Exception:
+            pass
+
+    def _clear_live_visible_picons(self, reset_signature=True):
+        self._live_row_picon_generation += 1
+        for row_index in range(
+            int(getattr(self, "page_size", LIVE_STREAM_PAGE_SIZE))
+        ):
+            self._close_live_pixmap_loader(
+                self, "live-row-picon-{}".format(row_index)
+            )
+            try:
+                self["stream_picon_{}".format(row_index)].hide()
+            except Exception:
+                pass
+        if reset_signature:
+            self._live_row_picon_signature = None
+
+    def _clear_live_selected_picon(self, reset_signature=True):
+        self._live_selected_picon_generation += 1
+        self._close_live_pixmap_loader(self, "live-selected-picon")
+        try:
+            self["detail_picon"].hide()
+        except Exception:
+            pass
+        if reset_signature:
+            self._live_selected_picon_signature = None
+
+    def _refresh_live_visible_picons(
+        self,
+        force=False,
+        page_start=None,
+        page_items=None,
+    ):
+        """Decode only the picons currently visible on the ten-row page."""
+        if (
+            self._closed
+            or self._fullscreen_active
+            or getattr(self, "_live_modal_active", False)
+            or not self._entries
+        ):
+            self._clear_live_visible_picons()
+            return
+        if page_start is None:
+            page_start = int(self.selected_index / self.page_size) * self.page_size
+        if page_items is None:
+            page_items = self._entries[page_start : page_start + self.page_size]
+        page_items = tuple(page_items or ())
+        paths = []
+        for item in page_items:
+            key = self._selection_key(item)
+            cached = self._detail_store_snapshot(key, item=item)
+            path = str(cached.get("picon_path", "") or "").strip()
+            if not path or not _valid_live_picon_file(path):
+                path = ""
+            paths.append((key, path))
+        signature = (int(page_start), tuple(paths))
+        if not force and signature == self._live_row_picon_signature:
+            return
+        self._clear_live_visible_picons(reset_signature=False)
+        self._live_row_picon_signature = signature
+        generation = self._live_row_picon_generation
+        for row_index, unused_pair in enumerate(paths):
+            unused_key, path = unused_pair
+            if not path:
+                continue
+            widget_name = "stream_picon_{}".format(row_index)
+            loader_key = "live-row-picon-{}".format(row_index)
+
+            def loaded(
+                success,
+                row=row_index,
+                expected=signature,
+                owner=generation,
+            ):
+                widget = "stream_picon_{}".format(row)
+                if (
+                    owner != self._live_row_picon_generation
+                    or expected != self._live_row_picon_signature
+                    or self._closed
+                    or self._fullscreen_active
+                ):
+                    return
+                try:
+                    if success:
+                        self[widget].show()
+                    else:
+                        self[widget].hide()
+                except Exception:
+                    pass
+
+            attach_native_alpha_pixmap(
+                self,
+                widget_name,
+                path,
+                key=loader_key,
+                on_loaded=loaded,
+            )
+
+    def _refresh_selected_picon(self, force=False):
+        """Show the selected channel logo in the large left-hand slot."""
+        if (
+            self._closed
+            or self._fullscreen_active
+            or getattr(self, "_live_modal_active", False)
+            or not self._entries
+        ):
+            self._clear_live_selected_picon()
+            return
+        item = self._entries[self.selected_index]
+        key = self._selection_key(item)
+        cached = self._detail_store_snapshot(key, item=item)
+        path = str(cached.get("picon_path", "") or "").strip()
+        if not path or not _valid_live_picon_file(path):
+            path = ""
+        signature = (key, path)
+        if not force and signature == self._live_selected_picon_signature:
+            return
+        self._clear_live_selected_picon(reset_signature=False)
+        self._live_selected_picon_signature = signature
+        if not path:
+            return
+        generation = self._live_selected_picon_generation
+
+        def loaded(success):
+            if (
+                generation != self._live_selected_picon_generation
+                or signature != self._live_selected_picon_signature
+                or self._closed
+                or self._fullscreen_active
+                or not self._entries
+                or self._selection_key(self._entries[self.selected_index]) != key
+            ):
+                return
+            try:
+                if success:
+                    self["detail_picon"].show()
+                else:
+                    self["detail_picon"].hide()
+            except Exception:
+                pass
+
+        attach_native_alpha_pixmap(
+            self,
+            "detail_picon",
+            path,
+            key="live-selected-picon",
+            on_loaded=loaded,
+        )
+
+    def _cancel_live_picon_prefetch(self, clear_render=False):
+        """Cancel the bounded category queue without touching disk cache."""
+        try:
+            self._live_picon_prefetch_poll_timer.stop()
+        except Exception:
+            pass
+        with self._live_picon_prefetch_lock:
+            self._live_picon_prefetch_generation += 1
+            tokens = tuple(self._live_picon_prefetch_tokens)
+            self._live_picon_prefetch_queue.clear()
+            self._live_picon_prefetch_jobs.clear()
+            self._live_picon_prefetch_known.clear()
+            self._live_picon_prefetch_completed.clear()
+            self._live_picon_prefetch_tokens.clear()
+        for token in tokens:
+            _cancel_worker_token(token)
+        if clear_render:
+            self._clear_live_visible_picons()
+            self._clear_live_selected_picon()
+
+    def _queue_live_category_picons(self, page_start=None, page_items=None):
+        """Queue visible logos first, then every channel in this category."""
+        if (
+            self._closed
+            or self._fullscreen_active
+            or getattr(self, "_live_modal_active", False)
+            or not self._entries
+        ):
+            return
+        if page_start is None:
+            page_start = int(self.selected_index / self.page_size) * self.page_size
+        if page_items is None:
+            page_items = self._entries[page_start : page_start + self.page_size]
+        visible_items = tuple(page_items or ())
+        ordered_items = visible_items + tuple(
+            self._entries[:LIVE_PICON_PREFETCH_MAX_ITEMS]
+        )
+        with self._live_picon_prefetch_lock:
+            generation = self._live_picon_prefetch_generation
+            for item in ordered_items:
+                key = self._selection_key(item)
+                url = _safe_picon_url(getattr(item, "icon", ""))
+                if not key or not url or key in self._live_picon_prefetch_known:
+                    continue
+                self._live_picon_prefetch_known.add(key)
+                self._live_picon_prefetch_jobs[key] = (
+                    item,
+                    self._detail_store_epoch,
+                )
+                self._live_picon_prefetch_queue.append(key)
+
+            # A page turn promotes still-pending visible jobs without
+            # duplicating them or creating hundreds of receiver threads.
+            priority = []
+            seen = set()
+            for item in visible_items:
+                key = self._selection_key(item)
+                if key in self._live_picon_prefetch_jobs and key not in seen:
+                    priority.append(key)
+                    seen.add(key)
+            remainder = [
+                key for key in self._live_picon_prefetch_queue
+                if key not in seen and key in self._live_picon_prefetch_jobs
+            ]
+            self._live_picon_prefetch_queue = deque(priority + remainder)
+            pending = bool(self._live_picon_prefetch_queue)
+        if pending:
+            self._start_live_picon_prefetch_workers(generation)
+            self._live_picon_prefetch_poll_timer.start(
+                LIVE_PICON_PREFETCH_POLL_MS,
+                True,
+            )
+        self._refresh_live_visible_picons(
+            page_start=page_start,
+            page_items=visible_items,
+        )
+
+    def _start_live_picon_prefetch_workers(self, generation=None):
+        threads = []
+        with self._live_picon_prefetch_lock:
+            current = self._live_picon_prefetch_generation
+            generation = current if generation is None else int(generation)
+            if generation != current or not self._live_picon_prefetch_queue:
+                return
+            active = int(
+                self._live_picon_prefetch_worker_counts.get(generation, 0)
+            )
+            count = min(
+                LIVE_PICON_PREFETCH_WORKERS - active,
+                len(self._live_picon_prefetch_queue),
+            )
+            if count <= 0:
+                return
+            self._live_picon_prefetch_worker_counts[generation] = active + count
+            for unused_index in range(count):
+                threads.append(
+                    threading.Thread(
+                        target=self._live_picon_prefetch_worker,
+                        args=(generation,),
+                    )
+                )
+        for worker in threads:
+            worker.daemon = True
+            try:
+                worker.start()
+            except Exception:
+                with self._live_picon_prefetch_lock:
+                    active = int(
+                        self._live_picon_prefetch_worker_counts.get(
+                            generation, 0
+                        )
+                    )
+                    if active <= 1:
+                        self._live_picon_prefetch_worker_counts.pop(
+                            generation, None
+                        )
+                    else:
+                        self._live_picon_prefetch_worker_counts[generation] = (
+                            active - 1
+                        )
+
+    def _live_picon_prefetch_worker(self, generation):
+        try:
+            while True:
+                with self._live_picon_prefetch_lock:
+                    if (
+                        generation != self._live_picon_prefetch_generation
+                        or self._closed
+                        or self._fullscreen_active
+                        or getattr(self, "_live_modal_active", False)
+                        or not self._live_picon_prefetch_queue
+                    ):
+                        return
+                    key = self._live_picon_prefetch_queue.popleft()
+                    job = self._live_picon_prefetch_jobs.pop(key, None)
+                if job is None:
+                    continue
+                item, store_epoch = job
+                token = _WorkerToken(max(3, LIVE_PICON_DOWNLOAD_TIMEOUT + 2))
+                with self._live_picon_prefetch_lock:
+                    if generation != self._live_picon_prefetch_generation:
+                        token.cancel()
+                        return
+                    self._live_picon_prefetch_tokens.add(token)
+                path = ""
+                try:
+                    path = self._load_detail_picon_path(item, token)
+                except _WorkerCancelled:
+                    pass
+                except Exception:
+                    url = _safe_picon_url(getattr(item, "icon", ""))
+                    if url:
+                        _mark_picon_failure(url)
+                finally:
+                    with self._live_picon_prefetch_lock:
+                        self._live_picon_prefetch_tokens.discard(token)
+                with self._live_picon_prefetch_lock:
+                    current = bool(
+                        generation == self._live_picon_prefetch_generation
+                        and not self._closed
+                        and not self._fullscreen_active
+                        and not getattr(self, "_live_modal_active", False)
+                    )
+                if not current:
+                    return
+                self._store_detail_component(
+                    key,
+                    "picon_path",
+                    path,
+                    expected_epoch=store_epoch,
+                )
+                with self._live_picon_prefetch_lock:
+                    if generation == self._live_picon_prefetch_generation:
+                        self._live_picon_prefetch_completed.add(key)
+        finally:
+            with self._live_picon_prefetch_lock:
+                active = int(
+                    self._live_picon_prefetch_worker_counts.get(generation, 0)
+                )
+                if active <= 1:
+                    self._live_picon_prefetch_worker_counts.pop(generation, None)
+                else:
+                    self._live_picon_prefetch_worker_counts[generation] = active - 1
+
+    def _live_picon_prefetch_poll(self):
+        if (
+            self._closed
+            or self._fullscreen_active
+            or getattr(self, "_live_modal_active", False)
+        ):
+            return
+        with self._live_picon_prefetch_lock:
+            generation = self._live_picon_prefetch_generation
+            completed = set(self._live_picon_prefetch_completed)
+            self._live_picon_prefetch_completed.clear()
+            pending = bool(self._live_picon_prefetch_queue)
+            active = bool(
+                self._live_picon_prefetch_worker_counts.get(generation, 0)
+            )
+        if completed and self._entries:
+            page_start = int(self.selected_index / self.page_size) * self.page_size
+            page_items = self._entries[page_start : page_start + self.page_size]
+            visible_keys = {
+                self._selection_key(item) for item in page_items
+            }
+            if completed.intersection(visible_keys):
+                self._refresh_live_visible_picons(
+                    force=True,
+                    page_start=page_start,
+                    page_items=page_items,
+                )
+            selected_key = self._selection_key(
+                self._entries[self.selected_index]
+            )
+            if selected_key in completed:
+                self._refresh_selected_picon(force=True)
+        if pending:
+            self._start_live_picon_prefetch_workers(generation)
+        with self._live_picon_prefetch_lock:
+            keep_polling = bool(
+                self._live_picon_prefetch_queue
+                or self._live_picon_prefetch_worker_counts.get(generation, 0)
+                or self._live_picon_prefetch_completed
+            )
+        if keep_polling:
+            self._live_picon_prefetch_poll_timer.start(
+                LIVE_PICON_PREFETCH_POLL_MS,
+                True,
+            )
 
     def _cancel_live_active_picon_fetch(self, clear_target=False):
         for timer in (
@@ -15829,6 +17318,7 @@ class GTStreamListScreen(
                 self._preview_epg_events = list(value or [])
                 self._preview_epg_loaded_at = time.time()
                 self._render_selected_epg(self._preview_epg_events)
+                self._refresh_live_row_epg()
                 if self._preview_epg_events:
                     self._detail_progress_timer.start(
                         LIVE_DETAIL_PROGRESS_INTERVAL_MS,
@@ -15902,13 +17392,15 @@ class GTStreamListScreen(
         self["ribbon_next_caption"].setText(_("NEXT"))
         self["ribbon_next_time"].setText("")
         self._set_static_next_title("")
-        for row in ("now", "next", "third", "fourth"):
-            self["epg_{}_time".format(row)].setText("")
-            self["epg_{}_title".format(row)].setText("")
-            self["epg_{}_status".format(row)].setText("")
+        for row in ("now", "next", "third", "fourth", "fifth"):
+            try:
+                self["epg_{}_time".format(row)].setText("")
+                self["epg_{}_title".format(row)].setText("")
+                self["epg_{}_status".format(row)].setText("")
+            except KeyError:
+                pass
         self._clear_epg_progress()
-        self["summary"].setText(_("Waiting for programme information"))
-        self["summary_scroll"].setText("")
+        self._set_summary(_("Waiting for programme information"))
 
     def _render_selected_epg(self, events):
         events = self._detail_window() if events else []
@@ -15925,15 +17417,15 @@ class GTStreamListScreen(
             self["epg_now_time"].setText("")
             self["epg_now_title"].setText("")
             self["epg_now_status"].setText("")
-            for row in ("next", "third", "fourth"):
-                self["epg_{}_time".format(row)].setText("")
-                self["epg_{}_title".format(row)].setText("")
-                self["epg_{}_status".format(row)].setText("")
+            for row in ("next", "third", "fourth", "fifth"):
+                try:
+                    self["epg_{}_time".format(row)].setText("")
+                    self["epg_{}_title".format(row)].setText("")
+                    self["epg_{}_status".format(row)].setText("")
+                except KeyError:
+                    pass
             self._clear_epg_progress()
-            self["summary"].setText(
-                _("No summary is available for this programme.")
-            )
-            self["summary_scroll"].setText("")
+            self._set_summary(_("No summary is available for this programme."))
             return
         future_only = _epg_event_starts_in_future(events[0])
         current = None if future_only else events[0]
@@ -15959,24 +17451,30 @@ class GTStreamListScreen(
             )
             self["epg_now_status"].setText(_("NOW"))
             self._set_epg_progress(current)
-        rows = ("next", "third", "fourth")
-        statuses = (_("NEXT"), _("LATER"), _("LATER"))
+        rows = ("next", "third", "fourth", "fifth")
+        statuses = (_("NEXT"), _("LATER"), _("LATER"), _("LATER"))
         first_upcoming = 0 if future_only else 1
         for row_offset, row in enumerate(rows):
+            try:
+                time_label = self["epg_{}_time".format(row)]
+                title_label = self["epg_{}_title".format(row)]
+                status_label = self["epg_{}_status".format(row)]
+            except KeyError:
+                continue
             offset = first_upcoming + row_offset
             event = events[offset] if offset < len(events) else None
-            self["epg_{}_time".format(row)].setText(
+            time_label.setText(
                 (event.start or event.time_text()) if event is not None else ""
             )
             if event is None:
-                self["epg_{}_title".format(row)].setText("")
+                title_label.setText("")
             else:
                 ellipsize_dynamic_text(
-                    self["epg_{}_title".format(row)],
+                    title_label,
                     event.title,
                     fallback_chars=54,
                 )
-            self["epg_{}_status".format(row)].setText(
+            status_label.setText(
                 statuses[row_offset] if event is not None else ""
             )
         upcoming = (
@@ -16011,10 +17509,7 @@ class GTStreamListScreen(
         if summary:
             self._set_summary(summary)
         else:
-            self["summary"].setText(
-                _("No summary is available for this programme.")
-            )
-            self["summary_scroll"].setText("")
+            self._set_summary(_("No summary is available for this programme."))
 
     def _set_now_title(self, value):
         return fit_dynamic_text(
@@ -16050,13 +17545,17 @@ class GTStreamListScreen(
                 loader.close()
         except Exception:
             pass
-        for row_index in range(
-            int(getattr(self, "page_size", LIVE_STREAM_PAGE_SIZE))
-        ):
-            try:
-                self["stream_picon_{}".format(row_index)].hide()
-            except Exception:
-                pass
+        # Compatibility for isolated method fixtures from pre-R76 releases.
+        # The real R76 screen owns the new visible-page renderer and must not
+        # blank its ten decoded picons when preview ownership changes.
+        if not callable(getattr(self, "_refresh_live_visible_picons", None)):
+            for row_index in range(
+                int(getattr(self, "page_size", LIVE_STREAM_PAGE_SIZE))
+            ):
+                try:
+                    self["stream_picon_{}".format(row_index)].hide()
+                except Exception:
+                    pass
         if reset_signature:
             self._live_active_picon_signature = None
 
@@ -16120,71 +17619,102 @@ class GTStreamListScreen(
             page_start=page_start,
             page_items=page_items,
         )
-        if not force and signature == self._live_active_picon_signature:
-            return
-        self._clear_live_active_picon(reset_signature=False)
-        self._live_active_picon_signature = signature
-        unused_page, row_index, unused_key, path = signature
-        if row_index < 0 or not path:
-            return
-        generation = self._live_active_picon_generation
-        widget_name = "stream_picon_{}".format(row_index)
-        self._live_active_picon_widget_owners[widget_name] = generation
+        visible_refresh = getattr(self, "_refresh_live_visible_picons", None)
+        selected_refresh = getattr(self, "_refresh_selected_picon", None)
+        if not callable(visible_refresh):
+            # Preserve the previous exact-active-row behavior for callers
+            # which intentionally extract this method in isolation.
+            if not force and signature == self._live_active_picon_signature:
+                return
+            self._clear_live_active_picon(reset_signature=False)
+            self._live_active_picon_signature = signature
+            unused_page, row_index, unused_key, path = signature
+            if row_index < 0 or not path:
+                return
+            generation = self._live_active_picon_generation
+            widget_name = "stream_picon_{}".format(row_index)
+            self._live_active_picon_widget_owners[widget_name] = generation
 
-        def loaded(success):
-            # A superseded loader may share the same physical row widget with
-            # the new active channel. Its late callback must not hide artwork
-            # which the current generation has already published.
-            if (
-                generation != self._live_active_picon_generation
-                or signature != self._live_active_picon_signature
-            ):
-                if widget_name not in self._live_active_picon_widget_owners:
+            def loaded(success):
+                if (
+                    generation != self._live_active_picon_generation
+                    or signature != self._live_active_picon_signature
+                ):
+                    if widget_name not in self._live_active_picon_widget_owners:
+                        try:
+                            self[widget_name].hide()
+                        except Exception:
+                            pass
+                    return
+                if (
+                    getattr(self, "_closed", False)
+                    or self._fullscreen_active
+                    or signature != self._live_active_picon_target()
+                ):
                     try:
                         self[widget_name].hide()
                     except Exception:
                         pass
-                return
-            if (
-                getattr(self, "_closed", False)
-                or self._fullscreen_active
-                or signature != self._live_active_picon_target()
-            ):
-                try:
+                    return
+                if success:
+                    self[widget_name].show()
+                else:
                     self[widget_name].hide()
-                except Exception:
-                    pass
-                return
-            if success:
-                self[widget_name].show()
-            else:
-                self[widget_name].hide()
 
-        attach_pixmap(
-            self,
-            widget_name,
-            path,
-            key="live-active-row-picon",
-            on_loaded=loaded,
+            attach_native_alpha_pixmap(
+                self,
+                widget_name,
+                path,
+                key="live-active-row-picon",
+                on_loaded=loaded,
+            )
+            return
+        self._live_active_picon_signature = signature
+        visible_refresh(
+            force=force,
+            page_start=page_start,
+            page_items=page_items,
         )
+        if callable(selected_refresh):
+            selected_refresh(force=force)
 
     def _update_epg_clock(self):
+        now = datetime.datetime.now()
         try:
-            self["ribbon_clock"].setText(time.strftime("%H:%M"))
+            self["ribbon_clock"].setText(now.strftime("%H:%M"))
+            self["clock_time"].setText(now.strftime("%H:%M:%S"))
+            localized = localized_date_text(now)
+            year = str(now.year)
+            if year not in localized:
+                parts = localized.rsplit(" ", 1)
+                if len(parts) == 2:
+                    weekday = parts[1]
+                    date_line = "{} {}".format(parts[0], year)
+                else:
+                    weekday = now.strftime("%A")
+                    date_line = "{} {}".format(localized, year)
+            else:
+                weekday = now.strftime("%A")
+                date_line = localized
+            self["clock_date"].setText("{}\n{}".format(weekday, date_line))
         except Exception:
             pass
+        minute = now.strftime("%Y%m%d%H%M")
+        if minute != self._live_clock_minute:
+            self._live_clock_minute = minute
+            self._refresh_live_row_epg()
 
     def start_epg_clock(self):
         if self._closed or self._fullscreen_active:
             return
         self._update_epg_clock()
-        self._epg_clock_timer.start(_minute_timer_delay_ms(), True)
+        self._epg_clock_timer.start(1000, True)
 
     def _epg_clock_tick(self):
         if self._closed or self._fullscreen_active:
             return
         self._update_epg_clock()
-        self._epg_clock_timer.start(_minute_timer_delay_ms(), True)
+        self._epg_clock_timer.start(1000, True)
 
     def _clear_epg_progress(self):
         self["epg_progress"].setText("")
@@ -16192,7 +17722,8 @@ class GTStreamListScreen(
 
     def _set_epg_progress(self, event):
         ratio, value = self._progress_details(event)
-        self["epg_progress"].setText(value)
+        percent = value.split("•", 1)[0].strip() if value else ""
+        self["epg_progress"].setText(percent)
         fill = self["epg_progress_fill"]
         if not value:
             fill.hide()
@@ -16209,13 +17740,64 @@ class GTStreamListScreen(
         fill.show()
 
     def _set_summary(self, summary):
-        fit_dynamic_text(
-            self["summary"],
-            summary,
-            max_lines=3,
-            fallback_chars=52,
+        rendered = clean_dynamic_text(summary)
+        selection_key = self._detail_selection_key
+        text_changed = rendered != self._summary_text
+        selection_changed = selection_key != self._summary_selection_key
+        if not text_changed and not selection_changed:
+            return rendered
+        self._summary_scroll_timer.stop()
+        self._summary_text = rendered
+        self._summary_selection_key = selection_key
+        self._summary_lines = _wrap_live_summary(
+            rendered, self._summary_line_capacity
         )
-        self["summary_scroll"].setText("")
+        self._summary_line_offset = 0
+        self._render_summary_window()
+        if len(self._summary_lines) > self._summary_visible_lines:
+            self._summary_scroll_timer.start(3500, True)
+        return rendered
+
+    def _render_summary_window(self):
+        lines = self._summary_lines
+        offset = self._summary_line_offset
+        visible = self._summary_visible_lines
+        self["summary"].setText("\n".join(lines[offset:offset + visible]))
+        self._refresh_summary_scroll_indicator()
+
+    def _summary_scroll_tick(self):
+        if self._closed or self._fullscreen_active:
+            return
+        last = max(0, len(self._summary_lines) - self._summary_visible_lines)
+        if not last:
+            return
+        if self._summary_line_offset >= last:
+            self._summary_line_offset = 0
+            delay = 3500
+        else:
+            self._summary_line_offset += 1
+            delay = 4500 if self._summary_line_offset == last else 3500
+        self._render_summary_window()
+        self._summary_scroll_timer.start(delay, True)
+
+    def _refresh_summary_scroll_indicator(self):
+        if self._closed or self._fullscreen_active:
+            return
+        total = len(self._summary_lines)
+        visible = self._summary_visible_lines
+        if total <= visible:
+            self["summary_scroll"].setText("")
+            hide_scrollbar(self, "summary_scrollbar")
+            return
+        position = min(max(0, self._summary_line_offset), total - visible)
+        pages = max(2, int(math.ceil(float(total) / visible)))
+        current = 1 + int(round(float(position) * (pages - 1) / (total - visible)))
+        self["summary_scroll"].setText("{}/{}".format(current, pages))
+        selected = int(round(float(position) * (total - 1) / (total - visible)))
+        update_scrollbar(
+            self, "summary_scrollbar", total, selected, visible,
+            self._summary_scrollbar_geometry,
+        )
 
     def _snapshot_for_selected(self, item):
         stream_id = self._selection_key(item)
@@ -16400,8 +17982,12 @@ class GTStreamListScreen(
             self._begin_preview_link(item, index, request_fullscreen=False)
             return
         self._fullscreen_link_snapshot = self._snapshot_for_selected(item)
+        self._cancel_live_page_epg()
         self._cancel_preview_resolution(clear_target=True)
         self._cancel_selected_detail(clear_selection=False)
+        cancel_prefetch = getattr(self, "_cancel_live_picon_prefetch", None)
+        if callable(cancel_prefetch):
+            cancel_prefetch(clear_render=True)
         self._cancel_live_active_picon_fetch(clear_target=True)
         self._clear_live_active_picon()
         with self._live_more_worker_events_lock:
@@ -16419,6 +18005,7 @@ class GTStreamListScreen(
         if recovery is not None:
             recovery.detach()
         self._fullscreen_active = True
+        self._stop_preview_stream_diag()
         self._suspend_preview_pig()
         arguments = (
             GTExternalPlayerScreen,
@@ -16441,6 +18028,8 @@ class GTStreamListScreen(
                     adopt_playing_service=True,
                     old_reference_override=self._pre_list_reference,
                     live_startup_recovery=recovery,
+                    stream_diag_play_id=self._stream_diag_play_id,
+                    stream_diag_started_at=self._stream_diag_started_at,
                 )
                 return
             dialog = self.session.open(
@@ -16452,6 +18041,8 @@ class GTStreamListScreen(
                 adopt_playing_service=True,
                 old_reference_override=self._pre_list_reference,
                 live_startup_recovery=recovery,
+                stream_diag_play_id=self._stream_diag_play_id,
+                stream_diag_started_at=self._stream_diag_started_at,
             )
             on_close = getattr(dialog, "onClose", None)
             if isinstance(on_close, list):
@@ -16466,6 +18057,7 @@ class GTStreamListScreen(
         self._fullscreen_open_failed()
 
     def _fullscreen_open_failed(self):
+        self._preview_stream_diag("fullscreen", "outcome=error")
         self._fullscreen_link_snapshot = None
         self._fullscreen_active = False
         if getattr(self, "_live_startup_recovery", None) is not None:
@@ -16477,6 +18069,7 @@ class GTStreamListScreen(
             self._timer.start(100, True)
         self.start_epg_clock()
         self._detail_selection_key = None
+        self._refresh_live_streams()
         if VideoWindow is None:
             suspended_key = self._playing_preview_key
             if self._entries:
@@ -16596,6 +18189,7 @@ class GTStreamListScreen(
         self.close()
 
     def _clear_preview_service_state(self):
+        self._stop_preview_stream_diag()
         cancel_startup = getattr(self, "_cancel_live_startup", None)
         if callable(cancel_startup):
             cancel_startup()
@@ -16685,6 +18279,7 @@ class GTStreamListScreen(
             self._clear_preview_service_state()
 
     def _stop(self):
+        self._stop_preview_stream_diag()
         self._release_preview_for_exit()
         GTAsyncListScreen._stop(self)
         with self._live_more_worker_events_lock:
@@ -16695,7 +18290,11 @@ class GTStreamListScreen(
             _cancel_worker_token(token)
         self._live_catalog_generation += 1
         self._live_more_loading = False
+        self._cancel_live_page_epg()
         self._cancel_selected_detail(clear_selection=True)
+        cancel_prefetch = getattr(self, "_cancel_live_picon_prefetch", None)
+        if callable(cancel_prefetch):
+            cancel_prefetch(clear_render=True)
         self._cancel_live_active_picon_fetch(clear_target=True)
         self._clear_live_active_picon()
         with self._preview_link_lock:
@@ -16709,6 +18308,7 @@ class GTStreamListScreen(
             self._preview_video_timer,
             self._live_active_picon_timer,
             self._live_active_picon_poll_timer,
+            self._live_picon_prefetch_poll_timer,
         ):
             try:
                 timer.stop()
@@ -16724,11 +18324,17 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
         series,
         client=None,
         favorite_store=None,
+        download_mode=False,
     ):
+        self.download_mode = bool(download_mode)
         self.series = series
         self.client = client or content_client_for(account)
         self._init_favorite_support(favorite_store)
-        self._footer_layout_items = EPISODE_FOOTER_ITEMS
+        self._footer_layout_items = (
+            EPISODE_DOWNLOAD_FOOTER_ITEMS
+            if self.download_mode else EPISODE_FOOTER_ITEMS
+        )
+        self._footer_layout_stacked = True
         self.skin = _episode_list_skin()
         self.page_size = EPISODE_PAGE_SIZE
         screen_width, screen_height, px = _scale()
@@ -16777,9 +18383,10 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
                 ] = Label("")
         self._clear_episode_rows()
         self["actions"] = ActionMap(
-            ["OkCancelActions", "DirectionActions", "ColorActions"],
+            ["OkCancelActions", "DirectionActions", "ColorActions", "MenuActions"],
             {
                 "ok": self.open_selected,
+                "menu": self.download_selected,
                 "cancel": self.close,
                 "up": self.move_up,
                 "down": self.move_down,
@@ -16941,7 +18548,16 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
                     "episode_focus_{}_{}".format(row_index, edge)
                 ].hide()
 
+    def download_selected(self):
+        if not self._entries or self._loading:
+            return
+        from .downloads_ui import request_download
+        request_download(self.session, self.client, self._entries[self.selected_index])
+
     def open_selected(self):
+        if self.download_mode:
+            self.download_selected()
+            return
         if not self._entries or self._loading:
             return
         open_extplayer(
@@ -17051,7 +18667,7 @@ def reference_stream_url(reference):
 
 def _play_service(navigation, reference):
     """Start a service and normalise Enigma2's image-specific return value."""
-    result = navigation.playService(reference)
+    result = _guarded_play_service(navigation, reference)
     # Native Enigma2 uses 0 for success and a non-zero integer for failure.
     # Several Enigma2 images return None instead, which is accepted.
     if isinstance(result, int) and result != 0:
@@ -18003,6 +19619,7 @@ def _launch_extplayer(
     owner=None,
     archive_initial_playback=None,
 ):
+    _remember_account_url(client, url)
     reference = build_extplayer_reference(
         url, item.name, getattr(item, "content_type", "movie")
     )
@@ -18026,6 +19643,8 @@ def _launch_extplayer(
                 pass
 
     def launch(start_position=0):
+        if not _allow_account_playback(session, client):
+            return
         session.open(
             GTExternalPlayerScreen,
             reference,
@@ -18325,6 +19944,7 @@ class _AsyncPlaybackResolver(object):
             self._resolution_failed()
 
     def _resolution_failed(self):
+        _cancel_download_pending(self.client)
         resume = getattr(self.owner, "_resume_after_playback_resolution_failure", None)
         if callable(resume) and not getattr(self.owner, "_closed", False):
             try:
@@ -18344,6 +19964,7 @@ class _AsyncPlaybackResolver(object):
         del args
         self.finished = True
         _cancel_worker_token(self.token)
+        _cancel_download_pending(self.client)
         try:
             self.timer.stop()
         except Exception:
@@ -18365,6 +19986,8 @@ def open_extplayer(
     favorite_parent=None,
     favorite_keys=None,
 ):
+    if not _allow_account_playback(session, client):
+        return
     if favorite_store is None:
         favorite_store = getattr(owner, "favorite_store", None)
     if favorite_parent is None:
@@ -18389,19 +20012,24 @@ def open_extplayer(
             favorite_parent=favorite_parent,
             favorite_keys=favorite_keys,
         ).start()
-    url = client.playback_url(item)
-    return _launch_extplayer(
-        session,
-        client,
-        item,
-        url,
-        items,
-        selected_index,
-        favorite_store=favorite_store,
-        favorite_parent=favorite_parent,
-        favorite_keys=favorite_keys,
-        owner=owner,
-    )
+    try:
+        url = client.playback_url(item)
+        return _launch_extplayer(
+            session,
+            client,
+            item,
+            url,
+            items,
+            selected_index,
+            favorite_store=favorite_store,
+            favorite_parent=favorite_parent,
+            favorite_keys=favorite_keys,
+            owner=owner,
+        )
+    except _DownloadError as error:
+        _cancel_download_pending(client)
+        session.open(MessageBox, _(str(error)), MessageBox.TYPE_INFO)
+        return
 
 
 def _connect_timer(timer, callback):
@@ -19453,6 +21081,80 @@ class GTPlayerFrontPanelSummary(Screen):
             pass
 
 
+class GTMinuteSeekScreen(Screen):
+    """Enter an integer number of minutes without replacing the video."""
+
+    def __init__(self, session, direction, current_position=0, length=0):
+        self.skin = _minute_seek_skin()
+        Screen.__init__(self, session)
+        self.direction = 1 if direction >= 0 else -1
+        self.current_position = max(0, int(current_position or 0))
+        self.length = max(0, int(length or 0))
+        self.digits = ""
+        for name in ("panel", "accent", "input_bg"):
+            self[name] = Label("")
+        self["title"] = Label(_(
+            "SEEK FORWARD" if self.direction > 0 else "SEEK BACKWARD"
+        ))
+        self["minutes"] = Label("")
+        self["unit"] = Label("")
+        self["position"] = Label("")
+        self["footer"] = Label("0–9  •  OK  •  EXIT / " + _("Cancel"))
+        digits = {
+            str(number): (lambda value=str(number): self.enter_digit(value))
+            for number in range(10)
+        }
+        digits.update({
+            "ok": self.confirm,
+            "cancel": self.cancel,
+            "back": self.cancel,
+            "red": self.cancel,
+            "green": self.confirm,
+            "deleteBackward": self.backspace,
+            "backspace": self.backspace,
+        })
+        self["actions"] = ActionMap(
+            ["NumberActions", "OkCancelActions", "ColorActions", "TextEditActions"],
+            digits,
+            -1,
+        )
+        self._refresh()
+
+    @staticmethod
+    def _time_text(seconds):
+        hours, remainder = divmod(max(0, int(seconds)), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
+
+    def _refresh(self):
+        minutes = int(self.digits or "0")
+        target = self.current_position + self.direction * minutes * 60
+        if self.length > 0:
+            target = min(target, self.length)
+        target = max(0, target)
+        self["minutes"].setText(self.digits or "0")
+        self["unit"].setText(_("{} minutes").format("").strip())
+        self["position"].setText("{}  →  {}".format(
+            self._time_text(self.current_position), self._time_text(target)
+        ))
+
+    def enter_digit(self, digit):
+        if len(self.digits) < 4:
+            self.digits = (self.digits + str(digit)).lstrip("0") or "0"
+            self._refresh()
+
+    def backspace(self):
+        self.digits = self.digits[:-1]
+        self._refresh()
+
+    def confirm(self):
+        minutes = int(self.digits or "0")
+        self.close(minutes if minutes > 0 else None)
+
+    def cancel(self):
+        self.close(None)
+
+
 class GTExternalPlayerScreen(
     _LiveStartupRecoverySupport,
     _FavoriteSupport,
@@ -19481,6 +21183,8 @@ class GTExternalPlayerScreen(
         live_startup_recovery=None,
         playback_owner=None,
         archive_initial_playback=None,
+        stream_diag_play_id="",
+        stream_diag_started_at=0.0,
     ):
         self.skin = _player_skin()
         Screen.__init__(self, session)
@@ -19520,6 +21224,9 @@ class GTExternalPlayerScreen(
             self.current_index = requested_index % len(self._entries)
             self.current_item = self._entries[self.current_index]
         self.title = getattr(item, "name", str(item or "GT IPTV"))
+        self._youtube_clock_base = 0
+        self._youtube_clock_started_at = time.monotonic()
+        self._youtube_clock_pause_started_at = None
         self.old_reference = None
         self._started = False
         self._closed = False
@@ -19538,6 +21245,16 @@ class GTExternalPlayerScreen(
         self._picon_request_token = 0
         self._live_info_ready_samples = 0
         self._live_play_started_at = 0.0
+        candidate_id = str(stream_diag_play_id or "").lower()
+        self._stream_diag_play_id = (
+            candidate_id if re.fullmatch(r"[0-9a-f]{10}", candidate_id)
+            else ""
+        )
+        try:
+            self._stream_diag_started_at = float(stream_diag_started_at or 0.0)
+        except (TypeError, ValueError, OverflowError):
+            self._stream_diag_started_at = 0.0
+        self._stream_diag_probe = None
         self._live_info_state = None
         self._live_info_results = {}
         self._live_info_results_lock = threading.Lock()
@@ -19591,14 +21308,26 @@ class GTExternalPlayerScreen(
         self._seek_target = 0
         self._seek_length = 0
         self._pending_seek_verification = None
+        self._seek_ready = False
+        self._seek_startup_deadline = 0.0
         self._paused = False
         self._blue_long_last_at = 0.0
         self._suppress_next_blue_short_until = 0.0
         self._audio_menu_open = False
+        self._media_menu_open = False
+        self._minute_seek_open = False
+        self._held_direction = None
+        self._held_direction_long = False
+        self._player_key_callback = self._handle_player_key
+        self._player_keys_bound = False
+        self._player_key_map = None
+        self._player_key_ids = {}
+        self._short_direction_is_seek = True
         self._subtitle_menu_open = False
         self._subtitle_menu_generation = None
         self._subtitle_message_tokens = set()
         self._subtitle_message_serial = 0
+        self._subtitle_auto_generation = -1
         self._resume_store = resume_store
         self._resume_key = str(resume_key_value or "")
         try:
@@ -19647,6 +21376,8 @@ class GTExternalPlayerScreen(
         self._engine_link_deadline = 0.0
         self._engine_link_token = None
         self._engine_decoder_released = False
+        self._engine_switch_resume_position = 0
+        self._youtube_pending_engine_start = None
         self._weather_token = None
         self._picon_worker_token = None
 
@@ -19661,6 +21392,7 @@ class GTExternalPlayerScreen(
             on_message=self._show_subtitle_message,
             on_changed=self._subtitle_changed,
             title_provider=self._subtitle_search_metadata,
+            position_provider=self._subtitle_position,
             is_paused=lambda: self._paused,
             pause_for_search=self._pause_for_subtitle_search,
             resume_after_search=self._resume_after_subtitle_search,
@@ -19676,7 +21408,9 @@ class GTExternalPlayerScreen(
         self._live_info_timer = eTimer()
         self._playback_timer = eTimer()
         self._resume_timer = eTimer()
+        self._direction_hold_timer = eTimer()
         self._seek_verify_timer = eTimer()
+        self._subtitle_auto_timer = eTimer()
         self._reconnect_timer = eTimer()
         self._channel_switch_timer = eTimer()
         self._archive_portal_timer = eTimer()
@@ -19688,7 +21422,12 @@ class GTExternalPlayerScreen(
         _connect_timer(self._live_info_timer, self._live_info_tick)
         _connect_timer(self._playback_timer, self._playback_tick)
         _connect_timer(self._resume_timer, self._resume_tick)
+        _connect_timer(self._direction_hold_timer, self._direction_hold_timeout)
         _connect_timer(self._seek_verify_timer, self._verify_seek_result)
+        _connect_timer(
+            self._subtitle_auto_timer,
+            self._start_automatic_subtitle_search,
+        )
         _connect_timer(self._reconnect_timer, self._complete_live_restart)
         self._engine_switch_timer = eTimer()
         _connect_timer(
@@ -19736,27 +21475,24 @@ class GTExternalPlayerScreen(
                 # Navigation aliases are intentionally not registered.
                 "channelUp": self.next_channel,
                 "channelDown": self.previous_channel,
-                # Match the familiar IPTV-player controls: 0 manually
-                # restarts a live stream, INFO/TV cycles installed engines.
+                # 0 restarts live playback, 1 cycles playback engines. INFO
+                # and EPG only show the ordinary player information.
                 "0": self.restart_live_stream,
-                "info": self.cycle_live_service_type,
-                "tv": self.cycle_live_service_type,
-                "showEventInfo": self.cycle_live_service_type,
-                "showEventView": self.cycle_live_service_type,
-                "keyTV": self.cycle_live_service_type,
+                "1": self.cycle_player_service_type,
+                "info": self.toggle_info,
+                "tv": self.toggle_info,
+                "showEventInfo": self.toggle_info,
+                "showEventView": self.toggle_info,
+                "showEventInfoSingleEPG": self.toggle_info,
+                "keyTV": self.toggle_info,
         }
-        if getattr(self.current_item, "content_type", "") in (
-            "movie",
-            "series",
-            "catchup",
-        ):
-            # Lists retain BLUE search.  Only the modal VOD player uses a
-            # short BLUE press for decoder-local audio-track selection.
+        content_type = getattr(self.current_item, "content_type", "")
+        if content_type in ("movie", "series"):
+            player_actions["blue"] = self.ignore_vod_blue
+            player_actions["bluelong"] = self.ignore_vod_blue
+            player_actions["blue_long"] = self.ignore_vod_blue
+        elif content_type == "catchup":
             player_actions["blue"] = self.open_audio_selection
-            # OpenATV publishes this optional long-key alias.  Images without
-            # it simply ignore the mapping; the primary short-key path remains
-            # portable.  Some keymaps emit BLUE once more on key release, so
-            # the long handler suppresses one immediate short event.
             player_actions["bluelong"] = self.toggle_favorite_with_blue_long
             player_actions["blue_long"] = self.toggle_favorite_with_blue_long
         if not self._is_live_item():
@@ -19785,15 +21521,13 @@ class GTExternalPlayerScreen(
                     "leftRepeated": self.seek_left_or_info,
                 }
             )
-        if getattr(self.current_item, "content_type", "") in (
-            "movie",
-            "series",
-            "catchup",
-        ):
+        if content_type in ("movie", "series", "catchup"):
             player_contexts.append("InfobarSubtitleSelectionActions")
             player_actions.update(
                 {
-                    "yellow": self.open_subtitle_selection,
+                    "yellow": (self.open_media_selection
+                               if content_type in ("movie", "series")
+                               else self.open_subtitle_selection),
                     "subtitleSelection": self.open_subtitle_selection,
                 }
             )
@@ -19802,6 +21536,11 @@ class GTExternalPlayerScreen(
             player_actions,
             -1,
         )
+        # Enigma2 images differ in their LEFT/RIGHT and colour keymaps. Bind
+        # the physical keys only while this player owns the modal screen.
+        # This also avoids a custom XML keymap lingering after an IPK update.
+        self.onExecBegin.append(self._bind_player_key_handler)
+        self.onExecEnd.append(self._unbind_player_key_handler)
         if hasattr(self, "onShown"):
             self.onShown.append(self.start_playback)
         if hasattr(self, "onClose"):
@@ -19838,6 +21577,58 @@ class GTExternalPlayerScreen(
 
     def _is_live_item(self):
         return getattr(self.current_item, "content_type", "") == "live"
+
+    def _player_stream_diag(
+        self, stage, detail="", play_id=None, started_at=None,
+    ):
+        if not self._is_live_item() or not _is_stalker_client(self.client):
+            return
+        if not play_id and not self._stream_diag_play_id:
+            self._stream_diag_play_id = uuid.uuid4().hex[:10]
+        if not started_at and not self._stream_diag_started_at:
+            self._stream_diag_started_at = time.monotonic()
+        play_id = play_id or self._stream_diag_play_id
+        started_at = started_at or self._stream_diag_started_at
+        elapsed_ms = max(0, int(
+            (time.monotonic() - started_at) * 1000
+        ))
+        log_event(
+            "stream_diag",
+            "play_id={} phase=player engine={} elapsed_ms={} stage={} {} "
+            "geo=unknown".format(
+                play_id,
+                reference_service_type(self.reference, 4097),
+                elapsed_ms, stage, detail,
+            ),
+        )
+
+    def _stop_player_stream_diag(self):
+        probe = getattr(self, "_stream_diag_probe", None)
+        self._stream_diag_probe = None
+        if probe is not None:
+            probe.stop()
+
+    def _new_player_stream_diag(self, reason):
+        if not self._is_live_item() or not _is_stalker_client(self.client):
+            return
+        self._stop_player_stream_diag()
+        self._stream_diag_play_id = uuid.uuid4().hex[:10]
+        self._stream_diag_started_at = time.monotonic()
+        self._player_stream_diag("request", "reason={}".format(reason))
+
+    def _watch_player_stream_diag(self, navigation, reference, reason):
+        if not self._is_live_item() or not _is_stalker_client(self.client):
+            return
+        self._stop_player_stream_diag()
+        self._player_stream_diag("service-active", "outcome=accepted reason={}".format(
+            reason,
+        ))
+        self._stream_diag_probe = _StalkerStreamProbe(
+            navigation, reference, self._stream_diag_play_id,
+            started_at=self._stream_diag_started_at,
+            phase="player",
+        )
+        self._stream_diag_probe.start()
 
     def _is_archive_item(self):
         return getattr(self.current_item, "content_type", "") == "catchup"
@@ -20737,6 +22528,12 @@ class GTExternalPlayerScreen(
             )
             self._started = True
             self._generation += 1
+            self._player_stream_diag(
+                "handoff", "outcome=accepted reason=preview-service",
+            )
+            self._watch_player_stream_diag(
+                navigation, active_reference, "preview-handoff",
+            )
             _debug(
                 "playback adopted content=live actual_engine={} "
                 "reason=preview_handoff".format(
@@ -20758,9 +22555,22 @@ class GTExternalPlayerScreen(
             # without issuing a second provider request.
             self._stop_live_auxiliary_timers()
             next_reference = self._fresh_live_reference()
+            self._player_stream_diag(
+                "service-reference",
+                "outcome={} actual_engine={}".format(
+                    "built" if next_reference is not None else "unavailable",
+                    reference_service_type(next_reference, 4097),
+                ),
+            )
             try:
                 _play_service(navigation, next_reference)
             except Exception as error:
+                self._player_stream_diag(
+                    "play-service",
+                    "outcome=error error_type={}".format(
+                        error.__class__.__name__,
+                    ),
+                )
                 _debug(
                     "live initial start failed error={}".format(
                         error.__class__.__name__
@@ -20779,6 +22589,9 @@ class GTExternalPlayerScreen(
             )
             self._started = True
             self._generation += 1
+            self._watch_player_stream_diag(
+                navigation, next_reference, "direct-screen-open",
+            )
             snapshot = self._live_snapshot_for_current_item()
             _debug(
                 "playback started content=live selected_engine={} "
@@ -20844,6 +22657,7 @@ class GTExternalPlayerScreen(
             )
             self.show_info()
             return
+        self._reset_youtube_clock()
         _debug(
             "playback started content={} selected_engine={} actual_engine={} reason=screen_open".format(
                 getattr(self.current_item, "content_type", "unknown"),
@@ -20855,8 +22669,47 @@ class GTExternalPlayerScreen(
         self._generation += 1
         self._after_zap()
 
+    def replace_web_video(self, reference, item):
+        """Replace an active web video without pushing another modal screen.
+
+        Keep old_reference from the first video. EXIT then restores the service
+        that was playing before the web player was opened, just once.
+        """
+        if (self._closed or not self._started
+                or getattr(self.session, "current_dialog", None) is not self):
+            return False
+        navigation = getattr(self.session, "nav", None)
+        if navigation is None:
+            return False
+        previous_reference = self.reference
+        try:
+            _play_service(navigation, reference)
+        except Exception:
+            # A failed replacement must not leave an older player screen on
+            # the stack or lose the currently selected video's reference.
+            try:
+                _play_service(navigation, previous_reference)
+            except Exception:
+                pass
+            return False
+        self.reference = reference
+        self.current_item = item
+        reset_youtube_clock = getattr(self, "_reset_youtube_clock", None)
+        if callable(reset_youtube_clock):
+            reset_youtube_clock()
+        self._active_live_service_type = reference_service_type(reference, 4097)
+        self._resume_start_position = 0
+        self._prepare_switched_vod()
+        self._generation += 1
+        self._after_zap()
+        return True
+
     def _after_zap(self, refresh_epg=False):
         self._cancel_seek_verification()
+        self._seek_ready = False
+        self._seek_startup_deadline = (
+            time.monotonic() + SEEK_STARTUP_GRACE_SECONDS
+        )
         self._stop_live_auxiliary_timers()
         # Never leave the previous channel logo visible while the new service
         # is starting. The snapshot/completion path restores current artwork.
@@ -20907,6 +22760,10 @@ class GTExternalPlayerScreen(
             self._resume_timer.stop()
         except Exception:
             pass
+        try:
+            self._subtitle_auto_timer.stop()
+        except Exception:
+            pass
         self._reset_live_reconnect()
         if not is_live:
             # VOD decoders need a short moment before seek().getLength()
@@ -20924,6 +22781,11 @@ class GTExternalPlayerScreen(
         else:
             self._start_picon_load()
             self._start_player_weather()
+            if getattr(self.current_item, "content_type", "") in ("movie", "series"):
+                self._subtitle_auto_generation = self._generation
+                self._subtitle_auto_timer.start(
+                    SUBTITLE_AUTO_MATCH_DELAY_MS, True
+                )
         if self._is_archive_item():
             self._archive_portal_keepalive()
             self._arm_archive_startup()
@@ -20977,6 +22839,228 @@ class GTExternalPlayerScreen(
             self._reconnect_queued = False
         _cancel_worker_token(token)
 
+    def _bind_player_key_handler(self):
+        """Receive remote events independently of image-specific keymaps."""
+        if self._player_keys_bound or self._closed:
+            return
+        try:
+            from enigma import eActionMap
+            from keyids import KEYIDS
+            self._player_key_ids = {
+                name: KEYIDS[name]
+                for name in ("KEY_1", "KEY_YELLOW", "KEY_LEFT", "KEY_RIGHT")
+            }
+            # Match this image's existing short RIGHT/LEFT behaviour. Some
+            # images seek directly; others show or adjust the player's OSD.
+            try:
+                try:
+                    from Tools.KeyBindings import queryKeyBinding
+                except ImportError:
+                    from Components.ActionMap import queryKeyBinding
+                self._short_direction_is_seek = any(
+                    code == KEYIDS["KEY_RIGHT"] and flags & 3
+                    for context in ("InfobarSeekActions", "InfobarSeekActionsPTS")
+                    for code, flags in queryKeyBinding(context, "seekFwd")
+                )
+            except Exception:
+                self._short_direction_is_seek = True
+            self._player_key_map = eActionMap.getInstance()
+            self._player_key_map.bindAction(
+                "", -100, self._player_key_callback
+            )
+            self._player_keys_bound = True
+            log_event("minute_seek", "remote-bound kind={}".format(
+                getattr(self.current_item, "content_type", "unknown")
+            ))
+        except Exception as error:
+            log_event("minute_seek", "remote-bind-failed", error)
+            _debug("player remote binding failed error={}".format(
+                error.__class__.__name__
+            ))
+
+    def _unbind_player_key_handler(self):
+        try:
+            self._direction_hold_timer.stop()
+        except Exception:
+            pass
+        self._held_direction = None
+        self._held_direction_long = False
+        if not self._player_keys_bound:
+            return
+        self._player_keys_bound = False
+        try:
+            self._player_key_map.unbindAction("", self._player_key_callback)
+        except Exception as error:
+            _debug("player remote unbinding failed error={}".format(
+                error.__class__.__name__
+            ))
+
+    def _handle_player_key(self, key, flag):
+        """Consume the four player keys on make/break/repeat/long events."""
+        key_ids = self._player_key_ids
+        if (
+            self._closed
+            or getattr(self.session, "current_dialog", None) is not self
+        ):
+            return 0
+        kind = getattr(self.current_item, "content_type", "")
+        if key == key_ids.get("KEY_1") and kind in ("live", "movie", "series"):
+            if flag == 0:
+                self.cycle_player_service_type()
+            return 1
+        if kind not in ("movie", "series"):
+            return 0
+        if key == key_ids.get("KEY_YELLOW"):
+            if flag == 0:
+                self.open_media_selection()
+            return 1
+        if key == key_ids.get("KEY_LEFT"):
+            direction = -1
+        elif key == key_ids.get("KEY_RIGHT"):
+            direction = 1
+        else:
+            return 0
+        if flag == 0:
+            self._direction_press(direction)
+        elif flag == 1:
+            self._direction_release(direction)
+        elif flag in (2, 3):
+            self._direction_long(direction)
+        else:
+            return 0
+        return 1
+
+    def cycle_player_service_type(self):
+        content_type = getattr(self.current_item, "content_type", "")
+        if content_type == "live":
+            return self.cycle_live_service_type()
+        if content_type in ("movie", "series"):
+            return self.cycle_vod_service_type()
+        self.show_info()
+
+    def _engine_candidates(self, url, current_type, content_type):
+        requested_types = list(available_service_types())
+        try:
+            configured_type = int(
+                load_player_settings().service_type_for(content_type)
+            )
+        except (AttributeError, TypeError, ValueError, OverflowError):
+            configured_type = current_type
+        # ServiceApp can register its service ID without exposing its binary
+        # at the conventional path. The user's working configured engine is
+        # therefore a candidate even when executable discovery misses it.
+        if configured_type not in requested_types:
+            requested_types.append(configured_type)
+        if current_type not in requested_types:
+            # A working ServiceApp engine may have a nonstandard executable.
+            requested_types.insert(0, current_type)
+        if content_type in ("movie", "series") and current_type != 1:
+            # Native type 1 cannot play arbitrary VOD containers reliably.
+            requested_types = [kind for kind in requested_types if kind != 1]
+        candidates = []
+        seen = set()
+        for requested_type in requested_types:
+            try:
+                candidate = build_extplayer_reference(
+                    url,
+                    getattr(self.current_item, "name", self.title),
+                    content_type,
+                    service_type=requested_type,
+                )
+            except Exception:
+                continue
+            actual_type = reference_service_type(candidate, 4097)
+            if actual_type in seen:
+                continue
+            seen.add(actual_type)
+            candidates.append((actual_type, candidate))
+        return candidates
+
+    def cycle_vod_service_type(self):
+        """Switch the local movie/episode engine and resume the same title."""
+        if (
+            self._closed or not self._started
+            or self._pending_engine_reference is not None
+            or self._audio_menu_open or self._subtitle_menu_open
+            or self._media_menu_open or self._minute_seek_open
+        ):
+            return
+        navigation = getattr(self.session, "nav", None)
+        url = reference_stream_url(self.reference)
+        if navigation is None or not url:
+            self.show_info()
+            return
+        current_type = reference_service_type(self.reference, 5002)
+        candidates = self._engine_candidates(
+            url, current_type, getattr(self.current_item, "content_type", "movie")
+        )
+        if len(candidates) < 2:
+            self.show_info()
+            return
+        types = [kind for kind, _reference in candidates]
+        next_index = (types.index(current_type) + 1) % len(types) if current_type in types else 0
+        target_type, target_reference = candidates[next_index]
+        position, length = self._seek_position()
+        resume_position = (
+            position if position > 0 and length > 0 and position < length - 30
+            else 0
+        )
+        previous_reference = self.reference
+        youtube_remux, youtube_duration = self._youtube_remux_context()
+        youtube_start = None
+        if youtube_remux is not None:
+            youtube_start = min(
+                max(0, int(position)),
+                max(0, youtube_duration - 1),
+            )
+            try:
+                switch_url = youtube_remux.url_for(youtube_start)
+                target_reference = build_extplayer_reference(
+                    switch_url,
+                    getattr(self.current_item, "name", self.title),
+                    "movie",
+                    service_type=target_type,
+                )
+                previous_reference = build_extplayer_reference(
+                    switch_url,
+                    getattr(self.current_item, "name", self.title),
+                    "movie",
+                    service_type=current_type,
+                )
+            except Exception:
+                self.show_info()
+                return
+            # A fresh FFmpeg input already starts at the absolute target; do
+            # not ask the linear decoder to perform a second native seek.
+            resume_position = 0
+        self._cancel_seek_verification()
+        self._seeking = False
+        self._hide_seek_overlay()
+        for timer in (
+            self._playback_timer,
+            self._resume_timer,
+            self._subtitle_auto_timer,
+        ):
+            try:
+                timer.stop()
+            except Exception:
+                pass
+        self._stop_live_auxiliary_timers()
+        self._generation += 1
+        self._pending_engine_reference = target_reference
+        self._previous_engine_reference = previous_reference
+        self._engine_switch_generation = self._generation
+        self._engine_switch_resume_position = resume_position
+        self._youtube_pending_engine_start = youtube_start
+        self._engine_link_pending = False
+        self._engine_decoder_released = False
+        self._set_static_info_epg("epg_now", _("Reconnecting the stream..."))
+        self._set_static_info_epg("epg_next", _("Please wait"))
+        self.show_info()
+        self._release_live_engine_for_switch(
+            navigation, current_type, target_type
+        )
+
     def cycle_live_service_type(self):
         """Cycle only through engines installed on the receiver."""
         if getattr(self.current_item, "content_type", "") != "live":
@@ -20999,30 +23083,7 @@ class GTExternalPlayerScreen(
             self.reference,
             self._active_live_service_type,
         )
-        requested_types = list(available_service_types())
-        if current_type not in requested_types:
-            # ServiceApp may register 5001/5002 without the conventional
-            # executable path. Never drop the engine that is already working.
-            requested_types.insert(0, current_type)
-        candidates = []
-        seen = set()
-        for requested_type in requested_types:
-            try:
-                candidate = build_extplayer_reference(
-                    url,
-                    getattr(self.current_item, "name", self.title),
-                    "live",
-                    service_type=requested_type,
-                )
-            except Exception:
-                continue
-            actual_type = reference_service_type(candidate, 4097)
-            # Ambiguous/non-TS URLs map native type 1 to 4097; do not show
-            # that same effective engine twice while cycling.
-            if actual_type in seen:
-                continue
-            seen.add(actual_type)
-            candidates.append((actual_type, candidate))
+        candidates = self._engine_candidates(url, current_type, "live")
         if len(candidates) < 2:
             self.show_info()
             return
@@ -21048,6 +23109,13 @@ class GTExternalPlayerScreen(
                 else 0
             )
         target_type, target_reference = candidates[target_index]
+        self._new_player_stream_diag("engine-switch")
+        self._player_stream_diag(
+            "service-reference",
+            "outcome=built requested_engine={} actual_engine={}".format(
+                target_type, reference_service_type(target_reference, 4097),
+            ),
+        )
         try:
             self._engine_switch_timer.stop()
         except Exception:
@@ -21069,7 +23137,7 @@ class GTExternalPlayerScreen(
         )
         self._set_static_info_epg("epg_next", _("Please wait"))
         self.show_info()
-        # INFO/TV changes only the local Enigma2 engine.  In particular, it
+        # The 1 key changes only the local Enigma2 engine.  In particular, it
         # never asks a Stalker/MAC portal for a replacement link or session;
         # the physical 0 key is the sole live-refresh control.
         self._release_live_engine_for_switch(
@@ -21093,6 +23161,8 @@ class GTExternalPlayerScreen(
         _cancel_worker_token(self._engine_link_token)
         self._engine_link_token = None
         self._engine_decoder_released = False
+        self._engine_switch_resume_position = 0
+        self._youtube_pending_engine_start = None
 
     def _refresh_engine_switch_link(
         self,
@@ -21160,6 +23230,8 @@ class GTExternalPlayerScreen(
     def _complete_live_engine_switch(self):
         target_reference = self._pending_engine_reference
         previous_reference = self._previous_engine_reference
+        resume_position = self._engine_switch_resume_position
+        youtube_start = self._youtube_pending_engine_start
         if target_reference is None:
             return
         if (
@@ -21242,6 +23314,17 @@ class GTExternalPlayerScreen(
         try:
             _play_service(navigation, target_reference)
         except Exception as error:
+            if (
+                getattr(getattr(self, "current_item", None), "content_type", "")
+                == "live"
+                and _is_stalker_client(getattr(self, "client", None))
+            ):
+                self._player_stream_diag(
+                    "play-service",
+                    "outcome=error reason=engine-switch error_type={}".format(
+                        error.__class__.__name__,
+                    ),
+                )
             _debug(
                 "playback engine switch failed from={} to={} error={}".format(
                     previous_type,
@@ -21249,14 +23332,29 @@ class GTExternalPlayerScreen(
                     error.__class__.__name__,
                 )
             )
+            restored = False
             if previous_reference is not None:
                 try:
                     _play_service(navigation, previous_reference)
+                    restored = True
                     self.reference = previous_reference
                     self._active_live_service_type = previous_type
+                    if not self._is_live_item():
+                        if youtube_start is not None:
+                            self.current_item.youtube_start_seconds = youtube_start
+                            self._reset_youtube_clock(youtube_start)
+                            self._resume_start_position = 0
+                        else:
+                            self._resume_start_position = resume_position
                 except Exception:
                     pass
             self._clear_live_engine_switch_state()
+            if not self._is_live_item() and restored:
+                self._prepare_switched_vod()
+            if not self._is_live_item() and not restored:
+                self._set_static_info_epg("epg_now", _("Could not open the stream."))
+                self.show_info()
+                return
             arm_startup = getattr(self, "_arm_live_startup", None)
             if callable(arm_startup):
                 arm_startup()
@@ -21264,7 +23362,23 @@ class GTExternalPlayerScreen(
             return
         self.reference = target_reference
         self._active_live_service_type = target_type
+        if (
+            getattr(getattr(self, "current_item", None), "content_type", "")
+            == "live"
+            and _is_stalker_client(getattr(self, "client", None))
+        ):
+            self._watch_player_stream_diag(
+                navigation, target_reference, "engine-switch",
+            )
         self._clear_live_engine_switch_state()
+        if not self._is_live_item():
+            if youtube_start is not None:
+                self.current_item.youtube_start_seconds = youtube_start
+                self._reset_youtube_clock(youtube_start)
+                self._resume_start_position = 0
+            else:
+                self._resume_start_position = resume_position
+            self._prepare_switched_vod()
         self._info_dialog["engine"].setText(service_engine_label(target_type))
         _debug(
             "playback engine switched from={} to={} reason=user".format(
@@ -21276,6 +23390,15 @@ class GTExternalPlayerScreen(
         if callable(arm_startup):
             arm_startup()
         self._after_zap()
+
+    def _prepare_switched_vod(self):
+        self._resume_saved = False
+        self._paused = False
+        self._seeking = False
+        self._youtube_clock_pause_started_at = None
+        controller = getattr(self, "_subtitle_controller", None)
+        if controller is not None:
+            controller.reset_for_service_change()
 
     def restart_live_stream(self):
         """Restart the current live stream only after an explicit 0 key."""
@@ -21305,6 +23428,7 @@ class GTExternalPlayerScreen(
         if getattr(self.current_item, "content_type", "") != "live":
             return
         self._live_reconnecting = True
+        self._new_player_stream_diag("manual-zero")
         navigation = getattr(self.session, "nav", None)
         if navigation is None:
             self._live_reconnecting = False
@@ -21423,6 +23547,10 @@ class GTExternalPlayerScreen(
                 return
             self._reconnect_link_url = url
             self._reconnect_link_ready = True
+        self._player_stream_diag(
+            "link-result",
+            "outcome={}".format("ready" if url else "empty"),
+        )
 
     def _fresh_live_reference(
         self,
@@ -21495,6 +23623,9 @@ class GTExternalPlayerScreen(
         with self._reconnect_link_lock:
             link_url = self._reconnect_link_url
         if not link_url:
+            self._player_stream_diag(
+                "link-result", "outcome=unavailable current_service=preserved",
+            )
             queued = bool(self._reconnect_queued)
             log_event(
                 "live_recovery",
@@ -21520,8 +23651,15 @@ class GTExternalPlayerScreen(
             )
         next_reference = self._reconnect_pending_reference
         if next_reference is None:
+            self._player_stream_diag("service-reference", "outcome=unavailable")
             resume_preserved_service()
             return
+        self._player_stream_diag(
+            "service-reference",
+            "outcome=built actual_engine={}".format(
+                reference_service_type(next_reference, 4097),
+            ),
+        )
         if not self._reconnect_decoder_released:
             try:
                 navigation.stopService()
@@ -21554,6 +23692,12 @@ class GTExternalPlayerScreen(
         try:
             _play_service(navigation, next_reference)
         except Exception as error:
+            self._player_stream_diag(
+                "play-service",
+                "outcome=error reason=manual-zero error_type={}".format(
+                    error.__class__.__name__,
+                ),
+            )
             _debug(
                 "live reconnect failed error={}".format(
                     error.__class__.__name__
@@ -21575,6 +23719,9 @@ class GTExternalPlayerScreen(
         self._active_live_service_type = reference_service_type(
             next_reference,
             4097,
+        )
+        self._watch_player_stream_diag(
+            navigation, next_reference, "manual-zero",
         )
         queued = bool(self._reconnect_queued)
         reconnect_reason = self._reconnect_reason or "manual"
@@ -21615,6 +23762,13 @@ class GTExternalPlayerScreen(
             )
         )
         self._info_dialog["resolution"].setText(_("Reading resolution"))
+        youtube_quality = getattr(self.current_item, "youtube_selected_quality", 0)
+        if youtube_quality:
+            requested = getattr(self.current_item, "youtube_requested_quality", "")
+            label = "{}P".format(youtube_quality)
+            if requested and str(requested) != str(youtube_quality):
+                label = "{}P → {}".format(requested, label)
+            self._info_dialog["resolution"].setText("{} · {}".format(_("Quality"), label))
         self._info_dialog["fps"].setText("-- FPS")
         self._info_dialog["video_codec"].setText(_("VIDEO: --"))
         self._info_dialog["audio_codec"].setText(_("AUDIO: --"))
@@ -21669,6 +23823,10 @@ class GTExternalPlayerScreen(
         self._toggle_favorite_item(item)
         self._render_favorite_badge()
         self.show_info()
+        return True
+
+    def ignore_vod_blue(self):
+        """BLUE is no longer an audio shortcut in movies or series."""
         return True
 
     def toggle_favorite_with_blue_long(self):
@@ -21801,6 +23959,48 @@ class GTExternalPlayerScreen(
     def _show_audio_message(self, message):
         self._show_subtitle_message(message)
 
+    def open_media_selection(self):
+        """Let YELLOW route to the existing manual audio/subtitle controls."""
+        if (
+            self._closed or not self._started
+            or getattr(self.current_item, "content_type", "") not in ("movie", "series")
+            or self._media_menu_open or self._audio_menu_open
+            or self._subtitle_menu_open or self._pending_engine_reference is not None
+        ):
+            return True
+        try:
+            from Screens.ChoiceBox import ChoiceBox
+        except ImportError:
+            return self.open_subtitle_selection()
+        opener = getattr(self.session, "openWithCallback", None)
+        if not callable(opener):
+            return self.open_subtitle_selection()
+        generation, item = self._generation, self.current_item
+        self._media_menu_open = True
+        self.hide_info()
+
+        def chosen(selection):
+            self._media_menu_open = False
+            if (
+                self._closed or self._generation != generation
+                or self.current_item is not item or not selection
+            ):
+                return
+            if selection[1] == "audio":
+                self.open_audio_selection()
+            elif selection[1] == "subtitle":
+                self.open_subtitle_selection()
+
+        try:
+            opener(
+                chosen, ChoiceBox, _("Select"),
+                [(_("Audio tracks"), "audio"), (_("Subtitles"), "subtitle")],
+            )
+        except Exception:
+            self._media_menu_open = False
+            self.show_info()
+        return True
+
     def open_audio_selection(self):
         """Open decoder-provided VOD audio tracks without restarting playback."""
         now = time.monotonic()
@@ -21818,7 +24018,6 @@ class GTExternalPlayerScreen(
             return True
         if getattr(self, "_audio_menu_open", False):
             return True
-
         _service, tracks, track_count = self._audio_tracks()
         if tracks is None or track_count <= 0:
             self._show_audio_message(N_("No audio tracks are available."))
@@ -22074,6 +24273,7 @@ class GTExternalPlayerScreen(
             return
 
         self._pending_channel_index = next_index
+        self._new_player_stream_diag("channel-key")
         self._generation += 1
         self._channel_key_accepted_at = now
         next_item = self._entries[next_index]
@@ -22104,6 +24304,7 @@ class GTExternalPlayerScreen(
             url = ""
         if not url:
             return False
+        self._player_stream_diag("link-result", "outcome=cached")
         self._clear_channel_link_state(keep_timing=True)
         with self._channel_link_lock:
             self._channel_link_pending = True
@@ -22142,6 +24343,7 @@ class GTExternalPlayerScreen(
             self._channel_link_token = token
             self._channel_link_deadline = token.deadline
             generation = self._channel_link_generation
+        self._player_stream_diag("link-request", "outcome=started reason=channel-key")
         worker = threading.Thread(
             target=self._resolve_channel_link,
             args=(
@@ -22209,6 +24411,11 @@ class GTExternalPlayerScreen(
                     raise ContentError("Stream link unavailable")
             else:
                 next_url = self.client.playback_url(next_item)
+                self._player_stream_diag(
+                    "link-result", "outcome={}".format(
+                        "ready" if next_url else "empty",
+                    ),
+                )
             next_reference = build_extplayer_reference(
                 next_url,
                 next_item.name,
@@ -22219,7 +24426,12 @@ class GTExternalPlayerScreen(
                     else None
                 ),
             )
-        except Exception:
+        except Exception as error:
+            self._player_stream_diag(
+                "start-failed", "reason=link-or-reference error_type={}".format(
+                    error.__class__.__name__,
+                ),
+            )
             self._clear_channel_link_state()
             self._after_zap()
             self._set_static_info_epg(
@@ -22235,9 +24447,15 @@ class GTExternalPlayerScreen(
 
         navigation = getattr(self.session, "nav", None)
         if navigation is None:
+            self._player_stream_diag("start-failed", "reason=navigation-unavailable")
             self._clear_channel_link_state()
             self._after_zap()
             return
+        self._player_stream_diag(
+            "service-reference", "outcome=built actual_engine={}".format(
+                reference_service_type(next_reference, 4097),
+            ),
+        )
         self._save_resume_position()
         subtitle_controller = getattr(self, "_subtitle_controller", None)
         previous_subtitle = (
@@ -22253,11 +24471,17 @@ class GTExternalPlayerScreen(
             # and removes the full teardown delay from ordinary channel zaps.
             _play_service(navigation, next_reference)
         except Exception as error:
+            self._player_stream_diag(
+                "play-service",
+                "outcome=error reason=channel-key error_type={}".format(
+                    error.__class__.__name__,
+                ),
+            )
             if previous_subtitle is not None and subtitle_controller is not None:
                 subtitle_controller.restore_state(previous_subtitle)
             _debug(
                 "live soft zap failed id={} error={}".format(
-                    getattr(next_item, "stream_id", ""),
+                    _debug_identifier(getattr(next_item, "stream_id", "")),
                     error.__class__.__name__,
                 )
             )
@@ -22291,6 +24515,9 @@ class GTExternalPlayerScreen(
             self._active_live_service_type = reference_service_type(
                 next_reference,
                 4097,
+            )
+            self._watch_player_stream_diag(
+                navigation, next_reference, "channel-key",
             )
         _debug(
             "playback channel changed content={} engine={} reason=user "
@@ -22340,6 +24567,13 @@ class GTExternalPlayerScreen(
             self._channel_link_url = url
             self._channel_link_ready = True
             self._channel_link_ready_at = time.monotonic()
+            diagnostic = (
+                self._stream_diag_play_id, self._stream_diag_started_at,
+            )
+        self._player_stream_diag(
+            "link-result", "outcome={}".format("ready" if url else "empty"),
+            play_id=diagnostic[0], started_at=diagnostic[1],
+        )
 
     def _clear_channel_link_state(self, keep_timing=False):
         with self._channel_link_lock:
@@ -22367,6 +24601,9 @@ class GTExternalPlayerScreen(
                 N_("LEFT / RIGHT to select time   •   OK to continue"),
             )
             return
+        # Child widgets retain visibility when their parent dialog is hidden.
+        # A transient seek warning must not cover the next normal infobar.
+        self._hide_seek_overlay()
         if self._is_live_item():
             # These are local, event-like reads performed only when the user
             # opens the banner (channel start/zap also opens it once). While a
@@ -22378,6 +24615,7 @@ class GTExternalPlayerScreen(
                 if not getattr(self, "_defer_live_metadata_once", False):
                     self._refresh_live_metadata_once()
         self._info_visible = True
+        self._set_subtitle_infobar_visible(True)
         self._info_dialog.show()
         try:
             if self._picon_visible:
@@ -22400,7 +24638,9 @@ class GTExternalPlayerScreen(
             self._hide_timer.stop()
         except Exception:
             pass
+        self._hide_seek_overlay()
         self._info_visible = False
+        self._set_subtitle_infobar_visible(False)
         dialog = getattr(self, "_info_dialog", None)
         if dialog is not None:
             try:
@@ -22447,6 +24687,15 @@ class GTExternalPlayerScreen(
         if selected_track is not None:
             self.hide_info()
 
+    def _set_subtitle_infobar_visible(self, visible):
+        controller = getattr(self, "_subtitle_controller", None)
+        setter = getattr(controller, "set_infobar_visible", None)
+        if callable(setter):
+            try:
+                setter(visible)
+            except Exception:
+                pass
+
     def _subtitle_menu_opened(self):
         """Keep the high-z player dialog below the whole subtitle workflow."""
         if self._closed:
@@ -22463,6 +24712,7 @@ class GTExternalPlayerScreen(
             pass
         self._hide_seek_overlay()
         self._info_visible = False
+        self._set_subtitle_infobar_visible(False)
         self._info_dialog.hide()
 
     def _subtitle_menu_closed(self):
@@ -22490,30 +24740,160 @@ class GTExternalPlayerScreen(
                 N_("PLAY / PAUSE to continue   •   STOP to close the video"),
             )
 
+    def _subtitle_playback_profile(self, item):
+        """Collect decoder-local matching hints without exposing stream URLs."""
+        release_parts = []
+        title = " ".join(str(getattr(item, "name", "") or "").split())[:160]
+        if title:
+            release_parts.append(title)
+
+        # Some direct-file providers retain a real release name in the final
+        # path component. Never retain the host, parent path, query or fragment.
+        try:
+            stream_path = urlsplit(
+                reference_stream_url(getattr(self, "reference", ""))
+                .split("#", 1)[0]
+            ).path
+            filename = os.path.basename(stream_path)
+            stem = os.path.splitext(filename)[0]
+            stem = re.sub(r"%[0-9A-Fa-f]{2}", " ", stem)
+            stem = " ".join(re.sub(
+                r"[^A-Za-z0-9._+\- ]+", " ", stem
+            ).split())[:160]
+            if (
+                len(stem) >= 3
+                and not stem.isdigit()
+                and not re.fullmatch(r"[0-9a-fA-F_-]{20,}", stem)
+                and stem not in release_parts
+            ):
+                release_parts.append(stem)
+        except (AttributeError, TypeError, ValueError):
+            pass
+
+        navigation = getattr(self.session, "nav", None)
+        service = None
+        if navigation is not None:
+            getter = getattr(navigation, "getCurrentService", None)
+            if callable(getter):
+                try:
+                    service = getter()
+                except Exception:
+                    service = None
+        try:
+            info = service.info() if service is not None else None
+        except Exception:
+            info = None
+        frame_rate = self._service_info_value(info, "sFrameRate")
+        height = self._service_info_value(info, "sVideoHeight")
+        if frame_rate <= 0:
+            frame_rate = _read_proc_number("/proc/stb/vmpeg/0/framerate", 10)
+        if height <= 0:
+            height = _read_proc_number("/proc/stb/vmpeg/0/yres", 16)
+
+        profile = {"release_hint": " | ".join(release_parts)[:240]}
+        if frame_rate > 0:
+            profile["fps"] = round(
+                frame_rate / 1000.0 if frame_rate > 1000 else float(frame_rate),
+                3,
+            )
+        if height >= 2100:
+            profile["resolution"] = 2160
+        elif height >= 1050:
+            profile["resolution"] = 1080
+        elif height >= 700:
+            profile["resolution"] = 720
+        elif height >= 540:
+            profile["resolution"] = 576
+        elif height > 0:
+            profile["resolution"] = 480
+        try:
+            seeker = self._raw_seek_interface()
+            duration = (
+                self._seek_seconds_precise(seeker.getLength())
+                if seeker is not None else -1
+            )
+        except Exception:
+            duration = -1
+        if duration > 0:
+            profile["duration_seconds"] = round(float(duration), 3)
+        return profile
+
+    def _start_automatic_subtitle_search(self):
+        """Wait briefly for decoder FPS before ranking automatic results."""
+        if (
+            self._closed
+            or self._subtitle_auto_generation != self._generation
+            or getattr(self.current_item, "content_type", "")
+            not in ("movie", "series")
+        ):
+            return
+        subtitle_controller = getattr(self, "_subtitle_controller", None)
+        if subtitle_controller is not None:
+            subtitle_controller.start_automatic_search()
+
     def _subtitle_search_metadata(self):
         item = self.current_item
         if getattr(item, "content_type", "") == "series":
             parent = getattr(item, "favorite_parent", None)
             if parent is None:
                 parent = getattr(self, "_favorite_parent", None)
-            return {
+            metadata = {
                 "title": (
-                    getattr(parent, "name", "")
+                    getattr(parent, "subtitle_title", "")
+                    or getattr(item, "subtitle_title", "")
+                    or getattr(parent, "name", "")
                     or getattr(item, "name", self.title)
                 ),
                 "year": (
-                    getattr(parent, "year", "")
+                    getattr(parent, "subtitle_year", "")
+                    or getattr(item, "subtitle_year", "")
+                    or getattr(parent, "year", "")
                     or getattr(item, "year", "")
                 ),
                 "season": getattr(item, "season", ""),
                 "episode": getattr(item, "episode", ""),
                 "content_type": "series",
                 "episode_title": getattr(item, "name", ""),
+                "tmdb_id": (
+                    getattr(parent, "subtitle_tmdb_id", "")
+                    or getattr(item, "subtitle_tmdb_id", "")
+                    or getattr(parent, "tmdb_id", "")
+                    or getattr(item, "tmdb_id", "")
+                ),
+                "imdb_id": (
+                    getattr(parent, "subtitle_imdb_id", "")
+                    or getattr(item, "subtitle_imdb_id", "")
+                    or getattr(parent, "imdb_id", "")
+                    or getattr(item, "imdb_id", "")
+                ),
             }
-        return (
-            getattr(item, "name", self.title),
-            getattr(item, "year", ""),
-        )
+        else:
+            metadata = {
+                "title": (
+                    getattr(item, "subtitle_title", "")
+                    or getattr(item, "name", self.title)
+                ),
+                "year": (
+                    getattr(item, "subtitle_year", "")
+                    or getattr(item, "year", "")
+                ),
+                "content_type": "movie",
+                "tmdb_id": (
+                    getattr(item, "subtitle_tmdb_id", "")
+                    or getattr(item, "tmdb_id", "")
+                ),
+                "imdb_id": (
+                    getattr(item, "subtitle_imdb_id", "")
+                    or getattr(item, "imdb_id", "")
+                ),
+            }
+        profile_loader = getattr(self, "_subtitle_playback_profile", None)
+        if callable(profile_loader):
+            try:
+                metadata.update(profile_loader(item))
+            except Exception as error:
+                log_event("subtitles", "playback-profile-failed", error)
+        return metadata
 
     def _pause_for_subtitle_search(self):
         """Pause VOD without leaving GT's high-z pause panel over search."""
@@ -22523,6 +24903,7 @@ class GTExternalPlayerScreen(
         paused_by_search = not was_paused and self._paused
         self._hide_seek_overlay()
         self._info_visible = False
+        self._set_subtitle_infobar_visible(False)
         try:
             self._info_dialog.hide()
         except Exception:
@@ -22585,7 +24966,38 @@ class GTExternalPlayerScreen(
         except Exception:
             return None
 
-    def _seek_interface(self):
+    def _youtube_remux_context(self):
+        """Return the active private remux and its authoritative duration."""
+        item = getattr(self, "current_item", None)
+        remux = getattr(item, "youtube_remux", None)
+        try:
+            duration = int(
+                getattr(item, "youtube_duration_seconds", 0) or 0
+            )
+        except (TypeError, ValueError, OverflowError):
+            duration = 0
+        if (
+            remux is None or duration <= 0
+            or bool(getattr(remux, "closed", False))
+            or not callable(getattr(remux, "url_for", None))
+        ):
+            return None, 0
+        return remux, duration
+
+    def _reset_youtube_clock(self, start_seconds=None):
+        item = getattr(self, "current_item", None)
+        if start_seconds is None:
+            start_seconds = getattr(item, "youtube_start_seconds", 0)
+        try:
+            start_seconds = max(0, int(start_seconds or 0))
+        except (TypeError, ValueError, OverflowError):
+            start_seconds = 0
+        self._youtube_clock_base = start_seconds
+        self._youtube_clock_started_at = time.monotonic()
+        self._youtube_clock_pause_started_at = None
+
+    def _raw_seek_interface(self):
+        """Return decoder timing even when a linear stream is not seekable."""
         service = self._current_service()
         if service is None:
             return None
@@ -22593,7 +25005,42 @@ class GTExternalPlayerScreen(
         if getter is None:
             return None
         try:
-            seeker = getter()
+            return getter()
+        except Exception:
+            return None
+
+    def _youtube_seek_position(self, duration):
+        base = max(0, int(getattr(self, "_youtube_clock_base", 0) or 0))
+        base = min(base, duration)
+        elapsed = -1
+        # MPEG-TS is linear, but most Enigma2 engines still expose its current
+        # decoder position. It is more accurate than the fallback clock after
+        # buffering; it intentionally is not used as a native seek interface.
+        seeker = self._raw_seek_interface()
+        if seeker is not None:
+            try:
+                candidate = self._seek_seconds(seeker.getPlayPosition())
+            except Exception:
+                candidate = -1
+            if 0 <= candidate <= max(0, duration - base) + 15:
+                elapsed = candidate
+        if elapsed < 0:
+            now = (
+                self._youtube_clock_pause_started_at
+                if self._youtube_clock_pause_started_at is not None
+                else time.monotonic()
+            )
+            elapsed = max(
+                0,
+                int(now - getattr(self, "_youtube_clock_started_at", now)),
+            )
+        return min(duration, base + elapsed), duration
+
+    def _seek_interface(self):
+        seeker = self._raw_seek_interface()
+        if seeker is None:
+            return None
+        try:
             seekable = seeker.isCurrentlySeekable()
             if isinstance(seekable, tuple):
                 seekable = seekable[-1]
@@ -22611,7 +25058,46 @@ class GTExternalPlayerScreen(
         except (TypeError, ValueError, OverflowError):
             return -1
 
+    @staticmethod
+    def _seek_seconds_precise(result):
+        """Convert the 90 kHz decoder clock without discarding milliseconds."""
+        try:
+            error, ticks = result
+            if int(error) != 0:
+                return -1
+            position = float(ticks) / 90000.0
+            return position if math.isfinite(position) and position >= 0 else -1
+        except (TypeError, ValueError, OverflowError):
+            return -1
+
+    def _subtitle_position(self):
+        """Read decoder time even when the engine reports non-seekable VOD."""
+        unused_remux, youtube_duration = self._youtube_remux_context()
+        seeker = self._raw_seek_interface()
+        if seeker is None:
+            return -1
+        try:
+            position = self._seek_seconds_precise(seeker.getPlayPosition())
+        except Exception:
+            return -1
+        if position < 0 or youtube_duration <= 0:
+            return position
+        # Remux decoder PTS is local to its requested start. Keep the absolute
+        # offset and sub-second precision, without borrowing the UI fallback
+        # timer when buffering leaves decoder timing unavailable.
+        base = min(
+            youtube_duration,
+            max(0, int(getattr(self, "_youtube_clock_base", 0) or 0)),
+        )
+        if position > max(0, youtube_duration - base) + 15:
+            return -1
+        return min(youtube_duration, base + position)
+
     def _seek_position(self, seeker=None):
+        unused_remux, youtube_duration = self._youtube_remux_context()
+        if youtube_duration > 0:
+            self._seek_ready = True
+            return self._youtube_seek_position(youtube_duration)
         seeker = seeker or self._seek_interface()
         if seeker is None:
             return -1, -1
@@ -22620,6 +25106,8 @@ class GTExternalPlayerScreen(
             length = self._seek_seconds(seeker.getLength())
         except Exception:
             return -1, -1
+        if position >= 0 and length > 0:
+            self._seek_ready = True
         return position, length
 
     def _show_seek_overlay(self, state, hint):
@@ -22667,6 +25155,7 @@ class GTExternalPlayerScreen(
             self._info_dialog[name].show()
         self._info_dialog.show()
         self._info_visible = True
+        self._set_subtitle_infobar_visible(True)
 
     def _hide_seek_overlay(self):
         for name in (
@@ -22678,6 +25167,21 @@ class GTExternalPlayerScreen(
             "seek_hint",
         ):
             self._info_dialog[name].hide()
+
+    def _seek_not_ready(self):
+        # Fresh VOD services may expose neither a seek interface nor duration
+        # yet. Only defer the capability warning during bounded startup, and
+        # stop treating failures as startup once valid timing was observed.
+        if (
+            not self._seek_ready
+            and time.monotonic() < self._seek_startup_deadline
+        ):
+            self._cancel_seek_verification()
+            self._seeking = False
+            self._show_seek_overlay(N_("Loading..."), N_("Please wait"))
+            self._hide_timer.start(INFO_TIMEOUT_MS, True)
+            return
+        self._seek_unavailable()
 
     def _seek_unavailable(self):
         self._cancel_seek_verification()
@@ -22696,8 +25200,12 @@ class GTExternalPlayerScreen(
             self._cancel_seek_verification()
         seeker = self._seek_interface()
         position, length = self._seek_position(seeker)
-        if seeker is None or position < 0 or length <= 0:
-            self._seek_unavailable()
+        youtube_remux, unused_duration = self._youtube_remux_context()
+        if (
+            (seeker is None and youtube_remux is None)
+            or position < 0 or length <= 0
+        ):
+            self._seek_not_ready()
             return
         if not self._seeking:
             self._seeking = True
@@ -22736,17 +25244,36 @@ class GTExternalPlayerScreen(
         if position < 0:
             return False
         distance = int(target) - int(origin)
-        if distance == 0 or abs(int(position) - int(target)) <= 5:
+        if distance == 0:
             return True
         # Do not confuse ordinary one-second playback progress with a working
         # seek. A keyframe landing may be a few seconds off the exact target,
         # but it still has to cover at least half of the requested distance.
-        required = max(3, int(abs(distance) / 2))
+        required = min(abs(distance), max(3, int(abs(distance) / 2)))
         if distance > 0:
-            return int(position) >= int(origin) + required
-        return int(position) <= int(origin) - required
+            return int(origin) + required <= int(position) <= int(target) + 5
+        return int(target) - 5 <= int(position) <= int(origin) - required
 
-    def _cancel_seek_verification(self):
+    def _prepare_subtitle_seek(self, target, origin=None):
+        controller = getattr(self, "_subtitle_controller", None)
+        preparer = getattr(controller, "prepare_seek", None)
+        if callable(preparer):
+            try:
+                preparer(target, origin_seconds=origin)
+            except Exception as error:
+                log_event("subtitles", "seek-anchor-failed", error)
+
+    def _complete_subtitle_seek(self, position=None):
+        controller = getattr(self, "_subtitle_controller", None)
+        callback = getattr(controller, "after_seek", None)
+        if callable(callback):
+            try:
+                callback(position)
+            except Exception as error:
+                log_event("subtitles", "seek-resync-failed", error)
+
+    def _cancel_seek_verification(self, resync_subtitles=True):
+        had_pending = self._pending_seek_verification is not None
         self._pending_seek_verification = None
         timer = getattr(self, "_seek_verify_timer", None)
         if timer is not None:
@@ -22754,6 +25281,14 @@ class GTExternalPlayerScreen(
                 timer.stop()
             except Exception:
                 pass
+        if had_pending and resync_subtitles:
+            controller = getattr(self, "_subtitle_controller", None)
+            callback = getattr(controller, "cancel_seek", None)
+            if callable(callback):
+                try:
+                    callback()
+                except Exception as error:
+                    log_event("subtitles", "seek-cancel-resync-failed", error)
 
     def _schedule_seek_verification(self, origin, target, method):
         self._pending_seek_verification = {
@@ -22761,22 +25296,122 @@ class GTExternalPlayerScreen(
             "target": int(target),
             "method": str(method),
             "checks": 0,
+            "async_deadline": (
+                time.monotonic() + SEEK_ASYNC_VERIFY_TIMEOUT_SECONDS
+                if reference_service_type(self.reference) == 5002
+                else None
+            ),
             "stream_id": str(
                 getattr(self.current_item, "stream_id", "") or ""
             ),
         }
         self._seek_verify_timer.start(SEEK_VERIFY_DELAY_MS, True)
 
+    def _request_youtube_seek(self, origin, target):
+        """Restart only the private YouTube remux at an absolute second."""
+        remux, duration = self._youtube_remux_context()
+        navigation = getattr(self.session, "nav", None)
+        if remux is None or duration <= 0 or navigation is None:
+            return False
+        origin = min(max(0, int(origin)), duration)
+        target = min(max(0, int(target)), max(0, duration - 1))
+        if target == origin:
+            return True
+        try:
+            next_url = remux.url_for(target)
+            next_reference = build_extplayer_reference(
+                next_url,
+                getattr(self.current_item, "name", self.title),
+                "movie",
+                service_type=reference_service_type(self.reference, 5002),
+            )
+        except Exception as error:
+            _debug(
+                "YouTube seek preparation failed error={}".format(
+                    error.__class__.__name__
+                )
+            )
+            return False
+        previous_reference = self.reference
+        try:
+            _play_service(navigation, next_reference)
+        except Exception as error:
+            # Keep the old linear stream untouched when the image rejects the
+            # replacement. Recover only if navigation no longer owns it.
+            active = None
+            getter = getattr(
+                navigation,
+                "getCurrentlyPlayingServiceReference",
+                None,
+            )
+            if callable(getter):
+                try:
+                    active = getter()
+                except Exception:
+                    active = None
+            if (
+                self._reference_identity(active)
+                != self._reference_identity(previous_reference)
+            ):
+                try:
+                    _play_service(navigation, previous_reference)
+                    self._reset_youtube_clock()
+                except Exception:
+                    pass
+            _debug(
+                "YouTube seek restart failed engine={} target={} error={}".format(
+                    reference_service_type(previous_reference, 5002),
+                    target,
+                    error.__class__.__name__,
+                )
+            )
+            return False
+        self.reference = next_reference
+        self._active_live_service_type = reference_service_type(
+            next_reference,
+            5002,
+        )
+        self.current_item.youtube_start_seconds = target
+        self._reset_youtube_clock(target)
+        self._seek_ready = True
+        was_paused = self._paused
+        self._paused = False
+        self._cancel_seek_verification()
+        if was_paused:
+            subtitle_controller = getattr(self, "_subtitle_controller", None)
+            if subtitle_controller is not None:
+                subtitle_controller.resume()
+        self._complete_subtitle_seek(target)
+        self._info_dialog["engine"].setText(
+            service_engine_label(self._active_live_service_type)
+        )
+        self._playback_tick()
+        _debug(
+            "YouTube seek restarted engine={} from={} target={} length={}".format(
+                self._active_live_service_type,
+                origin,
+                target,
+                duration,
+            )
+        )
+        return True
+
     def _request_seek(self, seeker, origin, target):
-        """Seek absolutely first, then verify and fall back if it was ignored."""
+        """Seek absolutely first, falling back immediately on explicit failure."""
         origin = int(origin)
         target = int(target)
+        youtube_remux, unused_duration = self._youtube_remux_context()
+        if youtube_remux is not None:
+            return self._request_youtube_seek(origin, target)
+        if seeker is None:
+            return False
         absolute = getattr(seeker, "seekTo", None)
         if absolute is not None:
             try:
                 result = absolute(target * 90000)
                 if not self._seek_call_failed(result):
                     self._schedule_seek_verification(origin, target, "absolute")
+                    self._prepare_subtitle_seek(target, origin=origin)
                     return True
             except Exception as error:
                 _debug(
@@ -22800,6 +25435,7 @@ class GTExternalPlayerScreen(
             )
             return False
         self._schedule_seek_verification(origin, target, "relative")
+        self._prepare_subtitle_seek(target, origin=origin)
         return True
 
     def _verify_seek_result(self):
@@ -22815,11 +25451,21 @@ class GTExternalPlayerScreen(
         seeker = self._seek_interface()
         position = self._seek_position(seeker)[0]
         if self._seek_reached(position, state["origin"], state["target"]):
-            self._cancel_seek_verification()
+            self._cancel_seek_verification(resync_subtitles=False)
             self._playback_tick()
-            subtitle_controller = getattr(self, "_subtitle_controller", None)
-            if subtitle_controller is not None:
-                subtitle_controller.after_seek()
+            observed = self._subtitle_position()
+            self._complete_subtitle_seek(observed if observed >= 0 else position)
+            return
+        async_deadline = state["async_deadline"]
+        if async_deadline is not None:
+            # ServiceApp 5002 queues the seek before its position catches up.
+            # A stale or missing sample does not prove that seeking failed;
+            # retrying relatively here can issue a second, unwanted seek.
+            if time.monotonic() < async_deadline:
+                self._seek_verify_timer.start(SEEK_VERIFY_DELAY_MS, True)
+            else:
+                _debug("5002 seek position confirmation timed out")
+                self._cancel_seek_verification()
             return
         state["checks"] += 1
         if state["checks"] < SEEK_VERIFY_MAX_CHECKS:
@@ -22839,6 +25485,9 @@ class GTExternalPlayerScreen(
                         state["origin"] = fallback_origin
                         state["method"] = "relative"
                         state["checks"] = 0
+                        self._prepare_subtitle_seek(
+                            state["target"], origin=fallback_origin
+                        )
                         self._seek_verify_timer.start(
                             SEEK_VERIFY_DELAY_MS,
                             True,
@@ -22850,6 +25499,7 @@ class GTExternalPlayerScreen(
                             error.__class__.__name__
                         )
                     )
+        self._cancel_seek_verification()
         self._seek_unavailable()
 
     def _seek_immediately(self, delta_seconds):
@@ -22858,8 +25508,12 @@ class GTExternalPlayerScreen(
             return
         seeker = self._seek_interface()
         position, length = self._seek_position(seeker)
-        if seeker is None or position < 0 or length <= 0:
-            self._seek_unavailable()
+        youtube_remux, unused_duration = self._youtube_remux_context()
+        if (
+            (seeker is None and youtube_remux is None)
+            or position < 0 or length <= 0
+        ):
+            self._seek_not_ready()
             return
         delta_seconds = int(delta_seconds)
         pending = self._pending_seek_verification
@@ -22894,6 +25548,137 @@ class GTExternalPlayerScreen(
         else:
             self._seek_immediately(-60)
 
+    def _direction_press(self, direction):
+        if (
+            self._closed or not self._started
+            or self._minute_seek_open or self._pending_engine_reference is not None
+        ):
+            return True
+        if self._held_direction == direction:
+            # Some remotes report held keys as repeated make events. Do not
+            # postpone the 650 ms hold deadline with every repeat.
+            return True
+        self._held_direction = direction
+        self._held_direction_long = False
+        timer = getattr(self, "_direction_hold_timer", None)
+        if timer is not None:
+            timer.stop()
+            timer.start(DIRECTION_HOLD_MS, True)
+        return True
+
+    def _direction_release(self, direction):
+        if self._held_direction != direction:
+            return True
+        timer = getattr(self, "_direction_hold_timer", None)
+        if timer is not None:
+            timer.stop()
+        was_long = self._held_direction_long
+        self._held_direction = None
+        self._held_direction_long = False
+        if not was_long and not self._minute_seek_open and not self._closed:
+            if getattr(self, "_short_direction_is_seek", True):
+                (self.seek_forward if direction > 0 else self.seek_backward)()
+            else:
+                (self.seek_right_or_info if direction > 0 else self.seek_left_or_info)()
+        return True
+
+    def _direction_hold_timeout(self):
+        direction = self._held_direction
+        log_event("minute_seek", "hold-timeout direction={} opened={}".format(
+            direction, int(self._minute_seek_open)
+        ))
+        if direction in (-1, 1) and not self._held_direction_long:
+            self._direction_long(direction)
+
+    def _direction_long(self, direction):
+        timer = getattr(self, "_direction_hold_timer", None)
+        if timer is not None:
+            timer.stop()
+        if (
+            self._closed or not self._started or self._minute_seek_open
+            or self._pending_engine_reference is not None
+        ):
+            log_event("minute_seek", "hold-blocked closed={} started={} open={} switching={}".format(
+                int(self._closed), int(self._started), int(self._minute_seek_open),
+                int(self._pending_engine_reference is not None),
+            ))
+            return True
+        if self._held_direction not in (None, direction):
+            log_event("minute_seek", "hold-other-direction")
+            return True
+        self._held_direction = direction
+        self._held_direction_long = True
+        log_event("minute_seek", "hold-accepted direction={}".format(direction))
+        self.open_minute_seek(direction)
+        return True
+
+    def open_minute_seek(self, direction):
+        """Open native minute input above VOD without stopping the video."""
+        if (
+            self._minute_seek_open or self._closed or not self._started
+            or getattr(self.current_item, "content_type", "") not in ("movie", "series")
+            or self._pending_engine_reference is not None
+        ):
+            return
+        # A freshly started or ServiceApp VOD stream may not have published
+        # duration yet. Allow minute entry now; validate seek capability only
+        # when OK requests the actual seek.
+        seeker = self._seek_interface()
+        position, length = self._seek_position(seeker)
+        position, length = max(0, position), max(0, length)
+        opener = getattr(self.session, "openWithCallback", None)
+        if not callable(opener):
+            log_event("minute_seek", "no-modal-opener")
+            return
+        self._seeking = False
+        self._hide_seek_overlay()
+        generation, item, reference = self._generation, self.current_item, self.reference
+        self._minute_seek_open = True
+        self.hide_info()
+
+        def entered(minutes):
+            self._minute_seek_open = False
+            if (
+                minutes is None or self._closed or self._generation != generation
+                or self.current_item is not item or self.reference is not reference
+            ):
+                return
+            try:
+                minutes = int(minutes)
+            except (ValueError, TypeError, OverflowError):
+                return
+            if 0 < minutes <= 9999:
+                self._seek_immediately(direction * minutes * 60)
+
+        try:
+            from Components.Input import Input
+            from Screens.InputBox import InputBox
+            opener(
+                entered,
+                InputBox,
+                title=_("SEEK FORWARD" if direction > 0 else "SEEK BACKWARD")
+                      + " (" + _("{} minutes").format("").strip() + ")",
+                # Enigma2 treats maxSize as a fixed-width overwrite field.
+                # Give it all four slots up front; an empty string leaves the
+                # cursor stuck on the first digit on OpenPLi and OpenATV.
+                text="    ",
+                maxSize=4,
+                type=Input.NUMBER,
+            )
+            log_event("minute_seek", "native-dialog-opened")
+        except Exception as error:
+            log_event("minute_seek", "native-dialog-failed", error)
+            _debug("native minute input failed error={}".format(
+                error.__class__.__name__
+            ))
+            try:
+                opener(entered, GTMinuteSeekScreen, direction, position, length)
+                log_event("minute_seek", "custom-dialog-opened")
+            except Exception as fallback_error:
+                log_event("minute_seek", "custom-dialog-failed", fallback_error)
+                self._minute_seek_open = False
+                self.show_info()
+
     def begin_seek_mode(self):
         self._begin_or_adjust_seek(0)
 
@@ -22913,12 +25698,13 @@ class GTExternalPlayerScreen(
         if not self._seeking:
             return False
         seeker = self._seek_interface()
-        if seeker is None:
-            self._seek_unavailable()
+        youtube_remux, unused_duration = self._youtube_remux_context()
+        if seeker is None and youtube_remux is None:
+            self._seek_not_ready()
             return True
         position, length = self._seek_position(seeker)
         if position < 0 or length <= 0:
-            self._seek_unavailable()
+            self._seek_not_ready()
             return True
         target = min(max(0, int(self._seek_target)), int(length))
         self._cancel_seek_verification()
@@ -22986,10 +25772,18 @@ class GTExternalPlayerScreen(
             self._hide_timer.start(INFO_TIMEOUT_MS, True)
             return
         try:
-            pauseable.pause()
+            result = pauseable.pause()
+            if self._seek_call_failed(result):
+                return
         except Exception:
             return
         self._paused = True
+        youtube_context = getattr(self, "_youtube_remux_context", None)
+        youtube_remux = (
+            youtube_context()[0] if callable(youtube_context) else None
+        )
+        if youtube_remux is not None:
+            self._youtube_clock_pause_started_at = time.monotonic()
         subtitle_controller = getattr(self, "_subtitle_controller", None)
         if subtitle_controller is not None:
             subtitle_controller.pause()
@@ -23009,9 +25803,22 @@ class GTExternalPlayerScreen(
         if pauseable is None:
             return
         try:
-            pauseable.unpause()
+            result = pauseable.unpause()
+            if self._seek_call_failed(result):
+                return
         except Exception:
             return
+        youtube_pause_started_at = getattr(
+            self,
+            "_youtube_clock_pause_started_at",
+            None,
+        )
+        if youtube_pause_started_at is not None:
+            self._youtube_clock_started_at += max(
+                0.0,
+                time.monotonic() - youtube_pause_started_at,
+            )
+            self._youtube_clock_pause_started_at = None
         self._paused = False
         subtitle_controller = getattr(self, "_subtitle_controller", None)
         if subtitle_controller is not None:
@@ -23574,23 +26381,34 @@ class GTExternalPlayerScreen(
             return "--"
         try:
             tracks = service.audioTracks()
-            if tracks is None or tracks.getNumberOfTracks() <= 0:
-                return "--"
-            current = tracks.getCurrentTrack()
-            track = tracks.getTrackInfo(current)
-            description = localized_language_name(
-                str(track.getDescription() or "").strip()
-            )
-            if description:
-                return description[:28]
-            language_getter = getattr(track, "getLanguage", None)
-            if callable(language_getter):
-                language = localized_language_name(language_getter())
-                if language:
-                    return language[:28]
-            return "--"
+            if tracks is not None and tracks.getNumberOfTracks() > 0:
+                current = tracks.getCurrentTrack()
+                track = tracks.getTrackInfo(current)
+                description = localized_language_name(
+                    str(track.getDescription() or "").strip()
+                )
+                if description:
+                    return description[:28]
+                language_getter = getattr(track, "getLanguage", None)
+                if callable(language_getter):
+                    language = localized_language_name(language_getter())
+                    if language:
+                        return language[:28]
         except Exception:
-            return "--"
+            pass
+        # GStreamer-backed IPTV can publish the codec tag before (or without)
+        # a selectable audio track. Only ask the current service; never guess
+        # from the URL or retain metadata from the previous channel.
+        try:
+            key = getattr(iServiceInformation, "sTagAudioCodec", None)
+            info = service.info() if key is not None else None
+            getter = getattr(info, "getInfoString", None)
+            codec = " ".join(str(getter(key) or "").split()) if callable(getter) else ""
+            if codec and codec.lower() not in ("unknown", "n/a", "--", "-1"):
+                return codec[:28]
+        except Exception:
+            pass
+        return "--"
 
     @staticmethod
     def _format_epg(event):
@@ -23766,7 +26584,12 @@ class GTExternalPlayerScreen(
             except Exception:
                 self._picon_visible = False
 
-        attach_pixmap(
+        loader = (
+            attach_native_alpha_pixmap
+            if self._is_live_item()
+            else attach_pixmap
+        )
+        loader(
             self._info_dialog,
             "picon",
             path,
@@ -23775,6 +26598,13 @@ class GTExternalPlayerScreen(
         )
 
     def stop_playback(self):
+        self._stop_player_stream_diag()
+        try:
+            self._direction_hold_timer.stop()
+        except Exception:
+            pass
+        self._held_direction = None
+        self._held_direction_long = False
         stop_archive_keepalive = getattr(
             self,
             "_stop_archive_portal_keepalive",
@@ -23810,6 +26640,7 @@ class GTExternalPlayerScreen(
             self._channel_switch_timer,
             self._reconnect_timer,
             self._engine_switch_timer,
+            self._subtitle_auto_timer,
         ):
             try:
                 timer.stop()
@@ -23936,6 +26767,7 @@ class GTExternalPlayerScreen(
                 # playback as transferred before close so _on_close cannot
                 # stop or restore it.
                 reference = active_reference
+                self._stop_player_stream_diag()
                 self._stop_live_auxiliary_timers()
                 self._started = False
                 self._fullscreen_close_result = self._live_fullscreen_result(
@@ -23969,6 +26801,10 @@ class GTExternalPlayerScreen(
         self.show_info()
 
     def _on_close(self):
+        self._stop_player_stream_diag()
+        self._unbind_player_key_handler()
+        self._held_direction = None
+        self._held_direction_long = False
         self._save_resume_position()
         stop_archive_keepalive = getattr(
             self,
@@ -24012,6 +26848,7 @@ class GTExternalPlayerScreen(
             self._playback_timer,
             self._resume_timer,
             self._seek_verify_timer,
+            self._subtitle_auto_timer,
             self._reconnect_timer,
             self._engine_switch_timer,
             self._channel_switch_timer,

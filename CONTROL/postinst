@@ -306,3 +306,4 @@ fi
 
 echo 'GT IPTV Player Pro installed; restart the Enigma2 GUI before opening the plugin.'
 exit 0
+

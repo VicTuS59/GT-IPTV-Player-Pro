@@ -627,3 +627,4 @@ class SubsSupportBridge(object):
         self._closed = True
         self.cancel_pending_search()
         self.disable()
+

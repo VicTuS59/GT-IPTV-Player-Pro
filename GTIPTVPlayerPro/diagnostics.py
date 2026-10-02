@@ -11,7 +11,10 @@ from urllib.parse import urlsplit
 
 
 DEFAULT_LOG_PATH = "/tmp/gtiptvplayerpro.log"
-MAX_LOG_BYTES = 256 * 1024
+# Diagnostic builds record each Stalker API and player milestone.  Keep enough
+# room for several channel attempts while retaining the existing file-size
+# bound and private file permissions.
+MAX_LOG_BYTES = 1024 * 1024
 
 _LOG_LOCK = threading.Lock()
 _QUERY_SECRET = re.compile(
@@ -127,3 +130,4 @@ def log_event(area, message, error=None, path=DEFAULT_LOG_PATH):
                 os.close(descriptor)
             except OSError:
                 pass
+

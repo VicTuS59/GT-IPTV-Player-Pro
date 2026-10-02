@@ -1,14 +1,314 @@
 Package: enigma2-plugin-extensions-gtiptvplayerpro
-Version: 1.1.0-r0
+Version: 1.2.0-r0
 Section: extra
 Priority: optional
 Architecture: all
 Maintainer: VicTuS59
-Depends: enigma2, python3-core, python3-compression, python3-crypt, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-math, python3-netclient, python3-stringold, python3-threading, python3-xml
-Installed-Size: 7507
+Depends: enigma2, python3-core, python3-compression, python3-crypt, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-math, python3-netclient, python3-netserver, python3-stringold, python3-threading, python3-xml
+Installed-Size: 45077
 Homepage: https://github.com/VicTuS59/GT-IPTV-Player-Pro
 License: GPL-2.0-or-later
-Description: Enigma2 IPTV player with provider TV archive and XMLTV EPG
+Description: Enigma2 IPTV player with TMDB movie discovery and VOD downloads
+ R123 derives web asset versions from the installed package metadata instead
+ of a stale fixed web revision. Matching web and running receiver versions
+ no longer show a false restart warning; real update mismatches and missing
+ API warnings remain visible. R122 independent subtitle keys are preserved.
+ R122 makes the first API key row follow the selected subtitle provider.
+ All key labels, masked values, keyboard entry and connection tests resolve
+ the same provider, while SubDL, OpenSubtitles.com and SubSource credentials
+ remain independently saved and preserved when switching providers.
+ R121 adds SubSource to the receiver's combined subtitle search, results and
+ provider filter. Its API key is shared with the web subtitle settings; no
+ username or password is required. IMDb/title lookup, primary/secondary
+ languages, bounded downloads and episode selection from season ZIPs use
+ the official SubSource API. The R120 translations and artwork are retained.
+ R120 completes the independent subtitle settings translations in all 43
+ packaged receiver language catalogs, including row labels, appearance values,
+ live preview, API status, provider connection feedback and the yellow API test
+ remote-control caption. Device-language selection and the R119 subtitle
+ synchronization, layouts, images, controls and saved settings are retained.
+ R119 uses decoder-authoritative independent subtitle timing: stalled or
+ invalid PTS can no longer start an unbounded substitute clock. Seek requests
+ suspend captions until actual decoder timing settles; success, cancellation,
+ timeout and service changes clear pending timing state. Sub-second position
+ precision, explicit pause/resume, remux offsets and the existing UHD/FHD/HD/SD
+ layouts are retained. Provider FPS alone no longer stretches SRT timestamps;
+ different frame rates remain matching hints. Bounded diagnostic samples
+ distinguish decoder, stalled, missing and seek timing without stream secrets.
+ R117 redesigns Independent Subtitle Settings as the approved two-panel glass
+ page: all SubDL/OpenSubtitles credentials and search/appearance controls stay
+ available on the left, while live preview, API state and connection feedback
+ remain visible on the right. Row arrows, saved focus colours and the shared
+ translated remote guide scale at UHD, FHD, HD and 4:3 SD GUI resolutions.
+ R116 redesigns the combined subtitle browser with translucent glass panels,
+ framed compatibility badges and the plugin's shared remote-control guide.
+ Its six translated actions and seven-row result layout scale independently
+ for native UHD, FHD, HD and 4:3 SD Enigma2 GUI desktops while the opaque
+ full-screen guard continues to prevent DVB video from leaking around the UI.
+ R115 scores combined subtitle results by exact programme/episode identity,
+ release source, edition, decoder FPS, timeline duration and codec/resolution.
+ Five colour-coded compatibility classes are shown in all 43 device languages;
+ safe film/PAL FPS pairs automatically retime cues without touching unknown or
+ incompatible rates, and doubled 50/60 FPS decoder values are normalized.
+ R114 adds a blue Edit action to the combined subtitle browser. The receiver
+ keyboard can replace a bad portal movie/series name before the next combined
+ SubDL and OpenSubtitles search; stale catalogue IDs and year are excluded from
+ that manual lookup while episode and release-compatibility hints are retained.
+ R113 normalizes decorated Stalker/MAC movie and series names before subtitle
+ lookup, recovers release years embedded beside quality tags, and carries the
+ portal detail title/year/TMDb/IMDb identity into player subtitle searches.
+ Exact provider identity checks remain active, but a correct result is no
+ longer rejected only because the portal appended language or release labels.
+ R112 suspends the compact high-z independent-subtitle window while the opaque
+ GT subtitle browser is open, preventing its transparent video rectangle from
+ covering result rows. Closing the browser restores the current cue without
+ losing timing, changing a user pause, or allowing stale-service callbacks.
+ R111 adds one GT IPTV PLAYER PRO subtitle browser to the yellow-key menu. Its
+ green key searches SubDL and OpenSubtitles together, the yellow key cycles an
+ in-memory All/OpenSubtitles/SubDL filter, and every result has a local flag.
+ The opaque interface scales across UHD, FHD, HD and SD GUI desktops and uses
+ the existing translated UI vocabulary available in all 43 language catalogs.
+ R110 removes bounded IPTV suffixes such as |DE and |4K before provider lookup,
+ accepts an exact-title adjacent release year, retries OpenSubtitles once without
+ its year filter, and logs bounded rejected-candidate identities for diagnosis.
+ R109 retries empty or rejected SubDL/OpenSubtitles identifier searches with
+ the cleaned title and year, verifies returned catalogue identity, and records
+ credential-free search stages and result counts in the subtitle diagnostics.
+ R108 verifies OpenSubtitles results against returned IMDb/TMDb identity or an
+ exact normalized title/year, limits the provider list to 15 relevant entries,
+ and anchors independent subtitle timing to the requested position after seek.
+ R107 makes OpenSubtitles username and password optional: the API key alone
+ enables connection tests and searches, while downloads use account login only
+ when both optional fields are present and otherwise try the API-key route.
+ R106 lists SubDL and OpenSubtitles.com together on every manual subtitle
+ search, keeps both API-key rows visible, and recognizes legacy OpenSubtitles
+ credential names without changing the provider used by automatic search.
+ R105 adds OpenSubtitles.com to the independent subtitle workflow with
+ provider selection, authenticated downloads and separate protected settings.
+ R104 preserves millisecond decoder timing for independent subtitles and ranks
+ same-language SubDL results by playback FPS, release type and resolution.
+ R103 moves active independent subtitles above the player infobar while it is
+ visible and narrows the subtitle window so neither OSD obscures the other.
+ R102 replaces the full-screen transparent subtitle dialog with a compact,
+ persistent high-z OSD window for Vu+/OpenPLi ServiceApp framebuffer drivers.
+ R101 uses a pause-aware monotonic fallback when ServiceApp exposes an invalid
+ or frozen decoder clock, and records bounded subtitle timing diagnostics.
+ R100 raises the independent subtitle window above ServiceApp/ExtEplayer3's
+ video plane so successfully loaded cues remain visible during playback.
+ R99 honours the configured primary subtitle language before using the
+ secondary language during automatic SubDL selection.
+ R98 cleans IPTV provider/language suffixes and duplicate years before SubDL
+ lookup, and treats an ordinary empty SubDL reply as no matching subtitles.
+ R97 fixes independent subtitle rendering on playback engines that expose
+ decoder time while reporting the stream as non-seekable.
+ R96 adds receiver-native online subtitles with SubDL, automatic film/series
+ search, independent SRT/WebVTT rendering and a live-preview settings screen.
+ R95 lowers remote-guide keys, captions and dividers within Settings, Films
+ and Series footer panels at UHD, FHD, HD and SD screen sizes.
+ R94 removes the dark legacy footer cover from the welcome screen across
+ native UHD, FHD, HD and SD layouts while retaining the remote guide panel.
+ R93 excludes build-only artwork sources from the IPK while preserving all
+ runtime HD, FHD, UHD and SD wallpapers, cards and receiver widgets.
+ R92 loads EPG for the ten visible Live TV channels in the background when
+ opening or changing pages, with bounded sequential calls and stale-job cancellation.
+ R91 gives Continue Watching and Favorites image-independent glass cards,
+ opaque wallpapers and remote guides at 720p, 1080p, 2160p and SD sizes.
+ R90 gives Films, Series, Settings and Add Source approved glass panels with
+ native opaque artwork at 720p, 1080p, 2160p and three SD GUI sizes.
+ R89 audits 44 receiver skin builders at UHD, FHD, HD and SD GUI sizes,
+ fixes YouTube and 4:3 discovery coverage, and adds native-size wallpapers
+ across shared screens and the Live TV, accounts and dashboard pages.
+ R88 selects crisp, opaque 720p, 1080p or 2160p welcome artwork for the
+ native GUI desktop while keeping the full-screen DVB guard and live labels.
+ R87 applies the approved curved welcome wallpaper and strengthens the
+ full-desktop DVB guard; layouts cover native UHD, HD and SD GUI sizes.
+ R86 makes every full-screen wallpaper cover its native screen widget and
+ gives the Xtream/M3U/Stalker account list the approved Live TV glass look.
+ R85 gives Manage Sources the approved Live TV wallpaper, translucent
+ source cards and main panel, and a matching transparent remote guide.
+ R84 applies the approved Live TV wallpaper to the live-category/weather
+ screen and replaces its opaque panels and category rows with translucent
+ glass artwork. The remote guide also reveals the wallpaper.
+ R83 precomposes the Live TV channel-row shadows into the RGB wallpaper and
+ leaves every unselected row widget fully transparent, avoiding Enigma2 OSD
+ alpha differences across OpenPLi, OpenATV and other receiver images.
+ R82 removes the compounded Live TV channel-panel tint seen on OpenATV and
+ keeps only one very light navy row shadow, matching the approved device view
+ while leaving the wallpaper visible through every unselected channel.
+ R81 removes the opaque Live TV remote-guide strip and replaces the black
+ channel rows with translucent navy-blue glass surfaces that reveal the R80
+ wallpaper while preserving strong contrast and the selected-channel frame.
+ R80 restores a dedicated low-contrast navy geometric background to the
+ full-screen Live TV guide while retaining an opaque fallback below it, so DVB
+ video remains confined to the decoder-0 mini TV and all text stays readable.
+ R79 routes live channel picons through Enigma2's native alpha-preserving
+ loader so transparent logo pixels are no longer flattened into black boxes
+ by ePicLoad in the guide or fullscreen player information panel.
+ R78 removes the black picon canvases from the full-screen Live TV guide by
+ explicitly making the ten row-picon widgets and selected-channel picon widget
+ transparent while preserving their original alpha-blended artwork.
+ R77 restores the Live TV mini TV by keeping the decoder-0 VideoWindow
+ transparent above the opaque guide and aligns the full-width remote guide
+ with the approved mockup while retaining the left/right page key.
+ R76 replaces the Live TV browser with a fully opaque, full-screen Enigma2
+ guide: ten large channel rows, selected-channel EPG, one decoder-0 mini TV
+ and a bounded visible-first picon cache for the complete active category.
+ R75 adds real seeking to high-quality YouTube playback by restarting the
+ private FFmpeg remux at the selected second without dropping separate audio.
+ It keeps authoritative elapsed/total time visible and supports 4097/5001/5002.
+ R74 replaces the washed-out selector artwork with 17 vivid outline colors
+ and applies the chosen frame to focus PNGs, edges, markers and glow frames
+ across all custom receiver pages while keeping selected fills independent.
+ R73 adds an independent 17-color selector-frame preference under Appearance.
+ It applies to focus outlines and markers throughout the receiver interface,
+ keeps selection fills separate and preserves the pre-R73 visual choice.
+ Discover Movies offers popular, top-rated, now-playing and genre lists,
+ recommendations, active-account IPTV search and optional YouTube trailers.
+ A user-supplied TMDB key is required. Lists and artwork load asynchronously.
+ R3 restores translucent dashboard cards, frames discovery posters and masks
+ the DVB video plane. Discovery hero artwork is bounded above the card rail,
+ independent of the VOD appearance setting, with stale image loads cancelled.
+ Remote hints sit below the card titles. YouTube trailers use the bundled
+ video resolver and the configured HTTP movie player without requiring a
+ separate YouTube plugin. Trailer failures remain separate from list errors.
+ R4 loads the transparent discovery menu and hero mask through native skin
+ PNG loading, preserving alpha instead of flattening it onto black. The hero
+ mask is shown only after the selected movie backdrop has decoded successfully.
+ R5 aligns the Downloads and Save folder remote guides with coloured key
+ badges and two-line captions, including Pause / Resume in all 43 catalogues.
+ R6 cancels pending discovery requests when the TMDB API key is removed,
+ clears the loading state and keeps translation build metadata in sync.
+ R7 makes the Discover Movies header and remote-guide backgrounds transparent
+ over the application artwork while retaining the opaque DVB video guard.
+ R8 adds Weather to Settings, opening the existing city, temperature-unit
+ and weather-display controls with the existing language catalogs.
+ R9 treats missing seek information during VOD startup as temporary loading
+ and clears transient seek overlays before showing the normal infobar.
+ R10 adds BLUE-key reordering of the dashboard menu. UP/DOWN moves the
+ selected entry, OK or BLUE saves its position, and EXIT cancels the move.
+ The order is stored in native Enigma2 settings and shared across sources.
+ R11 tolerates delayed 5002 seek-position updates without issuing a duplicate
+ relative seek or falsely reporting that the stream cannot be seeked.
+ Explicit seek-call failures retain the existing fallback and error handling.
+ R12 verifies the live channel list when a Stalker portal returns an empty
+ genre response, then opens All Channels with bounded request handling.
+ R13 adds one bounded MAG compatibility session after eligible Stalker
+ connection failures, using encoded MAC cookies, matching bearer/cookie
+ tokens, MAG browser headers and the complete device-profile exchange.
+ Verified sessions are reused; existing API paths and the total connection
+ deadline are retained. No new interface strings are introduced.
+ R14 recognizes the exact plain-text Authorization failed reply after a
+ successful handshake and activates the existing bounded MAG fallback.
+ A successful catalogue response is still required before reusing it.
+ HTTP/JSON access errors, rate limits, cancellation and redirect protections
+ keep their existing behavior. MAG profile provenance is documented.
+ R15 records the project-owner-supplied kiddac/EStalker statement and forum
+ post link beside the MAG profile code and in the attribution documents.
+ The R14 connection fix is retained without runtime logic changes.
+ R16 uses the exact English EStalker statement supplied by the project
+ owner in the MAG source comments and permission record, with the same
+ forum post link and attribution.
+ R17 aligns welcome-screen navigation with its layout: left/right selects
+ an action, up/down selects a source, and the remote guide matches.
+ R18 adds an optional device main-menu entry under Settings / Appearance.
+ The default remains enabled; disabling it keeps the plugin-browser entry
+ available. The new option is localized in all 43 device-language catalogs.
+ R19 separates Discover Movies tab focus from the open-section indicator.
+ UP/DOWN explicitly changes the navigation area; confirming a tab retains
+ tab focus. Unconfirmed tab choices reset when returning to the posters.
+ Near-simultaneous duplicate direction actions are filtered while held-key
+ navigation remains available. Existing 43 device-language catalogs remain.
+ R20 adds a responsive local web dashboard for phones, tablets and desktops.
+ A one-time six-digit code plus explicit TV approval gates each browser;
+ sessions are LAN-only, IP/device-bound, CSRF-protected and expire in memory.
+ OpenWebif serves /gtiptv when available, with temporary port 9999 fallback.
+ Source credentials and private keys are never returned to the browser.
+ R21 replaces the native Web Interface footer sentence with the shared neon
+ remote-control panel, coloured key badges and vertical dividers.
+ R22 removes the inactive source-status card from the web dashboard and adds
+ a dedicated automatic-test page for Xtream Codes and Stalker/MAC portals.
+ Tests run sequentially in a cancellable background job and report protected
+ traffic-light results, expiry, latency and connection use without exposing
+ account credentials to the browser.
+ R23 prevents mixed-version web bundles by disabling static-file caching and
+ versioning browser assets. It also blocks external browser translation from
+ corrupting interface labels and clearly requests an Enigma2 GUI restart when
+ the installed web bundle and running receiver process do not match.
+ R24 connects the built-in Xtream and Stalker TXT files on first use even
+ when they are empty, including upgrades from R23 with no selected TXT.
+ Explicit user-selected TXT files remain active.
+ R25 saves preferred movie/series audio and subtitle languages and selects
+ matching decoder tracks when they appear. Adds an authenticated responsive
+ web remote and sends pasted text to an open receiver virtual keyboard.
+ R26 waits for VOD playback to advance before selecting a preferred audio
+ track, checks that the decoder accepted the selection, and recognizes
+ Turkish track names when provider language metadata is missing. Streams
+ without a working seek position retain their existing audio to avoid an
+ unsafe startup track switch. Existing language catalogs are retained.
+ R27 prevents unstable or sped-up VOD video on some ServiceApp receivers by
+ suspending automatic audio-track switching during streamed playback. The
+ saved audio preference is retained, and manual BLUE-key audio selection
+ and preferred subtitles remain available. No UI translations change.
+ R28 uses an optional bounded ffprobe lookup for movie and series audio
+ languages on service type 5002. When a matching audio-track ordinal can be
+ identified, ServiceApp passes it to exteplayer3 at startup. Missing ffprobe,
+ unrecognized manifests and failed lookups keep the R27 playback path. All
+ existing device-language catalogs remain and 42 audio-language choices are
+ available in Settings; no running-video audio switch is scheduled.
+ R29 removes preferred audio and subtitle languages from Settings and stops
+ all automatic startup audio probing and playback subtitle selection. Saved
+ preferences from earlier builds are ignored. Manual BLUE-key audio and
+ YELLOW-key subtitle menus remain available; the 43 catalogs are retained.
+ R30 puts manual audio and subtitle selection under YELLOW for movies and
+ series; BLUE no longer opens VOD audio. The 1 key cycles installed playback
+ engines for live TV, movies and episodes; INFO/EPG shows player information.
+ Long LEFT/RIGHT opens an overlaid minute-entry seek dialog in movies and
+ series while short presses retain their previous seek action. Engine changes
+ preserve the same VOD URL and restore the episode position where possible.
+ R31 binds YELLOW, 1 and VOD LEFT/RIGHT to remote events only while the player
+ has focus, avoiding private keymap differences across Enigma2 images. Short
+ LEFT/RIGHT retains each image's original action. Configured ServiceApp engines
+ remain selectable when their executable is outside the usual search paths.
+ R32 opens the minute seek dialog after a held VOD LEFT/RIGHT key even when an
+ image supplies no long/repeat event. The dialog opens before decoder duration
+ is ready; seeking is checked only after OK. A native number-input fallback
+ opens if an image rejects the compact dialog.
+ R33 raises the minute entry window above the external player's video and
+ information layers and gives its input panel a readable background.
+ R34 records bounded, credential-free diagnostic events for movie and series
+ arrow holds and minute-dialog failures to identify receiver-specific errors.
+ R35 uses the receiver's native number-entry dialog for minute seeking during
+ movie and series playback, replacing an invisible custom modal on some images.
+ The compact custom window remains an opaque fallback; playback stays active.
+ R36 preallocates the native numeric input's four fixed-width digit slots so
+ successive remote digits append to the minute value rather than overwrite it.
+ R37 preserves explicitly supplied Stalker PHP endpoints, probes additional
+ /c/ loader paths and validates live access before reporting portal health.
+ A verified alternate MAG session can serve ordinary content requests after
+ a bounded compatibility failure; explicit account denials remain terminal.
+ R38 records credential-redacted Stalker request status, response shape,
+ link choice and timed playback milestones for black-screen diagnostics.
+ A country restriction is identified only from an explicit server response;
+ otherwise the diagnosis remains unknown. No extra stream requests or
+ automatic player restarts are introduced.
+ R39 shows a complete rounded focus outline on all eight dashboard menu
+ rows, aligning the highlighted card with the existing glass border instead
+ of drawing only a left edge and bottom line.
+ R60 discovers local addresses and prepares temporary web pairing outside the
+ receiver GUI loop; it checks the OpenWebif mount before advertising its URL
+ and uses the existing port-9999 fallback when that route is unavailable.
+ R64 applies the approved navy/cyan theme to Live TV channels, categories and
+ Xtream account rows, scaling live text with the existing appearance setting.
+ R65 removes the account-list footer mask that covered the seventh row and
+ enlarges channel EPG, account details and status text on the new theme.
+ R66 removes the extra dark NOW/NEXT ribbon and the framed live summary.
+ Long programme descriptions scroll vertically with a position indicator,
+ retaining the existing text-size setting and receiver-safe scrolling.
+ R67 restores reliable native Label rendering for live EPG descriptions;
+ longer text advances by visible lines instead of relying on ScrollLabel.
+ R68 follows the receiver language for native YouTube searches and each
+ browser language for web searches, including separate pagination cursors.
+ Search language is shown as automatic on the TV and web settings screens.
  Native Enigma2 interface for Xtream Codes, local or HTTP(S) M3U playlists,
  and Stalker/MAC portals. M3U sources support optional background XMLTV EPG;
  Xtream XMLTV data can also be mapped safely to native DVB services.
@@ -58,3 +358,106 @@ Description: Enigma2 IPTV player with provider TV archive and XMLTV EPG
  TV Archive replays available provider recordings through Xtream Codes,
  native Stalker/MAC archive APIs, or declared M3U catchup with XMLTV history.
  The neon interface follows the receiver language through 43 catalogs.
+ R128 adds a scrollable Downloads settings page, remote-controlled movie
+ and episode downloads for Xtream and Stalker/MAC, one active download,
+ HTTP Range resume, 100 KB/s to 10 MB/s speed limits, account playback
+ protection and local video playback. A detached worker keeps transfers
+ running after the plugin screen closes; a device reboot cancels pending
+ transfers without automatic restart. New UI text is localized in all
+ 43 device-language catalogs. Direct HTTP(S) video files are supported;
+ HLS and DASH manifests are reported as unsupported.
+ R129 adds confirmed deletion on YELLOW, fitted download titles,
+ slow detail scrolling, configured local playback engines, startup
+ diagnostics and bounded media-container validation. All six new
+ messages are available in the existing 43 language catalogs.
+ R130 fixes invisible download details on OpenPLi by raising the
+ native scroll container above the opaque panel. Hidden scrollbars
+ no longer reserve horizontal space. No new UI strings are added.
+ R131 fixes a local-player crash during modal screen teardown.
+ Startup monitoring stops before playback is stopped or closed,
+ and on loss of screen execution. Error dialogs require the
+ active player to own modal execution. No new UI strings are added.
+ R132 adds MENU Download to the movie, series, episode and
+ all-movie-search remote guides. The episode download picker
+ labels OK as Download. The new action is localized in all
+ 43 device-language catalogs using the existing adaptive footer.
+ R133 improves VOD remote-guide readability with compact keys above
+ centered captions, up to two caption lines and a bounded minimum
+ font. Movies, series, episode selection and all-movie search use
+ this layout for Xtream and Stalker/MAC, including both VOD views.
+ Existing translations in all 43 device languages are reused.
+ R134 fixes the OpenPLi screen-opening crash introduced by R133.
+ The stacked-footer layout callback is registered as a bound
+ method, avoiding the legacy exec path for plain functions.
+ The approved layout and all 43 language catalogs are retained.
+ R135 separates the stacked remote guide from the cinematic
+ poster scrollbar and category panel. The guide moves down
+ without reducing caption space; the scrollbar skin and runtime
+ geometry share the same position. The R134 crash fix is retained.
+ R136 extends download speed choices with 20, 30, 40, 50, 60,
+ 70, 80, 90 and 100 MB/s. The selector scrolls within nine visible
+ rows with direction indicators. Saved limits and the 10 MB/s
+ default are preserved; the worker accepts the extended range.
+ Existing translations in all 43 device languages are reused.
+ R40 adds web subtitle search for currently playing movies and episodes.
+ SubDL, SubSource and OpenSubtitles use optional per-user API keys stored
+ on the receiver; Subtitle Search Engine also offers keyless guest access.
+ Results are matched by episode, selected through opaque short-lived IDs,
+ downloaded with bounded HTTPS requests and loaded via SubsSupport/Pro.
+ R41 allows alignment of a spoken movie timestamp with a downloaded SRT cue,
+ plus half-second timing adjustments and reset from the paired web interface.
+ The original SRT remains intact; the active movie is checked before loading.
+ R42 shows decoder-provided movie and episode audio tracks in the paired web
+ interface, with manual selection bound to the current item and track list.
+ An absent dubbed language cannot be synthesized from an existing track.
+ R43 adds mobile IPTV movie and series search with TV playback, web TMDb
+ key setup, and a YouTube search/receiver playback screen with video quality
+ preferences. Video stream extraction runs on the receiver without a
+ separate YouTube plugin.
+ R44 removes the YouTube Data API key requirement and searches the public
+ YouTube results page from the receiver. Video quality controls remain;
+ search and stream extraction may need updates when YouTube changes.
+ R45 adds numbered, mobile-friendly YouTube search pages. A short-lived
+ receiver-side continuation cursor fetches more public results without
+ requiring a user API key; previously loaded pages stay available.
+ R46 plays Discover Movies trailers through the bundled receiver-side
+ YouTube resolver. Web and discovery extraction share one synchronization
+ lock and the configured quality; no separate YouTube plugin is needed.
+ R47 keeps fetching YouTube search pages while the search results provide a
+ continuation. It ignores unrelated sidebar commands, accepts both response
+ layouts, retains cursors for 30 minutes and exposes the next page number.
+ R48 replaces the stream inside the existing web YouTube player when another
+ video is sent to TV. This prevents modal player stacking, so one EXIT returns
+ to the underlying plugin instead of revisiting previously played videos.
+ R49 replaces Filter Search with MENU Hide All in the native Live TV, Movies
+ and Series category manager. GREEN saves, EXIT cancels and BLUE restores;
+ legacy filter exclusions are converted to editable hidden categories on save.
+ R50 adds a fourth YouTube tile to the native welcome screen. A receiver-native
+ search view lists compact video rows with keyless paged results and playback
+ through the bundled extractor. Pagination follows every available continuation;
+ quality controls share the existing YouTube settings. No IPTV account is needed.
+ R51 covers the full receiver display with an opaque welcome screen while the
+ artwork loads and stretches the welcome bitmap to the exact screen size.
+ The YouTube results screen also keeps its video guard visible. The old unused
+ welcome bitmap was removed and the current artwork recompressed losslessly.
+ R52 pauses the underlying live DVB channel while the welcome screen is open
+ and restores it on exit if no other service has started. Recordings and IPTV
+ playback are left alone, so video cannot leak through side margins.
+ R53 completes device and web translation coverage across 43 receiver catalogs
+ and 47 web language choices. It fixes play-on-TV, media, subtitles, settings,
+ status cards, pairing prompts, accessibility labels and localized errors.
+ R54 lets the mobile web sidebar scroll to every navigation item on short
+ screens, including the Settings entry and the version footer.
+ R55 detects the browser language again on page load. A previous web choice
+ remains saved only while the browser language has not changed.
+ R56 localizes initial web dashboard status and keyboard availability labels
+ before the first dashboard or remote-status response arrives.
+ R57 reviews the Arabic receiver and web catalogs line by line and corrects
+ series labels, subtitle timing examples, pairing prompts, form guidance and
+ remote-control instructions. Other language catalogs are unchanged.
+ R58 fixes download screen geometry on wide displays and uses safe screen
+ dimensions if the Enigma2 desktop size is temporarily unavailable.
+ R59 selects H.264 MP4 video and AAC audio for separate YouTube streams,
+ falling back to a combined stream or HLS when no suitable audio is present.
+ Receiver and web settings expose quality, compatible/DASH playback, audio
+ preference and search language, localized in all 43 receiver catalogs.

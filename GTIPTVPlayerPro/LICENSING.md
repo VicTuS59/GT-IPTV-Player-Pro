@@ -37,3 +37,15 @@ owned by the project owner. It is also distributed under
 
 These notices do not license the Open-Meteo or TMDB brands, APIs or third-party
 content as part of the GT IPTV Player Pro source code.
+
+## MAG compatibility reference in the R19 build
+
+The R13 MAG compatibility profile is retained in this test build. Its
+development used kiddac/EStalker as a reference. On 2026-09-24, project owner
+VicTuS59 confirmed that permission had been obtained from kiddac. See
+`PORTAL_COMPATIBILITY_PROVENANCE.md` for the technical scope and
+`ESTALKER_PERMISSION.md` for the permission record, the English statement
+supplied by the project owner, and the supplied forum post link. The same
+statement and link appear beside the MAG profile code in `stalker.py`.
+No additional license terms are inferred from the excerpt. This project's
+GPL notice does not grant rights in third-party work.

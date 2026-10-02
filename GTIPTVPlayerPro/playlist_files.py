@@ -41,6 +41,7 @@ def _empty_document():
     return {
         "version": _REGISTRY_VERSION,
         "legacy_migrated": False,
+        "defaults_bound": {source_type: False for source_type in PLAYLIST_FILE_TYPES},
         "types": {
             source_type: {
                 "slots": [None] * MAX_PLAYLIST_FILES_PER_TYPE,
@@ -96,6 +97,12 @@ def _normalise_document(value):
         raise PlaylistFileRegistryError("The playlist registry is invalid")
     result = _empty_document()
     result["legacy_migrated"] = bool(value.get("legacy_migrated", False))
+    defaults_bound = value.get("defaults_bound")
+    if isinstance(defaults_bound, dict):
+        for source_type in PLAYLIST_FILE_TYPES:
+            result["defaults_bound"][source_type] = bool(
+                defaults_bound.get(source_type, False)
+            )
     types = value.get("types")
     if not isinstance(types, dict):
         raise PlaylistFileRegistryError("The playlist registry is invalid")
@@ -127,24 +134,6 @@ def _normalise_document(value):
         result["types"][source_type]["slots"] = cleaned
         result["types"][source_type]["active"] = active
     return result
-
-
-def _has_user_data(path):
-    try:
-        details = os.lstat(path)
-        if stat.S_ISLNK(details.st_mode) or not stat.S_ISREG(details.st_mode):
-            return False
-        with open(path, "rb") as handle:
-            payload = handle.read(4 * 1024 * 1024 + 1)
-    except (IOError, OSError):
-        return False
-    if len(payload) > 4 * 1024 * 1024:
-        return False
-    for line in payload.decode("utf-8-sig", "replace").splitlines():
-        value = line.strip()
-        if value and not value.startswith("#"):
-            return True
-    return False
 
 
 class PlaylistFileRegistry(object):
@@ -287,8 +276,8 @@ class PlaylistFileRegistry(object):
                     pass
 
     def _migrate(self, document):
-        if document["legacy_migrated"]:
-            return False
+        changed = not document["legacy_migrated"]
+        document["legacy_migrated"] = True
         used = set()
         for source_type in PLAYLIST_FILE_TYPES:
             source = document["types"][source_type]
@@ -296,18 +285,32 @@ class PlaylistFileRegistry(object):
                 if path:
                     used.add(_path_identity(path))
         for source_type in PLAYLIST_FILE_TYPES:
+            if document["defaults_bound"][source_type]:
+                continue
+            source = document["types"][source_type]
+            if any(source["slots"]):
+                # An existing selection is the user's choice, even if it is
+                # currently disconnected or its storage is unavailable.
+                document["defaults_bound"][source_type] = True
+                changed = True
+                continue
             path = self.legacy_paths[source_type]
-            if not _has_user_data(path):
+            try:
+                details = os.lstat(path)
+            except OSError:
+                # The installer/first-run setup may create this file later.
+                continue
+            if not stat.S_ISREG(details.st_mode) or stat.S_ISLNK(details.st_mode):
                 continue
             identity = _path_identity(path)
             if identity in used:
                 continue
-            source = document["types"][source_type]
             source["slots"][0] = path
             source["active"] = 0
+            document["defaults_bound"][source_type] = True
+            changed = True
             used.add(identity)
-        document["legacy_migrated"] = True
-        return True
+        return changed
 
     def _load(self):
         document = self._read()
@@ -549,3 +552,4 @@ def playlist_write_path(source_type, legacy_path):
 
 def register_written_playlist(source_type, path):
     return default_registry().register_written_path(source_type, path)
+

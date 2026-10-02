@@ -4,8 +4,12 @@
 
 from collections import OrderedDict
 from math import ceil, gcd
+import os
 
-from Components.Pixmap import Pixmap
+try:
+    from Components.Pixmap import Pixmap
+except ImportError:  # Source-side skin tests run without Enigma2 components.
+    Pixmap = None
 
 try:
     from enigma import ePicLoad
@@ -19,6 +23,38 @@ _BACKGROUND_CACHE_MAX_BYTES = 32 * 1024 * 1024
 _BACKGROUND_CACHE_MAX_PIXELS = 8 * 1000 * 1000
 _BACKGROUND_CACHE_BYTES = [0]
 _BACKGROUND_CACHE_PIXELS = [0]
+
+_SCREEN_ART_FAMILIES = {
+    "global-neon-v0912.png": "screen-global-r89",
+    "accounts-neon-v0912.png": "screen-accounts-r89",
+    "dashboard-neon-r96.png": "screen-dashboard-r89",
+    "live-category-background-r84.png": "screen-live-category-r89",
+    "live-guide-background-r83.png": "screen-live-guide-r89",
+    "screen-cinematic-glass-r90.png": "screen-cinematic-glass-r90",
+    "screen-settings-glass-r90.png": "screen-settings-glass-r90",
+    "screen-source-glass-r90.png": "screen-source-glass-r90",
+    "screen-continue-glass-r91.png": "screen-continue-glass-r91",
+    "screen-favorites-glass-r91.png": "screen-favorites-glass-r91",
+}
+
+
+def _screen_wallpaper_for_desktop(path, width, height):
+    """Use the smallest opaque raster that covers the full-screen GUI widget."""
+    stem = _SCREEN_ART_FAMILIES.get(os.path.basename(path or ""))
+    if not stem:
+        return path
+    if stem.endswith(("-r90", "-r91")) and (width, height) in (
+            (720, 576), (720, 480), (640, 480)):
+        variant = {(720, 576): "sd576", (720, 480): "sd480",
+                   (640, 480): "sd640"}[(width, height)]
+    elif width <= 1280 and height <= 720:
+        variant = "720"
+    elif width <= 1920 and height <= 1080:
+        variant = "1080"
+    else:
+        variant = "2160"
+    candidate = os.path.join(os.path.dirname(path), "{}-{}.png".format(stem, variant))
+    return candidate if os.path.isfile(candidate) else path
 
 
 def _cache_get(key):
@@ -68,6 +104,7 @@ class AsyncBackgroundLoader(object):
         on_loaded=None,
         cover_ratio=None,
         cover_alignment="center",
+        stretch_to_widget=False,
     ):
         self.screen = screen
         self.widget_name = widget_name
@@ -75,6 +112,7 @@ class AsyncBackgroundLoader(object):
         self.on_loaded = on_loaded
         self.cover_ratio = cover_ratio
         self.cover_alignment = str(cover_alignment or "center").lower()
+        self.stretch_to_widget = bool(stretch_to_widget)
         self.picload = None
         self.connection = None
         self.closed = False
@@ -133,6 +171,8 @@ class AsyncBackgroundLoader(object):
                 height = int(desktop.height())
             except Exception:
                 width, height = 1280, 720
+        if self.stretch_to_widget:
+            self.path = _screen_wallpaper_for_desktop(self.path, width, height)
         # Decode at the exact covering size, then let ePixmap clip the excess.
         # R112 rounded the scale up to a whole-number source multiple (for
         # example 1280x720 -> 2560x1440), which over-zoomed cinematic heroes.
@@ -160,7 +200,11 @@ class AsyncBackgroundLoader(object):
                 cover = False
         # Minimal images without the native clipping API still fill the card.
         # A distinct key keeps stretched fallback data out of the normal cache.
-        stretch = bool(self.cover_ratio and not cover)
+        stretch = self.stretch_to_widget or bool(self.cover_ratio and not cover)
+        if self.stretch_to_widget:
+            # ePixmap fills the skin widget even when the PNG differs by a
+            # fraction of a pixel from the receiver desktop aspect ratio.
+            instance.setScale(1)
         key = (self.path, width, height)
         if stretch:
             key += ("fill",)
@@ -186,7 +230,8 @@ class AsyncBackgroundLoader(object):
                     lambda *args: self._decoded(key, *args)
                 )
             self.picload.setPara(
-                [width, height, 0 if stretch else 1, 1, False, 1, "#00000000"]
+                [width, height, 0 if stretch and not self.stretch_to_widget else 1,
+                 1, False, 1, "#00000000"]
             )
             result = self.picload.startDecode(self.path)
             if result not in (None, 0):
@@ -212,7 +257,7 @@ class AsyncBackgroundLoader(object):
 
     def _fallback(self, instance):
         try:
-            if self.cover_ratio:
+            if self.cover_ratio or self.stretch_to_widget:
                 instance.setScale(1)
             instance.setPixmapFromFile(self.path)
             self.screen[self.widget_name].show()
@@ -227,10 +272,67 @@ class AsyncBackgroundLoader(object):
         self.picload = None
 
 
-def attach_background(screen, widget_name, path):
-    """Bind a blank skin widget and load its artwork after layout."""
+class NativeAlphaPixmapLoader(object):
+    """Load small RGBA artwork without ePicLoad flattening its alpha."""
+
+    def __init__(self, screen, widget_name, path, on_loaded=None):
+        self.screen = screen
+        self.widget_name = widget_name
+        self.path = path
+        self.on_loaded = on_loaded
+        self.closed = False
+
+    def _notify(self, loaded):
+        callback = self.on_loaded
+        self.on_loaded = None
+        if callback is not None:
+            try:
+                callback(bool(loaded))
+            except Exception:
+                pass
+
+    def start(self):
+        if self.closed:
+            return
+        try:
+            widget = self.screen[self.widget_name]
+            instance = getattr(widget, "instance", None)
+            if instance is None:
+                return
+            try:
+                instance.setScale(1)
+            except Exception:
+                pass
+            # The native loader retains PNG/GIF alpha. ePicLoad composites
+            # transparent pixels onto its decode background, which produces
+            # the black rectangles seen around provider channel logos.
+            instance.setPixmapFromFile(self.path)
+            if self.closed:
+                return
+            widget.show()
+            self._notify(True)
+        except Exception:
+            self._notify(False)
+
+    def close(self):
+        self.closed = True
+        self._notify(False)
+
+
+def attach_background(screen, widget_name, path, stretch_to_widget=True):
+    """Fill the full skin widget with its wallpaper after layout.
+
+    Every caller uses this helper for a screen-wide surface.  A receiver's
+    desktop can differ slightly from the wallpaper aspect ratio, so the
+    historical fit mode left narrow live-video strips along its sides.
+    Poster and picon artwork use attach_pixmap and keep their fit behavior.
+    """
+    if Pixmap is None:
+        raise RuntimeError("Enigma2 pixmap widgets are unavailable")
     screen[widget_name] = Pixmap()
-    loader = AsyncBackgroundLoader(screen, widget_name, path)
+    loader = AsyncBackgroundLoader(
+        screen, widget_name, path, stretch_to_widget=stretch_to_widget
+    )
     screen._gt_background_loader = loader
     if hasattr(screen, "onLayoutFinish"):
         screen.onLayoutFinish.append(loader.start)
@@ -256,6 +358,8 @@ def attach_pixmap(
     cover_alignment="center",
 ):
     """Decode a dynamic PNG/JPEG and keep ePicLoad alive until completion."""
+    if Pixmap is None:
+        raise RuntimeError("Enigma2 pixmap widgets are unavailable")
     loaders = getattr(screen, "_gt_pixmap_loaders", None)
     if loaders is None:
         loaders = {}
@@ -273,6 +377,44 @@ def attach_pixmap(
         on_loaded=on_loaded,
         cover_ratio=cover_ratio,
         cover_alignment=cover_alignment,
+    )
+    loaders[loader_key] = loader
+    widget = screen[widget_name]
+    if (
+        getattr(widget, "instance", None) is None
+        and hasattr(screen, "onLayoutFinish")
+    ):
+        screen.onLayoutFinish.append(loader.start)
+    else:
+        loader.start()
+    return loader
+
+
+def attach_native_alpha_pixmap(
+    screen,
+    widget_name,
+    path,
+    key=None,
+    on_loaded=None,
+):
+    """Load small transparent artwork through Enigma2's native alpha path."""
+    if Pixmap is None:
+        raise RuntimeError("Enigma2 pixmap widgets are unavailable")
+    loaders = getattr(screen, "_gt_pixmap_loaders", None)
+    if loaders is None:
+        loaders = {}
+        screen._gt_pixmap_loaders = loaders
+        if hasattr(screen, "onClose"):
+            screen.onClose.append(lambda: _close_dynamic_pixmaps(screen))
+    loader_key = key if key is not None else widget_name
+    previous = loaders.pop(loader_key, None)
+    if previous is not None:
+        previous.close()
+    loader = NativeAlphaPixmapLoader(
+        screen,
+        widget_name,
+        path,
+        on_loaded=on_loaded,
     )
     loaders[loader_key] = loader
     widget = screen[widget_name]

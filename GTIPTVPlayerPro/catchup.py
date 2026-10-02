@@ -132,8 +132,8 @@ class ArchiveClient(object):
         self.source_type = str(getattr(account, "source_type", "xtream") or "xtream").lower()
         if content_client is None:
             if self.source_type == "stalker":
-                from .stalker import StalkerPortalClient
-                content_client = StalkerPortalClient(account)
+                from .stalker import StalkerContentClient
+                content_client = StalkerContentClient(account)
             elif self.source_type == "m3u":
                 from .m3u import M3UContentClient
                 content_client = M3UContentClient(account)
@@ -591,3 +591,4 @@ class ArchiveClient(object):
             duration, date, channel.stream_id, extension,
         )
         return urlunsplit((self.account.scheme, self.account.netloc, path, "", ""))
+

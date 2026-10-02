@@ -101,3 +101,4 @@ def filter_hidden_category_items(items, hidden_ids, category_id=""):
 
 def category_filter_active(hidden_ids):
     return isinstance(hidden_ids, CategoryVisibility)
+

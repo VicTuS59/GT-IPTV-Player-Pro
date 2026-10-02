@@ -49,6 +49,8 @@ def _scale():
     try:
         size = getDesktop(0).size()
         width, height = int(size.width()), int(size.height())
+        if width <= 0 or height <= 0:
+            raise ValueError("Desktop dimensions are unavailable")
     except Exception:
         width, height = 1280, 720
     factor = min(width / 1920.0, height / 1080.0)
@@ -715,3 +717,4 @@ class GTArchiveScreen(Screen):
         controller = getattr(self, "_playback_link_controller", None)
         if controller is not None:
             controller.cancel()
+

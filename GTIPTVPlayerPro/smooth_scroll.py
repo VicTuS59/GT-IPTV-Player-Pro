@@ -577,3 +577,4 @@ def GTSmoothScrollLabel(text=""):
     if DRIVER_SAFE_SCROLL and CANVAS_SCROLL_AVAILABLE:
         return GTSF8008CanvasScrollLabel(text)
     return GTNativeSmoothScrollLabel(text)
+

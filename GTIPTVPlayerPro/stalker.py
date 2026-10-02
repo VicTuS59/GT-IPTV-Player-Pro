@@ -90,6 +90,7 @@ PORTAL_SESSION_IDLE_SECONDS = 15 * 60
 # below, so this is a safety ceiling rather than a guessed provider lifetime.
 PORTAL_TOKEN_MAX_AGE_SECONDS = 30 * 60
 PORTAL_RENEWAL_FAILURE_COOLDOWN_SECONDS = 2.0
+PORTAL_COMPATIBILITY_PROBE_COOLDOWN_SECONDS = 8.0
 PORTAL_ENDPOINT_HINT_LIMIT = 32
 PLAYBACK_LINK_CACHE_LIMIT = 48
 PLAYBACK_LINK_CACHE_SECONDS = 20
@@ -193,6 +194,20 @@ _MAG_USER_AGENT = (
     "AppleWebKit/533.3 (KHTML, like Gecko) MAG250 stbapp"
 )
 _MAG_X_USER_AGENT = "Model: MAG250; Link: Ethernet"
+# MAG compatibility values were adapted with reference to kiddac/EStalker.
+# Permission received, confirmed by project owner VicTuS59 on 2026-09-24.
+# Attribution and authorization record: ESTALKER_PERMISSION.md.
+_MAG_COMPAT_USER_AGENT = (
+    "Mozilla/5.0 (QtEmbedded; U; Linux; C) "
+    "AppleWebKit/533.3 (KHTML, like Gecko) "
+    "MAG200 stbapp ver: 2 rev: 250 Safari/533.3"
+)
+_MAG_COMPAT_VERSION = (
+    "ImageDescription: 0.2.18-r23-250; "
+    "ImageDate: Thu Sep 13 11:31:16 EEST 2018; PORTAL version: 5.3.0; "
+    "API Version: JS API version: 343; STB API version: 146; "
+    "Player Engine version: 0x58c"
+)
 _DEVICE_TIMEZONE = [None]
 _DEVICE_TIMEZONE_LOCK = threading.Lock()
 _PORTAL_SESSIONS = OrderedDict()
@@ -200,6 +215,24 @@ _PORTAL_SESSIONS_LOCK = threading.RLock()
 _PORTAL_SESSION_INSTANCES = {}
 _PORTAL_ENDPOINT_HINTS = OrderedDict()
 _PORTAL_ENDPOINT_HINTS_LOCK = threading.RLock()
+_PORTAL_DIAGNOSTIC_COUNTER = [0]
+_PORTAL_DIAGNOSTIC_LOCK = threading.Lock()
+_PORTAL_DIAGNOSTIC_TYPES = frozenset(("stb", "itv", "vod", "movie", "series"))
+_PORTAL_DIAGNOSTIC_ACTIONS = frozenset((
+    "handshake", "get_profile", "get_genres", "get_categories",
+    "get_all_channels", "get_ordered_list", "get_main_info",
+    "get_vod_info", "get_series_info", "get_short_epg",
+    "get_epg_info", "create_link",
+))
+_PORTAL_GEO_DENIAL = re.compile(
+    r"\b(?:geo(?:graphic|graphical|location)?[\s_-]?(?:blocked|restricted)|"
+    r"(?:country|region|location)[\s_-]+(?:blocked|restricted|forbidden|"
+    r"not[\s_-]+(?:allowed|available|supported))|"
+    r"(?:not[\s_-]+(?:allowed|available|supported)|blocked|restricted)"
+    r"[\s_-]+(?:in|for|from|by)[\s_-]+(?:your[\s_-]+)?"
+    r"(?:country|region|location))\b",
+    re.IGNORECASE,
+)
 _PORTAL_FILE_TEMPLATE = (
     "# GT IPTV Player Pro - Stalker / MAC Portal\n"
     "# Add a portal URL, then place one or more MAC addresses below it.\n"
@@ -221,7 +254,7 @@ def _cookie_parts(value):
         if (
             not separator
             or not _COOKIE_NAME_PATTERN.match(name)
-            or not cookie_value
+            or (not cookie_value and name.lower() != "adid")
             or len(cookie_value) > 4096
             or _CONTROL_PATTERN.search(cookie_value)
             or any(character in cookie_value for character in (";", "&"))
@@ -569,7 +602,7 @@ def normalise_portal_url(value):
         raise ValueError(N_("Do not include a query or fragment in the portal URL"))
     path = quote(parsed.path or "/", safe="/%:@!$&'()*+,;=-._~")
     path = "/" + path.lstrip("/")
-    if not path.endswith("/"):
+    if not path.endswith("/") and not path.lower().endswith(".php"):
         path += "/"
     return urlunsplit(
         (parsed.scheme.lower(), parsed.netloc, path, "", "")
@@ -579,15 +612,25 @@ def normalise_portal_url(value):
 def portal_endpoint_candidates(portal_url):
     parsed = urlsplit(normalise_portal_url(portal_url))
     supplied_path = (parsed.path or "/").rstrip("/")
-    if supplied_path.lower().endswith("/c"):
-        supplied_path = supplied_path[:-2].rstrip("/")
-
     paths = []
+    alternate_c_path = ""
 
     def add(path):
         path = "/" + str(path or "").lstrip("/")
         if path not in paths:
             paths.append(path)
+
+    # A portal URL may already name its API script. Do not append another
+    # script to that path: custom installations need the supplied entry point.
+    if supplied_path.lower().endswith(".php"):
+        add(supplied_path)
+        if supplied_path.lower().endswith("/server/load.php"):
+            supplied_path = supplied_path[:-len("/server/load.php")]
+        else:
+            supplied_path = supplied_path.rsplit("/", 1)[0]
+    if supplied_path.lower().endswith("/c"):
+        alternate_c_path = supplied_path + "/server/load.php"
+        supplied_path = supplied_path[:-2].rstrip("/")
 
     # Respect the path entered by the user before trying generic roots.  This
     # avoids one or two predictable 404s for the common /c/ and
@@ -597,8 +640,11 @@ def portal_endpoint_candidates(portal_url):
         add(supplied_path + "/portal.php")
     else:
         add("/server/load.php")
+    if alternate_c_path:
+        add(alternate_c_path)
     add("/stalker_portal/server/load.php")
     add("/server/load.php")
+    add("/c/server/load.php")
     add("/portal.php")
 
     return tuple(
@@ -638,7 +684,7 @@ _REDIRECT_PRIVATE_HEADERS = frozenset(
     ("authorization", "cookie", "referer")
 )
 _REDIRECT_MANDATORY_COOKIE_NAMES = frozenset(
-    ("mac", "stb_lang", "timezone", "token")
+    ("mac", "stb_lang", "timezone", "token", "adid")
 )
 _REDIRECT_CREDENTIALS_DISABLED = "_gtiptv_redirect_credentials_disabled"
 _REDIRECT_MANDATORY_COOKIE = "_gtiptv_redirect_mandatory_cookie"
@@ -918,6 +964,72 @@ class _PortalRedirectHandler(HTTPRedirectHandler):
         return redirected
 
 
+def _next_portal_diagnostic_id():
+    with _PORTAL_DIAGNOSTIC_LOCK:
+        _PORTAL_DIAGNOSTIC_COUNTER[0] += 1
+        return _PORTAL_DIAGNOSTIC_COUNTER[0]
+
+
+def _portal_diagnostic_geo(payload, depth=0):
+    """Only a provider's explicit error envelope can report a geo denial.
+
+    HTTP 403/451 alone, programme descriptions and catalogue item titles do
+    not establish a country restriction.  This result is the provider's
+    assertion, not an independent geolocation or CDN connectivity check.
+    """
+    if depth > 3 or not isinstance(payload, dict):
+        return False
+    if _has_content_identity(payload):
+        return False
+    for field in (_AUTH_ERROR_FIELDS + _AUTH_MESSAGE_FIELDS +
+                  ("error_code", "status")):
+        value = payload.get(field)
+        if isinstance(value, (str, bytes)):
+            if isinstance(value, bytes):
+                value = value.decode("utf-8", "replace")
+            if _PORTAL_GEO_DENIAL.search(value[:512]):
+                return True
+    for wrapper in _AUTH_ERROR_WRAPPERS:
+        value = payload.get(wrapper)
+        if isinstance(value, dict) and _portal_diagnostic_geo(value, depth + 1):
+            return True
+    return False
+
+
+def _portal_diagnostic_http_geo(error):
+    """Do not read HTTPError bodies or interpret 403/451 as geoblocking."""
+    headers = getattr(error, "headers", None)
+    if headers is None:
+        return False
+    for name in ("X-Geo-Blocked", "X-Geo-Restricted"):
+        try:
+            value = headers.get(name, "")
+        except (AttributeError, TypeError, ValueError):
+            value = ""
+        if str(value).strip().lower() in ("true", "yes", "1"):
+            return True
+    return False
+
+
+def _portal_diagnostic_status(value):
+    try:
+        status = int(value)
+        return str(status) if 100 <= status <= 599 else "unknown"
+    except (TypeError, ValueError, OverflowError):
+        return "unknown"
+
+
+def _portal_diagnostic_reason(value):
+    permitted = (
+        ContentError.CANCELLED, ContentError.DEADLINE,
+        ContentError.ACCESS_DENIED, ContentError.RATE_LIMITED,
+        ContentError.CONNECTION, ContentError.RESPONSE_TOO_LARGE,
+        ContentError.INVALID_RESPONSE, ContentError.CONTENT_RESPONSE,
+        ContentError.HTTP_ERROR, ContentError.PLAYBACK_URL,
+    )
+    return str(value) if value in permitted else "unknown"
+
+
 class _PortalSession(object):
     """One in-memory MAG session shared by screens for the same account.
 
@@ -927,12 +1039,20 @@ class _PortalSession(object):
     to a content section.
     """
 
-    def __init__(self, account, opener=None, clock=None, shared=False):
+    def __init__(self, account, opener=None, clock=None, shared=False,
+                 mag_compat=False):
         self.identity = tuple(getattr(account, "identity", ()) or ())
         self.clock = clock or time.monotonic
         self.shared = bool(shared)
+        self.mag_compat = bool(mag_compat)
+        self.handshake_random = ""
+        self.handshake_not_valid = False
         self.revoked = False
         self.lock = threading.RLock()
+        # Ordinary content entry may probe an alternate MAG dialect without
+        # changing the session used by already-running clients.
+        self.compat_probe_lock = threading.Lock()
+        self.compat_probe_failed_at = 0.0
         self.request_slot = threading.BoundedSemaphore(1)
         self.priority_condition = threading.Condition(threading.Lock())
         self.playback_waiters = 0
@@ -948,6 +1068,7 @@ class _PortalSession(object):
         self.profile_attempted = False
         self.profile_attempts = 0
         self.profile_generation = 0
+        self.profile_identity_verified = False
         self.force_ch_link_check = False
         self.profile_active_connections = None
         self.profile_max_connections = None
@@ -999,14 +1120,19 @@ def _register_portal_session_locked(session):
     sessions.add(session)
 
 
-def _portal_session_for(account, opener=None, clock=None):
-    share = opener is None and (clock is None or clock is time.monotonic)
+def _portal_session_for(account, opener=None, clock=None, mag_compat=False):
+    share = (
+        not mag_compat
+        and opener is None
+        and (clock is None or clock is time.monotonic)
+    )
     if not share:
         session = _PortalSession(
             account,
             opener=opener,
             clock=clock,
             shared=False,
+            mag_compat=mag_compat,
         )
         with _PORTAL_SESSIONS_LOCK:
             _register_portal_session_locked(session)
@@ -1036,7 +1162,42 @@ def _portal_session_for(account, opener=None, clock=None):
                 _PORTAL_SESSION_INSTANCES.pop(registered_key, None)
         while len(_PORTAL_SESSIONS) > PORTAL_SESSION_CACHE_LIMIT:
             _PORTAL_SESSIONS.popitem(last=False)
-        return session
+    return session
+
+
+def _remember_mag_session(client, previous_session):
+    """Publish a verified alternate session without disturbing live clients."""
+    session = client._session
+    if not previous_session.shared or not session.mag_compat:
+        return
+    remembered = False
+    with _PORTAL_SESSIONS_LOCK:
+        if (
+            not session.revoked
+            and not previous_session.revoked
+            and _PORTAL_SESSIONS.get(session.identity) is previous_session
+        ):
+            session.shared = True
+            _PORTAL_SESSIONS[session.identity] = session
+            _PORTAL_SESSIONS.move_to_end(session.identity)
+            remembered = True
+    if remembered:
+        _remember_endpoint_hint(client.account.portal_url, session.endpoint)
+
+
+def _mag_compatibility_error(error):
+    """Retry known dialect failures, not HTTP/JSON access or terminal errors."""
+    if not isinstance(error, ContentError):
+        return False
+    if error.reason == ContentError.INVALID_RESPONSE:
+        return bool(
+            getattr(error, "portal_empty_body", False)
+            or getattr(error, "portal_plain_authorization_failed", False)
+        )
+    return bool(
+        error.reason == ContentError.HTTP_ERROR
+        and error.http_status in (400, 404, 405, 406, 415, 422, 501)
+    )
 
 
 def _clear_portal_cookie_jar(session):
@@ -1071,9 +1232,13 @@ def _clear_portal_session_state(session, blocking=True):
     session.token = ""
     session.token_generation = 0
     session.credential_snapshot = ("", 0)
+    session.handshake_random = ""
+    session.handshake_not_valid = False
     session.profile_attempted = False
     session.profile_attempts = 0
     session.profile_generation = 0
+    session.profile_identity_verified = False
+    session.compat_probe_failed_at = 0.0
     session.force_ch_link_check = False
     session.profile_active_connections = None
     session.profile_max_connections = None
@@ -1624,7 +1789,8 @@ class StalkerPortalClient(object):
     source_type = PORTAL_PROVIDER
     capabilities = PortalAccount.capabilities
 
-    def __init__(self, account, timeout=DEFAULT_TIMEOUT, opener=None, clock=None):
+    def __init__(self, account, timeout=DEFAULT_TIMEOUT, opener=None, clock=None,
+                 mag_compat=False):
         if not is_portal_account(account):
             raise ContentError(
                 N_("Invalid Stalker / MAC account"),
@@ -1637,6 +1803,7 @@ class StalkerPortalClient(object):
             account,
             opener=opener,
             clock=clock,
+            mag_compat=mag_compat,
         )
         self._opener = self._session.opener
         self._request_slot = self._session.request_slot
@@ -1876,11 +2043,14 @@ class StalkerPortalClient(object):
             previous_active = self._session.profile_active_connections
             previous_maximum = self._session.profile_max_connections
             previous_expiry = self._session.profile_expiry
+            previous_identity = self._session.profile_identity_verified
             self._profile_attempted = False
             self._session.profile_attempts = 0
+            self._session.profile_identity_verified = False
             try:
                 self._ensure_profile(
                     raise_transient=self._live_category_cache_is_fresh(),
+                    raise_access=True,
                 )
             except Exception:
                 self._profile_attempted = previous_attempted
@@ -1890,6 +2060,7 @@ class StalkerPortalClient(object):
                 self._session.profile_active_connections = previous_active
                 self._session.profile_max_connections = previous_maximum
                 self._session.profile_expiry = previous_expiry
+                self._session.profile_identity_verified = previous_identity
                 raise
             return generation
 
@@ -2240,12 +2411,15 @@ class StalkerPortalClient(object):
     def _cookie(self, include_token=False, request_url="", token=None):
         if self._session.revoked:
             return ""
-        language = device_language().split("_", 1)[0] or "en"
+        compat = self._session.mag_compat
+        language = "en" if compat else (device_language().split("_", 1)[0] or "en")
         mandatory = "mac={}; stb_lang={}; timezone={}".format(
-            self.account.mac,
+            quote(self.account.mac, safe="") if compat else self.account.mac,
             language,
             quote(_device_timezone(), safe=""),
         )
+        if compat:
+            mandatory += "; adid="
         if token is None:
             token = self._credential_snapshot()[0]
         if include_token and token:
@@ -2255,8 +2429,8 @@ class StalkerPortalClient(object):
         server_cookies = self._server_cookie_header(target)
         # A CookieJar token can outlive the bearer credential that superseded
         # it.  Never let that optional server value create two contradictory
-        # authentication identities; media requests receive the current token
-        # explicitly above, while API requests authenticate with Authorization.
+        # authentication identities. The explicit token above always matches
+        # the bearer snapshot, including for the legacy MAG API dialect.
         server_cookies = "; ".join(
             "{}={}".format(name, value)
             for name, value in _cookie_parts(server_cookies)
@@ -2267,12 +2441,43 @@ class StalkerPortalClient(object):
         # non-conflicting PHP/session cookie is retained.
         return _merge_cookie_headers(mandatory, server_cookies)
 
+    def _http_identity(self):
+        """Keep API, artwork and playback on the selected session dialect."""
+        portal_url = self.account.portal_url
+        parsed = urlsplit(portal_url)
+        path = (parsed.path or "").rstrip("/")
+        if path.lower().endswith(".php"):
+            # A directly supplied API script is never an HTML page. Infer the
+            # MAG browser path from its parent instead of sending a referer
+            # such as /portal.php/index.html to a strict portal.
+            base = path.rsplit("/", 1)[0]
+            if base.lower().endswith("/server"):
+                base = base[:-len("/server")]
+            if not base.lower().endswith("/c"):
+                base += "/c"
+            portal_url = urlunsplit(
+                (parsed.scheme, parsed.netloc, base + "/", "", "")
+            )
+        if self._session.mag_compat:
+            return {
+                "User-Agent": _MAG_COMPAT_USER_AGENT,
+                "X-User-Agent": "Model: MAG250; Link: WiFi",
+                "Referer": portal_url.rstrip("/") + "/index.html",
+            }
+        return {
+            "User-Agent": _MAG_USER_AGENT,
+            "X-User-Agent": _MAG_X_USER_AGENT,
+            "Referer": portal_url,
+        }
+
     def _headers(self, request_url="", credential=None):
+        identity = self._http_identity()
+        compat = self._session.mag_compat
         language = device_language().replace("_", "-") or "en"
         headers = {
-            "Accept": "application/json, text/javascript, */*; q=0.01",
-            "Accept-Language": language,
-            "User-Agent": _MAG_USER_AGENT,
+            "Accept": "*/*" if compat else "application/json, text/javascript, */*; q=0.01",
+            "Accept-Language": "en" if compat else language,
+            "User-Agent": identity["User-Agent"],
         }
         if self._session.revoked:
             return headers
@@ -2282,13 +2487,16 @@ class StalkerPortalClient(object):
         headers.update(
             {
                 "Cookie": self._cookie(
+                    include_token=compat,
                     request_url=request_url,
                     token=token,
                 ),
-                "Referer": self.account.portal_url,
-                "X-User-Agent": _MAG_X_USER_AGENT,
+                "Referer": identity["Referer"],
+                "X-User-Agent": identity["X-User-Agent"],
             }
         )
+        if compat:
+            headers["Pragma"] = "no-cache"
         if token:
             headers["Authorization"] = "Bearer {}".format(token)
         return headers
@@ -2312,20 +2520,21 @@ class StalkerPortalClient(object):
         if not self._endpoint or not self._token:
             return {}
         credential = self._credential_snapshot()
+        identity = self._http_identity()
         headers = {
             "Cookie": self._cookie(
                 include_token=True,
                 request_url=url,
                 token=credential[0],
             ),
-            "Referer": self.account.portal_url,
-            "X-User-Agent": _MAG_X_USER_AGENT,
+            "Referer": identity["Referer"],
+            "X-User-Agent": identity["X-User-Agent"],
         }
         if credential[0]:
             headers["Authorization"] = "Bearer {}".format(credential[0])
         return {
             "headers": headers,
-            "user_agent": _MAG_USER_AGENT,
+            "user_agent": identity["User-Agent"],
         }
 
     @staticmethod
@@ -2432,6 +2641,60 @@ class StalkerPortalClient(object):
         url = endpoint + "?" + urlencode(query)
         request_token = None
         request_generation = None
+        started_at = time.monotonic()
+        diagnostic_id = _next_portal_diagnostic_id()
+        self._request_context.last_api_diagnostic_id = diagnostic_id
+        request_type = next((value for name, value in query if name == "type"), "")
+        action = next((value for name, value in query if name == "action"), "")
+        request_type = (
+            request_type if request_type in _PORTAL_DIAGNOSTIC_TYPES else "other"
+        )
+        action = action if action in _PORTAL_DIAGNOSTIC_ACTIONS else "other"
+        try:
+            endpoint_path = urlsplit(endpoint).path.lower()
+        except (TypeError, ValueError):
+            endpoint_path = ""
+        # Distinguish common handshake candidates without recording a portal
+        # hostname or a custom path (which can itself contain credentials).
+        if endpoint_path == "/stalker_portal/server/load.php":
+            endpoint_kind = "stalker_load.php"
+        elif endpoint_path == "/server/load.php":
+            endpoint_kind = "root_load.php"
+        elif endpoint_path.endswith("/server/load.php"):
+            endpoint_kind = "custom_load.php"
+        elif endpoint_path == "/portal.php":
+            endpoint_kind = "root_portal.php"
+        elif endpoint_path.endswith("/portal.php"):
+            endpoint_kind = "custom_portal.php"
+        else:
+            endpoint_kind = "other"
+        dialect = "mag" if self._session.mag_compat else "default"
+        http_status = "unknown"
+        response_size = "unknown"
+        response_shape = "unknown"
+        redirected = "unknown"
+
+        def diagnostic(outcome, geo="unknown", geo_evidence="none"):
+            # Log only fixed labels and counts; API URLs, cmd, tokens, response
+            # bodies, cookies, hostnames and provider text are never included.
+            try:
+                elapsed = max(0, min(999999, int(
+                    (time.monotonic() - started_at) * 1000
+                )))
+                log_event(
+                    "portal",
+                    "API request id={} type={} action={} endpoint={} "
+                    "dialect={} outcome={} http={} elapsed_ms={} bytes={} "
+                    "shape={} redirect={} geo={} geo_evidence={}".format(
+                        diagnostic_id, request_type, action, endpoint_kind,
+                        dialect, outcome, http_status, elapsed, response_size,
+                        response_shape, redirected, geo, geo_evidence,
+                    ),
+                )
+            except Exception:
+                # A read-only diagnostic must never affect portal playback.
+                pass
+
         try:
             self._acquire_request_slot()
             try:
@@ -2459,7 +2722,24 @@ class StalkerPortalClient(object):
                     timeout=self._request_timeout(),
                 )
                 try:
+                    try:
+                        getcode = getattr(response, "getcode", None)
+                        http_status = _portal_diagnostic_status(
+                            getcode() if callable(getcode)
+                            else getattr(response, "status", 200)
+                        )
+                    except Exception:
+                        http_status = "unknown"
+                    try:
+                        geturl = getattr(response, "geturl", None)
+                        if callable(geturl):
+                            final_url = geturl()
+                            if isinstance(final_url, str):
+                                redirected = "yes" if final_url != url else "no"
+                    except Exception:
+                        redirected = "unknown"
                     body = self._read_response_body(response)
+                    response_size = str(len(body))
                     self._check_request_limits()
                 finally:
                     close = getattr(response, "close", None)
@@ -2468,11 +2748,17 @@ class StalkerPortalClient(object):
             finally:
                 self._request_slot.release()
         except HTTPError as error:
+            http_status = _portal_diagnostic_status(error.code)
+            geo_reported = _portal_diagnostic_http_geo(error)
+            diagnostic(
+                "http_error",
+                "reported" if geo_reported else "unknown",
+                "header" if geo_reported else "none",
+            )
             try:
                 error.close()
             except Exception:
                 pass
-            log_event("portal", "Portal HTTP failure", error)
             if error.code in (401, 403):
                 if authenticated:
                     access_error = ContentError(
@@ -2499,38 +2785,82 @@ class StalkerPortalClient(object):
                 ContentError.HTTP_ERROR,
                 http_status=error.code,
             )
-        except (URLError, socket.timeout, OSError) as error:
-            log_event("portal", "Portal connection failure", error)
+        except (URLError, socket.timeout, OSError):
+            diagnostic("connection_error")
             raise ContentError(
                 N_("Portal is unavailable"),
                 ContentError.CONNECTION,
             )
+        except ContentError as error:
+            diagnostic(_portal_diagnostic_reason(error.reason))
+            raise
         finally:
             if self._session.revoked:
                 _clear_portal_cookie_jar(self._session)
             _touch_portal_session(self._session)
         if len(body) > MAX_API_BYTES:
+            diagnostic("response_too_large")
             raise ContentError(
                 N_("Portal response is too large"),
                 ContentError.RESPONSE_TOO_LARGE,
             )
+        if not body:
+            response_shape = "empty"
+            diagnostic("empty_response")
+            error = ContentError(
+                N_("Invalid portal response"),
+                ContentError.INVALID_RESPONSE,
+            )
+            error.portal_empty_body = True
+            raise error
         if not isinstance(body, str):
             body = body.decode("utf-8-sig", "replace")
         try:
             payload = _provider_json_loads(body)
         except (TypeError, ValueError, RecursionError):
-            log_event("portal", "Invalid portal JSON")
-            raise ContentError(
+            error = ContentError(
                 N_("Invalid portal response"),
                 ContentError.INVALID_RESPONSE,
             )
+            # Some legacy portals issue a token but reject the short profile
+            # with this exact plain-text reply instead of an API JSON error.
+            # The health check may try its one existing MAG session; a reply
+            # alone never proves access. Do not match arbitrary HTML or text,
+            # retry an unauthenticated handshake, or log the response body.
+            if (
+                authenticated
+                and request_token
+                and len(body) <= 128
+                and body.strip().casefold()
+                in ("authorization failed", "authorization failed.")
+            ):
+                error.portal_plain_authorization_failed = True
+                diagnostic("legacy_plain_auth")
+            else:
+                diagnostic("invalid_json")
+            raise error
+        value = payload.get("js", payload) if isinstance(payload, dict) else payload
+        response_shape = (
+            "dict" if isinstance(value, dict)
+            else "list" if isinstance(value, list)
+            else "string" if isinstance(value, str)
+            else "other"
+        )
         try:
-            return self._json_value(payload)
+            result = self._json_value(payload)
         except ContentError as error:
+            geo_reported = _portal_diagnostic_geo(payload)
+            diagnostic(
+                "content_error",
+                "reported" if geo_reported else "unknown",
+                "error_envelope" if geo_reported else "none",
+            )
             if authenticated and error.reason == ContentError.ACCESS_DENIED:
                 error.portal_request_token = request_token
                 error.portal_request_generation = request_generation
             raise
+        diagnostic("ok")
+        return result
 
     def _handshake(self, force=False, retry_access=True):
         with self._session_critical():
@@ -2582,8 +2912,11 @@ class StalkerPortalClient(object):
         renewing = bool(force or expired)
         self._endpoint = ""
         self._token = ""
+        self._session.handshake_random = ""
+        self._session.handshake_not_valid = False
         self._profile_attempted = False
         self._session.profile_attempts = 0
+        self._session.profile_identity_verified = False
         self._force_ch_link_check = False
         self._session.profile_active_connections = None
         self._session.profile_max_connections = None
@@ -2596,6 +2929,11 @@ class StalkerPortalClient(object):
         )
         cookie_reset_pending = renewing
         for endpoint in candidates:
+            handshake_parameters = [
+                ("type", "stb"), ("action", "handshake"), ("token", ""),
+            ]
+            if self._session.mag_compat:
+                handshake_parameters.append(("prehash", "0"))
             previous_cookie_reset = getattr(
                 self._request_context,
                 "reset_cookie_jar_before_request",
@@ -2608,11 +2946,7 @@ class StalkerPortalClient(object):
                 try:
                     value = self._request_endpoint(
                         endpoint,
-                        (
-                            ("type", "stb"),
-                            ("action", "handshake"),
-                            ("token", ""),
-                        ),
+                        handshake_parameters,
                         authenticated=False,
                     )
                 finally:
@@ -2653,9 +2987,17 @@ class StalkerPortalClient(object):
                 continue
             self._endpoint = endpoint
             self._token = token
+            random_value = value.get("random", "")
+            if isinstance(random_value, (str, int)):
+                self._session.handshake_random = str(random_value)[:512]
+            self._session.handshake_not_valid = (
+                str(value.get("not_valid", "0")).strip().lower()
+                in ("1", "true", "yes")
+            )
             self._session.token_created_at = self.clock()
             self._session.renewal_failure = None
-            _remember_endpoint_hint(self.account.portal_url, endpoint)
+            if not self._session.mag_compat or self._session.shared:
+                _remember_endpoint_hint(self.account.portal_url, endpoint)
             if renewing:
                 log_event(
                     "portal",
@@ -2671,6 +3013,49 @@ class StalkerPortalClient(object):
             ContentError.ACCESS_DENIED,
         )
 
+    def _profile_parameters(self):
+        parameters = [
+            ("type", "stb"), ("action", "get_profile"),
+            ("hd", "1"), ("stb_type", "MAG250"), ("client_type", "STB"),
+            ("image_version", "218"), ("auth_second_step", "1"),
+            ("video_out", "hdmi"), ("not_valid_token", "0"),
+        ]
+        if not self._session.mag_compat:
+            return parameters
+        # EStalker/kiddac statement, English text supplied by VicTuS59:
+        # "My EStalker code is open source, not closed source. It's freely
+        # available on my GitHub for people to learn from, build on, or even
+        # use as a reference source for AI."
+        # Forum source supplied with this statement:
+        # https://www.linuxsat-support.com/thread/163591-iptv-box-by-mike68-a-lightweight-iptv-plugin-for-enigma2-openatv-python-3/?postID=959243#post959243
+        # Attribution and scope record: ESTALKER_PERMISSION.md.
+        # Stable MAG device fields belong to the account, not to the receiver
+        # or a random installation ID. Keep them local to this request.
+        mac = self.account.mac
+        encoded_mac = mac.encode("ascii")
+        serial = hashlib.md5(encoded_mac).hexdigest().upper()[:13]
+        device_id = hashlib.sha256(encoded_mac).hexdigest().upper()
+        metrics = {
+            "mac": mac, "sn": serial, "model": "MAG250", "type": "STB",
+            "uid": "", "random": self._session.handshake_random,
+        }
+        parameters[-1] = (
+            "not_valid_token", "1" if self._session.handshake_not_valid else "0",
+        )
+        parameters.extend([
+            ("ver", _MAG_COMPAT_VERSION), ("num_banks", "2"),
+            ("sn", serial), ("device_id", device_id), ("device_id2", device_id),
+            ("signature", hashlib.sha256((device_id * 2).encode("ascii")).hexdigest().upper()),
+            ("hw_version", "1.7-BD-00"),
+            ("hw_version_2", hashlib.sha1(encoded_mac).hexdigest()),
+            ("timestamp", str(int(time.time()))), ("api_signature", "262"),
+            ("prehash", hashlib.sha1((serial + mac).encode("ascii")).hexdigest()),
+            # This dialect carries percent-encoded JSON as one query value;
+            # _request_endpoint subsequently URL-encodes the outer query.
+            ("metrics", quote(json.dumps(metrics, separators=(",", ":")), safe="")),
+        ])
+        return parameters
+
     def _ensure_profile(self, raise_transient=False, raise_access=False):
         """Load one profile response and report whether it was received."""
         with self._session_critical():
@@ -2685,17 +3070,7 @@ class StalkerPortalClient(object):
                 try:
                     value = self._request_endpoint(
                         self._endpoint,
-                        (
-                            ("type", "stb"),
-                            ("action", "get_profile"),
-                            ("hd", "1"),
-                            ("stb_type", "MAG250"),
-                            ("client_type", "STB"),
-                            ("image_version", "218"),
-                            ("auth_second_step", "1"),
-                            ("video_out", "hdmi"),
-                            ("not_valid_token", "0"),
-                        ),
+                        self._profile_parameters(),
                     )
                 except ContentError as error:
                     # Older portals do not expose get_profile. The handshake
@@ -2741,10 +3116,22 @@ class StalkerPortalClient(object):
                     ):
                         self._profile_attempted = True
                     return False
+            if (
+                isinstance(value, dict)
+                and str(value.get("blocked", "0")).strip().lower()
+                in ("1", "true", "yes")
+            ):
+                raise ContentError(
+                    N_("Portal access denied"), ContentError.ACCESS_DENIED,
+                )
             active, maximum = self._profile_connection_counts(value)
             self._session.profile_active_connections = active
             self._session.profile_max_connections = maximum
             self._session.profile_expiry = portal_expiry(value)
+            self._session.profile_identity_verified = bool(
+                isinstance(value, dict)
+                and str(value.get("id") or "").strip() not in ("", "0")
+            )
             self._force_ch_link_check = self._profile_forces_create_link(value)
             self._session.profile_generation += 1
             self._profile_attempted = True
@@ -3276,7 +3663,20 @@ class StalkerPortalClient(object):
             self._category_cache = list(shared)
             self._category_cached_at = self.clock()
             return list(shared)
-        value = self._request("itv", "get_genres")
+        try:
+            value = self._request("itv", "get_genres")
+        except ContentError as error:
+            if (
+                error.reason != ContentError.INVALID_RESPONSE
+                or not getattr(error, "portal_empty_body", False)
+                or not self._verify_live_without_genres()
+            ):
+                raise
+            # A handshake/profile alone is not evidence that content exists.
+            # Only a usable channel list permits the existing All Channels
+            # category when this portal sends no genre response at all.
+            log_event("portal", "Empty genres; channel list verified")
+            value = []
         categories = [ContentCategory("", _(CONTENT_LABELS["live"][1]))]
         seen = set()
         for entry in self._data_list(value)[:MAX_RESULTS]:
@@ -3298,6 +3698,79 @@ class StalkerPortalClient(object):
         self._category_cached_at = self.clock()
         self._store_shared_categories("live", categories)
         return categories
+
+    def verify_live_access(self, fresh=False):
+        """Confirm health from portal data, never from the synthetic row."""
+        if fresh and self._live_category_cache_is_fresh():
+            # The shared category cache is useful to browse, but it cannot
+            # establish that an account is still authorized *now*.
+            try:
+                value = self._request("itv", "get_genres")
+            except ContentError as error:
+                if (
+                    error.reason != ContentError.INVALID_RESPONSE
+                    or not getattr(error, "portal_empty_body", False)
+                ):
+                    raise
+                value = []
+            live_rows = self._data_list(value)
+            if not (
+                self._session.profile_identity_verified
+                or any(
+                    isinstance(row, dict)
+                    and str(row.get("id") or row.get("genre_id") or "").strip()
+                    for row in live_rows
+                )
+                or self._verify_live_without_genres()
+            ):
+                raise ContentError(
+                    N_("Invalid portal response"), ContentError.INVALID_RESPONSE,
+                )
+            return self.load_categories("live")
+        categories = self.load_categories("live")
+        if (
+            self._session.profile_identity_verified
+            or any(str(category.category_id or "").strip()
+                   for category in categories)
+            or self._verify_live_without_genres()
+        ):
+            return categories
+        raise ContentError(
+            N_("Invalid portal response"), ContentError.INVALID_RESPONSE,
+        )
+
+    def _verify_live_without_genres(self):
+        """Probe a bounded live batch and preserve it for the channel screen."""
+        with self._live_catalog_lock:
+            state = self._live_catalog_state("")
+            terminal_reasons = REQUEST_ABORT_REASONS | frozenset(
+                (ContentError.ACCESS_DENIED, ContentError.RATE_LIMITED)
+            )
+            for unused in range(PORTAL_LIVE_INITIAL_REQUEST_BUDGET):
+                self._check_request_limits()
+                error = state.get("last_error")
+                if error is not None and error.reason in terminal_reasons:
+                    raise error
+                if state["results"] or state["complete"]:
+                    break
+                # Stop at the first usable channel. One request per step
+                # lets access/rate failures stop before another API is tried.
+                self._load_live_batch(state, 1, 1)
+            error = state.get("last_error")
+            if error is not None and error.reason in terminal_reasons:
+                raise error
+            if not state["results"]:
+                if error is not None:
+                    raise error
+                return False
+            # Fill the first screen from the page already received, without
+            # fetching more pages during connection verification.
+            self._load_live_batch(
+                state,
+                max(0, LIVE_INITIAL_ITEMS - len(state["results"])),
+                0,
+            )
+            return True
 
     def _load_vod_categories(self, content_type):
         cached = self._vod_category_cache.get(content_type)
@@ -3343,10 +3816,10 @@ class StalkerPortalClient(object):
         # the top-level DİZİLER category visible so the bounded catalogue probe
         # can classify the outcome safely.
         if (
-            content_type != "series"
-            and not entries
+            not entries
             and not successful_response
             and last_error is not None
+            and (content_type != "series" or _mag_compatibility_error(last_error))
         ):
             raise last_error
 
@@ -4212,7 +4685,12 @@ class StalkerPortalClient(object):
                 or entry.get("rating_imdb")
                 or entry.get("rating_kinopoisk")
             ),
-            year=entry.get("year") or entry.get("release_year"),
+            year=(
+                entry.get("year")
+                or entry.get("release_year")
+                or entry.get("releasedate")
+                or entry.get("releaseDate")
+            ),
             duration=entry.get("duration") or entry.get("time"),
             plot=(
                 entry.get("plot")
@@ -4227,6 +4705,11 @@ class StalkerPortalClient(object):
                 entry.get("tmdb_id")
                 or entry.get("tmdbId")
                 or entry.get("themoviedb_id")
+            ),
+            imdb_id=(
+                entry.get("imdb_id")
+                or entry.get("imdbId")
+                or entry.get("imdb")
             ),
         )
         # Preserve wide catalogue artwork independently from the portrait
@@ -5227,7 +5710,7 @@ class StalkerPortalClient(object):
             "year", "release_year", "releasedate", "releaseDate",
             "duration", "duration_secs", "time", "genres_str", "genre",
             "genres", "director", "actors", "cast", "tmdb_id", "tmdbId",
-            "themoviedb_id", "tmdb",
+            "themoviedb_id", "tmdb", "imdb_id", "imdbId", "imdb",
             "screenshot_uri", "movie_image", "cover_big", "cover",
             "poster", "stream_icon", "backdrop_path", "backdrop",
             "backdrop_url", "backdrop_image", "background",
@@ -5372,6 +5855,7 @@ class StalkerPortalClient(object):
                 "hero_image", "banner", "banner_url",
             ),
             tmdb_id=first("tmdb_id", "tmdbId", "themoviedb_id"),
+            imdb_id=first("imdb_id", "imdbId", "imdb"),
         )
 
     @staticmethod
@@ -6212,6 +6696,7 @@ class StalkerPortalClient(object):
                 "hero_image", "banner", "banner_url",
             ),
             tmdb_id=first("tmdb_id", "tmdbId", "themoviedb_id"),
+            imdb_id=first("imdb_id", "imdbId", "imdb"),
         )
 
     def load_series_summary(self, series_id):
@@ -6625,11 +7110,8 @@ class StalkerPortalClient(object):
         return value
 
     def _media_header_pairs(self, stream_url):
-        headers = [
-            ("User-Agent", _MAG_USER_AGENT),
-            ("Referer", self.account.portal_url),
-            ("X-User-Agent", _MAG_X_USER_AGENT),
-        ]
+        identity = self._http_identity()
+        headers = [(key, identity[key]) for key in ("User-Agent", "Referer", "X-User-Agent")]
         stream_origin = self._url_origin(stream_url)
         if (
             stream_origin
@@ -7115,7 +7597,10 @@ class StalkerPortalClient(object):
             candidates.remove(hint)
             candidates.insert(0, hint)
         last_error = None
-        for candidate_type, forced_storage in candidates:
+        for attempt_number, (candidate_type, forced_storage) in enumerate(
+            candidates, 1
+        ):
+            self._request_context.last_api_diagnostic_id = None
             try:
                 request_arguments = (
                     ("cmd", command),
@@ -7151,6 +7636,41 @@ class StalkerPortalClient(object):
                     prefer_alternate=request_type != "itv",
                 )
                 playable = self._with_media_headers(selected)
+                extension = "other"
+                try:
+                    scheme = urlsplit(selected.split("|", 1)[0]).scheme.lower()
+                    if scheme not in _STREAM_SCHEMES:
+                        scheme = "other"
+                    extension = choice["extension"]
+                    if extension not in (
+                        ".ts", ".m3u8", ".mp4", ".mkv", ".avi",
+                        ".mpg", ".mov", ".flv", ".webm",
+                    ):
+                        extension = (
+                            "other" if extension != "none" else "none"
+                        )
+                    log_event(
+                        "portal",
+                        "create_link attempt={} request_id={} type={} "
+                        "storage={} outcome=ok "
+                        "selected={} scheme={} extension={} query={} "
+                        "valid={} distinct={} fields={}".format(
+                            attempt_number,
+                            getattr(
+                                self._request_context, "last_api_diagnostic_id",
+                                None,
+                            ) or "none",
+                            candidate_type if candidate_type in
+                            _PORTAL_DIAGNOSTIC_TYPES else "other",
+                            forced_storage if forced_storage in
+                            ("undefined", "false") else "other",
+                            choice["selected"], scheme, extension,
+                            choice["query"], choice["valid"],
+                            choice["distinct"], choice["fields"],
+                        ),
+                    )
+                except Exception:
+                    pass
                 if request_type != "itv":
                     try:
                         log_event(
@@ -7164,7 +7684,7 @@ class StalkerPortalClient(object):
                                 choice["valid"],
                                 choice["distinct"],
                                 choice["selected"],
-                                choice["extension"],
+                                extension,
                                 choice["query"],
                                 choice["fields"],
                             ),
@@ -7172,6 +7692,26 @@ class StalkerPortalClient(object):
                     except Exception:
                         pass
             except ContentError as error:
+                try:
+                    log_event(
+                        "portal",
+                        "create_link attempt={} request_id={} type={} storage={} "
+                        "outcome=error reason={} http={}".format(
+                            attempt_number,
+                            getattr(
+                                self._request_context, "last_api_diagnostic_id",
+                                None,
+                            ) or "none",
+                            candidate_type if candidate_type in
+                            _PORTAL_DIAGNOSTIC_TYPES else "other",
+                            forced_storage if forced_storage in
+                            ("undefined", "false") else "other",
+                            _portal_diagnostic_reason(error.reason),
+                            _portal_diagnostic_status(error.http_status),
+                        ),
+                    )
+                except Exception:
+                    pass
                 last_error = error
                 if error.reason in CREATE_LINK_TERMINAL_REASONS:
                     raise
@@ -8051,6 +8591,174 @@ class StalkerPortalClient(object):
         return []
 
 
+_STALKER_COMPAT_OPERATIONS = frozenset((
+    # Restrict dialect discovery to account/content entry. A provider may
+    # legitimately return 404 for one optional EPG or playback operation.
+    "load_categories", "load_items", "load_more_items",
+    "load_vod_catalog_step", "load_vod_catalog_batch", "load_episodes",
+))
+
+
+class StalkerContentClient(object):
+    """Keep a verified alternate MAG client separate from live requests."""
+
+    source_type = PORTAL_PROVIDER
+    capabilities = PortalAccount.capabilities
+    async_playback_resolution = True
+    vod_catalog_pace_seconds = PORTAL_CATALOG_PACE_SECONDS
+
+    def __init__(self, account, timeout=DEFAULT_TIMEOUT, opener=None,
+                 clock=None, client=None):
+        self.account = account
+        self.timeout = max(1.0, float(timeout or DEFAULT_TIMEOUT))
+        self._external_opener = opener
+        self._custom_clock = clock
+        self._client = client or StalkerPortalClient(
+            account, timeout=self.timeout, opener=opener, clock=clock,
+        )
+        self._scope_context = threading.local()
+
+    @contextmanager
+    def request_scope(self, cancel_event=None, deadline=None, timeout=None):
+        previous = getattr(self._scope_context, "limits", None)
+        if previous is not None:
+            previous_event, previous_deadline, previous_timeout = previous
+            if cancel_event is None:
+                cancel_event = previous_event
+            if previous_deadline is not None:
+                deadline = (
+                    previous_deadline if deadline is None
+                    else min(float(deadline), float(previous_deadline))
+                )
+            if timeout is None:
+                timeout = previous_timeout
+            elif previous_timeout is not None:
+                timeout = min(float(timeout), float(previous_timeout))
+        client = self._client
+        with client.request_scope(
+            cancel_event=cancel_event, deadline=deadline, timeout=timeout,
+        ):
+            self._scope_context.limits = client._request_limits()
+            try:
+                yield
+            finally:
+                if previous is None:
+                    try:
+                        del self._scope_context.limits
+                    except AttributeError:
+                        pass
+                else:
+                    self._scope_context.limits = previous
+
+    def _call(self, client, name, args, kwargs):
+        limits = getattr(self._scope_context, "limits", None)
+        if limits is None:
+            return getattr(client, name)(*args, **kwargs)
+        with client.request_scope(*limits):
+            return getattr(client, name)(*args, **kwargs)
+
+    def _check_probe_limits(self, client):
+        cancel_event, deadline, unused_timeout = getattr(
+            self._scope_context, "limits", (None, None, None)
+        )
+        if client._session.revoked or (
+            cancel_event is not None and cancel_event.is_set()
+        ):
+            raise ContentError(
+                N_("Portal request cancelled"), ContentError.CANCELLED,
+            )
+        if deadline is not None and time.monotonic() >= deadline:
+            raise ContentError(
+                N_("Portal request timed out"), ContentError.DEADLINE,
+            )
+
+    def _try_compatible(self, original, name, args, kwargs, error):
+        if original._session.mag_compat or not _mag_compatibility_error(error):
+            raise error
+        probe_lock = original._session.compat_probe_lock
+        while not probe_lock.acquire(timeout=0.1):
+            self._check_probe_limits(original)
+        try:
+            self._check_probe_limits(original)
+            if self._client is not original:
+                return self._call(self._client, name, args, kwargs)
+            failed_at = original._session.compat_probe_failed_at
+            if (
+                failed_at
+                and time.monotonic() - failed_at
+                < PORTAL_COMPATIBILITY_PROBE_COOLDOWN_SECONDS
+            ):
+                raise error
+            # Another screen might already have published a verified session.
+            with _PORTAL_SESSIONS_LOCK:
+                published = _PORTAL_SESSIONS.get(original._session.identity)
+            if (
+                self._external_opener is None
+                and original._session.shared
+                and published is not original._session
+                and published is not None
+                and published.mag_compat
+                and not published.revoked
+            ):
+                alternate = StalkerPortalClient(
+                    self.account, timeout=self.timeout,
+                    clock=self._custom_clock,
+                )
+                result = self._call(alternate, name, args, kwargs)
+            else:
+                alternate = StalkerPortalClient(
+                    self.account, timeout=self.timeout,
+                    opener=self._external_opener, clock=self._custom_clock,
+                    mag_compat=True,
+                )
+                cancel_event, deadline, unused_timeout = getattr(
+                    self._scope_context, "limits", (None, None, None)
+                )
+                probe_deadline = time.monotonic() + self.timeout
+                if deadline is not None:
+                    probe_deadline = min(probe_deadline, float(deadline))
+                log_event("portal", "Trying legacy MAG request profile")
+                try:
+                    with alternate.request_scope(
+                        cancel_event=cancel_event,
+                        deadline=probe_deadline,
+                        timeout=self.timeout,
+                    ):
+                        alternate.verify_live_access()
+                        result = getattr(alternate, name)(*args, **kwargs)
+                except ContentError as alternate_error:
+                    if alternate_error.reason not in (
+                        ContentError.CANCELLED,
+                        ContentError.DEADLINE,
+                        ContentError.CONNECTION,
+                    ):
+                        original._session.compat_probe_failed_at = (
+                            time.monotonic()
+                        )
+                    raise
+                self._check_probe_limits(original)
+                _remember_mag_session(alternate, original._session)
+            self._client = alternate
+            log_event("portal", "Legacy MAG catalogue check succeeded")
+            return result
+        finally:
+            probe_lock.release()
+
+    def __getattr__(self, name):
+        attribute = getattr(self._client, name)
+        if name not in _STALKER_COMPAT_OPERATIONS or not callable(attribute):
+            return attribute
+
+        def invoke(*args, **kwargs):
+            client = self._client
+            try:
+                return self._call(client, name, args, kwargs)
+            except ContentError as error:
+                return self._try_compatible(client, name, args, kwargs, error)
+
+        return invoke
+
+
 def check_portal_health(
     account,
     timeout=DEFAULT_TIMEOUT,
@@ -8075,39 +8783,65 @@ def check_portal_health(
         # injectable health/cache clock and may have a different epoch.
         deadline = time.monotonic() + client.timeout
         profile_generation = None
-        with client.request_scope(
-            cancel_event=cancel_event,
-            deadline=deadline,
-            timeout=client.timeout,
-        ):
-            client._handshake()
-            profile_verified = False
-            refresh_profile = getattr(
-                client,
-                "refresh_profile_for_health",
-                None,
-            )
-            if callable(refresh_profile):
-                profile_generation = refresh_profile()
-                profile_snapshot = getattr(
-                    client,
-                    "profile_connection_snapshot",
-                    None,
-                )
-                if callable(profile_snapshot):
-                    snapshot = profile_snapshot()
-                    profile_verified = bool(
-                        profile_generation is not None
-                        and isinstance(snapshot, (tuple, list))
-                        and len(snapshot) == 3
-                        and snapshot[0] != profile_generation
+        previous_session = None
+        for attempt in range(2):
+            try:
+                with client.request_scope(
+                    cancel_event=cancel_event,
+                    deadline=deadline,
+                    timeout=client.timeout,
+                ):
+                    client._handshake()
+                    refresh_profile = getattr(
+                        client, "refresh_profile_for_health", None,
                     )
-            # A successful profile response already authenticates the account
-            # and carries the requested summary fields. Legacy portals that do
-            # not expose get_profile still receive the established category
-            # probe so a handshake token alone is never treated as proof.
-            if not summary_only or not profile_verified:
-                client.load_categories("live")
+                    if callable(refresh_profile):
+                        profile_generation = refresh_profile()
+                    # A profile request can return HTTP 200 with an empty js
+                    # object (or a generic reply unrelated to this MAC).
+                    # Verify actual catalogue access for every health result.
+                    # This also makes a summary-only result as trustworthy as
+                    # the full check without treating a token as permission.
+                    client.verify_live_access(fresh=True)
+            except ContentError as error:
+                if (
+                    attempt
+                    or client._session.mag_compat
+                    or not _mag_compatibility_error(error)
+                ):
+                    raise
+                client._check_request_limits()
+                if time.monotonic() >= deadline:
+                    raise ContentError(
+                        N_("Portal request timed out"), ContentError.DEADLINE,
+                    )
+                previous_session = client._session
+                # A fresh private session avoids changing headers or tokens
+                # under another screen. Only a verified result is shared.
+                # Register before an account purge can collect its sessions.
+                # A purge removes the registry entry before marking objects
+                # revoked, so check membership as well as the revocation flag.
+                with _PORTAL_SESSIONS_LOCK:
+                    if (
+                        previous_session.revoked
+                        or previous_session not in _PORTAL_SESSION_INSTANCES.get(
+                            previous_session.identity, (),
+                        )
+                    ):
+                        raise ContentError(
+                            N_("Portal request cancelled"), ContentError.CANCELLED,
+                        )
+                    client = StalkerPortalClient(
+                        account, timeout=timeout, opener=opener, clock=clock,
+                        mag_compat=True,
+                    )
+                profile_generation = None
+                log_event("portal", "Trying legacy MAG request profile")
+                continue
+            break
+        if previous_session is not None:
+            _remember_mag_session(client, previous_session)
+            log_event("portal", "Legacy MAG catalogue check succeeded")
         # Use a separate optional scope: request_scope checks its deadline on
         # exit, so nesting this in the mandatory health scope would turn an
         # account-info timeout into a false portal outage.
@@ -8171,7 +8905,10 @@ def check_portal_health(
             output_format="Portal",
             source_type=PORTAL_PROVIDER,
         )
-        health.content_client = client
+        health.content_client = StalkerContentClient(
+            account, timeout=timeout, opener=opener, clock=clock,
+            client=client,
+        )
         return health
     except (ContentError, ValueError, TypeError) as error:
         log_event("portal", "Portal health check failed", error)

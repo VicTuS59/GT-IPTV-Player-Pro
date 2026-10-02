@@ -473,3 +473,4 @@ def fetch_public_url(
             # a later redirect returns to it.
             provider_headers_allowed = False
     raise NetworkSecurityError(N_("Image redirection could not be completed."))
+

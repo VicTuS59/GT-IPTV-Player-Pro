@@ -250,3 +250,4 @@ def update_dvb_epg_settings(mutator, path=DVB_EPG_SETTINGS_PATH):
             raise TypeError("settings mutator must return settings, dict or None")
         _save_dvb_epg_settings_unlocked(candidate, path)
         return candidate.copy()
+

@@ -1028,3 +1028,4 @@ def scheduler_is_busy():
     """Return whether the automatic scheduler itself is updating."""
     instance = _INSTANCE
     return bool(instance is not None and instance.busy())
+

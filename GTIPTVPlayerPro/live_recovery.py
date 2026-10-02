@@ -965,3 +965,4 @@ class LiveStartupRecovery(object):
             return False
         self._finish("cancelled")
         return True
+

@@ -1273,3 +1273,4 @@ class GTM3UXMLTVSettingsScreen(Screen):
     def close_screen(self):
         self._stop_refresh_tracking()
         self.close(self._saved_binding)
+

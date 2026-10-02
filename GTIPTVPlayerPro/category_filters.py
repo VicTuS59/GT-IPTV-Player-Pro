@@ -217,3 +217,4 @@ def category_filter_ids(categories, include_terms=(), exclude_terms=()):
     blocked = set().union(*(matches[term] for term in exclude)) if exclude else set()
     allowed.difference_update(blocked)
     return frozenset(allowed), frozenset(blocked)
+

@@ -22,7 +22,7 @@ def _log_scheduler_failure(message, error):
 
 
 def _prepare_storage():
-    # plugin.py is imported while Enigma2 discovers installed plugins.
+    # Create both first-run account files before registering their TXT banks.
     from .playlist import ensure_playlist_file
 
     try:
@@ -31,10 +31,16 @@ def _prepare_storage():
         # The screen can still open and show a useful error if storage is read-only.
         pass
     try:
+        from .stalker import ensure_portal_file
+
+        ensure_portal_file()
+    except (ImportError, IOError, OSError):
+        pass
+    try:
         from .playlist_files import default_registry
 
-        # Loading either bank performs the one-time, path-only R100 migration
-        # for both legacy TXT files.  The source files themselves are untouched.
+        # Bind empty or populated default files once for each bank. A user's
+        # existing TXT selection stays in control after an upgrade.
         default_registry().slots("xtream")
     except (IOError, OSError, TypeError, ValueError):
         pass
@@ -44,11 +50,19 @@ def main(session, **kwargs):
     from .main import GTIPTVPlayerProScreen
 
     _prepare_storage()
+    from .download_guard import install as install_download_guard
+    install_download_guard(session)
     session.open(GTIPTVPlayerProScreen)
 
 
 def menu(menuid, **kwargs):
     if menuid != "mainmenu":
+        return []
+    from .settings import load_main_menu_visibility
+
+    # Read on each menu build so saved changes apply on the next opening.
+    # The plugin-browser descriptor stays available independently.
+    if not load_main_menu_visibility():
         return []
     return [
         (
@@ -62,6 +76,33 @@ def menu(menuid, **kwargs):
 
 def session_start(reason, session=None, **kwargs):
     """Start or stop the optional EPG schedulers with the GUI session."""
+    if reason == 0 and session is not None:
+        _prepare_storage()
+        from .web_remote import WEB_REMOTE
+        WEB_REMOTE.bind_session(session)
+        try:
+            from .download_guard import install as install_download_guard
+            install_download_guard(session)
+        except Exception:
+            pass
+        try:
+            # OpenWebif builds its external resource tree after ordinary
+            # session-start plugins.  Register the gated /gtiptv endpoint now;
+            # images without OpenWebif use the temporary port-9999 fallback.
+            from .web_server import register_openwebif
+
+            register_openwebif()
+        except Exception:
+            pass
+    elif reason != 0:
+        from .web_remote import WEB_REMOTE
+        WEB_REMOTE.bind_session(None)
+        try:
+            from .web_server import get_runtime
+
+            get_runtime().stop()
+        except Exception:
+            pass
     try:
         from .dvb_epg_scheduler import session_start as dvb_scheduler_start
 
@@ -104,12 +145,14 @@ def Plugins(**kwargs):
         None,
     )
     if session_start_location is not None:
-        descriptors.append(
-            PluginDescriptor(
-                where=session_start_location,
-                fnc=session_start,
-            )
+        session_descriptor = PluginDescriptor(
+            where=session_start_location,
+            fnc=session_start,
         )
+        # OpenWebif deliberately starts late (weight 100).  Keep GT at 90 so
+        # its optional external path is present when OpenWebif builds the tree.
+        session_descriptor.weight = 90
+        descriptors.append(session_descriptor)
     autostart_location = getattr(PluginDescriptor, "WHERE_AUTOSTART", None)
     if autostart_location is not None:
         descriptors.append(
@@ -119,3 +162,4 @@ def Plugins(**kwargs):
             )
         )
     return descriptors
+

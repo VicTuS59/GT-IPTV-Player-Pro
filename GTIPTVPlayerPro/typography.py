@@ -887,3 +887,4 @@ current_font_size = current_text_size
 
 def font_factor(value=None):
     return text_scale_percent(value) / 100.0
+

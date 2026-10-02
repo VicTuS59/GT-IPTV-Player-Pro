@@ -729,3 +729,4 @@ class LiveCategoryPreferenceStore(object):
                     directory_descriptor,
                     lock_descriptor,
                 )
+

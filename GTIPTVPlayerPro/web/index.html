@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en" dir="ltr" translate="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#061224">
+  <meta name="google" content="notranslate">
+  <title>GT IPTV Player Pro</title>
+  <link rel="icon" href="assets/logo.svg?v=__GT_PLUGIN_VERSION__" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/app.css?v=__GT_PLUGIN_VERSION__">
+</head>
+<body class="notranslate" translate="no">
+  <svg class="icon-sprite" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.2 12 4l9 7.2v8.3a1.5 1.5 0 0 1-1.5 1.5h-5v-6h-5v6h-5A1.5 1.5 0 0 1 3 19.5Z"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="i-subtitles" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M6 12h5M6 16h4M14 12h4M13 16h5"/></symbol>
+    <symbol id="i-audio" viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9H3Z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></symbol>
+    <symbol id="i-device" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="2"/><path d="M8 21h8M12 18v3M7 9h6"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 5.7a5.5 5.5 0 0 0-7.8 0L12 6.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 22l8.8-8.5a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l2.2-6 4.1 12 2.2-6H21"/><path d="M4 4v3M4 17v3M20 4v3M20 17v3"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-paste" viewBox="0 0 24 24"><path d="M9 5h6M9 3h6v4H9z"/><rect x="5" y="5" width="14" height="16" rx="2"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5M4 18v-5h5M6.1 9a7 7 0 0 1 11.5-2.6L20 11M4 13l2.4 4.6A7 7 0 0 0 18 15"/></symbol>
+    <symbol id="i-storage" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    <symbol id="i-youtube" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="m10 9 5 3-5 3z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></symbol>
+  </svg>
+
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <main id="authView" class="auth-shell" hidden>
+    <section class="auth-card">
+      <div class="brand auth-brand">
+        <img src="assets/logo.svg?v=__GT_PLUGIN_VERSION__" alt="GT">
+        <div><strong>GT IPTV PLAYER <span>PRO</span></strong><small data-i18n="pair_title">Web Interface</small></div>
+      </div>
+      <div class="auth-lock"><svg><use href="#i-lock"></use></svg></div>
+      <h1 data-i18n="pair_title">Web Interface</h1>
+      <p data-i18n="pair_intro">Enter the six-digit code shown on the receiver.</p>
+      <form id="pairForm" autocomplete="off">
+        <label for="pairCode" data-i18n="pair_code">Pairing code</label>
+        <input id="pairCode" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000 000" required>
+        <button class="primary-button" type="submit"><svg><use href="#i-lock"></use></svg><span data-i18n="pair">Connect</span></button>
+      </form>
+      <div id="pairStatus" class="auth-status" role="status"></div>
+      <select id="authLanguage" class="language-select" data-i18n-title="language" aria-label="Language"></select>
+    </section>
+  </main>
+
+  <div id="appView" class="app-shell" hidden>
+    <aside id="sidebar" class="sidebar">
+      <div class="brand sidebar-brand">
+        <img src="assets/logo.svg?v=__GT_PLUGIN_VERSION__" alt="GT">
+        <strong>GT IPTV PLAYER <span>PRO</span></strong>
+      </div>
+      <nav class="nav-list" data-i18n-title="main_navigation" aria-label="Main navigation">
+        <button class="nav-button active" data-page="dashboard"><svg><use href="#i-home"></use></svg><span data-i18n="dashboard">Dashboard</span></button>
+        <button class="nav-button" data-page="sources"><svg><use href="#i-db"></use></svg><span data-i18n="sources">Sources</span></button>
+        <button class="nav-button" data-page="automatic-test"><svg><use href="#i-activity"></use></svg><span data-i18n="automatic_test">Automatic Test</span></button>
+        <button class="nav-button" data-page="epg"><svg><use href="#i-calendar"></use></svg><span data-i18n="epg">EPG</span></button>
+        <button class="nav-button" data-page="downloads"><svg><use href="#i-download"></use></svg><span data-i18n="downloads">Downloads</span></button>
+        <button class="nav-button" data-page="subtitles"><svg><use href="#i-subtitles"></use></svg><span data-i18n="subtitle_search">Find subtitles</span></button>
+        <button class="nav-button" data-page="audio"><svg><use href="#i-audio"></use></svg><span data-i18n="audio_languages">Audio languages</span></button>
+        <button class="nav-button" data-page="youtube"><svg><use href="#i-youtube"></use></svg><span>YouTube</span></button>
+        <button class="nav-button" data-page="media"><svg><use href="#i-device"></use></svg><span data-i18n="media_web_to_tv">Web'den TV'ye İzle</span></button>
+        <button class="nav-button" data-page="favorites"><svg><use href="#i-star"></use></svg><span data-i18n="favorites">Favorites</span></button>
+        <button class="nav-button" data-page="remote"><svg><use href="#i-device"></use></svg><span data-i18n="remote_control">Remote control</span></button>
+        <button class="nav-button" data-page="settings"><svg><use href="#i-settings"></use></svg><span data-i18n="settings">Settings</span></button>
+      </nav>
+      <div class="sidebar-foot"><span class="live-dot"></span><span id="sidebarVersion">__GT_PLUGIN_VERSION__</span></div>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <button id="menuButton" class="icon-button mobile-only" data-i18n-title="menu" aria-label="Menu"><svg><use href="#i-menu"></use></svg></button>
+        <div class="mobile-video-brand"><img src="assets/logo.svg" alt=""><strong>GT IPTV<small>PLAYER <b>PRO</b></small></strong></div>
+        <div class="receiver-chip"><svg><use href="#i-device"></use></svg><strong id="receiverName">Enigma2</strong><span class="live-dot"></span></div>
+        <div class="network-chip"><span>LAN</span><span>•</span><strong id="secureLabel" data-i18n="connected">Connected</strong></div>
+        <time id="clock">--:--</time>
+        <div class="session-pill"><svg><use href="#i-lock"></use></svg><span id="sessionText">--:--</span></div>
+        <select id="languageSelect" class="language-select compact" data-i18n-title="language" aria-label="Language"></select>
+        <button id="logoutButton" class="icon-button" data-i18n-title="logout" aria-label="Logout"><svg><use href="#i-close"></use></svg></button>
+      </header>
+
+      <div class="content-scroll">
+        <div id="runtimeWarning" class="runtime-warning" role="alert" hidden>
+          <svg><use href="#i-refresh"></use></svg>
+          <div><strong data-i18n="restart_required_title">Restart required</strong><span data-i18n="restart_required">The web interface was updated. Restart the Enigma2 interface and refresh this page to activate the changes.</span></div>
+        </div>
+        <section id="page-dashboard" class="page active" data-page-panel="dashboard">
+          <div class="metric-grid">
+            <article class="metric-card"><div class="metric-icon blue"><svg><use href="#i-device"></use></svg></div><div><span data-i18n="receiver">Receiver</span><strong id="receiverStatus" class="good" data-i18n="connected">Connected</strong></div></article>
+            <article class="metric-card"><div class="metric-icon green"><svg><use href="#i-heart"></use></svg></div><div><span data-i18n="server_health">Server Health</span><strong id="healthStatus" class="good" data-i18n="active">Active</strong></div></article>
+            <article class="metric-card"><div class="metric-icon blue"><svg><use href="#i-download"></use></svg></div><div><span data-i18n="downloads">Downloads</span><strong id="activeDownloads">0</strong></div></article>
+            <article class="metric-card storage-card"><div class="metric-icon blue"><svg><use href="#i-storage"></use></svg></div><div><span data-i18n="storage">Storage</span><strong id="storageFree">—</strong></div><div class="storage-ring"><i id="storageRing"></i></div></article>
+          </div>
+
+          <section class="panel quick-panel">
+            <div class="panel-title"><span class="title-icon purple"><svg><use href="#i-paste"></use></svg></span><h2 data-i18n="quick_actions">Quick actions</h2></div>
+            <div class="quick-grid">
+              <button id="quickAdd" class="quick-button cyan"><svg><use href="#i-plus"></use></svg><span data-i18n="add_source">Add Source</span></button>
+              <button id="quickPaste" class="quick-button purple"><svg><use href="#i-paste"></use></svg><span data-i18n="secure_paste">Secure Paste</span></button>
+              <button id="quickEpg" class="quick-button outline"><svg><use href="#i-refresh"></use></svg><span data-i18n="update_epg">Update EPG</span></button>
+            </div>
+          </section>
+
+          <section class="panel list-panel dashboard-download-panel">
+            <div class="panel-title"><span class="title-icon purple"><svg><use href="#i-download"></use></svg></span><h2 data-i18n="active_downloads">Active Downloads</h2><span id="downloadCount" class="count-pill">0</span></div>
+            <div id="dashboardDownloads" class="stack-list"></div>
+          </section>
+        </section>
+
+        <section id="page-sources" class="page" data-page-panel="sources">
+          <div class="page-heading"><div><p>GT IPTV PLAYER PRO</p><h1 data-i18n="sources">Sources</h1></div><button id="addSourceButton" class="primary-button small"><svg><use href="#i-plus"></use></svg><span data-i18n="add_source">Add Source</span></button></div>
+          <div class="panel"><p class="privacy-note"><svg><use href="#i-lock"></use></svg><span data-i18n="masked_notice">Sensitive account data is hidden.</span></p><div id="sourcesList" class="management-list"></div></div>
+        </section>
+
+        <section id="page-automatic-test" class="page" data-page-panel="automatic-test">
+          <div class="page-heading"><div><p>GT IPTV PLAYER PRO</p><h1 data-i18n="automatic_test">Automatic Test</h1></div></div>
+          <p class="automatic-test-intro" data-i18n="automatic_test_intro">Choose one portal type. Saved accounts are tested securely and one at a time.</p>
+          <div class="portal-option-grid">
+            <article class="portal-option-card xtream">
+              <div class="portal-option-icon"><svg><use href="#i-db"></use></svg></div>
+              <div class="portal-option-copy"><span class="type-badge">XTREAM</span><h2 data-i18n="kind_xtream">Xtream Codes Accounts</h2><p data-i18n="xtream_test_description">Test every saved Xtream Codes account.</p></div>
+              <button class="primary-button small auto-test-start" type="button" data-auto-test-type="xtream"><svg><use href="#i-activity"></use></svg><span data-i18n="start_test">Start Test</span></button>
+            </article>
+            <article class="portal-option-card stalker">
+              <div class="portal-option-icon"><svg><use href="#i-device"></use></svg></div>
+              <div class="portal-option-copy"><span class="type-badge">STALKER / MAC</span><h2 data-i18n="kind_stalker">Stalker / MAC</h2><p data-i18n="stalker_test_description">Test every saved Stalker / MAC portal.</p></div>
+              <button class="primary-button small auto-test-start" type="button" data-auto-test-type="stalker"><svg><use href="#i-activity"></use></svg><span data-i18n="start_test">Start Test</span></button>
+            </article>
+          </div>
+
+          <section class="panel test-progress-panel">
+            <div class="test-progress-head"><div class="panel-title"><span class="title-icon cyan"><svg><use href="#i-activity"></use></svg></span><h2 data-i18n="test_progress">Test Progress</h2></div><span id="autoTestState" class="test-state-badge idle" data-i18n="test_ready">Ready</span></div>
+            <div class="test-progress-labels"><span id="autoTestType">—</span><strong id="autoTestProgressText">0 / 0</strong></div>
+            <div class="progress-track test-progress-track"><i id="autoTestProgressBar"></i></div>
+            <div id="autoTestCurrentWrap" class="test-current-line" hidden><span data-i18n="current_account">Current account</span><strong id="autoTestCurrent">—</strong></div>
+            <div class="test-summary-grid">
+              <article><span data-i18n="tested_accounts">Tested</span><strong id="autoTestCompleted">0</strong></article>
+              <article class="summary-good"><span data-i18n="active_accounts">Active</span><strong id="autoTestGreen">0</strong></article>
+              <article class="summary-warn"><span data-i18n="warning_accounts">Warning</span><strong id="autoTestYellow">0</strong></article>
+              <article class="summary-bad"><span data-i18n="failed_accounts">Failed</span><strong id="autoTestRed">0</strong></article>
+            </div>
+            <div class="test-run-actions"><button id="cancelAutomaticTest" class="secondary-button danger-button" type="button" hidden><svg><use href="#i-close"></use></svg><span data-i18n="cancel_test">Cancel Test</span></button></div>
+          </section>
+
+          <section class="panel test-results-panel">
+            <div class="panel-title"><span class="title-icon purple"><svg><use href="#i-heart"></use></svg></span><h2 data-i18n="test_results">Test Results</h2></div>
+            <div id="autoTestResults" class="test-result-list"><div class="empty-state" data-i18n="no_test_results">No automatic test has been run yet.</div></div>
+          </section>
+          <p class="privacy-note automatic-test-privacy"><svg><use href="#i-lock"></use></svg><span data-i18n="masked_notice">Sensitive account data is hidden.</span></p>
+        </section>
+
+        <section id="page-epg" class="page" data-page-panel="epg">
+          <div class="page-heading"><div><p>GT IPTV PLAYER PRO</p><h1 data-i18n="epg">EPG</h1></div><button id="refreshEpgButton" class="secondary-button"><svg><use href="#i-refresh"></use></svg><span data-i18n="refresh">Refresh</span></button></div>
+          <div id="epgContent" class="management-grid"></div>
+        </section>
+
+        <section id="page-downloads" class="page" data-page-panel="downloads">
+          <div class="page-heading"><div><p>GT IPTV PLAYER PRO</p><h1 data-i18n="downloads">Downloads</h1></div><button id="refreshDownloadsButton" class="secondary-button"><svg><use href="#i-refresh"></use></svg><span data-i18n="refresh">Refresh</span></button></div>
+          <div id="downloadsList" class="management-list"></div>
+        </section>
+
+        <section id="page-favorites" class="page" data-page-panel="favorites">
+          <div class="page-heading"><div><p>GT IPTV PLAYER PRO</p><h1 data-i18n="favorites">Favorites</h1></div></div>
+          <div id="favoritesList" class="management-grid"></div>
+        </section>
+
+        <section id="page-remote" class="page" data-page-panel="remote">
+          <div class="page-heading"><div><p>GT IPTV PLAYER PRO</p><h1 data-i18n="remote_control">Remote control</h1></div></div>
+          <div class="remote-layout">
+            <section class="panel remote-panel" data-i18n-title="remote_control" aria-label="Remote control">
+              <div class="remote-top"><button type="button" data-remote-key="menu" data-i18n="menu">Menu</button><button type="button" data-remote-key="info" data-i18n="info">Info</button><button type="button" data-remote-key="back" data-i18n="exit">Exit</button></div>
+              <div class="remote-dpad"><button type="button" class="direction up" data-remote-key="up" data-i18n-title="direction_up" aria-label="Up">▲</button><button type="button" class="direction left" data-remote-key="left" data-i18n-title="direction_left" aria-label="Left">◀</button><button type="button" class="confirm" data-remote-key="ok">OK</button><button type="button" class="direction right" data-remote-key="right" data-i18n-title="direction_right" aria-label="Right">▶</button><button type="button" class="direction down" data-remote-key="down" data-i18n-title="direction_down" aria-label="Down">▼</button></div>
+              <div class="remote-colors"><button type="button" class="red" data-remote-key="red" data-i18n-title="red" aria-label="Red"></button><button type="button" class="green" data-remote-key="green" data-i18n-title="green" aria-label="Green"></button><button type="button" class="yellow" data-remote-key="yellow" data-i18n-title="yellow" aria-label="Yellow"></button><button type="button" class="blue" data-remote-key="blue" data-i18n-title="blue" aria-label="Blue"></button></div>
+              <div class="remote-playback"><button type="button" data-remote-key="rewind" data-i18n-title="rewind" aria-label="Rewind">⏪</button><button type="button" data-remote-key="play" data-i18n-title="play" aria-label="Play">▶</button><button type="button" data-remote-key="pause" data-i18n-title="pause" aria-label="Pause">⏸</button><button type="button" data-remote-key="forward" data-i18n-title="forward" aria-label="Forward">⏩</button></div>
+              <div class="remote-extras"><div><span data-i18n="volume">Volume</span><button type="button" data-remote-key="volume_down">−</button><button type="button" data-remote-key="volume_up">+</button></div><div><span data-i18n="channels">Channels</span><button type="button" data-remote-key="channel_down">−</button><button type="button" data-remote-key="channel_up">+</button></div></div>
+              <div class="remote-digits"><button type="button" data-remote-key="1">1</button><button type="button" data-remote-key="2">2</button><button type="button" data-remote-key="3">3</button><button type="button" data-remote-key="4">4</button><button type="button" data-remote-key="5">5</button><button type="button" data-remote-key="6">6</button><button type="button" data-remote-key="7">7</button><button type="button" data-remote-key="8">8</button><button type="button" data-remote-key="9">9</button><button type="button" data-remote-key="mute" data-i18n-title="mute" aria-label="Mute">◼</button><button type="button" data-remote-key="0">0</button><button type="button" data-remote-key="back" data-i18n="exit">Exit</button></div>
+            </section>
+            <section class="panel remote-paste-panel">
+              <div class="panel-title"><span class="title-icon purple"><svg><use href="#i-paste"></use></svg></span><h2 data-i18n="tv_keyboard">TV keyboard</h2></div>
+              <p data-i18n="paste_instruction">Open the TV keyboard, then paste here.</p>
+              <p id="remoteKeyboardStatus" class="keyboard-status" role="status">TV keyboard · Off</p>
+              <label for="remotePaste" data-i18n="secure_paste">Secure Paste</label>
+              <textarea id="remotePaste" maxlength="2048" rows="4" autocomplete="off" spellcheck="false" disabled></textarea>
+              <button id="remotePasteSend" type="button" class="primary-button small" disabled><svg><use href="#i-paste"></use></svg><span data-i18n="send_to_tv">Send to TV</span></button>
+            </section>
+          </div>
+        </section>
+
+        <section id="page-youtube" class="page video-page" data-page-panel="youtube">
+          <div class="video-heading"><h1><svg><use href="#i-youtube"></use></svg><span data-i18n="youtube_search_title">YouTube'da Ara</span></h1><span class="video-receiver"><span class="live-dot"></span><svg><use href="#i-device"></use></svg><span id="youtubeReceiver">Enigma2</span> · <b data-i18n="connected">Bağlı</b></span></div>
+          <form id="youtubeSearchForm" class="video-search-form"><label class="video-search-input"><svg><use href="#i-search"></use></svg><input id="youtubeQuery" type="search" maxlength="120" autocomplete="off" required data-i18n-placeholder="youtube_search_placeholder" data-i18n-title="youtube_search_title" placeholder="Search music, documentaries or channels" aria-label="Search YouTube"></label><button class="video-blue-button" type="submit" data-i18n="search">Search</button></form>
+          <p id="youtubeMessage" class="video-message" role="status" data-i18n="youtube_search_hint">Videoları aramak için bir kelime yazın.</p>
+          <div id="youtubeResults" class="video-results" aria-live="polite"></div>
+          <nav id="youtubePager" class="video-pager" data-i18n-title="youtube_results_pages" aria-label="YouTube results pages" hidden></nav>
+          <section id="youtubeNow" class="video-now" hidden><h2 data-i18n="now_on_tv">Şu An TV'de</h2><div class="video-now-body"><img id="youtubeNowImage" alt="" src="assets/logo.svg"><div class="video-now-info"><strong id="youtubeNowTitle"></strong><span id="youtubeNowDetails">YouTube</span><div class="video-progress"><i id="youtubeProgress"></i></div></div><span id="youtubeNowTime"></span><button type="button" class="video-control" data-remote-key="pause" data-i18n-title="pause" aria-label="Pause">Ⅱ</button><button type="button" class="video-control" data-remote-key="play" data-i18n-title="play" aria-label="Play">▶</button></div></section>
+        </section>
+
+        <section id="page-media" class="page video-page" data-page-panel="media">
+          <div class="video-heading"><h1><svg><use href="#i-device"></use></svg><span data-i18n="media_web_to_tv">Web'den TV'ye İzle</span></h1></div>
+          <p class="video-message" data-i18n="media_intro">Kayıtlı IPTV kaynağında film veya dizi ara ve alıcıda oynat.</p>
+          <form id="mediaSearchForm" class="video-search-form media-search-form"><select id="mediaSource" data-i18n-title="iptv_source" aria-label="IPTV source"></select><select id="mediaKind" data-i18n-title="content_type" aria-label="Content type"><option value="movie" data-i18n="movies">Movies</option><option value="series" data-i18n="series">Series</option></select><label class="video-search-input"><svg><use href="#i-search"></use></svg><input id="mediaQuery" type="search" maxlength="120" required data-i18n-placeholder="media_search_placeholder" placeholder="Search a film or series"></label><button type="submit" class="video-blue-button" data-i18n="search">Search</button></form>
+          <p id="mediaMessage" class="video-message" role="status"></p><div id="mediaResults" class="video-results media-results" aria-live="polite"></div>
+        </section>
+
+        <section id="page-settings" class="page" data-page-panel="settings">
+          <div class="page-heading"><div><p>GT IPTV PLAYER PRO</p><h1 data-i18n="settings">Settings</h1></div></div>
+          <div id="settingsContent" class="management-grid"></div>
+          <div class="subtitle-settings-head"><h2 data-i18n="subtitle_providers">Subtitle providers</h2><p data-i18n="subtitle_keys_local">Keys are stored only on this receiver. Leave a key empty to skip that provider.</p></div>
+          <p id="subtitleHttpWarning" class="subtitle-http-warning" data-i18n="subtitle_http_warning" hidden>Local HTTP does not encrypt API keys in transit. Use HTTPS when available.</p>
+          <div id="subtitleProviders" class="management-grid"></div>
+          <div class="subtitle-settings-head"><h2 data-i18n="tmdb_sources">TMDB Kaynakları</h2><p data-i18n="tmdb_description">Film ve dizi bilgileri için TMDb API anahtarını girin.</p></div>
+          <div class="management-grid"><article class="info-card external-settings-card"><label for="tmdbKey" data-i18n="tmdb_api_key">TMDb API key</label><input id="tmdbKey" type="password" autocomplete="new-password" data-i18n-placeholder="subtitle_api_key" placeholder="API key"><span id="tmdbStatus" class="subtitle-hint"></span><div class="row-actions"><button id="tmdbSave" class="primary-button small" type="button" data-i18n="save">Save</button><button id="tmdbTest" class="secondary-button small" type="button" data-i18n="test">Test</button><button id="tmdbRemove" class="mini-button danger" type="button" data-i18n="subtitle_remove_key">Remove key</button></div></article></div>
+          <div class="subtitle-settings-head"><h2 data-i18n="youtube_settings">YouTube Ayarları</h2><p data-i18n="youtube_settings_intro">YouTube araması için API anahtarı gerekmez. TV görüntü kalitesini ayarlayın.</p></div>
+          <div class="management-grid"><article class="info-card external-settings-card"><label for="youtubeResolution" data-i18n="youtube_max_resolution">En yüksek görüntü çözünürlüğü</label><select id="youtubeResolution"><option value="360">360p</option><option value="480">480p</option><option value="720">720p HD</option><option value="1080">1080p Full HD</option><option value="2160">2160p 4K</option></select><label for="youtubeStreamMode" data-i18n="youtube_playback_mode">Oynatma modu</label><select id="youtubeStreamMode"><option value="auto" data-i18n="youtube_automatic">Otomatik</option><option value="compatible" data-i18n="youtube_compatible">Uyumlu</option><option value="dash">DASH</option></select><label for="youtubeAudioPreference" data-i18n="youtube_audio_preference">Ses tercihi</label><select id="youtubeAudioPreference"><option value="default" data-i18n="youtube_default_audio">YouTube varsayılanı</option><option value="original" data-i18n="youtube_original_audio">Orijinal ses</option></select><label for="youtubeLanguage" data-i18n="youtube_language">Arama dili</label><output id="youtubeLanguage" class="youtube-language-current" aria-live="polite">Otomatik</output><div class="row-actions"><button id="youtubeSettingsSave" class="primary-button small" type="button" data-i18n="save">Kaydet</button></div></article></div>
+        </section>
+
+        <section id="page-subtitles" class="page" data-page-panel="subtitles">
+          <div class="page-heading"><div><p>GT IPTV PLAYER PRO</p><h1 data-i18n="subtitle_search">Find subtitles</h1></div></div>
+          <div class="subtitle-search-card">
+            <div class="subtitle-now"><small data-i18n="now_playing">Now playing</small><strong id="subtitleCurrent" role="status">—</strong></div>
+            <form id="subtitleSearchForm" class="subtitle-search-form">
+              <label><span data-i18n="subtitle_title">Search title</span><input id="subtitleTitle" maxlength="120" autocomplete="off" required></label>
+              <label><span data-i18n="subtitle_language">Subtitle language</span><select id="subtitleLanguage"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="ar">العربية</option><option value="pt">Português</option><option value="fa">فارسی</option></select></label>
+              <button type="submit" id="subtitleSearchButton" class="primary-button small" data-i18n="subtitle_search_button">Search subtitles</button>
+            </form>
+            <p id="subtitleSearchHint" class="subtitle-hint" role="status"></p>
+          </div>
+          <div id="subtitleProviderStatus" class="subtitle-provider-status" aria-live="polite"></div>
+          <div id="subtitleResults" class="subtitle-results" aria-live="polite"></div>
+          <section id="subtitleSyncPanel" class="subtitle-search-card subtitle-sync-card" hidden>
+            <h2 data-i18n="subtitle_sync_title">Synchronize subtitles</h2>
+            <p class="subtitle-hint" data-i18n="subtitle_sync_intro">Pause at a spoken line. Match its movie time with the same line's subtitle time.</p>
+            <div class="subtitle-sync-now">
+              <span data-i18n="subtitle_movie_now">Movie position</span><strong id="subtitlePosition">—</strong>
+              <button type="button" id="subtitlePositionRefresh" class="secondary-button small" data-i18n="refresh">Refresh</button>
+            </div>
+            <label class="subtitle-sync-cue-label" for="subtitleCueQuery" data-i18n="subtitle_find_line">Find a subtitle line (optional)</label>
+            <input id="subtitleCueQuery" maxlength="80" autocomplete="off" data-i18n-placeholder="subtitle_cue_placeholder" placeholder="Search for a spoken phrase">
+            <div id="subtitleCueResults" class="subtitle-cue-results" aria-live="polite"></div>
+            <form id="subtitleSyncForm" class="subtitle-search-form">
+              <label><span data-i18n="subtitle_movie_time">Time heard in movie (MM:SS)</span><input id="subtitleMovieTime" inputmode="numeric" placeholder="12:34" maxlength="12" required></label>
+              <label><span data-i18n="subtitle_file_time">Same line starts in subtitle (MM:SS)</span><input id="subtitleFileTime" inputmode="numeric" placeholder="12:29" maxlength="12" required></label>
+              <button type="submit" id="subtitleSyncButton" class="primary-button small" data-i18n="subtitle_align">Align</button>
+            </form>
+            <p class="subtitle-hint" data-i18n="subtitle_sync_tip">Choose a line above to fill the subtitle time. You can also enter it manually.</p>
+            <div class="subtitle-sync-adjust">
+              <button type="button" class="secondary-button small" data-subtitle-step="-1000">−1 s</button>
+              <button type="button" class="secondary-button small" data-subtitle-step="-500">−0.5 s</button>
+              <strong id="subtitleOffset" aria-live="polite">0.0 s</strong>
+              <button type="button" class="secondary-button small" data-subtitle-step="500">+0.5 s</button>
+              <button type="button" class="secondary-button small" data-subtitle-step="1000">+1 s</button>
+              <button type="button" id="subtitleSyncReset" class="mini-button" data-i18n="subtitle_sync_reset">Reset</button>
+            </div>
+          </section>
+        </section>
+        <section id="page-audio" class="page" data-page-panel="audio">
+          <div class="page-heading"><div><p>GT IPTV PLAYER PRO</p><h1 data-i18n="audio_languages">Audio languages</h1></div></div>
+          <div class="info-card audio-panel">
+            <div class="audio-panel-head">
+              <div><small data-i18n="now_playing">Now playing</small><h2 id="audioCurrentTitle">—</h2></div>
+              <button type="button" id="audioRefresh" class="secondary-button small" data-i18n="refresh">Refresh</button>
+            </div>
+            <p data-i18n="audio_tracks_intro">Select an audio language included in the current movie or episode.</p>
+            <p id="audioStatus" role="status"></p>
+            <div id="audioTrackList" class="audio-track-list" aria-live="polite"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <div id="sourceModal" class="modal-backdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="sourceModalTitle">
+      <header><div><p>GT IPTV PLAYER PRO</p><h2 id="sourceModalTitle" data-i18n="add_source">Add Source</h2></div><button id="closeSourceModal" class="icon-button"><svg><use href="#i-close"></use></svg></button></header>
+      <form id="sourceForm" autocomplete="off">
+        <input id="sourceId" type="hidden">
+        <label><span data-i18n="type">Source type</span><select id="sourceType" required><option value="xtream">Xtream Codes</option><option value="stalker">Stalker / MAC</option><option value="m3u">M3U</option></select></label>
+        <label class="field-name"><span data-i18n="name">Name</span><input id="sourceName" maxlength="80"></label>
+        <div class="source-fields" data-fields="xtream">
+          <label><span data-i18n="server_url">Server URL</span><input id="xtreamServer" inputmode="url" placeholder="http://server:port"></label>
+          <div class="field-row"><label><span data-i18n="username">Username</span><input id="xtreamUser" autocomplete="off"></label><label><span data-i18n="password">Password</span><input id="xtreamPassword" type="password" autocomplete="new-password"></label></div>
+          <label><span data-i18n="output_format">Output format</span><select id="xtreamOutput"><option value="ts">TS</option><option value="m3u8">M3U8</option></select></label>
+        </div>
+        <div class="source-fields" data-fields="stalker" hidden>
+          <label><span data-i18n="portal_url">Portal URL</span><input id="stalkerPortal" inputmode="url" placeholder="http://portal/stalker_portal/c/"></label>
+          <label><span data-i18n="mac_address">MAC</span><input id="stalkerMac" autocomplete="off" placeholder="00:1A:79:XX:XX:XX"></label>
+        </div>
+        <div class="source-fields" data-fields="m3u" hidden>
+          <label><span data-i18n="type">Source type</span><select id="m3uKind"><option value="url" data-i18n="web_url">Web URL</option><option value="file" data-i18n="local_file">Local file</option></select></label>
+          <label><span data-i18n="m3u_location">M3U location</span><input id="m3uLocation" autocomplete="off"></label>
+        </div>
+        <label id="pasteField" hidden><span data-i18n="secure_paste">Secure Paste</span><textarea id="pasteValue" rows="4" spellcheck="false" data-i18n-placeholder="paste_source_hint" placeholder="Paste an Xtream URL, or a portal URL and MAC on separate lines"></textarea></label>
+        <div id="sourceFormError" class="form-error" role="alert"></div>
+        <footer><button id="cancelSource" type="button" class="secondary-button" data-i18n="cancel">Cancel</button><button type="submit" class="primary-button small"><span data-i18n="save">Save</span></button></footer>
+      </form>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script src="assets/app.js?v=__GT_PLUGIN_VERSION__" defer></script>
+</body>
+</html>

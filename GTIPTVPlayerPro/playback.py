@@ -459,3 +459,4 @@ class PlaybackResumeStore(object):
                 return True
             items.pop(key, None)
             return self._write_locked(items)
+

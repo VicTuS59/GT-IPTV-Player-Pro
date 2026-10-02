@@ -546,3 +546,4 @@ class CategoryEditLockStore(object):
                     directory_descriptor,
                     lock_descriptor,
                 )
+

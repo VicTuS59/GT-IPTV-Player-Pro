@@ -361,6 +361,31 @@ class FavoriteStore(object):
                 results.append(valid)
         return results[:MAX_FAVORITES]
 
+    def list_all_entries(self, content_type=""):
+        """Return credential-free favorites across every account scope.
+
+        The native UI normally opens favorites for one active account.  The
+        local web dashboard needs a read-only overview before a source is
+        selected, so expose the already-sanitized records without revealing
+        provider credentials or storage details.
+        """
+        content_type = str(content_type or "").lower()
+        if content_type and content_type not in _CONTENT_TYPES:
+            return []
+        with _STORE_LOCK:
+            items, order, unused_mutable = self._load_state()
+            del unused_mutable
+        results = []
+        for key in order:
+            valid = self._valid_entry(
+                key,
+                items.get(key),
+                content_type=content_type,
+            )
+            if valid is not None:
+                results.append(valid)
+        return results[:MAX_FAVORITES]
+
     def keys(self, account_scope=""):
         return {
             entry["key"]
@@ -544,3 +569,4 @@ class FavoriteStore(object):
                 for key in order
             ]
             return self._write_locked(items, replacement)
+

@@ -3035,3 +3035,4 @@ def _safe_response_headers(response):
             ContentError.INVALID_RESPONSE,
         )
     return headers
+

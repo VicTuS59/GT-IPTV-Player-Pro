@@ -11,7 +11,7 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 PROJECT_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd -P)
 PLUGIN_ROOT="$PROJECT_ROOT/GTIPTVPlayerPro"
 CONTROL_ROOT="$PROJECT_ROOT/CONTROL"
-DEFAULT_OUTPUT="$PROJECT_ROOT/dist/enigma2-plugin-extensions-gtiptvplayerpro_1.1.0-r0_all.ipk"
+DEFAULT_OUTPUT="$PROJECT_ROOT/dist/enigma2-plugin-extensions-gtiptvplayerpro_1.2.0-r0_all.ipk"
 
 if [ "$#" -gt 1 ]; then
     die 'usage: build-ipk.sh [output.ipk]'
@@ -41,7 +41,7 @@ esac
 
 [ -d "$PLUGIN_ROOT" ] && [ ! -L "$PLUGIN_ROOT" ] || die 'plugin root is missing or unsafe'
 [ -d "$CONTROL_ROOT" ] && [ ! -L "$CONTROL_ROOT" ] || die 'CONTROL root is missing or unsafe'
-for CONTROL_FILE in control postinst postrm; do
+for CONTROL_FILE in control postinst prerm postrm; do
     CONTROL_PATH="$CONTROL_ROOT/$CONTROL_FILE"
     [ -f "$CONTROL_PATH" ] && [ ! -L "$CONTROL_PATH" ] ||
         die "CONTROL/$CONTROL_FILE is missing or unsafe"
@@ -84,6 +84,7 @@ mkdir -p "$CONTROL_STAGE" "$PLUGIN_STAGE"
 
 cp "$CONTROL_ROOT/control" "$CONTROL_STAGE/control"
 cp "$CONTROL_ROOT/postinst" "$CONTROL_STAGE/postinst"
+cp "$CONTROL_ROOT/prerm" "$CONTROL_STAGE/prerm"
 cp "$CONTROL_ROOT/postrm" "$CONTROL_STAGE/postrm"
 
 # Make the staging payload from an explicit, sorted member list.  In
@@ -109,7 +110,7 @@ tar -C "$PLUGIN_STAGE" -xf "$BUILD_DIR/payload.tar"
 # final tar commands also force numeric root ownership and the fixed mtime.
 find "$CONTROL_STAGE" -type d -exec chmod 0755 {} \;
 find "$CONTROL_STAGE" -type f -exec chmod 0644 {} \;
-chmod 0755 "$CONTROL_STAGE/postinst" "$CONTROL_STAGE/postrm"
+chmod 0755 "$CONTROL_STAGE/postinst" "$CONTROL_STAGE/prerm" "$CONTROL_STAGE/postrm"
 find "$DATA_STAGE" -type d -exec chmod 0755 {} \;
 find "$DATA_STAGE" -type f -exec chmod 0644 {} \;
 

@@ -19,10 +19,10 @@ TEMPLATE_COMMENT = (
     "#\n"
 )
 TEMPLATE_PROJECT_HEADER = (
-    '"Project-Id-Version: GT IPTV Player Pro 1.1.0\\n"'
+    '"Project-Id-Version: GT IPTV Player Pro 1.2.0\\n"'
 )
 CATALOG_PROJECT_HEADER = (
-    '"Project-Id-Version: GT IPTV Player Pro 1.1.0\\n"'
+    '"Project-Id-Version: GT IPTV Player Pro 1.2.0\\n"'
 )
 BUGS_HEADER = (
     '"Report-Msgid-Bugs-To: '

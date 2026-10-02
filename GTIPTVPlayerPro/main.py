@@ -30,6 +30,16 @@ from . import (
     PLUGIN_VERSION,
 )
 from .background import attach_background, attach_pixmap
+from .channel_highlight import (
+    CHANNEL_HIGHLIGHT_KEYS,
+    DEFAULT_CHANNEL_HIGHLIGHT,
+    channel_highlight_art,
+    normalize_channel_highlight,
+    normalize_selection_border,
+    refresh_screen_selection,
+    selection_border_art,
+)
+from .dvb_background import DVBBackgroundGuard
 from .category_lock import CategoryEditLockStore
 from .category_lock_ui import (
     GTCategoryCodeInputScreen,
@@ -69,8 +79,10 @@ from .scrollbar import hide_scrollbar, update_scrollbar
 from .settings import (
     PlayerSettings,
     configurable_service_types,
+    load_dashboard_order,
     load_player_settings,
     normalize_text_size,
+    save_dashboard_order,
     save_player_settings,
     service_type_label,
 )
@@ -442,6 +454,11 @@ CONTENT_ITEMS = (
         "movie",
     ),
     (
+        N_("Discover Movies"),
+        N_("Discover new movies with TMDB recommendations"),
+        "discover",
+    ),
+    (
         N_("SERIES"),
         N_("Browse seasons and episodes"),
         "series",
@@ -522,11 +539,17 @@ DASHBOARD_BACKGROUND = os.path.join(
 ARCHIVE_HERO_PATH = os.path.join(
     PLUGIN_PATH, "skin", "images", "archive-hero-r88.png",
 )
-WELCOME_BACKGROUND = os.path.join(
-    PLUGIN_PATH,
-    "skin",
-    "images",
-    "welcome-neon-v0912.png",
+DISCOVERY_HERO_PATH = os.path.join(PLUGIN_PATH, "skin", "images", "discovery-hero.png")
+DISCOVERY_MENU_PATH = os.path.join(PLUGIN_PATH, "skin", "images", "dashboard-menu-discovery.png")
+DASHBOARD_FOCUS_PATH = os.path.join(PLUGIN_PATH, "skin", "images", "dashboard-menu-focus-r39.png")
+WELCOME_BACKGROUND_720 = os.path.join(
+    PLUGIN_PATH, "skin", "images", "welcome-vector-r88-720.png",
+)
+WELCOME_BACKGROUND_1080 = os.path.join(
+    PLUGIN_PATH, "skin", "images", "welcome-vector-r88-1080.png",
+)
+WELCOME_BACKGROUND_2160 = os.path.join(
+    PLUGIN_PATH, "skin", "images", "welcome-vector-r88-2160.png",
 )
 ACCOUNTS_BACKGROUND = os.path.join(
     PLUGIN_PATH,
@@ -539,6 +562,18 @@ APP_BACKGROUND = os.path.join(
     "skin",
     "images",
     "global-neon-v0912.png",
+)
+SETTINGS_GLASS_BACKGROUND = os.path.join(
+    PLUGIN_PATH, "skin", "images", "screen-settings-glass-r90.png",
+)
+ADD_SOURCE_GLASS_BACKGROUND = os.path.join(
+    PLUGIN_PATH, "skin", "images", "screen-source-glass-r90.png",
+)
+MANAGE_SOURCES_BACKGROUND = os.path.join(
+    PLUGIN_PATH, "skin", "images", "live-category-background-r84.png"
+)
+MANAGE_SOURCES_GLASS_ART = os.path.join(
+    PLUGIN_PATH, "skin", "images", "category-glass-panel-r84.png"
 )
 TMDB_LOGO_PATH = os.path.join(
     PLUGIN_PATH,
@@ -693,28 +728,38 @@ DASHBOARD_FOOTER_ITEMS = (
     footer_item("ok", "select"),
     footer_item("menu", "settings"),
     footer_item("yellow", "about"),
+    footer_item("blue", "move"),
     footer_item("exit", "exit"),
 )
+DASHBOARD_MOVE_FOOTER_ITEMS = (
+    footer_item("up_down", "move"),
+    footer_item("ok", "save"),
+    footer_item("", ""),
+    footer_item("", ""),
+    footer_item("blue", "save"),
+    footer_item("exit", "cancel"),
+)
 WELCOME_FOOTER_ITEMS = (
-    footer_item("left_right", "source_select", 1.1),
-    footer_item("up_down", "action_select", 1.05),
+    footer_item("up_down", "source_select", 1.1),
+    footer_item("left_right", "action_select", 1.05),
     footer_item("ok", "confirm", 0.82),
     footer_item("menu", "settings", 0.9),
     footer_item("exit", "exit", 0.72),
 )
 
-# Coordinates use the 1920x1080 design canvas.  Each tuple is the exact top
-# and bottom edge of one rounded panel baked into dashboard-neon-r96.png.
-# Labels, the moving underline and the neon left edge are all derived from this
-# single geometry so they cannot drift when the OSD is scaled to 720x405.
+# Coordinates use the 1920x1080 design canvas. Eight rounded panels in the
+# discovery menu overlay preserve the existing four quick-access cards.
+# Labels and the complete rounded selection outline follow the same geometry
+# so they cannot drift when the OSD is scaled to 720x405.
 DASHBOARD_MENU_ROWS = (
-    (112, 224),
-    (236, 348),
-    (360, 472),
-    (484, 596),
-    (608, 720),
-    (732, 844),
-    (856, 968),
+    (112, 210),
+    (220, 318),
+    (328, 426),
+    (436, 534),
+    (544, 642),
+    (652, 750),
+    (760, 858),
+    (868, 966),
 )
 
 
@@ -803,6 +848,15 @@ def _scale():
     return width, height, px
 
 
+def _welcome_background_for_desktop(width, height):
+    """Pick a raster rendered at least as large as the native GUI desktop."""
+    if width <= 1280 and height <= 720:
+        return WELCOME_BACKGROUND_720
+    if width <= 1920 and height <= 1080:
+        return WELCOME_BACKGROUND_1080
+    return WELCOME_BACKGROUND_2160
+
+
 def _set_dynamic_lines(component, values, fallback_chars=40, max_lines=12):
     """Fit a bounded set of deliberate rows without flattening the layout."""
     if isinstance(values, str):
@@ -838,18 +892,26 @@ def _ellipsize_inset_text(component, value, fallback_chars=40):
 
 def _welcome_skin():
     width, height, px = _scale()
-    button_y = px(550)
-    button_height = px(288)
-    # The centre card is wider in the artwork; focus frames follow it exactly.
-    button_width = (px(340), px(351), px(340))
-    button_x = (px(705), px(1082), px(1472))
-    footer_y = px(922)
+    # The selected 16:9 artwork fills the native desktop. On an SD/4:3 desktop
+    # the text and focus widgets follow the same vertical transform.
+    def py(value):
+        return max(1, int(round(value * float(height) / 1080.0)))
+
+    button_y = py(550)
+    button_height = py(288)
+    # Four equally spaced action cards in the R50 welcome artwork.
+    button_width = (px(258),) * 4
+    button_x = tuple(px(value) for value in (700, 982, 1268, 1553))
+    footer_y = py(922)
 
     return """
 <screen name="GTIPTVPlayerProScreen" position="0,0" size="{width},{height}"
-        flags="wfNoBorder" backgroundColor="#050914">
-    <widget name="welcome_bg" position="0,0" size="{width},{height}"
+        flags="wfNoBorder" backgroundColor="#050914" transparent="0">
+    <widget name="video_guard" position="0,0" size="{width},{height}"
+            font="Regular;1" backgroundColor="#050914" transparent="0"
             zPosition="0" />
+    <widget name="welcome_bg" position="0,0" size="{width},{height}"
+            zPosition="1" />
     <widget name="top_accent" position="0,0" size="1,1" font="Regular;1"
             transparent="1" zPosition="1" />
     <widget name="brand_panel" position="0,0" size="1,1" font="Regular;1"
@@ -942,6 +1004,10 @@ def _welcome_skin():
             size="{button_2_width},{button_label_h}" font="Regular;{button_font}"
             foregroundColor="#FFFFFF" transparent="1" zPosition="2"
             valign="center" halign="center" />
+    <widget name="youtube_button" position="{button_3_x},{button_label_y}"
+            size="{button_3_width},{button_label_h}" font="Regular;{button_font}"
+            foregroundColor="#FFFFFF" transparent="1" zPosition="2"
+            valign="center" halign="center" />
     <widget name="focus_0" position="{button_0_x},{focus_y}"
             size="{button_0_width},{focus_h}" font="Regular;1"
             backgroundColor="#22D3EE" transparent="0" zPosition="4" />
@@ -950,6 +1016,9 @@ def _welcome_skin():
             backgroundColor="#22D3EE" transparent="0" zPosition="4" />
     <widget name="focus_2" position="{button_2_x},{focus_y}"
             size="{button_2_width},{focus_h}" font="Regular;1"
+            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
+    <widget name="focus_3" position="{button_3_x},{focus_y}"
+            size="{button_3_width},{focus_h}" font="Regular;1"
             backgroundColor="#22D3EE" transparent="0" zPosition="4" />
     <widget name="focus_0_top" position="{button_0_x},{button_y}"
             size="{button_0_width},{focus_h}" font="Regular;1"
@@ -978,6 +1047,15 @@ def _welcome_skin():
     <widget name="focus_2_right" position="{focus_2_right_x},{button_y}"
             size="{focus_h},{button_height}" font="Regular;1"
             backgroundColor="#22D3EE" transparent="0" zPosition="4" />
+    <widget name="focus_3_top" position="{button_3_x},{button_y}"
+            size="{button_3_width},{focus_h}" font="Regular;1"
+            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
+    <widget name="focus_3_left" position="{button_3_x},{button_y}"
+            size="{focus_h},{button_height}" font="Regular;1"
+            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
+    <widget name="focus_3_right" position="{focus_3_right_x},{button_y}"
+            size="{focus_h},{button_height}" font="Regular;1"
+            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
     <widget name="hint" position="{hint_x},{hint_y}"
             size="{hint_w},{hint_h}" font="Regular;{hint_font}"
             foregroundColor="#A8B4C8" transparent="1" zPosition="2"
@@ -992,71 +1070,74 @@ def _welcome_skin():
         width=width,
         height=height,
         header_x=px(212),
-        header_y=px(105),
+        header_y=py(105),
         header_w=px(370),
-        header_h=px(105),
+        header_h=py(105),
         title_font=px(26),
         left_x=px(92),
         left_w=px(470),
-        eyebrow_y=px(250),
-        eyebrow_h=px(42),
+        eyebrow_y=py(250),
+        eyebrow_h=py(42),
         eyebrow_font=px(21),
-        welcome_y=px(292),
-        welcome_h=px(90),
+        welcome_y=py(292),
+        welcome_h=py(90),
         welcome_font=px(56),
-        subtitle_y=px(390),
-        subtitle_h=px(120),
+        subtitle_y=py(390),
+        subtitle_h=py(120),
         subtitle_font=px(28),
-        info_y=px(800),
-        info_h=px(55),
+        info_y=py(800),
+        info_h=py(55),
         info_font=px(18),
         account_caption_x=px(720),
-        account_caption_y=px(105),
+        account_caption_y=py(105),
         account_caption_w=px(1050),
-        account_caption_h=px(42),
+        account_caption_h=py(42),
         caption_font=px(22),
         account_text_x=px(1050),
-        account_text_y=px(225),
+        account_text_y=py(225),
         account_text_w=px(680),
-        account_text_h=px(100),
+        account_text_h=py(100),
         account_font=px(32),
-        account_status_y=px(330),
-        account_status_h=px(48),
+        account_status_y=py(330),
+        account_status_h=py(48),
         status_font=px(24),
-        account_expiry_y=px(378),
-        account_connection_y=px(424),
-        account_detail_h=px(42),
+        account_expiry_y=py(378),
+        account_connection_y=py(424),
+        account_detail_h=py(42),
         detail_font=px(22),
         account_meta_x=px(1600),
-        account_meta_y=px(115),
+        account_meta_y=py(115),
         account_meta_w=px(170),
-        account_meta_h=px(42),
+        account_meta_h=py(42),
         meta_font=px(19),
         button_y=button_y,
-        button_label_y=px(735),
-        button_label_h=px(72),
+        button_label_y=py(735),
+        button_label_h=py(72),
         button_0_x=button_x[0],
         button_1_x=button_x[1],
         button_2_x=button_x[2],
+        button_3_x=button_x[3],
         button_0_width=button_width[0],
         button_1_width=button_width[1],
         button_2_width=button_width[2],
+        button_3_width=button_width[3],
         button_height=button_height,
         focus_0_right_x=button_x[0] + button_width[0] - px(6),
         focus_1_right_x=button_x[1] + button_width[1] - px(6),
         focus_2_right_x=button_x[2] + button_width[2] - px(6),
-        button_font=px(25),
-        focus_y=button_y + button_height - px(6),
-        focus_h=px(6),
+        focus_3_right_x=button_x[3] + button_width[3] - px(6),
+        button_font=px(21),
+        focus_y=button_y + button_height - py(6),
+        focus_h=py(6),
         hint_x=px(720),
-        hint_y=px(850),
+        hint_y=py(850),
         hint_w=px(1050),
-        hint_h=px(45),
+        hint_h=py(45),
         hint_font=px(18),
         footer_x=px(65),
         footer_y=footer_y,
         footer_w=px(1790),
-        footer_h=px(110),
+        footer_h=py(110),
         footer_font=px(20),
     )
 
@@ -1066,15 +1147,14 @@ def _dashboard_skin():
     menu_widgets = []
     for index, (top, bottom) in enumerate(DASHBOARD_MENU_ROWS):
         menu_widgets.append(
-            '<widget name="focus_{i}" position="{x},{line_y}" size="{w},{line_h}" '
-            'font="Regular;1" backgroundColor="#E600FF" zPosition="4" />'
-            '<widget name="focus_edge_{i}" position="{x},{y}" size="{line_h},{h}" '
-            'font="Regular;1" backgroundColor="#E600FF" zPosition="4" />'
+            '<widget name="focus_{i}" position="0,{focus_y}" '
+            'size="{focus_w},{focus_h}" pixmap="{focus_path}" '
+            'alphatest="blend" scale="1" zPosition="4" />'
             '<widget name="card_{i}" position="{text_x},{text_y}" size="{text_w},{text_h}" '
             'font="Regular;{font}" foregroundColor="#F8FAFC" noWrap="1" '
             'transparent="1" zPosition="3" valign="center" halign="left" />'.format(
-                i=index, x=px(28), y=px(top), w=px(448), h=px(bottom-top),
-                line_y=px(bottom-6), line_h=px(6),
+                i=index, focus_y=px(top-8), focus_w=px(500),
+                focus_h=px(108), focus_path=DASHBOARD_FOCUS_PATH,
                 text_x=px(60), text_y=px(top+12), text_w=px(402),
                 text_h=px(bottom-top-24),
                 font=px(31 if CONTENT_ITEMS[index][2] == "continue" else 44),
@@ -1085,6 +1165,11 @@ def _dashboard_skin():
         flags="wfNoBorder" backgroundColor="#020617">
     <widget name="dashboard_bg" position="0,0" size="{width},{height}"
             zPosition="0" />
+    <widget name="discovery_menu_bg" position="0,0"
+            size="{menu_overlay_w},{height}" zPosition="1" />
+    <widget name="discovery_menu" position="0,{menu_overlay_y}"
+            size="{menu_overlay_w},{menu_overlay_h}" pixmap="{menu_overlay_path}"
+            zPosition="2" alphatest="blend" scale="1" />
 
     <widget name="brand_gt" position="{brand_gt_x},{header_y}"
             size="{brand_gt_w},{header_h}" font="Regular;{brand_font}"
@@ -1121,6 +1206,8 @@ def _dashboard_skin():
             size="{archive_panel_w},{archive_panel_h}" font="Regular;1"
             backgroundColor="#020617" transparent="0" zPosition="1" />
     <widget name="archive_hero" position="{archive_panel_x},{archive_panel_y}"
+            size="{archive_panel_w},{archive_panel_h}" scale="1" zPosition="2" />
+    <widget name="discovery_hero" position="{archive_panel_x},{archive_panel_y}"
             size="{archive_panel_w},{archive_panel_h}" scale="1" zPosition="2" />
 
     <widget name="preview_title" position="{preview_x},{preview_title_y}"
@@ -1259,6 +1346,10 @@ def _dashboard_skin():
         clock_w=px(115),
         clock_font=px(39),
         menu_widgets="\n".join(menu_widgets),
+        menu_overlay_y=px(104),
+        menu_overlay_w=px(500),
+        menu_overlay_h=px(878),
+        menu_overlay_path=DISCOVERY_MENU_PATH,
         # Fill the card; the decoder keeps the 3:1 artwork proportional and
         # ePixmap clips only the surrounding background to this viewport.
         # Derive all edges from the scaled border to avoid one-pixel seams.
@@ -1584,7 +1675,7 @@ def _player_settings_skin():
             """
     <widget name="row_bg_{index}" position="{row_x},{row_y}"
             size="{row_w},{row_h}" font="Regular;1"
-            backgroundColor="#101B30" transparent="0" zPosition="2" />
+            transparent="1" zPosition="2" />
     <widget name="row_focus_{index}" position="{row_x},{row_y}"
             size="{row_w},{row_h}" font="Regular;1"
             backgroundColor="#17536A" transparent="0" zPosition="3" />
@@ -1597,7 +1688,7 @@ def _player_settings_skin():
             valign="center" halign="left" />
     <widget name="value_bg_{index}" position="{value_x},{value_y}"
             size="{value_w},{value_h}" font="Regular;1"
-            backgroundColor="#091426" transparent="0" zPosition="4" />
+            transparent="1" zPosition="4" />
     <widget name="row_value_{index}" position="{value_x},{value_y}"
             size="{value_w},{value_h}" font="Regular;{value_font}"
             foregroundColor="#FFFFFF" transparent="1" zPosition="5"
@@ -1628,6 +1719,8 @@ def _player_settings_skin():
                 ),
             )
         )
+    for name, y in (("settings_up", 242), ("settings_down", 808)):
+        rows.append('<widget name="{}" position="{},{}" size="{},{}" font="Regular;{}" foregroundColor="#16C9F4" transparent="1" zPosition="5" halign="center" />'.format(name, px(1817), px(y), px(30), px(35), px(23)))
     footer_y = height - px(86)
     return """
 <screen name="GTPlayerSettingsScreen" position="0,0" size="{width},{height}"
@@ -1647,7 +1740,7 @@ def _player_settings_skin():
             valign="center" halign="right" />
     <widget name="panel" position="{panel_x},{panel_y}"
             size="{panel_w},{panel_h}" font="Regular;1"
-            backgroundColor="#07101F" transparent="0" zPosition="1" />
+            transparent="1" zPosition="1" />
     <widget name="player_tab_bg" position="{tab_left_x},{tab_y}"
             size="{tab_w},{tab_h}" font="Regular;1"
             backgroundColor="#16AEE0" transparent="0" zPosition="2" />
@@ -1657,7 +1750,7 @@ def _player_settings_skin():
             valign="center" halign="center" />
     <widget name="language_tab_bg" position="{tab_right_x},{tab_y}"
             size="{tab_w},{tab_h}" font="Regular;1"
-            backgroundColor="#0B1628" transparent="0" zPosition="2" />
+            transparent="1" zPosition="2" />
     <widget name="language_tab" position="{tab_right_x},{language_y}"
             size="{tab_w},{language_h}" font="Regular;{tab_font}"
             foregroundColor="#FFFFFF" transparent="1" zPosition="3"
@@ -1667,6 +1760,12 @@ def _player_settings_skin():
             foregroundColor="#8D9AAF" transparent="1" zPosition="3"
             valign="center" halign="center" />
     {rows}
+    <widget name="settings_scroll_track" position="{scroll_x},{scroll_y}"
+            size="{scroll_w},{scroll_h}" font="Regular;1"
+            backgroundColor="#26344E" transparent="0" zPosition="5" />
+    <widget name="settings_scroll_thumb" position="{scroll_x},{scroll_y}"
+            size="{scroll_w},{scroll_h}" font="Regular;1"
+            backgroundColor="#16C9F4" transparent="0" zPosition="6" />
     <widget name="message" position="{message_x},{message_y}"
             size="{message_w},{message_h}" font="Regular;{message_font}"
             foregroundColor="#16C9F4" transparent="1" zPosition="3"
@@ -1729,6 +1828,10 @@ def _player_settings_skin():
             vertical_padding=5,
         ),
         rows="".join(rows),
+        scroll_x=px(1824),
+        scroll_y=px(283),
+        scroll_w=px(10),
+        scroll_h=px(518),
         message_x=px(110),
         message_y=px(850),
         message_w=px(1690),
@@ -1746,11 +1849,11 @@ def _player_settings_skin():
 
 
 def _appearance_settings_skin():
-    """List-themed appearance page for text and cinematic VOD settings."""
+    """List-themed appearance page with the shared selection color preview."""
     width, height, px = _scale()
     footer_y = height - px(86)
     rows = []
-    for index in range(2):
+    for index in range(len(GTAppearanceSettingsScreen.LABELS)):
         row_y = px(290 + (index * 92))
         rows.append(
             """
@@ -1770,8 +1873,8 @@ def _appearance_settings_skin():
     <widget name="value_bg_{index}" position="{value_x},{value_y}"
             size="{value_w},{value_h}" font="Regular;1"
             backgroundColor="#091426" transparent="0" zPosition="4" />
-    <widget name="row_value_{index}" position="{value_x},{value_y}"
-            size="{value_w},{value_h}" font="Regular;{value_font}"
+    <widget name="row_value_{index}" position="{text_x},{value_y}"
+            size="{text_w},{value_h}" font="Regular;{value_font}"
             foregroundColor="#FFFFFF" transparent="1" zPosition="5"
             valign="center" halign="center" noWrap="1" />""".format(
                 index=index,
@@ -1789,6 +1892,8 @@ def _appearance_settings_skin():
                 value_y=row_y + px(8),
                 value_w=px(660),
                 value_h=px(56),
+                text_x=px(1260 if index >= 3 else 1115),
+                text_w=px(515 if index >= 3 else 660),
                 value_font=font_px(
                     px, 24, max_height=56, vertical_padding=10
                 ),
@@ -1820,6 +1925,13 @@ def _appearance_settings_skin():
             transparent="0" zPosition="2" valign="center"
             halign="center" noWrap="1" />
     {rows}
+    <widget name="channel_color_swatch" position="{swatch_x},{swatch_y}"
+            size="{swatch_w},{swatch_h}" pixmap="{swatch_art}"
+            alphatest="blend" scale="1" zPosition="6" />
+    <widget name="selection_border_swatch"
+            position="{swatch_x},{border_swatch_y}"
+            size="{swatch_w},{swatch_h}" pixmap="{border_swatch_art}"
+            alphatest="blend" scale="1" zPosition="6" />
     <widget name="message" position="{message_x},{message_y}"
             size="{message_w},{message_h}" font="Regular;{message_font}"
             foregroundColor="#16C9F4" transparent="1" zPosition="3"
@@ -1860,6 +1972,13 @@ def _appearance_settings_skin():
             px, 29, role="title", max_height=78, vertical_padding=14
         ),
         rows="".join(rows),
+        swatch_x=px(1130),
+        swatch_y=px(290 + 3 * 92 + 16),
+        border_swatch_y=px(290 + 4 * 92 + 16),
+        swatch_w=px(112),
+        swatch_h=px(40),
+        swatch_art=channel_highlight_art(DEFAULT_CHANNEL_HIGHLIGHT, "swatch"),
+        border_swatch_art=selection_border_art(DEFAULT_CHANNEL_HIGHLIGHT),
         message_x=px(110),
         message_y=px(835),
         message_w=px(1690),
@@ -1875,8 +1994,10 @@ def _appearance_settings_skin():
 
 def _accounts_skin():
     width, height, px = _scale()
-    row_y = tuple(190 + (index * 67) for index in range(10))
-    focus_y = tuple(184 + (index * 67) for index in range(10))
+    theme_dir = globals().get(
+        "ACCOUNTS_BACKGROUND",
+        "/usr/lib/enigma2/python/Plugins/Extensions/GTIPTVPlayerPro/skin/images/accounts-neon-v0912.png",
+    ).rsplit("/", 1)[0]
     rows = []
     separators = []
 
@@ -1884,8 +2005,7 @@ def _accounts_skin():
         line = max(1, px(3))
         return """
     <widget name="{name}_bg" position="{x},{y}" size="{w},{h}"
-            font="Regular;1" backgroundColor="#071426"
-            transparent="0" zPosition="1" />
+            font="Regular;1" transparent="1" zPosition="1" />
     <widget name="{name}_top" position="{x},{y}" size="{w},{line}"
             font="Regular;1" backgroundColor="#155E75"
             transparent="0" zPosition="2" />
@@ -1933,102 +2053,173 @@ def _accounts_skin():
             right_x=px(x + w) - line,
         )
 
-    panels = (
-        panel_widgets("account_panel", 35, 170, 1305, 730)
-        + panel_widgets("account_detail_panel", 1340, 170, 540, 730)
-    )
-    # Keep the account/page boards clear of the first list panel at every
-    # supported resolution. 104 maps to y=39 at 720x405, leaving one physical
-    # pixel above the list border without moving the title or list content.
+    # Seven tall rows keep both lines readable on 720p and SD skins. The
+    # complete width is available for long portal names and status details.
+    panels = panel_widgets("account_panel", 35, 170, 1845, 780)
     badge_frames = (
         frame_widgets("count_frame", 215, 104, 310, 64)
         + frame_widgets("page_frame", 535, 104, 270, 64)
     )
-    for index in range(10):
+    focus_x = px(50)
+    focus_w = px(1790)
+    focus_line = max(1, px(4))
+    number_font = font_px(px, 36, max_height=52, vertical_padding=4)
+    row_font = font_px(px, 40, max_height=52, vertical_padding=4)
+    detail_font = font_px(px, 29, max_height=38, vertical_padding=3)
+    status_font = font_px(px, 26, max_height=56, vertical_padding=5)
+    for index in range(7):
+        y = 179 + (index * 110)
         rows.append(
             """
-    <widget name="row_number_{index}" position="{number_x},{row_y}"
-            size="{number_w},{row_h}" font="Regular;{row_font}"
-            foregroundColor="#FFFFFF" transparent="1" zPosition="3"
-            valign="center" halign="right" />
-    <widget name="row_{index}" position="{row_x},{row_y}"
-            size="{row_w},{row_h}" font="Regular;{row_font}"
-            foregroundColor="#FFFFFF" transparent="1" zPosition="3"
+    <widget name="account_row_art_{index}" position="{focus_x},{focus_y}"
+            size="{focus_w},{focus_h}" pixmap="{row_art}"
+            alphatest="blend" scale="1" zPosition="2" />
+    <widget name="account_focus_art_{index}" position="{focus_x},{focus_y}"
+            size="{focus_w},{focus_h}" pixmap="{focus_art}"
+            alphatest="blend" scale="1" zPosition="4" />
+    <widget name="row_number_{index}" position="{number_x},{name_y}"
+            size="{number_w},{name_h}" font="Regular;{number_font}"
+            foregroundColor="#E4EBF8" transparent="1" zPosition="6"
+            valign="center" halign="right" noWrap="1" />
+    <widget name="row_{index}" position="{row_x},{name_y}"
+            size="{row_w},{name_h}" font="Regular;{row_font}"
+            foregroundColor="#FFFFFF" transparent="1" zPosition="6"
             valign="center" halign="left" noWrap="1" />
     <widget name="row_detail_{index}" position="{row_x},{detail_y}"
             size="{row_w},{detail_h}" font="Regular;{detail_font}"
-            foregroundColor="#9FB2CC" transparent="1" zPosition="3"
+            foregroundColor="#A8BBD0" transparent="1" zPosition="6"
             valign="center" halign="left" noWrap="1" />
     <widget name="row_detail_{index}_green" position="{row_x},{detail_y}"
             size="{row_w},{detail_h}" font="Regular;{detail_font}"
-            foregroundColor="#39FF74" transparent="1" zPosition="3"
+            foregroundColor="#69F0AB" transparent="1" zPosition="6"
             valign="center" halign="left" noWrap="1" />
     <widget name="row_detail_{index}_yellow" position="{row_x},{detail_y}"
             size="{row_w},{detail_h}" font="Regular;{detail_font}"
-            foregroundColor="#FACC15" transparent="1" zPosition="3"
+            foregroundColor="#FACC15" transparent="1" zPosition="6"
             valign="center" halign="left" noWrap="1" />
     <widget name="row_detail_{index}_red" position="{row_x},{detail_y}"
             size="{row_w},{detail_h}" font="Regular;{detail_font}"
-            foregroundColor="#FF477E" transparent="1" zPosition="3"
+            foregroundColor="#FF718C" transparent="1" zPosition="6"
             valign="center" halign="left" noWrap="1" />
+    <widget name="row_status_art_{index}_neutral" position="{status_x},{status_y}"
+            size="{status_w},{status_h}" pixmap="{status_neutral}"
+            alphatest="blend" scale="1" zPosition="7" />
+    <widget name="row_status_art_{index}_green" position="{status_x},{status_y}"
+            size="{status_w},{status_h}" pixmap="{status_green}"
+            alphatest="blend" scale="1" zPosition="7" />
+    <widget name="row_status_art_{index}_yellow" position="{status_x},{status_y}"
+            size="{status_w},{status_h}" pixmap="{status_yellow}"
+            alphatest="blend" scale="1" zPosition="7" />
+    <widget name="row_status_art_{index}_red" position="{status_x},{status_y}"
+            size="{status_w},{status_h}" pixmap="{status_red}"
+            alphatest="blend" scale="1" zPosition="7" />
+    <widget name="row_status_{index}" position="{status_x},{status_y}"
+            size="{status_w},{status_h}" font="Regular;{status_font}"
+            foregroundColor="#72B8FF" transparent="1" zPosition="8"
+            valign="center" halign="center" noWrap="1" />
+    <widget name="row_status_{index}_green" position="{status_x},{status_y}"
+            size="{status_w},{status_h}" font="Regular;{status_font}"
+            foregroundColor="#76FFAA" transparent="1" zPosition="8"
+            valign="center" halign="center" noWrap="1" />
+    <widget name="row_status_{index}_yellow" position="{status_x},{status_y}"
+            size="{status_w},{status_h}" font="Regular;{status_font}"
+            foregroundColor="#FFDD45" transparent="1" zPosition="8"
+            valign="center" halign="center" noWrap="1" />
+    <widget name="row_status_{index}_red" position="{status_x},{status_y}"
+            size="{status_w},{status_h}" font="Regular;{status_font}"
+            foregroundColor="#FF8AA1" transparent="1" zPosition="8"
+            valign="center" halign="center" noWrap="1" />
     <widget name="focus_{index}_top" position="{focus_x},{focus_y}"
-            size="{focus_w},{focus_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="4" />
+            size="{focus_w},{focus_line}" font="Regular;1"
+            backgroundColor="#00E5FF" transparent="0" zPosition="5" />
     <widget name="focus_{index}_bottom" position="{focus_x},{focus_bottom_y}"
-            size="{focus_w},{focus_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="4" />
+            size="{focus_w},{focus_line}" font="Regular;1"
+            backgroundColor="#C33BEE" transparent="0" zPosition="5" />
     <widget name="focus_{index}_left" position="{focus_x},{focus_y}"
-            size="{focus_h},{focus_box_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="4" />
+            size="{focus_line},{focus_h}" font="Regular;1"
+            backgroundColor="#00E5FF" transparent="0" zPosition="5" />
     <widget name="focus_{index}_right" position="{focus_right_x},{focus_y}"
-            size="{focus_h},{focus_box_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="4" />""".format(
+            size="{focus_line},{focus_h}" font="Regular;1"
+            backgroundColor="#C33BEE" transparent="0" zPosition="5" />""".format(
                 index=index,
-                number_x=px(75),
-                number_w=px(110),
-                row_x=px(230),
-                row_w=px(1025),
-                row_y=px(row_y[index]),
-                row_h=px(34),
-                row_font=max(11, px(27)),
-                detail_y=px(row_y[index] + 33),
-                detail_h=px(25),
-                detail_font=max(9, px(19)),
-                focus_x=px(50),
-                focus_y=px(focus_y[index]),
-                focus_w=px(1255),
-                focus_h=px(5),
-                focus_box_h=px(63),
-                focus_bottom_y=px(focus_y[index] + 58),
-                focus_right_x=px(1300),
+                row_art=theme_dir + "/category-glass-row-r84.png",
+                focus_art=theme_dir + "/category-glass-row-r84.png",
+                status_neutral=theme_dir + "/status-neutral-r64.png",
+                status_green=theme_dir + "/status-green-r64.png",
+                status_yellow=theme_dir + "/status-yellow-r64.png",
+                status_red=theme_dir + "/status-red-r64.png",
+                number_x=px(70), number_w=px(135),
+                row_x=px(245), row_w=px(1210),
+                name_y=px(y + 4), name_h=px(52),
+                detail_y=px(y + 57), detail_h=px(38),
+                number_font=number_font, row_font=row_font,
+                detail_font=detail_font, status_font=status_font,
+                status_x=px(1465), status_y=px(y + 21),
+                status_w=px(370), status_h=px(56),
+                focus_x=focus_x, focus_y=px(y),
+                focus_w=focus_w, focus_line=focus_line,
+                focus_h=px(103),
+                focus_bottom_y=px(y + 103) - focus_line,
+                focus_right_x=focus_x + focus_w - focus_line,
             )
         )
-        if index < 9:
+        if index < 6:
             separators.append(
                 """
     <widget name="row_separator_{index}" position="{x},{y}"
-            size="{w},{h}" font="Regular;1" backgroundColor="#1E344F"
+            size="{w},{h}" font="Regular;1" backgroundColor="#155E75"
             transparent="0" zPosition="2" />""".format(
-                    index=index,
-                    x=px(50),
-                    y=px(focus_y[index] + 65),
-                    w=px(1255),
-                    h=max(1, px(2)),
+                    index=index, x=focus_x, y=px(y + 106),
+                    w=focus_w, h=max(1, px(2)),
                 )
             )
+
+    # Keep the status components bound for test results and source actions.
+    # Their visible information now appears on the selected row itself.
+    hidden_names = [
+        "summary", "accounts", "footer", "selected_caption",
+        "selected_account", "detail_action",
+    ]
+    for prefix in ("selected_status", "selected_expiry", "selected_connection"):
+        hidden_names.append(prefix)
+        hidden_names.extend(prefix + suffix for suffix in ("_green", "_yellow", "_red"))
+    hidden = "".join(
+        '<widget name="{}" position="0,0" size="1,1" '
+        'font="Regular;1" foregroundColor="#020817" '
+        'transparent="1" zPosition="1" />'.format(name)
+        for name in hidden_names
+    )
     return """
 <screen name="GTAccountsScreen" position="0,0" size="{width},{height}"
         flags="wfNoBorder" backgroundColor="#020817">
     <widget name="accounts_bg" position="0,0" size="{width},{height}"
             zPosition="0" />
     {panels}
+    <widget name="account_panel_art" position="{panel_x},{panel_y}"
+            size="{panel_w},{panel_h}" pixmap="{panel_art}"
+            alphatest="blend" scale="1" zPosition="1" />
+    <widget name="accounts_icon" position="{icon_x},{icon_y}"
+            size="{icon_w},{icon_h}" pixmap="{accounts_icon}"
+            alphatest="blend" scale="1" zPosition="3" />
     <widget name="badge_mask" position="{badge_mask_x},{badge_mask_y}"
             size="{badge_mask_w},{badge_mask_h}" font="Regular;1"
-            backgroundColor="#071426" transparent="0" zPosition="1" />
+            backgroundColor="#071426" transparent="1" zPosition="1" />
+    <widget name="count_badge_bg" position="{count_x},{badge_y}"
+            size="{count_w},{badge_h}" font="Regular;1"
+            transparent="1" zPosition="2" />
+    <widget name="page_badge_bg" position="{source_x},{badge_y}"
+            size="{source_w},{badge_h}" font="Regular;1"
+            transparent="1" zPosition="2" />
+    <widget name="count_badge_art" position="{count_x},{badge_y}"
+            size="{count_w},{badge_h}" pixmap="{row_art}"
+            alphatest="blend" scale="1" zPosition="2" />
+    <widget name="page_badge_art" position="{source_x},{badge_y}"
+            size="{source_w},{badge_h}" pixmap="{row_art}"
+            alphatest="blend" scale="1" zPosition="2" />
     <widget name="header" position="{header_x},{header_y}"
             size="{header_w},{header_h}" font="Regular;{title_font}"
-            foregroundColor="#FFFFFF" transparent="1" zPosition="3"
-            valign="center" halign="left" />
+            foregroundColor="#20DDF4" transparent="1" zPosition="3"
+            valign="center" halign="left" noWrap="1" />
     <widget name="count_badge" position="{count_x},{badge_y}"
             size="{count_w},{badge_h}" font="Regular;{badge_font}"
             foregroundColor="#FFFFFF" transparent="1" zPosition="3"
@@ -2046,115 +2237,40 @@ def _accounts_skin():
     <widget name="account_scroll_thumb" position="{scroll_x},{scroll_y}"
             size="{scroll_w},{scroll_h}" font="Regular;1"
             backgroundColor="#22D3EE" transparent="0" zPosition="6" />
-    <widget name="summary" position="0,0" size="1,1" font="Regular;1"
-            foregroundColor="#020817" transparent="1" zPosition="1" />
-    <widget name="accounts" position="0,0" size="1,1" font="Regular;1"
-            foregroundColor="#020817" transparent="1" zPosition="1" />
-    <widget name="selected_caption" position="{detail_x},{caption_y}"
-            size="{detail_w},{caption_h}" font="Regular;{caption_font}"
-            foregroundColor="#00E5FF" transparent="1" zPosition="3"
+    <widget name="message" position="{message_x},{message_y}"
+            size="{message_w},{message_h}" font="Regular;{message_font}"
+            foregroundColor="#9FB2CC" transparent="1" zPosition="3"
             valign="center" halign="left" noWrap="1" />
-    <widget name="selected_account" position="{detail_x},{account_y}"
-            size="{detail_w},{account_h}" font="Regular;{account_font}"
-            foregroundColor="#FFFFFF" transparent="1" zPosition="3"
-            valign="center" halign="left" noWrap="1" />
-    <widget name="selected_status" position="{detail_x},{status_y}"
-            size="{detail_w},{status_h}" font="Regular;{status_font}"
-            foregroundColor="#9FB2CC" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_status_green" position="{detail_x},{status_y}"
-            size="{detail_w},{status_h}" font="Regular;{status_font}"
-            foregroundColor="#39FF74" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_status_yellow" position="{detail_x},{status_y}"
-            size="{detail_w},{status_h}" font="Regular;{status_font}"
-            foregroundColor="#FACC15" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_status_red" position="{detail_x},{status_y}"
-            size="{detail_w},{status_h}" font="Regular;{status_font}"
-            foregroundColor="#FF477E" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_expiry" position="{detail_x},{expiry_y}"
-            size="{detail_w},{meta_h}" font="Regular;{meta_font}"
-            foregroundColor="#9FB2CC" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_expiry_green" position="{detail_x},{expiry_y}"
-            size="{detail_w},{meta_h}" font="Regular;{meta_font}"
-            foregroundColor="#39FF74" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_expiry_yellow" position="{detail_x},{expiry_y}"
-            size="{detail_w},{meta_h}" font="Regular;{meta_font}"
-            foregroundColor="#FACC15" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_expiry_red" position="{detail_x},{expiry_y}"
-            size="{detail_w},{meta_h}" font="Regular;{meta_font}"
-            foregroundColor="#FF477E" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_connection" position="{detail_x},{connection_y}"
-            size="{detail_w},{meta_h}" font="Regular;{meta_font}"
-            foregroundColor="#9FB2CC" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_connection_green" position="{detail_x},{connection_y}"
-            size="{detail_w},{meta_h}" font="Regular;{meta_font}"
-            foregroundColor="#39FF74" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_connection_yellow" position="{detail_x},{connection_y}"
-            size="{detail_w},{meta_h}" font="Regular;{meta_font}"
-            foregroundColor="#FACC15" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="selected_connection_red" position="{detail_x},{connection_y}"
-            size="{detail_w},{meta_h}" font="Regular;{meta_font}"
-            foregroundColor="#FF477E" transparent="1" zPosition="3"
-            valign="center" halign="left" />
-    <widget name="detail_action" position="{action_x},{action_y}"
-            size="{action_w},{action_h}" font="Regular;{action_font}"
-            foregroundColor="#00E5FF" transparent="1" zPosition="3"
-            valign="center" halign="center" noWrap="1" />
-    <widget name="detail_top" position="{action_x},{action_y}"
-            size="{action_w},{line_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="4" />
-    <widget name="detail_bottom" position="{action_x},{action_bottom_y}"
-            size="{action_w},{line_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="4" />
-    <widget name="detail_left" position="{action_x},{action_y}"
-            size="{line_h},{action_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="4" />
-    <widget name="detail_right" position="{action_right_x},{action_y}"
-            size="{line_h},{action_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="4" />
-    <widget name="message" position="{detail_x},{message_y}"
-            size="{detail_w},{message_h}" font="Regular;{message_font}"
-            foregroundColor="#9FB2CC" transparent="1" zPosition="3"
-            valign="top" halign="left" noWrap="1" />
-    <widget name="footer" position="0,0" size="1,1" font="Regular;1"
-            foregroundColor="#020817" transparent="1" zPosition="1" />
+    <widget name="account_footer_art" position="{footer_x},{footer_y}"
+            size="{footer_w},{footer_h}" pixmap="{row_art}"
+            alphatest="blend" scale="1" zPosition="28" />
+    {hidden}
 </screen>
 """.format(
-        width=width,
-        height=height,
-        panels=panels,
-        badge_frames=badge_frames,
-        # The mask grows upward while its design-space bottom remains at 192,
-        # so the baked legacy boards cannot reappear below the raised frames.
+        width=width, height=height, panels=panels,
+        panel_x=px(35), panel_y=px(170), panel_w=px(1845), panel_h=px(780),
+        panel_art=theme_dir + "/category-glass-panel-r84.png",
+        row_art=theme_dir + "/category-glass-row-r84.png",
+        accounts_icon=theme_dir + "/accounts-icon-r64.png",
+        icon_x=px(49), icon_y=px(24), icon_w=px(106), icon_h=px(109),
+        badge_frames=badge_frames, rows="".join(rows),
+        separators="".join(separators), hidden=hidden,
         badge_mask_x=px(205), badge_mask_y=px(100),
         badge_mask_w=px(620), badge_mask_h=px(92),
-        rows="".join(rows),
-        separators="".join(separators),
-        scroll_x=px(1320), scroll_y=px(184), scroll_w=px(8), scroll_h=px(668),
-        header_x=px(225), header_y=px(35), header_w=px(1000), header_h=px(80),
-        title_font=max(13, px(42)),
+        header_x=px(180), header_y=px(28),
+        header_w=px(1450), header_h=px(80),
+        title_font=font_px(px, 50, role="title", max_height=80,
+                           vertical_padding=10),
         count_x=px(215), source_x=px(535), badge_y=px(104),
-        count_w=px(310), source_w=px(270), badge_h=px(64), badge_font=max(10, px(22)),
-        detail_x=px(1360), detail_w=px(480), caption_y=px(250), caption_h=px(55),
-        caption_font=px(30), account_y=px(350), account_h=px(105),
-        account_font=max(11, px(34)),
-        status_y=px(430), status_h=px(65), status_font=px(29),
-        expiry_y=px(510), connection_y=px(590), meta_h=px(58),
-        meta_font=max(10, px(23)),
-        action_x=px(1365), action_y=px(690), action_w=px(455), action_h=px(70),
-        action_font=px(25), line_h=px(4), action_bottom_y=px(756),
-        action_right_x=px(1816), message_y=px(785), message_h=px(75),
-        message_font=px(22),
+        count_w=px(310), source_w=px(270), badge_h=px(64),
+        badge_font=font_px(px, 27, max_height=64, vertical_padding=8),
+        scroll_x=px(1850), scroll_y=px(180),
+        scroll_w=px(9), scroll_h=px(755),
+        message_x=px(870), message_y=px(127),
+        message_w=px(930), message_h=px(34),
+        message_font=font_px(px, 22, max_height=40, vertical_padding=4),
+        footer_x=px(45), footer_y=height - px(112),
+        footer_w=px(1820), footer_h=px(100),
     )
 
 
@@ -2432,30 +2548,30 @@ def _add_source_type_skin():
             zPosition="0" />
     <widget name="panel" position="{panel_x},{panel_y}"
             size="{panel_width},{panel_h}" font="Regular;1"
-            backgroundColor="#0B1220" transparent="0" zPosition="1" />
+            transparent="1" zPosition="1" />
 
     <widget name="header" position="{content_x},{header_y}"
             size="{header_w},{header_h}" font="Regular;{title_font}"
-            foregroundColor="#22D3EE" backgroundColor="#0B1220"
-            transparent="0" valign="center" halign="left" zPosition="2" />
+            foregroundColor="#22D3EE" transparent="1"
+            valign="center" halign="left" zPosition="2" />
     <widget name="step" position="{step_x},{step_y}"
             size="{step_w},{step_h}" font="Regular;{step_font}"
-            foregroundColor="#B6C2D4" backgroundColor="#0B1220"
-            transparent="0" valign="center" halign="right" zPosition="2" />
+            foregroundColor="#B6C2D4" transparent="1"
+            valign="center" halign="right" zPosition="2" />
     <widget name="instruction" position="{content_x},{instruction_y}"
             size="{content_width},{instruction_h}" font="Regular;{instruction_font}"
-            foregroundColor="#C8D2E3" backgroundColor="#0B1220"
-            transparent="0" valign="center" halign="left" zPosition="2" />
+            foregroundColor="#C8D2E3" transparent="1"
+            valign="center" halign="left" zPosition="2" />
 
     <widget name="card_0" position="{card_x},{card_0_y}"
             size="{card_width},{card_h}" font="Regular;1"
-            backgroundColor="#121D31" transparent="0" zPosition="2" />
+            transparent="1" zPosition="2" />
     <widget name="card_1" position="{card_x},{card_1_y}"
             size="{card_width},{card_h}" font="Regular;1"
-            backgroundColor="#121D31" transparent="0" zPosition="2" />
+            transparent="1" zPosition="2" />
     <widget name="card_2" position="{card_x},{card_2_y}"
             size="{card_width},{card_h}" font="Regular;1"
-            backgroundColor="#121D31" transparent="0" zPosition="2" />
+            transparent="1" zPosition="2" />
 
     <widget name="icon_0" position="{icon_x},{icon_0_y}"
             size="{icon_w},{icon_h}" font="Regular;{icon_font}"
@@ -2472,29 +2588,29 @@ def _add_source_type_skin():
 
     <widget name="title_0" position="{text_x},{title_0_y}"
             size="{text_width},{title_h}" font="Regular;{card_title_font}"
-            foregroundColor="#FFFFFF" backgroundColor="#121D31"
-            transparent="0" valign="center" halign="left" zPosition="3" />
+            foregroundColor="#FFFFFF" transparent="1"
+            valign="center" halign="left" zPosition="3" />
     <widget name="description_0" position="{text_x},{description_0_y}"
             size="{text_width},{description_h}" font="Regular;{description_font}"
-            foregroundColor="#B8C3D5" backgroundColor="#121D31"
-            transparent="0" valign="center" halign="left" zPosition="3" />
+            foregroundColor="#B8C3D5" transparent="1"
+            valign="center" halign="left" zPosition="3" />
     <widget name="capabilities_0" position="{text_x},{capabilities_0_y}"
             size="{text_width},{capabilities_h}" font="Regular;{capabilities_font}"
-            foregroundColor="#22D3EE" backgroundColor="#121D31"
-            transparent="0" valign="center" halign="left" zPosition="3" />
+            foregroundColor="#22D3EE" transparent="1"
+            valign="center" halign="left" zPosition="3" />
 
     <widget name="title_1" position="{text_x},{title_1_y}"
             size="{m3u_text_w},{title_h}" font="Regular;{card_title_font}"
-            foregroundColor="#FFFFFF" backgroundColor="#121D31"
-            transparent="0" valign="center" halign="left" zPosition="3" />
+            foregroundColor="#FFFFFF" transparent="1"
+            valign="center" halign="left" zPosition="3" />
     <widget name="description_1" position="{text_x},{description_1_y}"
             size="{m3u_text_w},{description_h}" font="Regular;{description_font}"
-            foregroundColor="#B8C3D5" backgroundColor="#121D31"
-            transparent="0" valign="center" halign="left" zPosition="3" />
+            foregroundColor="#B8C3D5" transparent="1"
+            valign="center" halign="left" zPosition="3" />
     <widget name="capabilities_1" position="{text_x},{capabilities_1_y}"
             size="{m3u_text_w},{capabilities_h}" font="Regular;{capabilities_font}"
-            foregroundColor="#22D3EE" backgroundColor="#121D31"
-            transparent="0" valign="center" halign="left" zPosition="3" />
+            foregroundColor="#22D3EE" transparent="1"
+            valign="center" halign="left" zPosition="3" />
     <widget name="badge_1" position="{badge_x},{badge_y}"
             size="{badge_w},{badge_h}" font="Regular;{badge_font}"
             foregroundColor="#22D3EE" backgroundColor="#0B2734"
@@ -2502,16 +2618,16 @@ def _add_source_type_skin():
 
     <widget name="title_2" position="{text_x},{title_2_y}"
             size="{text_width},{title_h}" font="Regular;{card_title_font}"
-            foregroundColor="#FFFFFF" backgroundColor="#121D31"
-            transparent="0" valign="center" halign="left" zPosition="3" />
+            foregroundColor="#FFFFFF" transparent="1"
+            valign="center" halign="left" zPosition="3" />
     <widget name="description_2" position="{text_x},{description_2_y}"
             size="{text_width},{description_h}" font="Regular;{description_font}"
-            foregroundColor="#B8C3D5" backgroundColor="#121D31"
-            transparent="0" valign="center" halign="left" zPosition="3" />
+            foregroundColor="#B8C3D5" transparent="1"
+            valign="center" halign="left" zPosition="3" />
     <widget name="capabilities_2" position="{text_x},{capabilities_2_y}"
             size="{text_width},{capabilities_h}" font="Regular;{capabilities_font}"
-            foregroundColor="#22D3EE" backgroundColor="#121D31"
-            transparent="0" valign="center" halign="left" zPosition="3" />
+            foregroundColor="#22D3EE" transparent="1"
+            valign="center" halign="left" zPosition="3" />
 
     <widget name="focus_0_top" position="{card_x},{focus_0_top_y}"
             size="{card_width},{focus_h}" font="Regular;1"
@@ -2552,15 +2668,15 @@ def _add_source_type_skin():
 
     <widget name="info_panel" position="{card_x},{info_y}"
             size="{card_width},{info_h}" font="Regular;1"
-            backgroundColor="#0D1829" transparent="0" zPosition="2" />
+            transparent="1" zPosition="2" />
     <widget name="info_icon" position="{info_icon_x},{info_icon_y}"
             size="{info_icon_w},{info_icon_h}" font="Regular;{info_icon_font}"
-            foregroundColor="#22D3EE" backgroundColor="#0D1829"
-            transparent="0" valign="center" halign="center" zPosition="3" />
+            foregroundColor="#22D3EE" transparent="1"
+            valign="center" halign="center" zPosition="3" />
     <widget name="message" position="{message_x},{message_y}"
             size="{message_w},{message_h}" font="Regular;{message_font}"
-            foregroundColor="#C8D2E3" backgroundColor="#0D1829"
-            transparent="0" valign="center" halign="left" zPosition="3" />
+            foregroundColor="#C8D2E3" transparent="1"
+            valign="center" halign="left" zPosition="3" />
 
     <widget name="footer" position="0,{footer_y}" size="{width},{footer_h}"
             font="Regular;{footer_font}" foregroundColor="#C8D2E3"
@@ -2652,9 +2768,8 @@ def _add_source_type_skin():
 
 
 def _manage_sources_skin():
-    """Reuse the proven three-card geometry with independent count badges."""
-    width, unused_height, px = _scale()
-    del unused_height
+    """Keep the three-card geometry while exposing the Live TV wallpaper."""
+    width, height, px = _scale()
     panel_width = px(1320)
     panel_x = int((width - panel_width) / 2)
     card_x = panel_x + px(70)
@@ -2682,8 +2797,56 @@ def _manage_sources_skin():
         'name="GTManageSourcesScreen"',
         1,
     )
+    # The shared Add Source screen keeps its original solid cards.  Only the
+    # Manage Sources instance reveals its dedicated full-screen wallpaper.
+    for opaque in ("#0B1220", "#121D31", "#0D1829", "#0B2734"):
+        for spacing in (" ", "\n            "):
+            skin = skin.replace(
+                'backgroundColor="{}"{}transparent="0"'.format(
+                    opaque, spacing,
+                ),
+                'transparent="1"',
+            )
+    glass_art = globals().get(
+        "MANAGE_SOURCES_GLASS_ART",
+        "/usr/lib/enigma2/python/Plugins/Extensions/GTIPTVPlayerPro/"
+        "skin/images/category-glass-panel-r84.png",
+    ).replace("&", "&amp;").replace('"', "&quot;")
+    glass_widgets = [
+        '<widget name="manage_panel_art" position="{x},{y}" '
+        'size="{w},{h}" pixmap="{art}" alphatest="blend" '
+        'scale="1" zPosition="1" />'.format(
+            x=panel_x, y=px(55), w=panel_width, h=px(890), art=glass_art,
+        )
+    ]
+    for index, y in enumerate((220, 400, 580)):
+        glass_widgets.append(
+            '<widget name="manage_card_art_{index}" position="{x},{y}" '
+            'size="{w},{h}" pixmap="{art}" alphatest="blend" '
+            'scale="1" zPosition="2" />'.format(
+                index=index, x=card_x, y=px(y), w=card_width,
+                h=px(165), art=glass_art,
+            )
+        )
+    glass_widgets.extend((
+        '<widget name="manage_info_art" position="{x},{y}" '
+        'size="{w},{h}" pixmap="{art}" alphatest="blend" '
+        'scale="1" zPosition="2" />'.format(
+            x=card_x, y=px(765), w=card_width, h=px(135), art=glass_art,
+        ),
+        '<widget name="manage_footer_art" position="{x},{y}" '
+        'size="{w},{h}" pixmap="{art}" alphatest="blend" '
+        'scale="1" zPosition="29" />'.format(
+            x=px(45), y=height - px(112), w=px(1820),
+            h=px(100), art=glass_art,
+        ),
+    ))
     marker = '    <widget name="info_panel"'
-    return skin.replace(marker, "\n".join(widgets) + "\n\n" + marker, 1)
+    return skin.replace(
+        marker,
+        "\n".join(widgets + glass_widgets) + "\n\n" + marker,
+        1,
+    )
 
 
 def _playlist_type_skin():
@@ -4316,7 +4479,7 @@ class GTWeatherSettingsScreen(Screen):
 
 
 class GTAppearanceSettingsScreen(Screen):
-    """Transactional text-size and cinematic VOD appearance selector."""
+    """Transactional appearance and device main-menu preferences."""
 
     VALUES = ("standard", "large", "very_large")
     VALUE_LABELS = {
@@ -4324,13 +4487,22 @@ class GTAppearanceSettingsScreen(Screen):
         "large": N_("Large"),
         "very_large": N_("Very large"),
     }
-    LABELS = (N_("Text size"), N_("Cinematic view"))
+    LABELS = (
+        N_("Text size"),
+        N_("Cinematic view"),
+        N_("Show in device main menu"),
+        N_("Selection color"),
+        N_("Selection border color"),
+    )
 
     def __init__(
         self,
         session,
         value="standard",
         cinematic_view=True,
+        show_in_main_menu=True,
+        channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT,
+        selection_border=None,
     ):
         self.skin = decorate_remote_footer(
             _appearance_settings_skin(),
@@ -4340,6 +4512,11 @@ class GTAppearanceSettingsScreen(Screen):
         Screen.__init__(self, session)
         self.value = normalize_text_size(value)
         self.cinematic_view = bool(cinematic_view)
+        self.show_in_main_menu = bool(show_in_main_menu)
+        self.channel_highlight = normalize_channel_highlight(channel_highlight)
+        self.selection_border = normalize_selection_border(
+            selection_border, self.channel_highlight
+        )
         self.selected_index = 0
 
         attach_background(self, "app_bg", APP_BACKGROUND)
@@ -4355,6 +4532,8 @@ class GTAppearanceSettingsScreen(Screen):
             self["row_label_{}".format(index)] = Label(_(label))
             self["value_bg_{}".format(index)] = Label("")
             self["row_value_{}".format(index)] = Label("")
+        self["channel_color_swatch"] = Pixmap()
+        self["selection_border_swatch"] = Pixmap()
         self["message"] = Label(_("Select"))
         self["footer"] = Label("")
         install_remote_footer(self, APPEARANCE_FOOTER_ITEMS)
@@ -4378,13 +4557,55 @@ class GTAppearanceSettingsScreen(Screen):
             -1,
         )
         self._refresh()
+        self.onLayoutFinish.append(self._refresh_swatches)
+        self.onLayoutFinish.append(self._preview_selection_palette)
         self.setTitle("{} - {}".format(_("Settings"), _("Appearance")))
+
+    def _refresh_swatches(self):
+        for name, path in (
+            (
+                "channel_color_swatch",
+                channel_highlight_art(self.channel_highlight, "swatch"),
+            ),
+            (
+                "selection_border_swatch",
+                selection_border_art(self.selection_border),
+            ),
+        ):
+            instance = getattr(self[name], "instance", None)
+            if instance is not None:
+                try:
+                    instance.setPixmapFromFile(path)
+                except (AttributeError, IOError, OSError):
+                    pass
+
+    def _preview_selection_palette(self):
+        refresh_screen_selection(
+            self, self.channel_highlight, self.selection_border
+        )
 
     def _refresh(self):
         self["row_value_0"].setText(_(self.VALUE_LABELS[self.value]))
         self["row_value_1"].setText(
             _("On") if self.cinematic_view else _("Off")
         )
+        self["row_value_2"].setText(
+            _("On") if self.show_in_main_menu else _("Off")
+        )
+        self["row_value_3"].setText(
+            "{:02d} / {:02d}".format(
+                CHANNEL_HIGHLIGHT_KEYS.index(self.channel_highlight) + 1,
+                len(CHANNEL_HIGHLIGHT_KEYS),
+            )
+        )
+        self["row_value_4"].setText(
+            "{:02d} / {:02d}".format(
+                CHANNEL_HIGHLIGHT_KEYS.index(self.selection_border) + 1,
+                len(CHANNEL_HIGHLIGHT_KEYS),
+            )
+        )
+        self._refresh_swatches()
+        self._preview_selection_palette()
         for index in range(len(self.LABELS)):
             selected = index == self.selected_index
             for name in ("row_focus_{}", "row_marker_{}"):
@@ -4408,6 +4629,18 @@ class GTAppearanceSettingsScreen(Screen):
     def _change(self, step):
         if self.selected_index == 1:
             self.cinematic_view = not self.cinematic_view
+        elif self.selected_index == 2:
+            self.show_in_main_menu = not self.show_in_main_menu
+        elif self.selected_index == 3:
+            index = CHANNEL_HIGHLIGHT_KEYS.index(self.channel_highlight)
+            self.channel_highlight = CHANNEL_HIGHLIGHT_KEYS[
+                (index + int(step)) % len(CHANNEL_HIGHLIGHT_KEYS)
+            ]
+        elif self.selected_index == 4:
+            index = CHANNEL_HIGHLIGHT_KEYS.index(self.selection_border)
+            self.selection_border = CHANNEL_HIGHLIGHT_KEYS[
+                (index + int(step)) % len(CHANNEL_HIGHLIGHT_KEYS)
+            ]
         else:
             try:
                 index = self.VALUES.index(self.value)
@@ -4429,6 +4662,9 @@ class GTAppearanceSettingsScreen(Screen):
             {
                 "ui_text_size": self.value,
                 "cinematic_view": self.cinematic_view,
+                "show_in_main_menu": self.show_in_main_menu,
+                "channel_highlight": self.channel_highlight,
+                "selection_border": self.selection_border,
             }
         )
 
@@ -4448,7 +4684,12 @@ class GTPlayerSettingsScreen(Screen):
         N_("DVB EPG"),
         N_("Category edit lock"),
         N_("Appearance"),
+        N_("Subtitles"),
         N_("Select playlist"),
+        N_("Downloads"),
+        N_("Weather"),
+        N_("Web Interface"),
+        N_("YouTube"),
     )
 
     def __init__(
@@ -4463,7 +4704,9 @@ class GTPlayerSettingsScreen(Screen):
         self.skin = decorate_remote_footer(
             _player_settings_skin(),
             PLAYER_SETTINGS_FOOTER_ITEMS,
+            transparent_panel=True,
             skin_fonts_scaled=True,
+            content_y_offset=14,
         )
         Screen.__init__(self, session)
         self.settings_loader = settings_loader or load_player_settings
@@ -4495,6 +4738,7 @@ class GTPlayerSettingsScreen(Screen):
         # the user with no route back to 5002.
         self._service_types = configurable_service_types()
         self.selected_index = 0
+        self._settings_window = 0
         self._original_metadata_signature = self._metadata_signature()
         self._tmdb_test_pending = False
         self._tmdb_test_result = None
@@ -4507,7 +4751,7 @@ class GTPlayerSettingsScreen(Screen):
         self._tmdb_test_timer = eTimer()
         _connect_timer(self._tmdb_test_timer, self._poll_tmdb_test)
 
-        attach_background(self, "app_bg", APP_BACKGROUND)
+        attach_background(self, "app_bg", SETTINGS_GLASS_BACKGROUND)
         self["top_accent"] = Label("")
         self["header"] = Label(_("Settings"))
         self["brand"] = Label("GT IPTV PLAYER PRO")
@@ -4517,7 +4761,12 @@ class GTPlayerSettingsScreen(Screen):
         self["language_tab_bg"] = Label("")
         self["language_tab"] = Label(_("LANGUAGE"))
         self["language_soon"] = Label(device_language_label())
-        for index, label in enumerate(self.LABELS):
+        self["settings_up"] = Label("▲")
+        self["settings_down"] = Label("▼")
+        self["settings_scroll_track"] = Label("")
+        self["settings_scroll_thumb"] = Label("")
+        hide_scrollbar(self, "settings_scroll")
+        for index, label in enumerate(self.LABELS[:9]):
             self["row_bg_{}".format(index)] = Label("")
             self["row_focus_{}".format(index)] = Label("")
             self["row_marker_{}".format(index)] = Label("")
@@ -4556,6 +4805,8 @@ class GTPlayerSettingsScreen(Screen):
             self.onClose.append(self._stop_tmdb_test)
         if hasattr(self, "onShown"):
             self.onShown.append(self._refresh_device_language)
+        if hasattr(self, "onLayoutFinish"):
+            self.onLayoutFinish.append(self._refresh)
         self._refresh()
         self.setTitle(_("Settings - Player / Codec"))
 
@@ -4587,7 +4838,7 @@ class GTPlayerSettingsScreen(Screen):
         return []
 
     def _value_text(self, index):
-        if index in (5, 7, 8):
+        if index in (5, 7, 8, 9, 10, 11, 12, 13):
             return _("Open")
         if index == 6:
             status = getattr(self, "_category_lock_status", None)
@@ -4616,17 +4867,26 @@ class GTPlayerSettingsScreen(Screen):
         return str(value)
 
     def _refresh(self):
-        for index in range(len(self.LABELS)):
-            self["row_value_{}".format(index)].setText(
-                self._value_text(index)
-            )
-            selected = index == self.selected_index
+        if self.selected_index < self._settings_window:
+            self._settings_window = self.selected_index
+        elif self.selected_index >= self._settings_window + 9:
+            self._settings_window = self.selected_index - 8
+        self["settings_up"].show() if self._settings_window else self["settings_up"].hide()
+        self["settings_down"].show() if self._settings_window + 9 < len(self.LABELS) else self["settings_down"].hide()
+        for slot in range(9):
+            index = self._settings_window + slot
+            self["row_label_{}".format(slot)].setText(_(self.LABELS[index]))
+            self["row_value_{}".format(slot)].setText(self._value_text(index))
             for name in ("row_focus_{}", "row_marker_{}"):
-                widget = self[name.format(index)]
-                if selected:
-                    widget.show()
-                else:
-                    widget.hide()
+                widget = self[name.format(slot)]
+                widget.show() if index == self.selected_index else widget.hide()
+        width, height, px = _scale()
+        # A short thumb follows the selected setting; the existing arrows
+        # continue to show when more rows lie above or below the window.
+        update_scrollbar(
+            self, "settings_scroll", len(self.LABELS), self.selected_index,
+            1, (px(1824), px(283), px(10), px(518)),
+        )
 
     def move_up(self):
         self.selected_index = (self.selected_index - 1) % len(self.LABELS)
@@ -4637,6 +4897,18 @@ class GTPlayerSettingsScreen(Screen):
         self._refresh()
 
     def _change(self, step):
+        if self.selected_index == 13:
+            self["message"].setText(_("YouTube settings"))
+            return
+        if self.selected_index == 12:
+            self["message"].setText(_("Web Interface"))
+            return
+        if self.selected_index == 11:
+            self["message"].setText(_("Weather"))
+            return
+        if self.selected_index == 10:
+            self["message"].setText(_("Downloads"))
+            return
         if self.selected_index == 5:
             self["message"].setText(
                 _("Press OK to open the DVB EPG settings.")
@@ -4651,6 +4923,9 @@ class GTPlayerSettingsScreen(Screen):
             self["message"].setText(_("Select"))
             return
         if self.selected_index == 8:
+            self["message"].setText(_("Open independent subtitle settings."))
+            return
+        if self.selected_index == 9:
             self["message"].setText(_("Select"))
             return
         if self.selected_index == 4:
@@ -4685,11 +4960,39 @@ class GTPlayerSettingsScreen(Screen):
         elif self.selected_index == 7:
             self.open_appearance()
         elif self.selected_index == 8:
+            from .subtitle_ui import GTSubtitleSettingsScreen
+
+            self.session.open(GTSubtitleSettingsScreen)
+        elif self.selected_index == 9:
             self.open_playlist_files()
+        elif self.selected_index == 10:
+            from .downloads_ui import GTDownloadsScreen
+            self.session.open(GTDownloadsScreen)
+        elif self.selected_index == 11:
+            self.session.open(GTWeatherSettingsScreen)
+        elif self.selected_index == 12:
+            from .web_ui import GTWebInterfaceScreen
+
+            self.session.open(GTWebInterfaceScreen)
+        elif self.selected_index == 13:
+            from .youtube_ui import GTYouTubeSettingsScreen
+            self.session.openWithCallback(
+                self._youtube_settings_closed, GTYouTubeSettingsScreen,
+                self.settings.copy(),
+            )
         elif self.selected_index == 4:
             self.edit_tmdb_key()
         else:
             self.change_right()
+
+    def _youtube_settings_closed(self, values):
+        if values:
+            for field in ("youtube_resolution", "youtube_stream_mode",
+                          "youtube_audio_preference"):
+                setattr(self.settings, field, values[field])
+            self.settings.youtube_dash = self.settings.youtube_stream_mode != "compatible"
+            self["message"].setText(_("Press GREEN to save the changes."))
+            self._refresh()
 
     def _open_category_code(
         self,
@@ -4923,6 +5226,15 @@ class GTPlayerSettingsScreen(Screen):
         cinematic_view = bool(
             getattr(self.settings, "cinematic_view", True)
         )
+        show_in_main_menu = bool(
+            getattr(self.settings, "show_in_main_menu", True)
+        )
+        channel_highlight = normalize_channel_highlight(
+            getattr(self.settings, "channel_highlight", DEFAULT_CHANNEL_HIGHLIGHT)
+        )
+        selection_border = normalize_selection_border(
+            getattr(self.settings, "selection_border", None), channel_highlight
+        )
         opener = getattr(self.session, "openWithCallback", None)
         if callable(opener):
             opener(
@@ -4930,12 +5242,18 @@ class GTPlayerSettingsScreen(Screen):
                 GTAppearanceSettingsScreen,
                 value,
                 cinematic_view,
+                show_in_main_menu,
+                channel_highlight,
+                selection_border,
             )
         else:
             self.session.open(
                 GTAppearanceSettingsScreen,
                 value,
                 cinematic_view,
+                show_in_main_menu,
+                channel_highlight,
+                selection_border,
             )
 
     def open_playlist_files(self):
@@ -4955,11 +5273,27 @@ class GTPlayerSettingsScreen(Screen):
     def _appearance_closed(self, value=None):
         if value is None:
             return
+        show_in_main_menu = getattr(self.settings, "show_in_main_menu", True)
+        channel_highlight = getattr(
+            self.settings, "channel_highlight", DEFAULT_CHANNEL_HIGHLIGHT
+        )
+        selection_border = getattr(
+            self.settings, "selection_border", channel_highlight
+        )
         if isinstance(value, dict):
             text_size = value.get("ui_text_size", self.settings.ui_text_size)
             cinematic_view = value.get(
                 "cinematic_view",
                 getattr(self.settings, "cinematic_view", True),
+            )
+            show_in_main_menu = value.get(
+                "show_in_main_menu", show_in_main_menu
+            )
+            channel_highlight = value.get(
+                "channel_highlight", channel_highlight
+            )
+            selection_border = value.get(
+                "selection_border", selection_border
             )
         elif isinstance(value, (tuple, list)) and len(value) >= 2:
             text_size, cinematic_view = value[:2]
@@ -4973,6 +5307,18 @@ class GTPlayerSettingsScreen(Screen):
             )
         self.settings.ui_text_size = normalize_text_size(text_size)
         self.settings.cinematic_view = bool(cinematic_view)
+        self.settings.show_in_main_menu = bool(show_in_main_menu)
+        self.settings.channel_highlight = normalize_channel_highlight(
+            channel_highlight
+        )
+        self.settings.selection_border = normalize_selection_border(
+            selection_border, self.settings.channel_highlight
+        )
+        refresh_screen_selection(
+            self,
+            self.settings.channel_highlight,
+            self.settings.selection_border,
+        )
         self["message"].setText(_("Press GREEN to save the changes."))
         self._refresh()
 
@@ -5788,7 +6134,7 @@ class GTAccountBatchTestScreen(Screen):
 
 
 class GTAccountsScreen(Screen):
-    page_size = 10
+    page_size = 7
 
     def __init__(
         self,
@@ -5808,7 +6154,11 @@ class GTAccountsScreen(Screen):
         self.skin = decorate_remote_footer(
             _accounts_skin(),
             footer_items,
-            mask_legacy_frame=True,
+            # The R64 account panel reaches below the old footer stage's
+            # top edge. The stage would cover the seventh row and its status.
+            mask_legacy_frame=False,
+            transparent_panel=True,
+            skin_fonts_scaled=True,
         )
         Screen.__init__(self, session)
         self.source_type = source_type
@@ -5851,9 +6201,16 @@ class GTAccountsScreen(Screen):
         )
         self._delete_timer = eTimer()
         _connect_timer(self._delete_timer, self._poll_delete_result)
-        attach_background(self, "accounts_bg", ACCOUNTS_BACKGROUND)
+        attach_background(self, "accounts_bg", MANAGE_SOURCES_BACKGROUND)
+        self["account_panel_art"] = Pixmap()
+        self["accounts_icon"] = Pixmap()
+        self["count_badge_art"] = Pixmap()
+        self["page_badge_art"] = Pixmap()
+        self["account_footer_art"] = Pixmap()
         self["badge_mask"] = Label("")
-        for panel in ("account_panel", "account_detail_panel"):
+        self["count_badge_bg"] = Label("")
+        self["page_badge_bg"] = Label("")
+        for panel in ("account_panel",):
             self["{}_bg".format(panel)] = Label("")
             for edge in ("top", "bottom", "left", "right"):
                 self["{}_{}".format(panel, edge)] = Label("")
@@ -5886,11 +6243,20 @@ class GTAccountsScreen(Screen):
         for edge in ("top", "bottom", "left", "right"):
             self["detail_{}".format(edge)] = Label("")
         for index in range(self.page_size):
+            self["account_row_art_{}".format(index)] = Pixmap()
+            self["account_row_art_{}".format(index)].hide()
+            self["account_focus_art_{}".format(index)] = Pixmap()
+            self["account_focus_art_{}".format(index)].hide()
             self["row_number_{}".format(index)] = Label("")
             self["row_{}".format(index)] = Label("")
             self["row_detail_{}".format(index)] = Label("")
+            self["row_status_{}".format(index)] = Label("")
+            for signal in ("neutral", "green", "yellow", "red"):
+                self["row_status_art_{}_{}".format(index, signal)] = Pixmap()
+                self["row_status_art_{}_{}".format(index, signal)].hide()
             for suffix in ("_green", "_yellow", "_red"):
                 self["row_detail_{}{}".format(index, suffix)] = Label("")
+                self["row_status_{}{}".format(index, suffix)] = Label("")
             for edge in ("top", "bottom", "left", "right"):
                 self["focus_{}_{}".format(index, edge)] = Label("")
         self["footer"] = Label("")
@@ -6085,7 +6451,7 @@ class GTAccountsScreen(Screen):
 
     def _refresh(self):
         heading = self._heading()
-        self["header"].setText(heading)
+        self["header"].setText(localized_upper(heading))
         self.setTitle(heading)
         count = len(self.accounts)
         page_count = int((count + self.page_size - 1) / self.page_size) if count else 0
@@ -6116,6 +6482,8 @@ class GTAccountsScreen(Screen):
             )
             self["accounts"].setText(empty_text)
             for offset in range(self.page_size):
+                self["account_row_art_{}".format(offset)].hide()
+                self["account_focus_art_{}".format(offset)].hide()
                 self["row_number_{}".format(offset)].setText("")
                 self["row_{}".format(offset)].setText("")
                 _set_signal_label(
@@ -6125,6 +6493,12 @@ class GTAccountsScreen(Screen):
                     HEALTH_SIGNAL_NEUTRAL,
                     fallback_chars=68,
                 )
+                _set_signal_label(
+                    self, "row_status_{}".format(offset), "",
+                    HEALTH_SIGNAL_NEUTRAL,
+                )
+                for signal in ("neutral", "green", "yellow", "red"):
+                    self["row_status_art_{}_{}".format(offset, signal)].hide()
                 for edge in ("top", "bottom", "left", "right"):
                     self["focus_{}_{}".format(offset, edge)].hide()
             self["selected_account"].setText(
@@ -6156,8 +6530,9 @@ class GTAccountsScreen(Screen):
             )
             ellipsize_dynamic_text(
                 self["message"],
-                clean_dynamic_text(_(self.load_result.error)),
-                fallback_chars=32,
+                clean_dynamic_text(_(self.load_result.error))
+                if self.load_result.error else empty_text.splitlines()[0],
+                fallback_chars=90,
             )
             hide_scrollbar(self, "account_scroll")
             return
@@ -6169,15 +6544,29 @@ class GTAccountsScreen(Screen):
             primary, secondary = _source_list_labels(account)
             result = self._health_results.get(_source_result_key(account))
             if result is not None:
-                secondary = _account_test_row_detail(account, result)
-                unused_status, row_signal = _account_test_status_text(result)
-                del unused_status
+                details = [_source_badge(account)]
+                if _source_type(account) == "stalker":
+                    masked_mac = _safe_source_endpoint(account)
+                    if masked_mac:
+                        details.append(masked_mac)
+                details.extend((
+                    _account_test_expiry_text(result),
+                    _account_test_connection_text(result),
+                ))
+                secondary = "  |  ".join(details)
+                status_text, row_signal = _account_test_status_text(result)
             else:
                 row_signal = HEALTH_SIGNAL_NEUTRAL
+                status_text = _("Ready to connect")
             marker = ">" if index == self.selected_index else " "
             self["row_number_{}".format(offset)].setText(
-                "{:02d}.".format(index + 1)
+                "{:02d}".format(index + 1)
             )
+            self["account_row_art_{}".format(offset)].show()
+            if index == self.selected_index:
+                self["account_focus_art_{}".format(offset)].show()
+            else:
+                self["account_focus_art_{}".format(offset)].hide()
             rendered_primary = ellipsize_dynamic_text(
                 self["row_{}".format(offset)],
                 primary,
@@ -6188,8 +6577,26 @@ class GTAccountsScreen(Screen):
                 "row_detail_{}".format(offset),
                 secondary,
                 row_signal,
-                fallback_chars=68,
+                fallback_chars=52,
             )
+            _set_signal_label(
+                self,
+                "row_status_{}".format(offset),
+                localized_upper(status_text),
+                row_signal,
+                fallback_chars=29,
+            )
+            active_status = (
+                row_signal
+                if row_signal in ("green", "yellow", "red")
+                else "neutral"
+            )
+            for signal in ("neutral", "green", "yellow", "red"):
+                artwork = self["row_status_art_{}_{}".format(offset, signal)]
+                if signal == active_status:
+                    artwork.show()
+                else:
+                    artwork.hide()
             # This legacy compatibility label is visually hidden, but it must
             # not receive unbounded provider values either.
             lines.append(
@@ -6207,6 +6614,8 @@ class GTAccountsScreen(Screen):
                 else:
                     focus.hide()
         for offset in range(len(page_accounts), self.page_size):
+            self["account_row_art_{}".format(offset)].hide()
+            self["account_focus_art_{}".format(offset)].hide()
             self["row_number_{}".format(offset)].setText("")
             self["row_{}".format(offset)].setText("")
             _set_signal_label(
@@ -6216,6 +6625,12 @@ class GTAccountsScreen(Screen):
                 HEALTH_SIGNAL_NEUTRAL,
                 fallback_chars=68,
             )
+            _set_signal_label(
+                self, "row_status_{}".format(offset), "",
+                HEALTH_SIGNAL_NEUTRAL,
+            )
+            for signal in ("neutral", "green", "yellow", "red"):
+                self["row_status_art_{}_{}".format(offset, signal)].hide()
             for edge in ("top", "bottom", "left", "right"):
                 self["focus_{}_{}".format(offset, edge)].hide()
         self["accounts"].setText("\n\n".join(lines))
@@ -6294,11 +6709,9 @@ class GTAccountsScreen(Screen):
         self["detail_action"].setText(
             "OK  •  {}".format(localized_upper(_("Connect")))
         )
-        ellipsize_dynamic_text(
-            self["message"],
-            selected_secondary,
-            fallback_chars=32,
-        )
+        # The full-width rows already carry the source metadata. Reserve the
+        # line below them for loading and action feedback.
+        self["message"].setText("")
         width, height, px = _scale()
         update_scrollbar(
             self,
@@ -6306,7 +6719,7 @@ class GTAccountsScreen(Screen):
             count,
             self.selected_index,
             self.page_size,
-            (px(1320), px(184), px(8), px(668)),
+            (px(1850), px(180), px(9), px(755)),
         )
 
     def _select(self, index):
@@ -6652,12 +7065,21 @@ class GTManageSourcesScreen(Screen):
         self.skin = decorate_remote_footer(
             _manage_sources_skin(),
             MANAGE_SOURCES_FOOTER_ITEMS,
+            transparent_panel=True,
         )
         Screen.__init__(self, session)
-        attach_background(self, "app_bg", APP_BACKGROUND)
+        attach_background(
+            self, "app_bg", MANAGE_SOURCES_BACKGROUND,
+            stretch_to_widget=True,
+        )
         self.selected_index = 0
         self.results = [PlaylistLoadResult(), PlaylistLoadResult(), PlaylistLoadResult()]
         self["panel"] = Label("")
+        self["manage_panel_art"] = Pixmap()
+        for index in range(3):
+            self["manage_card_art_{}".format(index)] = Pixmap()
+        self["manage_info_art"] = Pixmap()
+        self["manage_footer_art"] = Pixmap()
         self["header"] = Label(localized_upper(_("Manage Sources")))
         self["step"] = Label("")
         self["instruction"] = Label(
@@ -6817,9 +7239,10 @@ class GTAddSourceTypeScreen(Screen):
         self.skin = decorate_remote_footer(
             _add_source_type_skin(),
             ADD_SOURCE_TYPE_FOOTER_ITEMS,
+            transparent_panel=True,
         )
         Screen.__init__(self, session)
-        attach_background(self, "app_bg", APP_BACKGROUND)
+        attach_background(self, "app_bg", ADD_SOURCE_GLASS_BACKGROUND)
         self.selected_index = 0
         self["panel"] = Label("")
         self["header"] = Label(localized_upper(_("Add Source")))
@@ -8962,6 +9385,7 @@ class GTDashboardScreen(Screen):
         self.skin = decorate_remote_footer(
             _dashboard_skin(),
             DASHBOARD_FOOTER_ITEMS,
+            alternate_items=DASHBOARD_MOVE_FOOTER_ITEMS,
             transparent_panel=True,
             show_dividers=False,
         )
@@ -8971,13 +9395,31 @@ class GTDashboardScreen(Screen):
             account,
             health,
         )
-        self.selected_index = 0
+        self._menu_default_order = tuple(item[2] for item in CONTENT_ITEMS)
+        items_by_action = {item[2]: item for item in CONTENT_ITEMS}
+        self._menu_items = [
+            items_by_action[action]
+            for action in load_dashboard_order(self._menu_default_order)
+        ]
+        self._menu_move_backup = None
+        self._menu_move_origin = 0
+        self._menu_move_error = False
+        available = self._available_indexes()
+        self.selected_index = available[0] if available else 0
         self._dashboard_child_open = False
         self._dashboard_closed = False
         self._clock_timer = eTimer()
         _connect_timer(self._clock_timer, self._update_clock)
 
         attach_background(self, "dashboard_bg", DASHBOARD_BACKGROUND)
+        self["discovery_menu_bg"] = Pixmap()
+        # Clip the normal full-screen theme to the menu column. This replaces
+        # the seven baked-in rows without covering the theme with a flat box.
+        attach_pixmap(self, "discovery_menu_bg", APP_BACKGROUND,
+                      cover_ratio=(16, 9), cover_alignment="top_left")
+        # Native skin loading preserves RGBA. ePicLoad flattens this overlay's
+        # transparent pixels onto black and would hide the theme underneath.
+        self["discovery_menu"] = Pixmap()
         # The PNG contains artwork only. All changing text and focus indicators
         # are real Enigma2 widgets so remote navigation remains fully live.
         self["brand_gt"] = Label("GT")
@@ -9003,10 +9445,12 @@ class GTDashboardScreen(Screen):
         self["archive_hero"] = Pixmap()
         self["archive_hero"].hide()
         self._archive_hero_loaded = False
-        for index in range(len(CONTENT_ITEMS)):
+        self["discovery_hero"] = Pixmap()
+        self["discovery_hero"].hide()
+        self._discovery_hero_loaded = False
+        for index in range(len(self._menu_items)):
             self["card_{}".format(index)] = Label("")
-            self["focus_{}".format(index)] = Label("")
-            self["focus_edge_{}".format(index)] = Label("")
+            self["focus_{}".format(index)] = Pixmap()
         self["preview_title"] = Label("")
         self["continue_preview_title"] = Label("")
         self["preview_description"] = Label("")
@@ -9049,12 +9493,14 @@ class GTDashboardScreen(Screen):
             ],
             {
                 "ok": self.open_selected,
-                "cancel": self.close,
-                "back": self.close,
+                "cancel": self.cancel_or_close,
+                "back": self.cancel_or_close,
                 "left": self.move_left,
                 "right": self.move_right,
                 "up": self.move_up,
                 "down": self.move_down,
+                "upRepeated": self.move_up,
+                "downRepeated": self.move_down,
                 "moveUp": self.move_up,
                 "moveDown": self.move_down,
                 "pageUp": self.move_up,
@@ -9063,10 +9509,11 @@ class GTDashboardScreen(Screen):
                 "channelDown": self.move_down,
                 "nextBouquet": self.move_up,
                 "prevBouquet": self.move_down,
-                "green": self.close,
+                "green": self.cancel_or_close,
                 "yellow": self.open_about,
+                "blue": self.toggle_menu_move,
                 "menu": self.open_settings,
-                "red": self.close,
+                "red": self.cancel_or_close,
             },
             -1,
         )
@@ -9107,11 +9554,11 @@ class GTDashboardScreen(Screen):
 
     def _refresh_selection(self):
         unused_width, unused_height, px = _scale()
-        for index in range(len(CONTENT_ITEMS)):
+        for index, menu_item in enumerate(self._menu_items):
             card = self["card_{}".format(index)]
-            action = CONTENT_ITEMS[index][2]
-            label = _(CONTENT_ITEMS[index][0])
-            if action == "catchup":
+            action = menu_item[2]
+            label = _(menu_item[0])
+            if action in ("catchup", "discover"):
                 label = localized_upper(label)
             if not self._action_available(action):
                 label = "{}  —".format(label)
@@ -9122,12 +9569,19 @@ class GTDashboardScreen(Screen):
             )
             if index == self.selected_index:
                 self["focus_{}".format(index)].show()
-                self["focus_edge_{}".format(index)].show()
             else:
                 self["focus_{}".format(index)].hide()
-                self["focus_edge_{}".format(index)].hide()
-        item = CONTENT_ITEMS[self.selected_index]
+        item = self._menu_items[self.selected_index]
         archive_selected = item[2] == "catchup"
+        discovery_selected = item[2] == "discover"
+        if discovery_selected and not self._discovery_hero_loaded:
+            self._discovery_hero_loaded = True
+            attach_pixmap(self, "discovery_hero", DISCOVERY_HERO_PATH,
+                          cover_ratio=(16, 5), on_loaded=self._discovery_hero_ready)
+        if discovery_selected:
+            self["discovery_hero"].show()
+        else:
+            self["discovery_hero"].hide()
         if archive_selected and not self._archive_hero_loaded:
             self._archive_hero_loaded = True
             attach_pixmap(
@@ -9135,11 +9589,13 @@ class GTDashboardScreen(Screen):
                 on_loaded=self._archive_hero_ready,
                 cover_ratio=(3, 1),
             )
-        if archive_selected:
+        if archive_selected or discovery_selected:
             self["archive_backdrop"].show()
-            self["archive_hero"].show()
         else:
             self["archive_backdrop"].hide()
+        if archive_selected:
+            self["archive_hero"].show()
+        else:
             self["archive_hero"].hide()
         if item[2] == "continue":
             self["preview_title"].hide()
@@ -9150,14 +9606,20 @@ class GTDashboardScreen(Screen):
             self["continue_preview_title"].show()
         else:
             self["continue_preview_title"].hide()
-            title = localized_upper(_(item[0])) if archive_selected else _(item[0])
+            title = localized_upper(_(item[0])) if archive_selected or discovery_selected else _(item[0])
             fit_dynamic_text(
                 self["preview_title"], title, fallback_chars=40,
                 preferred_size=font_px(px, 76, role="title"), min_size=px(28),
             )
             self["preview_title"].show()
+        description = _(item[1])
+        if self._menu_move_backup is not None:
+            description = (
+                _("Settings could not be saved. Check the receiver storage.")
+                if self._menu_move_error else _("Move")
+            )
         fit_dynamic_text(
-            self["preview_description"], _(item[1]), max_lines=2,
+            self["preview_description"], description, max_lines=2,
             fallback_chars=90,
             preferred_size=font_px(px, 36), min_size=px(25),
         )
@@ -9180,7 +9642,7 @@ class GTDashboardScreen(Screen):
                     glow.show()
                 else:
                     glow.hide()
-        hero_selected = item[2] in ("live", "catchup", "settings")
+        hero_selected = item[2] in ("live", "catchup", "settings", "discover")
         for edge in ("top", "bottom", "left", "right"):
             glow = self["hero_glow_{}".format(edge)]
             if hero_selected:
@@ -9190,10 +9652,16 @@ class GTDashboardScreen(Screen):
 
     def _archive_hero_ready(self, loaded):
         # Decoding may finish after the user has moved to another menu card.
-        if self._dashboard_closed or CONTENT_ITEMS[self.selected_index][2] != "catchup":
+        if self._dashboard_closed or self._menu_items[self.selected_index][2] != "catchup":
             self["archive_hero"].hide()
         elif loaded:
             self["archive_hero"].show()
+
+    def _discovery_hero_ready(self, loaded):
+        if self._dashboard_closed or self._menu_items[self.selected_index][2] != "discover":
+            self["discovery_hero"].hide()
+        elif loaded:
+            self["discovery_hero"].show()
 
     def _activate_remote_actions(self):
         action_map = self["actions"]
@@ -9255,7 +9723,7 @@ class GTDashboardScreen(Screen):
 
     def _action_available(self, action):
         action = str(action or "")
-        if action == "settings":
+        if action in ("settings", "discover"):
             return True
         if action == "catchup":
             # Archive support is provider/channel metadata, loaded on entry.
@@ -9267,11 +9735,22 @@ class GTDashboardScreen(Screen):
     def _available_indexes(self):
         return [
             index
-            for index, item in enumerate(CONTENT_ITEMS)
+            for index, item in enumerate(self._menu_items)
             if self._action_available(item[2])
         ]
 
     def _move(self, step):
+        if self._menu_move_backup is not None:
+            target = max(
+                0, min(self.selected_index + int(step), len(self._menu_items) - 1)
+            )
+            if target != self.selected_index:
+                item = self._menu_items.pop(self.selected_index)
+                self._menu_items.insert(target, item)
+                self.selected_index = target
+                self._menu_move_error = False
+                self._refresh_selection()
+            return
         available = self._available_indexes()
         if not available:
             return
@@ -9283,10 +9762,12 @@ class GTDashboardScreen(Screen):
         self._refresh_selection()
 
     def move_left(self):
-        self._move(-1)
+        if self._menu_move_backup is None:
+            self._move(-1)
 
     def move_right(self):
-        self._move(1)
+        if self._menu_move_backup is None:
+            self._move(1)
 
     def move_up(self):
         self._move(-1)
@@ -9294,8 +9775,47 @@ class GTDashboardScreen(Screen):
     def move_down(self):
         self._move(1)
 
+    def toggle_menu_move(self):
+        if self._menu_move_backup is not None:
+            self.save_menu_order()
+            return
+        self._menu_move_backup = list(self._menu_items)
+        self._menu_move_origin = self.selected_index
+        self._menu_move_error = False
+        set_remote_footer(self, DASHBOARD_MOVE_FOOTER_ITEMS)
+        self._refresh_selection()
+
+    def save_menu_order(self):
+        if self._menu_move_backup is None:
+            return
+        if self._menu_items != self._menu_move_backup:
+            if not save_dashboard_order(
+                [item[2] for item in self._menu_items], self._menu_default_order
+            ):
+                self._menu_move_error = True
+                self._refresh_selection()
+                return
+        self._menu_move_backup = None
+        self._menu_move_error = False
+        set_remote_footer(self, DASHBOARD_FOOTER_ITEMS)
+        self._refresh_selection()
+
+    def cancel_or_close(self):
+        if self._menu_move_backup is not None:
+            self._menu_items = self._menu_move_backup
+            self.selected_index = self._menu_move_origin
+            self._menu_move_backup = None
+            self._menu_move_error = False
+            set_remote_footer(self, DASHBOARD_FOOTER_ITEMS)
+            self._refresh_selection()
+            return
+        self.close()
+
     def open_selected(self):
-        item = CONTENT_ITEMS[self.selected_index]
+        if self._menu_move_backup is not None:
+            self.save_menu_order()
+            return
+        item = self._menu_items[self.selected_index]
         if not self._action_available(item[2]):
             self._open_feature(
                 _("Not available"),
@@ -9316,6 +9836,12 @@ class GTDashboardScreen(Screen):
 
             self._open_dashboard_child(
                 GTArchiveScreen, self.account, self._dashboard_content_client(),
+            )
+        elif item[2] == "discover":
+            from .discovery_ui import GTMovieDiscoveryScreen
+
+            self._open_dashboard_child(
+                GTMovieDiscoveryScreen, self.account, self._dashboard_content_client(),
             )
         elif item[2] == "continue":
             from .browser import GTContinueWatchingScreen
@@ -9340,9 +9866,13 @@ class GTDashboardScreen(Screen):
         self._open_dashboard_child(GTFeatureScreen, title, message)
 
     def open_settings(self):
+        if self._menu_move_backup is not None:
+            return
         self._open_dashboard_child(GTPlayerSettingsScreen)
 
     def open_about(self):
+        if self._menu_move_backup is not None:
+            return
         self._open_feature(
             _("About"),
             _about_text(),
@@ -9378,9 +9908,14 @@ class GTIPTVPlayerProScreen(Screen):
         self.skin = decorate_remote_footer(
             _welcome_skin(),
             WELCOME_FOOTER_ITEMS,
-            mask_legacy_frame=True,
+            # R88 wallpaper has no baked footer; the legacy cover would paint
+            # a dark strip above and around the shared remote guide.
+            mask_legacy_frame=False,
         )
         Screen.__init__(self, session)
+        self._dvb_background_guard = DVBBackgroundGuard(session)
+        if hasattr(self, "onLayoutFinish"):
+            self.onLayoutFinish.append(self._dvb_background_guard.pause)
         snapshot = device_snapshot()
         self.account_loader = account_loader or load_sources
         self.account_checker = account_checker or check_source_health
@@ -9392,10 +9927,8 @@ class GTIPTVPlayerProScreen(Screen):
         self._account_preview_closed = False
         self._account_preview_generation = 0
         self._account_preview_job = None
-        self._account_preview_result = None
-        self._account_preview_result_ready = False
+        self._account_preview_mailbox = None
         self._account_preview_cache = {}
-        self._account_preview_lock = threading.Lock()
         self._account_preview_debounce_timer = eTimer()
         _connect_timer(
             self._account_preview_debounce_timer,
@@ -9407,7 +9940,13 @@ class GTIPTVPlayerProScreen(Screen):
             self._poll_account_preview_check,
         )
 
-        attach_background(self, "welcome_bg", WELCOME_BACKGROUND)
+        desktop_width, desktop_height = _desktop_size()
+        attach_background(
+            self, "welcome_bg",
+            _welcome_background_for_desktop(desktop_width, desktop_height),
+            stretch_to_widget=True,
+        )
+        self["video_guard"] = Label("")
         self["top_accent"] = Label("")
         self["brand_panel"] = Label("")
         self["brand_mark"] = Label("GT\nTV")
@@ -9439,10 +9978,12 @@ class GTIPTVPlayerProScreen(Screen):
         self["connect_button"] = Label("")
         self["accounts_button"] = Label("")
         self["add_button"] = Label("")
+        self["youtube_button"] = Label("YouTube")
         self["focus_0"] = Label("")
         self["focus_1"] = Label("")
         self["focus_2"] = Label("")
-        for index in range(3):
+        self["focus_3"] = Label("")
+        for index in range(4):
             for edge in ("top", "left", "right"):
                 self["focus_{}_{}".format(index, edge)] = Label("")
         self["hint"] = Label("")
@@ -9460,10 +10001,10 @@ class GTIPTVPlayerProScreen(Screen):
                 "ok": self.open_selected,
                 "cancel": self.close,
                 "back": self.close,
-                "left": self.previous_account,
-                "right": self.next_account,
-                "up": self.previous_action,
-                "down": self.next_action,
+                "left": self.previous_action,
+                "right": self.next_action,
+                "up": self.previous_account,
+                "down": self.next_account,
                 "green": self.open_accounts,
                 "blue": self.connect_selected,
                 "menu": self.open_settings,
@@ -9473,11 +10014,17 @@ class GTIPTVPlayerProScreen(Screen):
         )
         self.reload_accounts()
         if hasattr(self, "onLayoutFinish"):
+            self.onLayoutFinish.append(self._cover_live_video)
             self.onLayoutFinish.append(self._refresh)
         if hasattr(self, "onClose"):
             self.onClose.append(self._stop_direct_connection)
             self.onClose.append(self._stop_account_preview)
+            self.onClose.append(self._dvb_background_guard.restore)
         self.setTitle("{} v{}".format(PLUGIN_NAME, PLUGIN_VERSION))
+
+    def _cover_live_video(self):
+        # Draw the full desktop before the asynchronously decoded artwork arrives.
+        self["video_guard"].show()
 
     @property
     def accounts(self):
@@ -9557,7 +10104,8 @@ class GTIPTVPlayerProScreen(Screen):
         self["connect_button"].setText(_("CONNECT SOURCE"))
         self["accounts_button"].setText(_("MANAGE SOURCES"))
         self["add_button"].setText(_("ADD SOURCE"))
-        for index in range(3):
+        self["youtube_button"].setText("YouTube")
+        for index in range(4):
             if self.selected_action == index:
                 self["focus_{}".format(index)].show()
                 for edge in ("top", "left", "right"):
@@ -9584,11 +10132,11 @@ class GTIPTVPlayerProScreen(Screen):
             self._schedule_account_preview_check()
 
     def previous_action(self):
-        self.selected_action = (self.selected_action - 1) % 3
+        self.selected_action = (self.selected_action - 1) % 4
         self._refresh()
 
     def next_action(self):
-        self.selected_action = (self.selected_action + 1) % 3
+        self.selected_action = (self.selected_action + 1) % 4
         self._refresh()
 
     def _set_account_preview_line(self, prefix, text, signal_name):
@@ -9693,9 +10241,7 @@ class GTIPTVPlayerProScreen(Screen):
         self._account_preview_generation += 1
         _cancel_ui_job(self._account_preview_job)
         self._account_preview_job = None
-        with self._account_preview_lock:
-            self._account_preview_result = None
-            self._account_preview_result_ready = False
+        self._account_preview_mailbox = None
         for timer in (
             self._account_preview_debounce_timer,
             self._account_preview_poll_timer,
@@ -9721,7 +10267,7 @@ class GTIPTVPlayerProScreen(Screen):
         )
 
     def _start_account_preview_check(self):
-        if self._account_preview_closed or not self.accounts:
+        if getattr(self, "_account_preview_closed", True) or not self.accounts:
             return
         account = self.accounts[self.selected_account_index]
         if _source_type(account) == "m3u":
@@ -9730,15 +10276,17 @@ class GTIPTVPlayerProScreen(Screen):
         generation = self._account_preview_generation
         job = _UIJobToken(WELCOME_ACCOUNT_QUERY_TIMEOUT_SECONDS)
         self._account_preview_job = job
-        with self._account_preview_lock:
-            self._account_preview_result = None
-            self._account_preview_result_ready = False
+        mailbox = {"lock": threading.Lock(), "ready": False, "result": None}
+        self._account_preview_mailbox = mailbox
         worker = threading.Thread(
-            target=lambda: self._run_account_preview_check(
+            target=GTIPTVPlayerProScreen._run_account_preview_check,
+            args=(
                 account,
                 generation,
                 job,
-            )
+                self.account_checker,
+                mailbox,
+            ),
         )
         worker.daemon = True
         worker.start()
@@ -9747,12 +10295,16 @@ class GTIPTVPlayerProScreen(Screen):
             True,
         )
 
-    def _run_account_preview_check(self, account, generation, job):
+    @staticmethod
+    def _run_account_preview_check(account, generation, job, checker, mailbox):
+        # Enigma2 can clear a Screen's attributes while a bounded request is
+        # still returning. The worker owns only immutable request inputs and
+        # its mailbox; it never accesses a closed screen or GUI component.
         try:
             job.check()
             result = _check_account_preview(
                 account,
-                self.account_checker,
+                checker,
                 WELCOME_ACCOUNT_QUERY_TIMEOUT_SECONDS,
             )
         except Exception:
@@ -9761,29 +10313,28 @@ class GTIPTVPlayerProScreen(Screen):
                 expiry=N_("Unknown"),
                 source_type=_source_type(account),
             )
-        with self._account_preview_lock:
-            if (
-                self._account_preview_closed
-                or generation != self._account_preview_generation
-                or not job.active()
-            ):
+        with mailbox["lock"]:
+            if not job.active():
                 return
-            self._account_preview_result = (
+            mailbox["result"] = (
                 generation,
                 id(account),
                 result,
             )
-            self._account_preview_result_ready = True
+            mailbox["ready"] = True
 
     def _poll_account_preview_check(self):
-        if self._account_preview_closed:
+        if getattr(self, "_account_preview_closed", True):
             return
-        with self._account_preview_lock:
-            ready = self._account_preview_result_ready
-            payload = self._account_preview_result
+        mailbox = self._account_preview_mailbox
+        if mailbox is None:
+            return
+        with mailbox["lock"]:
+            ready = mailbox["ready"]
+            payload = mailbox["result"]
             if ready:
-                self._account_preview_result = None
-                self._account_preview_result_ready = False
+                mailbox["result"] = None
+                mailbox["ready"] = False
         if not ready:
             job = self._account_preview_job
             if job is None:
@@ -9791,6 +10342,7 @@ class GTIPTVPlayerProScreen(Screen):
             if job.expired():
                 _cancel_ui_job(job)
                 self._account_preview_job = None
+                self._account_preview_mailbox = None
                 self._show_unknown_account_preview()
                 return
             self._account_preview_poll_timer.start(
@@ -9799,6 +10351,7 @@ class GTIPTVPlayerProScreen(Screen):
             )
             return
         self._account_preview_job = None
+        self._account_preview_mailbox = None
         if not payload or not self.accounts:
             return
         generation, account_key, result = payload
@@ -9824,6 +10377,9 @@ class GTIPTVPlayerProScreen(Screen):
             return
         if self.selected_action == 1:
             self.open_accounts()
+            return
+        if self.selected_action == 3:
+            self.open_youtube()
             return
         self.open_add_source()
 
@@ -9979,3 +10535,9 @@ class GTIPTVPlayerProScreen(Screen):
             GTPlayerSettingsScreen,
             self.reload_accounts,
         )
+
+    def open_youtube(self):
+        from .youtube_ui import GTYouTubeSearchScreen
+        self.selected_action = 3
+        self._refresh()
+        return self._open_child_screen(GTYouTubeSearchScreen)
