@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: fi\n"
-"Language: fi\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: fi\nLanguage: fi\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "ÄÄNI: {}"
 msgid "About"
 msgstr "Tietoja"
 
+msgid "Access code"
+msgstr "Pääsykoodi"
+
 msgid "Access your channels quickly"
 msgstr "Käytä kanaviasi nopeasti"
 
@@ -197,6 +190,9 @@ msgstr "Arabia"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Arkistotoisto ei ole saatavilla tälle kanavalle."
+
+msgid "Aspect ratio"
+msgstr "Kuvasuhde"
 
 msgid "Audio language changed"
 msgstr "Äänen kieli vaihdettu"
@@ -481,6 +477,9 @@ msgstr "Selkeä taivas"
 msgid "Close"
 msgstr "Sulje"
 
+msgid "Close menu"
+msgstr "Sulje valikko"
+
 msgid "Close the open screen before opening another one."
 msgstr "Sulje avoin näyttö ennen toisen avaamista."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Pyydettyä ääniraitaa ei voitu valita."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Itsenäisten tekstitysten näyttämistä ei voitu käynnistää."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Tekstitysten verkkohakua ei voitu käynnistää."
 
 msgid "Could not start the player."
 msgstr "Soitinta ei voitu käynnistää."
@@ -771,6 +770,9 @@ msgstr "Oletusjärjestys palautettu. Tallenna painamalla VIHREÄÄ."
 msgid "Delete"
 msgstr "Poista"
 
+msgid "Delete all"
+msgstr "Poista kaikki"
+
 msgid "Delete this item?"
 msgstr "Poistetaanko tämä kohde?"
 
@@ -818,6 +820,12 @@ msgstr "Löydä elokuvia"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Löydä uusia elokuvia TMDB:n suositusten avulla"
+
+msgid "Display 16:9 content as"
+msgstr "16:9-sisällön näyttötapa"
+
+msgid "Display 4:3 content as"
+msgstr "4:3-sisällön näyttötapa"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Älä sisällytä kyselyä tai osaa portaalin URL-osoitteeseen"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Syötä ensin SubDL-API-avain."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Syötä SubDL-API-avain tekstitysasetuksiin."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Syötä TMDb-API-avain elokuvien ja sarjojen tietoja varten."
@@ -1007,6 +1015,9 @@ msgstr "Syötä vastaanottimessa näkyvä kuusinumeroinen koodi."
 msgid "Enter the username"
 msgstr "Anna käyttäjänimi"
 
+msgid "Enter the username / Enter the password"
+msgstr "Anna käyttäjänimi / Anna salasana"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Syötä tämä koodi puhelimesi selaimeen ja hyväksy pyyntö televisiossa. 042 | Jaksoja ei voitu ladata"
 
@@ -1061,6 +1072,9 @@ msgstr "SUOSIKIT"
 
 msgid "FILE"
 msgstr "TIEDOSTO"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS muunnetaan"
@@ -1144,19 +1158,11 @@ msgstr "Koko näyttö"
 msgid "GREEN"
 msgstr "VIHREÄ"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"ELOKUVA"
+msgid "GT\nMOVIE"
+msgstr "GT\nELOKUVA"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"SARJA"
+msgid "GT\nSERIES"
+msgstr "GT\nSARJA"
 
 msgid "Genre unavailable"
 msgstr "Tyylilaji ei ole saatavilla"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Erillisten tekstitysten esikatselu"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Itsenäisten tekstitysten synkronointi"
 
 msgid "Independent subtitles"
 msgstr "Erilliset tekstitykset"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Itsenäiset tekstitykset on poistettu käytöstä asetuksissa."
 
 msgid "Information"
 msgstr "Tiedot"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Viive"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Viive: {} ms\n"
-"Tilin tila: {}\n"
-"Aktiivisia / Enintään: {}\n"
-"Vanheneminen: {}\n"
-"Palvelimen aika: {}\n"
-"Aikavyöhyke: {}\n"
-"Protokolla: {}\n"
-"Tulostusmuoto: {}\n"
-"Palvelinversio: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Viive: {} ms\nTilin tila: {}\nAktiivisia / Enintään: {}\nVanheneminen: {}\nPalvelimen aika: {}\nAikavyöhyke: {}\nProtokolla: {}\nTulostusmuoto: {}\nPalvelinversio: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Viive: {} ms\n"
-"Tilin tila: {}\n"
-"Protokolla: {}\n"
-"Tulostusmuoto: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Viive: {} ms\nTilin tila: {}\nProtokolla: {}\nTulostusmuoto: {}\n\n{}"
 
 msgid "Left"
 msgstr "Vasen"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Lataa tekstitys tältä verkkosivulta ennen synkronointia."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Lataa itsenäinen tekstitys ennen sen synkronointia."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "DVB-palvelujen ja välimuistissa olevien XMLTV-kanavien lataaminen..."
@@ -1514,6 +1486,9 @@ msgstr "Kirjaudu ulos"
 
 msgid "Lower"
 msgstr "Alempana"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "M3U-KANAVAHAKU"
@@ -1668,6 +1643,9 @@ msgstr "MAC-osoite"
 
 msgid "MANAGE SOURCES"
 msgstr "HALLITSE LÄHTEITÄ"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 s: Verkkokäyttöliittymä"
 
 msgid "MOVIE CATEGORIES"
 msgstr "ELOKUVALUOKAT"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Vastaavia tekstityksiä ei löytynyt. Tarkista kieli ja palveluntarjoajan tila."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "SubDL:stä ei löytynyt vastaavia tekstityksiä."
 
 msgid "No movies found."
 msgstr "Elokuvia ei löytynyt."
@@ -1946,14 +1924,8 @@ msgstr "Yhdistettävää lähdettä ei ole."
 msgid "No source is selected for deletion."
 msgstr "Poistettavaa lähdettä ei ole valittu."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Lähdettä ei löytynyt.\n"
-"\n"
-"Luo se aloitusnäytön LISÄÄ LÄHDE -paneelissa."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Lähdettä ei löytynyt.\n\nLuo se aloitusnäytön LISÄÄ LÄHDE -paneelissa."
 
 msgid "No summary is available for this programme."
 msgstr "Tälle ohjelmalle ei ole saatavilla yhteenvetoa."
@@ -1981,6 +1953,9 @@ msgstr "Kelvollista Xtream-lähdettä ei löytynyt."
 
 msgid "No valid title was found for TMDb"
 msgstr "TMDb:lle ei löytynyt kelvollista nimeä"
+
+msgid "No videos found at the selected quality."
+msgstr "Valitulla laadulla ei löytynyt videoita."
 
 msgid "No weather forecast is available for this city."
 msgstr "Tälle kaupungille ei ole saatavilla sääennustetta."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Avaa / Hyväksy"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Avaa itsenäisten tekstitysten asetukset."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Avaa television näppäimistö ja liitä teksti tähän."
@@ -2107,8 +2082,14 @@ msgstr "Toista"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Käynnistä elokuva tai jakso ensin vastaanottimessa."
 
+msgid "Play next video automatically"
+msgstr "Toista seuraava video automaattisesti"
+
 msgid "Play on TV"
 msgstr "Toista televisiossa"
+
+msgid "Playback history"
+msgstr "Toistohistoria"
 
 msgid "Playback mode"
 msgstr "Toistotila"
@@ -2269,6 +2250,9 @@ msgstr "Yhteys palveluntarjoajaan onnistui"
 msgid "Quality"
 msgstr "Laatu"
 
+msgid "Quality changed. Search again."
+msgstr "Laatu muuttui. Hae uudelleen."
+
 msgid "Queued"
 msgstr "Jonossa"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Arvosana"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Lukuaika: {} ms\n"
-"Lähteen tyyppi: {}\n"
-"Koko: {} tavua\n"
-"Kanavat: {}\n"
-"Luokat: {}\n"
-"Välimuistin ikä: {}\n"
-"Muokattu viimeksi: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Lukuaika: {} ms\nLähteen tyyppi: {}\nKoko: {} tavua\nKanavat: {}\nLuokat: {}\nVälimuistin ikä: {}\nMuokattu viimeksi: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Luetaan kestoa..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Yhdistetään suoratoisto uudelleen..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Palautus onnistui. Kirjoita uusi palautuskoodi muistiin; se näytetään vain kerran:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Palautus onnistui. Kirjoita uusi palautuskoodi muistiin; se näytetään vain kerran:\n\n{}"
 
 msgid "Red"
 msgstr "Punainen"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Nollaa"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Nollaa tekstityksen ajoitus"
 
 msgid "Resolution: --"
 msgstr "Tarkkuus: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Jatka"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Jatketaanko toistoa tallennetusta kohdasta?\n"
-"\n"
-"Tallennettu kohta: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Jatketaanko toistoa tallennetusta kohdasta?\n\nTallennettu kohta: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Jatka keskeneräisiä elokuvia ja sarjajaksoja"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "TEKSTITYSASETUKSET"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Sama rivi alkaa tekstityksessä (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Hae uudelleen; tämä tulos on vanhentunut."
 msgid "Search for a spoken phrase"
 msgstr "Hae puhuttua ilmausta"
 
+msgid "Search history"
+msgstr "Hakuhistoria"
+
 msgid "Search in IPTV"
 msgstr "Hae IPTV:stä"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Hae musiikkia, dokumentteja tai kanavia"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Hae tekstityksiä ohjelmalla SubDL"
 
 msgid "Search subtitles"
 msgstr "Hae tekstityksiä"
@@ -2550,6 +2507,9 @@ msgstr "Etsitään palveluntarjoajia…"
 
 msgid "Searching…"
 msgstr "Etsitään…"
+
+msgid "Season"
+msgstr "Kausi"
 
 msgid "Seasons"
 msgstr "Kaudet"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Näytä / piilota"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Näytä 0,5 sekuntia aiemmin"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Näytä 0,5 sekuntia myöhemmin"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Näytä 1 sekunti aiemmin"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Näytä 1 sekunti myöhemmin"
 
 msgid "Show in device main menu"
 msgstr "Näytä laitteen päävalikossa"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "SubDL-yhteys on valmis."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL ei ole tilapäisesti käytettävissä."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL on tämän version palveluntarjoaja."
 
 msgid "SubDL key change cancelled."
 msgstr "SubDL-avaimen muuttaminen peruutettu."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL palautti virheellisen vastauksen."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Tekstitykset"
 
 msgid "Subtitle"
 msgstr "Tekstitys"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Tekstityksen tarjoajat"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Tekstityksen valinta ei ole käytettävissä tässä imagessa."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "Tekstitysten haku edellyttää toimivaa SubsSupport- tai SubsSupportPro-asennusta."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Tekstityksen synkronointi on jo käynnissä."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Tekstitysten synkronointi ei ole käytettävissä tässä imagessa."
 
 msgid "Subtitle timing adjusted"
 msgstr "Tekstityksen ajoitusta säädetty"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Tekstityksen aikasiirtymä: {:+.1f} sekuntia"
 
 msgid "Subtitles"
 msgstr "Tekstitykset"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "SubDL-API-avain poistettiin."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "SubDL-API-avain hylättiin."
 
 msgid "The SubDL connection test is still running..."
 msgstr "SubDL-yhteyden testi on vielä käynnissä..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "SubDL:n pyyntöraja on saavutettu."
 
 msgid "The TMDb connection test is still running..."
 msgstr "TMDb-yhteystesti on edelleen käynnissä..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "Ero ei saa ylittää 30 minuuttia."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "Ladattua tekstitystä ei voitu tallentaa."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "Tiedostoa ei voitu poistaa. Tarkista tallennuslaite ja käyttöoikeudet."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Toistettava palvelu vaihtui. Avaa ääniraidan valinta uudelleen."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Ohjelman nimi ei ole käytettävissä tekstityshakua varten."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Vastaanottimen kello ei ole valmis. Tarkista verkkoaika ja yritä uudelleen."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "Valitun elokuvan tiedot ladataan palvelimelta."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Tekstityksen koko ylittää rajan"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Tätä tekstitysmuotoa ei tueta"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "Sarjavastaus käyttää tukematonta muotoa. Luokat ovat edelleen käytettävissä."
@@ -3266,12 +3226,8 @@ msgstr "Tässä sisällössä on vain yksi ääniraita."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Tämä kansio on sallittujen tallennussijaintien ulkopuolella."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Tämä on tekstityksen esikatselu.\n"
-"Muutokset näkyvät tässä heti."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Tämä on tekstityksen esikatselu.\nMuutokset näkyvät tässä heti."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Tämä esikatselu käyttää nykyisiä tallentamattomia ulkoasuasetuksia."
@@ -3419,6 +3375,9 @@ msgstr "Pystysijainti"
 msgid "Very large"
 msgstr "Erittäin suuri"
 
+msgid "Video"
+msgstr "Video"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Videota ei voitu toistaa tässä vastaanottimessa. Kokeile toista videota tai kuvanlaatua."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Valkoinen"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Kirjoita tämä palautuskoodi muistiin. Se näytetään vain kerran:\n"
-"\n"
-"{}\n"
-"\n"
-"Jos unohdat molemmat koodit, lisäosan poistaminen ja asentaminen uudelleen nollaa vain tämän lukon."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Kirjoita tämä palautuskoodi muistiin. Se näytetään vain kerran:\n\n{}\n\nJos unohdat molemmat koodit, lisäosan poistaminen ja asentaminen uudelleen nollaa vain tämän lukon."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "XMLTV EPG on poistettu käytöstä tältä M3U-lähteeltä."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} poistettiin suosikeista."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Avoimen lähdekoodin IPTV-soitin Enigma2:lle. Tukee Xtream Codes -tilejä sekä Live TV:tä tavallisista paikallisista, verkkoasemaan liitetyistä tai HTTP(S) M3U -soittolistoista. Tavalliset M3U-lähteet tarjoavat vain Live TV:tä.\n"
-"\n"
-"KEHITTÄJÄ\n"
-"{}\n"
-"\n"
-"OIKEUDELLINEN HUOMAUTUS\n"
-"Tämä laajennus ei tarjoa kanavia, suoratoistoja, tilejä tai soittolistoja. Käyttäjä vastaa siitä, että käyttää vain sisältöä, johon hänellä on käyttöoikeus.\n"
-"\n"
-"TIETOSUOJA\n"
-"Kun Open-Meteo on käytössä, valittu kaupunki ja sijainti lähetetään Open-Meteolle sääennustetta varten. Kun TMDb on käytössä, elokuvan tai sarjan nimi ja käyttäjän antama TMDb-avain tai -tunnus lähetetään TMDb:lle. IPTV-käyttäjänimeä ja -salasanaa ei lähetetä näihin palveluihin."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nAvoimen lähdekoodin IPTV-soitin Enigma2:lle. Tukee Xtream Codes -tilejä sekä Live TV:tä tavallisista paikallisista, verkkoasemaan liitetyistä tai HTTP(S) M3U -soittolistoista. Tavalliset M3U-lähteet tarjoavat vain Live TV:tä.\n\nKEHITTÄJÄ\n{}\n\nOIKEUDELLINEN HUOMAUTUS\nTämä laajennus ei tarjoa kanavia, suoratoistoja, tilejä tai soittolistoja. Käyttäjä vastaa siitä, että käyttää vain sisältöä, johon hänellä on käyttöoikeus.\n\nTIETOSUOJA\nKun Open-Meteo on käytössä, valittu kaupunki ja sijainti lähetetään Open-Meteolle sääennustetta varten. Kun TMDb on käytössä, elokuvan tai sarjan nimi ja käyttäjän antama TMDb-avain tai -tunnus lähetetään TMDb:lle. IPTV-käyttäjänimeä ja -salasanaa ei lähetetä näihin palveluihin."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

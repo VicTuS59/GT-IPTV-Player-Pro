@@ -1,16 +1,16 @@
-name: Publish GT IPTV Player Pro 1.2.0
+name: Publish GT IPTV Player Pro 1.3.0
 
 on:
   push:
     branches: [main]
-    paths: [.github/workflows/publish-1.2.0.yml]
+    paths: [.github/workflows/publish-1.3.0.yml]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: publish-gtiptvplayerpro-1.2.0
+  group: publish-gtiptvplayerpro-1.3.0
   cancel-in-progress: false
 
 jobs:
@@ -19,14 +19,14 @@ jobs:
       github.repository == 'VicTuS59/GT-IPTV-Player-Pro' &&
       github.ref == 'refs/heads/main' &&
       (github.event_name == 'workflow_dispatch' ||
-       github.event.head_commit.message == 'Release 1.2.0 stable')
+       github.event.head_commit.message == 'Release 1.3.0 stable')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       GH_TOKEN: ${{ github.token }}
-      IPK: dist/enigma2-plugin-extensions-gtiptvplayerpro_1.2.0-r0_all.ipk
-      EXPECTED_SHA256: 14b6a7be49bf0fc061196928df1de5fd72b7b8b888ac0e5ac15248c9c1d332b8
-      RELEASE_NOTES_BASE64: R1QgSVBUViBQbGF5ZXIgUHJvIHYxLjIuMCDigJMgU3RhYmxlIFJlbGVhc2UNCg0KSGlnaGxpZ2h0czoNCi0gWHRyZWFtIENvZGVzLCBNM1UgYW5kIFN0YWxrZXIvTUFDIFBvcnRhbCBzdXBwb3J0DQotIExpdmUgVFYsIE1vdmllcywgU2VyaWVzIGFuZCBwcm92aWRlciBUViBBcmNoaXZlDQotIEltcHJvdmVkIEVQRyBkaXNwbGF5IGFuZCBNM1UgWE1MVFYgc2V0dGluZ3MNCi0gQWNjb3VudCBtYW5hZ2VtZW50LCBleHBpcnkgaW5mb3JtYXRpb24gYW5kIHNpbmdsZS1hY2NvdW50IGhlYWx0aCBjaGVja3MNCi0gT3B0aW9uYWwgY2luZW1hdGljIE1vdmllcyBhbmQgU2VyaWVzIGxheW91dA0KLSBVc2VyIGludGVyZmFjZSB0cmFuc2xhdGVkIGludG8gNDMgbGFuZ3VhZ2VzDQoNClBhY2thZ2U6DQotIFBsdWdpbiB2ZXJzaW9uOiAxLjIuMA0KLSBQYWNrYWdlIHZlcnNpb246IDEuMi4wLXIwDQotIEFyY2hpdGVjdHVyZTogMy45IC0gMy4xMCAtIDMuMTEgLSAzLjEyIC0gMy4xMyAtIDMuMTQgUHl0aG9uDQotIGVuaWdtYTItcGx1Z2luLWV4dGVuc2lvbnMtZ3RpcHR2cGxheWVycHJvXzEuMi4wLXIwX2FsbC5pcGsNCg0KU0hBLTI1NjoNCjE0YjZhN2JlNDliZjBmYzA2MTE5NjkyOGRmMWRlNWZkNzJiN2I4Yjg4OGFjMGU1YWMxNTI0OGM5YzFkMzMyYjg=
+      IPK: dist/enigma2-plugin-extensions-gtiptvplayerpro_1.3.0-r0_all.ipk
+      EXPECTED_SHA256: bf8c98f531d1298c395a9010d3951716c99aa8ff358547c71c57497d88fb19fd
+      RELEASE_NOTES_BASE64: R1QgSVBUViBQbGF5ZXIgUHJvIHYxLjMuMCDigJMgU3RhYmxlIFJlbGVhc2UNCg0KSGlnaGxpZ2h0czoNCi0gWHRyZWFtIENvZGVzLCBNM1UgYW5kIFN0YWxrZXIvTUFDIFBvcnRhbCBzdXBwb3J0DQotIExpdmUgVFYsIE1vdmllcywgU2VyaWVzIGFuZCBwcm92aWRlciBUViBBcmNoaXZlDQotIEltcHJvdmVkIEVQRyBkaXNwbGF5IGFuZCBNM1UgWE1MVFYgc2V0dGluZ3MNCi0gQWNjb3VudCBtYW5hZ2VtZW50LCBleHBpcnkgaW5mb3JtYXRpb24gYW5kIHNpbmdsZS1hY2NvdW50IGhlYWx0aCBjaGVja3MNCi0gT3B0aW9uYWwgY2luZW1hdGljIE1vdmllcyBhbmQgU2VyaWVzIGxheW91dA0KLSBVc2VyIGludGVyZmFjZSB0cmFuc2xhdGVkIGludG8gNDMgbGFuZ3VhZ2VzDQoNClBhY2thZ2U6DQotIFBsdWdpbiB2ZXJzaW9uOiAxLjMuMA0KLSBQYWNrYWdlIHZlcnNpb246IDEuMy4wLXIwDQotIEFyY2hpdGVjdHVyZTogMy45IC0gMy4xMCAtIDMuMTEgLSAzLjEyIC0gMy4xMyAtIDMuMTQgUHl0aG9uDQotIGVuaWdtYTItcGx1Z2luLWV4dGVuc2lvbnMtZ3RpcHR2cGxheWVycHJvXzEuMy4wLXIwX2FsbC5pcGsNCg0KU0hBLTI1NjoNCmJmOGM5OGY1MzFkMTI5OGMzOTVhOTAxMGQzOTUxNzE2Yzk5YWE4ZmYzNTg1NDdjNzFjNTc0OTdkODhmYjE5ZmQ=
     steps:
       - name: Check out approved stable sources
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -43,11 +43,12 @@ jobs:
           from pathlib import Path
           root = Path('GTIPTVPlayerPro')
           metadata = (root / '__init__.py').read_text()
-          assert 'PLUGIN_VERSION = "1.2.0"' in metadata
-          assert '\nVersion: 1.2.0-r0\n' in Path('CONTROL/control').read_text()
+          assert 'PLUGIN_VERSION = "1.3.0"' in metadata
+          assert '\nVersion: 1.3.0-r0\n' in Path('CONTROL/control').read_text()
           for path in root.rglob('*.py'):
               ast.parse(path.read_text(), filename=str(path), feature_version=(3, 9))
           PY
+          make -C po check
           node --check GTIPTVPlayerPro/web/app.js
           sh -n CONTROL/postinst CONTROL/prerm CONTROL/postrm scripts/build-ipk.sh
           scripts/build-ipk.sh
@@ -65,22 +66,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name 'VicTuS59'
+          git config user.email 'guner.taylan59@icloud.com'
           git add -f -- "$IPK" "$IPK.sha256"
           if ! git diff --cached --quiet; then
-            git commit -m 'Add verified 1.2.0 release package'
+            git commit -m 'Add verified 1.3.0 release package'
           fi
           git push origin HEAD:main
           printf 'RELEASE_COMMIT=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
-      - name: Publish v1.2.0 and both download assets
+      - name: Publish v1.3.0 and both download assets
         shell: bash
         run: |
           set -euo pipefail
-          gh release create v1.2.0 "$IPK" "$IPK.sha256" \
+          gh release create v1.3.0 "$IPK" "$IPK.sha256" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$RELEASE_COMMIT" \
-            --title 'GT IPTV Player Pro v1.2.0' \
+            --title 'GT IPTV Player Pro v1.3.0' \
             --notes-file "$RUNNER_TEMP/release-notes.txt" \
             --latest

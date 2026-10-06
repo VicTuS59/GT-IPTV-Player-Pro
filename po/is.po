@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: Icelandic\n"
-"Language: is\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Icelandic\nLanguage: is\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "HLJÓÐ: {}"
 msgid "About"
 msgstr "Um viðbótina"
 
+msgid "Access code"
+msgstr "Aðgangskóði"
+
 msgid "Access your channels quickly"
 msgstr "Fljótur aðgangur að rásunum þínum"
 
@@ -197,6 +190,9 @@ msgstr "Arabíska"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Ekki er hægt að spila efni úr safni fyrir þessa rás."
+
+msgid "Aspect ratio"
+msgstr "Myndhlutfall"
 
 msgid "Audio language changed"
 msgstr "Hljóðtungumáli breytt"
@@ -481,6 +477,9 @@ msgstr "Heiðskír himinn"
 msgid "Close"
 msgstr "Loka"
 
+msgid "Close menu"
+msgstr "Loka valmynd"
+
 msgid "Close the open screen before opening another one."
 msgstr "Lokaðu opna skjánum áður en annar er opnaður."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Ekki tókst að velja umbeðið hljóðspor."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Ekki tókst að ræsa birtingu sjálfstæðra skjátexta."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Ekki tókst að hefja leit að skjátextum á netinu."
 
 msgid "Could not start the player."
 msgstr "Ekki tókst að ræsa spilarann."
@@ -771,6 +770,9 @@ msgstr "Sjálfgefin röð endurheimt. Ýttu á GRÆNAN til að vista."
 msgid "Delete"
 msgstr "Eyða"
 
+msgid "Delete all"
+msgstr "Eyða öllu"
+
 msgid "Delete this item?"
 msgstr "Eyða þessu atriði?"
 
@@ -818,6 +820,12 @@ msgstr "Uppgötva kvikmyndir"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Uppgötvaðu nýjar kvikmyndir með tillögum frá TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "Birta 16:9-efni sem"
+
+msgid "Display 4:3 content as"
+msgstr "Birta 4:3-efni sem"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Ekki hafa fyrirspurn eða brot í vefslóð gáttarinnar"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Sláðu fyrst inn SubDL-API-lykil."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Sláðu inn SubDL API-lykil í stillingum skjátexta."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Sláðu inn TMDb API-lykil fyrir upplýsingar um kvikmyndir og þætti."
@@ -1007,6 +1015,9 @@ msgstr "Sláðu inn sex stafa kóðann sem birtist á móttakaranum."
 msgid "Enter the username"
 msgstr "Sláðu inn notandanafnið"
 
+msgid "Enter the username / Enter the password"
+msgstr "Sláðu inn notandanafnið / Sláðu inn lykilorðið"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Sláðu þennan kóða inn í vafrann í símanum þínum og samþykktu síðan beiðnina í sjónvarpinu. 042 | Ekki tókst að hlaða inn þáttum"
 
@@ -1061,6 +1072,9 @@ msgstr "UPPÁHALD"
 
 msgid "FILE"
 msgstr "SKRÁ"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS verður umbreytt"
@@ -1144,19 +1158,11 @@ msgstr "Allur skjárinn"
 msgid "GREEN"
 msgstr "GRÆNN"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"KVIKMYND"
+msgid "GT\nMOVIE"
+msgstr "GT\nKVIKMYND"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"ÞÆTTIR"
+msgid "GT\nSERIES"
+msgstr "GT\nÞÆTTIR"
 
 msgid "Genre unavailable"
 msgstr "Tegund ekki í boði"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Forskoðun sjálfstæðra skjátexta"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Samstilling sjálfstæðra skjátexta"
 
 msgid "Independent subtitles"
 msgstr "Sjálfstæðir skjátextar"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Slökkt er á sjálfstæðum skjátextum í stillingum."
 
 msgid "Information"
 msgstr "Upplýsingar"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Töf (latency)"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Biðtími: {} ms\n"
-"Staða reiknings: {}\n"
-"Virk / Hámark: {}\n"
-"Gildir til: {}\n"
-"Tími þjóns: {}\n"
-"Tímabelti: {}\n"
-"Samskiptaregla: {}\n"
-"Úttakssnið: {}\n"
-"Útgáfa þjóns: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Biðtími: {} ms\nStaða reiknings: {}\nVirk / Hámark: {}\nGildir til: {}\nTími þjóns: {}\nTímabelti: {}\nSamskiptaregla: {}\nÚttakssnið: {}\nÚtgáfa þjóns: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Biðtími: {} ms\n"
-"Staða reiknings: {}\n"
-"Samskiptaregla: {}\n"
-"Úttakssnið: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Biðtími: {} ms\nStaða reiknings: {}\nSamskiptaregla: {}\nÚttakssnið: {}\n\n{}"
 
 msgid "Left"
 msgstr "Vinstri"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Hladdu inn texta af þessari vefsíðu áður en samstilling fer fram."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Hladdu inn sjálfstæðum skjátextum áður en þeir eru samstilltir."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "Hleð DVB-þjónustum og XMLTV-rásum úr skyndiminni..."
@@ -1514,6 +1486,9 @@ msgstr "Skrá út"
 
 msgid "Lower"
 msgstr "Neðar"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "M3U RÁSALEIT"
@@ -1668,6 +1643,9 @@ msgstr "MAC-vistfang"
 
 msgid "MANAGE SOURCES"
 msgstr "STJÓRNA EFNISVEITUM"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 sek.: Vefviðmót"
 
 msgid "MOVIE CATEGORIES"
 msgstr "KVIKMYNDAFLOKKAR"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Enginn samsvarandi texti fannst. Athugaðu tungumál og stöðu þjónustuveitu."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Engir samsvarandi skjátextar fundust á SubDL."
 
 msgid "No movies found."
 msgstr "Engar kvikmyndir fundust."
@@ -1946,14 +1924,8 @@ msgstr "Engin efnisveita er tiltæk til að tengjast."
 msgid "No source is selected for deletion."
 msgstr "Engin efnisveita er valin til eyðingar."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Engin efnisveita fannst.\n"
-"\n"
-"Búðu til eina í glugganum BÆTA VIÐ EFNISVEITU á heimaskjánum."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Engin efnisveita fannst.\n\nBúðu til eina í glugganum BÆTA VIÐ EFNISVEITU á heimaskjánum."
 
 msgid "No summary is available for this programme."
 msgstr "Ekkert yfirlit er tiltækt fyrir þennan dagskrárlið."
@@ -1981,6 +1953,9 @@ msgstr "Engin gild Xtream-veita fannst."
 
 msgid "No valid title was found for TMDb"
 msgstr "Enginn gildur titill fannst fyrir TMDb"
+
+msgid "No videos found at the selected quality."
+msgstr "Engin myndskeið fundust í völdum gæðum."
 
 msgid "No weather forecast is available for this city."
 msgstr "Engin veðurspá er tiltæk fyrir þessa borg."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Opna / Samþykkja"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Opnaðu stillingar sjálfstæðra skjátexta."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Opnaðu sjónvarpslyklaborðið og límdu textann hér."
@@ -2107,8 +2082,14 @@ msgstr "Spila"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Spilaðu fyrst kvikmynd eða þátt á móttakaranum."
 
+msgid "Play next video automatically"
+msgstr "Spila næsta myndskeið sjálfkrafa"
+
 msgid "Play on TV"
 msgstr "Spila í sjónvarpi"
+
+msgid "Playback history"
+msgstr "Spilunarferill"
 
 msgid "Playback mode"
 msgstr "Spilunarhamur"
@@ -2269,6 +2250,9 @@ msgstr "Tenging við þjónustuveitu tókst"
 msgid "Quality"
 msgstr "Gæði"
 
+msgid "Quality changed. Search again."
+msgstr "Gæðin hafa breyst. Leitaðu aftur."
+
 msgid "Queued"
 msgstr "Í biðröð"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Einkunn"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Lestími: {} ms\n"
-"Tegund efnisveitu: {}\n"
-"Stærð: {} bæti\n"
-"Rásir: {}\n"
-"Flokkar: {}\n"
-"Aldur skyndiminnis: {}\n"
-"Síðast breytt: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Lestími: {} ms\nTegund efnisveitu: {}\nStærð: {} bæti\nRásir: {}\nFlokkar: {}\nAldur skyndiminnis: {}\nSíðast breytt: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Les spilunartíma..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Tengist streyminu aftur..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Endurheimt tókst. Skrifaðu niður nýja endurheimtarkóðann; hann birtist aðeins einu sinni:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Endurheimt tókst. Skrifaðu niður nýja endurheimtarkóðann; hann birtist aðeins einu sinni:\n\n{}"
 
 msgid "Red"
 msgstr "Rauður"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Endurstilla"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Endurstilla tímasetningu skjátexta"
 
 msgid "Resolution: --"
 msgstr "Upplausn: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Halda áfram"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Halda spilun áfram frá vistaðri staðsetningu?\n"
-"\n"
-"Vistuð staðsetning: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Halda spilun áfram frá vistaðri staðsetningu?\n\nVistuð staðsetning: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Halda áfram með óloknar kvikmyndir og þætti"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "STILLINGAR SKJÁTEXTA"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Sama setning hefst í texta (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Leitaðu aftur; þessi niðurstaða er útrunnin."
 msgid "Search for a spoken phrase"
 msgstr "Leita að töluðum frasa"
 
+msgid "Search history"
+msgstr "Leitarferill"
+
 msgid "Search in IPTV"
 msgstr "Leita í IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Leita að tónlist, heimildarmyndum eða rásum"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Leita að skjátextum með SubDL"
 
 msgid "Search subtitles"
 msgstr "Leita í texta"
@@ -2550,6 +2507,9 @@ msgstr "Leita að þjónustuveitum..."
 
 msgid "Searching…"
 msgstr "Leitar..."
+
+msgid "Season"
+msgstr "Þáttaröð"
 
 msgid "Seasons"
 msgstr "Tímabil"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Sýna / fela"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Birta 0,5 sekúndum fyrr"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Birta 0,5 sekúndum síðar"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Birta 1 sekúndu fyrr"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Birta 1 sekúndu síðar"
 
 msgid "Show in device main menu"
 msgstr "Sýna í aðalvalmynd tækisins"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "Tengingin við SubDL er tilbúin."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL er ekki tiltækt tímabundið."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL er þjónustuveitan í þessari útgáfu."
 
 msgid "SubDL key change cancelled."
 msgstr "Hætt við breytingu á SubDL-lyklinum."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL skilaði ógildu svari."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Skjátextar"
 
 msgid "Subtitle"
 msgstr "Skjátexti"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Veitendur texta"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Val á skjátexta er ekki í boði á þessari kerfismynd."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "Leit að skjátextum krefst virkrar uppsetningar á SubsSupport eða SubsSupportPro."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Samstilling texta er nú þegar í gangi."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Samstilling skjátexta er ekki tiltæk í þessari kerfisútgáfu."
 
 msgid "Subtitle timing adjusted"
 msgstr "Tímasetning texta leiðrétt"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Tímahliðrun skjátexta: {:+.1f} sekúndur"
 
 msgid "Subtitles"
 msgstr "Skjátextar"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "SubDL-API-lyklinum var eytt."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "SubDL API-lyklinum var hafnað."
 
 msgid "The SubDL connection test is still running..."
 msgstr "Prófun á tengingunni við SubDL er enn í gangi..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "Hámarksfjölda SubDL-beiðna hefur verið náð."
 
 msgid "The TMDb connection test is still running..."
 msgstr "Tengingarprófun TMDb er enn í gangi..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "Munurinn má ekki vera meiri en 30 mínútur."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "Ekki tókst að vista skjátextana sem voru sóttir."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "Ekki tókst að eyða skránni. Athugaðu geymslutækið og aðgangsheimildir."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Spilunarþjónustan breyttist. Opnaðu hljóðvalið aftur."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Heiti dagskrárinnar er ekki tiltækt fyrir leit að skjátextum."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Klukka móttakarans er ekki tilbúin. Athugaðu nettímann og reyndu aftur."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "Upplýsingar um völdu kvikmyndina verða sóttar af þjóninum."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Texti fer yfir stærðarmörk"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Þetta textasnið er ekki stutt"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "Svar fyrir þætti er á óstuddu sniði. Flokkarnir eru áfram tiltækir."
@@ -3266,12 +3226,8 @@ msgstr "Þetta efni hefur aðeins eitt hljóðspor."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Þessi mappa er utan leyfilegra geymslustaða."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Þetta er forskoðun skjátexta.\n"
-"Breytingar birtast hér strax."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Þetta er forskoðun skjátexta.\nBreytingar birtast hér strax."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Þessi forskoðun notar núverandi óvistaðar útlitsstillingar."
@@ -3419,6 +3375,9 @@ msgstr "Lóðrétt staðsetning"
 msgid "Very large"
 msgstr "Mjög stór"
 
+msgid "Video"
+msgstr "Myndskeið"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Ekki var hægt að spila myndskeiðið í þessu tæki. Prófaðu annað myndskeið eða aðra gæðastillingu."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Hvítur"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Skrifaðu þennan endurheimtarkóða niður. Hann birtist aðeins einu sinni:\n"
-"\n"
-"{}\n"
-"\n"
-"Ef þú gleymir báðum kóðunum endurstillir það aðeins þessa læsingu að fjarlægja viðbótina og setja hana upp aftur."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Skrifaðu þennan endurheimtarkóða niður. Hann birtist aðeins einu sinni:\n\n{}\n\nEf þú gleymir báðum kóðunum endurstillir það aðeins þessa læsingu að fjarlægja viðbótina og setja hana upp aftur."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "XMLTV EPG er óvirkt fyrir þessa M3U-veitu."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} fjarlægt úr uppáhaldi."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Opinn IPTV-spilari fyrir Enigma2. Styður Xtream Codes-reikninga og beint sjónvarp frá stöðluðum staðbundnum, nettengdum eða HTTP(S) M3U-spilunarlistum. Einfaldar M3U-veitur bjóða aðeins beint sjónvarp.\n"
-"\n"
-"FORRITARI\n"
-"{}\n"
-"\n"
-"LAGALEGUR FYRIRVARI\n"
-"Þessi viðbót veitir hvorki rásir, streymi, reikninga né spilunarlista. Notandinn ber ábyrgð á að nota aðeins efni sem hann hefur aðgang að og notkunarréttindi fyrir.\n"
-"\n"
-"PERSÓNUVERND\n"
-"Þegar Open-Meteo er virkt eru valin borg og staðsetning send til Open-Meteo fyrir veðurspána. Þegar TMDb er virkt eru heiti kvikmyndar/þáttaraðar og TMDb-lykillinn eða teiknið sem notandinn sló inn send til TMDb. IPTV-notandanafnið og lykilorðið eru ekki send til þessara þjónusta."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nOpinn IPTV-spilari fyrir Enigma2. Styður Xtream Codes-reikninga og beint sjónvarp frá stöðluðum staðbundnum, nettengdum eða HTTP(S) M3U-spilunarlistum. Einfaldar M3U-veitur bjóða aðeins beint sjónvarp.\n\nFORRITARI\n{}\n\nLAGALEGUR FYRIRVARI\nÞessi viðbót veitir hvorki rásir, streymi, reikninga né spilunarlista. Notandinn ber ábyrgð á að nota aðeins efni sem hann hefur aðgang að og notkunarréttindi fyrir.\n\nPERSÓNUVERND\nÞegar Open-Meteo er virkt eru valin borg og staðsetning send til Open-Meteo fyrir veðurspána. Þegar TMDb er virkt eru heiti kvikmyndar/þáttaraðar og TMDb-lykillinn eða teiknið sem notandinn sló inn send til TMDb. IPTV-notandanafnið og lykilorðið eru ekki send til þessara þjónusta."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

@@ -11,7 +11,7 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 PROJECT_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd -P)
 PLUGIN_ROOT="$PROJECT_ROOT/GTIPTVPlayerPro"
 CONTROL_ROOT="$PROJECT_ROOT/CONTROL"
-DEFAULT_OUTPUT="$PROJECT_ROOT/dist/enigma2-plugin-extensions-gtiptvplayerpro_1.2.0-r0_all.ipk"
+DEFAULT_OUTPUT="$PROJECT_ROOT/dist/enigma2-plugin-extensions-gtiptvplayerpro_1.3.0-r0_all.ipk"
 
 if [ "$#" -gt 1 ]; then
     die 'usage: build-ipk.sh [output.ipk]'

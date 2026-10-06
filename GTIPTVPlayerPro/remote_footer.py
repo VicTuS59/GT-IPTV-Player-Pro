@@ -58,6 +58,7 @@ FOOTER_STACKED_KEY_WIDTH = 76
 FOOTER_STACKED_ACTION_FONT = 28
 FOOTER_STACKED_MIN_ACTION_FONT = 26
 FOOTER_STACKED_Y_SHIFT = 8
+WEB_SHORTCUT_HINT = N_("MENU 3s: Web interface")
 
 _ASSET_DIR = os.path.join(os.path.dirname(__file__), "skin", "images")
 _FOOTER_PANEL_ASSET = os.path.join(
@@ -151,6 +152,9 @@ _ACTION_TEXT = {
     "hide_all": N_("Hide All"),
     "quality": N_("Quality"),
     "new_search": N_("New search"),
+    "search_history": N_("Search history"),
+    "playback_history": N_("Playback history"),
+    "delete_all": N_("Delete all"),
     "clear": N_("Clear"),
     "preview": N_("Preview"),
     "rescan": N_("Rescan"),
@@ -235,6 +239,47 @@ def _stacked_action_fonts(scale, font_profile=None):
         _scaled(FOOTER_STACKED_ACTION_FONT, scale * factor),
         _scaled(FOOTER_STACKED_MIN_ACTION_FONT, scale),
     )
+
+
+def web_shortcut_hint_text():
+    """Shared localized caption for the receiver's MENU hold shortcut."""
+    return _(WEB_SHORTCUT_HINT)
+
+
+def _web_hint_fonts(scale, font_profile=None):
+    factor = text_scale_percent(font_profile) / 100.0
+    return max(8, _scaled(18, scale * factor)), max(8, _scaled(14, scale))
+
+
+def _web_hint_horizontal_space(skin, left, right, top, height, gap):
+    """Avoid bottom messages and cinematic poster scrollbars."""
+    spaces = [(left, right)]
+    for widget in re.findall(r'<widget\b[^>]*/>', skin):
+        name = re.search(r'\bname="([^"]+)"', widget)
+        if name is None or not (
+            "scroll" in name.group(1) or name.group(1) in ("message", "hint")
+        ):
+            continue
+        position = re.search(r'\bposition="(\d+),(\d+)"', widget)
+        size = re.search(r'\bsize="(\d+),(\d+)"', widget)
+        if position is None or size is None:
+            continue
+        item_x, item_y = (int(value) for value in position.groups())
+        item_w, item_h = (int(value) for value in size.groups())
+        if item_w <= 1 or item_h <= 1 or item_y >= top + height or item_y + item_h <= top:
+            continue
+        blocked_left, blocked_right = item_x - gap, item_x + item_w + gap
+        remaining = []
+        for start, end in spaces:
+            if blocked_right <= start or blocked_left >= end:
+                remaining.append((start, end))
+                continue
+            if blocked_left > start:
+                remaining.append((start, min(end, blocked_left)))
+            if blocked_right < end:
+                remaining.append((max(start, blocked_right), end))
+        spaces = remaining
+    return max(spaces, key=lambda space: space[1] - space[0]) if spaces else (left, right)
 
 
 def decorate_remote_footer(
@@ -447,6 +492,30 @@ def decorate_remote_footer(
         stage,
         panel,
     ]
+    # Keep the shortcut in its own narrow line so every existing key retains
+    # its slot and caption area. At SD this is more readable than squeezing a
+    # new key into the guide or using its very small upper padding.
+    if not re.search(r'<screen\b[^>]*\bname="GTWebInterfaceScreen"', skin):
+        hint_font = _web_hint_fonts(scale, font_profile)[0]
+        hint_h = max(hint_font + _scaled(4, scale), _scaled(24, scale))
+        hint_w = min(max(1, w - 2 * padding), _scaled(640, scale))
+        hint_x = x + w - padding - hint_w
+        hint_y = max(0, y - hint_h - _scaled(2, scale))
+        hint_left, hint_right = _web_hint_horizontal_space(
+            skin, x + padding, x + w - padding, hint_y, hint_h, _scaled(8, scale),
+        )
+        hint_w = min(hint_w, max(1, hint_right - hint_left))
+        hint_x = hint_right - hint_w
+        widgets.append(
+            '<widget name="remote_web_hint" '
+            'position="{hint_x},{hint_y}" size="{hint_w},{hint_h}" '
+            'font="Regular;{hint_font}" foregroundColor="#AFC3EC" '
+            'transparent="1" zPosition="33" valign="center" '
+            'halign="right" noWrap="1" />'.format(
+                hint_x=hint_x, hint_y=hint_y, hint_w=hint_w,
+                hint_h=hint_h, hint_font=hint_font,
+            )
+        )
     cursor = x + padding
     for index, item in enumerate(items):
         parts = _item_parts(item)
@@ -576,8 +645,12 @@ def _key_text(key):
 
 def _set_action_caption(screen, widget, action):
     text = remote_action_text(action)
-    if not getattr(screen, "_remote_footer_stacked", False):
-        widget.setText(localized_upper(text))
+    stacked = getattr(screen, "_remote_footer_stacked", False)
+    fitted = stacked or getattr(screen, "_remote_footer_fit_horizontal", False)
+    if not stacked:
+        text = localized_upper(text)
+    if not fitted:
+        widget.setText(text)
     elif getattr(widget, "instance", None) is None:
         # Native label geometry is not available until onLayoutFinish.
         widget.setText(text)
@@ -586,14 +659,15 @@ def _set_action_caption(screen, widget, action):
         fit_dynamic_text(
             widget,
             text,
-            max_lines=2,
+            max_lines=2 if stacked else 1,
             preferred_size=preferred,
             min_size=minimum,
         )
 
 
 def _refresh_stacked_captions(screen):
-    if not getattr(screen, "_remote_footer_stacked", False):
+    if not (getattr(screen, "_remote_footer_stacked", False)
+            or getattr(screen, "_remote_footer_fit_horizontal", False)):
         return
     items = getattr(screen, "_remote_footer_items", ())
     slots = int(getattr(screen, "_remote_footer_slot_count", len(items)))
@@ -607,6 +681,21 @@ def _refresh_stacked_captions(screen):
             )
 
 
+def _refresh_web_hint(screen):
+    if not getattr(screen, "_remote_web_hint_enabled", False):
+        return
+    widget = screen["remote_web_hint"]
+    text = web_shortcut_hint_text()
+    if getattr(widget, "instance", None) is None:
+        widget.setText(text)
+        return
+    preferred, minimum = screen._remote_web_hint_fonts
+    fit_dynamic_text(
+        widget, text, max_lines=1,
+        preferred_size=preferred, min_size=minimum,
+    )
+
+
 def set_remote_footer(screen, items):
     items = tuple(items or ())
     language = device_language()
@@ -617,6 +706,7 @@ def set_remote_footer(screen, items):
         return
     screen._remote_footer_items = items
     screen._remote_footer_language = language
+    _refresh_web_hint(screen)
     slots = int(getattr(screen, "_remote_footer_slot_count", len(items)))
     visible = []
     for index in range(slots):
@@ -665,16 +755,25 @@ def _current_selection_palette():
     return color, color
 
 
-def install_remote_footer(screen, items, slot_count=None, stacked=False, design_size=None):
+def install_remote_footer(screen, items, slot_count=None, stacked=False, design_size=None,
+                          fit_horizontal=False):
     if Label is None or Pixmap is None:
         raise RuntimeError("Enigma2 remote footer widgets are unavailable")
     items = tuple(items or ())
     slots = max(len(items), int(slot_count or 0))
     screen._remote_footer_slot_count = slots
     screen._remote_footer_stacked = bool(stacked)
+    screen._remote_footer_fit_horizontal = bool(fit_horizontal)
     if stacked:
         scale = _footer_geometry(screen.skin, design_size=design_size)[4]
         screen._remote_footer_action_fonts = _stacked_action_fonts(scale)
+    elif fit_horizontal:
+        # Use the font chosen by the layout's translated-width calculation.
+        # Only opt-in screens adjust horizontal captions after native layout.
+        caption = re.search(r'<widget\b[^>]*\bname="remote_action_0"[^>]*/>', screen.skin)
+        font = re.search(r'\bfont="[^";]+;(\d+)"', caption.group(0)) if caption else None
+        preferred = int(font.group(1)) if font else 22
+        screen._remote_footer_action_fonts = (preferred, max(5, int(round(preferred * 0.65))))
     for index in range(slots):
         screen["remote_key_bg_{}".format(index)] = Pixmap()
         screen["remote_key_{}".format(index)] = Label("")
@@ -683,6 +782,11 @@ def install_remote_footer(screen, items, slot_count=None, stacked=False, design_
             screen["remote_divider_{}".format(index)] = Label("")
     screen["remote_footer_stage"] = Pixmap()
     screen["remote_footer_bg"] = Pixmap()
+    screen._remote_web_hint_enabled = 'name="remote_web_hint"' in screen.skin
+    if screen._remote_web_hint_enabled:
+        scale = _footer_geometry(screen.skin, design_size=design_size)[4]
+        screen._remote_web_hint_fonts = _web_hint_fonts(scale)
+        screen["remote_web_hint"] = Label("")
     set_remote_footer(screen, items)
     screen._selection_palette_applied = _current_selection_palette()
 
@@ -691,6 +795,7 @@ def install_remote_footer(screen, items, slot_count=None, stacked=False, design_
             set_remote_footer(screen, screen._remote_footer_items)
         else:
             _refresh_stacked_captions(screen)
+            _refresh_web_hint(screen)
 
     def refresh_selection():
         palette = _current_selection_palette()
@@ -706,12 +811,16 @@ def install_remote_footer(screen, items, slot_count=None, stacked=False, design_
             if refreshed:
                 screen._selection_palette_applied = palette
 
-    if stacked:
+    if stacked or fit_horizontal:
         callbacks = getattr(screen, "onLayoutFinish", None)
         if callbacks is not None:
             # OpenPLi calls bound methods here, but passes other objects to
             # exec(). A lambda/function therefore crashes during applySkin.
             callbacks.append(MethodType(_refresh_stacked_captions, screen))
+    if screen._remote_web_hint_enabled:
+        callbacks = getattr(screen, "onLayoutFinish", None)
+        if callbacks is not None:
+            callbacks.append(MethodType(_refresh_web_hint, screen))
     callbacks = getattr(screen, "onShown", None)
     if callbacks is not None and refresh_language not in callbacks:
         callbacks.append(refresh_language)

@@ -4,9 +4,13 @@
 """Glass, resolution-independent browser for all subtitle providers."""
 
 import os
+from copy import deepcopy
 
 from .i18n import _
-from .online_subtitles import canonical_subtitle_fps, provider_display_name
+from .online_subtitles import (
+    canonical_subtitle_fps, polish_search_providers, provider_display_name,
+    subtitle_result_release,
+)
 from .paths import plugin_path
 from .remote_footer import (
     decorate_remote_footer,
@@ -14,23 +18,25 @@ from .remote_footer import (
     install_remote_footer,
 )
 from .typography import fit_dynamic_text
+from .subtitle_search_cache import subtitle_search_context
 
 try:
     from Components.ActionMap import ActionMap
     from Components.Label import Label
     from Components.Pixmap import Pixmap
     from Screens.Screen import Screen
-    from enigma import getDesktop
+    from enigma import eTimer, getDesktop
 except ImportError:  # Source maintenance and unit tests run without Enigma2.
     ActionMap = None
     Label = None
     Pixmap = None
     Screen = object
+    eTimer = None
     getDesktop = None
 
 
 ROWS = 7
-FILTERS = ("all", "opensubtitles", "subdl", "subsource")
+FILTERS = ("all", "opensubtitles", "subdl", "subsource", "napiprojekt", "napisy24")
 SEARCH_PROVIDER_NAMES = "SubDL + OpenSubtitles.com + SubSource"
 COMPATIBILITY_STATUSES = (
     "high", "possible", "fps_convert", "unknown", "different",
@@ -125,7 +131,7 @@ def manual_subtitle_metadata(metadata, title):
     are deliberately preserved.  Users can include a year in the edited title
     when they need to distinguish a remake; the provider normalizer will infer
     that year again.
-    """
+"""
     value = " ".join(str(title or "").split())[:120]
     if len(value) < 2:
         return None
@@ -276,11 +282,20 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         Screen.__init__(self, session)
         self.controller = controller
         self.metadata = dict(metadata) if isinstance(metadata, dict) else {}
+        self._cache_metadata = dict(self.metadata)
+        self._cache_context = self._state_context()
+        self._search_context = self._cache_context
+        self._manual_title = False
+        self._profile_fingerprint = None
+        self._profile_timer = None
+        self._result_message = ""
         self.results = []
         self.provider_filter = "all"
         self.selected = 0
         self.top = 0
         self._busy = False
+        self._searched = False
+        self._waiting_for_automatic = False
         self._closed = False
         self._flag_keys = [None] * ROWS
 
@@ -348,7 +363,176 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         self.onLayoutFinish.append(self._layout_ready)
         self.onClose.append(self._stop)
         self.setTitle("GT IPTV PLAYER PRO • " + _("Subtitles"))
+        self._restore_state()
         self._render()
+        self._start_profile_check()
+
+    def _start_profile_check(self):
+        if eTimer is None:
+            return
+        try:
+            timer = eTimer()
+            try:
+                timer.callback.append(self._profile_tick)
+            except Exception:
+                timer.timeout.connect(self._profile_tick)
+            self._profile_timer = timer
+            timer.start(1000, True)
+        except Exception:
+            self._profile_timer = None
+
+    def _profile_tick(self):
+        if self._closed:
+            return
+        context = self._state_context()
+        if not self._busy and context != self._cache_context:
+            self.results = []
+            self._searched = False
+            self._cache_context = self._search_context = context
+            self._restore_state()
+            self._render()
+        if self._refresh_playback_profile():
+            self._render()
+            self._remember_state()
+        self._load_automatic_results()
+        if self._profile_timer is not None:
+            try:
+                self._profile_timer.start(1000, True)
+            except Exception:
+                pass
+
+    def _state_context(self):
+        getter = getattr(self.controller, "_settings_value", None)
+        if not callable(getter):
+            return ""
+        try:
+            return subtitle_search_context(
+                self._cache_metadata, getter(),
+                (id(self.controller), getattr(self.controller, "_browser_generation", 0)),
+            )
+        except Exception:
+            return ""
+
+    def _restore_state(self):
+        if not self._content_is_current():
+            return
+        saved = getattr(self.controller, "_browser_state", None)
+        if not self._cache_context or not isinstance(saved, dict):
+            return
+        if saved.get("context") != self._cache_context:
+            if (
+                saved.get("content_context") == self._content_context()
+                and saved.get("manual_title")
+            ):
+                metadata = manual_subtitle_metadata(
+                    self.metadata, (saved.get("metadata") or {}).get("title")
+                )
+                if metadata is not None:
+                    self.metadata = metadata
+                    self._manual_title = True
+                    self["programme"].setText(self._programme_text())
+            self.controller._browser_state = None
+            return
+        self.metadata = deepcopy(saved.get("metadata") or self.metadata)
+        self._manual_title = bool(saved.get("manual_title"))
+        self.results = deepcopy(saved.get("results") or [])[:100]
+        self._searched = bool(saved.get("searched", bool(self.results)))
+        self.provider_filter = saved.get("provider_filter", "all")
+        if self.provider_filter not in self._available_filters():
+            self.provider_filter = "all"
+        self.selected = int(saved.get("selected") or 0)
+        self.top = int(saved.get("top") or 0)
+        self._result_message = str(saved.get("message") or "")
+        self._refresh_playback_profile(force=True)
+        self["programme"].setText(self._programme_text())
+        self["message"].setText(self._result_message)
+
+    def _remember_state(self):
+        if not self._content_is_current():
+            return
+        if not self._cache_context or self._cache_context != self._state_context():
+            self._discard_state()
+            return
+        self.controller._browser_state = {
+            "context": self._cache_context, "metadata": deepcopy(self.metadata),
+            "content_context": self._content_context(),
+            "manual_title": self._manual_title,
+            "searched": self._searched,
+            "results": deepcopy(self.results[:100]),
+            "provider_filter": self.provider_filter, "selected": self.selected,
+            "top": self.top, "message": self._result_message,
+        }
+
+    def _content_context(self, metadata=None):
+        return subtitle_search_context(
+            self._cache_metadata if metadata is None else metadata, None,
+            (id(self.controller), getattr(self.controller, "_browser_generation", 0)),
+        )
+
+    def _content_is_current(self):
+        getter = getattr(self.controller, "_metadata_value", None)
+        if not callable(getter):
+            return True
+        try:
+            return self._content_context(getter()) == self._content_context()
+        except Exception:
+            return False
+
+    @staticmethod
+    def _result_identity(result):
+        return tuple(str(result.get(name) or "") for name in (
+            "provider", "language", "subtitle_id", "file_id", "url", "release", "title",
+        ))
+
+    def _refresh_playback_profile(self, force=False):
+        """Refresh matching hints without repeating a provider query.
+
+        The saved title may be a user correction. Decoder hints belong to the
+        current playback and must never be restored from that older snapshot.
+        """
+        fresh = dict(self._cache_metadata)
+        getter = getattr(self.controller, "_metadata_value", None)
+        if callable(getter):
+            try:
+                current = getter()
+                if isinstance(current, dict):
+                    fresh = current
+            except Exception:
+                pass
+        if self._content_context(fresh) != self._content_context():
+            return
+        fields = ("fps", "resolution", "duration_seconds", "release_hint")
+        fingerprint = tuple(str(fresh.get(name) or "") for name in fields)
+        if not force and fingerprint == self._profile_fingerprint:
+            return
+        for name in fields:
+            if name in fresh:
+                self.metadata[name] = deepcopy(fresh[name])
+            else:
+                self.metadata.pop(name, None)
+        entries = self._filtered()
+        selected = (
+            self._result_identity(entries[self.selected])
+            if entries and 0 <= self.selected < len(entries) else None
+        )
+        refresher = getattr(self.controller, "refresh_browser_results", None)
+        if self.results and callable(refresher):
+            try:
+                self.results = list(refresher(dict(self.metadata), self.results))[:100]
+            except Exception:
+                return
+            if selected is not None:
+                for index, result in enumerate(self._filtered()):
+                    if self._result_identity(result) == selected:
+                        self.selected = index
+                        break
+        self._profile_fingerprint = fingerprint
+        return True
+
+    def _discard_state(self):
+        saved = getattr(self.controller, "_browser_state", None)
+        if isinstance(saved, dict) and saved.get("context") == self._cache_context:
+            self.controller._browser_state = None
 
     def _layout_ready(self):
         """Reassert layers after image-specific Enigma2 skin construction."""
@@ -359,6 +543,48 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         ):
             self[name].show()
         self._render()
+        self._load_automatic_results()
+
+    def _load_automatic_results(self):
+        if (self._closed or self._busy or self._searched or self._manual_title
+                or not self._content_is_current()):
+            return False
+        getter = getattr(self.controller, "_settings_value", None)
+        if not callable(getter):
+            return False
+        settings = getter()
+        if not settings.enabled or settings.search_mode != "automatic":
+            return False
+        starter = getattr(self.controller, "start_automatic_search", None)
+        if callable(starter):
+            starter()
+        # Preparation may have completed between construction and layout.
+        self._restore_state()
+        if self._searched:
+            self._render()
+            return True
+        follower = getattr(self.controller, "attach_automatic_search", None)
+        context = self._state_context()
+        self._cache_context = self._search_context = context
+        if not callable(follower) or not follower(
+                self._search_ready, self._search_finished, dict(self.metadata)):
+            return False
+        self._busy = True
+        self._waiting_for_automatic = True
+        self["message"].setText(
+            "{}  {}".format(_("Loading..."), self._search_provider_names())
+        )
+        return True
+
+    def _cancel_automatic_wait(self):
+        if not self._waiting_for_automatic:
+            return False
+        cancel = getattr(self.controller, "cancel_pending", None)
+        if callable(cancel):
+            cancel()
+        self._waiting_for_automatic = False
+        self._busy = False
+        return True
 
     def _programme_text(self):
         title = " ".join(str(self.metadata.get("title") or "").split())
@@ -375,7 +601,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         return title[:120] or _("Subtitles")
 
     def _provider_status_text(self):
-        values = ["{}: {}".format(_("Search"), SEARCH_PROVIDER_NAMES)]
+        values = ["{}: {}".format(_("Search"), self._search_provider_names())]
         fps = canonical_subtitle_fps(self.metadata.get("fps"))
         if fps:
             values.append(
@@ -394,10 +620,35 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             return _("All")
         return provider_display_name(self.provider_filter)
 
+    def _search_provider_names(self):
+        return " + ".join(
+            provider_display_name(provider)
+            for provider in ("subdl", "opensubtitles", "subsource") + self._polish_providers()
+        )
+
+    def _polish_providers(self):
+        getter = getattr(self.controller, "_settings_value", None)
+        if not callable(getter):
+            return ()
+        try:
+            settings = getter()
+            if not getattr(settings, "enabled", True):
+                return ()
+            return polish_search_providers(settings.primary_language)
+        except Exception:
+            return ()
+
+    def _available_filters(self):
+        return FILTERS[:4] + self._polish_providers()
+
     def _filtered(self):
         return filtered_subtitle_results(self.results, self.provider_filter)
 
     def _render(self):
+        self._refresh_playback_profile()
+        if self.provider_filter not in self._available_filters():
+            self.provider_filter = "all"
+        self["provider_status"].setText(self._provider_status_text())
         visible_results = self._filtered()
         if visible_results:
             self.selected = max(0, min(self.selected, len(visible_results) - 1))
@@ -455,7 +706,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             language = str(result.get("language") or "--").upper()[:3]
             provider = str(result.get("provider") or "subdl").lower()
             release = " ".join(
-                str(result.get("release") or _("Subtitle")).split()
+                subtitle_result_release(result, _("Subtitle")).split()
             )[:150]
             meta = []
             try:
@@ -525,17 +776,18 @@ class GTOnlineSubtitleBrowserScreen(Screen):
     def cycle_filter(self):
         if self._busy:
             return
+        filters = self._available_filters()
         try:
-            index = FILTERS.index(self.provider_filter)
+            index = filters.index(self.provider_filter)
         except ValueError:
             index = 0
-        self.provider_filter = FILTERS[(index + 1) % len(FILTERS)]
+        self.provider_filter = filters[(index + 1) % len(filters)]
         self.selected = self.top = 0
         self._render()
 
     def edit_title(self):
         """Open Enigma2's keyboard for a manual provider search title."""
-        if self._closed or self._busy:
+        if self._closed or (self._busy and not self._cancel_automatic_wait()):
             return
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
@@ -567,23 +819,35 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             self["message"].setText(_("Error"))
             return
         self.metadata = metadata
+        self._manual_title = True
+        self._searched = False
         self.results = []
         self.provider_filter = "all"
         self.selected = self.top = 0
+        self._result_message = ""
         self["programme"].setText(self._programme_text())
         self["message"].setText("")
         self._render()
+        self._remember_state()
 
     def search(self):
-        if self._closed or self._busy:
+        if self._closed or (self._busy and not self._cancel_automatic_wait()):
             return
+        self._refresh_playback_profile()
         searcher = getattr(self.controller, "search_combined", None)
         if not callable(searcher):
             self["message"].setText(_("Error"))
             return
+        context = self._state_context()
+        if context != self._cache_context:
+            self.results = []
+            self.provider_filter = "all"
+            self.selected = self.top = 0
+            self._cache_context = context
+        self._search_context = context
         self._busy = True
         self["message"].setText(
-            "{}  {}".format(_("Loading..."), SEARCH_PROVIDER_NAMES)
+            "{}  {}".format(_("Loading..."), self._search_provider_names())
         )
         opened = False
         try:
@@ -596,29 +860,50 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             opened = False
         if not opened:
             self._busy = False
-            self["message"].setText(_("Error"))
+            self["message"].setText(
+                _("Loading...")
+                if getattr(self.controller, "busy", False) else _("Error")
+            )
 
     def _search_ready(self, results, notices):
         if self._closed:
             return
+        if self._search_context != self._state_context():
+            self.results = []
+            self._discard_state()
+            self["message"].setText(_("Error"))
+            self._render()
+            return
         self.results = list(results or ())[:100]
+        self._searched = True
         self.selected = self.top = 0
+        self._refresh_playback_profile(force=True)
         if notices:
             self["message"].setText("  |  ".join(notices)[:240])
         elif not self.results:
             self["message"].setText("{}: 0".format(_("Subtitles")))
         else:
             self["message"].setText("")
+        self._cache_context = self._search_context
+        self._result_message = self["message"].getText()
         self._render()
+        self._remember_state()
 
     def _search_finished(self):
         if self._closed:
             return
         self._busy = False
+        self._waiting_for_automatic = False
         self._render()
 
     def download_selected(self):
         if self._closed or self._busy:
+            return
+        self._refresh_playback_profile()
+        if self._cache_context != self._state_context():
+            self.results = []
+            self._discard_state()
+            self._render()
             return
         entries = self._filtered()
         if not entries:
@@ -654,8 +939,18 @@ class GTOnlineSubtitleBrowserScreen(Screen):
     def _stop(self):
         if self._closed:
             return
+        if self._profile_timer is not None:
+            try:
+                self._profile_timer.stop()
+            except Exception:
+                pass
+        self._remember_state()
         self._closed = True
-        if self._busy:
+        if self._waiting_for_automatic:
+            detach = getattr(self.controller, "detach_automatic_search", None)
+            if callable(detach) and detach(self._search_ready):
+                return
+        if self._busy and self._search_context == self._state_context():
             cancel = getattr(self.controller, "cancel_pending", None)
             if callable(cancel):
                 try:

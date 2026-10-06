@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: sq_AL\n"
-"Language: sq_AL\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: sq_AL\nLanguage: sq_AL\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "AUDIO: {}"
 msgid "About"
 msgstr "Rreth"
 
+msgid "Access code"
+msgstr "Kodi i hyrjes"
+
 msgid "Access your channels quickly"
 msgstr "Hyr shpejt te kanalet e tua"
 
@@ -197,6 +190,9 @@ msgstr "Arabisht"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Riprodhimi nga arkivi nuk është i disponueshëm për këtë kanal."
+
+msgid "Aspect ratio"
+msgstr "Raporti i pamjes"
 
 msgid "Audio language changed"
 msgstr "Gjuha e audios u ndryshua"
@@ -481,6 +477,9 @@ msgstr "Qiell i kthjellët"
 msgid "Close"
 msgstr "Mbyll"
 
+msgid "Close menu"
+msgstr "Mbyll menynë"
+
 msgid "Close the open screen before opening another one."
 msgstr "Mbyll ekranin e hapur para se të hapësh një tjetër."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Pista audio e kërkuar nuk u përzgjodh dot."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Nuk mund të nisej shfaqja e titrave të pavarur."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Nuk mund të nisej kërkimi i titrave në internet."
 
 msgid "Could not start the player."
 msgstr "Luajtësi nuk u nis dot."
@@ -771,6 +770,9 @@ msgstr "Rendi i parazgjedhur u rikthye. Shtypni të GJELBRËN për ta ruajtur."
 msgid "Delete"
 msgstr "Fshi"
 
+msgid "Delete all"
+msgstr "Fshi të gjitha"
+
 msgid "Delete this item?"
 msgstr "Fshije këtë element?"
 
@@ -818,6 +820,12 @@ msgstr "Zbulo filma"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Zbulo filma të rinj me rekomandimet e TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "Shfaq përmbajtjen 16:9 si"
+
+msgid "Display 4:3 content as"
+msgstr "Shfaq përmbajtjen 4:3 si"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Mos përfshini pyetje ose fragment në URL-në e portalit"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Vendosni fillimisht një çelës API të SubDL."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Vendosni një çelës API të SubDL te cilësimet e titrave."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Fut një çelës API të TMDb për detajet e filmave dhe serialeve."
@@ -1007,6 +1015,9 @@ msgstr "Fut kodin me gjashtë shifra që shfaqet në marrës."
 msgid "Enter the username"
 msgstr "Fut emrin e përdoruesit"
 
+msgid "Enter the username / Enter the password"
+msgstr "Fut emrin e përdoruesit / Fut fjalëkalimin"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Fut këtë kod në shfletuesin e telefonit tënd, më pas mirato kërkesën në televizor."
 
@@ -1061,6 +1072,9 @@ msgstr "TË PREFERUARAT"
 
 msgid "FILE"
 msgstr "SKEDAR"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS do të konvertohet"
@@ -1144,19 +1158,11 @@ msgstr "Ekran i plotë"
 msgid "GREEN"
 msgstr "GJELBËR"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"FILM"
+msgid "GT\nMOVIE"
+msgstr "GT\nFILM"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"SERIAL"
+msgid "GT\nSERIES"
+msgstr "GT\nSERIAL"
 
 msgid "Genre unavailable"
 msgstr "Zhanri nuk disponohet"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Parapamja e titrave të pavarur"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Sinkronizimi i titrave të pavarur"
 
 msgid "Independent subtitles"
 msgstr "Titra të pavarur"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Titrat e pavarur janë çaktivizuar te cilësimet."
 
 msgid "Information"
 msgstr "Informacion"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Vonesa (Latency)"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Vonesa: {} ms\n"
-"Gjendja e llogarisë: {}\n"
-"Aktive / Maksimumi: {}\n"
-"Skadimi: {}\n"
-"Ora e serverit: {}\n"
-"Zona kohore: {}\n"
-"Protokolli: {}\n"
-"Formati i daljes: {}\n"
-"Versioni i serverit: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Vonesa: {} ms\nGjendja e llogarisë: {}\nAktive / Maksimumi: {}\nSkadimi: {}\nOra e serverit: {}\nZona kohore: {}\nProtokolli: {}\nFormati i daljes: {}\nVersioni i serverit: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Vonesa: {} ms\n"
-"Gjendja e llogarisë: {}\n"
-"Protokolli: {}\n"
-"Formati i daljes: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Vonesa: {} ms\nGjendja e llogarisë: {}\nProtokolli: {}\nFormati i daljes: {}\n\n{}"
 
 msgid "Left"
 msgstr "Majtas"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Ngarkoni një titër nga kjo faqe interneti para se të sinkronizoni."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Ngarkoni titra të pavarur para se t’i sinkronizoni."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "Po ngarkohen shërbimet DVB dhe kanalet XMLTV nga memoria e përkohshme..."
@@ -1514,6 +1486,9 @@ msgstr "Dil"
 
 msgid "Lower"
 msgstr "Më poshtë"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "KËRKIMI I KANALEVE M3U"
@@ -1668,6 +1643,9 @@ msgstr "Adresa MAC"
 
 msgid "MANAGE SOURCES"
 msgstr "MENAXHO BURIMET"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 sek.: Ndërfaqja në ueb"
 
 msgid "MOVIE CATEGORIES"
 msgstr "KATEGORITË E FILMAVE"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Nuk u gjetën titra përkatëse. Kontrolloni gjuhën dhe statusin e ofruesit."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Nuk u gjetën titra që përputhen në SubDL."
 
 msgid "No movies found."
 msgstr "Nuk u gjet asnjë film."
@@ -1946,14 +1924,8 @@ msgstr "Nuk ka burim të disponueshëm për t'u lidhur."
 msgid "No source is selected for deletion."
 msgstr "Nuk është zgjedhur asnjë burim për fshirje."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Nuk u gjet asnjë burim.\n"
-"\n"
-"Krijo një nga paneli SHTO BURIM në ekranin bazë."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Nuk u gjet asnjë burim.\n\nKrijo një nga paneli SHTO BURIM në ekranin bazë."
 
 msgid "No summary is available for this programme."
 msgstr "Nuk ka përmbledhje për këtë program."
@@ -1981,6 +1953,9 @@ msgstr "Nuk u gjet burim i vlefshëm Xtream."
 
 msgid "No valid title was found for TMDb"
 msgstr "Nuk u gjet titull i vlefshëm për TMDb"
+
+msgid "No videos found at the selected quality."
+msgstr "Nuk u gjetën video me cilësinë e zgjedhur."
 
 msgid "No weather forecast is available for this city."
 msgstr "Nuk ka parashikim moti për këtë qytet."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Hap / Mirato"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Hapni cilësimet e titrave të pavarur."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Hap tastierën e televizorit dhe ngjit tekstin këtu."
@@ -2107,8 +2082,14 @@ msgstr "Luaj"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Luani fillimisht një film ose episod në marrës."
 
+msgid "Play next video automatically"
+msgstr "Luaj automatikisht videon tjetër"
+
 msgid "Play on TV"
 msgstr "Luaj në TV"
+
+msgid "Playback history"
+msgstr "Historiku i luajtjes"
 
 msgid "Playback mode"
 msgstr "Mënyra e riprodhimit"
@@ -2269,6 +2250,9 @@ msgstr "Lidhja me ofruesin u realizua me sukses"
 msgid "Quality"
 msgstr "Cilësia"
 
+msgid "Quality changed. Search again."
+msgstr "Cilësia ndryshoi. Kërkoni përsëri."
+
 msgid "Queued"
 msgstr "Në radhë"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Vlerësim"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Koha e leximit: {} ms\n"
-"Lloji i burimit: {}\n"
-"Madhësia: {} bajte\n"
-"Kanalet: {}\n"
-"Kategoritë: {}\n"
-"Mosha e memories së përkohshme: {}\n"
-"Ndryshuar së fundi: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Koha e leximit: {} ms\nLloji i burimit: {}\nMadhësia: {} bajte\nKanalet: {}\nKategoritë: {}\nMosha e memories së përkohshme: {}\nNdryshuar së fundi: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Po lexohet kohëzgjatja..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Po rilidhet transmetimi..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Rikuperimi pati sukses. Shënoni kodin e ri të rikuperimit; ai shfaqet vetëm një herë:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Rikuperimi pati sukses. Shënoni kodin e ri të rikuperimit; ai shfaqet vetëm një herë:\n\n{}"
 
 msgid "Red"
 msgstr "E kuqe"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Rivendos"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Rivendos kohën e titrave"
 
 msgid "Resolution: --"
 msgstr "Rezolucioni: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Vazhdo"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Të vazhdojë luajtja nga pozicioni i ruajtur?\n"
-"\n"
-"Pozicioni i ruajtur: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Të vazhdojë luajtja nga pozicioni i ruajtur?\n\nPozicioni i ruajtur: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Vazhdo filmat dhe episodet e papërfunduara"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "CILËSIMET E TITRAVE"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "E njëjta rresht fillon në titra (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Kërko përsëri; ky rezultat ka skaduar."
 msgid "Search for a spoken phrase"
 msgstr "Kërko një frazë të folur"
 
+msgid "Search history"
+msgstr "Historiku i kërkimit"
+
 msgid "Search in IPTV"
 msgstr "Kërko në IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Kërko muzikë, dokumentarë ose kanale"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Kërko titra me SubDL"
 
 msgid "Search subtitles"
 msgstr "Kërko titra"
@@ -2550,6 +2507,9 @@ msgstr "Duke kërkuar te ofruesit..."
 
 msgid "Searching…"
 msgstr "Duke kërkuar..."
+
+msgid "Season"
+msgstr "Sezoni"
 
 msgid "Seasons"
 msgstr "Sezonet"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Shfaq / Fshih"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Shfaq 0,5 sekonda më herët"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Shfaq 0,5 sekonda më vonë"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Shfaq 1 sekondë më herët"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Shfaq 1 sekondë më vonë"
 
 msgid "Show in device main menu"
 msgstr "Shfaq në menynë kryesore të pajisjes"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "Lidhja me SubDL është gati."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL nuk është i disponueshëm përkohësisht."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL është ofruesi në këtë version."
 
 msgid "SubDL key change cancelled."
 msgstr "Ndryshimi i çelësit të SubDL u anulua."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL ktheu një përgjigje të pavlefshme."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Titra"
 
 msgid "Subtitle"
 msgstr "Titër"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Ofruesit e titrave"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Përzgjedhja e titrave nuk disponohet në këtë imazh."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "Kërkimi i titrave kërkon një instalim funksional të SubsSupport ose SubsSupportPro."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Sinkronizimi i titrave është tashmë në proces."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Sinkronizimi i titrave nuk është i disponueshëm në këtë imazh sistemi."
 
 msgid "Subtitle timing adjusted"
 msgstr "Kohëzgjatja e titrave u rregullua"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Zhvendosja kohore e titrave: {:+.1f} sekonda"
 
 msgid "Subtitles"
 msgstr "Titra"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "Çelësi API i SubDL u fshi."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "Çelësi API i SubDL u refuzua."
 
 msgid "The SubDL connection test is still running..."
 msgstr "Testi i lidhjes me SubDL është ende në vazhdim..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "U arrit kufiri i kërkesave për SubDL."
 
 msgid "The TMDb connection test is still running..."
 msgstr "Testi i lidhjes me TMDb-në është ende në proces..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "Diferenca nuk mund të kalojë 30 minuta."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "Titrat e shkarkuar nuk mund të ruheshin."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "Skedari nuk mund të fshihej. Kontrolloni pajisjen e ruajtjes dhe lejet."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Shërbimi që po luhet ndryshoi. Hapni sërish përzgjedhjen e audios."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Titulli i programit nuk është i disponueshëm për kërkimin e titrave."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Ora e marrësit nuk është ende gati. Kontrollo orën e rrjetit dhe provo përsëri."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "Hollësitë e filmit të zgjedhur do të ngarkohen nga serveri."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Titra tejkalon kufirin e madhësisë"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Ky format titrash nuk mbështetet."
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "Përgjigjja për serialet përdor format të pambështetur. Kategoritë mbeten të disponueshme."
@@ -3266,12 +3226,8 @@ msgstr "Kjo përmbajtje ka vetëm një pistë audio."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Kjo dosje ndodhet jashtë vendndodhjeve të lejuara të ruajtjes."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Kjo është një parapamje e titrave.\n"
-"Ndryshimet shfaqen këtu menjëherë."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Kjo është një parapamje e titrave.\nNdryshimet shfaqen këtu menjëherë."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Kjo parapamje përdor cilësimet aktuale të paruajtura të pamjes."
@@ -3419,6 +3375,9 @@ msgstr "Pozicioni vertikal"
 msgid "Very large"
 msgstr "Shumë e madhe"
 
+msgid "Video"
+msgstr "Video"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Videoja nuk mund të luhej në këtë marrës. Provoni një video ose cilësim cilësie tjetër."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "E bardhë"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Shënoni këtë kod rikuperimi. Ai shfaqet vetëm një herë:\n"
-"\n"
-"{}\n"
-"\n"
-"Nëse i harroni të dy kodet, heqja dhe riinstalimi i shtojcës rivendos vetëm këtë kyçje."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Shënoni këtë kod rikuperimi. Ai shfaqet vetëm një herë:\n\n{}\n\nNëse i harroni të dy kodet, heqja dhe riinstalimi i shtojcës rivendos vetëm këtë kyçje."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "EPG-ja XMLTV është e çaktivizuar për këtë burim M3U."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} u hoq nga të preferuarat."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Luajtës IPTV me burim të hapur për Enigma2. Mbështet llogaritë Xtream Codes dhe Live TV nga lista standarde lokale, të rrjetit të montuar ose HTTP(S) M3U. Burimet e thjeshta M3U ofrojnë vetëm Live TV.\n"
-"\n"
-"ZHVILLUESI\n"
-"{}\n"
-"\n"
-"NJOFTIM LIGJOR\n"
-"Kjo shtojcë nuk ofron kanale, transmetime, llogari ose lista. Përdoruesi është përgjegjës të përdorë vetëm përmbajtje për të cilën ka të drejta qasjeje dhe përdorimi.\n"
-"\n"
-"PRIVATËSIA\n"
-"Kur Open-Meteo është aktiv, qyteti dhe vendndodhja e zgjedhur i dërgohen Open-Meteo për parashikimin e motit. Kur TMDb është aktiv, titulli i filmit/serialit dhe çelësi ose tokeni TMDb i vendosur nga përdoruesi i dërgohen TMDb. Emri i përdoruesit dhe fjalëkalimi IPTV nuk u dërgohen këtyre shërbimeve."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nLuajtës IPTV me burim të hapur për Enigma2. Mbështet llogaritë Xtream Codes dhe Live TV nga lista standarde lokale, të rrjetit të montuar ose HTTP(S) M3U. Burimet e thjeshta M3U ofrojnë vetëm Live TV.\n\nZHVILLUESI\n{}\n\nNJOFTIM LIGJOR\nKjo shtojcë nuk ofron kanale, transmetime, llogari ose lista. Përdoruesi është përgjegjës të përdorë vetëm përmbajtje për të cilën ka të drejta qasjeje dhe përdorimi.\n\nPRIVATËSIA\nKur Open-Meteo është aktiv, qyteti dhe vendndodhja e zgjedhur i dërgohen Open-Meteo për parashikimin e motit. Kur TMDb është aktiv, titulli i filmit/serialit dhe çelësi ose tokeni TMDb i vendosur nga përdoruesi i dërgohen TMDb. Emri i përdoruesit dhe fjalëkalimi IPTV nuk u dërgohen këtyre shërbimeve."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

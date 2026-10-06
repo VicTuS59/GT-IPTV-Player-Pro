@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: zh_HK\n"
-"Language: zh_HK\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: zh_HK\nLanguage: zh_HK\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "音訊：{}"
 msgid "About"
 msgstr "關於"
 
+msgid "Access code"
+msgstr "存取碼"
+
 msgid "Access your channels quickly"
 msgstr "快速存取您的頻道"
 
@@ -197,6 +190,9 @@ msgstr "阿拉伯文"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "此頻道無法重溫。"
+
+msgid "Aspect ratio"
+msgstr "畫面比例"
 
 msgid "Audio language changed"
 msgstr "音訊語言已更改"
@@ -481,6 +477,9 @@ msgstr "晴空"
 msgid "Close"
 msgstr "關閉"
 
+msgid "Close menu"
+msgstr "關閉選單"
+
 msgid "Close the open screen before opening another one."
 msgstr "請先關閉目前畫面，再開啟另一個畫面。"
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "無法選擇要求的音軌。"
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "無法啟動獨立字幕顯示。"
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "無法啟動網上字幕搜尋。"
 
 msgid "Could not start the player."
 msgstr "無法啟動播放器。"
@@ -771,6 +770,9 @@ msgstr "已恢復預設順序。按綠鍵儲存。"
 msgid "Delete"
 msgstr "刪除"
 
+msgid "Delete all"
+msgstr "全部刪除"
+
 msgid "Delete this item?"
 msgstr "刪除此項目？"
 
@@ -818,6 +820,12 @@ msgstr "探索電影"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "透過 TMDB 推薦探索新電影"
+
+msgid "Display 16:9 content as"
+msgstr "16:9 內容顯示方式"
+
+msgid "Display 4:3 content as"
+msgstr "4:3 內容顯示方式"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Portal URL 中不要包含查詢參數或片段"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "請先輸入 SubDL API 金鑰。"
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "請在字幕設定中輸入 SubDL API 金鑰。"
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "輸入 TMDb API 金鑰以取得電影和影集詳情"
@@ -1007,6 +1015,9 @@ msgstr "輸入接收器上顯示的六位代碼"
 msgid "Enter the username"
 msgstr "請輸入使用者名稱"
 
+msgid "Enter the username / Enter the password"
+msgstr "請輸入使用者名稱 / 請輸入密碼"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "在手機瀏覽器中輸入此代碼，然後在電視上批准請求"
 
@@ -1061,6 +1072,9 @@ msgstr "我的最愛"
 
 msgid "FILE"
 msgstr "檔案"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "將轉換 FPS"
@@ -1144,19 +1158,11 @@ msgstr "全屏"
 msgid "GREEN"
 msgstr "綠鍵"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"電影"
+msgid "GT\nMOVIE"
+msgstr "GT\n電影"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"劇集"
+msgid "GT\nSERIES"
+msgstr "GT\n劇集"
 
 msgid "Genre unavailable"
 msgstr "類型無法使用"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "獨立字幕預覽"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "獨立字幕同步"
 
 msgid "Independent subtitles"
 msgstr "獨立字幕"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "獨立字幕已在設定中關閉。"
 
 msgid "Information"
 msgstr "資訊"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "延遲"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"延遲：{} 毫秒\n"
-"帳戶狀態：{}\n"
-"活動數 / 最大數：{}\n"
-"到期時間：{}\n"
-"伺服器時間：{}\n"
-"時區：{}\n"
-"協議：{}\n"
-"輸出格式：{}\n"
-"伺服器版本：{}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "延遲：{} 毫秒\n帳戶狀態：{}\n活動數 / 最大數：{}\n到期時間：{}\n伺服器時間：{}\n時區：{}\n協議：{}\n輸出格式：{}\n伺服器版本：{}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"延遲：{} 毫秒\n"
-"帳戶狀態：{}\n"
-"協議：{}\n"
-"輸出格式：{}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "延遲：{} 毫秒\n帳戶狀態：{}\n協議：{}\n輸出格式：{}\n\n{}"
 
 msgid "Left"
 msgstr "左側"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "同步前請從此網頁載入字幕。"
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "請先載入獨立字幕，再進行同步。"
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "正在載入 DVB 服務和快取的 XMLTV 頻道..."
@@ -1514,6 +1486,9 @@ msgstr "註銷"
 
 msgid "Lower"
 msgstr "較低位置"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "M3U 頻道搜尋"
@@ -1668,6 +1643,9 @@ msgstr "MAC 地址"
 
 msgid "MANAGE SOURCES"
 msgstr "管理來源"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3秒：網頁介面"
 
 msgid "MOVIE CATEGORIES"
 msgstr "電影類別"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "未找到符合的字幕。檢查語言和提供者狀態。"
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "SubDL 上找不到相符的字幕。"
 
 msgid "No movies found."
 msgstr "找不到電影。"
@@ -1946,14 +1924,8 @@ msgstr "沒有可連線的來源。"
 msgid "No source is selected for deletion."
 msgstr "未選擇要刪除的來源。"
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"找不到來源。\n"
-"\n"
-"請從主畫面的「新增來源」面板建立一個來源。"
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "找不到來源。\n\n請從主畫面的「新增來源」面板建立一個來源。"
 
 msgid "No summary is available for this programme."
 msgstr "此節目沒有可用的摘要。"
@@ -1981,6 +1953,9 @@ msgstr "未找到有效的 Xtream 來源。"
 
 msgid "No valid title was found for TMDb"
 msgstr "找不到用於 TMDb 的有效標題"
+
+msgid "No videos found at the selected quality."
+msgstr "找不到所選畫質的影片。"
 
 msgid "No weather forecast is available for this city."
 msgstr "沒有此城市的天氣預報。"
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "開啟/批准"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "開啟獨立字幕設定。"
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "開啟電視鍵盤，然後在此貼上文字。"
@@ -2107,8 +2082,14 @@ msgstr "播放"
 msgid "Play a movie or episode on the receiver first."
 msgstr "先在接收器上播放電影或劇集。"
 
+msgid "Play next video automatically"
+msgstr "自動播放下一個影片"
+
 msgid "Play on TV"
 msgstr "在電視上播放"
+
+msgid "Playback history"
+msgstr "播放記錄"
 
 msgid "Playback mode"
 msgstr "播放模式"
@@ -2269,6 +2250,9 @@ msgstr "提供者連線成功"
 msgid "Quality"
 msgstr "畫質"
 
+msgid "Quality changed. Search again."
+msgstr "畫質已變更，請重新搜尋。"
+
 msgid "Queued"
 msgstr "排隊中"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "評分"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"讀取時間：{} 毫秒\n"
-"來源類型：{}\n"
-"大小：{} 字節\n"
-"頻道：{}\n"
-"類別：{}\n"
-"快取時間：{}\n"
-"最後修改：{}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "讀取時間：{} 毫秒\n來源類型：{}\n大小：{} 字節\n頻道：{}\n類別：{}\n快取時間：{}\n最後修改：{}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "正在讀取時長..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "正在重新連線串流..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"復原成功。請記下新的復原碼；此復原碼只會顯示一次：\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "復原成功。請記下新的復原碼；此復原碼只會顯示一次：\n\n{}"
 
 msgid "Red"
 msgstr "紅色"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "重置"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "重設字幕時間"
 
 msgid "Resolution: --"
 msgstr "分辨率：--"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "恢復"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"是否從已儲存的位置繼續播放？\n"
-"\n"
-"已儲存的位置：{}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "是否從已儲存的位置繼續播放？\n\n已儲存的位置：{}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "繼續未看完的電影和劇集集數"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "字幕設定"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "字幕中同一行開始 (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "再次搜尋；此結果已過期。"
 msgid "Search for a spoken phrase"
 msgstr "搜尋字詞"
 
+msgid "Search history"
+msgstr "搜尋記錄"
+
 msgid "Search in IPTV"
 msgstr "在 IPTV 中搜尋"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "搜尋音樂、紀錄片或頻道"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "使用 SubDL 搜尋字幕"
 
 msgid "Search subtitles"
 msgstr "搜尋字幕"
@@ -2550,6 +2507,9 @@ msgstr "正在搜尋提供者…"
 
 msgid "Searching…"
 msgstr "搜尋中…"
+
+msgid "Season"
+msgstr "季"
 
 msgid "Seasons"
 msgstr "季"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "顯示 / 隱藏"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "提早 0.5 秒顯示"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "延後 0.5 秒顯示"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "提早 1 秒顯示"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "延後 1 秒顯示"
 
 msgid "Show in device main menu"
 msgstr "在裝置主選單中顯示"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "SubDL 連線已就緒。"
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL 暫時無法使用。"
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "此版本的供應商是 SubDL。"
 
 msgid "SubDL key change cancelled."
 msgstr "已取消變更 SubDL 金鑰。"
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL 傳回無效回應。"
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • 字幕"
 
 msgid "Subtitle"
 msgstr "字幕"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "字幕提供程序"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "此映像版本不支援字幕選擇。"
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "搜尋字幕需要已安裝且正常運作的 SubsSupport 或 SubsSupportPro。"
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "字幕同步已在運作。"
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "此系統映像不支援字幕同步。"
 
 msgid "Subtitle timing adjusted"
 msgstr "字幕時間軸已調整"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "字幕時間偏移：{:+.1f} 秒"
 
 msgid "Subtitles"
 msgstr "字幕"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "SubDL API 金鑰已清除。"
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "SubDL API 金鑰被拒絕。"
 
 msgid "The SubDL connection test is still running..."
 msgstr "SubDL 連線測試仍在進行中..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "已達 SubDL 請求上限。"
 
 msgid "The TMDb connection test is still running..."
 msgstr "TMDb 連線測試仍在執行..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "差異不得超過 30 分鐘。"
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "無法儲存已下載的字幕。"
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "無法刪除檔案。請檢查儲存裝置和存取權限。"
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "播放服務已變更。請重新開啟音軌選擇。"
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "節目標題無法用於字幕搜尋。"
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "接收器時鐘尚未就緒。請檢查網絡時間並重試。"
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "將從伺服器載入所選電影的詳細資訊。"
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "字幕超出大小限制"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "不支援此字幕格式。"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "劇集回應使用了不支援的格式。類別仍然可用。"
@@ -3266,12 +3226,8 @@ msgstr "此內容只有一條音軌。"
 msgid "This folder is outside the allowed storage locations."
 msgstr "此資料夾不在允許的儲存位置內。"
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"這是字幕預覽。\n"
-"變更會立即顯示在這裏。"
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "這是字幕預覽。\n變更會立即顯示在這裏。"
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "此預覽使用目前尚未儲存的外觀設定。"
@@ -3419,6 +3375,9 @@ msgstr "垂直位置"
 msgid "Very large"
 msgstr "特大"
 
+msgid "Video"
+msgstr "影片"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "此接收器無法播放影片。請嘗試其他影片或調整畫質設定。"
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "白色"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"請記下此復原碼。它只會顯示一次：\n"
-"\n"
-"{}\n"
-"\n"
-"如果兩個代碼都忘記了，移除並重新安裝外掛程式只會重設此鎖。"
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "請記下此復原碼。它只會顯示一次：\n\n{}\n\n如果兩個代碼都忘記了，移除並重新安裝外掛程式只會重設此鎖。"
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "此 M3U 來源已停用 XMLTV EPG。"
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "已將 {} 從我的最愛移除。"
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"適用於 Enigma2 的開放原始碼 IPTV 播放器。支援 Xtream Codes 帳戶，以及來自標準本地、掛載網絡或 HTTP(S) M3U 播放清單的直播電視。普通 M3U 來源僅提供直播電視。\n"
-"\n"
-"開發者\n"
-"{}\n"
-"\n"
-"法律聲明\n"
-"此外掛程式不提供頻道、流、帳戶或播放清單。使用者有責任僅使用自己擁有存取權和使用權的內容。\n"
-"\n"
-"隱私\n"
-"啟用 Open-Meteo 時，所選城市和位置會發送到 Open-Meteo 以獲取天氣預報。啟用 TMDb 時，電影或劇集標題以及使用者輸入的 TMDb 金鑰或權杖會發送到 TMDb。IPTV 使用者名稱和密碼不會發送到這些服務。"
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\n適用於 Enigma2 的開放原始碼 IPTV 播放器。支援 Xtream Codes 帳戶，以及來自標準本地、掛載網絡或 HTTP(S) M3U 播放清單的直播電視。普通 M3U 來源僅提供直播電視。\n\n開發者\n{}\n\n法律聲明\n此外掛程式不提供頻道、流、帳戶或播放清單。使用者有責任僅使用自己擁有存取權和使用權的內容。\n\n隱私\n啟用 Open-Meteo 時，所選城市和位置會發送到 Open-Meteo 以獲取天氣預報。啟用 TMDb 時，電影或劇集標題以及使用者輸入的 TMDb 金鑰或權杖會發送到 TMDb。IPTV 使用者名稱和密碼不會發送到這些服務。"
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

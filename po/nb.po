@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: nb\n"
-"Language: nb\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: nb\nLanguage: nb\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "LYD: {}"
 msgid "About"
 msgstr "Om"
 
+msgid "Access code"
+msgstr "Tilgangskode"
+
 msgid "Access your channels quickly"
 msgstr "Få rask tilgang til kanalene dine"
 
@@ -197,6 +190,9 @@ msgstr "arabisk"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Arkivavspilling er ikke tilgjengelig for denne kanalen."
+
+msgid "Aspect ratio"
+msgstr "Bildeformat"
 
 msgid "Audio language changed"
 msgstr "Lydspråk endret"
@@ -481,6 +477,9 @@ msgstr "Klar himmel"
 msgid "Close"
 msgstr "Lukk"
 
+msgid "Close menu"
+msgstr "Lukk menyen"
+
 msgid "Close the open screen before opening another one."
 msgstr "Lukk den åpne skjermen før du åpner en annen."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Kunne ikke velge det forespurte lydsporet."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Visningen av uavhengige undertekster kunne ikke startes."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Søk etter undertekster på nettet kunne ikke startes."
 
 msgid "Could not start the player."
 msgstr "Kunne ikke starte avspilleren."
@@ -771,6 +770,9 @@ msgstr "Standard rekkefølge gjenopprettet. Trykk GRØNN for å lagre."
 msgid "Delete"
 msgstr "Slett"
 
+msgid "Delete all"
+msgstr "Slett alle"
+
 msgid "Delete this item?"
 msgstr "Slette dette elementet?"
 
@@ -818,6 +820,12 @@ msgstr "Oppdag filmer"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Oppdag nye filmer med anbefalinger fra TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "Vis 16:9-innhold som"
+
+msgid "Display 4:3 content as"
+msgstr "Vis 4:3-innhold som"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Ikke ta med et søk eller fragment i portalens URL"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Skriv inn en SubDL-API-nøkkel først."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Skriv inn en SubDL-API-nøkkel i undertekstinnstillingene."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Angi en TMDb-API-nøkkel for detaljer om filmer og serier."
@@ -1007,6 +1015,9 @@ msgstr "Angi den sekssifrede koden som vises på mottakeren."
 msgid "Enter the username"
 msgstr "Skriv inn brukernavnet"
 
+msgid "Enter the username / Enter the password"
+msgstr "Skriv inn brukernavnet / Skriv inn passordet"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Skriv inn denne koden i nettleseren på telefonen, og godkjenn deretter forespørselen på TV-en."
 
@@ -1061,6 +1072,9 @@ msgstr "FAVORITTER"
 
 msgid "FILE"
 msgstr "FIL"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS konverteres"
@@ -1144,19 +1158,11 @@ msgstr "Fullskjerm"
 msgid "GREEN"
 msgstr "GRØNN"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"FILM"
+msgid "GT\nMOVIE"
+msgstr "GT\nFILM"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"SERIER"
+msgid "GT\nSERIES"
+msgstr "GT\nSERIER"
 
 msgid "Genre unavailable"
 msgstr "Sjangeren er ikke tilgjengelig"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Forhåndsvisning av uavhengige undertekster"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Synkronisering av uavhengige undertekster"
 
 msgid "Independent subtitles"
 msgstr "Uavhengige undertekster"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Uavhengige undertekster er slått av i innstillingene."
 
 msgid "Information"
 msgstr "Informasjon"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Forsinkelse (latens)"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Forsinkelse: {} ms\n"
-"Kontostatus: {}\n"
-"Aktiv / maksimum: {}\n"
-"Utløp: {}\n"
-"Servertid: {}\n"
-"Tidssone: {}\n"
-"Protokoll: {}\n"
-"Utdataformat: {}\n"
-"Serverversjon: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Forsinkelse: {} ms\nKontostatus: {}\nAktiv / maksimum: {}\nUtløp: {}\nServertid: {}\nTidssone: {}\nProtokoll: {}\nUtdataformat: {}\nServerversjon: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Tidsforsinkelse: {} ms\n"
-"Kontostatus: {}\n"
-"Protokoll: {}\n"
-"Utdataformat: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Tidsforsinkelse: {} ms\nKontostatus: {}\nProtokoll: {}\nUtdataformat: {}\n\n{}"
 
 msgid "Left"
 msgstr "Venstre"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Last inn en undertekst fra denne nettsiden før synkronisering."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Last inn uavhengige undertekster før du synkroniserer dem."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "Laster DVB tjenester og bufrede XMLTV kanaler ..."
@@ -1514,6 +1486,9 @@ msgstr "Logg ut"
 
 msgid "Lower"
 msgstr "Lenger ned"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "M3U KANALSØK"
@@ -1668,6 +1643,9 @@ msgstr "MAC adresse"
 
 msgid "MANAGE SOURCES"
 msgstr "ADMINISTRER KILDER"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 sek.: Nettgrensesnitt"
 
 msgid "MOVIE CATEGORIES"
 msgstr "FILMKATEGORIER"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Ingen matchende undertekster funnet. Sjekk språk og leverandørstatus."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Ingen passende undertekster ble funnet på SubDL."
 
 msgid "No movies found."
 msgstr "Ingen filmer funnet."
@@ -1946,14 +1924,8 @@ msgstr "Ingen kilde er tilgjengelig for tilkobling."
 msgid "No source is selected for deletion."
 msgstr "Ingen kilde er valgt for sletting."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Ingen kilde ble funnet.\n"
-"\n"
-"Opprett en fra LEGG TIL KILDE-panelet på startskjermen."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Ingen kilde ble funnet.\n\nOpprett en fra LEGG TIL KILDE-panelet på startskjermen."
 
 msgid "No summary is available for this programme."
 msgstr "Ingen oppsummering er tilgjengelig for dette programmet."
@@ -1981,6 +1953,9 @@ msgstr "Ingen gyldig Xtream-kilde ble funnet."
 
 msgid "No valid title was found for TMDb"
 msgstr "Ingen gyldig tittel ble funnet for TMDb"
+
+msgid "No videos found at the selected quality."
+msgstr "Ingen videoer funnet i valgt kvalitet."
 
 msgid "No weather forecast is available for this city."
 msgstr "Ingen værmelding er tilgjengelig for denne byen."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Åpne / Godkjenn"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Åpne innstillingene for uavhengige undertekster."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Åpne TV-tastaturet, og lim inn teksten her."
@@ -2107,8 +2082,14 @@ msgstr "Spill av"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Spill av en film eller episode på mottakeren først."
 
+msgid "Play next video automatically"
+msgstr "Spill av neste video automatisk"
+
 msgid "Play on TV"
 msgstr "Spill av på TV"
+
+msgid "Playback history"
+msgstr "Avspillingshistorikk"
 
 msgid "Playback mode"
 msgstr "Avspillingsmodus"
@@ -2269,6 +2250,9 @@ msgstr "Tilkobling til leverandør vellykket"
 msgid "Quality"
 msgstr "Kvalitet"
 
+msgid "Quality changed. Search again."
+msgstr "Kvaliteten er endret. Søk på nytt."
+
 msgid "Queued"
 msgstr "I kø"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Vurdering"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Lesetid: {} ms\n"
-"Kildetype: {}\n"
-"Størrelse: {} byte\n"
-"Kanaler: {}\n"
-"Kategorier: {}\n"
-"Hurtigbufferalder: {}\n"
-"Sist endret: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Lesetid: {} ms\nKildetype: {}\nStørrelse: {} byte\nKanaler: {}\nKategorier: {}\nHurtigbufferalder: {}\nSist endret: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Lesevarighet..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Kobler strømmen på nytt ..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Gjenopprettingen var vellykket. Skriv ned den nye gjenopprettingskoden; den vises bare én gang:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Gjenopprettingen var vellykket. Skriv ned den nye gjenopprettingskoden; den vises bare én gang:\n\n{}"
 
 msgid "Red"
 msgstr "Rød"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Tilbakestill"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Tilbakestill tidsinnstillingen for undertekster"
 
 msgid "Resolution: --"
 msgstr "Oppløsning: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Fortsett"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Fortsette avspilling fra den lagrede posisjonen?\n"
-"\n"
-"Lagret posisjon: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Fortsette avspilling fra den lagrede posisjonen?\n\nLagret posisjon: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Gjenoppta uferdige filmer og serieepisoder"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "UNDERTEKSTINNSTILLINGER"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Samme linje starter i underteksten (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Søk på nytt; dette resultatet har utløpt."
 msgid "Search for a spoken phrase"
 msgstr "Søk etter en talt frase"
 
+msgid "Search history"
+msgstr "Søkehistorikk"
+
 msgid "Search in IPTV"
 msgstr "Søk i IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Søk etter musikk, dokumentarer eller kanaler"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Søk undertekster med SubDL"
 
 msgid "Search subtitles"
 msgstr "Søk i undertekster"
@@ -2550,6 +2507,9 @@ msgstr "Søker hos leverandører..."
 
 msgid "Searching…"
 msgstr "Søker..."
+
+msgid "Season"
+msgstr "Sesong"
 
 msgid "Seasons"
 msgstr "Sesonger"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Vis / Skjul"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Vis 0,5 sekunder tidligere"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Vis 0,5 sekunder senere"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Vis 1 sekund tidligere"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Vis 1 sekund senere"
 
 msgid "Show in device main menu"
 msgstr "Vis i enhetens hovedmeny"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "Forbindelsen til SubDL er klar."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL er midlertidig utilgjengelig."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL er leverandøren i denne versjonen."
 
 msgid "SubDL key change cancelled."
 msgstr "Endringen av SubDL-nøkkelen ble avbrutt."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL returnerte et ugyldig svar."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Undertekster"
 
 msgid "Subtitle"
 msgstr "Undertekst"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Undertekstleverandører"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Valg av undertekst støttes ikke av denne Enigma2-programvaren."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "Søk etter undertekster krever en fungerende installasjon av SubsSupport eller SubsSupportPro."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Synkronisering av undertekster pågår allerede."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Synkronisering av undertekster er ikke tilgjengelig i dette imaget."
 
 msgid "Subtitle timing adjusted"
 msgstr "Timing av undertekster justert"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Tidsforskyvning for undertekster: {:+.1f} sekunder"
 
 msgid "Subtitles"
 msgstr "Undertekster"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "SubDL-API-nøkkelen ble slettet."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "SubDL-API-nøkkelen ble avvist."
 
 msgid "The SubDL connection test is still running..."
 msgstr "Testen av forbindelsen til SubDL pågår fortsatt..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "Grensen for SubDL-forespørsler er nådd."
 
 msgid "The TMDb connection test is still running..."
 msgstr "TMDb-tilkoblingstesten kjører fortsatt..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "Forskjellen kan ikke overstige 30 minutter."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "De nedlastede undertekstene kunne ikke lagres."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "Filen kunne ikke slettes. Kontroller lagringsenheten og tilgangsrettighetene."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Avspillingstjenesten ble endret. Åpne lydvalget på nytt."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Programtittelen er ikke tilgjengelig for undertekstsøk."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Mottakerklokken er ikke klar. Sjekk nettverkstiden og prøv igjen."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "Den valgte filmens detaljer vil bli lastet fra serveren."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Underteksten overskrider størrelsesgrensen"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Dette undertekstformatet støttes ikke"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "Seriesvaret bruker et format som ikke støttes. Kategorier forblir tilgjengelige."
@@ -3266,12 +3226,8 @@ msgstr "Dette innholdet har bare ett lydspor."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Denne mappen er utenfor de tillatte lagringsstedene."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Dette er en forhåndsvisning av undertekster.\n"
-"Endringer vises her med en gang."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Dette er en forhåndsvisning av undertekster.\nEndringer vises her med en gang."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Denne forhåndsvisningen bruker de gjeldende, ulagrede utseendeinnstillingene."
@@ -3419,6 +3375,9 @@ msgstr "Vertikal plassering"
 msgid "Very large"
 msgstr "Svært stor"
 
+msgid "Video"
+msgstr "Video"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Videoen kunne ikke spilles av på denne mottakeren. Prøv en annen video eller kvalitetsinnstilling."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Hvit"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Skriv ned denne gjenopprettingskoden. Den vises bare én gang:\n"
-"\n"
-"{}\n"
-"\n"
-"Hvis du glemmer begge kodene, tilbakestilles bare denne låsen når programtillegget fjernes og installeres på nytt."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Skriv ned denne gjenopprettingskoden. Den vises bare én gang:\n\n{}\n\nHvis du glemmer begge kodene, tilbakestilles bare denne låsen når programtillegget fjernes og installeres på nytt."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "XMLTV EPG er deaktivert for denne M3U-kilden."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} fjernet fra favoritter."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"IPTV-avspiller med åpen kildekode for Enigma2. Støtter Xtream Codes-kontoer og direkte-TV fra standard lokale, monterte nettverks- eller HTTP(S)-M3U-spillelister. Vanlige M3U-kilder leverer bare direkte-TV.\n"
-"\n"
-"UTVIKLER\n"
-"{}\n"
-"\n"
-"JURIDISK MERKNAD\n"
-"Dette programtillegget leverer ikke kanaler, strømmer, kontoer eller spillelister. Brukeren er ansvarlig for bare å bruke innhold vedkommende har tilgang til og rett til å bruke.\n"
-"\n"
-"PERSONVERN\n"
-"Når Open-Meteo er aktivert, sendes den valgte byen og plasseringen til Open-Meteo for værmeldingen. Når TMDb er aktivert, sendes film- eller serietittelen og TMDb-nøkkelen eller -tokenet som brukeren har angitt, til TMDb. IPTV-brukernavnet og -passordet sendes ikke til disse tjenestene."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nIPTV-avspiller med åpen kildekode for Enigma2. Støtter Xtream Codes-kontoer og direkte-TV fra standard lokale, monterte nettverks- eller HTTP(S)-M3U-spillelister. Vanlige M3U-kilder leverer bare direkte-TV.\n\nUTVIKLER\n{}\n\nJURIDISK MERKNAD\nDette programtillegget leverer ikke kanaler, strømmer, kontoer eller spillelister. Brukeren er ansvarlig for bare å bruke innhold vedkommende har tilgang til og rett til å bruke.\n\nPERSONVERN\nNår Open-Meteo er aktivert, sendes den valgte byen og plasseringen til Open-Meteo for værmeldingen. Når TMDb er aktivert, sendes film- eller serietittelen og TMDb-nøkkelen eller -tokenet som brukeren har angitt, til TMDb. IPTV-brukernavnet og -passordet sendes ikke til disse tjenestene."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

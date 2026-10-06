@@ -4,6 +4,10 @@
 """Independent Enigma2 subtitle overlay and online-provider workflow."""
 
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+from copy import deepcopy
+from hashlib import sha256
+import json
 import threading
 import time
 
@@ -15,12 +19,21 @@ from .online_subtitles import (
     active_subtitle_text,
     annotate_subtitle_results,
     parse_subtitle,
+    POLISH_PROVIDERS,
+    polish_search_providers,
     provider_display_name,
     retime_subtitle_cues,
     save_subtitle_file,
     subtitle_client,
+    subtitle_result_sort_key,
+    subtitle_search_available,
 )
 from .subtitle_settings import PROVIDERS, load_subtitle_settings
+from .subtitle_language import normalize_subtitle_language
+from .subtitle_search_cache import subtitle_search_context
+from .subtitle_jobs import check_subtitle_job, subtitle_request_scope
+
+SEARCH_PROVIDERS = PROVIDERS + POLISH_PROVIDERS
 
 try:
     from Components.Label import Label
@@ -41,6 +54,7 @@ SUBTITLE_OVERLAY_Z = 200
 SUBTITLE_BOX_WIDTH = 1360
 PLAYER_INFOBAR_HEIGHT = 280
 INFOBAR_SUBTITLE_GAP = 24
+_NATIVE_SOURCE_EXECUTOR = ThreadPoolExecutor(max_workers=3)
 
 
 def _result_compatibility_sort(result):
@@ -62,6 +76,7 @@ _ERROR_MESSAGES = {
     "subtitle_too_large": N_("The selected subtitle file is too large."),
     "subtitle_format_unsupported": N_("The selected subtitle format is not supported."),
     "subtitle_cache_unavailable": N_("The downloaded subtitle could not be saved."),
+    "subtitle_no_results": N_("No matching subtitles were found on SubDL."),
 }
 
 
@@ -216,9 +231,7 @@ class GTIndependentSubtitleOverlay(Screen):
         self._apply_position()
 
     def activate(self):
-        # Keep the compact transparent window alive for the whole subtitle
-        # session. Repeatedly hiding/showing a dialog can lose its framebuffer
-        # layer on some Vu+/OpenPLi ServiceApp combinations.
+        # Reuse the dialog between cues and restore its OSD layer on each show.
         self.show()
         self._raise_window()
         self._active = True
@@ -241,7 +254,8 @@ class GTIndependentSubtitleOverlay(Screen):
                 self.activate()
             self["subtitle"].show()
         else:
-            self["subtitle"].hide()
+            # An empty parent can still cover the video or a results screen.
+            self.deactivate()
 
 
 class IndependentSubtitleRenderer(object):
@@ -263,6 +277,7 @@ class IndependentSubtitleRenderer(object):
         self.overlay = None
         self.cues = ()
         self.starts = ()
+        self.end_prefix = ()
         self.loaded_path = None
         self.settings = None
         self.offset_ms = 0
@@ -276,6 +291,10 @@ class IndependentSubtitleRenderer(object):
         self._logged_visible_cue = False
         self._infobar_visible = False
         self._ui_obscured = False
+        self._ui_obscured_requested = False
+        self._ui_obscured_owners = set()
+        self.content_revision = 0
+        self.content_fingerprint = ""
 
     @property
     def is_loaded(self):
@@ -305,6 +324,9 @@ class IndependentSubtitleRenderer(object):
     def _delete_overlay(self):
         overlay = self.overlay
         self.overlay = None
+        self._dispose_overlay(overlay)
+
+    def _dispose_overlay(self, overlay):
         if overlay is None:
             return
         try:
@@ -330,16 +352,28 @@ class IndependentSubtitleRenderer(object):
         if self.overlay is not None and self.settings is not None:
             if self._style_signature(settings) == self._style_signature(self.settings):
                 return self.overlay
-            self._delete_overlay()
-        self.overlay = self._new_overlay(settings)
-        return self.overlay
+        # Keep the current window until the replacement can be created and
+        # activated. A skin/memory error must not destroy working subtitles.
+        return self._new_overlay(settings)
 
-    def load(self, cues, path, settings):
+    @staticmethod
+    def _content_fingerprint(cues):
+        value = [(cue.start_ms, cue.end_ms, cue.text) for cue in cues]
+        return sha256(json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+                      .encode("utf-8")).hexdigest()
+
+    def load(self, cues, path, settings, preserve_offset=True):
         if self.closed or not cues or not path:
+            return False
+        cues = tuple(cues)
+        if not cues:
             return False
         overlay = self._ensure_overlay(settings)
         if overlay is None:
             return False
+        fingerprint = self._content_fingerprint(cues)
+        offset = self.offset_ms if (preserve_offset and self.is_loaded
+                                   and fingerprint == self.content_fingerprint) else int(settings.offset_ms)
         try:
             if not self._ui_obscured:
                 activator = getattr(overlay, "activate", None)
@@ -354,13 +388,29 @@ class IndependentSubtitleRenderer(object):
                 infobar_setter(self._infobar_visible)
         except Exception as error:
             log_event("subtitles", "overlay-activate-failed", error)
+            if overlay is not self.overlay:
+                self._dispose_overlay(overlay)
             return False
+        if overlay is not self.overlay:
+            previous = self.overlay
+            self.overlay = overlay
+            self._dispose_overlay(previous)
         self.cues = tuple(cues)
         self.starts = tuple(cue.start_ms for cue in self.cues)
+        latest_end = 0
+        ends = []
+        for cue in self.cues:
+            latest_end = max(latest_end, cue.end_ms)
+            ends.append(latest_end)
+        self.end_prefix = tuple(ends)
         self.loaded_path = str(path)
         self.settings = settings.copy()
-        self.offset_ms = int(settings.offset_ms)
-        self._last_text = ""
+        self.offset_ms = offset
+        self.content_fingerprint = fingerprint
+        self.content_revision += 1
+        # A reused overlay can still show text from the previous file. Force
+        # the first update even when the new file is currently between cues.
+        self._last_text = None
         self._logged_visible_cue = False
         log_event(
             "subtitles",
@@ -385,8 +435,28 @@ class IndependentSubtitleRenderer(object):
                 log_event("subtitles", "overlay-position-failed", error)
 
     def set_ui_obscured(self, obscured):
-        """Hide the compact OSD while a full-screen subtitle UI owns display."""
-        obscured = bool(obscured)
+        """Set the legacy gate without releasing any open dialog's ownership."""
+        self._ui_obscured_requested = bool(obscured)
+        return self._update_ui_obscured()
+
+    def acquire_ui_obscured(self):
+        """Keep subtitles hidden until this particular dialog has closed."""
+        if self.closed:
+            return None
+        token = object()
+        self._ui_obscured_owners.add(token)
+        self._update_ui_obscured()
+        return token
+
+    def release_ui_obscured(self, token):
+        if token not in self._ui_obscured_owners:
+            return False
+        self._ui_obscured_owners.remove(token)
+        self._update_ui_obscured()
+        return True
+
+    def _update_ui_obscured(self):
+        obscured = bool(self._ui_obscured_requested or self._ui_obscured_owners)
         if obscured == self._ui_obscured:
             return False
         self._ui_obscured = obscured
@@ -401,7 +471,7 @@ class IndependentSubtitleRenderer(object):
                         overlay.hide()
                 except Exception as error:
                     log_event("subtitles", "overlay-suspend-failed", error)
-            log_event("subtitles", "overlay-suspended reason=subtitle-browser")
+            log_event("subtitles", "overlay-suspended reason=full-screen-ui")
             return True
         # Force the current cue through even if its text did not change while
         # the full-screen browser was open. A blank cue deliberately leaves the
@@ -409,7 +479,7 @@ class IndependentSubtitleRenderer(object):
         self._last_text = None
         if self.is_loaded and not self.closed:
             self._tick()
-        log_event("subtitles", "overlay-restored reason=subtitle-browser")
+        log_event("subtitles", "overlay-restored reason=full-screen-ui")
         return True
 
     def _clock_engine(self):
@@ -502,7 +572,7 @@ class IndependentSubtitleRenderer(object):
                 self._start_timer()
             return
         text = active_subtitle_text(
-            self.cues, position_ms, self.offset_ms, self.starts
+            self.cues, position_ms, self.offset_ms, self.starts, self.end_prefix
         ) if position_ms is not None else ""
         if text != self._last_text:
             self._last_text = text
@@ -587,10 +657,14 @@ class IndependentSubtitleRenderer(object):
     def disable(self):
         had_subtitle = self.is_loaded
         self._stop_timer()
-        self._ui_obscured = False
+        # File/service changes must not release a still-open dialog's gate.
         self.cues = ()
         self.starts = ()
+        self.end_prefix = ()
         self.loaded_path = None
+        self.content_fingerprint = ""
+        if had_subtitle:
+            self.content_revision += 1
         self._last_text = ""
         if self.overlay is not None:
             try:
@@ -624,6 +698,7 @@ class IndependentSubtitleRenderer(object):
             "cues": self.cues,
             "settings": self.settings.copy(),
             "offset_ms": self.offset_ms,
+            "content_fingerprint": self.content_fingerprint,
         }
 
     def restore(self, state):
@@ -634,13 +709,16 @@ class IndependentSubtitleRenderer(object):
             return False
         settings = settings.copy()
         settings.offset_ms = int(state.get("offset_ms", settings.offset_ms))
-        return self.load(state.get("cues"), state.get("path"), settings)
+        return self.load(state.get("cues"), state.get("path"), settings, preserve_offset=False)
 
     def close(self):
         if self.closed:
             return
         self.closed = True
         self.disable()
+        self._ui_obscured_owners.clear()
+        self._ui_obscured_requested = False
+        self._ui_obscured = False
         self._delete_overlay()
 
 
@@ -688,6 +766,16 @@ class OnlineSubtitleController(object):
         self._settings = None
         self._closed = False
         self._auto_started = False
+        self._auto_context = None
+        self._browser_state = None
+        self._browser_generation = 0
+        self._operation_context = None
+        self._download_provider = None
+        # Reopening a player must not create another set of network workers
+        # while the previous player's bounded HTTP calls are still finishing.
+        self._source_executor = _NATIVE_SOURCE_EXECUTOR
+        self._source_futures = set()
+        self._source_lock = threading.Lock()
 
     @property
     def is_loaded(self):
@@ -731,6 +819,11 @@ class OnlineSubtitleController(object):
 
     @staticmethod
     def _credentials_configured(settings, provider=None):
+        provider = provider or getattr(settings, "provider", "subdl")
+        if provider in POLISH_PROVIDERS:
+            return provider in polish_search_providers(getattr(settings, "primary_language", ""))
+        if provider not in SEARCH_PROVIDERS:
+            return False
         checker = getattr(settings, "credentials_configured", None)
         if callable(checker):
             try:
@@ -758,21 +851,170 @@ class OnlineSubtitleController(object):
             settings.provider = provider
         return settings
 
-    def _client(self, settings):
+    def _client(self, settings, provider=None):
         if callable(self.client_factory):
             return self.client_factory(settings.api_key)
+        if provider in POLISH_PROVIDERS:
+            return subtitle_client(settings, provider=provider)
         return subtitle_client(settings)
 
-    def _provider_text(self, message, settings=None):
+    def _current_context(self):
+        # Always use the original playback metadata. A corrected search title
+        # must not become the identity of the film currently on the decoder.
+        return subtitle_search_context(
+            self._metadata_value(), self._settings_value(),
+            (id(self), self._browser_generation),
+        )
+
+    def _context_is_current(self, generation):
+        return bool(
+            not self._closed and generation == self._generation
+            and self._operation_context == self._current_context()
+        )
+
+    def _job_is_current(self, generation):
+        # Worker checks must not read decoder widgets or settings on the GUI
+        # thread. Service/preferences are revalidated when data returns.
+        return bool(not self._closed and generation == self._generation)
+
+    def _submit_source_job(self, generation, function, *args):
+        if not self._job_is_current(generation):
+            return None
+        try:
+            future = self._source_executor.submit(function, *args)
+        except RuntimeError:
+            if not self._job_is_current(generation):
+                return None
+            raise
+        with self._source_lock:
+            if self._job_is_current(generation):
+                self._source_futures.add(future)
+            else:
+                future.cancel()
+        def finished(completed):
+            with self._source_lock:
+                self._source_futures.discard(completed)
+        future.add_done_callback(finished)
+        return future
+
+    def _cancel_source_jobs(self):
+        with self._source_lock:
+            futures = list(self._source_futures)
+            self._source_futures.clear()
+        for future in futures:
+            future.cancel()
+
+    def _fresh_search_metadata(self, search_metadata=None):
+        live = self._metadata_value()
+        query = dict(search_metadata) if isinstance(search_metadata, dict) else dict(self._metadata or live)
+        # A manual query may replace the title and remove stale catalogue IDs.
+        # Only decoder-local release/timing hints belong to live playback.
+        for name in ("release_hint", "fps", "resolution", "duration_seconds"):
+            query[name] = live.get(name, "" if name == "release_hint" else 0)
+        return query
+
+    def revalidate_result(self, result, search_metadata=None):
+        """Refresh matching hints without rewriting the user's search title."""
+        if search_metadata is None and isinstance(result, dict):
+            search_metadata = result.get("_search_metadata")
+        items = annotate_subtitle_results(self._fresh_search_metadata(search_metadata), [result])
+        return items[0] if items else {}
+
+    def refresh_browser_results(self, metadata, results):
+        settings = self._settings_value()
+        language_order = {language: index for index, language in enumerate((
+            settings.primary_language, settings.secondary_language)) if language}
+        provider_order = {provider: index for index, provider in enumerate(SEARCH_PROVIDERS)}
+        indexed = list(enumerate(annotate_subtitle_results(metadata, results)))
+        indexed.sort(key=lambda pair: (
+            language_order.get(normalize_subtitle_language(pair[1].get("language")), len(language_order)),
+            subtitle_result_sort_key(pair[1]),
+            provider_order.get(pair[1].get("provider"), len(provider_order)),
+            pair[0],
+        ))
+        ordered = [item for unused, item in indexed]
+        for item in ordered:
+            item["_search_metadata"] = dict(metadata)
+        return ordered
+
+    def begin_external_operation(self):
+        """Let a web selection supersede pending receiver subtitle work."""
+        if self._closed:
+            return None
+        token = self._generation + 1
+        self.cancel_pending()
+        # A completion callback can start a newer native action. Do not let
+        # this external action adopt that newer action's generation token.
+        return token
+
+    def operation_is_current(self, token):
+        return bool(not self._closed and token is not None
+                    and token == self._generation)
+
+    def _provider_search(self, provider, settings, metadata, generation):
+        languages = []
+        for value in (settings.primary_language, settings.secondary_language):
+            language = normalize_subtitle_language(value)
+            if language and language not in languages:
+                languages.append(language)
+        if provider in POLISH_PROVIDERS:
+            languages = ["pl"]
+        with subtitle_request_scope(lambda: self._job_is_current(generation)):
+            entries = self._client(settings, provider).search(metadata, languages)
+            check_subtitle_job()
+        results = []
+        for result in entries:
+            if not isinstance(result, dict):
+                continue
+            language = normalize_subtitle_language(result.get("language"))
+            if language not in languages:
+                continue
+            if not settings.hearing_impaired and result.get("hearing_impaired"):
+                continue
+            item = dict(result)
+            item["provider"] = provider
+            item["language"] = language
+            results.append(item)
+        return results
+
+    def _search_sources(self, configured, metadata, generation):
+        """Wait only for bounded provider calls; keep source order stable."""
+        combined, failures = [], []
+        if not configured:
+            return combined, failures
+        jobs = []
+        for provider, settings in configured:
+            future = self._submit_source_job(generation, self._provider_search,
+                                             provider, settings, metadata, generation)
+            if future is None:
+                break
+            jobs.append((provider, settings, future))
+        for provider, settings, future in jobs:
+            while self._job_is_current(generation):
+                try:
+                    combined.extend(future.result(timeout=.1))
+                    break
+                except FutureTimeout:
+                    continue
+                except Exception as error:
+                    failures.append((provider, settings, error))
+                    break
+            if not self._job_is_current(generation):
+                for unused_provider, unused_settings, pending in jobs:
+                    pending.cancel()
+                break
+        return combined, failures
+
+    def _provider_text(self, message, settings=None, provider=None):
         settings = settings or self._settings or self._settings_value()
         return _(message).replace(
-            "SubDL", provider_display_name(getattr(settings, "provider", "subdl"))
+            "SubDL", provider_display_name(provider or getattr(settings, "provider", "subdl"))
         )
 
     def configured(self, provider=None):
         settings = self._settings_for_provider(provider)
         return bool(
-            settings.enabled and self._credentials_configured(settings)
+            settings.enabled and self._credentials_configured(settings, provider)
         )
 
     def provider_name(self, provider=None):
@@ -820,42 +1062,78 @@ class OnlineSubtitleController(object):
         return dict(value) if isinstance(value, dict) else {}
 
     def start_automatic_search(self):
-        if self._closed or self._auto_started or self.is_loaded:
+        """Prepare the combined results list without selecting a subtitle."""
+        if self._closed or self._busy:
             return False
         settings = self._settings_value()
-        if not (
-            settings.enabled
-            and settings.search_mode == "automatic"
-            and self._credentials_configured(settings)
-        ):
+        if not settings.enabled or settings.search_mode != "automatic":
             return False
-        opened = self.search(automatic=True)
-        self._auto_started = bool(opened)
-        return opened
+        context = self._current_context()
+        if self._auto_started and self._auto_context == context:
+            return False
+        saved = self._browser_state
+        if (isinstance(saved, dict) and saved.get("context") == context
+                and (saved.get("searched") or saved.get("manual_title"))):
+            self._auto_started = True
+            self._auto_context = context
+            return False
+        return self.search_combined(None, automatic=True)
+
+    def attach_automatic_search(self, on_results, on_finished=None, metadata=None):
+        """Let an opened results page follow the already-running search."""
+        if (not callable(on_results) or not self._busy or not self._automatic
+                or not self._context_is_current(self._generation)):
+            return False
+        if isinstance(metadata, dict) and subtitle_search_context(
+                metadata, self._settings_value(), (id(self), self._browser_generation)
+        ) != self._operation_context:
+            return False
+        self._browser_results_callback = on_results
+        self._finish_callback = on_finished
+        return True
+
+    def detach_automatic_search(self, on_results):
+        """Closing a results page must not cancel background preparation."""
+        if not self._automatic or self._browser_results_callback != on_results:
+            return False
+        self._browser_results_callback = None
+        self._finish_callback = None
+        return True
 
     def search(self, automatic=False, on_finished=None, provider=None):
+        if automatic:
+            # Compatibility callers get the same search-only automatic mode.
+            return self.search_combined(None, on_finished, automatic=True)
+        if self._busy and self._automatic and not automatic:
+            self.cancel_pending()
         if self._closed or self._busy:
             if not automatic:
                 self._notify(N_("A subtitle search is already running."))
             return False
-        if provider is not None and provider not in PROVIDERS:
+        if provider is not None and provider not in SEARCH_PROVIDERS:
             return False
         settings = self._settings_for_provider(provider)
         if not settings.enabled:
             if not automatic:
                 self._notify(N_("Independent subtitles are turned off in settings."))
             return False
-        if not self._credentials_configured(settings):
+        requested_provider = provider or settings.provider
+        configured = []
+        if self._credentials_configured(settings, requested_provider):
+            configured.append((requested_provider, settings))
+        if not configured:
             if not automatic:
                 self._notify(self._credential_message(settings))
             return False
         metadata = self._metadata_value()
-        if len(" ".join(str(metadata.get("title") or "").split())) < 2:
+        if not subtitle_search_available(metadata):
             if not automatic:
                 self._notify(_ERROR_MESSAGES["invalid_search"])
             return False
         self._generation += 1
         generation = self._generation
+        self._operation_context = self._current_context()
+        self._download_provider = None
         self._busy = True
         self._automatic = bool(automatic)
         self._finish_callback = on_finished
@@ -869,14 +1147,9 @@ class OnlineSubtitleController(object):
                 for value in (settings.primary_language, settings.secondary_language):
                     if value and value not in languages:
                         languages.append(value)
-                results = self._client(settings).search(
-                    metadata, languages
-                )
-                if not settings.hearing_impaired:
-                    results = [
-                        result for result in results
-                        if not result.get("hearing_impaired")
-                    ]
+                results, failures = self._search_sources(configured, metadata, generation)
+                if failures and not results and len(configured) == 1:
+                    raise failures[0][2]
                 results = annotate_subtitle_results(metadata, results)
                 language_order = {
                     language: index
@@ -904,25 +1177,30 @@ class OnlineSubtitleController(object):
         return True
 
     def search_combined(
-        self, on_results, on_finished=None, metadata_override=None
+        self, on_results, on_finished=None, metadata_override=None, automatic=False
     ):
         """Search every configured native provider for the receiver page."""
+        if self._busy and self._automatic and not automatic:
+            self.cancel_pending()
         if self._closed or self._busy:
-            self._notify(N_("A subtitle search is already running."))
+            if not automatic:
+                self._notify(N_("A subtitle search is already running."))
             return False
-        if not callable(on_results):
+        if not callable(on_results) and not automatic:
             return False
         settings = self._settings_value()
-        if not settings.enabled:
-            self._notify(N_("Independent subtitles are turned off in settings."))
+        if not settings.enabled or (automatic and settings.search_mode != "automatic"):
+            if not automatic:
+                self._notify(N_("Independent subtitles are turned off in settings."))
             return False
         metadata = (
             dict(metadata_override)
             if isinstance(metadata_override, dict)
             else self._metadata_value()
         )
-        if len(" ".join(str(metadata.get("title") or "").split())) < 2:
-            self._notify(_ERROR_MESSAGES["invalid_search"])
+        if not subtitle_search_available(metadata):
+            if not automatic:
+                self._notify(_ERROR_MESSAGES["invalid_search"])
             return False
 
         configured = []
@@ -933,50 +1211,36 @@ class OnlineSubtitleController(object):
                 configured.append((provider, provider_settings))
             else:
                 missing.append((provider, provider_settings))
+        for provider in polish_search_providers(getattr(settings, "primary_language", "")):
+            configured.append((provider, settings.copy()))
+        if automatic and not configured:
+            return False
 
         self._generation += 1
         generation = self._generation
+        self._operation_context = self._current_context()
+        self._download_provider = None
         self._busy = True
-        self._automatic = False
+        self._automatic = bool(automatic)
         self._finish_callback = on_finished
         self._browser_results_callback = on_results
         self._metadata = metadata
         self._settings = settings
+        if automatic:
+            self._auto_started = True
+            self._auto_context = self._operation_context
 
         def worker():
-            combined = []
-            failures = []
-            for provider, provider_settings in configured:
-                try:
-                    languages = []
-                    for value in (
-                        provider_settings.primary_language,
-                        provider_settings.secondary_language,
-                    ):
-                        if value and value not in languages:
-                            languages.append(value)
-                    provider_results = self._client(provider_settings).search(
-                        metadata, languages
-                    )
-                    if not provider_settings.hearing_impaired:
-                        provider_results = [
-                            result for result in provider_results
-                            if not result.get("hearing_impaired")
-                        ]
-                    for result in provider_results:
-                        if not isinstance(result, dict):
-                            continue
-                        item = dict(result)
-                        item["provider"] = provider
-                        combined.append(item)
-                except Exception as error:
-                    failures.append((provider, provider_settings, error))
-            combined = annotate_subtitle_results(metadata, combined)
-            self._queue(
-                generation,
-                "browser_results",
-                (combined, failures, missing),
-            )
+            try:
+                combined, failures = self._search_sources(configured, metadata, generation)
+                combined = annotate_subtitle_results(metadata, combined)
+                self._queue(
+                    generation,
+                    "browser_results",
+                    (combined, failures, missing),
+                )
+            except Exception as error:
+                self._queue(generation, "error", error)
 
         thread = threading.Thread(target=worker)
         thread.daemon = True
@@ -986,12 +1250,14 @@ class OnlineSubtitleController(object):
 
     def download_result(self, result, on_finished=None):
         """Download one result selected on the combined receiver page."""
+        if self._busy and self._automatic:
+            self.cancel_pending()
         if self._closed or self._busy or not isinstance(result, dict):
             if self._busy:
                 self._notify(N_("A subtitle search is already running."))
             return False
         provider = str(result.get("provider") or "").lower()
-        if provider not in PROVIDERS:
+        if provider not in SEARCH_PROVIDERS:
             return False
         settings = self._settings_for_provider(provider)
         if not settings.enabled:
@@ -1000,12 +1266,25 @@ class OnlineSubtitleController(object):
         if not self._credentials_configured(settings, provider):
             self._notify(self._credential_message(settings))
             return False
-        metadata = self._metadata_value()
-        if len(" ".join(str(metadata.get("title") or "").split())) < 2:
+        requested = {normalize_subtitle_language(settings.primary_language),
+                     normalize_subtitle_language(settings.secondary_language)}
+        language = normalize_subtitle_language(result.get("language"))
+        if (not language or language not in requested
+                or (provider in POLISH_PROVIDERS and language != "pl")):
+            self._notify(self._provider_text(
+                N_("No matching subtitles were found on SubDL."), settings, provider
+            ))
+            return False
+        search_metadata = result.get("_search_metadata")
+        metadata = self._fresh_search_metadata(
+            search_metadata if isinstance(search_metadata, dict) else self._metadata_value()
+        )
+        if not subtitle_search_available(metadata):
             self._notify(_ERROR_MESSAGES["invalid_search"])
             return False
         self._generation += 1
         generation = self._generation
+        self._operation_context = self._current_context()
         self._busy = True
         self._automatic = False
         self._finish_callback = on_finished
@@ -1018,7 +1297,7 @@ class OnlineSubtitleController(object):
         self._arm_poll()
         return True
 
-    def _error_text_for(self, error, settings):
+    def _error_text_for(self, error, settings, provider=None):
         code = getattr(error, "code", "provider_unavailable")
         if code == "provider_key_missing":
             return self._credential_message(settings)
@@ -1028,15 +1307,20 @@ class OnlineSubtitleController(object):
             )
         return self._provider_text(
             _ERROR_MESSAGES.get(code, _ERROR_MESSAGES["provider_unavailable"]),
-            settings,
+            settings, provider,
         )
 
     def _error_text(self, error):
         settings = self._settings or self._settings_value()
-        return self._error_text_for(error, settings)
+        return self._error_text_for(error, settings, self._download_provider)
 
     def _poll(self):
         if self._closed:
+            return
+        if self._automatic and self._settings_value().search_mode != "automatic":
+            self._auto_started = False
+            self._auto_context = None
+            self.cancel_pending()
             return
         events = []
         with self._event_lock:
@@ -1045,6 +1329,10 @@ class OnlineSubtitleController(object):
         for generation, name, payload in events:
             if generation != self._generation:
                 continue
+            if not self._context_is_current(generation):
+                self._last_download_status = "cancelled"
+                self._finish(generation)
+                continue
             if name == "results":
                 self._results_ready(generation, payload)
             elif name == "browser_results":
@@ -1052,12 +1340,13 @@ class OnlineSubtitleController(object):
             elif name == "download":
                 self._download_ready(generation, payload)
             elif name == "error":
-                if (
-                    not self._automatic
-                    or getattr(payload, "code", "") == "provider_login_required"
-                ):
+                if self._automatic:
+                    self._browser_results_ready(generation, (
+                        [], [(self._settings.provider, self._settings, payload)], []
+                    ))
+                else:
                     self._notify(self._error_text(payload))
-                self._finish(generation)
+                    self._finish(generation)
         if self._busy:
             self._arm_poll()
 
@@ -1066,32 +1355,26 @@ class OnlineSubtitleController(object):
             results, failures, missing = payload
         except (TypeError, ValueError):
             results, failures, missing = [], [], []
-        settings = self._settings or self._settings_value()
-        language_order = {
-            language: index for index, language in enumerate((
-                getattr(settings, "primary_language", ""),
-                getattr(settings, "secondary_language", ""),
-            )) if language
-        }
-        provider_order = {
-            provider: index for index, provider in enumerate(PROVIDERS)
-        }
-        indexed = list(enumerate(results if isinstance(results, list) else []))
-        indexed.sort(key=lambda pair: (
-            language_order.get(
-                str(pair[1].get("language") or "").lower(),
-                len(language_order),
-            ),
-            _result_compatibility_sort(pair[1]),
-            provider_order.get(pair[1].get("provider"), len(provider_order)),
-            pair[0],
-        ))
-        ordered = [result for unused_index, result in indexed]
+        ordered = self.refresh_browser_results(
+            self._fresh_search_metadata(), results if isinstance(results, list) else []
+        )
         notices = []
         for unused_provider, provider_settings in missing:
             notices.append(self._credential_message(provider_settings))
-        for unused_provider, provider_settings, error in failures:
-            notices.append(self._error_text_for(error, provider_settings))
+        for provider, provider_settings, error in failures:
+            notices.append(self._error_text_for(error, provider_settings, provider))
+        if self._automatic:
+            self._browser_state = {
+                "context": self._operation_context,
+                "content_context": subtitle_search_context(
+                    self._metadata_value(), None, (id(self), self._browser_generation)
+                ),
+                "metadata": deepcopy(self._fresh_search_metadata()),
+                "manual_title": False, "searched": True,
+                "results": deepcopy(ordered[:100]),
+                "provider_filter": "all", "selected": 0, "top": 0,
+                "message": "  |  ".join(notices)[:240],
+            }
         callback = self._browser_results_callback
         self._browser_results_callback = None
         if callable(callback):
@@ -1102,15 +1385,16 @@ class OnlineSubtitleController(object):
         self._finish(generation)
 
     def _results_ready(self, generation, results):
+        if self._automatic:
+            self._browser_results_ready(generation, (list(results or ()), [], []))
+            return
+        results = self.refresh_browser_results(self._fresh_search_metadata(), results)
         if not results:
             if not self._automatic:
                 self._notify(self._provider_text(
                     N_("No matching subtitles were found on SubDL.")
                 ))
             self._finish(generation)
-            return
-        if self._automatic:
-            self._start_download(generation, results[0])
             return
         try:
             from Screens.ChoiceBox import ChoiceBox
@@ -1164,7 +1448,25 @@ class OnlineSubtitleController(object):
             self._finish(generation)
 
     def _start_download(self, generation, result):
+        if self._automatic:
+            return
+        if not self._context_is_current(generation):
+            self._finish(generation)
+            return
+        result = self.revalidate_result(result)
+        if result.get("identity_match") is False:
+            self._last_download_status = "different"
+            if not self._automatic:
+                self._notify(_("Different version"))
+            self._finish(generation)
+            return
         settings = self._settings
+        provider = str(result.get("provider") or "").lower()
+        if provider in PROVIDERS and provider != getattr(settings, "provider", None):
+            settings = settings.copy()
+            settings.provider = provider
+            self._settings = settings
+        self._download_provider = provider
         metadata = dict(self._metadata)
         release = " ".join(str(result.get("release") or "Subtitle").split())[:120]
         language = str(result.get("language") or "").upper()[:3]
@@ -1185,11 +1487,14 @@ class OnlineSubtitleController(object):
 
         def worker():
             try:
-                content = self._client(settings).download(result)
+                with subtitle_request_scope(lambda: self._job_is_current(generation)):
+                    content = self._client(settings, provider).download(result)
+                    check_subtitle_job()
                 cues = parse_subtitle(
-                    content, hearing_impaired=settings.hearing_impaired
+                    content, hearing_impaired=settings.hearing_impaired,
+                    language=result.get("language", ""),
                 )
-                cues, fps_factor, timeline_state = retime_subtitle_cues(
+                unused_cues, fps_factor, timeline_state = retime_subtitle_cues(
                     cues, result
                 )
                 log_event(
@@ -1203,22 +1508,35 @@ class OnlineSubtitleController(object):
                         timeline_state,
                     ),
                 )
+                if not self._job_is_current(generation):
+                    return
                 path = save_subtitle_file(content, metadata, result)
                 self._queue(
                     generation,
                     "download",
-                    (cues, path, settings, timeline_state),
+                    (cues, path, settings, timeline_state, result),
                 )
             except Exception as error:
                 self._queue(generation, "error", error)
 
-        thread = threading.Thread(target=worker)
-        thread.daemon = True
-        thread.start()
+        self._submit_source_job(generation, worker)
 
     def _download_ready(self, generation, payload):
+        if self._automatic:
+            return
+        if not self._context_is_current(generation):
+            self._last_download_status = "cancelled"
+            self._finish(generation)
+            return
         try:
-            if len(payload) == 4:
+            if len(payload) == 5:
+                cues, path, settings, timeline_state, result = payload
+                result = self.revalidate_result(result)
+                if result.get("identity_match") is False:
+                    timeline_state = "mismatch"
+                else:
+                    cues, unused_factor, timeline_state = retime_subtitle_cues(cues, result)
+            elif len(payload) == 4:
                 cues, path, settings, timeline_state = payload
             else:
                 cues, path, settings = payload
@@ -1232,6 +1550,13 @@ class OnlineSubtitleController(object):
                 self._notify(_("Different version"))
             self._finish(generation)
             return
+        # Font, position and global timing edits do not invalidate a search.
+        # Apply their current values rather than stale worker-captured values.
+        current_settings = self._settings_value()
+        settings = settings.copy()
+        for name in ("font_size", "font_color", "background", "vertical_position", "offset_ms"):
+            if hasattr(current_settings, name):
+                setattr(settings, name, getattr(current_settings, name))
         rollback = None
         if callable(self.before_activate):
             try:
@@ -1239,6 +1564,32 @@ class OnlineSubtitleController(object):
             except Exception:
                 if not self._automatic:
                     self._notify(N_("Could not start the independent subtitle renderer."))
+                self._finish(generation)
+                return
+        if not self._context_is_current(generation):
+            if callable(rollback):
+                try:
+                    rollback()
+                except Exception:
+                    pass
+            self._last_download_status = "cancelled"
+            self._finish(generation)
+            return
+        if len(payload) == 5:
+            latest = self.revalidate_result(payload[4])
+            if latest.get("identity_match") is False:
+                state = "mismatch"
+            else:
+                cues, unused_factor, state = retime_subtitle_cues(payload[0], latest)
+            if state == "mismatch":
+                if callable(rollback):
+                    try:
+                        rollback()
+                    except Exception:
+                        pass
+                self._last_download_status = "different"
+                if not self._automatic:
+                    self._notify(_("Different version"))
                 self._finish(generation)
                 return
         try:
@@ -1271,6 +1622,7 @@ class OnlineSubtitleController(object):
             return
         callback = self._finish_callback
         self._finish_callback = None
+        self._browser_results_callback = None
         self._busy = False
         self._automatic = False
         if callable(callback):
@@ -1283,9 +1635,14 @@ class OnlineSubtitleController(object):
         """Invalidate receiver-page work without disabling active subtitles."""
         if self._closed:
             return False
+        callback = self._finish_callback
         self._generation += 1
+        self._cancel_source_jobs()
         self._busy = False
         self._automatic = False
+        self._operation_context = None
+        self._last_download_succeeded = False
+        self._last_download_status = "cancelled"
         self._finish_callback = None
         self._browser_results_callback = None
         with self._event_lock:
@@ -1293,6 +1650,13 @@ class OnlineSubtitleController(object):
         if self.poll_timer is not None:
             try:
                 self.poll_timer.stop()
+            except Exception:
+                pass
+        # Release an open native results page after another action supersedes
+        # its request. Closed screens already make their callbacks no-ops.
+        if callable(callback):
+            try:
+                callback()
             except Exception:
                 pass
         return True
@@ -1316,9 +1680,12 @@ class OnlineSubtitleController(object):
             (_("Show 0.5 seconds later"), 500),
             (_("Show 1 second later"), 1000),
         )
+        revision = self.renderer.content_revision
 
         def selected(selection):
             try:
+                if self._closed or self.renderer.content_revision != revision:
+                    return
                 value = selection[1] if selection else None
                 if value == "reset":
                     offset = self.renderer.adjust_offset(absolute_ms=0)
@@ -1350,6 +1717,8 @@ class OnlineSubtitleController(object):
         return self.renderer.restore(state)
 
     def disable(self, notify=True):
+        if notify:
+            self.cancel_pending()
         had_subtitle = self.renderer.disable()
         if had_subtitle and notify:
             self._changed(None)
@@ -1384,14 +1753,31 @@ class OnlineSubtitleController(object):
             return bool(setter(obscured))
         return False
 
+    def acquire_ui_obscured(self):
+        acquirer = getattr(self.renderer, "acquire_ui_obscured", None)
+        if callable(acquirer):
+            return acquirer()
+        return None
+
+    def release_ui_obscured(self, token):
+        releaser = getattr(self.renderer, "release_ui_obscured", None)
+        if callable(releaser):
+            return bool(releaser(token))
+        return False
+
     def reset_for_service_change(self):
+        self._browser_state = None
+        self._browser_generation += 1
         self._generation += 1
+        self._cancel_source_jobs()
         self._busy = False
         self._finish_callback = None
         self._browser_results_callback = None
         self._last_download_succeeded = False
         self._automatic = False
+        self._operation_context = None
         self._auto_started = False
+        self._auto_context = None
         with self._event_lock:
             self._events.clear()
         self.renderer.disable()
@@ -1402,9 +1788,13 @@ class OnlineSubtitleController(object):
     def close(self):
         if self._closed:
             return
+        self._browser_state = None
+        self._browser_generation += 1
         self._closed = True
         self._generation += 1
+        self._cancel_source_jobs()
         self._busy = False
+        self._operation_context = None
         self._finish_callback = None
         self._browser_results_callback = None
         if self.poll_timer is not None:

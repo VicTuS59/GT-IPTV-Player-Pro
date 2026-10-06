@@ -5,6 +5,8 @@
 import json
 import os
 
+from .youtube_options import YOUTUBE_QUALITIES, DEFAULT_YOUTUBE_QUALITY
+
 from .channel_highlight import (
     CHANNEL_HIGHLIGHT_KEYS,
     DEFAULT_CHANNEL_HIGHLIGHT,
@@ -76,7 +78,9 @@ def _player_config():
     if not hasattr(section, "tmdb_api_key"):
         section.tmdb_api_key = ConfigText(default="", fixed_size=False)
     if not hasattr(section, "youtube_resolution"):
-        section.youtube_resolution = ConfigSelection(default="720", choices=["360", "480", "720", "1080", "2160"])
+        section.youtube_resolution = ConfigSelection(default=DEFAULT_YOUTUBE_QUALITY, choices=list(YOUTUBE_QUALITIES))
+    if not hasattr(section, "youtube_autoplay"):
+        section.youtube_autoplay = ConfigYesNo(default=False)
     if not hasattr(section, "youtube_dash"):
         section.youtube_dash = ConfigYesNo(default=True)
     if not hasattr(section, "youtube_stream_mode"):
@@ -315,7 +319,7 @@ class PlayerSettings(object):
         series_service_type=5002,
         metadata_enabled=True,
         tmdb_api_key="",
-        youtube_resolution="720",
+        youtube_resolution=DEFAULT_YOUTUBE_QUALITY,
         youtube_dash=True,
         youtube_search_language="tr",
         youtube_stream_mode=None,
@@ -325,6 +329,7 @@ class PlayerSettings(object):
         show_in_main_menu=True,
         channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT,
         selection_border=None,
+        youtube_autoplay=False,
     ):
         self.live_service_type = supported_service_type(
             live_service_type, 4097
@@ -337,16 +342,13 @@ class PlayerSettings(object):
         )
         self.metadata_enabled = bool(metadata_enabled)
         self.tmdb_api_key = str(tmdb_api_key or "").strip()[:512]
-        self.youtube_resolution = str(youtube_resolution) if str(youtube_resolution) in ("360", "480", "720", "1080", "2160") else "720"
-        mode = str(youtube_stream_mode) if youtube_stream_mode is not None else (
-            "auto" if youtube_dash else "compatible"
-        )
-        self.youtube_stream_mode = mode if mode in ("auto", "compatible", "dash") else "auto"
-        self.youtube_dash = self.youtube_stream_mode != "compatible"
-        self.youtube_audio_preference = (
-            youtube_audio_preference if youtube_audio_preference in ("default", "original")
-            else "default"
-        )
+        self.youtube_resolution = str(youtube_resolution) if str(youtube_resolution) in YOUTUBE_QUALITIES else DEFAULT_YOUTUBE_QUALITY
+        self.youtube_autoplay = bool(youtube_autoplay)
+        # Legacy mode/audio values remain readable for upgrades, but YouTube
+        # now always uses automatic native playback and the default audio.
+        self.youtube_stream_mode = "auto"
+        self.youtube_dash = True
+        self.youtube_audio_preference = "default"
         self.youtube_search_language = str(youtube_search_language) if str(youtube_search_language) in ("tr", "en", "de", "fr", "es", "ar") else "tr"
         self.ui_text_size = normalize_text_size(ui_text_size)
         self.cinematic_view = bool(cinematic_view)
@@ -365,7 +367,8 @@ class PlayerSettings(object):
             series_service_type=payload.get("series_service_type", 5002),
             metadata_enabled=payload.get("metadata_enabled", True),
             tmdb_api_key=payload.get("tmdb_api_key", ""),
-            youtube_resolution=payload.get("youtube_resolution", "720"),
+            youtube_resolution=payload.get("youtube_resolution", DEFAULT_YOUTUBE_QUALITY),
+            youtube_autoplay=payload.get("youtube_autoplay", False),
             youtube_dash=payload.get("youtube_dash", True),
             youtube_search_language=payload.get("youtube_search_language", "tr"),
             youtube_stream_mode=payload.get("youtube_stream_mode"),
@@ -395,6 +398,7 @@ class PlayerSettings(object):
             "metadata_enabled": self.metadata_enabled,
             "tmdb_api_key": self.tmdb_api_key,
             "youtube_resolution": self.youtube_resolution,
+            "youtube_autoplay": self.youtube_autoplay,
             "youtube_dash": self.youtube_dash,
             "youtube_search_language": self.youtube_search_language,
             "youtube_stream_mode": self.youtube_stream_mode,
@@ -490,6 +494,7 @@ def _settings_from_config(section):
         metadata_enabled=section.metadata_enabled.value,
         tmdb_api_key=section.tmdb_api_key.value,
         youtube_resolution=section.youtube_resolution.value,
+        youtube_autoplay=section.youtube_autoplay.value,
         youtube_dash=section.youtube_dash.value,
         youtube_search_language=section.youtube_search_language.value,
         youtube_stream_mode=(
@@ -527,6 +532,7 @@ def _store_config_settings(section, settings, migrated=True):
         )
         _set_config_value(section.tmdb_api_key, settings.tmdb_api_key)
         _set_config_value(section.youtube_resolution, settings.youtube_resolution)
+        _set_config_value(section.youtube_autoplay, settings.youtube_autoplay)
         _set_config_value(section.youtube_dash, settings.youtube_dash)
         _set_config_value(section.youtube_stream_mode, settings.youtube_stream_mode)
         _set_config_value(section.youtube_mode_migrated, True)

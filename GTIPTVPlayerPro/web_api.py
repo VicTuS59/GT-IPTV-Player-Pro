@@ -180,8 +180,12 @@ class GTWebService(object):
         self._health = {}
         self._automatic_test_lock = threading.RLock()
         self._automatic_test_generation = 0
+        self._automatic_test_instance = os.urandom(8).hex()
+        self._automatic_test_revision = 0
         self._automatic_test_cancel = threading.Event()
         self._automatic_test_thread = None
+        self._automatic_test_source_ids = set()
+        self._automatic_test_deleted = set()
         self._automatic_test = self._new_automatic_test_state()
 
     @staticmethod
@@ -314,16 +318,25 @@ class GTWebService(object):
 
     @staticmethod
     def _automatic_test_source_payload(source):
+        source_id = _source_key(source)
+        source_type = _source_type(source)
+        attribute = "mac" if source_type == "stalker" else "username"
+        secret = str(getattr(source, attribute, "") or "")
+        suffix = secret[-5:] if source_type == "stalker" else secret[-2:]
+        hint = "••••" + (suffix if len(secret) > len(suffix) else "")
         return {
-            "id": _source_key(source),
-            "type": _source_type(source),
+            "id": source_id,
+            "type": source_type,
             "name": _source_name(source),
             "endpoint": _source_endpoint(source),
+            "account_hint": _clean(hint, 40) + " · " + source_id[:8],
         }
 
     def _automatic_test_snapshot_locked(self):
         value = self._automatic_test
         return {
+            "instance": self._automatic_test_instance,
+            "revision": self._automatic_test_revision,
             "state": value["state"],
             "type": value["type"],
             "total": value["total"],
@@ -346,11 +359,6 @@ class GTWebService(object):
                 "invalid_automatic_test_type",
                 "Choose Xtream Codes or Stalker / MAC.",
             )
-        sources, unused_error = self._sources()
-        del unused_error
-        selected = tuple(
-            source for source in sources if _source_type(source) == source_type
-        )
         worker = None
         with self._automatic_test_lock:
             if self._automatic_test["state"] in ("running", "cancelling"):
@@ -359,6 +367,13 @@ class GTWebService(object):
                     "An automatic test is already running.",
                     409,
                 )
+            sources, unused_error = self._sources()
+            del unused_error
+            selected = tuple(
+                source for source in sources if _source_type(source) == source_type
+            )
+            self._automatic_test_source_ids = {_source_key(source) for source in selected}
+            self._automatic_test_deleted = set()
             self._automatic_test_generation += 1
             generation = self._automatic_test_generation
             cancel_event = threading.Event()
@@ -390,6 +405,7 @@ class GTWebService(object):
                 self._automatic_test_thread = worker
             else:
                 self._automatic_test_thread = None
+            self._automatic_test_revision += 1
             snapshot = self._automatic_test_snapshot_locked()
         if worker is not None:
             worker.start()
@@ -403,7 +419,10 @@ class GTWebService(object):
             with self._automatic_test_lock:
                 if generation != self._automatic_test_generation:
                     return
+                if source_payload["id"] in self._automatic_test_deleted:
+                    continue
                 self._automatic_test["current"] = source_payload
+                self._automatic_test_revision += 1
             try:
                 health = check_source_health(
                     source,
@@ -428,15 +447,18 @@ class GTWebService(object):
                 break
             result = dict(source_payload)
             result.update(payload)
-            with self._health_lock:
-                self._health[source_payload["id"]] = dict(payload)
             with self._automatic_test_lock:
                 if generation != self._automatic_test_generation:
                     return
+                if source_payload["id"] in self._automatic_test_deleted:
+                    continue
+                with self._health_lock:
+                    self._health[source_payload["id"]] = dict(payload)
                 self._automatic_test["results"].append(result)
                 self._automatic_test["completed"] += 1
                 self._automatic_test["summary"][payload["status"]] += 1
                 self._automatic_test["current"] = None
+                self._automatic_test_revision += 1
         with self._automatic_test_lock:
             if generation != self._automatic_test_generation:
                 return
@@ -446,12 +468,14 @@ class GTWebService(object):
             self._automatic_test["current"] = None
             self._automatic_test["finished_at"] = int(time.time())
             self._automatic_test_thread = None
+            self._automatic_test_revision += 1
 
     def cancel_automatic_test(self):
         with self._automatic_test_lock:
             if self._automatic_test["state"] == "running":
                 self._automatic_test_cancel.set()
                 self._automatic_test["state"] = "cancelling"
+                self._automatic_test_revision += 1
             return self._automatic_test_snapshot_locked()
 
     def shutdown(self):
@@ -459,6 +483,7 @@ class GTWebService(object):
             if self._automatic_test["state"] in ("running", "cancelling"):
                 self._automatic_test_cancel.set()
                 self._automatic_test["state"] = "cancelling"
+                self._automatic_test_revision += 1
 
     def add_source(self, payload):
         if not isinstance(payload, dict):
@@ -557,16 +582,46 @@ class GTWebService(object):
         return self.serialize_source(updated)
 
     def delete_source(self, source_id):
-        source = self._find_source(source_id)
-        try:
-            delete_source(source)
-        except (IOError, OSError, TypeError, ValueError):
-            raise WebServiceError(
-                "source_delete_failed", "The source could not be deleted."
-            )
-        with self._health_lock:
-            self._health.pop(str(source_id), None)
-        return {"deleted": True}
+        # Serialize the saved-source mutation with test selection and commit.
+        # An in-flight health request must never restore a deleted account.
+        source_id = str(source_id or "")
+        with self._automatic_test_lock:
+            source = self._find_source(source_id)
+            try:
+                if _source_type(source) == "xtream":
+                    from .playlist_files import selected_playlist_paths
+                    paths = list(selected_playlist_paths("xtream"))
+                    source_path = str(getattr(source, "source_path", "") or "")
+                    if source_path and source_path not in paths:
+                        paths.append(source_path)
+                    delete_source(source, paths=paths or None)
+                else:
+                    delete_source(source)
+            except (IOError, OSError, TypeError, ValueError):
+                raise WebServiceError(
+                    "source_delete_failed", "The source could not be deleted."
+                )
+            if (source_id in self._automatic_test_source_ids
+                    and source_id not in self._automatic_test_deleted):
+                self._automatic_test_deleted.add(source_id)
+                value = self._automatic_test
+                value["results"] = [item for item in value["results"]
+                                    if item["id"] != source_id]
+                value["total"] = max(0, value["total"] - 1)
+                value["completed"] = len(value["results"])
+                value["summary"] = {"green": 0, "yellow": 0, "red": 0, "neutral": 0}
+                for item in value["results"]:
+                    status = item.get("status", "neutral")
+                    if status not in value["summary"]:
+                        status = "neutral"
+                    value["summary"][status] += 1
+                if value["current"] and value["current"]["id"] == source_id:
+                    value["current"] = None
+            with self._health_lock:
+                self._health.pop(source_id, None)
+            self._automatic_test_revision += 1
+            snapshot = self._automatic_test_snapshot_locked()
+        return {"deleted": True, "automatic_test": snapshot}
 
     @staticmethod
     def _download_entry(job):
@@ -797,4 +852,3 @@ class GTWebService(object):
             "download_items": download_payload["items"][:6],
             "server_time": int(time.time()),
         }
-

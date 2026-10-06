@@ -50,6 +50,8 @@ def main(session, **kwargs):
     from .main import GTIPTVPlayerProScreen
 
     _prepare_storage()
+    from .web_shortcut import install as install_web_shortcut
+    install_web_shortcut(session)
     from .download_guard import install as install_download_guard
     install_download_guard(session)
     session.open(GTIPTVPlayerProScreen)
@@ -78,6 +80,8 @@ def session_start(reason, session=None, **kwargs):
     """Start or stop the optional EPG schedulers with the GUI session."""
     if reason == 0 and session is not None:
         _prepare_storage()
+        from .web_shortcut import install as install_web_shortcut
+        install_web_shortcut(session)
         from .web_remote import WEB_REMOTE
         WEB_REMOTE.bind_session(session)
         try:
@@ -95,6 +99,8 @@ def session_start(reason, session=None, **kwargs):
         except Exception:
             pass
     elif reason != 0:
+        from .web_shortcut import uninstall as uninstall_web_shortcut
+        uninstall_web_shortcut()
         from .web_remote import WEB_REMOTE
         WEB_REMOTE.bind_session(None)
         try:
@@ -162,4 +168,3 @@ def Plugins(**kwargs):
             )
         )
     return descriptors
-

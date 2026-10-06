@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: it\n"
-"Language: it\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: it\nLanguage: it\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "AUDIO: {}"
 msgid "About"
 msgstr "Informazioni"
 
+msgid "Access code"
+msgstr "Codice di accesso"
+
 msgid "Access your channels quickly"
 msgstr "Accedi rapidamente ai tuoi canali"
 
@@ -197,6 +190,9 @@ msgstr "Arabo"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "La riproduzione dall’archivio non è disponibile per questo canale."
+
+msgid "Aspect ratio"
+msgstr "Rapporto d’aspetto"
 
 msgid "Audio language changed"
 msgstr "Lingua audio modificata"
@@ -481,6 +477,9 @@ msgstr "Cielo sereno"
 msgid "Close"
 msgstr "Chiudi"
 
+msgid "Close menu"
+msgstr "Chiudi menu"
+
 msgid "Close the open screen before opening another one."
 msgstr "Chiudi la schermata aperta prima di aprirne un’altra."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Impossibile selezionare la traccia audio richiesta."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Impossibile avviare la visualizzazione dei sottotitoli indipendenti."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Impossibile avviare la ricerca dei sottotitoli online."
 
 msgid "Could not start the player."
 msgstr "Impossibile avviare il lettore."
@@ -771,6 +770,9 @@ msgstr "Ordine predefinito ripristinato. Premi VERDE per salvare."
 msgid "Delete"
 msgstr "Elimina"
 
+msgid "Delete all"
+msgstr "Elimina tutto"
+
 msgid "Delete this item?"
 msgstr "Eliminare questo elemento?"
 
@@ -818,6 +820,12 @@ msgstr "Scopri film"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Scopri nuovi film con i suggerimenti di TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "Mostra contenuti 16:9 come"
+
+msgid "Display 4:3 content as"
+msgstr "Mostra contenuti 4:3 come"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Non includere una query o un frammento nell’URL del portale"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Inserire prima una chiave API SubDL."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Inserisci una chiave API SubDL nelle impostazioni dei sottotitoli."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Inserisci una chiave API TMDb per i dettagli su film e serie."
@@ -1007,6 +1015,9 @@ msgstr "Inserisci il codice a sei cifre visualizzato sul ricevitore."
 msgid "Enter the username"
 msgstr "Inserisci il nome utente"
 
+msgid "Enter the username / Enter the password"
+msgstr "Inserisci il nome utente / Inserisci la password"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Inserisci questo codice nel browser del telefono, quindi approva la richiesta sulla TV."
 
@@ -1061,6 +1072,9 @@ msgstr "PREFERITI"
 
 msgid "FILE"
 msgstr "FILE"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "Gli FPS verranno convertiti"
@@ -1144,19 +1158,11 @@ msgstr "Schermo intero"
 msgid "GREEN"
 msgstr "VERDE"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"FILM"
+msgid "GT\nMOVIE"
+msgstr "GT\nFILM"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"SERIE"
+msgid "GT\nSERIES"
+msgstr "GT\nSERIE"
 
 msgid "Genre unavailable"
 msgstr "Genere non disponibile"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Anteprima dei sottotitoli indipendenti"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Sincronizzazione dei sottotitoli indipendenti"
 
 msgid "Independent subtitles"
 msgstr "Sottotitoli indipendenti"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "I sottotitoli indipendenti sono disattivati nelle impostazioni."
 
 msgid "Information"
 msgstr "Informazioni"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Latenza"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Latenza: {} ms\n"
-"Stato account: {}\n"
-"Attive / Massimo: {}\n"
-"Scadenza: {}\n"
-"Ora server: {}\n"
-"Fuso orario: {}\n"
-"Protocollo: {}\n"
-"Formato di uscita: {}\n"
-"Versione server: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Latenza: {} ms\nStato account: {}\nAttive / Massimo: {}\nScadenza: {}\nOra server: {}\nFuso orario: {}\nProtocollo: {}\nFormato di uscita: {}\nVersione server: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Latenza: {} ms\n"
-"Stato account: {}\n"
-"Protocollo: {}\n"
-"Formato di uscita: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Latenza: {} ms\nStato account: {}\nProtocollo: {}\nFormato di uscita: {}\n\n{}"
 
 msgid "Left"
 msgstr "Sinistra"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Carica un sottotitolo da questa pagina web prima di sincronizzare."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Carica dei sottotitoli indipendenti prima di sincronizzarli."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "Caricamento dei servizi DVB e dei canali XMLTV nella cache..."
@@ -1514,6 +1486,9 @@ msgstr "Esci"
 
 msgid "Lower"
 msgstr "Più in basso"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "RICERCA CANALI M3U"
@@ -1668,6 +1643,9 @@ msgstr "Indirizzo MAC"
 
 msgid "MANAGE SOURCES"
 msgstr "GESTISCI SORGENTI"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 s: Interfaccia web"
 
 msgid "MOVIE CATEGORIES"
 msgstr "CATEGORIE FILM"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Nessun sottotitolo corrispondente trovato. Controlla la lingua e lo stato del provider."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Nessun sottotitolo corrispondente trovato su SubDL."
 
 msgid "No movies found."
 msgstr "Nessun film trovato."
@@ -1946,14 +1924,8 @@ msgstr "Nessuna sorgente disponibile per la connessione."
 msgid "No source is selected for deletion."
 msgstr "Nessuna sorgente selezionata per l’eliminazione."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Nessuna sorgente trovata.\n"
-"\n"
-"Creane una dal pannello AGGIUNGI SORGENTE nella schermata iniziale."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Nessuna sorgente trovata.\n\nCreane una dal pannello AGGIUNGI SORGENTE nella schermata iniziale."
 
 msgid "No summary is available for this programme."
 msgstr "Nessun riepilogo disponibile per questo programma."
@@ -1981,6 +1953,9 @@ msgstr "Nessuna sorgente Xtream valida trovata."
 
 msgid "No valid title was found for TMDb"
 msgstr "Nessun titolo valido trovato per TMDb"
+
+msgid "No videos found at the selected quality."
+msgstr "Nessun video trovato con la qualità selezionata."
 
 msgid "No weather forecast is available for this city."
 msgstr "Nessuna previsione meteo disponibile per questa città."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Apri / Approva"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Apri le impostazioni dei sottotitoli indipendenti."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Apri la tastiera della TV e incolla il testo qui."
@@ -2107,8 +2082,14 @@ msgstr "Riproduci"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Avvia prima il film o l'episodio sul ricevitore."
 
+msgid "Play next video automatically"
+msgstr "Riproduci automaticamente il video successivo"
+
 msgid "Play on TV"
 msgstr "Riproduci sulla TV"
+
+msgid "Playback history"
+msgstr "Cronologia di riproduzione"
 
 msgid "Playback mode"
 msgstr "Modalità di riproduzione"
@@ -2269,6 +2250,9 @@ msgstr "Connessione al provider riuscita"
 msgid "Quality"
 msgstr "Qualità"
 
+msgid "Quality changed. Search again."
+msgstr "La qualità è cambiata. Cerca di nuovo."
+
 msgid "Queued"
 msgstr "In coda"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Classificazione"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Tempo di lettura: {} ms\n"
-"Tipo sorgente: {}\n"
-"Dimensione: {} byte\n"
-"Canali: {}\n"
-"Categorie: {}\n"
-"Età cache: {}\n"
-"Ultima modifica: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Tempo di lettura: {} ms\nTipo sorgente: {}\nDimensione: {} byte\nCanali: {}\nCategorie: {}\nEtà cache: {}\nUltima modifica: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Lettura durata..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Riconnessione dello stream..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Recupero riuscito. Annota il nuovo codice di recupero; viene mostrato una sola volta:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Recupero riuscito. Annota il nuovo codice di recupero; viene mostrato una sola volta:\n\n{}"
 
 msgid "Red"
 msgstr "Rosso"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Ripristina"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Reimposta la temporizzazione dei sottotitoli"
 
 msgid "Resolution: --"
 msgstr "Risoluzione: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Riprendi"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Riprendere la riproduzione dalla posizione salvata?\n"
-"\n"
-"Posizione salvata: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Riprendere la riproduzione dalla posizione salvata?\n\nPosizione salvata: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Riprendi film ed episodi di serie non completati"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "IMPOSTAZIONI SOTTOTITOLI"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Inizio della stessa battuta nei sottotitoli (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Cerca di nuovo; questo risultato è scaduto."
 msgid "Search for a spoken phrase"
 msgstr "Cerca una frase parlata"
 
+msgid "Search history"
+msgstr "Cronologia delle ricerche"
+
 msgid "Search in IPTV"
 msgstr "Cerca in IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Cerca musica, documentari o canali"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Cerca sottotitoli con SubDL"
 
 msgid "Search subtitles"
 msgstr "Cerca sottotitoli"
@@ -2550,6 +2507,9 @@ msgstr "Ricerca provider in corso…"
 
 msgid "Searching…"
 msgstr "Ricerca in corso…"
+
+msgid "Season"
+msgstr "Stagione"
 
 msgid "Seasons"
 msgstr "Stagioni"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Mostra / Nascondi"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Mostra 0,5 secondi prima"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Mostra 0,5 secondi dopo"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Mostra 1 secondo prima"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Mostra 1 secondo dopo"
 
 msgid "Show in device main menu"
 msgstr "Mostra nel menu principale del dispositivo"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "La connessione a SubDL è pronta."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL è temporaneamente non disponibile."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL è il fornitore in questa versione."
 
 msgid "SubDL key change cancelled."
 msgstr "Modifica della chiave SubDL annullata."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL ha restituito una risposta non valida."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Sottotitoli"
 
 msgid "Subtitle"
 msgstr "Sottotitolo"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Provider sottotitoli"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "La selezione dei sottotitoli non è disponibile su questa immagine."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "La ricerca dei sottotitoli richiede un’installazione funzionante di SubsSupport o SubsSupportPro."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "La sincronizzazione dei sottotitoli è già in corso."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "La sincronizzazione dei sottotitoli non è disponibile su questa immagine."
 
 msgid "Subtitle timing adjusted"
 msgstr "Temporizzazione sottotitoli regolata"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Scarto temporale dei sottotitoli: {:+.1f} secondi"
 
 msgid "Subtitles"
 msgstr "Sottotitoli"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "La chiave API SubDL è stata cancellata."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "La chiave API SubDL è stata rifiutata."
 
 msgid "The SubDL connection test is still running..."
 msgstr "Il test della connessione a SubDL è ancora in corso..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "È stato raggiunto il limite di richieste SubDL."
 
 msgid "The TMDb connection test is still running..."
 msgstr "Il test della connessione TMDb è ancora in corso..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "La differenza non può superare i 30 minuti."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "Impossibile salvare i sottotitoli scaricati."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "Impossibile eliminare il file. Controllare il dispositivo di archiviazione e le autorizzazioni."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Il servizio in riproduzione è cambiato. Riapri la selezione audio."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Il titolo del programma non è disponibile per la ricerca dei sottotitoli."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "L’orologio del ricevitore non è pronto. Controlla l’ora di rete e riprova."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "I dettagli del film selezionato verranno caricati dal server."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Il sottotitolo supera il limite di dimensione"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Questo formato di sottotitoli non è supportato"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "La risposta delle serie usa un formato non supportato. Le categorie restano disponibili."
@@ -3266,12 +3226,8 @@ msgstr "Questo contenuto dispone di una sola traccia audio."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Questa cartella è esterna alle posizioni di archiviazione consentite."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Questa è un'anteprima dei sottotitoli.\n"
-"Le modifiche vengono visualizzate qui immediatamente."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Questa è un'anteprima dei sottotitoli.\nLe modifiche vengono visualizzate qui immediatamente."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Questa anteprima usa le impostazioni di aspetto attuali non salvate."
@@ -3419,6 +3375,9 @@ msgstr "Posizione verticale"
 msgid "Very large"
 msgstr "Molto grande"
 
+msgid "Video"
+msgstr "Video"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Impossibile riprodurre il video su questo ricevitore. Prova un altro video o un'altra impostazione di qualità."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Bianco"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Annota questo codice di recupero. Viene mostrato una sola volta:\n"
-"\n"
-"{}\n"
-"\n"
-"Se dimentichi entrambi i codici, rimuovendo e reinstallando il plugin viene reimpostato soltanto questo blocco."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Annota questo codice di recupero. Viene mostrato una sola volta:\n\n{}\n\nSe dimentichi entrambi i codici, rimuovendo e reinstallando il plugin viene reimpostato soltanto questo blocco."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "L’EPG XMLTV è disabilitato per questa sorgente M3U."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} rimosso dai preferiti."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Lettore IPTV open source per Enigma2. Supporta account Xtream Codes e TV in diretta da playlist M3U locali, di rete montata o HTTP(S). Le sorgenti M3U semplici offrono solo la TV in diretta.\n"
-"\n"
-"SVILUPPATORE\n"
-"{}\n"
-"\n"
-"NOTE LEGALI\n"
-"Questo plugin non fornisce canali, flussi, account o playlist. L’utente è responsabile dell’uso dei soli contenuti per i quali dispone dei diritti di accesso e utilizzo.\n"
-"\n"
-"PRIVACY\n"
-"Quando Open-Meteo è abilitato, la città e la posizione selezionate vengono inviate a Open-Meteo per le previsioni meteo. Quando TMDb è abilitato, il titolo del film/della serie e la chiave o il token TMDb inseriti dall’utente vengono inviati a TMDb. Il nome utente e la password IPTV non vengono inviati a questi servizi."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nLettore IPTV open source per Enigma2. Supporta account Xtream Codes e TV in diretta da playlist M3U locali, di rete montata o HTTP(S). Le sorgenti M3U semplici offrono solo la TV in diretta.\n\nSVILUPPATORE\n{}\n\nNOTE LEGALI\nQuesto plugin non fornisce canali, flussi, account o playlist. L’utente è responsabile dell’uso dei soli contenuti per i quali dispone dei diritti di accesso e utilizzo.\n\nPRIVACY\nQuando Open-Meteo è abilitato, la città e la posizione selezionate vengono inviate a Open-Meteo per le previsioni meteo. Quando TMDb è abilitato, il titolo del film/della serie e la chiave o il token TMDb inseriti dall’utente vengono inviati a TMDb. Il nome utente e la password IPTV non vengono inviati a questi servizi."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

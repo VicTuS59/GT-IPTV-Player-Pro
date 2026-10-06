@@ -34,10 +34,12 @@ from .channel_highlight import (
     CHANNEL_HIGHLIGHT_KEYS,
     DEFAULT_CHANNEL_HIGHLIGHT,
     channel_highlight_art,
+    dashboard_selection_art,
     normalize_channel_highlight,
     normalize_selection_border,
     refresh_screen_selection,
     selection_border_art,
+    welcome_selection_art,
 )
 from .dvb_background import DVBBackgroundGuard
 from .category_lock import CategoryEditLockStore
@@ -542,6 +544,19 @@ ARCHIVE_HERO_PATH = os.path.join(
 DISCOVERY_HERO_PATH = os.path.join(PLUGIN_PATH, "skin", "images", "discovery-hero.png")
 DISCOVERY_MENU_PATH = os.path.join(PLUGIN_PATH, "skin", "images", "dashboard-menu-discovery.png")
 DASHBOARD_FOCUS_PATH = os.path.join(PLUGIN_PATH, "skin", "images", "dashboard-menu-focus-r39.png")
+# Outline boxes include a six-pixel stroke centred on the wallpaper's rounded
+# card edges. Scale their edges with the wallpaper, including 4:3 SD desktops.
+DASHBOARD_HERO_RECT = (507, 103, 1386, 447)
+DASHBOARD_QUICK_RECTS = (
+    (507, 567, 333, 419),
+    (853, 567, 345, 419),
+    (1211, 567, 340, 419),
+    (1565, 567, 329, 419),
+)
+DASHBOARD_QUICK_ACTIONS = ("movie", "series", "continue", "favorites")
+DASHBOARD_HERO_CORNERS_PATH = plugin_path(
+    "skin", "images", "dashboard-hero-corners-r30.png"
+)
 WELCOME_BACKGROUND_720 = os.path.join(
     PLUGIN_PATH, "skin", "images", "welcome-vector-r88-720.png",
 )
@@ -897,11 +912,18 @@ def _welcome_skin():
     def py(value):
         return max(1, int(round(value * float(height) / 1080.0)))
 
-    button_y = py(550)
-    button_height = py(288)
-    # Four equally spaced action cards in the R50 welcome artwork.
-    button_width = (px(258),) * 4
-    button_x = tuple(px(value) for value in (700, 982, 1268, 1553))
+    # Follow the wallpaper's horizontal stretch as well as its vertical one.
+    # A five-pixel margin contains the rounded stroke without clipping it.
+    def card_x(value):
+        return max(1, int(round(value * float(width) / 1920.0)))
+
+    card_positions = (700, 982, 1268, 1553)
+    button_x = tuple(card_x(value) for value in card_positions)
+    button_width = tuple(card_x(value + 258) - left
+                         for value, left in zip(card_positions, button_x))
+    focus_x = tuple(card_x(value - 5) for value in card_positions)
+    focus_width = tuple(card_x(value + 263) - left
+                        for value, left in zip(card_positions, focus_x))
     footer_y = py(922)
 
     return """
@@ -1008,54 +1030,18 @@ def _welcome_skin():
             size="{button_3_width},{button_label_h}" font="Regular;{button_font}"
             foregroundColor="#FFFFFF" transparent="1" zPosition="2"
             valign="center" halign="center" />
-    <widget name="focus_0" position="{button_0_x},{focus_y}"
-            size="{button_0_width},{focus_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_1" position="{button_1_x},{focus_y}"
-            size="{button_1_width},{focus_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_2" position="{button_2_x},{focus_y}"
-            size="{button_2_width},{focus_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_3" position="{button_3_x},{focus_y}"
-            size="{button_3_width},{focus_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_0_top" position="{button_0_x},{button_y}"
-            size="{button_0_width},{focus_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_0_left" position="{button_0_x},{button_y}"
-            size="{focus_h},{button_height}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_0_right" position="{focus_0_right_x},{button_y}"
-            size="{focus_h},{button_height}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_1_top" position="{button_1_x},{button_y}"
-            size="{button_1_width},{focus_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_1_left" position="{button_1_x},{button_y}"
-            size="{focus_h},{button_height}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_1_right" position="{focus_1_right_x},{button_y}"
-            size="{focus_h},{button_height}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_2_top" position="{button_2_x},{button_y}"
-            size="{button_2_width},{focus_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_2_left" position="{button_2_x},{button_y}"
-            size="{focus_h},{button_height}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_2_right" position="{focus_2_right_x},{button_y}"
-            size="{focus_h},{button_height}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_3_top" position="{button_3_x},{button_y}"
-            size="{button_3_width},{focus_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_3_left" position="{button_3_x},{button_y}"
-            size="{focus_h},{button_height}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="focus_3_right" position="{focus_3_right_x},{button_y}"
-            size="{focus_h},{button_height}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
+    <widget name="focus_0" position="{focus_0_x},{focus_y}"
+            size="{focus_0_w},{focus_h}" pixmap="{welcome_focus_art}"
+            scale="1" alphatest="blend" transparent="1" zPosition="4" />
+    <widget name="focus_1" position="{focus_1_x},{focus_y}"
+            size="{focus_1_w},{focus_h}" pixmap="{welcome_focus_art}"
+            scale="1" alphatest="blend" transparent="1" zPosition="4" />
+    <widget name="focus_2" position="{focus_2_x},{focus_y}"
+            size="{focus_2_w},{focus_h}" pixmap="{welcome_focus_art}"
+            scale="1" alphatest="blend" transparent="1" zPosition="4" />
+    <widget name="focus_3" position="{focus_3_x},{focus_y}"
+            size="{focus_3_w},{focus_h}" pixmap="{welcome_focus_art}"
+            scale="1" alphatest="blend" transparent="1" zPosition="4" />
     <widget name="hint" position="{hint_x},{hint_y}"
             size="{hint_w},{hint_h}" font="Regular;{hint_font}"
             foregroundColor="#A8B4C8" transparent="1" zPosition="2"
@@ -1110,7 +1096,6 @@ def _welcome_skin():
         account_meta_w=px(170),
         account_meta_h=py(42),
         meta_font=px(19),
-        button_y=button_y,
         button_label_y=py(735),
         button_label_h=py(72),
         button_0_x=button_x[0],
@@ -1121,18 +1106,24 @@ def _welcome_skin():
         button_1_width=button_width[1],
         button_2_width=button_width[2],
         button_3_width=button_width[3],
-        button_height=button_height,
-        focus_0_right_x=button_x[0] + button_width[0] - px(6),
-        focus_1_right_x=button_x[1] + button_width[1] - px(6),
-        focus_2_right_x=button_x[2] + button_width[2] - px(6),
-        focus_3_right_x=button_x[3] + button_width[3] - px(6),
+        focus_0_x=focus_x[0],
+        focus_1_x=focus_x[1],
+        focus_2_x=focus_x[2],
+        focus_3_x=focus_x[3],
+        focus_0_w=focus_width[0],
+        focus_1_w=focus_width[1],
+        focus_2_w=focus_width[2],
+        focus_3_w=focus_width[3],
+        welcome_focus_art=welcome_selection_art(DEFAULT_CHANNEL_HIGHLIGHT),
         button_font=px(21),
-        focus_y=button_y + button_height - py(6),
-        focus_h=py(6),
+        focus_y=py(545),
+        focus_h=py(843) - py(545),
         hint_x=px(720),
-        hint_y=py(850),
+        # Keep the full status row between the card focus (843) and the
+        # wallpaper's lower panel stroke (876), at every desktop height.
+        hint_y=py(844),
         hint_w=px(1050),
-        hint_h=py(45),
+        hint_h=py(26),
         hint_font=px(18),
         footer_x=px(65),
         footer_y=footer_y,
@@ -1144,6 +1135,39 @@ def _welcome_skin():
 
 def _dashboard_skin():
     width, height, px = _scale()
+
+    def xpx(value):
+        return int(round(value * width / 1920.0))
+
+    def ypx(value):
+        return int(round(value * height / 1080.0))
+
+    def card_rect(rect):
+        left, top, card_w, card_h = rect
+        return (
+            xpx(left), ypx(top),
+            max(1, xpx(left + card_w) - xpx(left)),
+            max(1, ypx(top + card_h) - ypx(top)),
+        )
+
+    hero_x, hero_y, hero_w, hero_h = card_rect(DASHBOARD_HERO_RECT)
+    left, top, card_w, card_h = DASHBOARD_HERO_RECT
+    panel_x, panel_y, panel_w, panel_h = card_rect(
+        (left + 6, top + 6, card_w - 12, card_h - 12)
+    )
+    quick_focus_widgets = []
+    for index, rect in enumerate(DASHBOARD_QUICK_RECTS):
+        x, y, card_w, card_h = card_rect(rect)
+        quick_focus_widgets.append(
+            '<widget name="quick_focus_{i}" position="{x},{y}" '
+            'size="{w},{h}" pixmap="{path}" alphatest="blend" '
+            'scale="1" zPosition="6" />'.format(
+                i=index, x=x, y=y, w=card_w, h=card_h,
+                path=dashboard_selection_art(
+                    DEFAULT_CHANNEL_HIGHLIGHT, DASHBOARD_QUICK_ACTIONS[index]
+                ),
+            )
+        )
     menu_widgets = []
     for index, (top, bottom) in enumerate(DASHBOARD_MENU_ROWS):
         menu_widgets.append(
@@ -1239,83 +1263,13 @@ def _dashboard_skin():
             font="Regular;{quick_font}" foregroundColor="#FFFFFF"
             transparent="1"
             zPosition="4" valign="bottom" halign="center" />
-    <widget name="quick_focus_0" position="{quick_line_0_x},{quick_line_y}"
-            size="{quick_line_w},{quick_line_h}" font="Regular;1"
-            backgroundColor="#D946EF" transparent="0" zPosition="5" />
-    <widget name="quick_focus_1" position="{quick_line_1_x},{quick_line_y}"
-            size="{quick_line_w},{quick_line_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="5" />
-    <widget name="quick_focus_2" position="{quick_line_2_x},{quick_line_y}"
-            size="{quick_line_w},{quick_line_h}" font="Regular;1"
-            backgroundColor="#FF477E" transparent="0" zPosition="5" />
-    <widget name="quick_focus_3" position="{quick_line_3_x},{quick_line_y}"
-            size="{quick_line_w},{quick_line_h}" font="Regular;1"
-            backgroundColor="#FACC15" transparent="0" zPosition="5" />
-
-    <widget name="hero_glow_top" position="{hero_glow_x},{hero_glow_y}"
-            size="{hero_glow_w},{glow_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="6" />
-    <widget name="hero_glow_bottom" position="{hero_glow_x},{hero_glow_bottom_y}"
-            size="{hero_glow_w},{glow_h}" font="Regular;1"
-            backgroundColor="#E600FF" transparent="0" zPosition="6" />
-    <widget name="hero_glow_left" position="{hero_glow_x},{hero_glow_y}"
-            size="{glow_h},{hero_glow_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="6" />
-    <widget name="hero_glow_right" position="{hero_glow_right_x},{hero_glow_y}"
-            size="{glow_h},{hero_glow_h}" font="Regular;1"
-            backgroundColor="#E600FF" transparent="0" zPosition="6" />
-
-    <widget name="quick_glow_0_top" position="{quick_glow_0_x},{quick_glow_y}"
-            size="{quick_glow_0_w},{glow_h}" font="Regular;1"
-            backgroundColor="#E600FF" transparent="0" zPosition="6" />
-    <widget name="quick_glow_0_bottom" position="{quick_glow_0_x},{quick_glow_bottom_y}"
-            size="{quick_glow_0_w},{glow_h}" font="Regular;1"
-            backgroundColor="#E600FF" transparent="0" zPosition="6" />
-    <widget name="quick_glow_0_left" position="{quick_glow_0_x},{quick_glow_y}"
-            size="{glow_h},{quick_glow_h}" font="Regular;1"
-            backgroundColor="#E600FF" transparent="0" zPosition="6" />
-    <widget name="quick_glow_0_right" position="{quick_glow_0_right_x},{quick_glow_y}"
-            size="{glow_h},{quick_glow_h}" font="Regular;1"
-            backgroundColor="#E600FF" transparent="0" zPosition="6" />
-
-    <widget name="quick_glow_1_top" position="{quick_glow_1_x},{quick_glow_y}"
-            size="{quick_glow_1_w},{glow_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="6" />
-    <widget name="quick_glow_1_bottom" position="{quick_glow_1_x},{quick_glow_bottom_y}"
-            size="{quick_glow_1_w},{glow_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="6" />
-    <widget name="quick_glow_1_left" position="{quick_glow_1_x},{quick_glow_y}"
-            size="{glow_h},{quick_glow_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="6" />
-    <widget name="quick_glow_1_right" position="{quick_glow_1_right_x},{quick_glow_y}"
-            size="{glow_h},{quick_glow_h}" font="Regular;1"
-            backgroundColor="#00E5FF" transparent="0" zPosition="6" />
-
-    <widget name="quick_glow_2_top" position="{quick_glow_2_x},{quick_glow_y}"
-            size="{quick_glow_2_w},{glow_h}" font="Regular;1"
-            backgroundColor="#FF477E" transparent="0" zPosition="6" />
-    <widget name="quick_glow_2_bottom" position="{quick_glow_2_x},{quick_glow_bottom_y}"
-            size="{quick_glow_2_w},{glow_h}" font="Regular;1"
-            backgroundColor="#FF477E" transparent="0" zPosition="6" />
-    <widget name="quick_glow_2_left" position="{quick_glow_2_x},{quick_glow_y}"
-            size="{glow_h},{quick_glow_h}" font="Regular;1"
-            backgroundColor="#FF477E" transparent="0" zPosition="6" />
-    <widget name="quick_glow_2_right" position="{quick_glow_2_right_x},{quick_glow_y}"
-            size="{glow_h},{quick_glow_h}" font="Regular;1"
-            backgroundColor="#FF477E" transparent="0" zPosition="6" />
-
-    <widget name="quick_glow_3_top" position="{quick_glow_3_x},{quick_glow_y}"
-            size="{quick_glow_3_w},{glow_h}" font="Regular;1"
-            backgroundColor="#FACC15" transparent="0" zPosition="6" />
-    <widget name="quick_glow_3_bottom" position="{quick_glow_3_x},{quick_glow_bottom_y}"
-            size="{quick_glow_3_w},{glow_h}" font="Regular;1"
-            backgroundColor="#FACC15" transparent="0" zPosition="6" />
-    <widget name="quick_glow_3_left" position="{quick_glow_3_x},{quick_glow_y}"
-            size="{glow_h},{quick_glow_h}" font="Regular;1"
-            backgroundColor="#FACC15" transparent="0" zPosition="6" />
-    <widget name="quick_glow_3_right" position="{quick_glow_3_right_x},{quick_glow_y}"
-            size="{glow_h},{quick_glow_h}" font="Regular;1"
-            backgroundColor="#FACC15" transparent="0" zPosition="6" />
+    <widget name="hero_corner_mask" position="{hero_x},{hero_y}"
+            size="{hero_w},{hero_h}" pixmap="{hero_corners_path}"
+            alphatest="blend" scale="1" zPosition="3" />
+    <widget name="hero_focus" position="{hero_x},{hero_y}"
+            size="{hero_w},{hero_h}" pixmap="{hero_focus_path}"
+            alphatest="blend" scale="1" zPosition="6" />
+    {quick_focus_widgets}
     <widget name="footer" position="0,{footer_y}" size="{width},{footer_h}"
             font="Regular;{footer_font}" foregroundColor="#F8FAFC"
             backgroundColor="#030817" transparent="1" zPosition="4"
@@ -1350,61 +1304,39 @@ def _dashboard_skin():
         menu_overlay_w=px(500),
         menu_overlay_h=px(878),
         menu_overlay_path=DISCOVERY_MENU_PATH,
-        # Fill the card; the decoder keeps the 3:1 artwork proportional and
-        # ePixmap clips only the surrounding background to this viewport.
-        # Derive all edges from the scaled border to avoid one-pixel seams.
-        archive_panel_x=px(507)+px(6),
-        archive_panel_y=px(104)+px(6),
-        archive_panel_w=px(1885)-px(507)-px(6),
-        archive_panel_h=px(539)-px(104)-px(6),
-        preview_x=px(555),
-        preview_w=px(700),
-        preview_title_y=px(205),
-        preview_title_h=px(90),
+        # The viewport shares its bounds with the rounded frame. A native
+        # alpha mask restores the wallpaper at its corners without changing
+        # the asynchronous hero decoder or cropping the title area.
+        archive_panel_x=panel_x,
+        archive_panel_y=panel_y,
+        archive_panel_w=panel_w,
+        archive_panel_h=panel_h,
+        hero_x=hero_x,
+        hero_y=hero_y,
+        hero_w=hero_w,
+        hero_h=hero_h,
+        hero_focus_path=dashboard_selection_art(DEFAULT_CHANNEL_HIGHLIGHT),
+        hero_corners_path=DASHBOARD_HERO_CORNERS_PATH,
+        quick_focus_widgets="\n".join(quick_focus_widgets),
+        preview_x=xpx(555),
+        preview_w=xpx(700),
+        preview_title_y=ypx(205),
+        preview_title_h=ypx(90),
         preview_title_font=px(76),
         continue_preview_title_font=px(48),
-        preview_desc_y=px(300),
-        preview_desc_h=px(110),
+        preview_desc_y=ypx(300),
+        preview_desc_h=ypx(110),
         preview_desc_font=px(36),
-        quick_0_x=px(512),
-        quick_1_x=px(861),
-        quick_2_x=px(1219),
-        quick_3_x=px(1575),
-        quick_3_w=px(311),
-        quick_y=px(820),
-        quick_w=px(320),
-        quick_h=px(110),
+        quick_0_x=xpx(512),
+        quick_1_x=xpx(861),
+        quick_2_x=xpx(1219),
+        quick_3_x=xpx(1575),
+        quick_3_w=xpx(311),
+        quick_y=ypx(820),
+        quick_w=xpx(320),
+        quick_h=ypx(110),
         quick_font=px(36),
         continue_quick_font=px(27),
-        quick_line_0_x=px(632),
-        quick_line_1_x=px(985),
-        quick_line_2_x=px(1342),
-        quick_line_3_x=px(1690),
-        quick_line_y=px(935),
-        quick_line_w=px(80),
-        quick_line_h=px(5),
-        glow_h=px(6),
-        hero_glow_x=px(507),
-        hero_glow_y=px(104),
-        hero_glow_w=px(1384),
-        hero_glow_h=px(441),
-        hero_glow_bottom_y=px(539),
-        hero_glow_right_x=px(1885),
-        quick_glow_y=px(568),
-        quick_glow_h=px(413),
-        quick_glow_bottom_y=px(975),
-        quick_glow_0_x=px(507),
-        quick_glow_0_w=px(330),
-        quick_glow_0_right_x=px(831),
-        quick_glow_1_x=px(856),
-        quick_glow_1_w=px(338),
-        quick_glow_1_right_x=px(1188),
-        quick_glow_2_x=px(1214),
-        quick_glow_2_w=px(337),
-        quick_glow_2_right_x=px(1545),
-        quick_glow_3_x=px(1570),
-        quick_glow_3_w=px(321),
-        quick_glow_3_right_x=px(1885),
         footer_y=px(982),
         footer_h=height - px(982),
         footer_font=px(30),
@@ -4805,6 +4737,7 @@ class GTPlayerSettingsScreen(Screen):
             self.onClose.append(self._stop_tmdb_test)
         if hasattr(self, "onShown"):
             self.onShown.append(self._refresh_device_language)
+            self.onShown.append(self._refresh_youtube_settings)
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._refresh)
         self._refresh()
@@ -4971,9 +4904,9 @@ class GTPlayerSettingsScreen(Screen):
         elif self.selected_index == 11:
             self.session.open(GTWeatherSettingsScreen)
         elif self.selected_index == 12:
-            from .web_ui import GTWebInterfaceScreen
+            from .web_ui import open_web_interface
 
-            self.session.open(GTWebInterfaceScreen)
+            open_web_interface(self.session)
         elif self.selected_index == 13:
             from .youtube_ui import GTYouTubeSettingsScreen
             self.session.openWithCallback(
@@ -4987,12 +4920,26 @@ class GTPlayerSettingsScreen(Screen):
 
     def _youtube_settings_closed(self, values):
         if values:
-            for field in ("youtube_resolution", "youtube_stream_mode",
-                          "youtube_audio_preference"):
+            for field in ("youtube_resolution", "youtube_autoplay"):
                 setattr(self.settings, field, values[field])
-            self.settings.youtube_dash = self.settings.youtube_stream_mode != "compatible"
-            self["message"].setText(_("Press GREEN to save the changes."))
+            self.settings.youtube_dash = True
+            self.settings.youtube_stream_mode = "auto"
+            self.settings.youtube_audio_preference = "default"
+            self["message"].setText(_("Settings saved"))
             self._refresh()
+
+    def _refresh_youtube_settings(self):
+        try:
+            shared = self.settings_loader()
+            if isinstance(shared, dict):
+                shared = PlayerSettings.from_dict(shared)
+            if not isinstance(shared, PlayerSettings):
+                return
+            for field in ("youtube_resolution", "youtube_autoplay", "youtube_dash",
+                          "youtube_stream_mode", "youtube_audio_preference"):
+                setattr(self.settings, field, getattr(shared, field))
+        except Exception:
+            return
 
     def _open_category_code(
         self,
@@ -5452,6 +5399,7 @@ class GTPlayerSettingsScreen(Screen):
 
     def save(self):
         try:
+            self._refresh_youtube_settings()
             result = self.settings_saver(self.settings)
         except Exception:
             result = False
@@ -9448,6 +9396,8 @@ class GTDashboardScreen(Screen):
         self["discovery_hero"] = Pixmap()
         self["discovery_hero"].hide()
         self._discovery_hero_loaded = False
+        self["hero_corner_mask"] = Pixmap()
+        self["hero_corner_mask"].hide()
         for index in range(len(self._menu_items)):
             self["card_{}".format(index)] = Label("")
             self["focus_{}".format(index)] = Pixmap()
@@ -9471,11 +9421,8 @@ class GTDashboardScreen(Screen):
             movie_label, series_label, continue_label, _("FAVORITES"),
         )
         for index in range(4):
-            self["quick_focus_{}".format(index)] = Label("")
-            for edge in ("top", "bottom", "left", "right"):
-                self["quick_glow_{}_{}".format(index, edge)] = Label("")
-        for edge in ("top", "bottom", "left", "right"):
-            self["hero_glow_{}".format(edge)] = Label("")
+            self["quick_focus_{}".format(index)] = Pixmap()
+        self["hero_focus"] = Pixmap()
         self["footer"] = Label("")
         self._refit_source_labels()
         install_remote_footer(self, DASHBOARD_FOOTER_ITEMS)
@@ -9591,8 +9538,10 @@ class GTDashboardScreen(Screen):
             )
         if archive_selected or discovery_selected:
             self["archive_backdrop"].show()
+            self["hero_corner_mask"].show()
         else:
             self["archive_backdrop"].hide()
+            self["hero_corner_mask"].hide()
         if archive_selected:
             self["archive_hero"].show()
         else:
@@ -9631,24 +9580,16 @@ class GTDashboardScreen(Screen):
                 min_size=px(21),
             )
             quick_focus = self["quick_focus_{}".format(index)]
-            selected = item[2] == ("movie", "series", "continue", "favorites")[index]
+            selected = item[2] == DASHBOARD_QUICK_ACTIONS[index]
             if selected:
                 quick_focus.show()
             else:
                 quick_focus.hide()
-            for edge in ("top", "bottom", "left", "right"):
-                glow = self["quick_glow_{}_{}".format(index, edge)]
-                if selected:
-                    glow.show()
-                else:
-                    glow.hide()
         hero_selected = item[2] in ("live", "catchup", "settings", "discover")
-        for edge in ("top", "bottom", "left", "right"):
-            glow = self["hero_glow_{}".format(edge)]
-            if hero_selected:
-                glow.show()
-            else:
-                glow.hide()
+        if hero_selected:
+            self["hero_focus"].show()
+        else:
+            self["hero_focus"].hide()
 
     def _archive_hero_ready(self, loaded):
         # Decoding may finish after the user has moved to another menu card.
@@ -9979,13 +9920,8 @@ class GTIPTVPlayerProScreen(Screen):
         self["accounts_button"] = Label("")
         self["add_button"] = Label("")
         self["youtube_button"] = Label("YouTube")
-        self["focus_0"] = Label("")
-        self["focus_1"] = Label("")
-        self["focus_2"] = Label("")
-        self["focus_3"] = Label("")
         for index in range(4):
-            for edge in ("top", "left", "right"):
-                self["focus_{}_{}".format(index, edge)] = Label("")
+            self["focus_{}".format(index)] = Pixmap()
         self["hint"] = Label("")
         self["footer"] = Label("")
         install_remote_footer(self, WELCOME_FOOTER_ITEMS)
@@ -10036,6 +9972,11 @@ class GTIPTVPlayerProScreen(Screen):
         self._cancel_account_preview()
         self._account_preview_cache.clear()
         self.load_result = self.account_loader()
+        settings = load_player_settings()
+        refresh_screen_selection(
+            self, settings.channel_highlight,
+            getattr(settings, "selection_border", None),
+        )
         if self.selected_account_index >= len(self.accounts):
             self.selected_account_index = max(0, len(self.accounts) - 1)
         self._refresh()
@@ -10108,12 +10049,8 @@ class GTIPTVPlayerProScreen(Screen):
         for index in range(4):
             if self.selected_action == index:
                 self["focus_{}".format(index)].show()
-                for edge in ("top", "left", "right"):
-                    self["focus_{}_{}".format(index, edge)].show()
             else:
                 self["focus_{}".format(index)].hide()
-                for edge in ("top", "left", "right"):
-                    self["focus_{}_{}".format(index, edge)].hide()
 
     def previous_account(self):
         if self.accounts:

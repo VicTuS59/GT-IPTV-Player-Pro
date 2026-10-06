@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro\n"
-"Language-Team: Romanian\n"
-"Language: ro\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro\nLanguage-Team: Romanian\nLanguage: ro\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "AUDIO: {}"
 msgid "About"
 msgstr "Despre"
 
+msgid "Access code"
+msgstr "Cod de acces"
+
 msgid "Access your channels quickly"
 msgstr "Accesați rapid canalele"
 
@@ -197,6 +190,9 @@ msgstr "Arabă"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Redarea din arhivă nu este disponibilă pentru acest canal."
+
+msgid "Aspect ratio"
+msgstr "Raport de aspect"
 
 msgid "Audio language changed"
 msgstr "Limba audio a fost schimbată"
@@ -481,6 +477,9 @@ msgstr "Cer senin"
 msgid "Close"
 msgstr "Închidere"
 
+msgid "Close menu"
+msgstr "Închide meniul"
+
 msgid "Close the open screen before opening another one."
 msgstr "Închideți ecranul deschis înainte de a deschide altul."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Pista audio solicitată nu a putut fi selectată."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Nu s-a putut porni afișarea subtitrărilor independente."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Nu s-a putut porni căutarea subtitrărilor online."
 
 msgid "Could not start the player."
 msgstr "Playerul nu a putut fi pornit."
@@ -771,6 +770,9 @@ msgstr "Ordinea implicită a fost restabilită. Apăsați VERDE pentru salvare."
 msgid "Delete"
 msgstr "Ștergere"
 
+msgid "Delete all"
+msgstr "Șterge tot"
+
 msgid "Delete this item?"
 msgstr "Ștergeți acest element?"
 
@@ -818,6 +820,12 @@ msgstr "Descoperă filme"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Descoperă filme noi cu recomandările TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "Afișează conținutul 16:9 ca"
+
+msgid "Display 4:3 content as"
+msgstr "Afișează conținutul 4:3 ca"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Nu includeți o interogare sau un fragment în URL-ul portalului"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Introduceți mai întâi o cheie API SubDL."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Introduceți o cheie API SubDL în setările pentru subtitrări."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Introduceți o cheie API TMDb pentru detalii despre filme și seriale."
@@ -1007,6 +1015,9 @@ msgstr "Introduceți codul din șase cifre afișat pe receptor."
 msgid "Enter the username"
 msgstr "Introduceți numele de utilizator"
 
+msgid "Enter the username / Enter the password"
+msgstr "Introduceți numele de utilizator / Introduceți parola"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Introduceți acest cod în browserul telefonului, apoi aprobați solicitarea pe televizor."
 
@@ -1061,6 +1072,9 @@ msgstr "FAVORITE"
 
 msgid "FILE"
 msgstr "FIȘIER"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS va fi convertit"
@@ -1144,19 +1158,11 @@ msgstr "Ecran complet"
 msgid "GREEN"
 msgstr "VERDE"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"FILM"
+msgid "GT\nMOVIE"
+msgstr "GT\nFILM"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"SERIAL"
+msgid "GT\nSERIES"
+msgstr "GT\nSERIAL"
 
 msgid "Genre unavailable"
 msgstr "Genul nu este disponibil"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Previzualizarea subtitrărilor independente"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Sincronizarea subtitrărilor independente"
 
 msgid "Independent subtitles"
 msgstr "Subtitrări independente"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Subtitrările independente sunt dezactivate în setări."
 
 msgid "Information"
 msgstr "Informații"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Latență"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Latență: {} ms\n"
-"Starea contului: {}\n"
-"Active / Maximum: {}\n"
-"Expirare: {}\n"
-"Ora serverului: {}\n"
-"Fus orar: {}\n"
-"Protocol: {}\n"
-"Format de ieșire: {}\n"
-"Versiunea serverului: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Latență: {} ms\nStarea contului: {}\nActive / Maximum: {}\nExpirare: {}\nOra serverului: {}\nFus orar: {}\nProtocol: {}\nFormat de ieșire: {}\nVersiunea serverului: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Latență: {} ms\n"
-"Starea contului: {}\n"
-"Protocol: {}\n"
-"Format de ieșire: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Latență: {} ms\nStarea contului: {}\nProtocol: {}\nFormat de ieșire: {}\n\n{}"
 
 msgid "Left"
 msgstr "Stânga"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Încarcă o subtitrare de pe această pagină web înainte de sincronizare."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Încărcați subtitrări independente înainte de a le sincroniza."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "Se încarcă serviciile DVB și canalele XMLTV din cache..."
@@ -1514,6 +1486,9 @@ msgstr "Deconectare"
 
 msgid "Lower"
 msgstr "Mai jos"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "CĂUTARE CANALE M3U"
@@ -1668,6 +1643,9 @@ msgstr "Adresă MAC"
 
 msgid "MANAGE SOURCES"
 msgstr "GESTIONARE SURSE"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 s: Interfață web"
 
 msgid "MOVIE CATEGORIES"
 msgstr "CATEGORII FILME"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Nu s-au găsit subtitrări corespunzătoare. Verifică limba și starea furnizorului."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Nu s-au găsit subtitrări potrivite pe SubDL."
 
 msgid "No movies found."
 msgstr "Nu s-au găsit filme."
@@ -1946,14 +1924,8 @@ msgstr "Nu este disponibilă nicio sursă pentru conectare."
 msgid "No source is selected for deletion."
 msgstr "Nu este selectată nicio sursă pentru ștergere."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Nu s-a găsit nicio sursă.\n"
-"\n"
-"Creați una din panoul ADĂUGARE SURSĂ de pe ecranul principal."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Nu s-a găsit nicio sursă.\n\nCreați una din panoul ADĂUGARE SURSĂ de pe ecranul principal."
 
 msgid "No summary is available for this programme."
 msgstr "Nu este disponibil niciun rezumat pentru acest program."
@@ -1981,6 +1953,9 @@ msgstr "Nu s-a găsit nicio sursă Xtream validă."
 
 msgid "No valid title was found for TMDb"
 msgstr "Nu s-a găsit niciun titlu valid pentru TMDb"
+
+msgid "No videos found at the selected quality."
+msgstr "Nu s-au găsit videoclipuri la calitatea selectată."
 
 msgid "No weather forecast is available for this city."
 msgstr "Nu este disponibilă nicio prognoză meteo pentru această localitate."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Deschide / Aprobă"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Deschideți setările pentru subtitrările independente."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Deschide tastatura televizorului și lipește textul aici."
@@ -2107,8 +2082,14 @@ msgstr "Redare"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Redă mai întâi un film sau un episod pe receptor."
 
+msgid "Play next video automatically"
+msgstr "Redă automat următorul videoclip"
+
 msgid "Play on TV"
 msgstr "Redă pe TV"
+
+msgid "Playback history"
+msgstr "Istoricul redării"
 
 msgid "Playback mode"
 msgstr "Mod de redare"
@@ -2269,6 +2250,9 @@ msgstr "Conexiunea cu furnizorul a reușit"
 msgid "Quality"
 msgstr "Calitate"
 
+msgid "Quality changed. Search again."
+msgstr "Calitatea s-a schimbat. Caută din nou."
+
 msgid "Queued"
 msgstr "În așteptare"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Evaluare"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Timp de citire: {} ms\n"
-"Tip sursă: {}\n"
-"Dimensiune: {} octeți\n"
-"Canale: {}\n"
-"Categorii: {}\n"
-"Vechime cache: {}\n"
-"Ultima modificare: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Timp de citire: {} ms\nTip sursă: {}\nDimensiune: {} octeți\nCanale: {}\nCategorii: {}\nVechime cache: {}\nUltima modificare: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Se citește durata..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Se reconectează fluxul..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Recuperarea a reușit. Notați noul cod de recuperare; acesta este afișat o singură dată:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Recuperarea a reușit. Notați noul cod de recuperare; acesta este afișat o singură dată:\n\n{}"
 
 msgid "Red"
 msgstr "Roșu"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Resetare"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Resetează temporizarea subtitrărilor"
 
 msgid "Resolution: --"
 msgstr "Rezoluție: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Reluare"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Reluați redarea din poziția salvată?\n"
-"\n"
-"Poziție salvată: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Reluați redarea din poziția salvată?\n\nPoziție salvată: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Reluați filmele și episoadele de serial neterminate"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "SETĂRI SUBTITRĂRI"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Aceeași linie începe în subtitrare (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Căutați din nou; acest rezultat a expirat."
 msgid "Search for a spoken phrase"
 msgstr "Căutare după o expresie rostită"
 
+msgid "Search history"
+msgstr "Istoricul căutărilor"
+
 msgid "Search in IPTV"
 msgstr "Caută în IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Căutare muzică, documentare sau canale"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Căutare subtitrări cu SubDL"
 
 msgid "Search subtitles"
 msgstr "Căutare subtitrări"
@@ -2550,6 +2507,9 @@ msgstr "Se caută furnizori..."
 
 msgid "Searching…"
 msgstr "Se caută..."
+
+msgid "Season"
+msgstr "Sezon"
 
 msgid "Seasons"
 msgstr "Sezoane"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Afișare / Ascundere"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Afișează cu 0,5 secunde mai devreme"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Afișează cu 0,5 secunde mai târziu"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Afișează cu 1 secundă mai devreme"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Afișează cu 1 secundă mai târziu"
 
 msgid "Show in device main menu"
 msgstr "Afișare în meniul principal al dispozitivului"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "Conexiunea la SubDL este pregătită."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL este temporar indisponibil."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL este furnizorul în această versiune."
 
 msgid "SubDL key change cancelled."
 msgstr "Schimbarea cheii SubDL a fost anulată."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL a returnat un răspuns nevalid."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Subtitrări"
 
 msgid "Subtitle"
 msgstr "Subtitrare"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Furnizori de subtitrări"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Selectarea subtitrării nu este disponibilă pe această imagine de sistem."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "Căutarea subtitrărilor necesită o instalare funcțională a SubsSupport sau SubsSupportPro."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Sincronizarea subtitrărilor este deja în curs."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Sincronizarea subtitrărilor nu este disponibilă în această imagine."
 
 msgid "Subtitle timing adjusted"
 msgstr "Temporizarea subtitrării ajustată"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Decalajul subtitrărilor: {:+.1f} secunde"
 
 msgid "Subtitles"
 msgstr "Subtitrări"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "Cheia API SubDL a fost ștearsă."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "Cheia API SubDL a fost respinsă."
 
 msgid "The SubDL connection test is still running..."
 msgstr "Testul conexiunii la SubDL este încă în curs..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "S-a atins limita de cereri SubDL."
 
 msgid "The TMDb connection test is still running..."
 msgstr "Testul conexiunii TMDb rulează încă..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "Diferența nu poate depăși 30 de minute."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "Subtitrările descărcate nu au putut fi salvate."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "Fișierul nu a putut fi șters. Verificați dispozitivul de stocare și permisiunile."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Serviciul redat s-a schimbat. Deschideți din nou selectarea audio."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Titlul programului nu este disponibil pentru căutarea subtitrărilor."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Ceasul receptorului nu este pregătit. Verificați ora rețelei și încercați din nou."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "Detaliile filmului selectat vor fi încărcate de pe server."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Subtitrarea depășește limita de dimensiune"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Acest format de subtitrare nu este suportat"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "Răspunsul serialului utilizează un format neacceptat. Categoriile rămân disponibile."
@@ -3266,12 +3226,8 @@ msgstr "Acest conținut are o singură pistă audio."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Acest dosar se află în afara locațiilor de stocare permise."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Aceasta este o previzualizare a subtitrărilor.\n"
-"Modificările apar aici imediat."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Aceasta este o previzualizare a subtitrărilor.\nModificările apar aici imediat."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Această previzualizare folosește setările actuale de aspect nesalvate."
@@ -3419,6 +3375,9 @@ msgstr "Poziție verticală"
 msgid "Very large"
 msgstr "Foarte mare"
 
+msgid "Video"
+msgstr "Videoclip"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Videoclipul nu a putut fi redat pe acest receptor. Încearcă un alt videoclip sau o altă setare de calitate."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Alb"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Notați acest cod de recuperare. Este afișat o singură dată:\n"
-"\n"
-"{}\n"
-"\n"
-"Dacă uitați ambele coduri, dezinstalarea și reinstalarea modulului resetează doar această blocare."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Notați acest cod de recuperare. Este afișat o singură dată:\n\n{}\n\nDacă uitați ambele coduri, dezinstalarea și reinstalarea modulului resetează doar această blocare."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "EPG XMLTV este dezactivat pentru această sursă M3U."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} eliminat din favorite."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Player IPTV cu sursă deschisă pentru Enigma2. Acceptă conturi Xtream Codes și TV în direct din liste de redare M3U standard locale, din rețele montate sau HTTP(S). Sursele M3U simple oferă numai TV în direct.\n"
-"\n"
-"DEZVOLTATOR\n"
-"{}\n"
-"\n"
-"NOTĂ JURIDICĂ\n"
-"Acest plugin nu furnizează canale, fluxuri, conturi sau liste de redare. Utilizatorul este responsabil să folosească numai conținut pentru care deține drepturi de acces și utilizare.\n"
-"\n"
-"CONFIDENȚIALITATE\n"
-"Când Open-Meteo este activat, localitatea și poziția selectate sunt trimise către Open-Meteo pentru prognoza meteo. Când TMDb este activat, titlul filmului/serialului și cheia sau tokenul TMDb introduse de utilizator sunt trimise către TMDb. Numele de utilizator și parola IPTV nu sunt trimise acestor servicii."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nPlayer IPTV cu sursă deschisă pentru Enigma2. Acceptă conturi Xtream Codes și TV în direct din liste de redare M3U standard locale, din rețele montate sau HTTP(S). Sursele M3U simple oferă numai TV în direct.\n\nDEZVOLTATOR\n{}\n\nNOTĂ JURIDICĂ\nAcest plugin nu furnizează canale, fluxuri, conturi sau liste de redare. Utilizatorul este responsabil să folosească numai conținut pentru care deține drepturi de acces și utilizare.\n\nCONFIDENȚIALITATE\nCând Open-Meteo este activat, localitatea și poziția selectate sunt trimise către Open-Meteo pentru prognoza meteo. Când TMDb este activat, titlul filmului/serialului și cheia sau tokenul TMDb introduse de utilizator sunt trimise către TMDb. Numele de utilizator și parola IPTV nu sunt trimise acestor servicii."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

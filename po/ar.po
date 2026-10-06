@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: ar\n"
-"Language: ar\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=(n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5);\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: ar\nLanguage: ar\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=6; plural=(n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5);\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -48,7 +38,7 @@ msgid "A source connection is already in progress."
 msgstr "يوجد اتصال بمصدر قيد التنفيذ بالفعل."
 
 msgid "A subtitle search is already running."
-msgstr "A subtitle search is already running."
+msgstr "هناك بحث عن الترجمة قيد التنفيذ."
 
 msgid "ADD NEW ACCOUNT"
 msgstr "إضافة حساب جديد"
@@ -82,6 +72,12 @@ msgstr "خطأ اتصال API، الإجراء={}"
 msgid "API connection successful"
 msgstr "نجح الاتصال بواجهة API"
 
+msgid "API key"
+msgstr "مفتاح API"
+
+msgid "API key was rejected"
+msgstr "تم رفض مفتاح API"
+
 msgid "API response is invalid"
 msgstr "استجابة API غير صالحة"
 
@@ -104,6 +100,9 @@ msgstr "الصوت: {}"
 msgid "About"
 msgstr "حول"
 
+msgid "Access code"
+msgstr "رمز الدخول"
+
 msgid "Access your channels quickly"
 msgstr "وصول سريع إلى قنواتك"
 
@@ -123,6 +122,9 @@ msgstr "إجراء"
 msgid "Active"
 msgstr "نشط"
 
+msgid "Active downloads"
+msgstr "التنزيلات الجارية"
+
 msgid "Add M3U Source"
 msgstr "إضافة مصدر M3U"
 
@@ -131,6 +133,9 @@ msgstr "إضافة حساب جديد"
 
 msgid "Add Source"
 msgstr "إضافة مصدر"
+
+msgid "Add an API key first"
+msgstr "أضف مفتاح API أولاً"
 
 msgid "Add playlist"
 msgstr "إضافة قائمة تشغيل"
@@ -174,6 +179,9 @@ msgstr "لا يمكن إعادة توجيه طلب صورة HTTPS إلى HTTP."
 msgid "An automatic DVB EPG update is already running."
 msgstr "يجري بالفعل تحديث تلقائي لـ DVB EPG."
 
+msgid "An automatic test is already running."
+msgstr "يوجد اختبار تلقائي قيد التشغيل بالفعل."
+
 msgid "Appearance"
 msgstr "المظهر"
 
@@ -182,6 +190,9 @@ msgstr "العربية"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "تشغيل الأرشيف غير متاح لهذه القناة."
+
+msgid "Aspect ratio"
+msgstr "نسبة العرض إلى الارتفاع"
 
 msgid "Audio language changed"
 msgstr "تم تغيير لغة الصوت"
@@ -216,9 +227,21 @@ msgstr "تغيرت المسارات الصوتية. افتح اختيار الص
 msgid "Automatic"
 msgstr "تلقائي"
 
+msgid "Automatic Test"
+msgstr "الاختبار التلقائي"
+
 #, python-brace-format
 msgid "Automatic matching restored for {}."
 msgstr "تمت استعادة المطابقة التلقائية لـ {}."
+
+msgid "Automatic test cancelled"
+msgstr "أُلغي الاختبار التلقائي"
+
+msgid "Automatic test completed"
+msgstr "اكتمل الاختبار التلقائي"
+
+msgid "Automatic test is running"
+msgstr "الاختبار التلقائي قيد التشغيل"
 
 msgid "Automatic update settings could not be opened."
 msgstr "تعذّر فتح إعدادات التحديث التلقائي."
@@ -291,6 +314,9 @@ msgstr "تعذر تحميل المسلسلات"
 
 msgid "Cancel"
 msgstr "إلغاء"
+
+msgid "Cancel Test"
+msgstr "إلغاء الاختبار"
 
 msgid "Cancel the active download before deleting it."
 msgstr "ألغِ التنزيل الجاري قبل حذفه."
@@ -391,6 +417,9 @@ msgstr "اختر Xtream Codes أو Stalker / MAC."
 msgid "Choose a line above to fill the subtitle time. Minus shows subtitles earlier; plus shows them later."
 msgstr "اختر سطرًا أعلاه لتحديد وقت الترجمة. علامة الناقص (-) تُظهرها أبكر، وعلامة الزائد (+) تُظهرها لاحقًا."
 
+msgid "Choose a portal type"
+msgstr "اختر نوع البوابة"
+
 msgid "Choose a source type first."
 msgstr "اختر نوع المصدر أولًا."
 
@@ -411,6 +440,9 @@ msgstr "اختر مساراً صوتياً متاحاً."
 
 msgid "Choose episodes"
 msgstr "اختر الحلقات"
+
+msgid "Choose one portal type. Saved accounts are tested securely and one at a time."
+msgstr "اختر نوع بوابة واحدًا. تُختبر الحسابات المحفوظة بأمان وبالتتابع."
 
 msgid "Choose the destination with the arrows. OK places marked categories below the line; EXIT cancels."
 msgstr "اختر الموضع بالأسهم. اضغط OK لوضع الفئات المحددة أسفل الخط، أو EXIT للإلغاء."
@@ -444,6 +476,9 @@ msgstr "سماء صافية"
 
 msgid "Close"
 msgstr "إغلاق"
+
+msgid "Close menu"
+msgstr "إغلاق القائمة"
 
 msgid "Close the open screen before opening another one."
 msgstr "أغلق الشاشة المفتوحة قبل فتح شاشة أخرى."
@@ -506,6 +541,12 @@ msgstr "جارٍ الاتصال بـ {}، يُرجى الانتظار."
 
 msgid "Connection limit reached"
 msgstr "تم بلوغ حد الاتصالات"
+
+msgid "Connection status"
+msgstr "حالة الاتصال"
+
+msgid "Connections"
+msgstr "الاتصالات"
 
 msgid "Content type"
 msgstr "نوع المحتوى"
@@ -636,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "تعذر اختيار المسار الصوتي المطلوب."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "تعذر بدء عرض الترجمة المستقلة."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "تعذر بدء البحث عن الترجمة عبر الإنترنت."
 
 msgid "Could not start the player."
 msgstr "تعذر بدء المشغل."
@@ -655,6 +696,9 @@ msgstr "أنشئ مصدرًا جديدًا من لوحة إضافة مصدر."
 
 msgid "Create category edit PIN"
 msgstr "أنشئ رمز PIN لتعديل الفئات"
+
+msgid "Current account"
+msgstr "الحساب الحالي"
 
 msgid "Cyan"
 msgstr "سماوي"
@@ -708,6 +752,12 @@ msgstr "دليل DVB EPG للأقمار الصناعية"
 msgid "DVB bouquets could not be scanned."
 msgstr "تعذر فحص باقات DVB."
 
+msgid "Daily source limit reached"
+msgstr "تم بلوغ الحد اليومي للمصدر"
+
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
 msgid "Deep standby never wakes the receiver; an overdue update runs after the next startup."
 msgstr "لا يوقظ وضع الاستعداد العميق جهاز الاستقبال مطلقًا؛ وسيُجرى التحديث المتأخر بعد التشغيل التالي."
 
@@ -719,6 +769,9 @@ msgstr "تمت استعادة الترتيب الافتراضي. اضغط الأ
 
 msgid "Delete"
 msgstr "حذف"
+
+msgid "Delete all"
+msgstr "حذف الكل"
 
 msgid "Delete this item?"
 msgstr "هل تريد حذف هذا العنصر؟"
@@ -768,6 +821,12 @@ msgstr "اكتشف الأفلام"
 msgid "Discover new movies with TMDB recommendations"
 msgstr "اكتشف أفلامًا جديدة مع توصيات TMDB"
 
+msgid "Display 16:9 content as"
+msgstr "عرض محتوى 16:9 بوضع"
+
+msgid "Display 4:3 content as"
+msgstr "عرض محتوى 4:3 بوضع"
+
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "لا تُضمّن استعلامًا أو جزءًا في عنوان URL للبوابة"
 
@@ -779,6 +838,9 @@ msgstr "أسفل"
 
 msgid "Download"
 msgstr "تنزيل"
+
+msgid "Download and use"
+msgstr "تنزيل واستخدام"
 
 msgid "Download cancelled after device restart."
 msgstr "أُلغي التنزيل بعد إعادة تشغيل الجهاز."
@@ -856,6 +918,9 @@ msgstr "تمكين DVB EPG"
 msgid "Enable DVB EPG before starting an update."
 msgstr "قم بتمكين DVB EPG قبل بدء التحديث."
 
+msgid "Enable a subtitle provider in Settings."
+msgstr "فعّل مصدراً للترجمة من الإعدادات."
+
 msgid "Enable external XMLTV EPG"
 msgstr "تفعيل دليل XMLTV EPG الخارجي"
 
@@ -872,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "أدخل مفتاح API لخدمة SubDL أولًا."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "أدخل مفتاح API لـ SubDL في إعدادات الترجمة."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "أدخل مفتاح API الخاص بـ TMDb للحصول على تفاصيل الأفلام والمسلسلات."
@@ -944,8 +1009,14 @@ msgstr "أدخل رمز PIN نفسه المكون من 4 أرقام مرة أخ�
 msgid "Enter the server URL"
 msgstr "أدخل رابط الخادم"
 
+msgid "Enter the six-digit code shown on the receiver."
+msgstr "أدخل الرمز المكون من ستة أرقام الظاهر على جهاز الاستقبال."
+
 msgid "Enter the username"
 msgstr "أدخل اسم المستخدم"
+
+msgid "Enter the username / Enter the password"
+msgstr "أدخل اسم المستخدم / أدخل كلمة المرور"
 
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "أدخل هذا الرمز في متصفح هاتفك، ثم وافق على الطلب من جهاز الاستقبال."
@@ -970,6 +1041,9 @@ msgstr "خروج"
 
 msgid "Expired"
 msgstr "منتهي الصلاحية"
+
+msgid "Expiry date"
+msgstr "تاريخ الانتهاء"
 
 #, python-brace-format
 msgid "Expiry: {}"
@@ -999,8 +1073,14 @@ msgstr "المفضلة"
 msgid "FILE"
 msgstr "ملف"
 
+msgid "FPS"
+msgstr "FPS"
+
 msgid "FPS will be converted"
 msgstr "سيتم تحويل معدل الإطارات"
+
+msgid "Failed"
+msgstr "الحسابات الفاشلة"
 
 msgid "Fast forward"
 msgstr "تقديم سريع"
@@ -1047,6 +1127,9 @@ msgstr "تم تحديث المرشحات. اضغط الزر الأخضر للح�
 msgid "Find a subtitle line (optional)"
 msgstr "ابحث عن سطر ترجمة (اختياري)"
 
+msgid "Find subtitles"
+msgstr "البحث عن ترجمة"
+
 msgid "Finnish"
 msgstr "الفنلندية"
 
@@ -1075,19 +1158,11 @@ msgstr "ملء الشاشة"
 msgid "GREEN"
 msgstr "الأخضر"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"فيلم"
+msgid "GT\nMOVIE"
+msgstr "GT\nفيلم"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"مسلسلات"
+msgid "GT\nSERIES"
+msgstr "GT\nمسلسلات"
 
 msgid "Genre unavailable"
 msgstr "النوع غير متاح"
@@ -1209,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "معاينة الترجمات المستقلة"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "مزامنة الترجمة المستقلة"
 
 msgid "Independent subtitles"
 msgstr "ترجمات مستقلة"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "الترجمة المستقلة متوقفة في الإعدادات."
 
 msgid "Information"
 msgstr "معلومات"
@@ -1225,6 +1300,9 @@ msgstr "تم استلام المعلومات. عدّل الحقل التالي �
 
 msgid "Information unavailable."
 msgstr "المعلومات غير متاحة."
+
+msgid "Install SubsSupport or SubsSupport Pro to load external subtitles."
+msgstr "ثبت SubsSupport أو SubsSupport Pro لتحميل الترجمة الخارجية."
 
 msgid "Invalid"
 msgstr "غير صالح"
@@ -1266,6 +1344,12 @@ msgstr "الإيطالية"
 
 msgid "Keeping the current stream"
 msgstr "الإبقاء على البث الحالي"
+
+msgid "Key saved · enter a new key to replace it"
+msgstr "المفتاح محفوظ · أدخل مفتاحاً جديداً لاستبداله"
+
+msgid "Keys are stored only on this receiver. Leave a key empty to skip that provider."
+msgstr "تُحفظ المفاتيح على جهاز الاستقبال فقط. اترك حقل المفتاح فارغًا لتخطي المصدر."
 
 msgid "LAN only • HTTP • Do not expose port 9999 to the internet"
 msgstr "الشبكة المحلية (LAN) فقط • HTTP • لا تفتح المنفذ 9999 للإنترنت"
@@ -1310,47 +1394,16 @@ msgstr "آخر تحديث"
 msgid "Last update: {}  •  {} channels  •  {} events"
 msgstr "آخر تحديث: {}  •  {} قناة  •  {} حدث"
 
-#, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"زمن الاستجابة: {} مللي ثانية\n"
-"حالة الحساب: {}\n"
-"النشط / الحد الأقصى: {}\n"
-"انتهاء الصلاحية: {}\n"
-"وقت الخادم: {}\n"
-"المنطقة الزمنية: {}\n"
-"البروتوكول: {}\n"
-"تنسيق الإخراج: {}\n"
-"إصدار الخادم: {}\n"
-"\n"
-"{}"
+msgid "Latency"
+msgstr "زمن الاستجابة"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"زمن الاستجابة: {} مللي ثانية\n"
-"حالة الحساب: {}\n"
-"البروتوكول: {}\n"
-"تنسيق الإخراج: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "زمن الاستجابة: {} مللي ثانية\nحالة الحساب: {}\nالنشط / الحد الأقصى: {}\nانتهاء الصلاحية: {}\nوقت الخادم: {}\nالمنطقة الزمنية: {}\nالبروتوكول: {}\nتنسيق الإخراج: {}\nإصدار الخادم: {}\n\n{}"
+
+#, python-brace-format
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "زمن الاستجابة: {} مللي ثانية\nحالة الحساب: {}\nالبروتوكول: {}\nتنسيق الإخراج: {}\n\n{}"
 
 msgid "Left"
 msgstr "يسار"
@@ -1375,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "قم بتحميل ملف ترجمة من صفحة الويب هذه قبل المزامنة."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "حمّل ترجمة مستقلة قبل مزامنتها."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "جارٍ تحميل خدمات DVB وقنوات XMLTV المخزنة مؤقتًا..."
@@ -1419,6 +1472,9 @@ msgstr "محلي / NAS"
 msgid "Local / NAS file"
 msgstr "ملف محلي / NAS"
 
+msgid "Local HTTP does not encrypt API keys in transit. Use HTTPS when available."
+msgstr "اتصال HTTP المحلي لا يشفر مفاتيح API أثناء نقلها. استخدم HTTPS إن توفر."
+
 msgid "Local file"
 msgstr "ملف محلي"
 
@@ -1430,6 +1486,9 @@ msgstr "تسجيل الخروج"
 
 msgid "Lower"
 msgstr "الجزء السفلي"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "البحث في قنوات M3U"
@@ -1584,6 +1643,9 @@ msgstr "عنوان MAC"
 
 msgid "MANAGE SOURCES"
 msgstr "إدارة المصادر"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 ث: واجهة الويب"
 
 msgid "MOVIE CATEGORIES"
 msgstr "فئات الأفلام"
@@ -1769,6 +1831,9 @@ msgstr "لا تتوفر برامج مؤرشفة لهذا اليوم."
 msgid "No audio tracks are available."
 msgstr "لا تتوفر مسارات صوتية."
 
+msgid "No automatic test has been run yet."
+msgstr "لم يتم تشغيل اختبار تلقائي بعد."
+
 msgid "No cached XMLTV guide was found. Press YELLOW to download it."
 msgstr "لم يتم العثور على دليل XMLTV مخزن مؤقتًا. اضغط الزر الأصفر لتنزيله."
 
@@ -1811,8 +1876,14 @@ msgstr "لم يتم العثور على مرشحات."
 msgid "No items found."
 msgstr "لم يُعثر على عناصر."
 
+msgid "No key required. Guest limits apply."
+msgstr "لا يلزم مفتاح. تُطبّق حدود استخدام الزوار."
+
+msgid "No matching subtitles found. Check the language and provider status."
+msgstr "لم يتم العثور على ترجمة مطابقة. تحقق من اللغة وحالة المصادر."
+
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "لم يتم العثور على ترجمة مطابقة في SubDL."
 
 msgid "No movies found."
 msgstr "لم يتم العثور على أفلام."
@@ -1835,6 +1906,9 @@ msgstr "لم يتم العثور على نتائج"
 msgid "No saved IPTV source was found"
 msgstr "لم يُعثر على مصدر IPTV محفوظ"
 
+msgid "No saved portal was found for this type"
+msgstr "لم يتم العثور على بوابة محفوظة من هذا النوع"
+
 msgid "No saved source found"
 msgstr "لم يُعثر على مصدر محفوظ"
 
@@ -1850,14 +1924,8 @@ msgstr "لا يوجد مصدر متاح للاتصال."
 msgid "No source is selected for deletion."
 msgstr "لم يُحدد مصدر للحذف."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"لم يُعثر على مصدر.\n"
-"\n"
-"أنشئ واحدًا من لوحة إضافة مصدر في الشاشة الرئيسية."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "لم يُعثر على مصدر.\n\nأنشئ واحدًا من لوحة إضافة مصدر في الشاشة الرئيسية."
 
 msgid "No summary is available for this programme."
 msgstr "لا يتوفر ملخص لهذا البرنامج."
@@ -1886,6 +1954,9 @@ msgstr "لم يتم العثور على مصدر Xtream صالح."
 msgid "No valid title was found for TMDb"
 msgstr "لم يُعثر على عنوان صالح لـ TMDb"
 
+msgid "No videos found at the selected quality."
+msgstr "لم يتم العثور على فيديوهات بالجودة المحددة."
+
 msgid "No weather forecast is available for this city."
 msgstr "لا تتوفر توقعات طقس لهذه المدينة."
 
@@ -1910,6 +1981,9 @@ msgstr "لم يُجلب بعد"
 msgid "Now on TV"
 msgstr "يُعرض الآن على التلفاز"
 
+msgid "Now playing"
+msgstr "يُعرض الآن"
+
 msgid "OPENING MAIN PANEL"
 msgstr "جارٍ فتح اللوحة الرئيسية"
 
@@ -1933,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "فتح / موافقة"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "افتح إعدادات الترجمة المستقلة."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "افتح لوحة مفاتيح التلفاز، ثم الصق النص هنا."
@@ -1975,6 +2049,9 @@ msgstr "ملخص البرنامج"
 msgid "Page"
 msgstr "الصفحة"
 
+msgid "Pairing code"
+msgstr "رمز الاقتران"
+
 msgid "Partly cloudy"
 msgstr "غائم جزئيًا"
 
@@ -1983,6 +2060,9 @@ msgstr "كلمة المرور"
 
 msgid "Paste an Xtream URL, or a portal URL and MAC on separate lines"
 msgstr "الصق رابط Xtream، أو رابط البوابة وعنوان MAC في سطرين منفصلين"
+
+msgid "Paste your key here"
+msgstr "الصق مفتاحك هنا"
 
 msgid "Pause"
 msgstr "إيقاف مؤقت"
@@ -1999,8 +2079,17 @@ msgstr "متوقف مؤقتًا"
 msgid "Play"
 msgstr "تشغيل"
 
+msgid "Play a movie or episode on the receiver first."
+msgstr "شغّل فيلماً أو حلقة على جهاز الاستقبال أولاً."
+
+msgid "Play next video automatically"
+msgstr "تشغيل الفيديو التالي تلقائيًا"
+
 msgid "Play on TV"
 msgstr "شغّل على التلفاز"
+
+msgid "Playback history"
+msgstr "سجل التشغيل"
 
 msgid "Playback mode"
 msgstr "وضع التشغيل"
@@ -2155,11 +2244,20 @@ msgstr "اللغة الأساسية"
 msgid "Provider"
 msgstr "مزود الخدمة"
 
+msgid "Provider connection succeeded"
+msgstr "تم الاتصال بالمصدر بنجاح"
+
 msgid "Quality"
 msgstr "الجودة"
 
+msgid "Quality changed. Search again."
+msgstr "تم تغيير الجودة. ابحث مرة أخرى."
+
 msgid "Queued"
 msgstr "في قائمة الانتظار"
+
+msgid "Quick actions"
+msgstr "إجراءات سريعة"
 
 msgid "REMAINING"
 msgstr "المتبقي"
@@ -2174,26 +2272,8 @@ msgid "Rating"
 msgstr "التقييم"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"وقت القراءة: {} مللي ثانية\n"
-"نوع المصدر: {}\n"
-"الحجم: {} بايت\n"
-"القنوات: {}\n"
-"الفئات: {}\n"
-"عمر ذاكرة التخزين المؤقت: {}\n"
-"آخر تعديل: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "وقت القراءة: {} مللي ثانية\nنوع المصدر: {}\nالحجم: {} بايت\nالقنوات: {}\nالفئات: {}\nعمر ذاكرة التخزين المؤقت: {}\nآخر تعديل: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "جارٍ قراءة المدة..."
@@ -2201,8 +2281,14 @@ msgstr "جارٍ قراءة المدة..."
 msgid "Reading resolution"
 msgstr "جارٍ قراءة الدقة"
 
+msgid "Ready"
+msgstr "جاهز"
+
 msgid "Ready to connect"
 msgstr "جاهز للاتصال"
+
+msgid "Receiver"
+msgstr "جهاز الاستقبال"
 
 msgid "Receiver unavailable"
 msgstr "جهاز الاستقبال غير متاح"
@@ -2211,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "جارٍ إعادة اتصال البث..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"نجحت عملية الاسترداد. دوّن رمز الاسترداد الجديد؛ سيظهر مرة واحدة فقط:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "نجحت عملية الاسترداد. دوّن رمز الاسترداد الجديد؛ سيظهر مرة واحدة فقط:\n\n{}"
 
 msgid "Red"
 msgstr "أحمر"
@@ -2231,6 +2311,9 @@ msgstr "جهاز التحكم عن بعد"
 
 msgid "Remove"
 msgstr "إزالة"
+
+msgid "Remove key"
+msgstr "حذف المفتاح"
 
 msgid "Rename"
 msgstr "إعادة التسمية"
@@ -2254,10 +2337,13 @@ msgid "Reset"
 msgstr "إعادة ضبط"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "إعادة ضبط توقيت الترجمة"
 
 msgid "Resolution: --"
 msgstr "الدقة: --"
+
+msgid "Restart required"
+msgstr "إعادة التشغيل مطلوبة"
 
 msgid "Results are loading"
 msgstr "جارٍ تحميل النتائج"
@@ -2266,14 +2352,8 @@ msgid "Resume"
 msgstr "استئناف"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"هل تريد متابعة التشغيل من الموضع المحفوظ؟\n"
-"\n"
-"الموضع المحفوظ: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "هل تريد متابعة التشغيل من الموضع المحفوظ؟\n\nالموضع المحفوظ: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "متابعة الأفلام وحلقات المسلسلات غير المكتملة"
@@ -2339,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "إعدادات الترجمة"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "وقت ظهور الجملة نفسها في الترجمة (MM:SS)"
@@ -2383,8 +2463,14 @@ msgstr "ابحث مجدداً لعرض المزيد من النتائج"
 msgid "Search again to select this title"
 msgstr "ابحث مجدداً لاختيار هذا العنوان"
 
+msgid "Search again; this result has expired."
+msgstr "انتهت صلاحية هذه النتيجة. ابحث مرة أخرى."
+
 msgid "Search for a spoken phrase"
 msgstr "البحث عن عبارة منطوقة"
+
+msgid "Search history"
+msgstr "سجل البحث"
 
 msgid "Search in IPTV"
 msgstr "ابحث في IPTV"
@@ -2399,7 +2485,10 @@ msgid "Search music, documentaries or channels"
 msgstr "البحث عن موسيقى أو أفلام وثائقية أو قنوات"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "البحث عن ترجمة باستخدام SubDL"
+
+msgid "Search subtitles"
+msgstr "ابحث عن ترجمة"
 
 msgid "Search subtitles with %s"
 msgstr "البحث عن ترجمة باستخدام %s"
@@ -2410,14 +2499,26 @@ msgstr "البحث عن ترجمة باستخدام SubsSupport"
 msgid "Search the selected movie in your active IPTV account."
 msgstr "ابحث عن الفيلم المحدد في حساب IPTV النشط."
 
+msgid "Search title"
+msgstr "عنوان البحث"
+
+msgid "Searching providers…"
+msgstr "جارٍ البحث في المصادر…"
+
 msgid "Searching…"
 msgstr "جارٍ البحث..."
+
+msgid "Season"
+msgstr "الموسم"
 
 msgid "Seasons"
 msgstr "المواسم"
 
 msgid "Secondary language"
 msgstr "اللغة الثانوية"
+
+msgid "Secure Paste"
+msgstr "لصق آمن"
 
 msgid "Security"
 msgstr "الأمان"
@@ -2576,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "إظهار / إخفاء"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "عرض أبكر بمقدار 0.5 ثانية"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "عرض لاحق بمقدار 0.5 ثانية"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "عرض أبكر بمقدار ثانية واحدة"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "عرض لاحق بمقدار ثانية واحدة"
 
 msgid "Show in device main menu"
 msgstr "إظهار في القائمة الرئيسية للجهاز"
@@ -2626,6 +2727,9 @@ msgstr "تفاصيل المصدر"
 msgid "Source name"
 msgstr "اسم المصدر"
 
+msgid "Source returned invalid data"
+msgstr "أرسل المصدر استجابة غير صالحة"
+
 msgid "Source saved"
 msgstr "تم حفظ المصدر"
 
@@ -2637,6 +2741,9 @@ msgstr "يتم فحص حالة المصدر تلقائيًا عند الاتصا
 
 msgid "Source type"
 msgstr "نوع المصدر"
+
+msgid "Source unavailable"
+msgstr "المصدر غير متاح"
 
 msgid "Sources"
 msgstr "المصادر"
@@ -2665,6 +2772,9 @@ msgstr "قياسي"
 msgid "Standard M3U sources support Live TV only."
 msgstr "تدعم مصادر M3U القياسية البث التلفزيوني المباشر فقط."
 
+msgid "Start Test"
+msgstr "بدء الاختبار"
+
 msgid "Status"
 msgstr "الحالة"
 
@@ -2676,6 +2786,9 @@ msgstr "إيقاف"
 
 msgid "Stop / Deny"
 msgstr "إيقاف / رفض"
+
+msgid "Stopping"
+msgstr "جارٍ الإيقاف"
 
 msgid "Storage"
 msgstr "التخزين"
@@ -2696,25 +2809,40 @@ msgid "SubDL connection is ready."
 msgstr "اتصال SubDL جاهز."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL غير متاح مؤقتاً."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL هو المصدر في هذا الإصدار."
 
 msgid "SubDL key change cancelled."
 msgstr "تم إلغاء تغيير مفتاح SubDL."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "أرسل SubDL استجابة غير صالحة."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • الترجمات"
 
 msgid "Subtitle"
 msgstr "ترجمة"
 
+msgid "Subtitle exceeds the size limit"
+msgstr "تجاوز حجم الترجمة الحد المسموح"
+
+msgid "Subtitle language"
+msgstr "لغة الترجمة"
+
+msgid "Subtitle loaded on the receiver"
+msgstr "تم تحميل الترجمة على جهاز الاستقبال"
+
+msgid "Subtitle provider updated"
+msgstr "تم تحديث مصدر الترجمة"
+
+msgid "Subtitle providers"
+msgstr "مصادر الترجمة"
+
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "اختيار الترجمة غير متاح في هذا النظام."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "يتطلب البحث عن الترجمة تثبيتًا يعمل بشكل صحيح لـ SubsSupport أو SubsSupportPro."
@@ -2729,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "عملية مزامنة الترجمة قيد التشغيل بالفعل."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "مزامنة الترجمة غير متاحة في هذه الصورة."
 
 msgid "Subtitle timing adjusted"
 msgstr "تم تعديل توقيت الترجمة"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "إزاحة توقيت الترجمة: {:+.1f} ثانية"
 
 msgid "Subtitles"
 msgstr "الترجمات"
@@ -2876,6 +3004,21 @@ msgstr "تم تحديث وحدة الحرارة."
 msgid "Test"
 msgstr "اختبار"
 
+msgid "Test Progress"
+msgstr "تقدم الاختبار"
+
+msgid "Test Results"
+msgstr "نتائج الاختبار"
+
+msgid "Test every saved Stalker / MAC portal."
+msgstr "اختبار جميع بوابات Stalker / MAC المحفوظة."
+
+msgid "Test every saved Xtream Codes account."
+msgstr "اختبار جميع حسابات Xtream Codes المحفوظة."
+
+msgid "Tested"
+msgstr "الحسابات المختبرة"
+
 msgid "Testing the SubDL connection..."
 msgstr "جارٍ اختبار اتصال SubDL..."
 
@@ -2937,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "تم مسح مفتاح API لخدمة SubDL."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "تم رفض مفتاح API لـ SubDL."
 
 msgid "The SubDL connection test is still running..."
 msgstr "اختبار اتصال SubDL لا يزال جاريًا..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "تم بلوغ حد طلبات SubDL."
 
 msgid "The TMDb connection test is still running..."
 msgstr "ما زال اختبار اتصال TMDb قيد التشغيل..."
@@ -2976,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "لا يمكن أن يتجاوز الفارق 30 دقيقة."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "تعذر حفظ الترجمة التي تم تنزيلها."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "تعذّر حذف الملف. تحقّق من جهاز التخزين والأذونات."
@@ -2996,17 +3139,23 @@ msgstr "رفضت ذاكرة التخزين المؤقت الأصلية لـ Enig
 msgid "The new PIN could not be saved. Category editor remains locked."
 msgstr "تعذر حفظ رمز PIN الجديد. سيظل محرر الفئات مقفلًا."
 
+msgid "The playing movie or episode changed. Search again."
+msgstr "تغير المحتوى الجاري تشغيله. ابحث مرة أخرى."
+
 msgid "The playing service changed. Open audio selection again."
 msgstr "تغيرت خدمة التشغيل. افتح اختيار الصوت مرة أخرى."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "عنوان البرنامج غير متاح للبحث عن الترجمة."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "ساعة جهاز الاستقبال غير جاهزة. تحقق من وقت الشبكة وحاول مجددًا."
 
 msgid "The receiver could not change the audio track."
 msgstr "تعذر على جهاز الاستقبال تغيير المسار الصوتي."
+
+msgid "The receiver could not load this subtitle."
+msgstr "تعذر تحميل هذه الترجمة على الجهاز."
 
 msgid "The selected M3U source was not found"
 msgstr "لم يُعثر على مصدر M3U المحدد"
@@ -3021,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "سيتم تحميل تفاصيل الفيلم المحدد من الخادم."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "تجاوز حجم الترجمة الحد المسموح"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "صيغة الترجمة هذه غير مدعومة"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "تستخدم استجابة المسلسلات تنسيقًا غير مدعوم. تظل الفئات متاحة."
@@ -3053,6 +3202,9 @@ msgstr "تغير الفيديو أو مساراته الصوتية. قم بال�
 msgid "The virtual keyboard is unavailable on this image."
 msgstr "لوحة المفاتيح الافتراضية غير متاحة على هذا النظام."
 
+msgid "The web interface was updated. Restart the Enigma2 interface and refresh this page to activate the changes."
+msgstr "تم تحديث واجهة الويب. أعد تشغيل واجهة Enigma2 ثم حدّث هذه الصفحة لتفعيل التغييرات."
+
 msgid "This M3U source supports Live TV only."
 msgstr "يدعم مصدر M3U هذا البث التلفزيوني المباشر فقط."
 
@@ -3074,12 +3226,8 @@ msgstr "يحتوي هذا المحتوى على مسار صوتي واحد فق�
 msgid "This folder is outside the allowed storage locations."
 msgstr "هذا المجلد خارج مواقع التخزين المسموح بها."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"هذه معاينة للترجمة.\n"
-"تظهر التغييرات هنا فورًا."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "هذه معاينة للترجمة.\nتظهر التغييرات هنا فورًا."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "تستخدم هذه المعاينة إعدادات المظهر الحالية غير المحفوظة."
@@ -3095,6 +3243,9 @@ msgstr "لا يدعم هذا المصدر نوع المحتوى المحدد."
 
 msgid "This stream is not a downloadable video file."
 msgstr "هذا البث ليس ملف فيديو قابلًا للتنزيل."
+
+msgid "This subtitle format is not supported"
+msgstr "صيغة الترجمة هذه غير مدعومة"
 
 msgid "This video could not be played. Check the playback engine and file format."
 msgstr "تعذّر تشغيل هذا الفيديو. تحقّق من محرك التشغيل وصيغة الملف."
@@ -3168,6 +3319,9 @@ msgstr "محتوى بلا عنوان"
 msgid "Up"
 msgstr "للأعلى"
 
+msgid "Update EPG"
+msgstr "تحديث دليل البرامج"
+
 msgid "Update failed; the previous guide remains available."
 msgstr "فشل التحديث؛ سيظل الدليل السابق متاحًا."
 
@@ -3192,6 +3346,9 @@ msgstr "تعمل التحديثات في الخلفية. لا يؤدي تغيي�
 
 msgid "Use this audio"
 msgstr "استخدام هذا الصوت"
+
+msgid "Use this provider"
+msgstr "استخدام هذا المصدر"
 
 msgid "Username"
 msgstr "اسم المستخدم"
@@ -3218,6 +3375,9 @@ msgstr "الموضع العمودي"
 msgid "Very large"
 msgstr "كبير جدًا"
 
+msgid "Video"
+msgstr "فيديو"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "تعذر تشغيل الفيديو على جهاز الاستقبال هذا. جرب فيديو آخر أو إعداد جودة مختلف."
 
@@ -3238,6 +3398,9 @@ msgstr "الطقس"
 
 msgid "WEB"
 msgstr "الويب"
+
+msgid "Waiting for approval on the receiver."
+msgstr "في انتظار التأكيد على جهاز الاستقبال."
 
 msgid "Waiting for programme information"
 msgstr "في انتظار معلومات البرنامج"
@@ -3296,22 +3459,15 @@ msgstr "WebVTT"
 msgid "Welcome"
 msgstr "مرحبًا"
 
+msgid "Where to get a key"
+msgstr "من أين أحصل على المفتاح؟"
+
 msgid "White"
 msgstr "أبيض"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"دوّن رمز الاسترداد هذا. سيظهر مرة واحدة فقط:\n"
-"\n"
-"{}\n"
-"\n"
-"إذا نسيت الرمزين، فإن إزالة الإضافة وإعادة تثبيتها ستعيد ضبط هذا القفل فقط."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "دوّن رمز الاسترداد هذا. سيظهر مرة واحدة فقط:\n\n{}\n\nإذا نسيت الرمزين، فإن إزالة الإضافة وإعادة تثبيتها ستعيد ضبط هذا القفل فقط."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "دليل XMLTV EPG معطل لمصدر M3U هذا."
@@ -3456,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "تمت إزالة {} من المفضلة."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"مشغل IPTV مفتوح المصدر لـ Enigma2. يدعم حسابات Xtream Codes والبث التلفزيوني المباشر من قوائم تشغيل M3U محلية قياسية أو عبر شبكة مُركّبة أو HTTP(S). توفر مصادر M3U العادية البث التلفزيوني المباشر فقط.\n"
-"\n"
-"المطور\n"
-"{}\n"
-"\n"
-"إشعار قانوني\n"
-"لا توفر هذه الإضافة قنوات أو عمليات بث أو حسابات أو قوائم تشغيل. يتحمل المستخدم مسؤولية استخدام المحتوى الذي يملك حق الوصول إليه واستخدامه فقط.\n"
-"\n"
-"الخصوصية\n"
-"عند تمكين Open-Meteo، تُرسل المدينة والموقع المحددان إلى Open-Meteo للحصول على توقعات الطقس. وعند تمكين TMDb، يُرسل عنوان الفيلم أو المسلسل ومفتاح أو رمز TMDb الذي أدخله المستخدم إلى TMDb. لا يُرسل اسم مستخدم IPTV أو كلمة مروره إلى هذه الخدمات."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nمشغل IPTV مفتوح المصدر لـ Enigma2. يدعم حسابات Xtream Codes والبث التلفزيوني المباشر من قوائم تشغيل M3U محلية قياسية أو عبر شبكة مُركّبة أو HTTP(S). توفر مصادر M3U العادية البث التلفزيوني المباشر فقط.\n\nالمطور\n{}\n\nإشعار قانوني\nلا توفر هذه الإضافة قنوات أو عمليات بث أو حسابات أو قوائم تشغيل. يتحمل المستخدم مسؤولية استخدام المحتوى الذي يملك حق الوصول إليه واستخدامه فقط.\n\nالخصوصية\nعند تمكين Open-Meteo، تُرسل المدينة والموقع المحددان إلى Open-Meteo للحصول على توقعات الطقس. وعند تمكين TMDb، يُرسل عنوان الفيلم أو المسلسل ومفتاح أو رمز TMDb الذي أدخله المستخدم إلى TMDb. لا يُرسل اسم مستخدم IPTV أو كلمة مروره إلى هذه الخدمات."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."
@@ -3512,210 +3646,3 @@ msgstr "{} • {} أفلام"
 #, python-brace-format
 msgid "{} • {} SERIES"
 msgstr "{} • {} مسلسلات"
-
-msgid "API key"
-msgstr ""
-
-msgid "API key was rejected"
-msgstr ""
-
-msgid "Active downloads"
-msgstr ""
-
-msgid "Add an API key first"
-msgstr ""
-
-msgid "An automatic test is already running."
-msgstr ""
-
-msgid "Automatic Test"
-msgstr ""
-
-msgid "Automatic test cancelled"
-msgstr ""
-
-msgid "Automatic test completed"
-msgstr ""
-
-msgid "Automatic test is running"
-msgstr ""
-
-msgid "Cancel Test"
-msgstr ""
-
-msgid "Choose a portal type"
-msgstr ""
-
-msgid "Choose one portal type. Saved accounts are tested securely and one at a time."
-msgstr ""
-
-msgid "Connection status"
-msgstr ""
-
-msgid "Connections"
-msgstr ""
-
-msgid "Current account"
-msgstr ""
-
-msgid "Daily source limit reached"
-msgstr ""
-
-msgid "Dashboard"
-msgstr ""
-
-msgid "Download and use"
-msgstr ""
-
-msgid "Enable a subtitle provider in Settings."
-msgstr ""
-
-msgid "Enter the six-digit code shown on the receiver."
-msgstr ""
-
-msgid "Expiry date"
-msgstr ""
-
-msgid "Failed"
-msgstr ""
-
-msgid "Find subtitles"
-msgstr ""
-
-msgid "Install SubsSupport or SubsSupport Pro to load external subtitles."
-msgstr ""
-
-msgid "Key saved · enter a new key to replace it"
-msgstr ""
-
-msgid "Keys are stored only on this receiver. Leave a key empty to skip that provider."
-msgstr ""
-
-msgid "Latency"
-msgstr ""
-
-msgid "Local HTTP does not encrypt API keys in transit. Use HTTPS when available."
-msgstr ""
-
-msgid "No automatic test has been run yet."
-msgstr ""
-
-msgid "No key required. Guest limits apply."
-msgstr ""
-
-msgid "No matching subtitles found. Check the language and provider status."
-msgstr ""
-
-msgid "No saved portal was found for this type"
-msgstr ""
-
-msgid "Now playing"
-msgstr ""
-
-msgid "Pairing code"
-msgstr ""
-
-msgid "Paste your key here"
-msgstr ""
-
-msgid "Play a movie or episode on the receiver first."
-msgstr ""
-
-msgid "Provider connection succeeded"
-msgstr ""
-
-msgid "Quick actions"
-msgstr ""
-
-msgid "Ready"
-msgstr ""
-
-msgid "Receiver"
-msgstr ""
-
-msgid "Remove key"
-msgstr ""
-
-msgid "Restart required"
-msgstr ""
-
-msgid "Search again; this result has expired."
-msgstr ""
-
-msgid "Search subtitles"
-msgstr ""
-
-msgid "Search title"
-msgstr ""
-
-msgid "Searching providers…"
-msgstr ""
-
-msgid "Secure Paste"
-msgstr ""
-
-msgid "Source returned invalid data"
-msgstr ""
-
-msgid "Source unavailable"
-msgstr ""
-
-msgid "Start Test"
-msgstr ""
-
-msgid "Stopping"
-msgstr ""
-
-msgid "Subtitle exceeds the size limit"
-msgstr ""
-
-msgid "Subtitle language"
-msgstr ""
-
-msgid "Subtitle loaded on the receiver"
-msgstr ""
-
-msgid "Subtitle provider updated"
-msgstr ""
-
-msgid "Subtitle providers"
-msgstr ""
-
-msgid "Test Progress"
-msgstr ""
-
-msgid "Test Results"
-msgstr ""
-
-msgid "Test every saved Stalker / MAC portal."
-msgstr ""
-
-msgid "Test every saved Xtream Codes account."
-msgstr ""
-
-msgid "Tested"
-msgstr ""
-
-msgid "The playing movie or episode changed. Search again."
-msgstr ""
-
-msgid "The receiver could not load this subtitle."
-msgstr ""
-
-msgid "The web interface was updated. Restart the Enigma2 interface and refresh this page to activate the changes."
-msgstr ""
-
-msgid "This subtitle format is not supported"
-msgstr ""
-
-msgid "Update EPG"
-msgstr ""
-
-msgid "Use this provider"
-msgstr ""
-
-msgid "Waiting for approval on the receiver."
-msgstr ""
-
-msgid "Where to get a key"
-msgstr ""

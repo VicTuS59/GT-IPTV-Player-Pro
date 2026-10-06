@@ -226,6 +226,7 @@ class _BundledTrailerResolver(object):
 
     def __init__(self, player):
         from .i18n import metadata_language
+        self.requested_quality = str(player.youtube_resolution)
         self._preferences = (player.youtube_resolution, metadata_language(),
                              player.youtube_dash, player.youtube_stream_mode,
                              player.youtube_audio_preference)
@@ -237,7 +238,11 @@ class _BundledTrailerResolver(object):
         with EXTRACT_LOCK:
             set_preferences(*self._preferences)
             from .youtube_vendor.video_url import YouTubeVideoUrl
-            return YouTubeVideoUrl().extract(video_id)
+            resolver = YouTubeVideoUrl()
+            url = resolver.extract(video_id)
+            self.selected_quality = int(getattr(resolver, "selected_quality", 0) or 0)
+            self.duration_seconds = int(getattr(resolver, "duration_seconds", 0) or 0)
+            return url
 
 
 def prepare_youtube_trailer():
@@ -266,15 +271,8 @@ def resolve_youtube_trailer(video_id, token, resolver):
         try:
             url = str(resolver.extract(video_id) or "")
             token.check()
-            # SUBURI is used by Enigma2 to play separate video/audio streams.
-            for part in url.split("&suburi="):
-                parsed = urlsplit(part)
-                host = str(parsed.hostname or "").lower()
-                if (parsed.scheme not in ("http", "https") or not host
-                        or not (host.endswith(".googlevideo.com") or host in
-                                ("googlevideo.com", "www.youtube.com", "youtube.com"))
-                        or any(char in part for char in ("\r", "\n", "\x00"))):
-                    raise ValueError("Invalid trailer stream")
+            from .youtube_playback import youtube_stream_parts
+            youtube_stream_parts(url)
         except Exception as exc:
             token.check()
             log_event("discovery", "trailer resolution failed: {}".format(type(exc).__name__))
@@ -282,4 +280,3 @@ def resolve_youtube_trailer(video_id, token, resolver):
         return url
     finally:
         _TRAILER_LOCK.release()
-

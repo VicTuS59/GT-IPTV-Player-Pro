@@ -389,8 +389,8 @@ def localized_upper(value):
     return value.upper()
 
 
-def localized_language_name(value):
-    """Translate common decoder language codes without dynamic msgids."""
+def track_language_name(value):
+    """Resolve decoder language codes to stable source messages."""
     text = " ".join(str(value or "").replace("\r", " ").replace("\n", " ").split())
     if not text or text.lower() in ("und", "unknown"):
         return ""
@@ -399,8 +399,19 @@ def localized_language_name(value):
     if message is None and "_" in key:
         message = _TRACK_LANGUAGE_NAMES.get(key.split("_", 1)[0])
     if message is not None:
-        return _(message)
+        return message
     return text.upper() if len(text) <= 3 else text
+
+
+def localized_language_name(value):
+    """Translate common decoder language codes without dynamic msgids."""
+    message = track_language_name(value)
+    return _(message) if message in _TRACK_LANGUAGE_NAMES.values() else message
+
+
+def track_language_messages():
+    """Share canonical audio language names with the browser catalogue."""
+    return tuple(sorted(set(_TRACK_LANGUAGE_NAMES.values())))
 
 
 def localized_date_text(value=None):
@@ -456,4 +467,3 @@ def locale_init(*unused_args, **unused_kwargs):
 
 
 locale_init()
-

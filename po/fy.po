@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: fy\n"
-"Language: fy\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: fy\nLanguage: fy\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "AUDIO: {}"
 msgid "About"
 msgstr "Oer"
 
+msgid "Access code"
+msgstr "Tagongskoade"
+
 msgid "Access your channels quickly"
 msgstr "Fluch tagong ta jo kanalen"
 
@@ -197,6 +190,9 @@ msgstr "Arabysk"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Ofspyljen út it argyf is net beskikber foar dit kanaal."
+
+msgid "Aspect ratio"
+msgstr "Byldferhâlding"
 
 msgid "Audio language changed"
 msgstr "Audiotaal feroare"
@@ -481,6 +477,9 @@ msgstr "Heldere loft"
 msgid "Close"
 msgstr "Slute"
 
+msgid "Close menu"
+msgstr "Menu slute"
+
 msgid "Close the open screen before opening another one."
 msgstr "Slút it iepene skerm foardat jo in oar iepenje."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "It frege audiospoar koe net wurde selektearre."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "De werjefte fan ûnôfhinklike ûndertitels koe net starte."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "It online sykjen nei ûndertitels koe net starte."
 
 msgid "Could not start the player."
 msgstr "Kin de spiler net starte."
@@ -771,6 +770,9 @@ msgstr "Standertfolchoarder wersteld. Druk op GRIEN om te bewarjen."
 msgid "Delete"
 msgstr "Fuortsmite"
 
+msgid "Delete all"
+msgstr "Alles wiskje"
+
 msgid "Delete this item?"
 msgstr "Dit item wiskje?"
 
@@ -818,6 +820,12 @@ msgstr "Films ûntdekke"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Untdek nije films mei oanbefellings fan TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "16:9-ynhâld werjaan as"
+
+msgid "Display 4:3 content as"
+msgstr "4:3-ynhâld werjaan as"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Foegje gjin query of fragment ta oan de portaal-URL"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Fier earst in SubDL-API-kaai yn."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Fier in SubDL-API-kaai yn by de ûndertitelynstellingen."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Fier in TMDb API-kaai yn foar details oer films en searjes."
@@ -1007,6 +1015,9 @@ msgstr "Fier de koade fan seis sifers yn dy't op de ûntfanger werjûn wurdt."
 msgid "Enter the username"
 msgstr "Fier de brûkersnamme yn"
 
+msgid "Enter the username / Enter the password"
+msgstr "Fier de brûkersnamme yn / Fier it wachtwurd yn"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Fier dizze koade yn yn de browser fan jo tillefoan en befêstigje dêrnei it fersyk op de TV."
 
@@ -1061,6 +1072,9 @@ msgstr "FAVORITEN"
 
 msgid "FILE"
 msgstr "BESTÂN"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS wurdt omset"
@@ -1144,19 +1158,11 @@ msgstr "Folslein skerm"
 msgid "GREEN"
 msgstr "GRIEN"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"FILM"
+msgid "GT\nMOVIE"
+msgstr "GT\nFILM"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"SEARJE"
+msgid "GT\nSERIES"
+msgstr "GT\nSEARJE"
 
 msgid "Genre unavailable"
 msgstr "Sjenre net beskikber"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Foarbyld fan unôfhinklike ûndertitels"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Syngronisaasje fan ûnôfhinklike ûndertitels"
 
 msgid "Independent subtitles"
 msgstr "Unôfhinklike ûndertitels"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Unôfhinklike ûndertitels binne útskeakele yn de ynstellingen."
 
 msgid "Information"
 msgstr "Ynformaasje"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Latinsje"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Fertraging: {} ms\n"
-"Akkountstatus: {}\n"
-"Aktyf / Maksimum: {}\n"
-"Ferfaldatum: {}\n"
-"Servertiid: {}\n"
-"Tiidsône: {}\n"
-"Protokol: {}\n"
-"Útfierformaat: {}\n"
-"Serverferzje: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Fertraging: {} ms\nAkkountstatus: {}\nAktyf / Maksimum: {}\nFerfaldatum: {}\nServertiid: {}\nTiidsône: {}\nProtokol: {}\nÚtfierformaat: {}\nServerferzje: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Fertraging: {} ms\n"
-"Akkountstatus: {}\n"
-"Protokol: {}\n"
-"Útfierformaat: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Fertraging: {} ms\nAkkountstatus: {}\nProtokol: {}\nÚtfierformaat: {}\n\n{}"
 
 msgid "Left"
 msgstr "Links"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Laad in ûndertitel fan dizze webside foardat jo syngronisearje."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Laad ûnôfhinklike ûndertitels foardat jo se syngronisearje."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "DVB-tsjinsten en XMLTV-kanalen yn de cache lade..."
@@ -1514,6 +1486,9 @@ msgstr "Ofmelde"
 
 msgid "Lower"
 msgstr "Leger"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "M3U-KANALEN SYKJE"
@@ -1668,6 +1643,9 @@ msgstr "MAC-adres"
 
 msgid "MANAGE SOURCES"
 msgstr "BOARNEN BEHEARE"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 s: Webynterface"
 
 msgid "MOVIE CATEGORIES"
 msgstr "FILMKATEGORYEN"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Gjin passende ûndertitels fûn. Kontrolearje de taal en de status fan de oanbieder."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Der binne gjin passende ûndertitels fûn op SubDL."
 
 msgid "No movies found."
 msgstr "Gjin films fûn."
@@ -1946,14 +1924,8 @@ msgstr "Der is gjin boarne beskikber om mei te ferbine."
 msgid "No source is selected for deletion."
 msgstr "Der is gjin boarne selektearre om te fuortsmite."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Gjin boarne fûn.\n"
-"\n"
-"Meitsje der in fia it paniel BOARNE TAFOEGJE op it startskerm."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Gjin boarne fûn.\n\nMeitsje der in fia it paniel BOARNE TAFOEGJE op it startskerm."
 
 msgid "No summary is available for this programme."
 msgstr "Der is gjin gearfetting beskikber foar dit programma."
@@ -1981,6 +1953,9 @@ msgstr "Der is gjin jildige Xtream-boarne fûn."
 
 msgid "No valid title was found for TMDb"
 msgstr "Gjin jildige titel foar TMDb fûn"
+
+msgid "No videos found at the selected quality."
+msgstr "Gjin fideo’s fûn mei de keazen kwaliteit."
 
 msgid "No weather forecast is available for this city."
 msgstr "Der is gjin waarferwachting beskikber foar dizze plak."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Iepenje / Goedkarre"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Iepenje de ynstellingen foar ûnôfhinklike ûndertitels."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Iepenje it TV-toetseboerd en plak de tekst hjir."
@@ -2107,8 +2082,14 @@ msgstr "Ôfspylje"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Spylje earst in film of ôflevering ôf op de ûntfanger."
 
+msgid "Play next video automatically"
+msgstr "Folgjende fideo automatysk ôfspylje"
+
 msgid "Play on TV"
 msgstr "Op tv ôfspylje"
+
+msgid "Playback history"
+msgstr "Ofspylskiednis"
 
 msgid "Playback mode"
 msgstr "Ofspielmodus"
@@ -2269,6 +2250,9 @@ msgstr "Ferbining mei provider slagge"
 msgid "Quality"
 msgstr "Kwaliteit"
 
+msgid "Quality changed. Search again."
+msgstr "Kwaliteit feroare. Sykje opnij."
+
 msgid "Queued"
 msgstr "Yn wachtrige"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Wurdearring"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Lêstiid: {} ms\n"
-"Boarnetype: {}\n"
-"Grutte: {} bytes\n"
-"Kanalen: {}\n"
-"Kategoryen: {}\n"
-"Cacheâldens: {}\n"
-"Lêst wizige: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Lêstiid: {} ms\nBoarnetype: {}\nGrutte: {} bytes\nKanalen: {}\nKategoryen: {}\nCacheâldens: {}\nLêst wizige: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Doer lêze..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Opnij ferbine mei de stream..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Werstel slagge. Skriuw de nije werstelkoade op; dy wurdt mar ien kear toand:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Werstel slagge. Skriuw de nije werstelkoade op; dy wurdt mar ien kear toand:\n\n{}"
 
 msgid "Red"
 msgstr "Read"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Werstelle"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Tiid fan ûndertitels weromsette"
 
 msgid "Resolution: --"
 msgstr "Resolúsje: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Fierdergean"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Ôfspylje ferfetsje fanôf de bewarre posysje?\n"
-"\n"
-"Bewarre posysje: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Ôfspylje ferfetsje fanôf de bewarre posysje?\n\nBewarre posysje: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Ûnfoltôge films en searjeôfleverings ferfetsje"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "UNDERTITELYNSTELLINGEN"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Deselde sin begjint yn de ûndertiteling (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Sykje op 'e nij; dit resultaat is ferrûn."
 msgid "Search for a spoken phrase"
 msgstr "Sykje nei in sprutsen sin"
 
+msgid "Search history"
+msgstr "Sykskiednis"
+
 msgid "Search in IPTV"
 msgstr "Sykje yn IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Sykje nei muzyk, dokumintêres of kanalen"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Ûndertitels sykje mei SubDL"
 
 msgid "Search subtitles"
 msgstr "Sykje nei ûndertiteling"
@@ -2550,6 +2507,9 @@ msgstr "Providers sykje…"
 
 msgid "Searching…"
 msgstr "Sykje…"
+
+msgid "Season"
+msgstr "Seizoen"
 
 msgid "Seasons"
 msgstr "Seizoenen"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Toane / ferbergje"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "0,5 sekonden earder toane"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "0,5 sekonden letter toane"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "1 sekonde earder toane"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "1 sekonde letter toane"
 
 msgid "Show in device main menu"
 msgstr "Yn it haadmenu fan it apparaat sjen litte"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "De ferbining mei SubDL is klear."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL is tydlik net beskikber."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL is de oanbieder yn dizze ferzje."
 
 msgid "SubDL key change cancelled."
 msgstr "Feroaring fan de SubDL-kaai annulearre."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL hat in ûnjildich antwurd weromjûn."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Ûndertitels"
 
 msgid "Subtitle"
 msgstr "Ûndertitel"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Oanbieders fan ûndertitels"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Ûndertitelseleksje is net beskikber yn dizze systeemôfbylding."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "It sykjen nei ûndertitels fereasket in wurkjende ynstallaasje fan SubsSupport of SubsSupportPro."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Syngronisaasje fan ûndertitels rint al."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Syngronisaasje fan ûndertitels is net beskikber op dizze image."
 
 msgid "Subtitle timing adjusted"
 msgstr "Timing fan ûndertitel oanpast"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Tiidferskowing fan ûndertitels: {:+.1f} sekonden"
 
 msgid "Subtitles"
 msgstr "Ûndertitels"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "De SubDL-API-kaai is wiske."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "De SubDL-API-kaai is ôfwiisd."
 
 msgid "The SubDL connection test is still running..."
 msgstr "De ferbiningstest mei SubDL is noch oan 'e gong..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "De oanfraachlimyt fan SubDL is berikt."
 
 msgid "The TMDb connection test is still running..."
 msgstr "De TMDb-ferbiningstest wurdt noch útfierd..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "It ferskil mei net mear as 30 minuten wêze."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "De ynladen ûndertitels koene net bewarre wurde."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "It bestân koe net fuortsmiten wurde. Kontrolearje it opslachapparaat en de tagongsrjochten."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "De aktive tsjinst is wizige. Iepenje de audioseleksje opnij."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "De programmatitel is net beskikber foar it sykjen nei ûndertitels."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "De klok fan de ûntfanger is noch net klear. Kontrolearje de netwurktiid en besykje it opnij."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "De details fan de selektearre film wurde fan de server laden."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Undertitel grutter as de tastiene grutte"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Dit ûndertitelformaat wurdt net stipe"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "It searjeantwurd brûkt in net-stipe formaat. Kategoryen bliuwe beskikber."
@@ -3266,12 +3226,8 @@ msgstr "Dizze ynhâld hat mar ien audiospoar."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Dizze map leit bûten de tastiene opslachlokaasjes."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Dit is in foarbyld fan ûndertitels.\n"
-"Feroarings binne hjir daliks te sjen."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Dit is in foarbyld fan ûndertitels.\nFeroarings binne hjir daliks te sjen."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Dit foarbyld brûkt de hjoeddeiske, net bewarre ynstellingen foar it uterlik."
@@ -3419,6 +3375,9 @@ msgstr "Fertikale posysje"
 msgid "Very large"
 msgstr "Tige grut"
 
+msgid "Video"
+msgstr "Fideo"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Fideo koe net ôfspile wurde op dizze ûntfanger. Besykje in oare fideo of kwaliteitynstelling."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Wyt"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Skriuw dizze werstelkoade op. Dy wurdt mar ien kear toand:\n"
-"\n"
-"{}\n"
-"\n"
-"As jo beide koades ferjitte, wurdt allinnich dit slot weromset troch de plugin te ferwiderjen en opnij te ynstallearjen."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Skriuw dizze werstelkoade op. Dy wurdt mar ien kear toand:\n\n{}\n\nAs jo beide koades ferjitte, wurdt allinnich dit slot weromset troch de plugin te ferwiderjen en opnij te ynstallearjen."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "XMLTV-EPG is útskeakele foar dizze M3U-boarne."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} is fuortsmiten út favoriten."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Iepenboarne-IPTV-spiler foar Enigma2. Stipet Xtream Codes-akkounts en Live TV fan standert lokale, keppele netwurk- of HTTP(S) M3U-ôfspyllisten. Gewoane M3U-boarnen biede allinnich Live TV.\n"
-"\n"
-"ÛNTWIKKELDER\n"
-"{}\n"
-"\n"
-"JURIDYSKE MEIDIELING\n"
-"Dizze ynstekker leveret gjin kanalen, streamen, akkounts of ôfspyllisten. De brûker is ferantwurdlik foar it brûken fan allinnich ynhâld dêr't dy tagongs- en gebrûksrjochten foar hat.\n"
-"\n"
-"PRIVACY\n"
-"As Open-Meteo ynskeakele is, wurde it selektearre plak en de lokaasje foar de waarferwachting nei Open-Meteo stjoerd. As TMDb ynskeakele is, wurde de titel fan de film of searje en de troch de brûker ynfierde TMDb-kaai of token nei TMDb stjoerd. De IPTV-brûkersnamme en it wachtwurd wurde net nei dizze tsjinsten stjoerd."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nIepenboarne-IPTV-spiler foar Enigma2. Stipet Xtream Codes-akkounts en Live TV fan standert lokale, keppele netwurk- of HTTP(S) M3U-ôfspyllisten. Gewoane M3U-boarnen biede allinnich Live TV.\n\nÛNTWIKKELDER\n{}\n\nJURIDYSKE MEIDIELING\nDizze ynstekker leveret gjin kanalen, streamen, akkounts of ôfspyllisten. De brûker is ferantwurdlik foar it brûken fan allinnich ynhâld dêr't dy tagongs- en gebrûksrjochten foar hat.\n\nPRIVACY\nAs Open-Meteo ynskeakele is, wurde it selektearre plak en de lokaasje foar de waarferwachting nei Open-Meteo stjoerd. As TMDb ynskeakele is, wurde de titel fan de film of searje en de troch de brûker ynfierde TMDb-kaai of token nei TMDb stjoerd. De IPTV-brûkersnamme en it wachtwurd wurde net nei dizze tsjinsten stjoerd."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

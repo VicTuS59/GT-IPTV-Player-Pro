@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: Turkish\n"
-"Language: tr\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Turkish\nLanguage: tr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -82,6 +72,12 @@ msgstr "API bağlantı hatası action={}"
 msgid "API connection successful"
 msgstr "API bağlantısı başarılı"
 
+msgid "API key"
+msgstr "API anahtarı"
+
+msgid "API key was rejected"
+msgstr "API anahtarı reddedildi"
+
 msgid "API response is invalid"
 msgstr "API yanıtı geçersiz"
 
@@ -104,6 +100,9 @@ msgstr "SES: {}"
 msgid "About"
 msgstr "Hakkında"
 
+msgid "Access code"
+msgstr "Erişim kodu"
+
 msgid "Access your channels quickly"
 msgstr "Kanallarınıza hızlıca erişin"
 
@@ -123,6 +122,9 @@ msgstr "İşlem"
 msgid "Active"
 msgstr "Etkin"
 
+msgid "Active downloads"
+msgstr "Devam Eden İndirmeler"
+
 msgid "Add M3U Source"
 msgstr "M3U Kaynağı Ekle"
 
@@ -132,11 +134,17 @@ msgstr "Yeni Hesap Ekle"
 msgid "Add Source"
 msgstr "Kaynak Ekle"
 
+msgid "Add an API key first"
+msgstr "Önce API anahtarı ekleyin"
+
 msgid "Add playlist"
 msgstr "Oynatma listesi ekle"
 
 msgid "Albanian"
 msgstr "Arnavutça"
+
+msgid "Align"
+msgstr "Hizala"
 
 msgid "All"
 msgstr "Tümü"
@@ -153,6 +161,12 @@ msgstr "Tüm Diziler"
 msgid "All TV bouquets"
 msgstr "Tüm TV buketleri"
 
+msgid "All healthy"
+msgstr "Tümü Sağlıklı"
+
+msgid "Allow separate audio/video streams for higher quality (DASH)"
+msgstr "Yüksek kalite için ayrı ses/video akışlarına izin ver (DASH)"
+
 msgid "Always off"
 msgstr "Her zaman kapalı"
 
@@ -165,6 +179,9 @@ msgstr "HTTPS görsel bağlantısı HTTP adresine düşürülemez."
 msgid "An automatic DVB EPG update is already running."
 msgstr "Otomatik bir DVB EPG güncellemesi zaten devam ediyor."
 
+msgid "An automatic test is already running."
+msgstr "Bir otomatik test zaten çalışıyor."
+
 msgid "Appearance"
 msgstr "Görünüm"
 
@@ -174,8 +191,23 @@ msgstr "Arapça"
 msgid "Archive playback is unavailable for this channel."
 msgstr "Bu kanalda arşivden oynatma kullanılamıyor."
 
+msgid "Aspect ratio"
+msgstr "Görüntü oranı"
+
+msgid "Audio language changed"
+msgstr "Ses dili değiştirildi"
+
+msgid "Audio languages"
+msgstr "Ses dilleri"
+
 msgid "Audio preference"
 msgstr "Ses tercihi"
+
+msgid "Audio selection is busy. Try again shortly."
+msgstr "Ses seçimi sürüyor. Kısa süre sonra yeniden deneyin."
+
+msgid "Audio selection is unavailable on this receiver."
+msgstr "Bu alıcıda ses seçimi kullanılamıyor."
 
 msgid "Audio track"
 msgstr "Ses parçası"
@@ -186,15 +218,30 @@ msgstr "Bu imajda ses parçası seçimi kullanılamıyor."
 msgid "Audio tracks"
 msgstr "Ses parçaları"
 
+msgid "Audio tracks are not ready. Refresh after playback starts."
+msgstr "Ses parçaları henüz hazır değil. Oynatma başladıktan sonra yenileyin."
+
 msgid "Audio tracks changed. Open audio selection again."
 msgstr "Ses parçaları değişti. Ses seçimini yeniden açın."
 
 msgid "Automatic"
 msgstr "Otomatik"
 
+msgid "Automatic Test"
+msgstr "Otomatik Test"
+
 #, python-brace-format
 msgid "Automatic matching restored for {}."
 msgstr "{} için otomatik eşleştirme geri yüklendi."
+
+msgid "Automatic test cancelled"
+msgstr "Otomatik test iptal edildi"
+
+msgid "Automatic test completed"
+msgstr "Otomatik test tamamlandı"
+
+msgid "Automatic test is running"
+msgstr "Otomatik test çalışıyor"
 
 msgid "Automatic update settings could not be opened."
 msgstr "Otomatik güncelleme ayarları açılamadı."
@@ -267,6 +314,9 @@ msgstr "DİZİLER ALINAMADI"
 
 msgid "Cancel"
 msgstr "İptal"
+
+msgid "Cancel Test"
+msgstr "Testi İptal Et"
 
 msgid "Cancel the active download before deleting it."
 msgstr "Silmeden önce devam eden indirmeyi iptal edin."
@@ -361,6 +411,15 @@ msgstr "{} doğrulanıyor..."
 msgid "Chinese"
 msgstr "Çince"
 
+msgid "Choose Xtream Codes or Stalker / MAC."
+msgstr "Xtream Codes veya Stalker / MAC seçin."
+
+msgid "Choose a line above to fill the subtitle time. Minus shows subtitles earlier; plus shows them later."
+msgstr "Üstteki satıra dokunarak altyazı zamanını doldurun. Eksi altyazıyı öne, artı geriye alır."
+
+msgid "Choose a portal type"
+msgstr "Bir portal türü seçin"
+
 msgid "Choose a source type first."
 msgstr "Önce bir kaynak türü seçin."
 
@@ -375,6 +434,15 @@ msgstr "Bu seçeneği etkinleştirmeden önce bir XMLTV kaynağı seçin."
 
 msgid "Choose an XMLTV source before saving."
 msgstr "Kaydetmeden önce bir XMLTV kaynağı seçin."
+
+msgid "Choose an available audio track."
+msgstr "Geçerli bir ses parçası seçin."
+
+msgid "Choose episodes"
+msgstr "Bölümleri seç"
+
+msgid "Choose one portal type. Saved accounts are tested securely and one at a time."
+msgstr "Bir portal türü seçin. Kayıtlı hesaplar güvenli biçimde ve sırayla test edilir."
 
 msgid "Choose the destination with the arrows. OK places marked categories below the line; EXIT cancels."
 msgstr "Yön tuşlarıyla hedef konumu seçin. OK, işaretli kategorileri çizginin altına yerleştirir; EXIT iptal eder."
@@ -408,6 +476,9 @@ msgstr "Açık gökyüzü"
 
 msgid "Close"
 msgstr "Kapat"
+
+msgid "Close menu"
+msgstr "Menüyü kapat"
 
 msgid "Close the open screen before opening another one."
 msgstr "Açık ekran kapatılmadan yeni ekran açılamaz."
@@ -470,6 +541,12 @@ msgstr "{} kaynağına bağlanılıyor, lütfen bekleyin."
 
 msgid "Connection limit reached"
 msgstr "Bağlantı limiti dolu"
+
+msgid "Connection status"
+msgstr "Bağlantı durumu"
+
+msgid "Connections"
+msgstr "Bağlantılar"
 
 msgid "Content type"
 msgstr "İçerik türü"
@@ -620,6 +697,9 @@ msgstr "KAYNAK EKLE panelinden yeni bir kaynak oluşturun."
 msgid "Create category edit PIN"
 msgstr "Kategori düzenleme PIN'i oluştur"
 
+msgid "Current account"
+msgstr "Test edilen hesap"
+
 msgid "Cyan"
 msgstr "Camgöbeği"
 
@@ -672,6 +752,12 @@ msgstr "DVB UYDU EPG"
 msgid "DVB bouquets could not be scanned."
 msgstr "DVB buketleri taranamadı."
 
+msgid "Daily source limit reached"
+msgstr "Kaynağın günlük kullanım sınırı doldu"
+
+msgid "Dashboard"
+msgstr "Gösterge Paneli"
+
 msgid "Deep standby never wakes the receiver; an overdue update runs after the next startup."
 msgstr "Derin bekleme modunda cihaz hiçbir zaman uyandırılmaz; gecikmiş bir güncelleme bir sonraki başlangıçtan sonra çalıştırılır."
 
@@ -684,12 +770,21 @@ msgstr "Varsayılan sıralama geri yüklendi. Kaydetmek için YEŞİL tuşa bas�
 msgid "Delete"
 msgstr "Sil"
 
+msgid "Delete all"
+msgstr "Tümünü sil"
+
+msgid "Delete this item?"
+msgstr "Bu kaynak silinsin mi?"
+
 msgid "Delete this video and its download entry?"
 msgstr "Bu video ve indirme kaydı silinsin mi?"
 
 #, python-brace-format
 msgid "Delete {}?"
 msgstr "{} silinsin mi?"
+
+msgid "Deleted"
+msgstr "Silindi"
 
 msgid "Details"
 msgstr "Ayrıntılar"
@@ -717,11 +812,20 @@ msgstr "Kategori düzenleme kilidini devre dışı bırak"
 msgid "Disable the category edit lock?"
 msgstr "Kategori düzenleme kilidi devre dışı bırakılsın mı?"
 
+msgid "Disabled"
+msgstr "Devre dışı"
+
 msgid "Discover Movies"
 msgstr "Film Keşfet"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "TMDB önerileriyle yeni filmler keşfet"
+
+msgid "Display 16:9 content as"
+msgstr "16:9 içeriği gösterme biçimi"
+
+msgid "Display 4:3 content as"
+msgstr "4:3 içeriği gösterme biçimi"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Portal URL’sine sorgu veya parça eklemeyin"
@@ -734,6 +838,9 @@ msgstr "Aşağı"
 
 msgid "Download"
 msgstr "İndir"
+
+msgid "Download and use"
+msgstr "İndir ve kullan"
 
 msgid "Download cancelled after device restart."
 msgstr "Cihaz yeniden başlatıldığı için indirme iptal edildi."
@@ -811,6 +918,9 @@ msgstr "DVB EPG’yi etkinleştir"
 msgid "Enable DVB EPG before starting an update."
 msgstr "Güncellemeyi başlatmadan önce DVB EPG’yi etkinleştirin."
 
+msgid "Enable a subtitle provider in Settings."
+msgstr "Ayarlardan bir altyazı kaynağını etkinleştirin."
+
 msgid "Enable external XMLTV EPG"
 msgstr "Harici XMLTV EPG’yi etkinleştir"
 
@@ -828,6 +938,9 @@ msgstr "Önce bir SubDL API anahtarı girin."
 
 msgid "Enter a SubDL API key in subtitle settings."
 msgstr "Altyazı ayarlarına bir SubDL API anahtarı girin."
+
+msgid "Enter a TMDb API key for movie and series details."
+msgstr "Film ve dizi bilgileri için TMDb API anahtarını girin."
 
 msgid "Enter a channel name."
 msgstr "Bir kanal adı girin."
@@ -855,6 +968,12 @@ msgstr "Geçerli bir portal URL’si girin"
 
 msgid "Enter a valid server URL"
 msgstr "Geçerli bir sunucu URL'si girin"
+
+msgid "Enter a valid time (MM:SS or HH:MM:SS)."
+msgstr "Geçerli bir zaman girin (DD:SS veya SS:DD:SS)."
+
+msgid "Enter a word to search videos."
+msgstr "Video aramak için bir kelime yazın."
 
 #, python-brace-format
 msgid "Enter exactly {} digits."
@@ -890,14 +1009,23 @@ msgstr "Aynı 4 haneli PIN'i tekrar girin."
 msgid "Enter the server URL"
 msgstr "Sunucu adresini girin"
 
+msgid "Enter the six-digit code shown on the receiver."
+msgstr "Alıcı ekranında görünen altı haneli kodu girin."
+
 msgid "Enter the username"
 msgstr "Kullanıcı adını girin"
+
+msgid "Enter the username / Enter the password"
+msgstr "Kullanıcı adını girin / Parolayı girin"
 
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Bu kodu telefon tarayıcınıza girin, ardından isteği TV'de onaylayın."
 
 msgid "Episode"
 msgstr "Bölüm"
+
+msgid "Episodes could not be loaded"
+msgstr "Bölümler yüklenemedi"
 
 msgid "Error"
 msgstr "HATA"
@@ -910,6 +1038,12 @@ msgstr "Programlar"
 
 msgid "Exit"
 msgstr "Çıkış"
+
+msgid "Expired"
+msgstr "Süresi dolmuş"
+
+msgid "Expiry date"
+msgstr "Bitiş tarihi"
 
 #, python-brace-format
 msgid "Expiry: {}"
@@ -939,8 +1073,14 @@ msgstr "FAVORİLER"
 msgid "FILE"
 msgstr "DOSYA"
 
+msgid "FPS"
+msgstr "FPS"
+
 msgid "FPS will be converted"
 msgstr "FPS dönüştürülecek"
+
+msgid "Failed"
+msgstr "Başarısız"
 
 msgid "Fast forward"
 msgstr "İleri sar"
@@ -984,6 +1124,12 @@ msgstr "Filtre kuralları: Göster / Gizle / Temizle"
 msgid "Filters updated. Press GREEN to save."
 msgstr "Filtreler güncellendi. Kaydetmek için YEŞİL tuşa basın."
 
+msgid "Find a subtitle line (optional)"
+msgstr "Altyazı satırını bul (isteğe bağlı)"
+
+msgid "Find subtitles"
+msgstr "Altyazı Bul"
+
 msgid "Finnish"
 msgstr "Fince"
 
@@ -1012,19 +1158,11 @@ msgstr "Tam ekran"
 msgid "GREEN"
 msgstr "YEŞİL"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"FİLM"
+msgid "GT\nMOVIE"
+msgstr "GT\nFİLM"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"DİZİ"
+msgid "GT\nSERIES"
+msgstr "GT\nDİZİ"
 
 msgid "Genre unavailable"
 msgstr "Tür bilgisi yok"
@@ -1163,6 +1301,9 @@ msgstr "Bilgi alındı. Sonraki alanı düzenleyin veya YEŞİL ile kaydedin."
 msgid "Information unavailable."
 msgstr "Bilgi yok"
 
+msgid "Install SubsSupport or SubsSupport Pro to load external subtitles."
+msgstr "Harici altyazı için SubsSupport veya SubsSupport Pro kurun."
+
 msgid "Invalid"
 msgstr "Geçersiz"
 
@@ -1203,6 +1344,12 @@ msgstr "İtalyanca"
 
 msgid "Keeping the current stream"
 msgstr "Mevcut yayın korunuyor"
+
+msgid "Key saved · enter a new key to replace it"
+msgstr "Anahtar kayıtlı · değiştirmek için yenisini girin"
+
+msgid "Keys are stored only on this receiver. Leave a key empty to skip that provider."
+msgstr "Anahtarlar yalnızca bu alıcıda saklanır. Anahtar eklenmeyen kaynak aramaya katılmaz."
 
 msgid "LAN only • HTTP • Do not expose port 9999 to the internet"
 msgstr "Yalnızca LAN • HTTP • 9999 portunu internete açmayın"
@@ -1247,47 +1394,16 @@ msgstr "Son güncelleme"
 msgid "Last update: {}  •  {} channels  •  {} events"
 msgstr "Son güncelleme: {}  •  {} kanal  •  {} etkinlik"
 
-#, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Gecikme: {} ms\n"
-"Hesap durumu: {}\n"
-"Aktif / Maksimum: {}\n"
-"Bitiş: {}\n"
-"Sunucu saati: {}\n"
-"Saat dilimi: {}\n"
-"Protokol: {}\n"
-"Çıkış biçimi: {}\n"
-"Sunucu sürümü: {}\n"
-"\n"
-"{}"
+msgid "Latency"
+msgstr "Gecikme"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Gecikme: {} ms\n"
-"Hesap durumu: {}\n"
-"Protokol: {}\n"
-"Çıkış biçimi: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Gecikme: {} ms\nHesap durumu: {}\nAktif / Maksimum: {}\nBitiş: {}\nSunucu saati: {}\nSaat dilimi: {}\nProtokol: {}\nÇıkış biçimi: {}\nSunucu sürümü: {}\n\n{}"
+
+#, python-brace-format
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Gecikme: {} ms\nHesap durumu: {}\nProtokol: {}\nÇıkış biçimi: {}\n\n{}"
 
 msgid "Left"
 msgstr "Sol"
@@ -1308,6 +1424,9 @@ msgstr "Canlı TV çıktısı {} olarak seçildi."
 msgid "Live TV service type"
 msgstr "Canlı TV servis türü"
 
+msgid "Load a subtitle from this web page before synchronizing."
+msgstr "Önce bu web sayfasından altyazı yükleyin."
+
 msgid "Load an independent subtitle before synchronizing it."
 msgstr "Senkronlamadan önce bağımsız bir altyazı yükleyin."
 
@@ -1325,6 +1444,9 @@ msgstr "İçerik yükleniyor..."
 
 msgid "Loading data... Please wait."
 msgstr "Veriler çekiliyor… Lütfen bekleyin."
+
+msgid "Loading episodes…"
+msgstr "Bölümler yükleniyor…"
 
 msgid "Loading forecast"
 msgstr "Tahmin yükleniyor"
@@ -1350,6 +1472,9 @@ msgstr "Yerel / NAS"
 msgid "Local / NAS file"
 msgstr "Yerel / NAS dosyası"
 
+msgid "Local HTTP does not encrypt API keys in transit. Use HTTPS when available."
+msgstr "Yerel HTTP bağlantısı API anahtarlarını aktarırken şifrelemez. Mümkünse HTTPS kullanın."
+
 msgid "Local file"
 msgstr "Yerel dosya"
 
@@ -1361,6 +1486,9 @@ msgstr "Oturumu kapat"
 
 msgid "Lower"
 msgstr "Aşağı"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "M3U KANAL ARAMA"
@@ -1516,6 +1644,9 @@ msgstr "MAC adresi"
 msgid "MANAGE SOURCES"
 msgstr "KAYNAKLARI YÖNET"
 
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 sn: Web arayüzü"
+
 msgid "MOVIE CATEGORIES"
 msgstr "FİLM KATEGORİLERİ"
 
@@ -1562,14 +1693,23 @@ msgstr "Önce KIRMIZI tuşla kategorileri işaretleyin."
 msgid "Marked"
 msgstr "İşaretli"
 
+msgid "Maximum video resolution"
+msgstr "En yüksek görüntü çözünürlüğü"
+
 msgid "Medium"
 msgstr "Orta"
+
+msgid "Menu"
+msgstr "Menü"
 
 msgid "Middle"
 msgstr "Orta bölüm"
 
 msgid "Modern Enigma2 IPTV player"
 msgstr "Modern Enigma2 IPTV oynatıcı"
+
+msgid "More results could not be loaded"
+msgstr "Sonraki sonuçlar yüklenemedi"
 
 msgid "Move"
 msgstr "Taşı"
@@ -1588,6 +1728,12 @@ msgstr "Film bilgisi"
 
 msgid "Movie information unavailable."
 msgstr "Film bilgisi bulunamadı."
+
+msgid "Movie position"
+msgstr "Filmin konumu"
+
+msgid "Movie position is unavailable."
+msgstr "Filmin konumu alınamıyor."
 
 msgid "Movie request timed out"
 msgstr "Film isteği zaman aşımına uğradı"
@@ -1622,6 +1768,9 @@ msgstr "ŞİMDİ"
 msgid "NUMBER KEYS: Enter  |  YELLOW: Delete  |  OK/GREEN: Confirm  |  BACK: Cancel"
 msgstr "RAKAM TUŞLARI: Gir  |  SARI: Sil  |  OK/YEŞİL: Onayla  |  GERİ: İptal"
 
+msgid "Name"
+msgstr "Ad"
+
 msgid "Navigate"
 msgstr "Gezin"
 
@@ -1648,6 +1797,9 @@ msgstr "Yeni kod"
 
 msgid "New search"
 msgstr "Yeni Ara"
+
+msgid "Next"
+msgstr "Sonraki"
 
 msgid "Next update"
 msgstr "Sonraki güncelleme"
@@ -1679,6 +1831,9 @@ msgstr "Bu gün için arşivlenmiş program bulunmuyor."
 msgid "No audio tracks are available."
 msgstr "Kullanılabilir ses parçası yok."
 
+msgid "No automatic test has been run yet."
+msgstr "Henüz otomatik test yapılmadı."
+
 msgid "No cached XMLTV guide was found. Press YELLOW to download it."
 msgstr "Önbelleğe alınmış XMLTV rehberi bulunamadı. İndirmek için SARI tuşa basın."
 
@@ -1697,6 +1852,9 @@ msgstr "Bu aramayla eşleşen kanal bulunamadı."
 msgid "No content found."
 msgstr "İçerik bulunamadı."
 
+msgid "No downloads"
+msgstr "İndirme bulunmuyor"
+
 msgid "No downloads or local videos."
 msgstr "İndirme veya yerel video yok."
 
@@ -1706,6 +1864,9 @@ msgstr "Gömülü altyazı bulunamadı."
 msgid "No episodes were found for this series."
 msgstr "Bu dizi için bölüm bulunamadı."
 
+msgid "No favorites"
+msgstr "Favori bulunmuyor"
+
 msgid "No favorites have been added."
 msgstr "Henüz favori eklenmedi."
 
@@ -1714,6 +1875,12 @@ msgstr "Filtre bulunamadı."
 
 msgid "No items found."
 msgstr "İçerik bulunamadı."
+
+msgid "No key required. Guest limits apply."
+msgstr "Anahtar gerektirmez. Misafir kullanım sınırı geçerlidir."
+
+msgid "No matching subtitles found. Check the language and provider status."
+msgstr "Eşleşen altyazı bulunamadı. Dili ve kaynak durumunu kontrol edin."
 
 msgid "No matching subtitles were found on SubDL."
 msgstr "SubDL üzerinde eşleşen altyazı bulunamadı."
@@ -1733,8 +1900,14 @@ msgstr "Eşleştirilebilecek gerçek bir DVB servisi yok."
 msgid "No real DVB service was found in the selected bouquet."
 msgstr "Seçilen bukette gerçek bir DVB servisi bulunamadı."
 
+msgid "No results found"
+msgstr "Sonuç bulunamadı"
+
 msgid "No saved IPTV source was found"
 msgstr "Kayıtlı IPTV kaynağı bulunamadı"
+
+msgid "No saved portal was found for this type"
+msgstr "Bu türde kayıtlı portal bulunamadı"
 
 msgid "No saved source found"
 msgstr "Kayıtlı kaynak bulunamadı"
@@ -1751,14 +1924,8 @@ msgstr "Bağlanılabilecek bir kaynak yok."
 msgid "No source is selected for deletion."
 msgstr "Silmek için bir kaynak seçilmedi."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Kaynak bulunamadı.\n"
-"\n"
-"Ana ekrandaki KAYNAK EKLE panelinden bir kaynak oluşturun."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Kaynak bulunamadı.\n\nAna ekrandaki KAYNAK EKLE panelinden bir kaynak oluşturun."
 
 msgid "No summary is available for this programme."
 msgstr "Bu program için özet bilgisi bulunmuyor."
@@ -1787,6 +1954,9 @@ msgstr "Geçerli bir Xtream kaynağı bulunamadı."
 msgid "No valid title was found for TMDb"
 msgstr "TMDb için geçerli yapım adı bulunamadı"
 
+msgid "No videos found at the selected quality."
+msgstr "Seçilen kalitede video bulunamadı."
+
 msgid "No weather forecast is available for this city."
 msgstr "Bu şehir için hava tahmini alınamadı."
 
@@ -1808,6 +1978,12 @@ msgstr "Yeterli boş alan yok."
 msgid "Not fetched yet"
 msgstr "Henüz alınmadı"
 
+msgid "Now on TV"
+msgstr "Şu An TV'de"
+
+msgid "Now playing"
+msgstr "Şu an izlenen"
+
 msgid "OPENING MAIN PANEL"
 msgstr "ANA PANEL AÇILIYOR"
 
@@ -1816,6 +1992,9 @@ msgstr "Kapalı"
 
 msgid "On"
 msgstr "Açık"
+
+msgid "Only the first 64 audio tracks are shown."
+msgstr "Yalnızca ilk 64 ses parçası gösteriliyor."
 
 msgid "Open"
 msgstr "Aç"
@@ -1838,6 +2017,9 @@ msgstr "Open-Meteo isteği başarısız"
 
 msgid "Original audio"
 msgstr "Orijinal ses"
+
+msgid "Output format"
+msgstr "Çıkış biçimi"
 
 msgid "Output format must be TS or M3U8"
 msgstr "Çıktı biçimi TS veya M3U8 olmalıdır"
@@ -1867,11 +2049,20 @@ msgstr "PROGRAM ÖZETİ"
 msgid "Page"
 msgstr "Sayfa"
 
+msgid "Pairing code"
+msgstr "Eşleştirme kodu"
+
 msgid "Partly cloudy"
 msgstr "Parçalı bulutlu"
 
+msgid "Password"
+msgstr "Parola"
+
 msgid "Paste an Xtream URL, or a portal URL and MAC on separate lines"
 msgstr "Xtream URL'sini veya portal URL'si ile MAC adresini ayrı satırlara yapıştırın"
+
+msgid "Paste your key here"
+msgstr "Anahtarınızı buraya yapıştırın"
 
 msgid "Pause"
 msgstr "Duraklat"
@@ -1879,20 +2070,41 @@ msgstr "Duraklat"
 msgid "Pause / Resume"
 msgstr "Duraklat / Devam"
 
+msgid "Pause at a spoken line. Match its movie time with the same line's subtitle time."
+msgstr "Bir replikte filmi durdurun. Filmde duyulduğu anı, altyazıdaki aynı satırın başlangıç anıyla eşleştirin."
+
 msgid "Paused"
 msgstr "Duraklatıldı"
 
 msgid "Play"
 msgstr "Oynat"
 
+msgid "Play a movie or episode on the receiver first."
+msgstr "Önce alıcıda bir film veya dizi bölümü açın."
+
+msgid "Play next video automatically"
+msgstr "Sonraki videoyu otomatik oynat"
+
+msgid "Play on TV"
+msgstr "TV'de Oynat"
+
+msgid "Playback history"
+msgstr "Oynatma geçmişi"
+
 msgid "Playback mode"
 msgstr "Oynatma modu"
+
+msgid "Playback requested on TV"
+msgstr "TV'de oynatma istendi"
 
 msgid "Player"
 msgstr "Oynatıcı"
 
 msgid "Player / Codec"
 msgstr "Oynatıcı / Kodek"
+
+msgid "Playing"
+msgstr "Çalıyor"
 
 msgid "Playlist file is too large"
 msgstr "Playlist dosyası çok büyük"
@@ -1975,6 +2187,9 @@ msgstr "Tercih edilen ses dili"
 msgid "Preferred subtitle language"
 msgstr "Tercih edilen altyazı dili"
 
+msgid "Preparing the video for TV…"
+msgstr "Video TV için hazırlanıyor…"
+
 msgid "Press BLUE to search all movies."
 msgstr "Tüm filmlerde aramak için MAVİ tuşa basın."
 
@@ -2020,17 +2235,29 @@ msgstr "SubDL bağlantısını sınamak için SARI tuşa basın."
 msgid "Preview"
 msgstr "Önizleme"
 
+msgid "Previous"
+msgstr "Önceki"
+
 msgid "Primary language"
 msgstr "Birincil dil"
 
 msgid "Provider"
 msgstr "Sağlayıcı"
 
+msgid "Provider connection succeeded"
+msgstr "Kaynağa bağlantı başarılı"
+
 msgid "Quality"
 msgstr "Kalite"
 
+msgid "Quality changed. Search again."
+msgstr "Kalite değişti. Yeniden arayın."
+
 msgid "Queued"
 msgstr "Sırada"
+
+msgid "Quick actions"
+msgstr "Hızlı İşlemler"
 
 msgid "REMAINING"
 msgstr "KALAN"
@@ -2045,26 +2272,8 @@ msgid "Rating"
 msgstr "Puan"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Okuma süresi: {} ms\n"
-"Kaynak türü: {}\n"
-"Boyut: {} bayt\n"
-"Kanallar: {}\n"
-"Kategoriler: {}\n"
-"Önbellek yaşı: {}\n"
-"Son değiştirilme: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Okuma süresi: {} ms\nKaynak türü: {}\nBoyut: {} bayt\nKanallar: {}\nKategoriler: {}\nÖnbellek yaşı: {}\nSon değiştirilme: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Süre alınıyor..."
@@ -2072,8 +2281,14 @@ msgstr "Süre alınıyor..."
 msgid "Reading resolution"
 msgstr "Çözünürlük alınıyor"
 
+msgid "Ready"
+msgstr "Hazır"
+
 msgid "Ready to connect"
 msgstr "Bağlanmaya hazır"
+
+msgid "Receiver"
+msgstr "Alıcı"
 
 msgid "Receiver unavailable"
 msgstr "Alıcıya ulaşılamıyor"
@@ -2082,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Yayın yeniden bağlanıyor..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Kurtarma başarılı. Yalnızca bir kez gösterilecek yeni kurtarma kodunu not edin:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Kurtarma başarılı. Yalnızca bir kez gösterilecek yeni kurtarma kodunu not edin:\n\n{}"
 
 msgid "Red"
 msgstr "Kırmızı"
@@ -2103,11 +2312,20 @@ msgstr "Uzaktan kumanda"
 msgid "Remove"
 msgstr "Kaldır"
 
+msgid "Remove key"
+msgstr "Anahtarı sil"
+
 msgid "Rename"
 msgstr "Yeniden adlandır"
 
 msgid "Request cancelled"
 msgstr "İstek iptal edildi"
+
+msgid "Request denied"
+msgstr "İstek reddedildi"
+
+msgid "Request failed"
+msgstr "İşlem başarısız oldu"
 
 msgid "Request timed out"
 msgstr "İstek zaman aşımına uğradı"
@@ -2124,18 +2342,18 @@ msgstr "Altyazı zamanlamasını sıfırla"
 msgid "Resolution: --"
 msgstr "Çözünürlük: --"
 
+msgid "Restart required"
+msgstr "Yeniden başlatma gerekli"
+
+msgid "Results are loading"
+msgstr "Sonuçlar yükleniyor"
+
 msgid "Resume"
 msgstr "Devam et"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Kaldığın yerden devam edilsin mi?\n"
-"\n"
-"Kayıtlı süre: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Kaldığın yerden devam edilsin mi?\n\nKayıtlı süre: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Yarım kalan film ve dizi bölümlerine devam edin"
@@ -2203,11 +2421,17 @@ msgstr "SSA"
 msgid "SUBTITLE SETTINGS"
 msgstr "ALTYAZI AYARLARI"
 
+msgid "Same line starts in subtitle (MM:SS)"
+msgstr "Altyazıdaki başlangıç anı (DD:SS)"
+
 msgid "Save"
 msgstr "Kaydet"
 
 msgid "Save folder"
 msgstr "Kayıt konumu"
+
+msgid "Saved"
+msgstr "Kaydedildi"
 
 msgid "Scanning DVB bouquets..."
 msgstr "DVB buketleri taranıyor..."
@@ -2224,6 +2448,30 @@ msgstr "Tüm Filmlerde Ara"
 msgid "Search XMLTV channels"
 msgstr "XMLTV kanallarında ara"
 
+msgid "Search YouTube"
+msgstr "YouTube'da Ara"
+
+msgid "Search a film or series"
+msgstr "Film veya dizi adı ara"
+
+msgid "Search a saved IPTV source for a film or series and play it on TV."
+msgstr "Kayıtlı IPTV kaynağında film veya dizi ara ve alıcıda oynat."
+
+msgid "Search again to see more results"
+msgstr "Diğer sonuçlar için yeniden arayın"
+
+msgid "Search again to select this title"
+msgstr "Bu içerik için yeniden arama yapın"
+
+msgid "Search again; this result has expired."
+msgstr "Sonucun süresi doldu; yeniden arayın."
+
+msgid "Search for a spoken phrase"
+msgstr "Konuşulan cümleyi ara"
+
+msgid "Search history"
+msgstr "Arama geçmişi"
+
 msgid "Search in IPTV"
 msgstr "IPTV’de Ara"
 
@@ -2233,8 +2481,14 @@ msgstr "Arama dili"
 msgid "Search mode"
 msgstr "Arama modu"
 
+msgid "Search music, documentaries or channels"
+msgstr "müzik, belgesel veya kanal ara"
+
 msgid "Search online subtitles with SubDL"
 msgstr "SubDL ile çevrim içi altyazı ara"
+
+msgid "Search subtitles"
+msgstr "Altyazı ara"
 
 msgid "Search subtitles with %s"
 msgstr "%s ile altyazı ara"
@@ -2245,11 +2499,26 @@ msgstr "SubsSupport ile altyazı ara"
 msgid "Search the selected movie in your active IPTV account."
 msgstr "Seçili filmi aktif IPTV hesabınızda arayın."
 
+msgid "Search title"
+msgstr "Aranacak başlık"
+
+msgid "Searching providers…"
+msgstr "Kaynaklarda aranıyor…"
+
+msgid "Searching…"
+msgstr "Aranıyor…"
+
+msgid "Season"
+msgstr "Sezon"
+
 msgid "Seasons"
 msgstr "SEZONLAR"
 
 msgid "Secondary language"
 msgstr "İkincil dil"
+
+msgid "Secure Paste"
+msgstr "Güvenli Yapıştırma"
 
 msgid "Security"
 msgstr "Güvenlik"
@@ -2262,6 +2531,9 @@ msgstr "XMLTV kanalı seç"
 
 msgid "Select a valid Xtream XMLTV source."
 msgstr "Geçerli bir Xtream XMLTV kaynağı seçin."
+
+msgid "Select an audio language included in the current movie or episode."
+msgstr "Oynatılan film veya bölümün içindeki ses dillerinden birini seçin."
 
 msgid "Select and connect to a saved source to start watching."
 msgstr "İzlemeye başlamak için kayıtlı bir kaynağı seçip bağlanın."
@@ -2290,8 +2562,14 @@ msgstr "Seçim çerçevesi rengi"
 msgid "Selection color"
 msgstr "Seçim rengi"
 
+msgid "Selection requested. Refresh to check the active audio."
+msgstr "Ses seçimi gönderildi. Etkin dili görmek için yenileyin."
+
 msgid "Send to TV"
 msgstr "TV'ye gönder"
+
+msgid "Sensitive account data is hidden."
+msgstr "Hassas hesap bilgileri gizlenmiştir."
 
 msgid "Serbian"
 msgstr "Sırpça"
@@ -2367,6 +2645,9 @@ msgstr "Sunucu HTTP {} döndürdü"
 msgid "Server returned an invalid content response"
 msgstr "Sunucu geçersiz içerik yanıtı verdi"
 
+msgid "Session expires soon"
+msgstr "Oturum yakında kapanacak"
+
 msgid "Settings"
 msgstr "Ayarlar"
 
@@ -2385,6 +2666,9 @@ msgstr "Ayarlar kaydedilemedi. Cihaz depolamasını kontrol edin."
 #, python-brace-format
 msgid "Settings could not be saved: {}"
 msgstr "Ayar kaydedilemedi: {}"
+
+msgid "Settings saved"
+msgstr "Ayarlar kaydedildi"
 
 msgid "Show"
 msgstr "Göster"
@@ -2431,6 +2715,9 @@ msgstr "Kaynak"
 msgid "Source Health"
 msgstr "Kaynak Durumu"
 
+msgid "Source deleted"
+msgstr "Kaynak silindi"
+
 msgid "Source deletion cancelled."
 msgstr "Kaynak silme işlemi iptal edildi."
 
@@ -2440,11 +2727,23 @@ msgstr "Kaynak bilgileri"
 msgid "Source name"
 msgstr "Kaynak adı"
 
+msgid "Source returned invalid data"
+msgstr "Kaynak geçersiz yanıt verdi"
+
+msgid "Source saved"
+msgstr "Kaynak kaydedildi"
+
+msgid "Source search failed or timed out"
+msgstr "Kaynak araması başarısız veya zaman aşımına uğradı"
+
 msgid "Source status is checked automatically when connecting."
 msgstr "Kaynak durumu bağlanırken otomatik olarak kontrol edilir."
 
 msgid "Source type"
 msgstr "Kaynak türü"
+
+msgid "Source unavailable"
+msgstr "Kaynağa ulaşılamıyor"
 
 msgid "Sources"
 msgstr "Kaynaklar"
@@ -2458,6 +2757,9 @@ msgstr "Hız"
 msgid "Speed limit"
 msgstr "Hız sınırı"
 
+msgid "Stale"
+msgstr "Eski veri"
+
 msgid "Stalker / MAC"
 msgstr "Stalker / MAC"
 
@@ -2470,6 +2772,9 @@ msgstr "Standart"
 msgid "Standard M3U sources support Live TV only."
 msgstr "Standart M3U kaynakları yalnızca Canlı TV'yi destekler."
 
+msgid "Start Test"
+msgstr "Testi Başlat"
+
 msgid "Status"
 msgstr "Durum"
 
@@ -2481,6 +2786,9 @@ msgstr "Durdur"
 
 msgid "Stop / Deny"
 msgstr "Durdur / Reddet"
+
+msgid "Stopping"
+msgstr "Durduruluyor"
 
 msgid "Storage"
 msgstr "Depolama"
@@ -2518,6 +2826,21 @@ msgstr "SubDL altyazıları"
 msgid "Subtitle"
 msgstr "Altyazı"
 
+msgid "Subtitle exceeds the size limit"
+msgstr "Altyazı boyut sınırını aşıyor"
+
+msgid "Subtitle language"
+msgstr "Altyazı dili"
+
+msgid "Subtitle loaded on the receiver"
+msgstr "Altyazı alıcıda yüklendi"
+
+msgid "Subtitle provider updated"
+msgstr "Altyazı kaynağı güncellendi"
+
+msgid "Subtitle providers"
+msgstr "Altyazı Kaynakları"
+
 msgid "Subtitle result selection is unavailable on this image."
 msgstr "Bu imajda altyazı sonucu seçimi kullanılamıyor."
 
@@ -2530,8 +2853,14 @@ msgstr "Bu imajda altyazı seçimi kullanılamıyor."
 msgid "Subtitle settings could not be saved."
 msgstr "Altyazı ayarları kaydedilemedi."
 
+msgid "Subtitle synchronization is already running."
+msgstr "Altyazı eşzamanlama işlemi sürüyor."
+
 msgid "Subtitle synchronization is unavailable on this image."
 msgstr "Bu imajda altyazı senkronu kullanılamıyor."
+
+msgid "Subtitle timing adjusted"
+msgstr "Altyazı zamanlaması ayarlandı"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
@@ -2549,6 +2878,9 @@ msgstr "Bu seçeneği değiştirmek için Güncelleme modunu Otomatik olarak aya
 msgid "Symbolic links cannot be used as M3U sources."
 msgstr "Simgesel bağlantılar M3U kaynağı olarak kullanılamaz."
 
+msgid "Synchronize subtitles"
+msgstr "Altyazıyı eşzamanla"
+
 #, python-brace-format
 msgid "S{}  •  E{}"
 msgstr "S{}  •  B{}"
@@ -2562,6 +2894,9 @@ msgstr "TEST EDİLİYOR..."
 
 msgid "THIS STREAM CANNOT BE SEEKED"
 msgstr "BU YAYINDA ZAMAN ATLAMA YAPILAMIYOR"
+
+msgid "TMDb API key"
+msgstr "TMDb API anahtarı"
 
 msgid "TMDb API key / token"
 msgstr "TMDb API anahtarı / token"
@@ -2580,6 +2915,9 @@ msgstr "TMDb HTTP hatası path={}"
 msgid "TMDb connection error path={}"
 msgstr "TMDb bağlantı hatası path={}"
 
+msgid "TMDb connection successful"
+msgstr "TMDb bağlantısı başarılı"
+
 msgid "TMDb connection successful; the API key is valid."
 msgstr "TMDb bağlantısı başarılı; API anahtarı geçerli."
 
@@ -2591,6 +2929,9 @@ msgstr "TMDb anahtarı temizlendi; YEŞİL tuşla kaydedin."
 
 msgid "TMDb key saved; press BLUE to test and GREEN to save."
 msgstr "TMDb anahtarı ayarlandı; MAVİ ile test edip YEŞİL ile kaydedin."
+
+msgid "TMDb key test failed"
+msgstr "TMDb anahtarı doğrulanamadı"
 
 msgid "TMDb metadata enrichment"
 msgstr "TMDb bilgi tamamlama"
@@ -2619,6 +2960,9 @@ msgstr "TMDb HTTP {} döndürdü"
 
 msgid "TMDb returned an invalid response"
 msgstr "TMDb geçersiz yanıt verdi"
+
+msgid "TMDb sources"
+msgstr "TMDB Kaynakları"
 
 msgid "TMDb test failed: could not connect."
 msgstr "TMDb testi başarısız: bağlantı kurulamadı."
@@ -2659,6 +3003,21 @@ msgstr "Sıcaklık birimi güncellendi."
 
 msgid "Test"
 msgstr "Test"
+
+msgid "Test Progress"
+msgstr "Test İlerlemesi"
+
+msgid "Test Results"
+msgstr "Test Sonuçları"
+
+msgid "Test every saved Stalker / MAC portal."
+msgstr "Kayıtlı tüm Stalker / MAC portallarını test eder."
+
+msgid "Test every saved Xtream Codes account."
+msgstr "Kayıtlı tüm Xtream Codes hesaplarını test eder."
+
+msgid "Tested"
+msgstr "Test Edilen"
 
 msgid "Testing the SubDL connection..."
 msgstr "SubDL bağlantısı sınanıyor..."
@@ -2756,6 +3115,9 @@ msgstr "Silinecek hesap geçersiz"
 msgid "The confirmation screen is unavailable on this image."
 msgstr "Onay ekranı bu imajda kullanılamıyor."
 
+msgid "The difference cannot exceed 30 minutes."
+msgstr "Fark 30 dakikayı aşamaz."
+
 msgid "The downloaded subtitle could not be saved."
 msgstr "İndirilen altyazı kaydedilemedi."
 
@@ -2777,6 +3139,9 @@ msgstr "Yerel Enigma2 EPG önbelleği güncellemeyi reddetti."
 msgid "The new PIN could not be saved. Category editor remains locked."
 msgstr "Yeni PIN kaydedilemedi. Kategori düzenleyicisi kilitli kalacak."
 
+msgid "The playing movie or episode changed. Search again."
+msgstr "Oynatılan içerik değişti. Yeniden arayın."
+
 msgid "The playing service changed. Open audio selection again."
 msgstr "Oynatılan servis değişti. Ses seçimini yeniden açın."
 
@@ -2785,6 +3150,12 @@ msgstr "İçerik başlığı altyazı araması için kullanılamıyor."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Cihaz saati henüz hazır değil. Ağ saatini kontrol edip yeniden deneyin."
+
+msgid "The receiver could not change the audio track."
+msgstr "Alıcı ses parçasını değiştiremedi."
+
+msgid "The receiver could not load this subtitle."
+msgstr "Alıcı bu altyazıyı yükleyemedi."
 
 msgid "The selected M3U source was not found"
 msgstr "Seçili M3U kaynağı bulunamadı"
@@ -2825,8 +3196,14 @@ msgstr "Fragman oynatılamadı."
 msgid "The video file is incomplete or its format could not be verified."
 msgstr "Video dosyası eksik veya dosya biçimi doğrulanamadı."
 
+msgid "The video or its audio tracks changed. Refresh and choose again."
+msgstr "Film veya ses parçaları değişti. Yenileyip yeniden seçin."
+
 msgid "The virtual keyboard is unavailable on this image."
 msgstr "Sanal klavye bu imajda kullanılamıyor."
+
+msgid "The web interface was updated. Restart the Enigma2 interface and refresh this page to activate the changes."
+msgstr "Web arayüzü güncellendi. Değişiklikleri etkinleştirmek için Enigma2 arayüzünü yeniden başlatın ve sayfayı yenileyin."
 
 msgid "This M3U source supports Live TV only."
 msgstr "Bu M3U kaynağı yalnızca Canlı TV'yi destekler."
@@ -2849,12 +3226,8 @@ msgstr "Bu içerikte yalnızca bir ses parçası var."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Bu klasör izin verilen depolama konumlarının dışında."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Bu bir altyazı önizlemesidir.\n"
-"Değişiklikler burada anında görünür."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Bu bir altyazı önizlemesidir.\nDeğişiklikler burada anında görünür."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Bu önizleme mevcut kaydedilmemiş görünüm ayarlarını kullanır."
@@ -2871,11 +3244,20 @@ msgstr "Bu kaynak seçilen içerik türünü desteklemiyor."
 msgid "This stream is not a downloadable video file."
 msgstr "Bu yayın indirilebilir bir video dosyası değil."
 
+msgid "This subtitle format is not supported"
+msgstr "Bu altyazı biçimi desteklenmiyor"
+
 msgid "This video could not be played. Check the playback engine and file format."
 msgstr "Bu video oynatılamadı. Oynatma motorunu ve dosya biçimini kontrol edin."
 
+msgid "This video has only one audio language."
+msgstr "Bu videoda yalnızca bir ses dili var."
+
 msgid "Thunderstorms"
 msgstr "Gök gürültülü sağanaklar"
+
+msgid "Time heard in movie (MM:SS)"
+msgstr "Filmde duyulan an (DD:SS)"
 
 msgid "Time left"
 msgstr "Kalan süre"
@@ -2937,6 +3319,9 @@ msgstr "İsimsiz içerik"
 msgid "Up"
 msgstr "Yukarı"
 
+msgid "Update EPG"
+msgstr "EPG Güncelle"
+
 msgid "Update failed; the previous guide remains available."
 msgstr "Güncelleme başarısız oldu; önceki rehber kullanılmaya devam edecek."
 
@@ -2959,6 +3344,15 @@ msgstr "Güncellendi: {}{}"
 msgid "Updates run in the background. Channel changes never download EPG data."
 msgstr "Güncellemeler arka planda çalışır. Kanal değişiklikleri hiçbir zaman EPG verisi indirmez."
 
+msgid "Use this audio"
+msgstr "Bu sesi kullan"
+
+msgid "Use this provider"
+msgstr "Bu kaynağı kullan"
+
+msgid "Username"
+msgstr "Kullanıcı adı"
+
 msgid "VIDEO: --"
 msgstr "VİDEO: --"
 
@@ -2972,11 +3366,20 @@ msgstr "VOB"
 msgid "Variable"
 msgstr "Değişken"
 
+msgid "Version"
+msgstr "Sürüm"
+
 msgid "Vertical position"
 msgstr "Dikey konum"
 
 msgid "Very large"
 msgstr "Çok büyük"
+
+msgid "Video"
+msgstr "Video"
+
+msgid "Video could not be played on this receiver. Try another video or quality setting."
+msgstr "Bu video alıcıda oynatılamadı. Başka video veya kalite ayarı deneyin."
 
 msgid "Video quality"
 msgstr "Görüntü kalitesi"
@@ -2996,6 +3399,9 @@ msgstr "HAVA DURUMU"
 msgid "WEB"
 msgstr "WEB"
 
+msgid "Waiting for approval on the receiver."
+msgstr "Alıcıdan onay bekleniyor."
+
 msgid "Waiting for programme information"
 msgstr "Program bilgisi bekleniyor"
 
@@ -3004,6 +3410,9 @@ msgstr "Uyarı"
 
 msgid "Watch from archive"
 msgstr "Arşivden izle"
+
+msgid "Watch on TV from web"
+msgstr "Web'den TV'ye İzle"
 
 msgid "Watch programmes you missed"
 msgstr "Kaçırdığın programları yeniden izle"
@@ -3050,22 +3459,15 @@ msgstr "WebVTT"
 msgid "Welcome"
 msgstr "Hoş geldin"
 
+msgid "Where to get a key"
+msgstr "Anahtar nereden alınır?"
+
 msgid "White"
 msgstr "Beyaz"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Bu kurtarma kodunu not edin. Yalnızca bir kez gösterilecektir:\n"
-"\n"
-"{}\n"
-"\n"
-"Her iki kodu da unutursanız eklentiyi kaldırıp yeniden yüklemek yalnızca bu kilidi sıfırlar."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Bu kurtarma kodunu not edin. Yalnızca bir kez gösterilecektir:\n\n{}\n\nHer iki kodu da unutursanız eklentiyi kaldırıp yeniden yüklemek yalnızca bu kilidi sıfırlar."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "XMLTV EPG bu M3U kaynağı için devre dışı."
@@ -3127,8 +3529,17 @@ msgstr "YouTube"
 msgid "YouTube default"
 msgstr "YouTube varsayılanı"
 
+msgid "YouTube is temporarily limiting searches"
+msgstr "YouTube aramaları geçici olarak sınırlıyor"
+
 msgid "YouTube results pages"
 msgstr "YouTube sonuç sayfaları"
+
+msgid "YouTube search does not need an API key. Set your TV video quality."
+msgstr "YouTube araması için API anahtarı gerekmez. TV görüntü kalitesini ayarlayın."
+
+msgid "YouTube search is unavailable"
+msgstr "YouTube araması kullanılamıyor"
 
 msgid "YouTube settings"
 msgstr "YouTube ayarları"
@@ -3201,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} favorilerden kaldırıldı."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Enigma2 için açık kaynaklı IPTV oynatıcısı. Xtream Codes hesaplarını ve standart yerel, bağlı ağ ya da HTTP(S) M3U oynatma listelerinden Canlı TV'yi destekler. Yalın M3U kaynakları yalnızca Canlı TV sağlar.\n"
-"\n"
-"GELİŞTİRİCİ\n"
-"{}\n"
-"\n"
-"YASAL UYARI\n"
-"Bu eklenti kanal, yayın, hesap veya oynatma listesi sağlamaz. Kullanıcı yalnızca erişim ve kullanım hakkına sahip olduğu içerikleri kullanmaktan sorumludur.\n"
-"\n"
-"GİZLİLİK\n"
-"Open-Meteo etkinleştirildiğinde seçilen şehir ve konum, hava tahmini için Open-Meteo'ya gönderilir. TMDb etkinleştirildiğinde film/dizi adı ile kullanıcının girdiği TMDb anahtarı veya belirteci TMDb'ye gönderilir. IPTV kullanıcı adı ve parolası bu hizmetlere gönderilmez."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nEnigma2 için açık kaynaklı IPTV oynatıcısı. Xtream Codes hesaplarını ve standart yerel, bağlı ağ ya da HTTP(S) M3U oynatma listelerinden Canlı TV'yi destekler. Yalın M3U kaynakları yalnızca Canlı TV sağlar.\n\nGELİŞTİRİCİ\n{}\n\nYASAL UYARI\nBu eklenti kanal, yayın, hesap veya oynatma listesi sağlamaz. Kullanıcı yalnızca erişim ve kullanım hakkına sahip olduğu içerikleri kullanmaktan sorumludur.\n\nGİZLİLİK\nOpen-Meteo etkinleştirildiğinde seçilen şehir ve konum, hava tahmini için Open-Meteo'ya gönderilir. TMDb etkinleştirildiğinde film/dizi adı ile kullanıcının girdiği TMDb anahtarı veya belirteci TMDb'ye gönderilir. IPTV kullanıcı adı ve parolası bu hizmetlere gönderilmez."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."
@@ -3257,465 +3646,3 @@ msgstr "{}  •  {} FİLM"
 #, python-brace-format
 msgid "{} • {} SERIES"
 msgstr "{}  •  {} DİZİ"
-
-msgid "API key"
-msgstr ""
-
-msgid "API key was rejected"
-msgstr ""
-
-msgid "Active downloads"
-msgstr ""
-
-msgid "Add an API key first"
-msgstr ""
-
-msgid "Align"
-msgstr ""
-
-msgid "All healthy"
-msgstr ""
-
-msgid "Allow separate audio/video streams for higher quality (DASH)"
-msgstr ""
-
-msgid "An automatic test is already running."
-msgstr ""
-
-msgid "Audio language changed"
-msgstr ""
-
-msgid "Audio languages"
-msgstr ""
-
-msgid "Audio selection is busy. Try again shortly."
-msgstr ""
-
-msgid "Audio selection is unavailable on this receiver."
-msgstr ""
-
-msgid "Audio tracks are not ready. Refresh after playback starts."
-msgstr ""
-
-msgid "Automatic Test"
-msgstr ""
-
-msgid "Automatic test cancelled"
-msgstr ""
-
-msgid "Automatic test completed"
-msgstr ""
-
-msgid "Automatic test is running"
-msgstr ""
-
-msgid "Cancel Test"
-msgstr ""
-
-msgid "Choose Xtream Codes or Stalker / MAC."
-msgstr ""
-
-msgid "Choose a line above to fill the subtitle time. Minus shows subtitles earlier; plus shows them later."
-msgstr ""
-
-msgid "Choose a portal type"
-msgstr ""
-
-msgid "Choose an available audio track."
-msgstr ""
-
-msgid "Choose episodes"
-msgstr ""
-
-msgid "Choose one portal type. Saved accounts are tested securely and one at a time."
-msgstr ""
-
-msgid "Connection status"
-msgstr ""
-
-msgid "Connections"
-msgstr ""
-
-msgid "Current account"
-msgstr ""
-
-msgid "Daily source limit reached"
-msgstr ""
-
-msgid "Dashboard"
-msgstr ""
-
-msgid "Delete this item?"
-msgstr ""
-
-msgid "Deleted"
-msgstr ""
-
-msgid "Disabled"
-msgstr ""
-
-msgid "Download and use"
-msgstr ""
-
-msgid "Enable a subtitle provider in Settings."
-msgstr ""
-
-msgid "Enter a TMDb API key for movie and series details."
-msgstr ""
-
-msgid "Enter a valid time (MM:SS or HH:MM:SS)."
-msgstr ""
-
-msgid "Enter a word to search videos."
-msgstr ""
-
-msgid "Enter the six-digit code shown on the receiver."
-msgstr ""
-
-msgid "Episodes could not be loaded"
-msgstr ""
-
-msgid "Expired"
-msgstr ""
-
-msgid "Expiry date"
-msgstr ""
-
-msgid "Failed"
-msgstr ""
-
-msgid "Find a subtitle line (optional)"
-msgstr ""
-
-msgid "Find subtitles"
-msgstr ""
-
-msgid "Install SubsSupport or SubsSupport Pro to load external subtitles."
-msgstr ""
-
-msgid "Key saved · enter a new key to replace it"
-msgstr ""
-
-msgid "Keys are stored only on this receiver. Leave a key empty to skip that provider."
-msgstr ""
-
-msgid "Latency"
-msgstr ""
-
-msgid "Load a subtitle from this web page before synchronizing."
-msgstr ""
-
-msgid "Loading episodes…"
-msgstr ""
-
-msgid "Local HTTP does not encrypt API keys in transit. Use HTTPS when available."
-msgstr ""
-
-msgid "Maximum video resolution"
-msgstr ""
-
-msgid "Menu"
-msgstr ""
-
-msgid "More results could not be loaded"
-msgstr ""
-
-msgid "Movie position"
-msgstr ""
-
-msgid "Movie position is unavailable."
-msgstr ""
-
-msgid "Name"
-msgstr ""
-
-msgid "Next"
-msgstr ""
-
-msgid "No automatic test has been run yet."
-msgstr ""
-
-msgid "No downloads"
-msgstr ""
-
-msgid "No favorites"
-msgstr ""
-
-msgid "No key required. Guest limits apply."
-msgstr ""
-
-msgid "No matching subtitles found. Check the language and provider status."
-msgstr ""
-
-msgid "No results found"
-msgstr ""
-
-msgid "No saved portal was found for this type"
-msgstr ""
-
-msgid "Now on TV"
-msgstr ""
-
-msgid "Now playing"
-msgstr ""
-
-msgid "Only the first 64 audio tracks are shown."
-msgstr ""
-
-msgid "Output format"
-msgstr ""
-
-msgid "Pairing code"
-msgstr ""
-
-msgid "Password"
-msgstr ""
-
-msgid "Paste your key here"
-msgstr ""
-
-msgid "Pause at a spoken line. Match its movie time with the same line's subtitle time."
-msgstr ""
-
-msgid "Play a movie or episode on the receiver first."
-msgstr ""
-
-msgid "Play on TV"
-msgstr ""
-
-msgid "Playback requested on TV"
-msgstr ""
-
-msgid "Playing"
-msgstr ""
-
-msgid "Preparing the video for TV…"
-msgstr ""
-
-msgid "Previous"
-msgstr ""
-
-msgid "Provider connection succeeded"
-msgstr ""
-
-msgid "Quick actions"
-msgstr ""
-
-msgid "Ready"
-msgstr ""
-
-msgid "Receiver"
-msgstr ""
-
-msgid "Remove key"
-msgstr ""
-
-msgid "Request denied"
-msgstr ""
-
-msgid "Request failed"
-msgstr ""
-
-msgid "Restart required"
-msgstr ""
-
-msgid "Results are loading"
-msgstr ""
-
-msgid "Same line starts in subtitle (MM:SS)"
-msgstr ""
-
-msgid "Saved"
-msgstr ""
-
-msgid "Search YouTube"
-msgstr ""
-
-msgid "Search a film or series"
-msgstr ""
-
-msgid "Search a saved IPTV source for a film or series and play it on TV."
-msgstr ""
-
-msgid "Search again to see more results"
-msgstr ""
-
-msgid "Search again to select this title"
-msgstr ""
-
-msgid "Search again; this result has expired."
-msgstr ""
-
-msgid "Search for a spoken phrase"
-msgstr ""
-
-msgid "Search music, documentaries or channels"
-msgstr ""
-
-msgid "Search subtitles"
-msgstr ""
-
-msgid "Search title"
-msgstr ""
-
-msgid "Searching providers…"
-msgstr ""
-
-msgid "Searching…"
-msgstr ""
-
-msgid "Secure Paste"
-msgstr ""
-
-msgid "Select an audio language included in the current movie or episode."
-msgstr ""
-
-msgid "Selection requested. Refresh to check the active audio."
-msgstr ""
-
-msgid "Sensitive account data is hidden."
-msgstr ""
-
-msgid "Session expires soon"
-msgstr ""
-
-msgid "Settings saved"
-msgstr ""
-
-msgid "Source deleted"
-msgstr ""
-
-msgid "Source returned invalid data"
-msgstr ""
-
-msgid "Source saved"
-msgstr ""
-
-msgid "Source search failed or timed out"
-msgstr ""
-
-msgid "Source unavailable"
-msgstr ""
-
-msgid "Stale"
-msgstr ""
-
-msgid "Start Test"
-msgstr ""
-
-msgid "Stopping"
-msgstr ""
-
-msgid "Subtitle exceeds the size limit"
-msgstr ""
-
-msgid "Subtitle language"
-msgstr ""
-
-msgid "Subtitle loaded on the receiver"
-msgstr ""
-
-msgid "Subtitle provider updated"
-msgstr ""
-
-msgid "Subtitle providers"
-msgstr ""
-
-msgid "Subtitle synchronization is already running."
-msgstr ""
-
-msgid "Subtitle timing adjusted"
-msgstr ""
-
-msgid "Synchronize subtitles"
-msgstr ""
-
-msgid "TMDb API key"
-msgstr ""
-
-msgid "TMDb connection successful"
-msgstr ""
-
-msgid "TMDb key test failed"
-msgstr ""
-
-msgid "TMDb sources"
-msgstr ""
-
-msgid "Test Progress"
-msgstr ""
-
-msgid "Test Results"
-msgstr ""
-
-msgid "Test every saved Stalker / MAC portal."
-msgstr ""
-
-msgid "Test every saved Xtream Codes account."
-msgstr ""
-
-msgid "Tested"
-msgstr ""
-
-msgid "The difference cannot exceed 30 minutes."
-msgstr ""
-
-msgid "The playing movie or episode changed. Search again."
-msgstr ""
-
-msgid "The receiver could not change the audio track."
-msgstr ""
-
-msgid "The receiver could not load this subtitle."
-msgstr ""
-
-msgid "The video or its audio tracks changed. Refresh and choose again."
-msgstr ""
-
-msgid "The web interface was updated. Restart the Enigma2 interface and refresh this page to activate the changes."
-msgstr ""
-
-msgid "This subtitle format is not supported"
-msgstr ""
-
-msgid "This video has only one audio language."
-msgstr ""
-
-msgid "Time heard in movie (MM:SS)"
-msgstr ""
-
-msgid "Update EPG"
-msgstr ""
-
-msgid "Use this audio"
-msgstr ""
-
-msgid "Use this provider"
-msgstr ""
-
-msgid "Username"
-msgstr ""
-
-msgid "Version"
-msgstr ""
-
-msgid "Video could not be played on this receiver. Try another video or quality setting."
-msgstr ""
-
-msgid "Waiting for approval on the receiver."
-msgstr ""
-
-msgid "Watch on TV from web"
-msgstr ""
-
-msgid "Where to get a key"
-msgstr ""
-
-msgid "YouTube is temporarily limiting searches"
-msgstr ""
-
-msgid "YouTube search does not need an API key. Set your TV video quality."
-msgstr ""
-
-msgid "YouTube search is unavailable"
-msgstr ""

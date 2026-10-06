@@ -93,7 +93,6 @@ def _skin():
     for index in range(4):
         x = 38 + index * 462
         label("tab_{}".format(index), x, 96, 446, 56, 28, background="#181A35", align="center")
-        label("tab_active_{}".format(index), x, 150, 446, 4, 1, background="#64748B", z=4)
         label("tab_focus_{}".format(index), x, 150, 446, 4, 1, background="#22D3EE", z=5)
     label("section", 50, 173, 1600, 40, 25, "#22D3EE")
     label("title", 50, 218, 1190, 82, 56, lines=True)
@@ -170,7 +169,6 @@ class GTMovieDiscoveryScreen(Screen):
             self[name] = Label("")
         for index in range(4):
             self["tab_{}".format(index)] = Label(_(SECTIONS[index][1]))
-            self["tab_active_{}".format(index)] = Label("")
             self["tab_focus_{}".format(index)] = Label("")
         for index in range(6):
             for prefix in ("frame", "focus", "body", "empty", "name"):
@@ -415,11 +413,8 @@ class GTMovieDiscoveryScreen(Screen):
 
     def _render(self):
         unused_width, unused_height, px = _scale()
-        active_index = self._active_tab_index()
         for index, (key, label) in enumerate(SECTIONS):
             fit_dynamic_text(self["tab_{}".format(index)], _(label), preferred_size=font_px(px, 28), min_size=px(20))
-            active = self["tab_active_{}".format(index)]
-            active.show() if index == active_index else active.hide()
             focus = self["tab_focus_{}".format(index)]
             if self._tabs_focused and index == self._tab_index:
                 focus.show()
@@ -624,7 +619,6 @@ class GTMovieDiscoveryScreen(Screen):
             return
         self._tabs_focused = value
         # Leaving an unconfirmed tab returns to the section actually open.
-        # The grey section marker and the cyan keyboard focus are independent.
         active_index = self._active_tab_index()
         if active_index >= 0:
             self._tab_index = active_index
@@ -749,9 +743,24 @@ class GTMovieDiscoveryScreen(Screen):
 
         def ready(url):
             self._busy = False
+            from .youtube_playback import (
+                YouTubeNativePlayerUnavailable, youtube_service_type, youtube_stream_parts,
+            )
+            try:
+                native_type = youtube_service_type(url, service_type)
+                unused_video, audio = youtube_stream_parts(url)
+            except YouTubeNativePlayerUnavailable:
+                self._failed("trailer", _("The trailer could not be played.")
+                             + " · ServiceApp / ExtEplayer3 (5002)")
+                return
             title = movie["title"] + " — " + _("Trailer")
             item = ContentItem("movie", "tmdb-trailer-{}".format(movie["id"]), title, icon=movie.get("poster", ""))
-            reference = eServiceReference(service_type, 0, url)
+            item.youtube_native = True
+            item.youtube_separate_audio = bool(audio)
+            item.youtube_requested_quality = getattr(resolver, "requested_quality", "")
+            item.youtube_selected_quality = getattr(resolver, "selected_quality", 0)
+            item.youtube_duration_seconds = getattr(resolver, "duration_seconds", 0)
+            reference = eServiceReference(native_type, 0, url)
             reference.setName(title)
             self["status"].setText(_("Search the selected movie in your active IPTV account."))
             self._open_child(None, GTExternalPlayerScreen, reference, item)
@@ -808,4 +817,3 @@ class GTMovieDiscoveryScreen(Screen):
         self._entries = []
         self._details.clear()
         self._history = []
-

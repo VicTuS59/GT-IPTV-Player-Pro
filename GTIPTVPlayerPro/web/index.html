@@ -49,7 +49,7 @@
       <p data-i18n="pair_intro">Enter the six-digit code shown on the receiver.</p>
       <form id="pairForm" autocomplete="off">
         <label for="pairCode" data-i18n="pair_code">Pairing code</label>
-        <input id="pairCode" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000 000" required>
+        <input id="pairCode" name="code" dir="ltr" inputmode="numeric" pattern="[0-9]{3} ?[0-9]{3}" maxlength="7" placeholder="000 000" required>
         <button class="primary-button" type="submit"><svg><use href="#i-lock"></use></svg><span data-i18n="pair">Connect</span></button>
       </form>
       <div id="pairStatus" class="auth-status" role="status"></div>
@@ -58,10 +58,13 @@
   </main>
 
   <div id="appView" class="app-shell" hidden>
-    <aside id="sidebar" class="sidebar">
-      <div class="brand sidebar-brand">
-        <img src="assets/logo.svg?v=__GT_PLUGIN_VERSION__" alt="GT">
-        <strong>GT IPTV PLAYER <span>PRO</span></strong>
+    <aside id="sidebar" class="sidebar" data-i18n-title="main_navigation" aria-label="Main navigation">
+      <div class="sidebar-heading">
+        <div class="brand sidebar-brand">
+          <img src="assets/logo.svg?v=__GT_PLUGIN_VERSION__" alt="GT">
+          <strong>GT IPTV PLAYER <span>PRO</span></strong>
+        </div>
+        <button id="closeMenuButton" type="button" class="icon-button mobile-only" data-i18n-title="close_menu" aria-label="Close menu"><svg><use href="#i-close"></use></svg></button>
       </div>
       <nav class="nav-list" data-i18n-title="main_navigation" aria-label="Main navigation">
         <button class="nav-button active" data-page="dashboard"><svg><use href="#i-home"></use></svg><span data-i18n="dashboard">Dashboard</span></button>
@@ -80,9 +83,10 @@
       <div class="sidebar-foot"><span class="live-dot"></span><span id="sidebarVersion">__GT_PLUGIN_VERSION__</span></div>
     </aside>
 
-    <section class="workspace">
+    <div id="menuBackdrop" class="menu-backdrop" aria-hidden="true" hidden></div>
+    <section id="workspace" class="workspace">
       <header class="topbar">
-        <button id="menuButton" class="icon-button mobile-only" data-i18n-title="menu" aria-label="Menu"><svg><use href="#i-menu"></use></svg></button>
+        <button id="menuButton" type="button" class="icon-button mobile-only" data-i18n-title="menu" aria-label="Menu" aria-controls="sidebar" aria-expanded="false"><svg><use href="#i-menu"></use></svg></button>
         <div class="mobile-video-brand"><img src="assets/logo.svg" alt=""><strong>GT IPTV<small>PLAYER <b>PRO</b></small></strong></div>
         <div class="receiver-chip"><svg><use href="#i-device"></use></svg><strong id="receiverName">Enigma2</strong><span class="live-dot"></span></div>
         <div class="network-chip"><span>LAN</span><span>•</span><strong id="secureLabel" data-i18n="connected">Connected</strong></div>
@@ -183,10 +187,10 @@
             <section class="panel remote-panel" data-i18n-title="remote_control" aria-label="Remote control">
               <div class="remote-top"><button type="button" data-remote-key="menu" data-i18n="menu">Menu</button><button type="button" data-remote-key="info" data-i18n="info">Info</button><button type="button" data-remote-key="back" data-i18n="exit">Exit</button></div>
               <div class="remote-dpad"><button type="button" class="direction up" data-remote-key="up" data-i18n-title="direction_up" aria-label="Up">▲</button><button type="button" class="direction left" data-remote-key="left" data-i18n-title="direction_left" aria-label="Left">◀</button><button type="button" class="confirm" data-remote-key="ok">OK</button><button type="button" class="direction right" data-remote-key="right" data-i18n-title="direction_right" aria-label="Right">▶</button><button type="button" class="direction down" data-remote-key="down" data-i18n-title="direction_down" aria-label="Down">▼</button></div>
+              <div class="remote-digits"><button type="button" data-remote-key="1">1</button><button type="button" data-remote-key="2">2</button><button type="button" data-remote-key="3">3</button><button type="button" data-remote-key="4">4</button><button type="button" data-remote-key="5">5</button><button type="button" data-remote-key="6">6</button><button type="button" data-remote-key="7">7</button><button type="button" data-remote-key="8">8</button><button type="button" data-remote-key="9">9</button><button type="button" data-remote-key="mute" data-i18n-title="mute" aria-label="Mute">◼</button><button type="button" data-remote-key="0">0</button><button type="button" data-remote-key="back" data-i18n="exit">Exit</button></div>
               <div class="remote-colors"><button type="button" class="red" data-remote-key="red" data-i18n-title="red" aria-label="Red"></button><button type="button" class="green" data-remote-key="green" data-i18n-title="green" aria-label="Green"></button><button type="button" class="yellow" data-remote-key="yellow" data-i18n-title="yellow" aria-label="Yellow"></button><button type="button" class="blue" data-remote-key="blue" data-i18n-title="blue" aria-label="Blue"></button></div>
               <div class="remote-playback"><button type="button" data-remote-key="rewind" data-i18n-title="rewind" aria-label="Rewind">⏪</button><button type="button" data-remote-key="play" data-i18n-title="play" aria-label="Play">▶</button><button type="button" data-remote-key="pause" data-i18n-title="pause" aria-label="Pause">⏸</button><button type="button" data-remote-key="forward" data-i18n-title="forward" aria-label="Forward">⏩</button></div>
               <div class="remote-extras"><div><span data-i18n="volume">Volume</span><button type="button" data-remote-key="volume_down">−</button><button type="button" data-remote-key="volume_up">+</button></div><div><span data-i18n="channels">Channels</span><button type="button" data-remote-key="channel_down">−</button><button type="button" data-remote-key="channel_up">+</button></div></div>
-              <div class="remote-digits"><button type="button" data-remote-key="1">1</button><button type="button" data-remote-key="2">2</button><button type="button" data-remote-key="3">3</button><button type="button" data-remote-key="4">4</button><button type="button" data-remote-key="5">5</button><button type="button" data-remote-key="6">6</button><button type="button" data-remote-key="7">7</button><button type="button" data-remote-key="8">8</button><button type="button" data-remote-key="9">9</button><button type="button" data-remote-key="mute" data-i18n-title="mute" aria-label="Mute">◼</button><button type="button" data-remote-key="0">0</button><button type="button" data-remote-key="back" data-i18n="exit">Exit</button></div>
             </section>
             <section class="panel remote-paste-panel">
               <div class="panel-title"><span class="title-icon purple"><svg><use href="#i-paste"></use></svg></span><h2 data-i18n="tv_keyboard">TV keyboard</h2></div>
@@ -202,6 +206,8 @@
         <section id="page-youtube" class="page video-page" data-page-panel="youtube">
           <div class="video-heading"><h1><svg><use href="#i-youtube"></use></svg><span data-i18n="youtube_search_title">YouTube'da Ara</span></h1><span class="video-receiver"><span class="live-dot"></span><svg><use href="#i-device"></use></svg><span id="youtubeReceiver">Enigma2</span> · <b data-i18n="connected">Bağlı</b></span></div>
           <form id="youtubeSearchForm" class="video-search-form"><label class="video-search-input"><svg><use href="#i-search"></use></svg><input id="youtubeQuery" type="search" maxlength="120" autocomplete="off" required data-i18n-placeholder="youtube_search_placeholder" data-i18n-title="youtube_search_title" placeholder="Search music, documentaries or channels" aria-label="Search YouTube"></label><button class="video-blue-button" type="submit" data-i18n="search">Search</button></form>
+          <div class="youtube-search-tools"><button id="youtubeHistoryToggle" type="button" class="secondary-button" aria-expanded="false" aria-controls="youtubeHistory" data-i18n="youtube_history">Search history</button><span id="youtubeSearchQuality" class="video-receiver"></span></div>
+          <section id="youtubeHistory" class="youtube-history info-card" hidden><div class="youtube-history-heading"><h2 data-i18n="youtube_history">Search history</h2><button id="youtubeHistoryClear" type="button" class="secondary-button small" data-i18n="clear">Clear</button></div><div id="youtubeHistoryList" class="youtube-history-list"></div></section>
           <p id="youtubeMessage" class="video-message" role="status" data-i18n="youtube_search_hint">Videoları aramak için bir kelime yazın.</p>
           <div id="youtubeResults" class="video-results" aria-live="polite"></div>
           <nav id="youtubePager" class="video-pager" data-i18n-title="youtube_results_pages" aria-label="YouTube results pages" hidden></nav>
@@ -224,7 +230,7 @@
           <div class="subtitle-settings-head"><h2 data-i18n="tmdb_sources">TMDB Kaynakları</h2><p data-i18n="tmdb_description">Film ve dizi bilgileri için TMDb API anahtarını girin.</p></div>
           <div class="management-grid"><article class="info-card external-settings-card"><label for="tmdbKey" data-i18n="tmdb_api_key">TMDb API key</label><input id="tmdbKey" type="password" autocomplete="new-password" data-i18n-placeholder="subtitle_api_key" placeholder="API key"><span id="tmdbStatus" class="subtitle-hint"></span><div class="row-actions"><button id="tmdbSave" class="primary-button small" type="button" data-i18n="save">Save</button><button id="tmdbTest" class="secondary-button small" type="button" data-i18n="test">Test</button><button id="tmdbRemove" class="mini-button danger" type="button" data-i18n="subtitle_remove_key">Remove key</button></div></article></div>
           <div class="subtitle-settings-head"><h2 data-i18n="youtube_settings">YouTube Ayarları</h2><p data-i18n="youtube_settings_intro">YouTube araması için API anahtarı gerekmez. TV görüntü kalitesini ayarlayın.</p></div>
-          <div class="management-grid"><article class="info-card external-settings-card"><label for="youtubeResolution" data-i18n="youtube_max_resolution">En yüksek görüntü çözünürlüğü</label><select id="youtubeResolution"><option value="360">360p</option><option value="480">480p</option><option value="720">720p HD</option><option value="1080">1080p Full HD</option><option value="2160">2160p 4K</option></select><label for="youtubeStreamMode" data-i18n="youtube_playback_mode">Oynatma modu</label><select id="youtubeStreamMode"><option value="auto" data-i18n="youtube_automatic">Otomatik</option><option value="compatible" data-i18n="youtube_compatible">Uyumlu</option><option value="dash">DASH</option></select><label for="youtubeAudioPreference" data-i18n="youtube_audio_preference">Ses tercihi</label><select id="youtubeAudioPreference"><option value="default" data-i18n="youtube_default_audio">YouTube varsayılanı</option><option value="original" data-i18n="youtube_original_audio">Orijinal ses</option></select><label for="youtubeLanguage" data-i18n="youtube_language">Arama dili</label><output id="youtubeLanguage" class="youtube-language-current" aria-live="polite">Otomatik</output><div class="row-actions"><button id="youtubeSettingsSave" class="primary-button small" type="button" data-i18n="save">Kaydet</button></div></article></div>
+          <div class="management-grid"><article class="info-card external-settings-card"><label for="youtubeResolution" data-i18n="youtube_quality">Video quality</label><select id="youtubeResolution"><option value="2160">4K (2160p)</option><option value="1440" selected>2K (1440p)</option><option value="1080">1080p</option><option value="720">720p</option><option value="480">480p</option><option value="360">360p</option></select><label for="youtubeAutoplay" data-i18n="youtube_autoplay">Play next video automatically</label><select id="youtubeAutoplay"><option value="off" data-i18n="off">Off</option><option value="on" data-i18n="on">On</option></select><label for="youtubeLanguage" data-i18n="youtube_language">Search language</label><output id="youtubeLanguage" class="youtube-language-current" aria-live="polite">Automatic</output><div class="row-actions"><button id="youtubeSettingsSave" class="primary-button small" type="button" data-i18n="save">Save</button></div></article></div>
         </section>
 
         <section id="page-subtitles" class="page" data-page-panel="subtitles">
@@ -233,7 +239,7 @@
             <div class="subtitle-now"><small data-i18n="now_playing">Now playing</small><strong id="subtitleCurrent" role="status">—</strong></div>
             <form id="subtitleSearchForm" class="subtitle-search-form">
               <label><span data-i18n="subtitle_title">Search title</span><input id="subtitleTitle" maxlength="120" autocomplete="off" required></label>
-              <label><span data-i18n="subtitle_language">Subtitle language</span><select id="subtitleLanguage"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="ar">العربية</option><option value="pt">Português</option><option value="fa">فارسی</option></select></label>
+              <label><span data-i18n="subtitle_language">Subtitle language</span><select id="subtitleLanguage"><option value="en">English</option></select></label>
               <button type="submit" id="subtitleSearchButton" class="primary-button small" data-i18n="subtitle_search_button">Search subtitles</button>
             </form>
             <p id="subtitleSearchHint" class="subtitle-hint" role="status"></p>
@@ -284,7 +290,7 @@
 
   <div id="sourceModal" class="modal-backdrop" hidden>
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="sourceModalTitle">
-      <header><div><p>GT IPTV PLAYER PRO</p><h2 id="sourceModalTitle" data-i18n="add_source">Add Source</h2></div><button id="closeSourceModal" class="icon-button"><svg><use href="#i-close"></use></svg></button></header>
+      <header><div><p>GT IPTV PLAYER PRO</p><h2 id="sourceModalTitle" data-i18n="add_source">Add Source</h2></div><button id="closeSourceModal" class="icon-button" data-i18n-title="cancel" aria-label="Cancel"><svg><use href="#i-close"></use></svg></button></header>
       <form id="sourceForm" autocomplete="off">
         <input id="sourceId" type="hidden">
         <label><span data-i18n="type">Source type</span><select id="sourceType" required><option value="xtream">Xtream Codes</option><option value="stalker">Stalker / MAC</option><option value="m3u">M3U</option></select></label>

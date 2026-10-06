@@ -39,6 +39,7 @@ from .i18n import (
     N_,
     _,
     localized_date_text,
+    localized_short_weekday,
     localized_language_name,
     localized_upper,
     metadata_language,
@@ -89,9 +90,11 @@ from .playback import (
     resume_key,
     should_save_resume,
 )
+from .subtitle_resume import SubtitleResumeStore
 from .paths import plugin_path
 from .portal_identity import safe_composite_id
 from .remote_footer import (
+    web_shortcut_hint_text,
     decorate_remote_footer,
     footer_item,
     install_remote_footer,
@@ -109,6 +112,9 @@ from .settings import (
     service_engine_label,
 )
 from .subtitles import MovieSubtitleController
+from .video_aspect import aspect_groups, apply_aspect_choice
+from .youtube_playback import youtube_duration_seconds, NATIVE_AUDIO_SERVICE_TYPE, YouTubeEndWatcher
+from .youtube_history import youtube_resume_position
 from .typography import (
     _grapheme_boundaries,
     _text_units,
@@ -4592,6 +4598,10 @@ def _player_info_skin():
             foregroundColor="#64748B" backgroundColor="#00000000"
             transparent="1" valign="center" halign="right" noWrap="1"
             zPosition="3" />
+    <widget name="web_shortcut_hint" position="{web_hint_x},{web_hint_y}"
+            size="{web_hint_w},{web_hint_h}" font="Regular;{web_hint_font}"
+            foregroundColor="#94A3B8" transparent="1" noWrap="1"
+            valign="center" halign="right" zPosition="3" />
     <widget name="resolution" position="{detail_x},{detail_y}"
             size="{resolution_w},{detail_h}" font="Regular;{detail_font}"
             foregroundColor="#D0D8E4" backgroundColor="#180B1726"
@@ -4723,6 +4733,8 @@ def _player_info_skin():
         title_y=px(20), title_h=px(64), title_font=px(40),
         engine_x=weather_x + px(365), engine_y=px(238),
         engine_w=weather_w - px(385), engine_h=px(32), detail_x=detail_x,
+        web_hint_x=weather_x + px(20), web_hint_y=px(206),
+        web_hint_w=weather_w - px(40), web_hint_h=px(28), web_hint_font=px(18),
         detail_y=px(88), detail_h=px(36), detail_font=px(20),
         resolution_w=px(200), fps_x=detail_x + px(208), fps_w=px(132),
         video_x=detail_x + px(348), video_w=px(220),
@@ -17691,10 +17703,10 @@ class GTStreamListScreen(
                     weekday = parts[1]
                     date_line = "{} {}".format(parts[0], year)
                 else:
-                    weekday = now.strftime("%A")
+                    weekday = localized_short_weekday(now.date().isoformat())
                     date_line = "{} {}".format(localized, year)
             else:
-                weekday = now.strftime("%A")
+                weekday = localized_short_weekday(now.date().isoformat())
                 date_line = localized
             self["clock_date"].setText("{}\n{}".format(weekday, date_line))
         except Exception:
@@ -20804,6 +20816,9 @@ class GTPlayerInfoOverlay(Screen):
         self["number_divider"] = Label("")
         self["channel_name"] = Label("")
         self["engine"] = Label(_("Player"))
+        self["web_shortcut_hint"] = Label(web_shortcut_hint_text())
+        self.onLayoutFinish.append(self._fit_web_shortcut_hint)
+        self.onShown.append(self._fit_web_shortcut_hint)
         self["resolution"] = Label(_("Reading resolution"))
         self["fps"] = Label("-- FPS")
         self["video_codec"] = Label(_("VIDEO: --"))
@@ -20843,6 +20858,13 @@ class GTPlayerInfoOverlay(Screen):
             "seek_hint",
         ):
             self[name].hide()
+
+    def _fit_web_shortcut_hint(self):
+        unused_width, unused_height, px = _scale()
+        fit_dynamic_text(
+            self["web_shortcut_hint"], web_shortcut_hint_text(),
+            max_lines=1, preferred_size=px(18), min_size=max(8, px(12)),
+        )
 
 
 class GTPlayerFrontPanelSummary(Screen):
@@ -21185,10 +21207,17 @@ class GTExternalPlayerScreen(
         archive_initial_playback=None,
         stream_diag_play_id="",
         stream_diag_started_at=0.0,
+        web_return_player=None,
     ):
         self.skin = _player_skin()
         Screen.__init__(self, session)
         self.reference = reference
+        self._web_return_player = web_return_player
+        self._web_suspended = None
+        self._subtitle_play_transition = False
+        self._resume_web_return = False
+        self._web_resume_subtitle = None
+        self._web_resume_paused = False
         self.client = client
         self._favorite_parent = favorite_parent
         self._init_favorite_support(favorite_store, favorite_keys)
@@ -21224,12 +21253,10 @@ class GTExternalPlayerScreen(
             self.current_index = requested_index % len(self._entries)
             self.current_item = self._entries[self.current_index]
         self.title = getattr(item, "name", str(item or "GT IPTV"))
-        self._youtube_clock_base = 0
-        self._youtube_clock_started_at = time.monotonic()
-        self._youtube_clock_pause_started_at = None
         self.old_reference = None
         self._started = False
         self._closed = False
+        self._youtube_end_watcher = None
         self._fullscreen_close_result = None
         self._front_panel_summary = None
         self._generation = 0
@@ -21315,6 +21342,7 @@ class GTExternalPlayerScreen(
         self._suppress_next_blue_short_until = 0.0
         self._audio_menu_open = False
         self._media_menu_open = False
+        self._aspect_menu_open = False
         self._minute_seek_open = False
         self._held_direction = None
         self._held_direction_long = False
@@ -21334,6 +21362,18 @@ class GTExternalPlayerScreen(
             self._resume_start_position = max(0, int(start_position or 0))
         except (TypeError, ValueError, OverflowError):
             self._resume_start_position = 0
+        resume_path = getattr(self._resume_store, "path", "")
+        self._subtitle_resume_store = (
+            SubtitleResumeStore(os.path.join(
+                os.path.dirname(resume_path), "gtiptvplayerpro-subtitle-cache"
+            )) if isinstance(resume_path, str) and resume_path
+            else SubtitleResumeStore()
+        )
+        self._resume_subtitle_pending_key = (
+            self._resume_key if self._resume_start_position > 0
+            and not bool(getattr(self.current_item, "youtube_native", False)) else ""
+        )
+        self._resume_subtitle_restore_attempts = 0
         self._resume_attempts = 0
         self._resume_last_length = -1
         self._resume_stable_length_samples = 0
@@ -21377,7 +21417,6 @@ class GTExternalPlayerScreen(
         self._engine_link_token = None
         self._engine_decoder_released = False
         self._engine_switch_resume_position = 0
-        self._youtube_pending_engine_start = None
         self._weather_token = None
         self._picon_worker_token = None
 
@@ -21398,6 +21437,7 @@ class GTExternalPlayerScreen(
             resume_after_search=self._resume_after_subtitle_search,
             on_menu_open=self._subtitle_menu_opened,
             on_menu_close=self._subtitle_menu_closed,
+            native_scope=self._native_subtitle_scope_active,
         )
 
         self._hide_timer = eTimer()
@@ -21521,7 +21561,14 @@ class GTExternalPlayerScreen(
                     "leftRepeated": self.seek_left_or_info,
                 }
             )
-        if content_type in ("movie", "series", "catchup"):
+        if content_type == "live":
+            player_contexts.append("InfobarSubtitleSelectionActions")
+            player_actions.update({
+                "yellow": self.open_media_selection,
+                "green": self.open_aspect_selection,
+                "subtitleSelection": self.open_subtitle_selection,
+            })
+        elif content_type in ("movie", "series", "catchup"):
             player_contexts.append("InfobarSubtitleSelectionActions")
             player_actions.update(
                 {
@@ -21557,6 +21604,36 @@ class GTExternalPlayerScreen(
         self.setTitle(self.title)
 
         self._exit_action = exit_action
+
+    def _native_subtitle_scope_active(self):
+        """Keep image autoselection out of GT movies, including child dialogs."""
+        return bool(
+            not self._closed
+            and getattr(self.current_item, "content_type", "")
+            in ("movie", "series")
+            and not bool(getattr(self.current_item, "youtube_native", False))
+            and (
+                self._web_suspended is None
+                or self._subtitle_play_transition
+            )
+        )
+
+    def _play_subtitle_service(self, navigation, reference):
+        """Protect the pending VOD reference before native startup callbacks."""
+        previous_transition = self._subtitle_play_transition
+        self._subtitle_play_transition = True
+        try:
+            controller = getattr(self, "_subtitle_controller", None)
+            if controller is not None:
+                try:
+                    controller.prepare_native_service(reference)
+                except Exception as error:
+                    _debug("native subtitle guard failed error={}".format(
+                        error.__class__.__name__,
+                    ))
+            return _play_service(navigation, reference)
+        finally:
+            self._subtitle_play_transition = previous_transition
 
     def createSummary(self):
         """Let Enigma2 attach our adaptive LCD/VFD view when available."""
@@ -22456,6 +22533,18 @@ class GTExternalPlayerScreen(
         """Restore the pre-player service at most once."""
         if self._old_reference_restored:
             return True
+        returning = getattr(self, "_web_return_player", None)
+        if returning is not None:
+            parent, state = returning
+            if not parent.web_return_valid(state):
+                self._web_return_player = None
+                self._old_reference_restored = True
+                return True
+            if not parent.resume_from_web_video(state):
+                return False
+            self._web_return_player = None
+            self._old_reference_restored = True
+            return True
         navigation = navigation or getattr(self.session, "nav", None)
         if self.old_reference is None:
             self._old_reference_restored = True
@@ -22563,7 +22652,7 @@ class GTExternalPlayerScreen(
                 ),
             )
             try:
-                _play_service(navigation, next_reference)
+                self._play_subtitle_service(navigation, next_reference)
             except Exception as error:
                 self._player_stream_diag(
                     "play-service",
@@ -22640,7 +22729,7 @@ class GTExternalPlayerScreen(
                 )
             )
         try:
-            _play_service(navigation, self.reference)
+            self._play_subtitle_service(navigation, self.reference)
         except Exception as error:
             _debug(
                 "playback start failed content={} error={}".format(
@@ -22657,7 +22746,6 @@ class GTExternalPlayerScreen(
             )
             self.show_info()
             return
-        self._reset_youtube_clock()
         _debug(
             "playback started content={} selected_engine={} actual_engine={} reason=screen_open".format(
                 getattr(self.current_item, "content_type", "unknown"),
@@ -22669,7 +22757,124 @@ class GTExternalPlayerScreen(
         self._generation += 1
         self._after_zap()
 
-    def replace_web_video(self, reference, item):
+    def suspend_for_web_video(self):
+        """Capture VOD before a web YouTube player replaces its decoder."""
+        if (self._closed or not self._started
+                or getattr(self.session, "current_dialog", None) is not self
+                or getattr(self.current_item, "content_type", "") not in ("movie", "series")
+                or bool(getattr(self.current_item, "youtube_native", False))
+                or getattr(self, "_web_suspended", None) is not None
+                or self._pending_engine_reference is not None
+                or self._playing_reference_identity() != self._reference_identity(self.reference)):
+            return None
+        position, _length = self._seek_position()
+        if getattr(self, "_resume_web_return", False) and self._resume_start_position > 0:
+            position = self._resume_start_position
+        controller = getattr(self, "_subtitle_controller", None)
+        pending_return = bool(getattr(self, "_resume_web_return", False))
+        subtitle_state = self._web_resume_subtitle if pending_return else None
+        if controller is not None:
+            try:
+                if not pending_return:
+                    subtitle_state = controller.snapshot_resume_state()
+            except Exception:
+                pass
+        if not pending_return:
+            self._resume_saved = False
+            self._save_resume_position()
+        state = {
+            "generation": self._generation, "item": self.current_item,
+            "reference": self.reference, "position": max(0, int(position)),
+            "paused": self._web_resume_paused if pending_return else self._paused,
+            "subtitle": subtitle_state,
+        }
+        self._web_suspended = state
+        self._cancel_seek_verification()
+        self._hide_subtitle_overlay()
+        for name in ("_hide_timer", "_metadata_timer", "_picon_timer", "_clock_timer",
+                     "_weather_timer", "_playback_timer", "_resume_timer",
+                     "_direction_hold_timer", "_seek_verify_timer", "_subtitle_auto_timer"):
+            timer = getattr(self, name, None)
+            if timer is not None:
+                try:
+                    timer.stop()
+                except Exception:
+                    pass
+        self._held_direction = None
+        self._held_direction_long = False
+        if controller is not None:
+            try:
+                controller.reset_for_service_change()
+            except Exception:
+                _debug("interrupted VOD subtitle reset failed")
+        self._hide_subtitle_overlay()
+        return state
+
+    def web_return_valid(self, state):
+        return bool(not self._closed and state is getattr(self, "_web_suspended", None)
+                    and isinstance(state, dict) and state["generation"] == self._generation
+                    and state["item"] is self.current_item and state["reference"] is self.reference)
+
+    def resume_from_web_video(self, state):
+        """Restore the interrupted VOD and seek automatically, without a prompt."""
+        if not self.web_return_valid(state):
+            return False
+        navigation = getattr(self.session, "nav", None)
+        if navigation is None:
+            return False
+        try:
+            if self._playing_reference_identity() != self._reference_identity(state["reference"]):
+                self._play_subtitle_service(navigation, state["reference"])
+        except Exception:
+            return False
+        self._web_suspended = None
+        self._generation += 1
+        self._started = True
+        self._seeking = False
+        self._paused = False
+        self._resume_saved = False
+        self._resume_start_position = state["position"]
+        self._resume_web_return = True
+        self._web_resume_paused = state["paused"]
+        self._web_resume_subtitle = state["subtitle"] or {"kind": "disabled"}
+        self._resume_subtitle_pending_key = ""
+        self._after_zap()
+        # Restore this playback's captured subtitle choice after seeking;
+        # reopening the decoder must not launch another online search.
+        self._subtitle_auto_generation = -1
+        self._subtitle_auto_timer.stop()
+        self._clock_timer.start(1000, False)
+        if self._resume_start_position <= 0:
+            self._finish_web_resume()
+        return True
+
+    def _finish_web_resume(self):
+        if not getattr(self, "_resume_web_return", False):
+            return
+        self._resume_web_return = False
+        state = self._web_resume_subtitle
+        self._web_resume_subtitle = None
+        controller = getattr(self, "_subtitle_controller", None)
+        if state is not None and controller is not None:
+            try:
+                controller.restore_resume_state(state)
+            except Exception:
+                _debug("interrupted VOD subtitle restore failed")
+        paused = self._web_resume_paused
+        self._web_resume_paused = False
+        if paused:
+            self.pause_playback()
+
+    def set_youtube_end_callback(self, callback):
+        if not bool(getattr(self.current_item, "youtube_native", False)):
+            return
+        if self._youtube_end_watcher is None:
+            self._youtube_end_watcher = YouTubeEndWatcher(self, callback)
+        else:
+            self._youtube_end_watcher.callback = callback
+            self._youtube_end_watcher.arm()
+
+    def replace_web_video(self, reference, item, resume_store=None, start_position=0):
         """Replace an active web video without pushing another modal screen.
 
         Keep old_reference from the first video. EXIT then restores the service
@@ -22682,23 +22887,26 @@ class GTExternalPlayerScreen(
         if navigation is None:
             return False
         previous_reference = self.reference
+        self._save_resume_position()
         try:
-            _play_service(navigation, reference)
+            self._play_subtitle_service(navigation, reference)
         except Exception:
             # A failed replacement must not leave an older player screen on
             # the stack or lose the currently selected video's reference.
             try:
-                _play_service(navigation, previous_reference)
+                self._play_subtitle_service(navigation, previous_reference)
             except Exception:
                 pass
             return False
         self.reference = reference
         self.current_item = item
-        reset_youtube_clock = getattr(self, "_reset_youtube_clock", None)
-        if callable(reset_youtube_clock):
-            reset_youtube_clock()
         self._active_live_service_type = reference_service_type(reference, 4097)
-        self._resume_start_position = 0
+        self._resume_store = resume_store
+        self._resume_key = str(getattr(item, "stream_id", "") or "")
+        self._resume_start_position = youtube_resume_position(
+            start_position, youtube_duration_seconds(item)
+        )
+        self._resume_subtitle_pending_key = ""
         self._prepare_switched_vod()
         self._generation += 1
         self._after_zap()
@@ -22841,14 +23049,16 @@ class GTExternalPlayerScreen(
 
     def _bind_player_key_handler(self):
         """Receive remote events independently of image-specific keymaps."""
-        if self._player_keys_bound or self._closed:
+        if (self._player_keys_bound or self._closed
+                or getattr(self, "_web_suspended", None) is not None):
             return
         try:
             from enigma import eActionMap
             from keyids import KEYIDS
             self._player_key_ids = {
                 name: KEYIDS[name]
-                for name in ("KEY_1", "KEY_YELLOW", "KEY_LEFT", "KEY_RIGHT")
+                for name in ("KEY_1", "KEY_YELLOW", "KEY_GREEN", "KEY_LEFT", "KEY_RIGHT")
+                if name in KEYIDS
             }
             # Match this image's existing short RIGHT/LEFT behaviour. Some
             # images seek directly; others show or adjust the player's OSD.
@@ -22896,7 +23106,7 @@ class GTExternalPlayerScreen(
             ))
 
     def _handle_player_key(self, key, flag):
-        """Consume the four player keys on make/break/repeat/long events."""
+        """Consume player keys only while the fullscreen player owns focus."""
         key_ids = self._player_key_ids
         if (
             self._closed
@@ -22907,6 +23117,15 @@ class GTExternalPlayerScreen(
         if key == key_ids.get("KEY_1") and kind in ("live", "movie", "series"):
             if flag == 0:
                 self.cycle_player_service_type()
+            return 1
+        if kind == "live" and key in (
+            key_ids.get("KEY_YELLOW"), key_ids.get("KEY_GREEN")
+        ):
+            if flag == 0:
+                if key == key_ids.get("KEY_YELLOW"):
+                    self.open_media_selection()
+                else:
+                    self.open_aspect_selection()
             return 1
         if kind not in ("movie", "series"):
             return 0
@@ -22957,6 +23176,11 @@ class GTExternalPlayerScreen(
         if content_type in ("movie", "series") and current_type != 1:
             # Native type 1 cannot play arbitrary VOD containers reliably.
             requested_types = [kind for kind in requested_types if kind != 1]
+        if (bool(getattr(self.current_item, "youtube_separate_audio", False))
+                or getattr(self.current_item, "youtube_video_codec", "") == "vp9"):
+            # Keep original separate audio and VP9 on their native backend.
+            # A manual engine change must preserve the selected stream support.
+            requested_types = [NATIVE_AUDIO_SERVICE_TYPE]
         candidates = []
         seen = set()
         for requested_type in requested_types:
@@ -23006,33 +23230,12 @@ class GTExternalPlayerScreen(
             else 0
         )
         previous_reference = self.reference
-        youtube_remux, youtube_duration = self._youtube_remux_context()
-        youtube_start = None
-        if youtube_remux is not None:
-            youtube_start = min(
-                max(0, int(position)),
-                max(0, youtube_duration - 1),
-            )
-            try:
-                switch_url = youtube_remux.url_for(youtube_start)
-                target_reference = build_extplayer_reference(
-                    switch_url,
-                    getattr(self.current_item, "name", self.title),
-                    "movie",
-                    service_type=target_type,
-                )
-                previous_reference = build_extplayer_reference(
-                    switch_url,
-                    getattr(self.current_item, "name", self.title),
-                    "movie",
-                    service_type=current_type,
-                )
-            except Exception:
-                self.show_info()
-                return
-            # A fresh FFmpeg input already starts at the absolute target; do
-            # not ask the linear decoder to perform a second native seek.
-            resume_position = 0
+        # Preserve the current file/track and its timing before the decoder
+        # is released. The normal decoder-ready timer restores this same
+        # choice in both manual and automatic search modes.
+        self._remember_resume_subtitle(mark_disabled=True)
+        self._resume_subtitle_pending_key = self._resume_key
+        self._resume_subtitle_restore_attempts = 0
         self._cancel_seek_verification()
         self._seeking = False
         self._hide_seek_overlay()
@@ -23051,7 +23254,6 @@ class GTExternalPlayerScreen(
         self._previous_engine_reference = previous_reference
         self._engine_switch_generation = self._generation
         self._engine_switch_resume_position = resume_position
-        self._youtube_pending_engine_start = youtube_start
         self._engine_link_pending = False
         self._engine_decoder_released = False
         self._set_static_info_epg("epg_now", _("Reconnecting the stream..."))
@@ -23162,7 +23364,6 @@ class GTExternalPlayerScreen(
         self._engine_link_token = None
         self._engine_decoder_released = False
         self._engine_switch_resume_position = 0
-        self._youtube_pending_engine_start = None
 
     def _refresh_engine_switch_link(
         self,
@@ -23231,7 +23432,6 @@ class GTExternalPlayerScreen(
         target_reference = self._pending_engine_reference
         previous_reference = self._previous_engine_reference
         resume_position = self._engine_switch_resume_position
-        youtube_start = self._youtube_pending_engine_start
         if target_reference is None:
             return
         if (
@@ -23312,7 +23512,7 @@ class GTExternalPlayerScreen(
             )
             return
         try:
-            _play_service(navigation, target_reference)
+            self._play_subtitle_service(navigation, target_reference)
         except Exception as error:
             if (
                 getattr(getattr(self, "current_item", None), "content_type", "")
@@ -23335,17 +23535,12 @@ class GTExternalPlayerScreen(
             restored = False
             if previous_reference is not None:
                 try:
-                    _play_service(navigation, previous_reference)
+                    self._play_subtitle_service(navigation, previous_reference)
                     restored = True
                     self.reference = previous_reference
                     self._active_live_service_type = previous_type
                     if not self._is_live_item():
-                        if youtube_start is not None:
-                            self.current_item.youtube_start_seconds = youtube_start
-                            self._reset_youtube_clock(youtube_start)
-                            self._resume_start_position = 0
-                        else:
-                            self._resume_start_position = resume_position
+                        self._resume_start_position = resume_position
                 except Exception:
                     pass
             self._clear_live_engine_switch_state()
@@ -23372,12 +23567,7 @@ class GTExternalPlayerScreen(
             )
         self._clear_live_engine_switch_state()
         if not self._is_live_item():
-            if youtube_start is not None:
-                self.current_item.youtube_start_seconds = youtube_start
-                self._reset_youtube_clock(youtube_start)
-                self._resume_start_position = 0
-            else:
-                self._resume_start_position = resume_position
+            self._resume_start_position = resume_position
             self._prepare_switched_vod()
         self._info_dialog["engine"].setText(service_engine_label(target_type))
         _debug(
@@ -23395,7 +23585,6 @@ class GTExternalPlayerScreen(
         self._resume_saved = False
         self._paused = False
         self._seeking = False
-        self._youtube_clock_pause_started_at = None
         controller = getattr(self, "_subtitle_controller", None)
         if controller is not None:
             controller.reset_for_service_change()
@@ -23690,7 +23879,7 @@ class GTExternalPlayerScreen(
                 self._complete_live_restart()
             return
         try:
-            _play_service(navigation, next_reference)
+            self._play_subtitle_service(navigation, next_reference)
         except Exception as error:
             self._player_stream_diag(
                 "play-service",
@@ -23704,7 +23893,7 @@ class GTExternalPlayerScreen(
                 )
             )
             try:
-                _play_service(navigation, self.reference)
+                self._play_subtitle_service(navigation, self.reference)
                 log_event(
                     "live_recovery",
                     "manual replay outcome=rollback",
@@ -23963,9 +24152,11 @@ class GTExternalPlayerScreen(
         """Let YELLOW route to the existing manual audio/subtitle controls."""
         if (
             self._closed or not self._started
-            or getattr(self.current_item, "content_type", "") not in ("movie", "series")
+            or getattr(self.current_item, "content_type", "") not in ("live", "movie", "series")
             or self._media_menu_open or self._audio_menu_open
             or self._subtitle_menu_open or self._pending_engine_reference is not None
+            or getattr(self, "_aspect_menu_open", False)
+            or self._live_transition_in_progress()
         ):
             return True
         try:
@@ -23976,6 +24167,7 @@ class GTExternalPlayerScreen(
         if not callable(opener):
             return self.open_subtitle_selection()
         generation, item = self._generation, self.current_item
+        expected_context = self._audio_selection_context()
         self._media_menu_open = True
         self.hide_info()
 
@@ -23984,6 +24176,8 @@ class GTExternalPlayerScreen(
             if (
                 self._closed or self._generation != generation
                 or self.current_item is not item or not selection
+                or self._live_transition_in_progress()
+                or self._audio_selection_context() != expected_context
             ):
                 return
             if selection[1] == "audio":
@@ -24002,7 +24196,7 @@ class GTExternalPlayerScreen(
         return True
 
     def open_audio_selection(self):
-        """Open decoder-provided VOD audio tracks without restarting playback."""
+        """Open decoder audio tracks without restarting live or VOD playback."""
         now = time.monotonic()
         if self._suppress_next_blue_short_until:
             suppress = now <= self._suppress_next_blue_short_until
@@ -24013,7 +24207,9 @@ class GTExternalPlayerScreen(
             self._closed
             or not self._started
             or getattr(self.current_item, "content_type", "")
-            not in ("movie", "series")
+            not in ("live", "movie", "series")
+            or self._live_transition_in_progress()
+            or getattr(self, "_aspect_menu_open", False)
         ):
             return True
         if getattr(self, "_audio_menu_open", False):
@@ -24105,7 +24301,8 @@ class GTExternalPlayerScreen(
     def _audio_selection_made(self, expected_context, selection):
         if self._closed or not selection:
             return
-        if self._audio_selection_context() != expected_context:
+        if (self._audio_selection_context() != expected_context
+                or self._live_transition_in_progress()):
             self._show_audio_message(
                 N_("The playing service changed. Open audio selection again.")
             )
@@ -24469,7 +24666,7 @@ class GTExternalPlayerScreen(
             # Enigma2 replaces the current service on the same navigation slot.
             # Avoiding an explicit stop keeps the decoder/network pipeline warm
             # and removes the full teardown delay from ordinary channel zaps.
-            _play_service(navigation, next_reference)
+            self._play_subtitle_service(navigation, next_reference)
         except Exception as error:
             self._player_stream_diag(
                 "play-service",
@@ -24592,6 +24789,7 @@ class GTExternalPlayerScreen(
     def show_info(self):
         if (
             getattr(self, "_subtitle_menu_open", False)
+            or getattr(self, "_aspect_menu_open", False)
             or getattr(self, "_subtitle_message_tokens", None)
         ):
             return
@@ -24686,6 +24884,67 @@ class GTExternalPlayerScreen(
         """Keep the player banner from covering newly enabled subtitles."""
         if selected_track is not None:
             self.hide_info()
+        controller = getattr(self, "_subtitle_controller", None)
+        if controller is None or getattr(controller, "_closed", False) or getattr(
+            controller, "_resume_state_resetting", False
+        ):
+            return
+        self._resume_subtitle_pending_key = ""
+        self._resume_subtitle_restore_attempts = 0
+        self._remember_resume_subtitle(mark_disabled=True)
+
+    def _remember_resume_subtitle(self, mark_disabled=False):
+        if self._closed or getattr(self.current_item, "content_type", "") not in (
+            "movie", "series"
+        ):
+            return
+        store = getattr(self, "_subtitle_resume_store", None)
+        controller = getattr(self, "_subtitle_controller", None)
+        if store is None or controller is None or not self._resume_key:
+            return
+        try:
+            state = controller.snapshot_resume_state()
+            if state is None and mark_disabled:
+                state = {"kind": "disabled"}
+            if state is not None and not store.remember(self._resume_key, state):
+                _debug("resume subtitle save failed")
+        except Exception:
+            _debug("resume subtitle save failed")
+
+    def _restore_resume_subtitle(self):
+        key = getattr(self, "_resume_subtitle_pending_key", "")
+        if not key:
+            return False
+        if key != self._resume_key:
+            self._resume_subtitle_pending_key = ""
+            return False
+        controller = getattr(self, "_subtitle_controller", None)
+        store = getattr(self, "_subtitle_resume_store", None)
+        if controller is None or store is None:
+            self._resume_subtitle_pending_key = ""
+            return False
+        try:
+            state = store.get(key)
+            if state is not None and state.get("kind") in ("embedded", "external"):
+                ready = (bool(controller.embedded.available_tracks())
+                         if state["kind"] == "embedded"
+                         else controller.bridge._play_position_available())
+                attempts = getattr(self, "_resume_subtitle_restore_attempts", 0)
+                if not ready and attempts < 6:
+                    self._resume_subtitle_restore_attempts = attempts + 1
+                    self._subtitle_auto_timer.start(500, True)
+                    return True
+            self._resume_subtitle_pending_key = ""
+            self._resume_subtitle_restore_attempts = 0
+            if state is not None and controller.restore_resume_state(state):
+                _debug("resume subtitle restored kind={}".format(state["kind"]))
+                return True
+        except Exception:
+            pass
+        self._resume_subtitle_pending_key = ""
+        self._resume_subtitle_restore_attempts = 0
+        _debug("resume subtitle unavailable; using configured search mode")
+        return False
 
     def _set_subtitle_infobar_visible(self, visible):
         controller = getattr(self, "_subtitle_controller", None)
@@ -24784,9 +25043,12 @@ class GTExternalPlayerScreen(
         except Exception:
             info = None
         frame_rate = self._service_info_value(info, "sFrameRate")
+        width = self._service_info_value(info, "sVideoWidth")
         height = self._service_info_value(info, "sVideoHeight")
         if frame_rate <= 0:
             frame_rate = _read_proc_number("/proc/stb/vmpeg/0/framerate", 10)
+        if width <= 0:
+            width = _read_proc_number("/proc/stb/vmpeg/0/xres", 16)
         if height <= 0:
             height = _read_proc_number("/proc/stb/vmpeg/0/yres", 16)
 
@@ -24796,11 +25058,13 @@ class GTExternalPlayerScreen(
                 frame_rate / 1000.0 if frame_rate > 1000 else float(frame_rate),
                 3,
             )
-        if height >= 2100:
+        # Widescreen releases may crop black bars (1920x800, 3840x1600).
+        # Their encoded width still identifies the normal release resolution.
+        if width >= 3800 or height >= 2100:
             profile["resolution"] = 2160
-        elif height >= 1050:
+        elif width >= 1850 or height >= 1050:
             profile["resolution"] = 1080
-        elif height >= 700:
+        elif width >= 1200 or height >= 700:
             profile["resolution"] = 720
         elif height >= 540:
             profile["resolution"] = 576
@@ -24826,6 +25090,9 @@ class GTExternalPlayerScreen(
             or getattr(self.current_item, "content_type", "")
             not in ("movie", "series")
         ):
+            return
+        if (self._restore_resume_subtitle()
+                and getattr(self, "_resume_subtitle_pending_key", "")):
             return
         subtitle_controller = getattr(self, "_subtitle_controller", None)
         if subtitle_controller is not None:
@@ -24926,8 +25193,18 @@ class GTExternalPlayerScreen(
             )
 
     def open_subtitle_selection(self):
-        """Open the safe VOD subtitle menu and consume the remote action."""
+        """Use decoder-only subtitles for live TV and the full menu for VOD."""
         if getattr(self, "_closed", False):
+            return True
+        if self._is_live_item():
+            if (not self._started or self._live_transition_in_progress()
+                    or self._media_menu_open or self._audio_menu_open
+                    or getattr(self, "_aspect_menu_open", False)):
+                return True
+            self.hide_info()
+            controller = getattr(self, "_subtitle_controller", None)
+            if controller is not None:
+                controller.open_embedded_selection()
             return True
         if getattr(self.current_item, "content_type", "") not in (
             "movie",
@@ -24944,6 +25221,83 @@ class GTExternalPlayerScreen(
         # Enigma2 may fall through to a yellow-key action in another context.
         return True
 
+    def open_aspect_selection(self):
+        """Open the installed image's aspect and display policies on GREEN."""
+        if (self._closed or not self._started or not self._is_live_item()
+                or self._live_transition_in_progress()
+                or self._media_menu_open or self._audio_menu_open
+                or self._subtitle_menu_open or self._aspect_menu_open):
+            return True
+        expected_context = self._audio_selection_context()
+        groups = aspect_groups()
+        if not groups:
+            self._show_subtitle_message(_("Aspect ratio") + " • " + _("Not available"))
+            return True
+        self._aspect_menu_open = True
+        self.hide_info()
+
+        def valid_context():
+            return (not self._closed and self._started and self._is_live_item()
+                    and not self._live_transition_in_progress()
+                    and self._audio_selection_context() == expected_context)
+
+        def finish(unavailable=False):
+            self._aspect_menu_open = False
+            if not valid_context():
+                return
+            if unavailable:
+                self._show_subtitle_message(_("Aspect ratio") + " • " + _("Not available"))
+            else:
+                self.show_info()
+
+        def open_choices(callback, title, choices, selected_index=0):
+            try:
+                from Screens.ChoiceBox import ChoiceBox
+                try:
+                    self.session.openWithCallback(
+                        callback, ChoiceBox, title, choices, selection=selected_index,
+                    )
+                except TypeError:
+                    self.session.openWithCallback(callback, ChoiceBox, title, choices)
+            except Exception:
+                finish(unavailable=True)
+
+        def group_selected(selection):
+            if not selection or not valid_context():
+                finish()
+                return
+            group = selection[1]
+            if not any(group is known for known in groups):
+                finish()
+                return
+            # Refresh the native choices before showing the second menu.
+            current = next((candidate for candidate in aspect_groups()
+                            if candidate["field"] == group["field"]
+                            and candidate["element"] is group["element"]), None)
+            if current is None:
+                finish(unavailable=True)
+                return
+            choices = [(label, value) for value, label in current["choices"]]
+            selected_index = next((index for index, (_label, value) in enumerate(choices)
+                                   if str(value) == str(current["current"])), 0)
+
+            def value_selected(choice):
+                if not choice or not valid_context():
+                    finish()
+                    return
+                applied = apply_aspect_choice(current["field"], current["element"], choice[1])
+                finish(unavailable=not applied)
+
+            open_choices(value_selected, _(current["title"]), choices, selected_index)
+
+        choices = []
+        for group in groups:
+            label = next((label for value, label in group["choices"]
+                          if str(value) == str(group["current"])), str(group["current"]))
+            choices.append((_(group["title"]) + " • " + label, group))
+        open_choices(group_selected, _("Aspect ratio"), choices)
+        return True
+
     @staticmethod
     def _format_play_time(seconds):
         try:
@@ -24955,6 +25309,8 @@ class GTExternalPlayerScreen(
         return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
 
     def _current_service(self):
+        if getattr(self, "_web_suspended", None) is not None:
+            return None
         navigation = getattr(self.session, "nav", None)
         if navigation is None:
             return None
@@ -24966,35 +25322,7 @@ class GTExternalPlayerScreen(
         except Exception:
             return None
 
-    def _youtube_remux_context(self):
-        """Return the active private remux and its authoritative duration."""
-        item = getattr(self, "current_item", None)
-        remux = getattr(item, "youtube_remux", None)
-        try:
-            duration = int(
-                getattr(item, "youtube_duration_seconds", 0) or 0
-            )
-        except (TypeError, ValueError, OverflowError):
-            duration = 0
-        if (
-            remux is None or duration <= 0
-            or bool(getattr(remux, "closed", False))
-            or not callable(getattr(remux, "url_for", None))
-        ):
-            return None, 0
-        return remux, duration
 
-    def _reset_youtube_clock(self, start_seconds=None):
-        item = getattr(self, "current_item", None)
-        if start_seconds is None:
-            start_seconds = getattr(item, "youtube_start_seconds", 0)
-        try:
-            start_seconds = max(0, int(start_seconds or 0))
-        except (TypeError, ValueError, OverflowError):
-            start_seconds = 0
-        self._youtube_clock_base = start_seconds
-        self._youtube_clock_started_at = time.monotonic()
-        self._youtube_clock_pause_started_at = None
 
     def _raw_seek_interface(self):
         """Return decoder timing even when a linear stream is not seekable."""
@@ -25009,32 +25337,6 @@ class GTExternalPlayerScreen(
         except Exception:
             return None
 
-    def _youtube_seek_position(self, duration):
-        base = max(0, int(getattr(self, "_youtube_clock_base", 0) or 0))
-        base = min(base, duration)
-        elapsed = -1
-        # MPEG-TS is linear, but most Enigma2 engines still expose its current
-        # decoder position. It is more accurate than the fallback clock after
-        # buffering; it intentionally is not used as a native seek interface.
-        seeker = self._raw_seek_interface()
-        if seeker is not None:
-            try:
-                candidate = self._seek_seconds(seeker.getPlayPosition())
-            except Exception:
-                candidate = -1
-            if 0 <= candidate <= max(0, duration - base) + 15:
-                elapsed = candidate
-        if elapsed < 0:
-            now = (
-                self._youtube_clock_pause_started_at
-                if self._youtube_clock_pause_started_at is not None
-                else time.monotonic()
-            )
-            elapsed = max(
-                0,
-                int(now - getattr(self, "_youtube_clock_started_at", now)),
-            )
-        return min(duration, base + elapsed), duration
 
     def _seek_interface(self):
         seeker = self._raw_seek_interface()
@@ -25071,41 +25373,32 @@ class GTExternalPlayerScreen(
             return -1
 
     def _subtitle_position(self):
-        """Read decoder time even when the engine reports non-seekable VOD."""
-        unused_remux, youtube_duration = self._youtube_remux_context()
+        """Use the native decoder clock, including original YouTube streams."""
         seeker = self._raw_seek_interface()
         if seeker is None:
             return -1
         try:
-            position = self._seek_seconds_precise(seeker.getPlayPosition())
+            return self._seek_seconds_precise(seeker.getPlayPosition())
         except Exception:
             return -1
-        if position < 0 or youtube_duration <= 0:
-            return position
-        # Remux decoder PTS is local to its requested start. Keep the absolute
-        # offset and sub-second precision, without borrowing the UI fallback
-        # timer when buffering leaves decoder timing unavailable.
-        base = min(
-            youtube_duration,
-            max(0, int(getattr(self, "_youtube_clock_base", 0) or 0)),
-        )
-        if position > max(0, youtube_duration - base) + 15:
-            return -1
-        return min(youtube_duration, base + position)
 
     def _seek_position(self, seeker=None):
-        unused_remux, youtube_duration = self._youtube_remux_context()
-        if youtube_duration > 0:
-            self._seek_ready = True
-            return self._youtube_seek_position(youtube_duration)
-        seeker = seeker or self._seek_interface()
+        duration = youtube_duration_seconds(getattr(self, "current_item", None))
+        # Reading position does not imply that the engine supports seeking.
+        # Native YouTube timestamps are absolute; no remux offset or wall clock.
+        seeker = seeker or (self._raw_seek_interface() if duration > 0 else self._seek_interface())
         if seeker is None:
-            return -1, -1
+            return -1, duration if duration > 0 else -1
         try:
             position = self._seek_seconds(seeker.getPlayPosition())
+        except Exception:
+            position = -1
+        try:
             length = self._seek_seconds(seeker.getLength())
         except Exception:
-            return -1, -1
+            length = -1
+        if length <= 0 and duration > 0:
+            length = duration
         if position >= 0 and length > 0:
             self._seek_ready = True
         return position, length
@@ -25200,10 +25493,8 @@ class GTExternalPlayerScreen(
             self._cancel_seek_verification()
         seeker = self._seek_interface()
         position, length = self._seek_position(seeker)
-        youtube_remux, unused_duration = self._youtube_remux_context()
         if (
-            (seeker is None and youtube_remux is None)
-            or position < 0 or length <= 0
+            seeker is None or position < 0 or length <= 0
         ):
             self._seek_not_ready()
             return
@@ -25307,102 +25598,11 @@ class GTExternalPlayerScreen(
         }
         self._seek_verify_timer.start(SEEK_VERIFY_DELAY_MS, True)
 
-    def _request_youtube_seek(self, origin, target):
-        """Restart only the private YouTube remux at an absolute second."""
-        remux, duration = self._youtube_remux_context()
-        navigation = getattr(self.session, "nav", None)
-        if remux is None or duration <= 0 or navigation is None:
-            return False
-        origin = min(max(0, int(origin)), duration)
-        target = min(max(0, int(target)), max(0, duration - 1))
-        if target == origin:
-            return True
-        try:
-            next_url = remux.url_for(target)
-            next_reference = build_extplayer_reference(
-                next_url,
-                getattr(self.current_item, "name", self.title),
-                "movie",
-                service_type=reference_service_type(self.reference, 5002),
-            )
-        except Exception as error:
-            _debug(
-                "YouTube seek preparation failed error={}".format(
-                    error.__class__.__name__
-                )
-            )
-            return False
-        previous_reference = self.reference
-        try:
-            _play_service(navigation, next_reference)
-        except Exception as error:
-            # Keep the old linear stream untouched when the image rejects the
-            # replacement. Recover only if navigation no longer owns it.
-            active = None
-            getter = getattr(
-                navigation,
-                "getCurrentlyPlayingServiceReference",
-                None,
-            )
-            if callable(getter):
-                try:
-                    active = getter()
-                except Exception:
-                    active = None
-            if (
-                self._reference_identity(active)
-                != self._reference_identity(previous_reference)
-            ):
-                try:
-                    _play_service(navigation, previous_reference)
-                    self._reset_youtube_clock()
-                except Exception:
-                    pass
-            _debug(
-                "YouTube seek restart failed engine={} target={} error={}".format(
-                    reference_service_type(previous_reference, 5002),
-                    target,
-                    error.__class__.__name__,
-                )
-            )
-            return False
-        self.reference = next_reference
-        self._active_live_service_type = reference_service_type(
-            next_reference,
-            5002,
-        )
-        self.current_item.youtube_start_seconds = target
-        self._reset_youtube_clock(target)
-        self._seek_ready = True
-        was_paused = self._paused
-        self._paused = False
-        self._cancel_seek_verification()
-        if was_paused:
-            subtitle_controller = getattr(self, "_subtitle_controller", None)
-            if subtitle_controller is not None:
-                subtitle_controller.resume()
-        self._complete_subtitle_seek(target)
-        self._info_dialog["engine"].setText(
-            service_engine_label(self._active_live_service_type)
-        )
-        self._playback_tick()
-        _debug(
-            "YouTube seek restarted engine={} from={} target={} length={}".format(
-                self._active_live_service_type,
-                origin,
-                target,
-                duration,
-            )
-        )
-        return True
 
     def _request_seek(self, seeker, origin, target):
         """Seek absolutely first, falling back immediately on explicit failure."""
         origin = int(origin)
         target = int(target)
-        youtube_remux, unused_duration = self._youtube_remux_context()
-        if youtube_remux is not None:
-            return self._request_youtube_seek(origin, target)
         if seeker is None:
             return False
         absolute = getattr(seeker, "seekTo", None)
@@ -25508,10 +25708,8 @@ class GTExternalPlayerScreen(
             return
         seeker = self._seek_interface()
         position, length = self._seek_position(seeker)
-        youtube_remux, unused_duration = self._youtube_remux_context()
         if (
-            (seeker is None and youtube_remux is None)
-            or position < 0 or length <= 0
+            seeker is None or position < 0 or length <= 0
         ):
             self._seek_not_ready()
             return
@@ -25698,8 +25896,7 @@ class GTExternalPlayerScreen(
         if not self._seeking:
             return False
         seeker = self._seek_interface()
-        youtube_remux, unused_duration = self._youtube_remux_context()
-        if seeker is None and youtube_remux is None:
+        if seeker is None:
             self._seek_not_ready()
             return True
         position, length = self._seek_position(seeker)
@@ -25778,12 +25975,6 @@ class GTExternalPlayerScreen(
         except Exception:
             return
         self._paused = True
-        youtube_context = getattr(self, "_youtube_remux_context", None)
-        youtube_remux = (
-            youtube_context()[0] if callable(youtube_context) else None
-        )
-        if youtube_remux is not None:
-            self._youtube_clock_pause_started_at = time.monotonic()
         subtitle_controller = getattr(self, "_subtitle_controller", None)
         if subtitle_controller is not None:
             subtitle_controller.pause()
@@ -25808,17 +25999,6 @@ class GTExternalPlayerScreen(
                 return
         except Exception:
             return
-        youtube_pause_started_at = getattr(
-            self,
-            "_youtube_clock_pause_started_at",
-            None,
-        )
-        if youtube_pause_started_at is not None:
-            self._youtube_clock_started_at += max(
-                0.0,
-                time.monotonic() - youtube_pause_started_at,
-            )
-            self._youtube_clock_pause_started_at = None
         self._paused = False
         subtitle_controller = getattr(self, "_subtitle_controller", None)
         if subtitle_controller is not None:
@@ -26057,6 +26237,8 @@ class GTExternalPlayerScreen(
         if getattr(self.current_item, "content_type", "") == "live":
             return
         position, length = self._seek_position()
+        if self._youtube_end_watcher is not None:
+            self._youtube_end_watcher.sample(position, length)
         if position >= 0 and length > 0:
             position = min(position, length)
             self._set_static_info_epg(
@@ -26089,6 +26271,7 @@ class GTExternalPlayerScreen(
         )
         self._resume_start_position = 0
         self._reset_resume_length_probe()
+        self._finish_web_resume()
         return False
 
     def _reset_resume_length_probe(self):
@@ -26098,7 +26281,13 @@ class GTExternalPlayerScreen(
     def _resume_length_ready(self, length):
         """Reject provisional VOD durations before applying a saved position."""
         length = int(length)
-        if not should_save_resume(self._resume_start_position, length):
+        if bool(getattr(self.current_item, "youtube_native", False)):
+            eligible = bool(youtube_resume_position(self._resume_start_position, length))
+        else:
+            eligible = (0 < self._resume_start_position < length
+                        if getattr(self, "_resume_web_return", False)
+                        else should_save_resume(self._resume_start_position, length))
+        if not eligible:
             self._reset_resume_length_probe()
             return False
 
@@ -26152,18 +26341,37 @@ class GTExternalPlayerScreen(
         self._resume_start_position = 0
         self._reset_resume_length_probe()
         self._resume_saved = False
+        self._finish_web_resume()
         self._playback_tick()
         self.show_info()
 
     def _save_resume_position(self):
+        if getattr(self, "_web_suspended", None) is not None:
+            return
         if self._resume_saved or self._resume_store is None or not self._resume_key:
             return
         if getattr(self.current_item, "content_type", "") not in (
             "movie", "series"
         ):
             return
+        if bool(getattr(self.current_item, "youtube_native", False)):
+            # EXIT while the decoder is still opening must retain the bookmark.
+            if self._resume_start_position > 0:
+                return
+            position, length = self._seek_position()
+            watcher = getattr(self, "_youtube_end_watcher", None)
+            if getattr(watcher, "ended", False):
+                position = length
+            try:
+                self._resume_saved = bool(self._resume_store.save(
+                    self._resume_key, position, length
+                ))
+            except OSError as exc:
+                log_event("youtube", "playback-history-write-failed error_type={}".format(type(exc).__name__))
+            return
         position, length = self._seek_position()
         if position >= 0 and length > 0:
+            self._remember_resume_subtitle()
             self._resume_store.save(
                 self._resume_key,
                 position,
@@ -26801,6 +27009,9 @@ class GTExternalPlayerScreen(
         self.show_info()
 
     def _on_close(self):
+        if self._youtube_end_watcher is not None:
+            self._youtube_end_watcher.close()
+            self._youtube_end_watcher = None
         self._stop_player_stream_diag()
         self._unbind_player_key_handler()
         self._held_direction = None
@@ -26819,6 +27030,7 @@ class GTExternalPlayerScreen(
         self._subtitle_menu_open = False
         self._subtitle_menu_generation = None
         self._subtitle_message_tokens.clear()
+        self._aspect_menu_open = False
         subtitle_controller = getattr(self, "_subtitle_controller", None)
         self._subtitle_controller = None
         if subtitle_controller is not None:

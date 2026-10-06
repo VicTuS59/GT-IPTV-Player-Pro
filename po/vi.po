@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: Vietnamese\n"
-"Language: vi\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Vietnamese\nLanguage: vi\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "ÂM THANH: {}"
 msgid "About"
 msgstr "Giới thiệu"
 
+msgid "Access code"
+msgstr "Mã truy cập"
+
 msgid "Access your channels quickly"
 msgstr "Truy cập nhanh các kênh của bạn"
 
@@ -197,6 +190,9 @@ msgstr "Tiếng Ả Rập"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Kênh này không hỗ trợ xem lại."
+
+msgid "Aspect ratio"
+msgstr "Tỷ lệ khung hình"
 
 msgid "Audio language changed"
 msgstr "Ngôn ngữ âm thanh đã thay đổi"
@@ -481,6 +477,9 @@ msgstr "Trời quang"
 msgid "Close"
 msgstr "Đóng"
 
+msgid "Close menu"
+msgstr "Đóng menu"
+
 msgid "Close the open screen before opening another one."
 msgstr "Hãy đóng màn hình đang mở trước khi mở màn hình khác."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Không thể chọn bản âm thanh được yêu cầu."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Không thể khởi động phần hiển thị phụ đề độc lập."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Không thể bắt đầu tìm kiếm phụ đề trực tuyến."
 
 msgid "Could not start the player."
 msgstr "Không thể khởi động trình phát."
@@ -771,6 +770,9 @@ msgstr "Đã khôi phục thứ tự mặc định. Nhấn XANH LÁ để lưu."
 msgid "Delete"
 msgstr "Xóa"
 
+msgid "Delete all"
+msgstr "Xóa tất cả"
+
 msgid "Delete this item?"
 msgstr "Xóa mục này?"
 
@@ -818,6 +820,12 @@ msgstr "Khám phá phim"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Khám phá phim mới với đề xuất từ TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "Hiển thị nội dung 16:9 dưới dạng"
+
+msgid "Display 4:3 content as"
+msgstr "Hiển thị nội dung 4:3 dưới dạng"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Không đưa truy vấn hoặc phân đoạn vào URL cổng thông tin"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Hãy nhập khóa API SubDL trước."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Nhập khóa API SubDL trong cài đặt phụ đề."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Nhập khóa API TMDb để xem thông tin chi tiết về phim và phim bộ."
@@ -1007,6 +1015,9 @@ msgstr "Nhập mã gồm sáu chữ số hiển thị trên thiết bị thu."
 msgid "Enter the username"
 msgstr "Nhập tên người dùng"
 
+msgid "Enter the username / Enter the password"
+msgstr "Nhập tên người dùng / Nhập mật khẩu"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Nhập mã này vào trình duyệt trên điện thoại, sau đó chấp thuận yêu cầu trên TV."
 
@@ -1061,6 +1072,9 @@ msgstr "MỤC YÊU THÍCH"
 
 msgid "FILE"
 msgstr "TỆP"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS sẽ được chuyển đổi"
@@ -1144,19 +1158,11 @@ msgstr "Toàn màn hình"
 msgid "GREEN"
 msgstr "XANH LÁ"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"PHIM"
+msgid "GT\nMOVIE"
+msgstr "GT\nPHIM"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"PHIM BỘ"
+msgid "GT\nSERIES"
+msgstr "GT\nPHIM BỘ"
 
 msgid "Genre unavailable"
 msgstr "Thể loại không khả dụng"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Xem trước phụ đề độc lập"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Đồng bộ phụ đề độc lập"
 
 msgid "Independent subtitles"
 msgstr "Phụ đề độc lập"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Phụ đề độc lập đã bị tắt trong cài đặt."
 
 msgid "Information"
 msgstr "Thông tin"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Độ trễ"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Độ trễ: {} ms\n"
-"Trạng thái tài khoản: {}\n"
-"Đang dùng / Tối đa: {}\n"
-"Hết hạn: {}\n"
-"Giờ máy chủ: {}\n"
-"Múi giờ: {}\n"
-"Giao thức: {}\n"
-"Định dạng đầu ra: {}\n"
-"Phiên bản máy chủ: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Độ trễ: {} ms\nTrạng thái tài khoản: {}\nĐang dùng / Tối đa: {}\nHết hạn: {}\nGiờ máy chủ: {}\nMúi giờ: {}\nGiao thức: {}\nĐịnh dạng đầu ra: {}\nPhiên bản máy chủ: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Độ trễ: {} ms\n"
-"Trạng thái tài khoản: {}\n"
-"Giao thức: {}\n"
-"Định dạng đầu ra: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Độ trễ: {} ms\nTrạng thái tài khoản: {}\nGiao thức: {}\nĐịnh dạng đầu ra: {}\n\n{}"
 
 msgid "Left"
 msgstr "Trái"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Tải phụ đề từ trang web này trước khi đồng bộ hóa."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Tải phụ đề độc lập trước khi đồng bộ."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "Đang tải dịch vụ DVB và các kênh XMLTV đã lưu vào bộ nhớ đệm..."
@@ -1514,6 +1486,9 @@ msgstr "Đăng xuất"
 
 msgid "Lower"
 msgstr "Thấp hơn"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "TÌM KIẾM KÊNH M3U"
@@ -1668,6 +1643,9 @@ msgstr "Địa chỉ MAC"
 
 msgid "MANAGE SOURCES"
 msgstr "QUẢN LÝ NGUỒN"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 giây: Giao diện web"
 
 msgid "MOVIE CATEGORIES"
 msgstr "DANH MỤC PHIM"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Không tìm thấy phụ đề phù hợp. Kiểm tra ngôn ngữ và trạng thái nhà cung cấp."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Không tìm thấy phụ đề phù hợp trên SubDL."
 
 msgid "No movies found."
 msgstr "Không tìm thấy phim."
@@ -1946,14 +1924,8 @@ msgstr "Không có nguồn nào khả dụng để kết nối."
 msgid "No source is selected for deletion."
 msgstr "Chưa chọn nguồn để xóa."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Không tìm thấy nguồn.\n"
-"\n"
-"Hãy tạo nguồn từ bảng THÊM NGUỒN trên màn hình chính."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Không tìm thấy nguồn.\n\nHãy tạo nguồn từ bảng THÊM NGUỒN trên màn hình chính."
 
 msgid "No summary is available for this programme."
 msgstr "Không có tóm tắt cho chương trình này."
@@ -1981,6 +1953,9 @@ msgstr "Không tìm thấy nguồn Xtream hợp lệ."
 
 msgid "No valid title was found for TMDb"
 msgstr "Không tìm thấy tiêu đề hợp lệ để tra cứu trên TMDb"
+
+msgid "No videos found at the selected quality."
+msgstr "Không tìm thấy video ở chất lượng đã chọn."
 
 msgid "No weather forecast is available for this city."
 msgstr "Không có dự báo thời tiết cho thành phố này."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Mở / Phê duyệt"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Mở cài đặt phụ đề độc lập."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Mở bàn phím TV rồi dán văn bản vào đây."
@@ -2107,8 +2082,14 @@ msgstr "Phát"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Phát phim hoặc tập phim trên thiết bị nhận trước."
 
+msgid "Play next video automatically"
+msgstr "Tự động phát video tiếp theo"
+
 msgid "Play on TV"
 msgstr "Phát trên TV"
+
+msgid "Playback history"
+msgstr "Lịch sử phát"
 
 msgid "Playback mode"
 msgstr "Chế độ phát"
@@ -2269,6 +2250,9 @@ msgstr "Kết nối nhà cung cấp thành công"
 msgid "Quality"
 msgstr "Chất lượng"
 
+msgid "Quality changed. Search again."
+msgstr "Chất lượng đã thay đổi. Hãy tìm lại."
+
 msgid "Queued"
 msgstr "Đang chờ"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Xếp hạng"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Thời gian đọc: {} ms\n"
-"Loại nguồn: {}\n"
-"Kích thước: {} byte\n"
-"Kênh: {}\n"
-"Danh mục: {}\n"
-"Thời gian từ khi lưu đệm: {}\n"
-"Sửa đổi gần nhất: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Thời gian đọc: {} ms\nLoại nguồn: {}\nKích thước: {} byte\nKênh: {}\nDanh mục: {}\nThời gian từ khi lưu đệm: {}\nSửa đổi gần nhất: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Đang đọc thời lượng..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Đang kết nối lại luồng..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Khôi phục thành công. Hãy ghi lại mã khôi phục mới; mã này chỉ được hiển thị một lần:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Khôi phục thành công. Hãy ghi lại mã khôi phục mới; mã này chỉ được hiển thị một lần:\n\n{}"
 
 msgid "Red"
 msgstr "Đỏ"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Đặt lại"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Đặt lại thời gian phụ đề"
 
 msgid "Resolution: --"
 msgstr "Độ phân giải: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Tiếp tục"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Tiếp tục phát từ vị trí đã lưu?\n"
-"\n"
-"Vị trí đã lưu: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Tiếp tục phát từ vị trí đã lưu?\n\nVị trí đã lưu: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Xem tiếp phim và tập phim bộ chưa hoàn tất"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "CÀI ĐẶT PHỤ ĐỀ"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Dòng bắt đầu trong phụ đề (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Tìm kiếm lại; kết quả này đã hết hạn."
 msgid "Search for a spoken phrase"
 msgstr "Tìm kiếm cụm từ được nói"
 
+msgid "Search history"
+msgstr "Lịch sử tìm kiếm"
+
 msgid "Search in IPTV"
 msgstr "Tìm trong IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Tìm kiếm nhạc, phim tài liệu hoặc kênh"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Tìm kiếm phụ đề với SubDL"
 
 msgid "Search subtitles"
 msgstr "Tìm kiếm phụ đề"
@@ -2550,6 +2507,9 @@ msgstr "Đang tìm kiếm nhà cung cấp…"
 
 msgid "Searching…"
 msgstr "Đang tìm kiếm…"
+
+msgid "Season"
+msgstr "Mùa"
 
 msgid "Seasons"
 msgstr "Mùa"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Hiện / Ẩn"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Hiển thị sớm hơn 0,5 giây"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Hiển thị muộn hơn 0,5 giây"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Hiển thị sớm hơn 1 giây"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Hiển thị muộn hơn 1 giây"
 
 msgid "Show in device main menu"
 msgstr "Hiển thị trong menu chính của thiết bị"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "Kết nối SubDL đã sẵn sàng."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL tạm thời không khả dụng."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL là nhà cung cấp trong phiên bản này."
 
 msgid "SubDL key change cancelled."
 msgstr "Đã hủy thay đổi khóa SubDL."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL trả về phản hồi không hợp lệ."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Phụ đề"
 
 msgid "Subtitle"
 msgstr "Phụ đề"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Các nhà cung cấp phụ đề"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Tính năng chọn phụ đề không khả dụng trên bản phần mềm hệ thống này."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "Tìm kiếm phụ đề yêu cầu bản cài đặt SubsSupport hoặc SubsSupportPro hoạt động bình thường."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Quá trình đồng bộ hóa phụ đề đang chạy."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Không thể đồng bộ phụ đề trên bản hệ thống này."
 
 msgid "Subtitle timing adjusted"
 msgstr "Đã điều chỉnh thời gian phụ đề"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Độ lệch thời gian phụ đề: {:+.1f} giây"
 
 msgid "Subtitles"
 msgstr "Phụ đề"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "Đã xóa khóa API SubDL."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "Khóa API SubDL đã bị từ chối."
 
 msgid "The SubDL connection test is still running..."
 msgstr "Kiểm tra kết nối SubDL vẫn đang diễn ra..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "Đã đạt giới hạn yêu cầu của SubDL."
 
 msgid "The TMDb connection test is still running..."
 msgstr "Kiểm tra kết nối TMDb vẫn đang chạy..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "Chênh lệch không được vượt quá 30 phút."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "Không thể lưu phụ đề đã tải xuống."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "Không thể xóa tệp. Hãy kiểm tra thiết bị lưu trữ và quyền truy cập."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Dịch vụ đang phát đã thay đổi. Hãy mở lại phần chọn âm thanh."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Không có tên chương trình để tìm kiếm phụ đề."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Đồng hồ đầu thu chưa sẵn sàng. Kiểm tra giờ mạng rồi thử lại."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "Chi tiết phim đã chọn sẽ được tải từ máy chủ."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Phụ đề vượt quá giới hạn kích thước"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Định dạng phụ đề này không được hỗ trợ."
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "Phản hồi phim bộ dùng định dạng không được hỗ trợ. Các danh mục vẫn khả dụng."
@@ -3266,12 +3226,8 @@ msgstr "Nội dung này chỉ có một bản âm thanh."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Thư mục này nằm ngoài các vị trí lưu trữ được phép."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Đây là bản xem trước phụ đề.\n"
-"Các thay đổi xuất hiện tại đây ngay lập tức."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Đây là bản xem trước phụ đề.\nCác thay đổi xuất hiện tại đây ngay lập tức."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Bản xem trước này sử dụng các thiết lập giao diện hiện tại chưa được lưu."
@@ -3419,6 +3375,9 @@ msgstr "Vị trí dọc"
 msgid "Very large"
 msgstr "Rất lớn"
 
+msgid "Video"
+msgstr "Video"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Không thể phát video trên đầu thu này. Hãy thử video hoặc cài đặt chất lượng khác."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Trắng"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Hãy ghi lại mã khôi phục này. Mã chỉ được hiển thị một lần:\n"
-"\n"
-"{}\n"
-"\n"
-"Nếu quên cả hai mã, việc gỡ rồi cài đặt lại tiện ích sẽ chỉ đặt lại khóa này."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Hãy ghi lại mã khôi phục này. Mã chỉ được hiển thị một lần:\n\n{}\n\nNếu quên cả hai mã, việc gỡ rồi cài đặt lại tiện ích sẽ chỉ đặt lại khóa này."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "EPG XMLTV đã tắt cho nguồn M3U này."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "Đã xóa {} khỏi mục yêu thích."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Trình phát IPTV mã nguồn mở cho Enigma2. Hỗ trợ tài khoản Xtream Codes và TV trực tiếp từ danh sách phát M3U tiêu chuẩn được lưu cục bộ, trên ổ mạng đã gắn kết hoặc truy cập qua HTTP(S). Nguồn M3U thông thường chỉ cung cấp TV trực tiếp.\n"
-"\n"
-"NHÀ PHÁT TRIỂN\n"
-"{}\n"
-"\n"
-"THÔNG BÁO PHÁP LÝ\n"
-"Tiện ích này không cung cấp kênh, luồng, tài khoản hoặc danh sách phát. Người dùng chịu trách nhiệm chỉ sử dụng nội dung mà mình có quyền truy cập và quyền sử dụng.\n"
-"\n"
-"QUYỀN RIÊNG TƯ\n"
-"Khi bật Open-Meteo, thành phố và vị trí đã chọn được gửi tới Open-Meteo để dự báo thời tiết. Khi bật TMDb, tiêu đề phim/phim bộ và khóa hoặc mã truy cập TMDb do người dùng nhập được gửi tới TMDb. Tên người dùng và mật khẩu IPTV không được gửi tới các dịch vụ này."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nTrình phát IPTV mã nguồn mở cho Enigma2. Hỗ trợ tài khoản Xtream Codes và TV trực tiếp từ danh sách phát M3U tiêu chuẩn được lưu cục bộ, trên ổ mạng đã gắn kết hoặc truy cập qua HTTP(S). Nguồn M3U thông thường chỉ cung cấp TV trực tiếp.\n\nNHÀ PHÁT TRIỂN\n{}\n\nTHÔNG BÁO PHÁP LÝ\nTiện ích này không cung cấp kênh, luồng, tài khoản hoặc danh sách phát. Người dùng chịu trách nhiệm chỉ sử dụng nội dung mà mình có quyền truy cập và quyền sử dụng.\n\nQUYỀN RIÊNG TƯ\nKhi bật Open-Meteo, thành phố và vị trí đã chọn được gửi tới Open-Meteo để dự báo thời tiết. Khi bật TMDb, tiêu đề phim/phim bộ và khóa hoặc mã truy cập TMDb do người dùng nhập được gửi tới TMDb. Tên người dùng và mật khẩu IPTV không được gửi tới các dịch vụ này."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

@@ -5,6 +5,10 @@ import threading
 import time
 from contextlib import nullcontext
 
+from .downloads import (
+    DownloadError, MESSAGES as DOWNLOAD_MESSAGES, STATUS as DOWNLOAD_STATUSES,
+    enqueue as enqueue_download, snapshot as download_snapshot,
+)
 from .web_api import GTWebService, WebServiceError, _source_key, _source_name
 from .web_remote import WEB_REMOTE
 
@@ -14,6 +18,20 @@ class WebMedia(object):
         self._lock = threading.RLock()
         self._items = {}
         self._service = GTWebService()
+
+    @staticmethod
+    def _playable(source, item):
+        return item.content_type == "movie" or (
+            item.content_type == "series" and (
+                bool(getattr(item, "episode", "") or getattr(item, "parent_id", ""))
+                or str(getattr(source, "source_type", "")) == "m3u"
+            )
+        )
+
+    @classmethod
+    def _downloadable(cls, source, item):
+        return (str(getattr(source, "source_type", "xtream") or "xtream")
+                in ("xtream", "stalker") and cls._playable(source, item))
 
     def _put(self, source, item):
         token = secrets.token_urlsafe(24)
@@ -26,7 +44,8 @@ class WebMedia(object):
                 self._items.pop(next(iter(self._items)))
         return {"token": token, "name": str(item.name)[:160],
                 "kind": str(item.content_type), "source": _source_name(source),
-                "playable": item.content_type == "movie" or bool(getattr(item, "episode", "") or getattr(item, "parent_id", "")) or str(getattr(source, "source_type", "")) == "m3u",
+                "playable": self._playable(source, item),
+                "downloadable": self._downloadable(source, item),
                 "season": str(getattr(item, "season", "") or ""),
                 "episode": str(getattr(item, "episode", "") or "")}
 
@@ -79,7 +98,36 @@ class WebMedia(object):
                 episodes = client.load_episodes(item.stream_id)
         except Exception:
             raise WebServiceError("episodes_failed", "Episodes could not be loaded", 502)
+        for episode in episodes[:120]:
+            episode.favorite_parent = item
         return {"results": [self._put(source, episode) for episode in episodes[:120]]}
+
+    def download(self, token):
+        source, item = self._get(token)
+        if not self._downloadable(source, item):
+            raise WebServiceError("download_unsupported", DOWNLOAD_MESSAGES["unsupported"], 400)
+        try:
+            from .browser import content_client_for
+            # Link resolution and transfer belong to the existing detached
+            # worker; the web request only submits the saved selection.
+            identity = enqueue_download(content_client_for(source), item)
+        except DownloadError as error:
+            code = error.code if error.code in DOWNLOAD_MESSAGES else "failed"
+            status = 409 if code in ("playing", "busy", "folder", "space") else (
+                400 if code == "unsupported" else 500
+            )
+            raise WebServiceError("download_" + code, DOWNLOAD_MESSAGES[code], status)
+        except Exception:
+            raise WebServiceError("download_failed", DOWNLOAD_MESSAGES["failed"], 500)
+        status = "queued"
+        try:
+            job = next((job for job in download_snapshot().get("jobs", [])
+                        if job.get("id") == identity), {})
+            if job.get("status") in DOWNLOAD_STATUSES:
+                status = job["status"]
+        except Exception:
+            pass  # A committed queue request remains successful.
+        return {"id": identity, "name": str(item.name)[:160], "status": status}
 
     def play(self, token):
         source, item = self._get(token)
@@ -96,4 +144,3 @@ class WebMedia(object):
 
 
 WEB_MEDIA = WebMedia()
-

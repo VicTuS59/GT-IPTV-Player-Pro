@@ -4,13 +4,23 @@
 """Browser-language catalog assembled from the existing Enigma2 gettext UI."""
 
 from .i18n import (
+    device_language,
     normalize_language,
     supported_language_names,
+    track_language_messages,
     translate_for_language,
 )
+from .downloads import MESSAGES as DOWNLOAD_MESSAGES
 
 
 WEB_MESSAGES = {
+    "video": "Video",
+    "season": "Season",
+    "episode": "Episode",
+    "resolving": "Please wait",
+    "local": "Local file",
+    "deleting": "Please wait",
+    "youtube_native_player_required": "Could not start the player.",
     "youtube_search_title": "Search YouTube",
     "youtube_search_placeholder": "Search music, documentaries or channels",
     "youtube_search_hint": "Enter a word to search videos.",
@@ -23,6 +33,12 @@ WEB_MESSAGES = {
     "youtube_settings": "YouTube settings",
     "youtube_settings_intro": "YouTube search does not need an API key. Set your TV video quality.",
     "youtube_max_resolution": "Maximum video resolution",
+    "youtube_quality": "Video quality",
+    "youtube_autoplay": "Play next video automatically",
+    "youtube_history": "Search history",
+    "youtube_quality_unavailable": "No videos found at the selected quality.",
+    "youtube_quality_changed": "Quality changed. Search again.",
+    "clear": "Clear",
     "youtube_actual_quality": "Quality",
     "youtube_dash": "Allow separate audio/video streams for higher quality (DASH)",
     "youtube_playback_mode": "Playback mode",
@@ -62,6 +78,7 @@ WEB_MESSAGES = {
     "sources": "Sources",
     "epg": "EPG settings",
     "downloads": "Downloads",
+    "download": "Download",
     "favorites": "Favorites",
     "settings": "Settings",
     "remote_control": "Remote control",
@@ -192,6 +209,7 @@ WEB_MESSAGES = {
     "kind_stalker": "Stalker / MAC",
     "kind_m3u": "M3U",
     "menu": "Menu",
+    "close_menu": "Close menu",
     "main_navigation": "Main navigation",
     "youtube_results_pages": "YouTube results pages",
     "iptv_source": "IPTV source",
@@ -231,6 +249,14 @@ WEB_MESSAGES = {
     "subtitle_key_valid": "Provider connection succeeded",
     "now_playing": "Now playing",
     "subtitle_language": "Subtitle language",
+    "subtitleFps": "FPS",
+    "subtitleCompatibilityHigh": "High compatibility",
+    "subtitleCompatibilityPossible": "Possible compatibility",
+    "subtitleCompatibilityConverted": "FPS will be converted",
+    "subtitleCompatibilityUnknown": "Compatibility unknown",
+    "subtitleCompatibilityDifferent": "Different version",
+    "subtitleHearingImpaired": "Hearing-impaired subtitles",
+    "subtitle_operation_cancelled": "Request cancelled",
     "subtitle_title": "Search title",
     "subtitle_search_button": "Search subtitles",
     "subtitle_searching": "Searching providers…",
@@ -258,6 +284,9 @@ WEB_MESSAGES = {
     "vod_changed": "The playing movie or episode changed. Search again.",
     "subssupport_required": "Install SubsSupport or SubsSupport Pro to load external subtitles.",
     "subtitle_load_failed": "The receiver could not load this subtitle.",
+    "subtitle_cache_unavailable": "The receiver could not load this subtitle.",
+    "provider_login_required": "Enter the username / Enter the password",
+    "independent_subtitles_disabled": "Independent subtitles are turned off in settings.",
     "subtitle_not_found": "Search again; this result has expired.",
     "subtitle_search_busy": "A subtitle search is already running.",
     "provider_unavailable": "Source unavailable",
@@ -269,6 +298,9 @@ WEB_MESSAGES = {
     "subtitle_too_large": "Subtitle exceeds the size limit",
 }
 
+
+WEB_MESSAGES.update({"download_" + code: message
+                     for code, message in DOWNLOAD_MESSAGES.items()})
 
 OVERRIDES = {
     "tr": {
@@ -617,6 +649,86 @@ OVERRIDES = {
 
 RTL_LANGUAGES = frozenset(("ar", "fa", "he"))
 
+# This web-only control is independent of the receiver's gettext catalog.
+MENU_CLOSE_LABELS = {
+    "ar": "إغلاق القائمة", "bg": "Затваряне на менюто",
+    "ca": "Tanca el menú", "cs": "Zavřít nabídku", "da": "Luk menuen",
+    "de": "Menü schließen", "el": "Κλείσιμο μενού", "es": "Cerrar menú",
+    "et": "Sulge menüü", "fa": "بستن منو", "fi": "Sulje valikko",
+    "fr": "Fermer le menu", "fy": "Menu slute", "gl": "Pechar o menú",
+    "he": "סגירת התפריט", "hr": "Zatvori izbornik", "hu": "Menü bezárása",
+    "id": "Tutup menu", "is": "Loka valmynd", "it": "Chiudi menu",
+    "ku": "Menûyê bigire", "lt": "Uždaryti meniu", "lv": "Aizvērt izvēlni",
+    "mk": "Затвори го менито", "nl": "Menu sluiten", "nb": "Lukk menyen",
+    "nn": "Lukk menyen", "pl": "Zamknij menu", "pt": "Fechar menu",
+    "pt_BR": "Fechar menu", "ro": "Închide meniul", "ru": "Закрыть меню",
+    "sk": "Zavrieť ponuku", "sl": "Zapri meni", "sr": "Затвори мени",
+    "sv": "Stäng menyn", "th": "ปิดเมนู", "tr": "Menüyü kapat",
+    "uk": "Закрити меню", "vi": "Đóng menu", "zh_CN": "关闭菜单",
+    "zh_HK": "關閉選單", "sq": "Mbyll menynë", "ta": "மெனுவை மூடு",
+}
+
+INDEPENDENT_SUBTITLES_DISABLED_LABELS = {
+    "ar": "الترجمة المستقلة متوقفة في الإعدادات.",
+    "bg": "Независимите субтитри са изключени в настройките.",
+    "ca": "Els subtítols independents estan desactivats a la configuració.",
+    "cs": "Nezávislé titulky jsou v nastavení vypnuté.",
+    "da": "Uafhængige undertekster er slået fra i indstillingerne.",
+    "de": "Unabhängige Untertitel sind in den Einstellungen deaktiviert.",
+    "el": "Οι ανεξάρτητοι υπότιτλοι είναι απενεργοποιημένοι στις ρυθμίσεις.",
+    "es": "Los subtítulos independientes están desactivados en la configuración.",
+    "et": "Sõltumatud subtiitrid on seadetes välja lülitatud.",
+    "fa": "زیرنویس‌های مستقل در تنظیمات غیرفعال هستند.",
+    "fi": "Itsenäiset tekstitykset on poistettu käytöstä asetuksissa.",
+    "fr": "Les sous-titres indépendants sont désactivés dans les paramètres.",
+    "fy": "Unôfhinklike ûndertitels binne útskeakele yn de ynstellingen.",
+    "gl": "Os subtítulos independentes están desactivados na configuración.",
+    "he": "הכתוביות העצמאיות כבויות בהגדרות.",
+    "hr": "Neovisni titlovi isključeni su u postavkama.",
+    "hu": "A független feliratok ki vannak kapcsolva a beállításokban.",
+    "id": "Subtitel mandiri dinonaktifkan dalam pengaturan.",
+    "is": "Sjálfstæðir skjátextar eru óvirkir í stillingum.",
+    "it": "I sottotitoli indipendenti sono disattivati nelle impostazioni.",
+    "ku": "Binnivîsên serbixwe di mîhengan de neçalak in.",
+    "lt": "Nepriklausomi subtitrai išjungti nustatymuose.",
+    "lv": "Neatkarīgie subtitri ir izslēgti iestatījumos.",
+    "mk": "Независните преводи се исклучени во поставките.",
+    "nl": "Onafhankelijke ondertitels zijn uitgeschakeld in de instellingen.",
+    "nb": "Uavhengige undertekster er slått av i innstillingene.",
+    "nn": "Uavhengige undertekstar er slått av i innstillingane.",
+    "pl": "Niezależne napisy są wyłączone w ustawieniach.",
+    "pt": "As legendas independentes estão desativadas nas definições.",
+    "pt_BR": "As legendas independentes estão desativadas nas definições.",
+    "ro": "Subtitrările independente sunt dezactivate în setări.",
+    "ru": "Независимые субтитры отключены в настройках.",
+    "sk": "Nezávislé titulky sú v nastaveniach vypnuté.",
+    "sl": "Neodvisni podnapisi so izklopljeni v nastavitvah.",
+    "sr": "Независни титлови су искључени у подешавањима.",
+    "sv": "Oberoende undertexter är avstängda i inställningarna.",
+    "th": "ปิดใช้งานคำบรรยายอิสระในการตั้งค่าแล้ว",
+    "tr": "Bağımsız altyazılar ayarlarda kapalı.",
+    "uk": "Незалежні субтитри вимкнено в налаштуваннях.",
+    "vi": "Phụ đề độc lập đã bị tắt trong cài đặt.",
+    "zh_CN": "独立字幕已在设置中关闭。", "zh_HK": "獨立字幕已在設定中關閉。",
+    "sq": "Titrat e pavarur janë çaktivizuar te cilësimet.",
+    "ta": "அமைப்புகளில் தனித்த வசன வரிகள் முடக்கப்பட்டுள்ளன.",
+}
+
+# Source status details can arrive as source text or in the receiver's language.
+# Browser choices must localize those details without changing the TV language.
+RUNTIME_MESSAGES = (
+    "API response is invalid", "Server did not validate the account",
+    "Connection limit reached", "API connection successful",
+    "API response is too large", "Server denied access",
+    "Server request limit reached", "Could not connect to the server",
+    "Request cancelled", "M3U catalogue loaded from cache.",
+    "M3U source is accessible.", "The source is unavailable; a stale cache is in use.",
+    "The M3U source could not be checked.", "Portal connection successful",
+    "The health check could not be completed.", "Account status: {}",
+    "Server returned HTTP {}", "Unknown", "Never / unknown",
+    "Active", "Invalid", "Disabled", "Expired",
+)
+
 
 def web_catalog(requested_language):
     code = normalize_language(requested_language, fallback="en")
@@ -625,13 +737,29 @@ def web_catalog(requested_language):
         for key, message in WEB_MESSAGES.items()
     }
     strings.update(OVERRIDES.get(code, {}))
+    strings["close_menu"] = MENU_CLOSE_LABELS.get(code, WEB_MESSAGES["close_menu"])
+    strings["independent_subtitles_disabled"] = INDEPENDENT_SUBTITLES_DISABLED_LABELS.get(
+        code, WEB_MESSAGES["independent_subtitles_disabled"]
+    )
+    strings["subtitle_cache_unavailable"] = strings["subtitle_load_failed"]
+    strings["provider_login_required"] = "{} / {}".format(
+        translate_for_language("Enter the username", code),
+        translate_for_language("Enter the password", code),
+    )
+    runtime_texts = {}
+    receiver_language = device_language()
+    for message in RUNTIME_MESSAGES + track_language_messages() + ("Audio track",):
+        translated = strings.get(message.lower(), translate_for_language(message, code))
+        runtime_texts[message] = translated
+        runtime_texts[translate_for_language(message, receiver_language)] = translated
+    runtime_texts["The source could not be checked."] = strings["request_failed"]
     return {
         "language": code,
         "direction": "rtl" if code in RTL_LANGUAGES else "ltr",
         "strings": strings,
+        "runtime_texts": runtime_texts,
         "languages": [
             {"code": item_code, "name": name}
             for item_code, name in supported_language_names()
         ],
     }
-

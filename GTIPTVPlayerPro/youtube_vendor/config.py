@@ -22,7 +22,7 @@ class _Value(object):
 
 
 class _Section(object):
-    maxResolution = _Value("max_resolution", "22")
+    maxResolution = _Value("max_resolution", "264")
     searchLanguage = _Value("search_language", "tr")
     useDashMP4 = _Value("use_dash", True)
     streamMode = _Value("stream_mode", "auto")
@@ -43,8 +43,8 @@ config = _Config()
 def set_preferences(resolution, language, dash, stream_mode=None, audio_preference="default"):
     _local.max_resolution = {
         "360": "18", "480": "35", "720": "22",
-        "1080": "37", "2160": "38",
-    }.get(str(resolution), "22")
+        "1080": "37", "1440": "264", "2160": "38",
+    }.get(str(resolution), "264")
     _local.search_language = str(language or "tr")[:2]
     _local.use_dash = bool(dash)
     mode = str(stream_mode) if stream_mode is not None else ("auto" if dash else "compatible")

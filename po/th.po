@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro Team\n"
-"Language-Team: Thai\n"
-"Language: th\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Thai\nLanguage: th\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -83,7 +73,7 @@ msgid "API connection successful"
 msgstr "การเชื่อมต่อ API สำเร็จ"
 
 msgid "API key"
-msgstr "API key"
+msgstr "คีย์ API"
 
 msgid "API key was rejected"
 msgstr "API key ถูกปฏิเสธ"
@@ -109,6 +99,9 @@ msgstr "เสียง: {}"
 
 msgid "About"
 msgstr "เกี่ยวกับ"
+
+msgid "Access code"
+msgstr "รหัสเข้าถึง"
 
 msgid "Access your channels quickly"
 msgstr "เข้าถึงช่องของคุณอย่างรวดเร็ว"
@@ -197,6 +190,9 @@ msgstr "ภาษาอาหรับ"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "ช่องนี้ไม่สามารถรับชมย้อนหลังได้"
+
+msgid "Aspect ratio"
+msgstr "อัตราส่วนภาพ"
 
 msgid "Audio language changed"
 msgstr "เปลี่ยนภาษาเสียงแล้ว"
@@ -481,6 +477,9 @@ msgstr "ท้องฟ้าแจ่มใส"
 msgid "Close"
 msgstr "ปิด"
 
+msgid "Close menu"
+msgstr "ปิดเมนู"
+
 msgid "Close the open screen before opening another one."
 msgstr "ปิดหน้าจอที่เปิดอยู่ก่อนเปิดหน้าจออื่น"
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "ไม่สามารถเลือกแทร็กเสียงที่ร้องขอได้"
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "ไม่สามารถเริ่มแสดงคำบรรยายอิสระได้"
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "ไม่สามารถเริ่มค้นหาคำบรรยายออนไลน์ได้"
 
 msgid "Could not start the player."
 msgstr "ไม่สามารถเริ่มเล่นได้"
@@ -771,6 +770,9 @@ msgstr "คืนค่าลำดับเริ่มต้นแล้ว �
 msgid "Delete"
 msgstr "ลบ"
 
+msgid "Delete all"
+msgstr "ลบทั้งหมด"
+
 msgid "Delete this item?"
 msgstr "ลบรายการนี้หรือไม่?"
 
@@ -818,6 +820,12 @@ msgstr "ค้นพบภาพยนตร์"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "ค้นพบภาพยนตร์ใหม่จากคำแนะนำของ TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "แสดงเนื้อหา 16:9 แบบ"
+
+msgid "Display 4:3 content as"
+msgstr "แสดงเนื้อหา 4:3 แบบ"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "ห้ามใส่คำค้นหาหรือส่วนย่อยใน URL ของพอร์ทัล"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "ป้อนคีย์ API ของ SubDL ก่อน"
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "ป้อนคีย์ API ของ SubDL ในการตั้งค่าคำบรรยาย"
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "ป้อน TMDb API key สำหรับข้อมูลภาพยนตร์และซีรีส์"
@@ -1007,6 +1015,9 @@ msgstr "ป้อนรหัส 6 หลักที่แสดงบนเค
 msgid "Enter the username"
 msgstr "ป้อนชื่อผู้ใช้"
 
+msgid "Enter the username / Enter the password"
+msgstr "ป้อนชื่อผู้ใช้ / ป้อนรหัสผ่าน"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "ป้อนรหัสนี้ในเบราว์เซอร์บนโทรศัพท์ของคุณ จากนั้นอนุมัติคำขอบนทีวี"
 
@@ -1061,6 +1072,9 @@ msgstr "รายการโปรด"
 
 msgid "FILE"
 msgstr "ไฟล์"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS จะถูกแปลง"
@@ -1144,19 +1158,11 @@ msgstr "เต็มหน้าจอ"
 msgid "GREEN"
 msgstr "สีเขียว"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"ภาพยนตร์"
+msgid "GT\nMOVIE"
+msgstr "GT\nภาพยนตร์"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"ซีรีส์"
+msgid "GT\nSERIES"
+msgstr "GT\nซีรีส์"
 
 msgid "Genre unavailable"
 msgstr "ไม่ระบุประเภท"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "ตัวอย่างคำบรรยายอิสระ"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "การซิงโครไนซ์คำบรรยายอิสระ"
 
 msgid "Independent subtitles"
 msgstr "คำบรรยายอิสระ"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "ปิดใช้งานคำบรรยายอิสระในการตั้งค่าแล้ว"
 
 msgid "Information"
 msgstr "ข้อมูล"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "ความหน่วง (Latency)"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"ความหน่วง: {} มิลลิวินาที\n"
-"สถานะบัญชี: {}\n"
-"ใช้งาน / สูงสุด: {}\n"
-"หมดอายุ: {}\n"
-"เวลาเซิร์ฟเวอร์: {}\n"
-"เขตเวลา: {}\n"
-"โปรโตคอล: {}\n"
-"รูปแบบเอาต์พุต: {}\n"
-"เวอร์ชันเซิร์ฟเวอร์: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "ความหน่วง: {} มิลลิวินาที\nสถานะบัญชี: {}\nใช้งาน / สูงสุด: {}\nหมดอายุ: {}\nเวลาเซิร์ฟเวอร์: {}\nเขตเวลา: {}\nโปรโตคอล: {}\nรูปแบบเอาต์พุต: {}\nเวอร์ชันเซิร์ฟเวอร์: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"ความหน่วง: {} มิลลิวินาที\n"
-"สถานะบัญชี: {}\n"
-"โปรโตคอล: {}\n"
-"รูปแบบเอาต์พุต: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "ความหน่วง: {} มิลลิวินาที\nสถานะบัญชี: {}\nโปรโตคอล: {}\nรูปแบบเอาต์พุต: {}\n\n{}"
 
 msgid "Left"
 msgstr "ซ้าย"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "โหลดคำบรรยาย (subtitle) จากหน้าเว็บนี้ก่อนทำการซิงโครไนซ์"
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "โหลดคำบรรยายอิสระก่อนซิงโครไนซ์"
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "กำลังโหลดบริการ DVB และช่อง XMLTV ที่แคชไว้..."
@@ -1514,6 +1486,9 @@ msgstr "ออกจากระบบ"
 
 msgid "Lower"
 msgstr "ต่ำลง"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "ค้นหาช่อง M3U"
@@ -1668,6 +1643,9 @@ msgstr "ที่อยู่ MAC"
 
 msgid "MANAGE SOURCES"
 msgstr "จัดการแหล่งที่มา"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 วินาที: เว็บอินเทอร์เฟซ"
 
 msgid "MOVIE CATEGORIES"
 msgstr "หมวดหมู่ภาพยนตร์"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "ไม่พบคำบรรยายที่ตรงกัน ตรวจสอบภาษาและสถานะของผู้ให้บริการ"
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "ไม่พบคำบรรยายที่ตรงกันใน SubDL"
 
 msgid "No movies found."
 msgstr "ไม่พบภาพยนตร์"
@@ -1946,14 +1924,8 @@ msgstr "ไม่มีแหล่งให้เชื่อมต่อ"
 msgid "No source is selected for deletion."
 msgstr "ไม่ได้เลือกแหล่งใดไว้สำหรับการลบ"
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"ไม่พบแหล่งที่มา\n"
-"\n"
-"สร้างแหล่งใหม่จากแผงเพิ่มแหล่งบนหน้าจอหลัก"
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "ไม่พบแหล่งที่มา\n\nสร้างแหล่งใหม่จากแผงเพิ่มแหล่งบนหน้าจอหลัก"
 
 msgid "No summary is available for this programme."
 msgstr "ไม่มีข้อมูลสรุปสำหรับรายการนี้"
@@ -1981,6 +1953,9 @@ msgstr "ไม่พบแหล่ง Xtream ที่ถูกต้อง"
 
 msgid "No valid title was found for TMDb"
 msgstr "ไม่พบชื่อเรื่องที่ถูกต้องสำหรับ TMDb"
+
+msgid "No videos found at the selected quality."
+msgstr "ไม่พบวิดีโอที่มีคุณภาพตามที่เลือก"
 
 msgid "No weather forecast is available for this city."
 msgstr "ไม่มีพยากรณ์อากาศสำหรับเมืองนี้"
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "เปิด / อนุมัติ"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "เปิดการตั้งค่าคำบรรยายอิสระ"
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "เปิดแป้นพิมพ์ทีวีแล้ววางข้อความที่นี่"
@@ -2107,8 +2082,14 @@ msgstr "เล่น"
 msgid "Play a movie or episode on the receiver first."
 msgstr "เล่นภาพยนตร์หรือตอนของซีรีส์บนเครื่องรับสัญญาณก่อน"
 
+msgid "Play next video automatically"
+msgstr "เล่นวิดีโอถัดไปโดยอัตโนมัติ"
+
 msgid "Play on TV"
 msgstr "เล่นบนทีวี"
+
+msgid "Playback history"
+msgstr "ประวัติการเล่น"
 
 msgid "Playback mode"
 msgstr "โหมดการเล่น"
@@ -2269,6 +2250,9 @@ msgstr "การเชื่อมต่อกับผู้ให้บริ
 msgid "Quality"
 msgstr "คุณภาพ"
 
+msgid "Quality changed. Search again."
+msgstr "คุณภาพเปลี่ยนแล้ว โปรดค้นหาอีกครั้ง"
+
 msgid "Queued"
 msgstr "อยู่ในคิว"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "เรตติ้ง"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"เวลาอ่าน: {} มิลลิวินาที\n"
-"ประเภทแหล่งที่มา: {}\n"
-"ขนาด: {} ไบต์\n"
-"ช่องสัญญาณ: {}\n"
-"หมวดหมู่: {}\n"
-"อายุแคช: {}\n"
-"แก้ไขล่าสุด: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "เวลาอ่าน: {} มิลลิวินาที\nประเภทแหล่งที่มา: {}\nขนาด: {} ไบต์\nช่องสัญญาณ: {}\nหมวดหมู่: {}\nอายุแคช: {}\nแก้ไขล่าสุด: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "กำลังอ่านระยะเวลา..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "กำลังเชื่อมต่อสตรีมใหม่..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"กู้คืนสำเร็จ โปรดจดรหัสกู้คืนใหม่ รหัสนี้จะแสดงเพียงครั้งเดียว:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "กู้คืนสำเร็จ โปรดจดรหัสกู้คืนใหม่ รหัสนี้จะแสดงเพียงครั้งเดียว:\n\n{}"
 
 msgid "Red"
 msgstr "แดง"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "รีเซ็ต"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "รีเซ็ตเวลาคำบรรยาย"
 
 msgid "Resolution: --"
 msgstr "ความละเอียด: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "ดำเนินการต่อ"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"เล่นต่อจากตำแหน่งที่บันทึกไว้หรือไม่?\n"
-"\n"
-"ตำแหน่งที่บันทึกไว้: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "เล่นต่อจากตำแหน่งที่บันทึกไว้หรือไม่?\n\nตำแหน่งที่บันทึกไว้: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "เล่นภาพยนตร์และซีรีส์ที่ค้างไว้ต่อตอนต่างๆ"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "การตั้งค่าคำบรรยาย"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "เริ่มบรรทัดเดียวกันในคำบรรยาย (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "ค้นหาอีกครั้ง ผลลัพธ์นี้�
 msgid "Search for a spoken phrase"
 msgstr "ค้นหาจากวลีที่พูด"
 
+msgid "Search history"
+msgstr "ประวัติการค้นหา"
+
 msgid "Search in IPTV"
 msgstr "ค้นหาใน IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "ค้นหาเพลง สารคดี หรือช่องรายการ"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "ค้นหาคำบรรยายด้วย SubDL"
 
 msgid "Search subtitles"
 msgstr "ค้นหาคำบรรยาย"
@@ -2550,6 +2507,9 @@ msgstr "กำลังค้นหาผู้ให้บริการ..."
 
 msgid "Searching…"
 msgstr "กำลังค้นหา..."
+
+msgid "Season"
+msgstr "ซีซัน"
 
 msgid "Seasons"
 msgstr "ซีซัน"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "แสดง / ซ่อน"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "แสดงเร็วขึ้น 0.5 วินาที"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "แสดงช้าลง 0.5 วินาที"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "แสดงเร็วขึ้น 1 วินาที"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "แสดงช้าลง 1 วินาที"
 
 msgid "Show in device main menu"
 msgstr "แสดงในเมนูหลักของอุปกรณ์"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "การเชื่อมต่อ SubDL พร้อมใช้งาน"
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL ไม่พร้อมใช้งานชั่วคราว"
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL เป็นผู้ให้บริการในเวอร์ชันนี้"
 
 msgid "SubDL key change cancelled."
 msgstr "ยกเลิกการเปลี่ยนคีย์ SubDL แล้ว"
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL ส่งคำตอบที่ไม่ถูกต้อง"
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • คำบรรยาย"
 
 msgid "Subtitle"
 msgstr "คำบรรยาย"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "ผู้ให้บริการคำบรรยาย"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "ไม่สามารถเลือกคำบรรยายในอิมเมจระบบนี้ได้"
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "การค้นหาคำบรรยายต้องติดตั้ง SubsSupport หรือ SubsSupportPro ที่ทำงานได้อย่างถูกต้อง"
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "การซิงโครไนซ์คำบรรยายกำลังทำงานอยู่"
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "ไม่สามารถซิงโครไนซ์คำบรรยายบนอิมเมจระบบนี้ได้"
 
 msgid "Subtitle timing adjusted"
 msgstr "ปรับเวลาคำบรรยายแล้ว"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "ค่าชดเชยเวลาคำบรรยาย: {:+.1f} วินาที"
 
 msgid "Subtitles"
 msgstr "คำบรรยาย"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "ล้างคีย์ API ของ SubDL แล้ว"
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "คีย์ API ของ SubDL ถูกปฏิเสธ"
 
 msgid "The SubDL connection test is still running..."
 msgstr "การทดสอบการเชื่อมต่อ SubDL ยังดำเนินอยู่..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "ถึงขีดจำกัดคำขอของ SubDL แล้ว"
 
 msgid "The TMDb connection test is still running..."
 msgstr "การทดสอบการเชื่อมต่อ TMDb ยังคงทำงานอยู่..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "ส่วนต่างต้องไม่เกิน 30 นาที"
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "ไม่สามารถบันทึกคำบรรยายที่ดาวน์โหลดได้"
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "ไม่สามารถลบไฟล์ได้ โปรดตรวจสอบอุปกรณ์จัดเก็บข้อมูลและสิทธิ์การเข้าถึง"
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "บริการที่กำลังเล่นเปลี่ยนไปแล้ว เปิดการเลือกเสียงอีกครั้ง"
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "ไม่มีชื่อรายการสำหรับค้นหาคำบรรยาย"
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "นาฬิกาของเครื่องรับยังไม่พร้อม ตรวจสอบเวลาเครือข่ายแล้วลองอีกครั้ง"
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "รายละเอียดของภาพยนตร์ที่เลือกจะถูกโหลดจากเซิร์ฟเวอร์"
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "คำบรรยายมีขนาดเกินขีดจำกัด"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "ไม่รองรับรูปแบบคำบรรยายนี้"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "การตอบกลับของซีรีส์ใช้รูปแบบที่ไม่รองรับ หมวดหมู่ยังคงใช้งานได้"
@@ -3266,12 +3226,8 @@ msgstr "เนื้อหานี้มีแทร็กเสียงเพ
 msgid "This folder is outside the allowed storage locations."
 msgstr "โฟลเดอร์นี้อยู่นอกตำแหน่งจัดเก็บที่อนุญาต"
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"นี่คือตัวอย่างคำบรรยาย\n"
-"การเปลี่ยนแปลงจะแสดงที่นี่ทันที"
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "นี่คือตัวอย่างคำบรรยาย\nการเปลี่ยนแปลงจะแสดงที่นี่ทันที"
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "ตัวอย่างนี้ใช้การตั้งค่ารูปลักษณ์ปัจจุบันที่ยังไม่ได้บันทึก"
@@ -3419,6 +3375,9 @@ msgstr "ตำแหน่งแนวตั้ง"
 msgid "Very large"
 msgstr "ใหญ่มาก"
 
+msgid "Video"
+msgstr "วิดีโอ"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "ไม่สามารถเล่นวิดีโอนี้บนเครื่องรับสัญญาณได้ โปรดลองวิดีโออื่นหรือปรับการตั้งค่าคุณภาพใหม่"
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "ขาว"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"โปรดจดรหัสกู้คืนนี้ รหัสจะแสดงเพียงครั้งเดียว:\n"
-"\n"
-"{}\n"
-"\n"
-"หากคุณลืมทั้งสองรหัส การถอนการติดตั้งแล้วติดตั้งปลั๊กอินใหม่จะรีเซ็ตเฉพาะการล็อกนี้"
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "โปรดจดรหัสกู้คืนนี้ รหัสจะแสดงเพียงครั้งเดียว:\n\n{}\n\nหากคุณลืมทั้งสองรหัส การถอนการติดตั้งแล้วติดตั้งปลั๊กอินใหม่จะรีเซ็ตเฉพาะการล็อกนี้"
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "XMLTV EPG ถูกปิดใช้งานสำหรับแหล่ง M3U นี้"
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} ลบออกจากรายการโปรดแล้ว"
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"โปรแกรมเล่น IPTV แบบโอเพนซอร์สสำหรับ Enigma2 รองรับบัญชี Xtream Codes และทีวีถ่ายทอดสดจากเพลย์ลิสต์ M3U มาตรฐานในเครื่อง เครือข่ายที่เชื่อมต่อ หรือ HTTP(S) แหล่ง M3U ทั่วไปให้บริการเฉพาะทีวีถ่ายทอดสดเท่านั้น\n"
-"\n"
-"ผู้พัฒนา\n"
-"{}\n"
-"\n"
-"ประกาศทางกฎหมาย\n"
-"ปลั๊กอินนี้ไม่ได้ให้บริการช่อง สตรีม บัญชี หรือเพลย์ลิสต์ ผู้ใช้มีหน้าที่รับผิดชอบในการใช้เฉพาะเนื้อหาที่ตนมีสิทธิ์เข้าถึงและใช้งานเท่านั้น\n"
-"\n"
-"ความเป็นส่วนตัว\n"
-"เมื่อเปิดใช้งาน Open-Meteo เมืองและตำแหน่งที่เลือกจะถูกส่งไปยัง Open-Meteo เพื่อรับพยากรณ์อากาศ เมื่อเปิดใช้งาน TMDb ชื่อภาพยนตร์/ซีรีส์และคีย์หรือโทเค็น TMDb ที่ผู้ใช้ป้อนจะถูกส่งไปยัง TMDb ชื่อผู้ใช้และรหัสผ่าน IPTV จะไม่ถูกส่งไปยังบริการเหล่านี้"
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nโปรแกรมเล่น IPTV แบบโอเพนซอร์สสำหรับ Enigma2 รองรับบัญชี Xtream Codes และทีวีถ่ายทอดสดจากเพลย์ลิสต์ M3U มาตรฐานในเครื่อง เครือข่ายที่เชื่อมต่อ หรือ HTTP(S) แหล่ง M3U ทั่วไปให้บริการเฉพาะทีวีถ่ายทอดสดเท่านั้น\n\nผู้พัฒนา\n{}\n\nประกาศทางกฎหมาย\nปลั๊กอินนี้ไม่ได้ให้บริการช่อง สตรีม บัญชี หรือเพลย์ลิสต์ ผู้ใช้มีหน้าที่รับผิดชอบในการใช้เฉพาะเนื้อหาที่ตนมีสิทธิ์เข้าถึงและใช้งานเท่านั้น\n\nความเป็นส่วนตัว\nเมื่อเปิดใช้งาน Open-Meteo เมืองและตำแหน่งที่เลือกจะถูกส่งไปยัง Open-Meteo เพื่อรับพยากรณ์อากาศ เมื่อเปิดใช้งาน TMDb ชื่อภาพยนตร์/ซีรีส์และคีย์หรือโทเค็น TMDb ที่ผู้ใช้ป้อนจะถูกส่งไปยัง TMDb ชื่อผู้ใช้และรหัสผ่าน IPTV จะไม่ถูกส่งไปยังบริการเหล่านี้"
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

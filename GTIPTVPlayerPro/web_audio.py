@@ -11,6 +11,8 @@ import secrets
 import threading
 import time
 
+from .i18n import track_language_name
+
 
 MAX_TRACKS = 64
 TOKEN_LIFETIME = 90
@@ -42,14 +44,24 @@ def _track_fingerprint(player, info):
 
 
 def _label(player, info, index):
-    try:
-        label = str(player._audio_track_label(info, index))[:120]
-    except Exception:
-        label = "{}. Audio track".format(index + 1)
-    # Some decoders put the source URI in the description. Keep it on the box.
-    if "://" in label or "token=" in label.lower() or "password=" in label.lower():
-        label = "{}. Audio track".format(index + 1)
-    return label
+    # Keep source messages stable even if the TV language changes after the
+    # browser loaded its catalogue. Selection fingerprints remain untouched.
+    details = []
+    for name in ("getLanguage", "getDescription"):
+        getter = getattr(info, name, None)
+        if not callable(getter):
+            continue
+        try:
+            text = " ".join(str(getter() or "").split())[:48]
+        except Exception:
+            continue
+        # Some decoders put the source URI in the description. Keep it on the box.
+        if "://" in text or "token=" in text.lower() or "password=" in text.lower():
+            continue
+        text = track_language_name(text)
+        if text and not any(text.casefold() == value.casefold() for value in details):
+            details.append(text)
+    return "{}. {}".format(index + 1, " • ".join(details) or "Audio track")[:120]
 
 
 class WebAudio(object):
@@ -104,7 +116,7 @@ class WebAudio(object):
                     if len(self.tokens) > 16:
                         oldest = min(self.tokens, key=lambda key: self.tokens[key][0])
                         self.tokens.pop(oldest, None)
-            return {"playing": True, "title": title or "Movie", "tracks": entries,
+            return {"playing": True, "title": title, "tracks": entries,
                     "selectable": bool(can_select), "token": token,
                     "truncated": count > MAX_TRACKS}
 
@@ -163,4 +175,3 @@ class WebAudio(object):
 
 
 WEB_AUDIO = WebAudio()
-

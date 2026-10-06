@@ -10,10 +10,17 @@ import json
 import os
 import re
 import tempfile
+from time import monotonic
 from urllib.parse import quote, urlencode, urlsplit
 
 from .diagnostics import log_event
 from .subtitle_settings import MAX_OFFSET_MS
+from .subtitle_language import (
+    LANGUAGE_ALIASES as _LANGUAGE_ALIASES, normalize_subtitle_language,
+    text_matches_language, subtitle_episode_numbers, subtitle_episode_matches,
+)
+from .subtitle_decode import decode_subtitle_content
+from .polish_subtitles import POLISH_PROVIDERS, polish_search_providers
 from .web_subtitles import SubtitleError, _download, _request
 
 
@@ -25,36 +32,10 @@ PROVIDER_NAMES = {
     "subdl": "SubDL",
     "opensubtitles": "OpenSubtitles.com",
     "subsource": "SubSource",
+    "napiprojekt": "NapiProjekt",
+    "napisy24": "Napisy24",
 }
-_LANGUAGE_ALIASES = {
-    "albanian": "sq", "arabic": "ar", "bulgarian": "bg",
-    "catalan": "ca", "chinese": "zh", "croatian": "hr",
-    "czech": "cs", "danish": "da", "dutch": "nl", "english": "en",
-    "estonian": "et", "farsi": "fa", "persian": "fa", "finnish": "fi",
-    "french": "fr", "galician": "gl", "german": "de", "greek": "el",
-    "hebrew": "he", "hungarian": "hu", "icelandic": "is",
-    "indonesian": "id", "italian": "it", "kurdish": "ku",
-    "latvian": "lv", "lithuanian": "lt", "macedonian": "mk",
-    "norwegian": "nb", "polish": "pl", "portuguese": "pt",
-    "romanian": "ro", "russian": "ru", "serbian": "sr",
-    "slovak": "sk", "slovenian": "sl", "spanish": "es",
-    "swedish": "sv", "tamil": "ta", "thai": "th", "turkish": "tr",
-    "ukrainian": "uk", "vietnamese": "vi",
-    "alb": "sq", "sqi": "sq", "ara": "ar", "bul": "bg",
-    "cat": "ca", "chi": "zh", "zho": "zh", "hrv": "hr",
-    "cze": "cs", "ces": "cs", "dan": "da", "dut": "nl",
-    "nld": "nl", "eng": "en", "est": "et", "per": "fa",
-    "fas": "fa", "fin": "fi", "fre": "fr", "fra": "fr",
-    "glg": "gl", "ger": "de", "deu": "de", "gre": "el",
-    "ell": "el", "heb": "he", "hun": "hu", "ice": "is",
-    "isl": "is", "ind": "id", "ita": "it", "kur": "ku",
-    "lav": "lv", "lit": "lt", "mac": "mk", "mkd": "mk",
-    "nor": "nb", "pol": "pl", "por": "pt", "rum": "ro",
-    "ron": "ro", "rus": "ru", "srp": "sr", "slo": "sk",
-    "slk": "sk", "slv": "sl", "spa": "es", "swe": "sv",
-    "tam": "ta", "tha": "th", "tur": "tr", "ukr": "uk",
-    "vie": "vi",
-}
+
 _TIME = re.compile(
     r"(?:(\d{1,3}):)?(\d{1,2}):(\d{2})[,.](\d{3})"
 )
@@ -122,6 +103,9 @@ _FPS_DOUBLE_STANDARDS = (
     (59.94, 29.97),
     (60.0, 30.0),
 )
+_SUBDL_FRAMERATE_CODES = {
+    2: 23.976, 6: 23.980, 5: 24.0, 3: 25.0, 4: 29.970, 7: 30.0,
+}
 
 
 class SubtitleCue(object):
@@ -146,17 +130,8 @@ class SubtitleCue(object):
         )
 
 
-def _decode_content(content):
-    if isinstance(content, str):
-        return content
-    if not isinstance(content, bytes):
-        raise SubtitleError("subtitle_format_unsupported", 422)
-    for encoding in ("utf-8-sig", "cp1254", "iso-8859-9", "latin-1"):
-        try:
-            return content.decode(encoding)
-        except UnicodeDecodeError:
-            pass
-    raise SubtitleError("subtitle_format_unsupported", 422)
+def _decode_content(content, language=""):
+    return decode_subtitle_content(content, language)
 
 
 def _time_ms(value):
@@ -189,9 +164,9 @@ def _clean_text(lines, hearing_impaired=True):
     return "\n".join(output[:3])[:MAX_TEXT_LENGTH].strip()
 
 
-def parse_subtitle(content, hearing_impaired=True):
+def parse_subtitle(content, hearing_impaired=True, language=""):
     """Parse bounded SRT or WebVTT text into sorted, non-empty cues."""
-    text = _decode_content(content).replace("\r\n", "\n").replace("\r", "\n")
+    text = _decode_content(content, language).replace("\r\n", "\n").replace("\r", "\n")
     if len(text.encode("utf-8", "ignore")) > 2 * 1024 * 1024:
         raise SubtitleError("subtitle_too_large", 422)
     blocks = re.split(r"\n[ \t]*\n", text.strip())
@@ -201,7 +176,9 @@ def parse_subtitle(content, hearing_impaired=True):
         if not lines:
             continue
         first = lines[0].strip().lstrip("\ufeff")
-        if first == "WEBVTT" or first.startswith(("NOTE", "STYLE", "REGION")):
+        if (first == "WEBVTT" or first.startswith("WEBVTT ")
+                or first in ("STYLE", "REGION")
+                or re.match(r"^NOTE(?:$|[ \t])", first)):
             continue
         timing_index = -1
         timing = None
@@ -227,11 +204,13 @@ def parse_subtitle(content, hearing_impaired=True):
     cues.sort(key=lambda cue: (cue.start_ms, cue.end_ms))
     if not cues:
         raise SubtitleError("subtitle_format_unsupported", 422)
+    if not text_matches_language("\n".join(cue.text for cue in cues), language):
+        raise SubtitleError("subtitle_no_results", 404)
     return tuple(cues)
 
 
-def active_subtitle_text(cues, position_ms, offset_ms=0, starts=None):
-    """Return text active at media position using a logarithmic cue lookup."""
+def active_subtitle_text(cues, position_ms, offset_ms=0, starts=None, end_prefix=None):
+    """Find the current cues without truncating older overlapping captions."""
     try:
         position_ms = int(position_ms)
         offset_ms = max(-MAX_OFFSET_MS, min(MAX_OFFSET_MS, int(offset_ms)))
@@ -245,14 +224,23 @@ def active_subtitle_text(cues, position_ms, offset_ms=0, starts=None):
     index = bisect_right(starts, target) - 1
     if index < 0:
         return ""
-    # A handful of overlapping cues is common in ASS-converted and WebVTT
-    # files. Preserve their order without walking the complete subtitle list.
+    # The most recent cue does not bound the lifetime of an older overlapping
+    # cue. A prefix maximum excludes expired ranges without a five-cue limit.
+    if end_prefix is None:
+        latest_end, ends = 0, []
+        for cue in cues:
+            latest_end = max(latest_end, cue.end_ms)
+            ends.append(latest_end)
+        end_prefix = ends
+    first = bisect_right(end_prefix, target, 0, index + 1)
     active = []
-    for candidate in range(max(0, index - 4), index + 1):
+    for candidate in range(index, first - 1, -1):
         cue = cues[candidate]
         if cue.start_ms <= target < cue.end_ms and cue.text not in active:
             active.append(cue.text)
-    return "\n".join(active[-2:])[:MAX_TEXT_LENGTH]
+            if len(active) == 2:
+                break
+    return "\n".join(reversed(active))[:MAX_TEXT_LENGTH]
 
 
 def _number(value):
@@ -300,12 +288,15 @@ def canonical_subtitle_fps(value):
     number = _fps_number(value)
     if not number:
         return 0.0
-    for doubled, canonical in _FPS_DOUBLE_STANDARDS:
-        if abs(number - doubled) <= 0.08:
-            return canonical
-    for standard in _FPS_STANDARDS:
-        if abs(number - standard) <= 0.08:
-            return standard
+    doubled, canonical = min(_FPS_DOUBLE_STANDARDS,
+                             key=lambda pair: abs(number - pair[0]))
+    if abs(number - doubled) <= 0.08:
+        return canonical
+    # Choose the nearest standard instead of the first rate in the table:
+    # 24 must remain 24, and 30 must not silently become 29.97.
+    standard = min(_FPS_STANDARDS, key=lambda rate: abs(number - rate))
+    if abs(number - standard) <= 0.08:
+        return standard
     return number
 
 
@@ -367,133 +358,321 @@ def _normalise_resolution(value):
     return number if number in (2160, 1080, 720, 576, 480) else 0
 
 
-def _release_profile(value):
-    """Build local-only compatibility hints from a bounded release label."""
-    text = _safe_text(value, limit=240).casefold()
-    compact = re.sub(r"[^a-z0-9]+", "", text)
+_TECH_SOURCE = re.compile(
+    r"(?<![a-z0-9])(?:web[ ._-]*dl|web[ ._-]*rip|blu[ ._-]*ray|"
+    r"bd[ ._-]*rip|br[ ._-]*rip|hdtv|dvd[ ._-]*rip|dvd)(?![a-z0-9])", re.I
+)
+_TECH_RESOLUTION = re.compile(r"(?<!\d)(2160|1080|720|576|480)[pi](?!\d)", re.I)
+_TECH_CODEC = re.compile(r"(?<![a-z0-9])(?:[xh][ ._-]*26[45]|hevc|avc)(?![a-z0-9])", re.I)
+_EDITION_MARKERS = (
+    (r"extended(?:[ ._-]+cut)?", "extended"),
+    (r"(?:director(?:['’]s|s)?[ ._-]*cut|dc)", "directorscut"),
+    (r"final[ ._-]+cut", "finalcut"),
+    (r"ultimate[ ._-]+(?:cut|edition)", "ultimatecut"),
+    (r"special[ ._-]+edition", "specialedition"),
+    (r"unrated", "unrated"), (r"uncut", "uncut"),
+    (r"(?:theatrical(?:[ ._-]+(?:cut|edition))?|cinema[ ._-]+(?:cut|edition))", "theatrical"),
+    (r"imax", "imax"), (r"remastered", "remastered"),
+)
+_CUT_MARKERS = frozenset((
+    "extended", "directorscut", "finalcut", "ultimatecut",
+    "specialedition", "unrated", "uncut", "theatrical",
+))
+_REVISION_MARKER = re.compile(
+    r"(?<![a-z0-9])(?:(repack|proper)(?:[ ._-]*v?[ ._-]*([1-9]\d{0,2}))?"
+    r"|v([1-9]\d{0,2}))(?![a-z0-9])", re.I
+)
+_PART_MARKER = re.compile(
+    r"(?<![a-z0-9])(?:cd|disc|disk|part|pt)[ ._-]*([1-9]\d?)"
+    r"(?:[ ._-]*(?:of|/)[ ._-]*([1-9]\d?))?(?![a-z0-9])", re.I
+)
+_GROUP_RESERVED = frozenset(tuple(_LANGUAGE_ALIASES) + tuple(_LANGUAGE_ALIASES.values()) + (
+    "dl", "rip", "web", "bluray", "hdtv", "dvd", "multi", "dub", "sub", "subs",
+    "srt", "vtt", "hi", "sdh", "forced", "full", "cc", "hdr", "hdr10", "dv",
+    "proper", "repack", "extended", "remastered", "theatrical", "unrated",
+    "uncut", "dc", "cd1", "cd2", "part1", "part2",
+    "h264", "h265", "x264", "x265", "hevc", "avc", "fps", "hls", "vod",
+))
+
+
+def _single_release_profile(value):
+    text = _safe_text(value, limit=240).casefold().strip()
+    text = re.sub(r"\.(?:srt|vtt|sub|txt|mkv|mp4|avi|ts|webm)$", "", text)
+    if _TECH_SOURCE.search(text) and (_TECH_RESOLUTION.search(text) or _TECH_CODEC.search(text)):
+        marker = re.search(r"[ ._-]([a-z]{2,3})$", text)
+        if marker and normalize_subtitle_language(marker.group(1)) in set(_LANGUAGE_ALIASES.values()):
+            text = text[:marker.start()]
+    source_match = _TECH_SOURCE.search(text)
+    resolution_match = _TECH_RESOLUTION.search(text)
+    codec_match = _TECH_CODEC.search(text)
     source = ""
-    for marker, canonical in (
-        ("webdl", "webdl"),
-        ("webrip", "webrip"),
-        ("bluray", "bluray"),
-        ("bdrip", "bluray"),
-        ("brrip", "bluray"),
-        ("hdtv", "hdtv"),
-        ("dvdrip", "dvd"),
-        ("dvd", "dvd"),
-    ):
-        if marker in compact:
-            source = canonical
-            break
-    resolution_match = re.search(
-        r"(?<!\d)(2160|1080|720|576|480)[pi](?!\d)", text,
-        re.IGNORECASE,
-    )
-    resolution = (
-        int(resolution_match.group(1)) if resolution_match is not None else 0
-    )
+    if source_match:
+        marker = re.sub(r"[^a-z0-9]", "", source_match.group(0))
+        source = {"webdl": "webdl", "webrip": "webrip", "bluray": "bluray",
+                  "bdrip": "bluray", "brrip": "bluray", "hdtv": "hdtv",
+                  "dvd": "dvd", "dvdrip": "dvd"}[marker]
+    resolution = int(resolution_match.group(1)) if resolution_match else 0
     codec = ""
-    if any(marker in compact for marker in ("x265", "h265", "hevc")):
-        codec = "h265"
-    elif any(marker in compact for marker in ("x264", "h264", "avc")):
-        codec = "h264"
-    editions = tuple(
-        marker for marker in (
-            "extended", "directorscut", "unrated", "theatrical", "imax",
-            "remastered",
+    if codec_match:
+        marker = re.sub(r"[^a-z0-9]", "", codec_match.group(0))
+        codec = "h265" if marker in ("x265", "h265", "hevc") else "h264"
+    technical = [match.start() for match in (source_match, resolution_match, codec_match) if match]
+    prefix = text[:min(technical)].strip(" ._-") if technical else text
+    year_match = None
+    for match in re.finditer(r"(?<!\d)((?:19|20)\d{2})(?!\d)", prefix):
+        # The last release year follows a programme name. Preserve leading
+        # and interior title numbers (1917, Blade Runner 2049, 2001, etc.).
+        before = re.sub(r"[^\w]", "", prefix[:match.start()])
+        tail = prefix[match.end():]
+        tail = re.sub(r"(?i)(?<![a-z0-9])S\d{1,2}[ ._-]*E\d{1,3}(?![a-z0-9])|(?<![a-z0-9])\d{1,2}x\d{1,3}(?![a-z0-9])", " ", tail)
+        for pattern, unused_name in _EDITION_MARKERS:
+            tail = re.sub(r"(?<![a-z0-9])(?:" + pattern + r")(?![a-z0-9])", " ", tail)
+        tail = _REVISION_MARKER.sub(" ", tail)
+        tail = _PART_MARKER.sub(" ", tail)
+        tail = re.sub(r"(?i)(?<![a-z0-9])(?:amzn|nf|dsnp|hmax|atvp)(?![a-z0-9])", " ", tail)
+        if len(before) >= 2 and not re.search(r"[a-z0-9]", tail):
+            year_match = match
+    def version_context(match):
+        # Protect title words: The Final Cut, DC League, Film Part 2, etc.
+        return bool(
+            (technical and match.start() >= min(technical))
+            or (year_match and match.start() > year_match.end())
+            or (re.search(r"[\[({]\s*$", text[:match.start()])
+                and re.match(r"\s*[\])}]", text[match.end():]))
         )
-        if marker in compact
-    )
-    return {
-        "source": source,
-        "resolution": resolution,
-        "codec": codec,
-        "editions": editions,
+
+    editions, edition_matches = [], []
+    for pattern, name in _EDITION_MARKERS:
+        matches = [
+            match for match in re.finditer(
+                r"(?<![a-z0-9])(?:" + pattern + r")(?![a-z0-9])", text
+            ) if version_context(match)
+        ]
+        if matches:
+            editions.append(name)
+            edition_matches.extend(matches)
+    revision_matches = [
+        match for match in _REVISION_MARKER.finditer(text) if version_context(match)
+    ]
+    revisions = tuple(sorted(set(
+        (match.group(1).lower() + (match.group(2) or ""))
+        if match.group(1) else "v" + match.group(3)
+        for match in revision_matches
+    )))
+    part_matches = [
+        match for match in _PART_MARKER.finditer(text) if version_context(match)
+    ]
+    parts = {(int(match.group(1)), int(match.group(2) or 0))
+             for match in part_matches}
+    part = next(iter(parts)) if len(parts) == 1 else (0, 0)
+    group = ""
+    match = re.search(r"-([a-z][a-z0-9]{1,24})$", text)
+    if match and len(technical) >= 2 and match.group(1) not in _GROUP_RESERVED:
+        # The group follows a technical release suffix. A hyphen in a film
+        # title, WEB-DL, language tag or a bare year is never a group.
+        if any(position < match.start() for position in technical):
+            group = match.group(1)
+    years = [int(year_match.group(1))] if year_match else []
+    spans = [(match.start(), match.end())
+             for match in edition_matches + revision_matches + part_matches
+             if match.end() <= len(prefix)]
+    if year_match:
+        spans.append((year_match.start(), year_match.end()))
+    for start, end in sorted(set(spans), reverse=True):
+        prefix = prefix[:start] + " " + prefix[end:]
+    prefix = re.sub(r"(?i)(?<![a-z0-9])S\d{1,2}[ ._-]*E\d{1,3}(?![a-z0-9])|(?<![a-z0-9])\d{1,2}x\d{1,3}(?![a-z0-9])", " ", prefix)
+    prefix = re.sub(r"(?i)(?<![a-z0-9])(?:amzn|nf|dsnp|hmax|atvp)(?![a-z0-9])", " ", prefix)
+    prefix = re.sub(r"[\[({]\s*[\])}]", " ", prefix)
+    # Strip only explicit IPTV language decorations from the title prefix.
+    prefix = (_subtitle_search_title(
+        re.sub(r"[._]+", " ", prefix), years[0] if years else 0
+    ) if prefix and (technical or years or editions or revisions or part[0]) else "")
+    platforms = tuple(name for name in ("amzn", "nf", "dsnp", "hmax", "atvp")
+                      if technical and re.search(r"(?<![a-z0-9])" + name + r"(?![a-z0-9])", text))
+    episode = subtitle_episode_numbers(text)
+    # A generic quality label is not a complete release identity. Require a
+    # programme name, technical suffix and a distinguishing version marker.
+    identity = ""
+    if prefix and source and resolution and codec and (group or editions or revisions or platforms):
+        identity = " ".join(re.findall(r"[^\W_]+", text, re.UNICODE))
+    if len(text) >= 240:
+        # The boundary may have cut a distinguishing final token. Keep broad
+        # hints, but do not claim exact/group evidence from a clipped label.
+        identity, group = "", ""
+    if len(parts) > 1:
+        identity = ""
+    return {"source": source, "resolution": resolution, "codec": codec,
+            "editions": tuple(editions), "group": group, "identity": identity,
+            "title": prefix, "years": tuple(years), "episode": episode,
+            "revisions": revisions, "platforms": platforms, "part": part}
+
+
+def _release_profile(value):
+    """Keep bounded release alternatives instead of joining conflicting hints."""
+    raw = _safe_text(value, limit=240)
+    variants = [_single_release_profile(part) for part in re.split(r"\s*[|;]\s*", raw)[:8] if part.strip()]
+    if not variants:
+        variants = [_single_release_profile("")]
+    profile = dict(variants[0])
+    empty = {"source": "", "resolution": 0, "codec": "", "editions": (),
+             "group": "", "revisions": (), "part": (0, 0)}
+    for name, missing in empty.items():
+        known = [variant[name] for variant in variants if variant[name] != missing]
+        profile[name] = known[0] if known and all(value == known[0] for value in known) else missing
+    profile["variants"] = tuple(variants)
+    return profile
+
+
+def _release_identity_evidence(meta, target, candidate, verified_identity=False):
+    expected_title = _title_identity(meta.get("search_title"))
+    pairs = []
+    title_conflict = False
+    for left in target["variants"]:
+        for right in candidate["variants"]:
+            left_title = _title_identity(left["title"])
+            right_title = _title_identity(right["title"])
+            if right_title and expected_title and right_title != expected_title:
+                title_conflict = True
+            # Returned catalogue IDs can verify a decorated/localized IPTV
+            # title. The two actual release titles must still agree before
+            # granting full-release or group evidence.
+            semantic_match = bool(
+                expected_title and left_title == expected_title and right_title == expected_title
+                or verified_identity and left_title and left_title == right_title
+            )
+            same_full = bool(semantic_match and left["identity"] and left["identity"] == right["identity"])
+            same_group = bool(semantic_match and left["group"] and left["group"] == right["group"])
+            # A group can publish multiple cuts/platforms/revisions. One-sided
+            # version details are unknown, not proof of the original edition.
+            version_supported = all(left[name] == right[name] for name in
+                                    ("editions", "revisions", "platforms", "part"))
+            year_supported = not (left["years"] and right["years"]) or left["years"] == right["years"]
+            pairs.append((same_full, same_group and version_supported and year_supported))
+    full = any(pair[0] for pair in pairs)
+    group = any(pair[1] for pair in pairs)
+    if any(len({variant["identity"] for variant in profile["variants"] if variant["identity"]}) > 1
+           or len({variant["group"] for variant in profile["variants"] if variant["group"]}) > 1
+           for profile in (target, candidate)):
+        full, group = False, False
+    # A matching alternative is sufficient, but a translated title alone is
+    # not rejected when the adapter verified the programme by a catalogue ID.
+    return full, group, title_conflict and not (full or group)
+
+
+def _release_profiles_support_match(target, candidate):
+    """Check known version hints for a strong match without a release group."""
+    missing = {
+        "source": "", "resolution": 0, "codec": "", "group": "",
+        "editions": (), "revisions": (), "platforms": (), "part": (0, 0),
     }
+    for profile in (target, candidate):
+        for name, empty in missing.items():
+            values = {
+                variant[name] for variant in profile["variants"]
+                if variant[name] != empty
+            }
+            if len(values) > 1:
+                return False
+    # Unknown source/group/platform hints are allowed, but contradictory
+    # known hints must not be promoted by a matching catalogue identifier.
+    for name in ("source", "resolution", "codec", "group", "platforms"):
+        left, right = target[name], candidate[name]
+        if left != missing[name] and right != missing[name] and left != right:
+            return False
+    # A one-sided cut, revision or CD marker remains a version uncertainty.
+    return all(target[name] == candidate[name]
+               for name in ("editions", "revisions", "part"))
 
 
-def _subtitle_fps(candidate, parent, release):
+def _subtitle_file_part(result):
+    """A single file with cd_number=1 is normally a complete subtitle."""
+    number = _number(result.get("cd_number"))
+    count = _number(result.get("cd_count") or result.get("nb_cd"))
+    number = number if number <= 99 else 0
+    count = count if count <= 99 else 0
+    filename = _safe_text(result.get("file_name"), limit=240)
+    profile = _single_release_profile(filename)
+    part = profile["part"]
+    if not part[0] and not profile["source"] and not profile["years"]:
+        # CD/disc tokens in subtitle filenames are unambiguous even when
+        # the uploader omitted the year and technical release suffix.
+        match = re.search(
+            r"(?<![a-z0-9])(?:cd|disc|disk)[ ._-]*([1-9]\d?)(?![a-z0-9])",
+            filename, re.I,
+        )
+        if match:
+            part = (int(match.group(1)), 0)
+    if part[0]:
+        if number and number != part[0] and (count > 1 or number > 1):
+            return number, max(count, number, part[1])
+        return part[0], max(part[1], count)
+    if count > 1 or number > 1:
+        return number, max(count, number)
+    return 0, 0
+
+
+def _informative_subtitle_filename(filename, parent=""):
+    profile = _single_release_profile(filename)
+    if not profile["title"]:
+        return False
+    if (profile["source"] or profile["resolution"] or profile["codec"]
+            or profile["editions"] or profile["revisions"] or profile["part"][0]):
+        return True
+    if profile["years"]:
+        owner = _single_release_profile(parent)
+        # A plain Film.Year.srt supplies no version detail. Preserve the
+        # descriptive release when its title/year agree with that filename.
+        return bool(
+            not owner["title"]
+            or _title_identity(profile["title"]) != _title_identity(owner["title"])
+            or (owner["years"] and owner["years"] != profile["years"])
+        )
+    return False
+
+
+def subtitle_result_release(result, default="Subtitle"):
+    """Keep CD labels visible in both result lists without new UI strings."""
+    release = _safe_text(result.get("release"), limit=240) or default
+    number, count = _subtitle_file_part(result)
+    if number or count > 1:
+        label = "CD {}/{}".format(number or "?", count) if count > 1 else "CD {}".format(number)
+        release = "[{}] {}".format(label, release)
+    return release[:240]
+
+def _subtitle_fps(candidate, parent, release, framerate_codes=None):
     for item in (candidate, parent):
         if not isinstance(item, dict):
             continue
         for key in ("fps", "framerate", "frame_rate"):
             value = _fps_number(item.get(key))
+            if (not value and key == "framerate" and framerate_codes
+                    and not isinstance(item.get(key), bool)):
+                # SubDL's framerate is an upload enum, not a decimal FPS.
+                # Keep this provider-specific: other adapters use real rates.
+                try:
+                    code = float(str(item.get(key) or "").strip())
+                    value = framerate_codes.get(code, 0.0)
+                except (TypeError, ValueError, OverflowError):
+                    pass
             if value:
                 return value
     return _release_fps(release)
 
 
 def _release_match_key(meta, result):
-    """Rank same-language results without guessing when hints are absent."""
-    target = _release_profile(meta.get("release_hint"))
-    candidate = _release_profile(result.get("release"))
-    target_fps = _fps_number(meta.get("fps"))
-    candidate_fps = _fps_number(result.get("fps"))
-    penalty = 0
-    evidence = 0
+    """Use the same release evidence order before every provider result cap."""
+    return annotate_subtitle_compatibility(meta, result)["compatibility_sort"]
 
-    if target_fps:
-        if candidate_fps:
-            evidence += 1
-            difference = abs(target_fps - candidate_fps)
-            if difference > 0.15:
-                penalty += 12
-            elif difference > 0.06:
-                penalty += 2
-        else:
-            penalty += 3
 
-    target_source = target["source"]
-    if target_source:
-        if candidate["source"] == target_source:
-            evidence += 1
-        elif candidate["source"]:
-            penalty += 8
-        else:
-            penalty += 2
-
-    target_resolution = (
-        _normalise_resolution(meta.get("resolution"))
-        or target["resolution"]
-    )
-    if target_resolution:
-        if candidate["resolution"] == target_resolution:
-            evidence += 1
-        elif candidate["resolution"]:
-            penalty += 3
-        else:
-            penalty += 1
-
-    if target["codec"]:
-        if candidate["codec"] == target["codec"]:
-            evidence += 1
-        elif candidate["codec"]:
-            penalty += 2
-        else:
-            penalty += 1
-
-    target_editions = set(target["editions"])
-    candidate_editions = set(candidate["editions"])
-    has_target_hint = bool(
-        target_fps
-        or target_source
-        or target_resolution
-        or target["codec"]
-        or target_editions
-    )
-    if target_editions:
-        if target_editions == candidate_editions:
-            evidence += 1
-        elif not candidate_editions:
-            penalty += 4
-        else:
-            penalty += 10
-    elif has_target_hint and candidate_editions:
-        # Prefer an ordinary cut when playback metadata does not name a
-        # special edition; special cuts commonly have a different timeline.
-        penalty += 2
-
-    return penalty, -evidence
+def subtitle_result_sort_key(result):
+    """Stable eight-integer key shared by native and web result lists."""
+    value = result.get("compatibility_sort") if isinstance(result, dict) else None
+    if isinstance(value, (tuple, list)) and len(value) == 8:
+        try:
+            return tuple(int(item) for item in value)
+        except (TypeError, ValueError, OverflowError):
+            pass
+    return (0, 4, 2, 2, 2, 2, 10, 0)
 
 
 def subtitle_timeline_compatibility(cues, video_duration_seconds):
@@ -564,64 +743,126 @@ def retime_subtitle_cues(cues, result):
 
 
 def annotate_subtitle_compatibility(metadata, result):
-    """Attach a stable compatibility class and priority tuple to one result."""
+    """Rank known release evidence without calling missing hints a match."""
     item = dict(result) if isinstance(result, dict) else {}
     language = item.get("language") or "en"
     meta = normalized_metadata(metadata, language)
     target = _release_profile(meta.get("release_hint"))
-    candidate = _release_profile(item.get("release"))
-
+    filename = _safe_text(item.get("file_name"), limit=240)
+    candidate = _release_profile(
+        filename if _informative_subtitle_filename(
+            filename, item.get("release_parent") or item.get("release")
+        )
+        else item.get("release")
+    )
+    file_part = _subtitle_file_part(item)
+    if file_part != (0, 0):
+        candidate["part"] = file_part
+        candidate["variants"] = tuple(
+            dict(variant, part=file_part) for variant in candidate["variants"]
+        )
     identity_mismatch = item.get("identity_match") is False
-    expected_season = _number(meta.get("season"))
-    expected_episode = _number(meta.get("episode"))
-    found_season = _number(item.get("season"))
-    found_episode = _number(item.get("episode"))
-    if (
-        expected_season and expected_episode
-        and found_season and found_episode
-        and (expected_season, expected_episode) != (found_season, found_episode)
-    ):
-        identity_mismatch = True
+    identifier_matches = []
+    if meta["content_type"] != "series":
+        for field, imdb in (("imdb_id", True), ("tmdb_id", False)):
+            expected = _numeric_identifier(meta.get(field), imdb=imdb)
+            found = _numeric_identifier(item.get(field), imdb=imdb)
+            if expected and found:
+                identifier_matches.append(expected == found)
+        if identifier_matches and not all(identifier_matches):
+            identity_mismatch = True
+    reliable_same_id = bool(identifier_matches and all(identifier_matches))
+    same_full, same_group, release_title_conflict = _release_identity_evidence(
+        meta, target, candidate, verified_identity=reliable_same_id,
+    )
+    expected_year = _year_number(meta.get("year"))
+    found_year = _year_number(item.get("year") or item.get("release_year"))
+    release_years = {year for variant in candidate["variants"] for year in variant["years"]}
+    if meta["content_type"] != "series" and expected_year and not reliable_same_id:
+        if found_year and not _catalog_year_matches(expected_year, found_year):
+            identity_mismatch = True
+        elif not found_year and release_years and not any(_catalog_year_matches(expected_year, year) for year in release_years):
+            identity_mismatch = True
+    expected_season, expected_episode = _number(meta.get("season")), _number(meta.get("episode"))
+    found_season, found_episode = _number(item.get("season")), _number(item.get("episode"))
+    parsed_episodes = {variant["episode"] for variant in candidate["variants"] if variant["episode"]}
+    if expected_season and expected_episode:
+        expected_pair = (expected_season, expected_episode)
+        if found_season and found_episode and (found_season, found_episode) != expected_pair:
+            identity_mismatch = True
+        if parsed_episodes and expected_pair not in parsed_episodes:
+            identity_mismatch = True
+    expected_title = _title_identity(meta.get("search_title"))
+    declared_title = _safe_text(item.get("title"))
+    declared_title_conflict = bool(declared_title and expected_title and
+        _title_identity(_subtitle_search_title(declared_title, found_year or expected_year)) != expected_title)
+    title_uncertain = (release_title_conflict or declared_title_conflict) and not reliable_same_id
 
-    target_source = target["source"]
-    candidate_source = candidate["source"]
-    if target_source and candidate_source:
-        source_state = (
-            "match" if target_source == candidate_source else "mismatch"
+    # Adapters may copy the query title/episode into the result. Strong
+    # identity support must come from returned IDs or the actual release.
+    release_title_matches = bool(expected_title and any(
+        _title_identity(variant["title"]) == expected_title
+        for variant in candidate["variants"]
+    ))
+    if meta["content_type"] == "series":
+        identity_supported = bool(
+            release_title_matches and expected_season and expected_episode
+            and parsed_episodes == {(expected_season, expected_episode)}
         )
     else:
-        source_state = "unknown"
+        known_years = release_years | ({found_year} if found_year else set())
+        identity_supported = bool(reliable_same_id or (
+            release_title_matches and expected_year and known_years
+            and all(_catalog_year_matches(expected_year, year)
+                    for year in known_years)
+        ))
 
-    target_editions = set(target["editions"])
-    candidate_editions = set(candidate["editions"])
-    target_has_release_profile = bool(
-        target_source or target["resolution"] or target["codec"]
-    )
-    if target_editions:
-        if target_editions == candidate_editions:
-            edition_state = "match"
-        elif candidate_editions:
-            edition_state = "mismatch"
-        else:
-            edition_state = "unknown"
-    elif candidate_editions and target_has_release_profile:
-        edition_state = "mismatch"
+    target_source, candidate_source = target["source"], candidate["source"]
+    source_state = ("match" if target_source == candidate_source else "mismatch") if target_source and candidate_source else "unknown"
+    target_editions, candidate_editions = set(target["editions"]), set(candidate["editions"])
+    target_cuts, candidate_cuts = target_editions & _CUT_MARKERS, candidate_editions & _CUT_MARKERS
+    if target_cuts and candidate_cuts:
+        edition_state = ("match" if target_cuts == candidate_cuts
+                         else "unknown" if target_cuts & candidate_cuts
+                         else "mismatch")
+    elif target_editions and target_editions == candidate_editions:
+        edition_state = "match"
     else:
+        # An absent cut marker does not establish the theatrical version.
         edition_state = "unknown"
+    target_revision, candidate_revision = target["revisions"], candidate["revisions"]
+    revision_state = "unknown"
+    if target_revision and target_revision == candidate_revision:
+        revision_state = "match"
+    elif target_revision and candidate_revision:
+        def revision_numbers(values):
+            output = {}
+            for value in values:
+                match = re.fullmatch(r"(repack|proper|v)(\d*)", value)
+                if match and match.group(2):
+                    output[match.group(1)] = match.group(2)
+            return output
+        left, right = revision_numbers(target_revision), revision_numbers(candidate_revision)
+        if any(left[name] != right[name] for name in left.keys() & right.keys()):
+            revision_state = "mismatch"
+    target_part, candidate_part = target["part"], candidate["part"]
+    part_state = "unknown"
+    if target_part != (0, 0) and candidate_part != (0, 0):
+        if target_part[0] and candidate_part[0]:
+            part_state = "match" if target_part[0] == candidate_part[0] else "mismatch"
+        if target_part[1] and candidate_part[1] and target_part[1] != candidate_part[1]:
+            part_state = "mismatch"
+    elif candidate_part != (0, 0):
+        # A CD/part subtitle must not be advertised for the complete feature.
+        part_state = "mismatch"
 
     video_fps = canonical_subtitle_fps(meta.get("fps"))
-    subtitle_fps = canonical_subtitle_fps(item.get("fps"))
+    subtitle_fps = canonical_subtitle_fps(item.get("fps") or _release_fps(item.get("release")))
     fps_scale = subtitle_fps_scale(video_fps, subtitle_fps)
     if video_fps and subtitle_fps:
-        if abs(video_fps - subtitle_fps) <= 0.01:
-            fps_state = "match"
-        elif fps_scale:
-            fps_state = "convert"
-        else:
-            fps_state = "mismatch"
+        fps_state = "match" if abs(video_fps - subtitle_fps) <= 0.01 else "convert" if fps_scale else "mismatch"
     else:
         fps_state = "unknown"
-
     duration_state = "unknown"
     video_duration = _duration_seconds(meta.get("duration_seconds"))
     subtitle_duration = _duration_seconds(item.get("subtitle_duration_seconds"))
@@ -631,82 +872,95 @@ def annotate_subtitle_compatibility(metadata, result):
             duration_state = "match"
         elif ratio < 0.35 or ratio > 1.15:
             duration_state = "mismatch"
-
-    target_resolution = (
-        _normalise_resolution(meta.get("resolution"))
-        or target["resolution"]
-    )
+    # The final spoken cue can precede credits by minutes. Plausible duration
+    # is only a sanity check, never evidence for a high release match.
+    target_resolution = _normalise_resolution(meta.get("resolution")) or target["resolution"]
     candidate_resolution = candidate["resolution"]
-    if target_resolution and candidate_resolution:
-        resolution_state = (
-            "match"
-            if target_resolution == candidate_resolution
-            else "mismatch"
-        )
-    else:
-        resolution_state = "unknown"
-
-    if target["codec"] and candidate["codec"]:
-        codec_state = (
-            "match" if target["codec"] == candidate["codec"] else "mismatch"
-        )
-    else:
-        codec_state = "unknown"
-
-    score = 50
-    score += {"match": 15, "mismatch": -10}.get(source_state, 0)
-    score += {"match": 15, "mismatch": -35}.get(edition_state, 0)
-    score += {"match": 20, "convert": 14, "mismatch": -25}.get(
-        fps_state, 0
+    resolution_state = ("match" if target_resolution == candidate_resolution else "mismatch") if target_resolution and candidate_resolution else "unknown"
+    codec_state = ("match" if target["codec"] == candidate["codec"] else "mismatch") if target["codec"] and candidate["codec"] else "unknown"
+    # A decoded/container FPS and an uploader's release FPS can differ while
+    # timestamped captions still follow the same movie timeline. Strong
+    # release evidence must not be discarded because of that hint alone.
+    supported_group = bool(same_group and source_state == "match" and
+                           (resolution_state == "match" or codec_state == "match" or edition_state == "match"))
+    version_matches = sum(state == "match" for state in (
+        source_state, resolution_state, codec_state,
+    ))
+    supported_profile = bool(
+        identity_supported and not title_uncertain
+        and (fps_state == "match" or version_matches >= 2)
+        and all(state != "mismatch" for state in (
+            source_state, resolution_state, codec_state,
+        ))
+        and any(state == "match" for state in (
+            source_state, resolution_state, codec_state,
+            edition_state, revision_state,
+        ))
+        and _release_profiles_support_match(target, candidate)
     )
-    score += {"match": 5, "mismatch": -20}.get(duration_state, 0)
+    if title_uncertain:
+        same_full, supported_group = False, False
+    different = bool(identity_mismatch or edition_state == "mismatch"
+                     or revision_state == "mismatch" or part_state == "mismatch"
+                     or duration_state == "mismatch")
+    evidence = any(state != "unknown" for state in (
+        source_state, edition_state, revision_state, part_state,
+        fps_state, resolution_state, codec_state,
+    ))
+    # Preserve concrete release/group evidence ahead of inferred profiles.
+    # Within each tier, FPS agreement is useful positive evidence even though
+    # disagreement alone must never label timestamped captions incompatible.
+    release_strength = (0 if same_full else 1 if supported_group
+                        else 2 if supported_profile else 3 if evidence else 4)
+    score = 50
+    score += {"match": 12, "mismatch": -8}.get(source_state, 0)
+    score += {"match": 12, "mismatch": -35}.get(edition_state, 0)
+    score += {"match": 3, "mismatch": -15}.get(revision_state, 0)
+    score += {"mismatch": -35}.get(part_state, 0)
+    score += {"match": 15}.get(fps_state, 0)
+    score += {"mismatch": -20}.get(duration_state, 0)
     score += {"match": 3, "mismatch": -1}.get(resolution_state, 0)
     score += {"match": 2, "mismatch": -1}.get(codec_state, 0)
+    score += 25 if same_full else 5 if supported_group else 0
+    if title_uncertain:
+        score = min(score, 60)
     if identity_mismatch:
         score = 0
     score = max(0, min(100, int(score)))
-
-    different = bool(
-        identity_mismatch
-        or edition_state == "mismatch"
-        or fps_state == "mismatch"
-        or duration_state == "mismatch"
-    )
-    evidence = any(state != "unknown" for state in (
-        source_state, edition_state, fps_state, duration_state,
-        resolution_state, codec_state,
-    ))
     if different:
         status = "different"
     elif fps_state == "convert" and item.get("fps_conversion_verified") is True:
         status = "fps_convert"
-    elif source_state == "match" and fps_state == "match" and score >= 80:
+    elif same_full or supported_group or supported_profile:
+        # Exact releases and supported groups take priority over FPS hints.
+        # Without those, require verified identity and either matching FPS
+        # with another hint, or two agreeing technical release details.
         status = "high"
     elif evidence:
         status = "possible"
     else:
         status = "unknown"
-
-    state_rank = {
-        "match": 0, "convert": 1, "unknown": 2, "mismatch": 3,
-    }
+    state_rank = {"match": 0, "convert": 1, "unknown": 2, "mismatch": 3}
     item.update({
         "identity_match": not identity_mismatch,
         "compatibility_status": status,
         "compatibility_score": score,
         "video_fps": video_fps,
         "subtitle_fps": subtitle_fps,
+        "compatibility_fps_state": fps_state,
         "fps_scale": fps_scale if status == "fps_convert" else 1.0,
         "fps_scale_hint": fps_scale if fps_state == "convert" else 1.0,
         "video_duration_seconds": video_duration,
         "compatibility_sort": (
             1 if status == "different" else 0,
-            state_rank[source_state],
+            release_strength,
             state_rank[edition_state],
-            state_rank[fps_state],
+            0 if fps_state == "match" else 1 if (
+                fps_state == "convert" and item.get("fps_conversion_verified") is True
+            ) else 2,
+            state_rank[source_state],
             state_rank[duration_state],
-            state_rank[resolution_state],
-            state_rank[codec_state],
+            state_rank[resolution_state] * 4 + state_rank[codec_state],
             -score,
         ),
     })
@@ -821,6 +1075,16 @@ def normalized_metadata(metadata, language):
     tmdb_id = str(metadata.get("tmdb_id") or "").strip()
     imdb_id = str(metadata.get("imdb_id") or "").strip().lower()
     sd_id = str(metadata.get("sd_id") or "").strip()
+    # Keep technical details from the original IPTV name before removing
+    # decorations from the provider query. Explicit hints remain first.
+    hint = _safe_text(metadata.get("release_hint"), limit=240)
+    raw_title_hint = _safe_text(title, limit=120)
+    if raw_title_hint and raw_title_hint.casefold() not in hint.casefold():
+        hint = " | ".join(value for value in (hint, raw_title_hint) if value)[:240]
+    raw_profile = _single_release_profile(raw_title_hint)
+    if raw_profile["title"] and raw_profile["source"] and raw_profile["resolution"] and raw_profile["codec"]:
+        search_title = raw_profile["title"]
+        year = year or next(iter(raw_profile["years"]), 0)
     return {
         "title": title,
         "search_title": search_title,
@@ -838,8 +1102,8 @@ def normalized_metadata(metadata, language):
         "sd_id": sd_id if re.fullmatch(r"[A-Za-z0-9_-]{1,120}", sd_id) else "",
         # These hints are used only to rank the returned provider entries. They
         # are never included in the provider query or request headers.
-        "release_hint": _safe_text(metadata.get("release_hint"), limit=240),
-        "fps": _fps_number(metadata.get("fps")),
+        "release_hint": hint,
+        "fps": _fps_number(metadata.get("fps")) or _release_fps(hint),
         "resolution": _normalise_resolution(metadata.get("resolution")),
         "duration_seconds": _duration_seconds(
             metadata.get("duration_seconds")
@@ -852,6 +1116,13 @@ def _safe_text(value, limit=120):
         return ""
     value = " ".join(str(value).split())[:limit]
     return "" if "://" in value else value
+
+
+def subtitle_search_available(metadata):
+    """Accept a short film name when a valid catalogue key can resolve it."""
+    meta = normalized_metadata(metadata, "en")
+    return bool(meta["title"] and (len(meta["search_title"]) >= 2
+                or meta["imdb_id"] or meta["tmdb_id"] or meta["sd_id"]))
 
 
 def _checked_reply(data):
@@ -1005,33 +1276,16 @@ def _provider_candidate_log(provider, stage, data):
 
 
 def _episode_matches(item, season, episode):
-    if not season or not episode:
-        return True
-    try:
-        found_season = int(item.get("season", item.get("season_number")) or 0)
-        found_episode = int(item.get("episode", item.get("episode_number")) or 0)
-    except (TypeError, ValueError, OverflowError):
-        found_season, found_episode = 0, 0
-    if found_season and found_episode:
-        return (found_season, found_episode) == (season, episode)
-    release = _safe_text(
-        item.get("release_name") or item.get("name"), limit=240
-    )
-    match = re.search(
-        r"(?i)\bS(\d{1,2})[ ._-]*E(\d{1,3})\b|\b(\d{1,2})x(\d{1,3})\b",
-        release,
-    )
-    if match:
-        found = match.group(1, 2) if match.group(1) else match.group(3, 4)
-        return tuple(map(int, found)) == (season, episode)
-    return False
+    return subtitle_episode_matches(item, season, episode)
 
 
 def _numeric_identifier(value, imdb=False):
     value = str(value or "").strip().lower()
     if imdb and value.startswith("tt"):
         value = value[2:]
-    return value if value.isdigit() else ""
+    # APIs often expose IMDb IDs as integers (111161), while catalogues use
+    # their zero-padded public form (tt0111161). Compare numerical identity.
+    return (value.lstrip("0") or "0") if value.isdigit() else ""
 
 
 def _subdl_response_matches(meta, data):
@@ -1046,7 +1300,10 @@ def _subdl_response_matches(meta, data):
     expected_sd = str(meta.get("sd_id") or "").strip()
     expected_imdb = _numeric_identifier(meta.get("imdb_id"), imdb=True)
     expected_tmdb = _numeric_identifier(meta.get("tmdb_id"))
-    for item in entries[:30]:
+    # The subtitle array belongs to the leading catalogue result. Finding
+    # the requested film later in the list cannot validate another film's
+    # subtitles; title resolution must query that film's own sd_id instead.
+    for item in entries[:1]:
         if not isinstance(item, dict):
             continue
         candidate_sd = str(item.get("sd_id") or "").strip()
@@ -1076,9 +1333,11 @@ def _subdl_response_matches(meta, data):
         if identifier_checks:
             if not all(identifier_checks):
                 continue
-            # Catch stale IPTV catalogue identifiers when SubDL also supplies
-            # a human-readable identity for the referenced feature.
-            if has_candidate_title and not title_matches:
+            # A translated title needs supporting year/ID evidence. Keep
+            # rejecting conflicting catalogue IDs or an unverified name.
+            if (has_candidate_title and not title_matches
+                    and not (len(identifier_checks) >= 2
+                             or (expected_year and candidate_year == expected_year))):
                 continue
             if (
                 meta.get("content_type") != "series"
@@ -1154,9 +1413,11 @@ def _opensubtitles_identity_matches(meta, attributes, details):
     if identifier_checks:
         if not all(identifier_checks):
             return False
-        if has_candidate_title and not title_matches:
-            return False
         expected_year = _year_number(meta.get("year"))
+        if (has_candidate_title and not title_matches
+                and not (len(identifier_checks) >= 2
+                         or (expected_year and candidate_year == expected_year))):
+            return False
         if expected_year and not _catalog_year_matches(
             expected_year, candidate_year
         ):
@@ -1189,15 +1450,14 @@ def _download_url(candidate, parent):
 
 
 def _language_code(candidate, parent, requested):
-    raw = str(
+    raw = normalize_subtitle_language(
         candidate.get("language")
         or candidate.get("lang")
         or parent.get("language")
         or parent.get("lang")
         or ""
-    ).strip().lower().replace("-", "_")
-    raw = _LANGUAGE_ALIASES.get(raw, raw.split("_", 1)[0][:3])
-    return raw if raw in requested else (requested[0] if requested else "en")
+    )
+    return raw if raw in requested else ""
 
 
 def _boolean(value):
@@ -1206,6 +1466,41 @@ def _boolean(value):
     if isinstance(value, (int, float)):
         return value != 0
     return str(value or "").strip().lower() in ("1", "true", "yes", "on")
+
+
+def _subdl_release_names(candidate, parent):
+    """Read release alternatives without replacing a specific unpacked file."""
+    filename = _safe_text(candidate.get("name"), limit=240)
+    own_release = _safe_text(candidate.get("release_name"), limit=240)
+    parent_release = _safe_text(parent.get("release_name"), limit=240)
+    if candidate is not parent:
+        for value in (filename, own_release):
+            if (_informative_subtitle_filename(value, parent_release)
+                    or subtitle_episode_numbers(value)):
+                # A per-episode/CD filename is more specific than its pack's
+                # generic release list. Never borrow another file's version.
+                return [value]
+    for item in (candidate, parent):
+        values = item.get("releases")
+        values = values if isinstance(values, (list, tuple)) else [values]
+        names = []
+        for value in values[:30]:
+            if isinstance(value, dict):
+                value = value.get("release_name") or value.get("name")
+            value = _safe_text(value, limit=240)
+            if value and value not in names:
+                names.append(value)
+        if names:
+            descriptive = [value for value in names if (
+                _informative_subtitle_filename(value)
+                or subtitle_episode_numbers(value)
+            )]
+            return descriptive or names
+    release = next((value for value in (own_release, filename)
+                    if _informative_subtitle_filename(value, parent_release)
+                    or subtitle_episode_numbers(value)), "")
+    release = release or parent_release or own_release or filename or "Subtitle"
+    return [release]
 
 
 class SubDLClient(object):
@@ -1243,13 +1538,14 @@ class SubDLClient(object):
             if code not in requested:
                 requested.append(code)
         meta = normalized_metadata(metadata, requested[0] if requested else "en")
-        if len(meta["title"]) < 2:
+        if not subtitle_search_available(meta):
             raise SubtitleError("invalid_search", 400)
         base_params = {
             "type": "tv" if meta["content_type"] == "series" else "movie",
             "languages": ",".join(requested or ("en",)),
             "subs_per_page": 30,
             "unpack": 1,
+            "releases": 1,
         }
         if meta["content_type"] == "series":
             if meta["season"]:
@@ -1261,6 +1557,8 @@ class SubDLClient(object):
             items = _subtitle_items(data)
             if not _subdl_response_matches(match_meta, data):
                 return len(items), []
+            catalog = data.get("results") or []
+            owner = catalog[0] if isinstance(catalog, list) and catalog and isinstance(catalog[0], dict) else {}
             results = []
             seen = set()
             for parent in items[:50]:
@@ -1271,30 +1569,25 @@ class SubDLClient(object):
                     files if isinstance(files, list) and files else [parent]
                 )
                 for candidate in candidates[:50]:
-                    if not isinstance(candidate, dict) or not _episode_matches(
-                        candidate, meta["season"], meta["episode"]
-                    ):
+                    if not isinstance(candidate, dict):
+                        continue
+                    language = _language_code(candidate, parent, requested)
+                    if not language:
                         continue
                     url = _download_url(candidate, parent)
                     if not url:
                         continue
-                    release = _safe_text(
-                        candidate.get("release_name")
-                        or candidate.get("name")
-                        or parent.get("release_name")
-                    ) or "Subtitle"
-                    identity = (url, release)
-                    if identity in seen:
-                        continue
-                    seen.add(identity)
-                    results.append({
+                    result = {
                         "provider": "subdl",
                         "title": meta["title"],
                         "identity_match": True,
+                        "imdb_id": _numeric_identifier(owner.get("imdb_id"), imdb=True),
+                        "tmdb_id": _numeric_identifier(owner.get("tmdb_id")),
+                        "year": _year_number(owner.get("year") or owner.get("release_year")),
                         "season": meta["season"],
                         "episode": meta["episode"],
-                        "release": release,
-                        "language": _language_code(candidate, parent, requested),
+                        "file_name": _safe_text(candidate.get("name"), limit=240),
+                        "language": language,
                         "hearing_impaired": _boolean(
                             candidate.get(
                                 "hi",
@@ -1307,9 +1600,32 @@ class SubDLClient(object):
                                 ),
                             )
                         ),
-                        "fps": _subtitle_fps(candidate, parent, release),
                         "url": url,
-                    })
+                    }
+                    alternatives = []
+                    for release in _subdl_release_names(candidate, parent):
+                        episode_data = dict(candidate, release_name=release)
+                        if not _episode_matches(
+                            episode_data, meta["season"], meta["episode"]
+                        ):
+                            continue
+                        parsed_episode = subtitle_episode_numbers(release)
+                        if (meta["season"] and meta["episode"] and parsed_episode
+                                and parsed_episode != (meta["season"], meta["episode"])):
+                            continue
+                        option = dict(result, release=release, fps=_subtitle_fps(
+                            candidate, parent, release,
+                            framerate_codes=_SUBDL_FRAMERATE_CODES,
+                        ))
+                        alternatives.append(option)
+                    if not alternatives:
+                        continue
+                    result = min(alternatives, key=lambda option: _release_match_key(meta, option))
+                    identity = (url, result["release"], language)
+                    if identity in seen:
+                        continue
+                    seen.add(identity)
+                    results.append(result)
             return len(items), results
 
         language_priority = {
@@ -1323,8 +1639,9 @@ class SubDLClient(object):
                 language_priority.get(
                     result.get("language"), len(language_priority)
                 ),
+            ) + _release_match_key(meta, result) + (
                 bool(result.get("hearing_impaired")),
-            ) + _release_match_key(meta, result))
+            ))
             return results
 
         def request_results(extra, stage, match_meta=None):
@@ -1356,6 +1673,9 @@ class SubDLClient(object):
             results = request_results(*identifier)
             if results:
                 return results
+
+        if len(meta["search_title"]) < 2:
+            return []
 
         title_meta = dict(meta)
         title_meta["sd_id"] = ""
@@ -1430,13 +1750,18 @@ class OpenSubtitlesClient(object):
 
     API_BASE = "https://api.opensubtitles.com/api/v1"
     API_HOSTS = ("api.opensubtitles.com", "vip-api.opensubtitles.com")
+    MAX_SEARCH_PAGES = 3
+    MAX_SEARCH_REQUESTS = 6
+    SEARCH_BUDGET_SECONDS = 18
+    RESULTS_PER_LANGUAGE = 20
 
-    def __init__(self, api_key, username="", password=""):
+    def __init__(self, api_key, username="", password="", hearing_impaired=True):
         self.api_key = "".join(str(api_key or "").split())[:300]
         self.username = str(username or "").strip()[:160]
         self.password = str(password or "")[:300]
         self._token = ""
         self._base_url = self.API_BASE
+        self.hearing_impaired = bool(hearing_impaired)
 
     def _require_key(self):
         if not self.api_key:
@@ -1499,8 +1824,10 @@ class OpenSubtitlesClient(object):
             if code not in requested:
                 requested.append(code)
         meta = normalized_metadata(metadata, requested[0] if requested else "en")
-        if len(meta["title"]) < 2:
+        if not subtitle_search_available(meta):
             raise SubtitleError("invalid_search", 400)
+        search_started = monotonic()
+        request_count = 0
         base_params = {
             "languages": ",".join(requested or ("en",)),
             "type": "episode" if meta["content_type"] == "series" else "movie",
@@ -1522,11 +1849,16 @@ class OpenSubtitlesClient(object):
             items = data.get("data", [])
             results = []
             seen = set()
-            for item in items[:50]:
+            # The API can return 60 entries per page. Rank the complete
+            # bounded page before applying the result quota.
+            for item in items[:100]:
                 if not isinstance(item, dict):
                     continue
                 attributes = item.get("attributes")
                 if not isinstance(attributes, dict):
+                    continue
+                hearing_impaired = _boolean(attributes.get("hearing_impaired", False))
+                if hearing_impaired and not self.hearing_impaired:
                     continue
                 details = attributes.get("feature_details")
                 details = details if isinstance(details, dict) else {}
@@ -1546,6 +1878,11 @@ class OpenSubtitlesClient(object):
                 files = attributes.get("files")
                 if not isinstance(files, list):
                     continue
+                cd_numbers = {_number(entry.get("cd_number")) for entry in files[:50]
+                              if isinstance(entry, dict)}
+                cd_count = _number(attributes.get("nb_cd"))
+                if len(cd_numbers - {0}) > 1:
+                    cd_count = max(cd_count, max(cd_numbers))
                 raw_language = str(
                     attributes.get("language") or ""
                 ).lower().replace("-", "_")
@@ -1564,22 +1901,29 @@ class OpenSubtitlesClient(object):
                     if file_id <= 0 or file_id in seen:
                         continue
                     seen.add(file_id)
-                    release = _safe_text(
-                        attributes.get("release")
-                        or subtitle_file.get("file_name"),
-                        limit=240,
+                    filename = _safe_text(subtitle_file.get("file_name"), limit=240)
+                    filename = filename.replace("\\", "/").rsplit("/", 1)[-1]
+                    parent_release = _safe_text(attributes.get("release"), limit=240)
+                    release = (
+                        filename if _informative_subtitle_filename(filename, parent_release)
+                        else parent_release or filename
                     ) or "Subtitle"
                     results.append({
                         "provider": "opensubtitles",
                         "title": meta["title"],
                         "identity_match": True,
+                        "imdb_id": _numeric_identifier(details.get("imdb_id") or attributes.get("imdb_id"), imdb=True),
+                        "tmdb_id": _numeric_identifier(details.get("tmdb_id") or attributes.get("tmdb_id")),
+                        "year": _year_number(details.get("year") or details.get("release_year") or attributes.get("year")),
                         "season": meta["season"],
                         "episode": meta["episode"],
                         "release": release,
+                        "release_parent": parent_release,
+                        "file_name": filename,
+                        "cd_number": _number(subtitle_file.get("cd_number")),
+                        "cd_count": cd_count,
                         "language": language,
-                        "hearing_impaired": _boolean(
-                            attributes.get("hearing_impaired", False)
-                        ),
+                        "hearing_impaired": hearing_impaired,
                         "fps": _subtitle_fps(
                             subtitle_file, attributes, release
                         ),
@@ -1596,25 +1940,58 @@ class OpenSubtitlesClient(object):
                 language_priority.get(
                     result.get("language"), len(language_priority)
                 ),
+            ) + _release_match_key(meta, result) + (
                 bool(result.get("hearing_impaired")),
-            ) + _release_match_key(meta, result))
-            return results[:15]
+            ))
+            output, counts = [], {}
+            for result in results:
+                language = result["language"]
+                if counts.get(language, 0) < self.RESULTS_PER_LANGUAGE:
+                    output.append(result)
+                    counts[language] = counts.get(language, 0) + 1
+            return output
 
         def request_results(extra, stage, match_meta):
-            params = dict(base_params)
-            params.update(extra)
-            _provider_search_log("opensubtitles", stage, meta, requested)
-            data = _request(
-                self.API_BASE + "/subtitles?" + urlencode(params),
-                self.API_HOSTS,
-                {"Api-Key": self.api_key},
-            )
-            raw, results = collect(data, match_meta)
-            _provider_search_log(
-                "opensubtitles", stage, meta, requested, raw, len(results)
-            )
-            if raw and not results:
-                _provider_candidate_log("opensubtitles", stage, data)
+            nonlocal request_count
+            results, seen = [], set()
+            for page in range(1, self.MAX_SEARCH_PAGES + 1):
+                remaining = self.SEARCH_BUDGET_SECONDS - (monotonic() - search_started)
+                if request_count >= self.MAX_SEARCH_REQUESTS or remaining <= 0:
+                    break
+                params = dict(base_params)
+                params.update(extra)
+                if page > 1:
+                    params["page"] = page
+                _provider_search_log("opensubtitles", stage, meta, requested)
+                request_count += 1
+                try:
+                    data = _request(
+                        self.API_BASE + "/subtitles?" + urlencode(params),
+                        self.API_HOSTS, {"Api-Key": self.api_key},
+                        timeout=min(6, remaining),
+                    )
+                    raw, entries = collect(data, match_meta)
+                except SubtitleError:
+                    # An unavailable extra page must not erase good results.
+                    if not results:
+                        raise
+                    break
+                _provider_search_log(
+                    "opensubtitles", stage, meta, requested, raw, len(entries)
+                )
+                if raw and not entries:
+                    _provider_candidate_log("opensubtitles", stage, data)
+                fresh = [entry for entry in entries if entry["file_id"] not in seen]
+                seen.update(entry["file_id"] for entry in fresh)
+                results.extend(fresh)
+                # Stop when pagination is absent, empty, inconsistent, or
+                # repeats a page. Never follow provider-supplied URLs.
+                total_pages = _number(data.get("total_pages"))
+                reported_page = _number(data.get("page"))
+                if (not raw or page >= total_pages
+                        or (reported_page and reported_page != page)
+                        or (page > 1 and entries and not fresh)):
+                    break
             return ranked(results)
 
         identifier = None
@@ -1628,6 +2005,9 @@ class OpenSubtitlesClient(object):
             results = request_results(identifier[0], identifier[1], meta)
             if results:
                 return results
+
+        if len(meta["search_title"]) < 2:
+            return []
 
         title_params = {"query": meta["search_title"]}
         if meta["year"]:
@@ -1719,8 +2099,9 @@ class SubSourceClient(object):
         "uk": "ukrainian", "vi": "vietnamese", "zh": "chinese_bg_code",
     }
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, hearing_impaired=True):
         self.api_key = "".join(str(api_key or "").split())[:300]
+        self.hearing_impaired = bool(hearing_impaired)
 
     def _require_key(self):
         if not self.api_key:
@@ -1800,8 +2181,8 @@ class SubSourceClient(object):
         # A season pack is useful only if the matching episode is selected
         # from its ZIP at download time. Never load the first file blindly.
         for release in releases:
-            season = re.search(r"(?i)\b(?:S|season[ ._-]*)(\d{1,2})\b", release)
-            has_episode = re.search(r"(?i)\bS\d{1,2}[ ._-]*E\d|\b\d{1,2}x\d", release)
+            season = re.search(r"(?i)(?<![a-z0-9])(?:S|season[ ._-]*)(\d{1,2})(?![a-z0-9])", release)
+            has_episode = bool(subtitle_episode_numbers(release))
             if season and int(season.group(1)) == meta["season"] and not has_episode:
                 return release, True
         return "", False
@@ -1826,7 +2207,7 @@ class SubSourceClient(object):
         if not requested:
             return []
         meta = normalized_metadata(metadata, requested[0])
-        if len(meta["search_title"]) < 2:
+        if len(meta["search_title"]) < 2 and not meta["imdb_id"]:
             raise SubtitleError("invalid_search", 400)
 
         def movies_for(params, match_meta, stage):
@@ -1842,7 +2223,7 @@ class SubSourceClient(object):
         movies = []
         if meta["imdb_id"]:
             movies = movies_for({"searchType": "imdb", "imdb": meta["imdb_id"]}, meta, "imdb-id")
-        if not movies:
+        if not movies and len(meta["search_title"]) >= 2:
             title_meta = dict(meta)
             title_meta["imdb_id"] = ""
             movies = movies_for({"searchType": "text", "q": meta["search_title"]}, title_meta, "title")
@@ -1852,8 +2233,6 @@ class SubSourceClient(object):
         for movie in movies:
             movie_id = _numeric_identifier(movie.get("movieId") or movie.get("id"))
             for language in requested:
-                if language_counts[language] >= 20:
-                    continue
                 params = {"movieId": movie_id, "language": self.LANGUAGES[language], "limit": 100}
                 if meta["content_type"] == "series":
                     if meta["season"]:
@@ -1865,6 +2244,8 @@ class SubSourceClient(object):
                 for item in items[:100]:
                     if not isinstance(item, dict):
                         continue
+                    if self._hearing_impaired(item) and not self.hearing_impaired:
+                        continue
                     subtitle_id = _numeric_identifier(item.get("subtitleId") or item.get("id"))
                     if not re.fullmatch(r"[1-9]\d{0,17}", subtitle_id) or subtitle_id in seen:
                         continue
@@ -1874,7 +2255,24 @@ class SubSourceClient(object):
                         code = aliases.get(raw_language, _LANGUAGE_ALIASES.get(raw_language, raw_language))
                         if code != language and raw_language != self.LANGUAGES[language]:
                             continue
-                    release, is_pack = self._episode_release(item, self._release_names(item), meta)
+                    alternatives = []
+                    for release_name in self._release_names(item):
+                        release_value, pack = self._episode_release(item, [release_name], meta)
+                        if release_value:
+                            evidence = {
+                                "provider": "subsource", "title": meta["title"],
+                                "identity_match": True, "season": meta["season"],
+                                "episode": meta["episode"], "release": release_value,
+                                "language": language,
+                                "fps": _subtitle_fps(item, movie, release_value),
+                            }
+                            # An exact episode takes precedence over a pack;
+                            # every compatible release of this file is ranked.
+                            alternatives.append((pack, _release_match_key(meta, evidence),
+                                                 release_value))
+                    if not alternatives:
+                        continue
+                    is_pack, unused_rank, release = min(alternatives)
                     if not release:
                         continue
                     seen.add(subtitle_id)
@@ -1884,18 +2282,26 @@ class SubSourceClient(object):
                         "provider": "subsource", "title": meta["title"],
                         "identity_match": True, "season": meta["season"],
                         "episode": meta["episode"], "release": release,
+                        "imdb_id": _numeric_identifier(movie.get("imdbId") or movie.get("imdb_id") or movie.get("imdb"), imdb=True),
+                        "year": _year_number(movie.get("releaseYear") or movie.get("year")),
                         "language": language, "subtitle_id": subtitle_id,
                         "is_pack": is_pack, "hearing_impaired": self._hearing_impaired(item),
                         "fps": _subtitle_fps(item, movie, release),
                     })
-                    if language_counts[language] >= 20:
-                        break
                 _provider_search_log("subsource", "subtitles", meta, [language], len(items), accepted)
         priority = {language: index for index, language in enumerate(requested)}
         results.sort(key=lambda result: (
-            priority.get(result["language"], len(priority)), bool(result["hearing_impaired"]),
-        ) + _release_match_key(meta, result))
-        return results[:40]
+            priority.get(result["language"], len(priority)),
+        ) + _release_match_key(meta, result) + (
+            bool(result["hearing_impaired"]),
+        ))
+        ranked, counts = [], {}
+        for result in results:
+            language = result["language"]
+            if counts.get(language, 0) < 20:
+                ranked.append(result)
+                counts[language] = counts.get(language, 0) + 1
+        return ranked[:40]
 
     def download(self, result):
         self._require_key()
@@ -1910,15 +2316,32 @@ class SubSourceClient(object):
         return _download("subsource", secured, extensions=(".srt", ".vtt"))
 
 
-def subtitle_client(settings):
+def subtitle_client(settings, provider=None):
     """Construct only the selected provider adapter from private settings."""
-    if getattr(settings, "provider", "subdl") == "subsource":
-        return SubSourceClient(getattr(settings, "subsource_api_key", ""))
-    if getattr(settings, "provider", "subdl") == "opensubtitles":
+    provider = provider or getattr(settings, "provider", "subdl")
+    if provider in POLISH_PROVIDERS and not polish_search_providers(
+        getattr(settings, "primary_language", "")
+    ):
+        raise SubtitleError("invalid_provider", 400)
+    if provider == "napiprojekt":
+        from .polish_subtitles import NapiProjektClient
+        return NapiProjektClient()
+    if provider == "napisy24":
+        from .polish_subtitles import Napisy24Client
+        return Napisy24Client()
+    if provider not in ("subdl", "subsource", "opensubtitles"):
+        raise SubtitleError("invalid_provider", 400)
+    if provider == "subsource":
+        return SubSourceClient(
+            getattr(settings, "subsource_api_key", ""),
+            hearing_impaired=getattr(settings, "hearing_impaired", False),
+        )
+    if provider == "opensubtitles":
         return OpenSubtitlesClient(
             getattr(settings, "opensubtitles_api_key", ""),
             getattr(settings, "opensubtitles_username", ""),
             getattr(settings, "opensubtitles_password", ""),
+            hearing_impaired=getattr(settings, "hearing_impaired", False),
         )
     return SubDLClient(
         getattr(settings, "subdl_api_key", getattr(settings, "api_key", ""))
@@ -1937,6 +2360,7 @@ def save_subtitle_file(content, metadata, result, root="/tmp/gtiptvplayerpro-sub
             (metadata or {}).get("episode"),
             (result or {}).get("language"),
             (result or {}).get("release"),
+            sha256(content).hexdigest(),
         )
     )
     filename = sha256(identity.encode("utf-8", "ignore")).hexdigest() + ".srt"

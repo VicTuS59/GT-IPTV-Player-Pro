@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro Team\n"
-"Language-Team: Persian\n"
-"Language: fa\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1); \n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Persian\nLanguage: fa\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1); \n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "صدا: {}"
 msgid "About"
 msgstr "درباره"
 
+msgid "Access code"
+msgstr "کد دسترسی"
+
 msgid "Access your channels quickly"
 msgstr "به‌سرعت به کانال‌های خود دسترسی پیدا کنید"
 
@@ -197,6 +190,9 @@ msgstr "عربی"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "پخش آرشیو برای این کانال در دسترس نیست."
+
+msgid "Aspect ratio"
+msgstr "نسبت تصویر"
 
 msgid "Audio language changed"
 msgstr "زبان صوتی تغییر کرد"
@@ -481,6 +477,9 @@ msgstr "آسمان صاف"
 msgid "Close"
 msgstr "بستن"
 
+msgid "Close menu"
+msgstr "بستن منو"
+
 msgid "Close the open screen before opening another one."
 msgstr "قبل از باز کردن صفحه دیگری، صفحه باز را ببندید."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "ترک صوتی درخواستی انتخاب نشد."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "نمایش زیرنویس‌های مستقل راه‌اندازی نشد."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "جستجوی اینترنتی زیرنویس آغاز نشد."
 
 msgid "Could not start the player."
 msgstr "پخش کننده شروع نشد."
@@ -771,6 +770,9 @@ msgstr "ترتیب پیش‌فرض بازیابی شد. برای ذخیره، س
 msgid "Delete"
 msgstr "حذف"
 
+msgid "Delete all"
+msgstr "حذف همه"
+
 msgid "Delete this item?"
 msgstr "حذف این مورد؟"
 
@@ -818,6 +820,12 @@ msgstr "کشف فیلم‌ها"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "فیلم‌های جدید را با پیشنهادهای TMDB کشف کنید"
+
+msgid "Display 16:9 content as"
+msgstr "نمایش محتوای 16:9 به صورت"
+
+msgid "Display 4:3 content as"
+msgstr "نمایش محتوای 4:3 به صورت"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "در آدرس اینترنتی پورتال، کوئری یا قطعه کدی قرار ندهید."
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "ابتدا یک کلید API برای SubDL وارد کنید."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "کلید API مربوط به SubDL را در تنظیمات زیرنویس وارد کنید."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "برای دریافت جزئیات فیلم و سریال، کلید API سرویس TMDb را وارد کنید."
@@ -1007,6 +1015,9 @@ msgstr "کد شش‌رقمی نمایش‌داده‌شده روی گیرنده 
 msgid "Enter the username"
 msgstr "وارد کنیدنام کاربری"
 
+msgid "Enter the username / Enter the password"
+msgstr "وارد کنیدنام کاربری / رمز عبور را وارد کنید"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "این کد را در مرورگر گوشی خود وارد کرده و سپس درخواست را در تلویزیون تأیید کنید. 042 | امکان بارگذاری قسمت‌ها وجود ندارد"
 
@@ -1061,6 +1072,9 @@ msgstr "موارد دلخواه"
 
 msgid "FILE"
 msgstr "فایل"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "نرخ فریم تبدیل می‌شود"
@@ -1144,19 +1158,11 @@ msgstr "تمام صفحه"
 msgid "GREEN"
 msgstr "سبز"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"فیلم"
+msgid "GT\nMOVIE"
+msgstr "GT\nفیلم"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"سریال‌ها"
+msgid "GT\nSERIES"
+msgstr "GT\nسریال‌ها"
 
 msgid "Genre unavailable"
 msgstr "ژانر موجود نیست"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "پیش‌نمایش زیرنویس‌های مستقل"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "همگام‌سازی زیرنویس‌های مستقل"
 
 msgid "Independent subtitles"
 msgstr "زیرنویس‌های مستقل"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "زیرنویس‌های مستقل در تنظیمات غیرفعال هستند."
 
 msgid "Information"
 msgstr "اطلاعات"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "تأخیر (Latency)"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"تأخیر: {} میلی‌ثانیه\n"
-"وضعیت حساب: {}\n"
-"فعال / حداکثر: {}\n"
-"تاریخ انقضا: {}\n"
-"زمان سرور: {}\n"
-"منطقه زمانی: {}\n"
-"پروتکل: {}\n"
-"فرمت خروجی: {}\n"
-"نسخه سرور: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "تأخیر: {} میلی‌ثانیه\nوضعیت حساب: {}\nفعال / حداکثر: {}\nتاریخ انقضا: {}\nزمان سرور: {}\nمنطقه زمانی: {}\nپروتکل: {}\nفرمت خروجی: {}\nنسخه سرور: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"تأخیر: {} میلی‌ثانیه\n"
-"وضعیت حساب: {}\n"
-"پروتکل: {}\n"
-"فرمت خروجی: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "تأخیر: {} میلی‌ثانیه\nوضعیت حساب: {}\nپروتکل: {}\nفرمت خروجی: {}\n\n{}"
 
 msgid "Left"
 msgstr "چپ"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "پیش از همگام‌سازی، زیرنویس را از این صفحه وب بارگذاری کنید."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "پیش از همگام‌سازی، یک زیرنویس مستقل بارگذاری کنید."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "در حال بارگیری سرویس‌های DVB و کانال‌های XMLTV ذخیره شده..."
@@ -1514,6 +1486,9 @@ msgstr "خروج"
 
 msgid "Lower"
 msgstr "پایین‌تر"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "جستجوی کانال M3U"
@@ -1668,6 +1643,9 @@ msgstr "آدرس مک"
 
 msgid "MANAGE SOURCES"
 msgstr "مدیریت منابع"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU ۳ ثانیه: رابط وب"
 
 msgid "MOVIE CATEGORIES"
 msgstr "دسته‌بندی فیلم‌ها"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "زیرنویس منطبقی یافت نشد. زبان و وضعیت ارائه‌دهنده را بررسی کنید."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "زیرنویس مطابقی در SubDL یافت نشد."
 
 msgid "No movies found."
 msgstr "فیلمی یافت نشد."
@@ -1946,14 +1924,8 @@ msgstr "هیچ منبعی برای اتصال در دسترس نیست."
 msgid "No source is selected for deletion."
 msgstr "هیچ منبعی برای حذف انتخاب نشده است."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"هیچ منبعی یافت نشد.\n"
-"\n"
-"یکی را از پنل «افزودن منبع» در صفحهٔ اصلی ایجاد کنید."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "هیچ منبعی یافت نشد.\n\nیکی را از پنل «افزودن منبع» در صفحهٔ اصلی ایجاد کنید."
 
 msgid "No summary is available for this programme."
 msgstr "هیچ خلاصه‌ای برای این برنامه در دسترس نیست."
@@ -1981,6 +1953,9 @@ msgstr "هیچ منبع معتبری Xtream یافت نشد."
 
 msgid "No valid title was found for TMDb"
 msgstr "هیچ عنوان معتبری برای TMDb یافت نشد"
+
+msgid "No videos found at the selected quality."
+msgstr "ویدیویی با کیفیت انتخاب‌شده پیدا نشد."
 
 msgid "No weather forecast is available for this city."
 msgstr "هیچ پیش‌بینی آب و هوایی برای این شهر در دسترس نیست."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "باز کردن / تأیید"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "تنظیمات زیرنویس‌های مستقل را باز کنید."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "صفحه‌کلید تلویزیون را باز کنید و متن را اینجا جای‌گذاری کنید."
@@ -2107,8 +2082,14 @@ msgstr "پخش"
 msgid "Play a movie or episode on the receiver first."
 msgstr "ابتدا فیلم یا قسمت مورد نظر را روی گیرنده پخش کنید."
 
+msgid "Play next video automatically"
+msgstr "پخش خودکار ویدیوی بعدی"
+
 msgid "Play on TV"
 msgstr "پخش در تلویزیون"
+
+msgid "Playback history"
+msgstr "تاریخچه پخش"
 
 msgid "Playback mode"
 msgstr "حالت پخش"
@@ -2269,6 +2250,9 @@ msgstr "اتصال به ارائه‌دهنده با موفقیت برقرار �
 msgid "Quality"
 msgstr "کیفیت"
 
+msgid "Quality changed. Search again."
+msgstr "کیفیت تغییر کرد. دوباره جستجو کنید."
+
 msgid "Queued"
 msgstr "در صف"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "رتبه‌بندی"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"زمان خواندن: {} میلی‌ثانیه\n"
-"نوع منبع: {}\n"
-"اندازه: {} بایت\n"
-"کانال‌ها: {}\n"
-"دسته‌بندی‌ها: {}\n"
-"سن حافظه پنهان: {}\n"
-"آخرین تغییر: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "زمان خواندن: {} میلی‌ثانیه\nنوع منبع: {}\nاندازه: {} بایت\nکانال‌ها: {}\nدسته‌بندی‌ها: {}\nسن حافظه پنهان: {}\nآخرین تغییر: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "مدت زمان خواندن..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "اتصال مجدد جریان..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"بازیابی موفق بود. کد بازیابی جدید را یادداشت کنید؛ این کد فقط یک‌بار نمایش داده می‌شود:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "بازیابی موفق بود. کد بازیابی جدید را یادداشت کنید؛ این کد فقط یک‌بار نمایش داده می‌شود:\n\n{}"
 
 msgid "Red"
 msgstr "قرمز"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "تنظیم مجدد"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "بازنشانی زمان‌بندی زیرنویس"
 
 msgid "Resolution: --"
 msgstr "وضوح: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "ادامه پخش"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"پخش از موقعیت ذخیره‌شده از سر گرفته شود؟\n"
-"\n"
-"موقعیت ذخیره‌شده: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "پخش از موقعیت ذخیره‌شده از سر گرفته شود؟\n\nموقعیت ذخیره‌شده: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "از سرگیری فیلم‌ها و قسمت‌های ناتمام سریال"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "تنظیمات زیرنویس"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "شروع همان جمله در زیرنویس (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "دوباره جستجو کنید؛ اعتبار این نتیجه منق
 msgid "Search for a spoken phrase"
 msgstr "جستجوی یک عبارت گفتاری"
 
+msgid "Search history"
+msgstr "تاریخچه جستجو"
+
 msgid "Search in IPTV"
 msgstr "جست‌وجو در IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "جستجوی موسیقی، مستند یا کانال‌ها"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "جستجوی زیرنویس با SubDL"
 
 msgid "Search subtitles"
 msgstr "جستجوی زیرنویس"
@@ -2550,6 +2507,9 @@ msgstr "در حال جستجوی ارائه‌دهندگان..."
 
 msgid "Searching…"
 msgstr "در حال جستجو..."
+
+msgid "Season"
+msgstr "فصل"
 
 msgid "Seasons"
 msgstr "فصل‌ها"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "نمایش / عدم نمایش"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "نمایش ۰٫۵ ثانیه زودتر"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "نمایش ۰٫۵ ثانیه دیرتر"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "نمایش ۱ ثانیه زودتر"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "نمایش ۱ ثانیه دیرتر"
 
 msgid "Show in device main menu"
 msgstr "نمایش در منوی اصلی دستگاه"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "اتصال SubDL آماده است."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL موقتاً در دسترس نیست."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "در این نسخه SubDL ارائه‌دهنده است."
 
 msgid "SubDL key change cancelled."
 msgstr "تغییر کلید SubDL لغو شد."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL پاسخ نامعتبری فرستاد."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • زیرنویس"
 
 msgid "Subtitle"
 msgstr "زیرنویس"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "ارائه‌دهندگان زیرنویس"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "انتخاب زیرنویس در این ایمیج سیستم در دسترس نیست."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "جستجوی زیرنویس به نصب سالم و فعال SubsSupport یا SubsSupportPro نیاز دارد."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "همگام‌سازی زیرنویس در حال اجراست."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "همگام‌سازی زیرنویس در این ایمیج در دسترس نیست."
 
 msgid "Subtitle timing adjusted"
 msgstr "زمان‌بندی زیرنویس تنظیم شد"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "جابجایی زمان زیرنویس: {:+.1f} ثانیه"
 
 msgid "Subtitles"
 msgstr "زیرنویس"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "کلید API سرویس SubDL پاک شد."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "کلید API مربوط به SubDL رد شد."
 
 msgid "The SubDL connection test is still running..."
 msgstr "آزمایش اتصال SubDL هنوز در حال اجراست..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "محدودیت درخواست‌های SubDL به پایان رسیده است."
 
 msgid "The TMDb connection test is still running..."
 msgstr "تست اتصال TMDb هنوز در حال اجرا است..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "اختلاف زمانی نمی‌تواند بیش از 30 دقیقه باشد."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "زیرنویس دانلودشده ذخیره نشد."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "حذف فایل ممکن نشد. دستگاه ذخیره‌سازی و مجوزها را بررسی کنید."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "سرویس در حال پخش تغییر کرد. انتخاب ترک صوتی را دوباره باز کنید."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "عنوان برنامه برای جستجوی زیرنویس در دسترس نیست."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "ساعت گیرنده آماده نیست. زمان شبکه را بررسی کنید و دوباره امتحان کنید."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "جزئیات فیلم انتخاب شده از سرور بارگیری خواهد شد."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "حجم زیرنویس بیش از حد مجاز است"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "این فرمت زیرنویس پشتیبانی نمی‌شود"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "پاسخ سریال از یک قالب پشتیبانی نشده استفاده می‌کند. دسته‌ها همچنان در دسترس هستند."
@@ -3266,12 +3226,8 @@ msgstr "این محتوا فقط یک ترک صوتی دارد."
 msgid "This folder is outside the allowed storage locations."
 msgstr "این پوشه خارج از مکان‌های ذخیره‌سازی مجاز است."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"این یک پیش‌نمایش زیرنویس است.\n"
-"تغییرات بلافاصله در اینجا نمایش داده می‌شوند."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "این یک پیش‌نمایش زیرنویس است.\nتغییرات بلافاصله در اینجا نمایش داده می‌شوند."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "این پیش‌نمایش از تنظیمات ظاهری فعلی و ذخیره‌نشده استفاده می‌کند."
@@ -3419,6 +3375,9 @@ msgstr "موقعیت عمودی"
 msgid "Very large"
 msgstr "بسیار بزرگ"
 
+msgid "Video"
+msgstr "ویدیو"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "ویدیو در این گیرنده قابل پخش نبود. ویدیوی دیگری را امتحان کنید یا تنظیمات کیفیت را تغییر دهید."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "سفید"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"این کد بازیابی را یادداشت کنید. فقط یک‌بار نمایش داده می‌شود:\n"
-"\n"
-"{}\n"
-"\n"
-"اگر هر دو کد را فراموش کردید، با حذف و نصب دوباره افزونه فقط همین قفل بازنشانی می‌شود."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "این کد بازیابی را یادداشت کنید. فقط یک‌بار نمایش داده می‌شود:\n\n{}\n\nاگر هر دو کد را فراموش کردید، با حذف و نصب دوباره افزونه فقط همین قفل بازنشانی می‌شود."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "XMLTV EPG برای این منبع M3U غیرفعال است."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} از موارد دلخواه حذف شد."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"پخش‌کننده IPTV متن‌باز برای Enigma2. از حساب‌های Xtream Codes و تلویزیون زنده از لیست‌های پخش محلی استاندارد، شبکه نصب‌شده یا HTTP(S) M3U پشتیبانی می‌کند. منابع ساده M3U فقط تلویزیون زنده ارائه می‌دهند.\n"
-"\n"
-"توسعه‌دهنده\n"
-"{}\n"
-"\n"
-"اطلاعیه قانونی\n"
-"این افزونه کانال، پخش زنده، حساب یا لیست پخش ارائه نمی‌دهد. کاربر مسئول استفاده از محتوایی است که فقط به آن دسترسی و حق استفاده دارد.\n"
-"\n"
-"حریم خصوصی\n"
-"هنگامی که Open-Meteo فعال است، شهر و مکان انتخاب شده برای پیش‌بینی آب و هوا به Open-Meteo ارسال می‌شود. هنگامی که TMDb فعال است، عنوان فیلم/سریال و کلید یا توکن TMDb وارد شده توسط کاربر به TMDb ارسال می‌شود. نام کاربری و رمز عبور IPTV به این سرویس‌ها ارسال نمی‌شود."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nپخش‌کننده IPTV متن‌باز برای Enigma2. از حساب‌های Xtream Codes و تلویزیون زنده از لیست‌های پخش محلی استاندارد، شبکه نصب‌شده یا HTTP(S) M3U پشتیبانی می‌کند. منابع ساده M3U فقط تلویزیون زنده ارائه می‌دهند.\n\nتوسعه‌دهنده\n{}\n\nاطلاعیه قانونی\nاین افزونه کانال، پخش زنده، حساب یا لیست پخش ارائه نمی‌دهد. کاربر مسئول استفاده از محتوایی است که فقط به آن دسترسی و حق استفاده دارد.\n\nحریم خصوصی\nهنگامی که Open-Meteo فعال است، شهر و مکان انتخاب شده برای پیش‌بینی آب و هوا به Open-Meteo ارسال می‌شود. هنگامی که TMDb فعال است، عنوان فیلم/سریال و کلید یا توکن TMDb وارد شده توسط کاربر به TMDb ارسال می‌شود. نام کاربری و رمز عبور IPTV به این سرویس‌ها ارسال نمی‌شود."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

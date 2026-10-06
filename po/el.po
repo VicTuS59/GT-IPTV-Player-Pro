@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: el\n"
-"Language: el\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: el\nLanguage: el\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "ΗΧΟΣ: {}"
 msgid "About"
 msgstr "Σχετικά"
 
+msgid "Access code"
+msgstr "Κωδικός πρόσβασης"
+
 msgid "Access your channels quickly"
 msgstr "Γρήγορη πρόσβαση στα κανάλια σας"
 
@@ -197,6 +190,9 @@ msgstr "Αραβικά"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Η αναπαραγωγή από το αρχείο δεν είναι διαθέσιμη για αυτό το κανάλι."
+
+msgid "Aspect ratio"
+msgstr "Αναλογία εικόνας"
 
 msgid "Audio language changed"
 msgstr "Η γλώσσα ήχου άλλαξε"
@@ -481,6 +477,9 @@ msgstr "Αίθριος ουρανός"
 msgid "Close"
 msgstr "Κλείσιμο"
 
+msgid "Close menu"
+msgstr "Κλείσιμο μενού"
+
 msgid "Close the open screen before opening another one."
 msgstr "Κλείστε την ανοικτή οθόνη πριν ανοίξετε άλλη."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Δεν ήταν δυνατή η επιλογή του ζητούμενου κομματιού ήχου."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Δεν ήταν δυνατή η έναρξη εμφάνισης των ανεξάρτητων υποτίτλων."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Δεν ήταν δυνατή η έναρξη της διαδικτυακής αναζήτησης υποτίτλων."
 
 msgid "Could not start the player."
 msgstr "Αδυναμία έναρξης αναπαραγωγής."
@@ -771,6 +770,9 @@ msgstr "Η προεπιλεγμένη σειρά επαναφέρθηκε. Πα�
 msgid "Delete"
 msgstr "Διαγραφή"
 
+msgid "Delete all"
+msgstr "Διαγραφή όλων"
+
 msgid "Delete this item?"
 msgstr "Διαγραφή αυτού του στοιχείου;"
 
@@ -818,6 +820,12 @@ msgstr "Ανακαλύψτε ταινίες"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Ανακαλύψτε νέες ταινίες με προτάσεις του TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "Εμφάνιση περιεχομένου 16:9 ως"
+
+msgid "Display 4:3 content as"
+msgstr "Εμφάνιση περιεχομένου 4:3 ως"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Μην συμπεριλάβετε ερώτημα ή τμήμα στη διεύθυνση URL της πύλης"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Εισαγάγετε πρώτα ένα κλειδί API SubDL."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Εισαγάγετε ένα κλειδί API SubDL στις ρυθμίσεις υποτίτλων."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Εισαγάγετε ένα κλειδί API TMDb για λεπτομέρειες σχετικά με ταινίες και σειρές."
@@ -1007,6 +1015,9 @@ msgstr "Εισαγάγετε τον εξαψήφιο κωδικό που εμφ�
 msgid "Enter the username"
 msgstr "Εισαγάγετε το όνομα χρήστη"
 
+msgid "Enter the username / Enter the password"
+msgstr "Εισαγάγετε το όνομα χρήστη / Εισαγάγετε τον κωδικό"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Εισαγάγετε αυτόν τον κωδικό στο πρόγραμμα περιήγησης του τηλεφώνου σας και, στη συνέχεια, εγκρίνετε το αίτημα στην τηλεόραση. 042 | Αδυναμία φόρτωσης επεισοδίων"
 
@@ -1061,6 +1072,9 @@ msgstr "ΑΓΑΠΗΜΕΝΑ"
 
 msgid "FILE"
 msgstr "ΑΡΧΕΙΟ"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "Το FPS θα μετατραπεί"
@@ -1144,19 +1158,11 @@ msgstr "Πλήρης οθόνη"
 msgid "GREEN"
 msgstr "ΠΡΑΣΙΝΟ"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"ΤΑΙΝΙΑ"
+msgid "GT\nMOVIE"
+msgstr "GT\nΤΑΙΝΙΑ"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"ΣΕΙΡΑ"
+msgid "GT\nSERIES"
+msgstr "GT\nΣΕΙΡΑ"
 
 msgid "Genre unavailable"
 msgstr "Το είδος δεν είναι διαθέσιμο"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Προεπισκόπηση ανεξάρτητων υποτίτλων"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Συγχρονισμός ανεξάρτητων υποτίτλων"
 
 msgid "Independent subtitles"
 msgstr "Ανεξάρτητοι υπότιτλοι"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Οι ανεξάρτητοι υπότιτλοι είναι απενεργοποιημένοι στις ρυθμίσεις."
 
 msgid "Information"
 msgstr "Πληροφορίες"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Καθυστέρηση (Latency)"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Καθυστέρηση: {} ms\n"
-"Κατάσταση λογαριασμού: {}\n"
-"Ενεργές / Μέγιστες: {}\n"
-"Λήξη: {}\n"
-"Ώρα διακομιστή: {}\n"
-"Ζώνη ώρας: {}\n"
-"Πρωτόκολλο: {}\n"
-"Μορφή εξόδου: {}\n"
-"Έκδοση διακομιστή: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Καθυστέρηση: {} ms\nΚατάσταση λογαριασμού: {}\nΕνεργές / Μέγιστες: {}\nΛήξη: {}\nΏρα διακομιστή: {}\nΖώνη ώρας: {}\nΠρωτόκολλο: {}\nΜορφή εξόδου: {}\nΈκδοση διακομιστή: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Καθυστέρηση: {} ms\n"
-"Κατάσταση λογαριασμού: {}\n"
-"Πρωτόκολλο: {}\n"
-"Μορφή εξόδου: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Καθυστέρηση: {} ms\nΚατάσταση λογαριασμού: {}\nΠρωτόκολλο: {}\nΜορφή εξόδου: {}\n\n{}"
 
 msgid "Left"
 msgstr "Αριστερά"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Φορτώστε υπότιτλους από αυτήν την ιστοσελίδα πριν από τον συγχρονισμό."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Φορτώστε ανεξάρτητους υπότιτλους πριν τους συγχρονίσετε."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "Φόρτωση υπηρεσιών DVB και αποθηκευμένων καναλιών XMLTV..."
@@ -1514,6 +1486,9 @@ msgstr "Αποσύνδεση"
 
 msgid "Lower"
 msgstr "Χαμηλότερα"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "ΑΝΑΖΗΤΗΣΗ ΚΑΝΑΛΙΩΝ M3U"
@@ -1668,6 +1643,9 @@ msgstr "Διεύθυνση MAC"
 
 msgid "MANAGE SOURCES"
 msgstr "ΔΙΑΧΕΙΡΙΣΗ ΠΗΓΩΝ"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 δευτ.: Διεπαφή ιστού"
 
 msgid "MOVIE CATEGORIES"
 msgstr "ΚΑΤΗΓΟΡΙΕΣ ΤΑΙΝΙΩΝ"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Δεν βρέθηκαν αντίστοιχοι υπότιτλοι. Ελέγξτε τη γλώσσα και την κατάσταση του παρόχου."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Δεν βρέθηκαν αντίστοιχοι υπότιτλοι στο SubDL."
 
 msgid "No movies found."
 msgstr "Δεν βρέθηκαν ταινίες."
@@ -1946,14 +1924,8 @@ msgstr "Δεν υπάρχει διαθέσιμη πηγή για σύνδεση.
 msgid "No source is selected for deletion."
 msgstr "Δεν έχει επιλεγεί πηγή για διαγραφή."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Δεν βρέθηκε πηγή.\n"
-"\n"
-"Δημιουργήστε μία από το πλαίσιο ΠΡΟΣΘΗΚΗ ΠΗΓΗΣ στην αρχική οθόνη."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Δεν βρέθηκε πηγή.\n\nΔημιουργήστε μία από το πλαίσιο ΠΡΟΣΘΗΚΗ ΠΗΓΗΣ στην αρχική οθόνη."
 
 msgid "No summary is available for this programme."
 msgstr "Δεν υπάρχει διαθέσιμη σύνοψη για αυτό το πρόγραμμα."
@@ -1981,6 +1953,9 @@ msgstr "Δεν βρέθηκε έγκυρη πηγή Xtream."
 
 msgid "No valid title was found for TMDb"
 msgstr "Δεν βρέθηκε έγκυρος τίτλος για το TMDb"
+
+msgid "No videos found at the selected quality."
+msgstr "Δεν βρέθηκαν βίντεο στην επιλεγμένη ποιότητα."
 
 msgid "No weather forecast is available for this city."
 msgstr "Δεν υπάρχει διαθέσιμη πρόγνωση καιρού για αυτήν την πόλη."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Άνοιγμα / Έγκριση"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Ανοίξτε τις ρυθμίσεις ανεξάρτητων υποτίτλων."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Ανοίξτε το πληκτρολόγιο της τηλεόρασης και επικολλήστε εδώ."
@@ -2107,8 +2082,14 @@ msgstr "Αναπαραγωγή"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Ξεκινήστε πρώτα την αναπαραγωγή μιας ταινίας ή ενός επεισοδίου στον δέκτη."
 
+msgid "Play next video automatically"
+msgstr "Αυτόματη αναπαραγωγή επόμενου βίντεο"
+
 msgid "Play on TV"
 msgstr "Αναπαραγωγή στην τηλεόραση"
+
+msgid "Playback history"
+msgstr "Ιστορικό αναπαραγωγής"
 
 msgid "Playback mode"
 msgstr "Λειτουργία αναπαραγωγής"
@@ -2269,6 +2250,9 @@ msgstr "Επιτυχής σύνδεση με τον πάροχο"
 msgid "Quality"
 msgstr "Ποιότητα"
 
+msgid "Quality changed. Search again."
+msgstr "Η ποιότητα άλλαξε. Αναζητήστε ξανά."
+
 msgid "Queued"
 msgstr "Σε αναμονή"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Βαθμολογία"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Χρόνος ανάγνωσης: {} ms\n"
-"Τύπος πηγής: {}\n"
-"Μέγεθος: {} byte\n"
-"Κανάλια: {}\n"
-"Κατηγορίες: {}\n"
-"Ηλικία προσωρινής μνήμης: {}\n"
-"Τελευταία τροποποίηση: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Χρόνος ανάγνωσης: {} ms\nΤύπος πηγής: {}\nΜέγεθος: {} byte\nΚανάλια: {}\nΚατηγορίες: {}\nΗλικία προσωρινής μνήμης: {}\nΤελευταία τροποποίηση: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Ανάγνωση διάρκειας..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Επανασύνδεση ροής..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Η ανάκτηση ολοκληρώθηκε. Σημειώστε τον νέο κωδικό ανάκτησης· εμφανίζεται μόνο μία φορά:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Η ανάκτηση ολοκληρώθηκε. Σημειώστε τον νέο κωδικό ανάκτησης· εμφανίζεται μόνο μία φορά:\n\n{}"
 
 msgid "Red"
 msgstr "Κόκκινο"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Επαναφορά"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Επαναφορά χρονισμού υποτίτλων"
 
 msgid "Resolution: --"
 msgstr "Ανάλυση: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Συνέχιση"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Συνέχιση αναπαραγωγής από την αποθηκευμένη θέση;\n"
-"\n"
-"Αποθηκευμένη θέση: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Συνέχιση αναπαραγωγής από την αποθηκευμένη θέση;\n\nΑποθηκευμένη θέση: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Συνέχιση ημιτελών ταινιών και επεισοδίων σειρών"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "ΡΥΘΜΙΣΕΙΣ ΥΠΟΤΙΤΛΩΝ"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Η ίδια γραμμή ξεκινά στον υπότιτλο (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Αναζητήστε ξανά· αυτό το αποτέλεσμα έχ�
 msgid "Search for a spoken phrase"
 msgstr "Αναζήτηση προφορικής φράσης"
 
+msgid "Search history"
+msgstr "Ιστορικό αναζήτησης"
+
 msgid "Search in IPTV"
 msgstr "Αναζήτηση στο IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Αναζήτηση μουσικής, ντοκιμαντέρ ή καναλιών"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Αναζήτηση υποτίτλων με το SubDL"
 
 msgid "Search subtitles"
 msgstr "Αναζήτηση υποτίτλων"
@@ -2550,6 +2507,9 @@ msgstr "Αναζήτηση παρόχων…"
 
 msgid "Searching…"
 msgstr "Αναζήτηση…"
+
+msgid "Season"
+msgstr "Σεζόν"
 
 msgid "Seasons"
 msgstr "Κύκλοι"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Εμφάνιση / Απόκρυψη"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Εμφάνιση 0,5 δευτερόλεπτα νωρίτερα"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Εμφάνιση 0,5 δευτερόλεπτα αργότερα"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Εμφάνιση 1 δευτερόλεπτο νωρίτερα"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Εμφάνιση 1 δευτερόλεπτο αργότερα"
 
 msgid "Show in device main menu"
 msgstr "Εμφάνιση στο κύριο μενού της συσκευής"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "Η σύνδεση με το SubDL είναι έτοιμη."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "Το SubDL δεν είναι προσωρινά διαθέσιμο."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "Το SubDL είναι ο πάροχος σε αυτή την έκδοση."
 
 msgid "SubDL key change cancelled."
 msgstr "Η αλλαγή του κλειδιού SubDL ακυρώθηκε."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "Το SubDL επέστρεψε μη έγκυρη απόκριση."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Υπότιτλοι"
 
 msgid "Subtitle"
 msgstr "Υπότιτλος"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Πάροχοι υποτίτλων"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Η επιλογή υποτίτλων δεν είναι διαθέσιμη σε αυτό το σύστημα."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "Η αναζήτηση υποτίτλων απαιτεί λειτουργική εγκατάσταση του SubsSupport ή του SubsSupportPro."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Ο συγχρονισμός υποτίτλων εκτελείται ήδη."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Ο συγχρονισμός υποτίτλων δεν είναι διαθέσιμος σε αυτή την εικόνα συστήματος."
 
 msgid "Subtitle timing adjusted"
 msgstr "Ο χρονισμός του υποτίτλου προσαρμόστηκε"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Χρονική μετατόπιση υποτίτλων: {:+.1f} δευτερόλεπτα"
 
 msgid "Subtitles"
 msgstr "Υπότιτλοι"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "Το κλειδί API SubDL διαγράφηκε."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "Το κλειδί API SubDL απορρίφθηκε."
 
 msgid "The SubDL connection test is still running..."
 msgstr "Ο έλεγχος σύνδεσης με το SubDL βρίσκεται ακόμη σε εξέλιξη..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "Έχει συμπληρωθεί το όριο αιτημάτων SubDL."
 
 msgid "The TMDb connection test is still running..."
 msgstr "Η δοκιμή σύνδεσης TMDb συνεχίζεται..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "Η διαφορά δεν μπορεί να υπερβαίνει τα 30 λεπτά."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "Δεν ήταν δυνατή η αποθήκευση των ληφθέντων υποτίτλων."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "Δεν ήταν δυνατή η διαγραφή του αρχείου. Ελέγξτε τη συσκευή αποθήκευσης και τα δικαιώματα."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Η υπηρεσία αναπαραγωγής άλλαξε. Ανοίξτε ξανά την επιλογή ήχου."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Ο τίτλος του προγράμματος δεν είναι διαθέσιμος για αναζήτηση υποτίτλων."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Το ρολόι του δέκτη δεν είναι έτοιμο. Ελέγξτε την ώρα δικτύου και δοκιμάστε ξανά."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "Οι λεπτομέρειες της επιλεγμένης ταινίας θα φορτωθούν από τον διακομιστή."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Ο υπότιτλος υπερβαίνει το όριο μεγέθους"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Αυτή η μορφή υποτίτλων δεν υποστηρίζεται"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "Η απόκριση σειρών χρησιμοποιεί μη υποστηριζόμενη μορφή. Οι κατηγορίες παραμένουν διαθέσιμες."
@@ -3266,12 +3226,8 @@ msgstr "Αυτό το περιεχόμενο διαθέτει μόνο ένα κ
 msgid "This folder is outside the allowed storage locations."
 msgstr "Αυτός ο φάκελος βρίσκεται εκτός των επιτρεπόμενων θέσεων αποθήκευσης."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Αυτή είναι μια προεπισκόπηση υποτίτλων.\n"
-"Οι αλλαγές εμφανίζονται εδώ αμέσως."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Αυτή είναι μια προεπισκόπηση υποτίτλων.\nΟι αλλαγές εμφανίζονται εδώ αμέσως."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Αυτή η προεπισκόπηση χρησιμοποιεί τις τρέχουσες μη αποθηκευμένες ρυθμίσεις εμφάνισης."
@@ -3419,6 +3375,9 @@ msgstr "Κατακόρυφη θέση"
 msgid "Very large"
 msgstr "Πολύ μεγάλο"
 
+msgid "Video"
+msgstr "Βίντεο"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Δεν ήταν δυνατή η αναπαραγωγή του βίντεο σε αυτή τη συσκευή λήψης. Δοκιμάστε άλλο βίντεο ή άλλη ρύθμιση ποιότητας."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Λευκό"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Σημειώστε αυτόν τον κωδικό ανάκτησης. Εμφανίζεται μόνο μία φορά:\n"
-"\n"
-"{}\n"
-"\n"
-"Αν ξεχάσετε και τους δύο κωδικούς, η αφαίρεση και επανεγκατάσταση του πρόσθετου επαναφέρει μόνο αυτό το κλείδωμα."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Σημειώστε αυτόν τον κωδικό ανάκτησης. Εμφανίζεται μόνο μία φορά:\n\n{}\n\nΑν ξεχάσετε και τους δύο κωδικούς, η αφαίρεση και επανεγκατάσταση του πρόσθετου επαναφέρει μόνο αυτό το κλείδωμα."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "Το XMLTV EPG είναι απενεργοποιημένο για αυτή την πηγή M3U."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "Το {} αφαιρέθηκε από τα αγαπημένα."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Πρόγραμμα αναπαραγωγής IPTV ανοικτού κώδικα για Enigma2. Υποστηρίζει λογαριασμούς Xtream Codes και Ζωντανή TV από τυπικές τοπικές, δικτυακά προσαρτημένες ή HTTP(S) λίστες αναπαραγωγής M3U. Οι απλές πηγές M3U παρέχουν μόνο Ζωντανή TV.\n"
-"\n"
-"ΠΡΟΓΡΑΜΜΑΤΙΣΤΗΣ\n"
-"{}\n"
-"\n"
-"ΝΟΜΙΚΗ ΣΗΜΕΙΩΣΗ\n"
-"Αυτό το πρόσθετο δεν παρέχει κανάλια, ροές, λογαριασμούς ή λίστες αναπαραγωγής. Ο χρήστης είναι υπεύθυνος να χρησιμοποιεί μόνο περιεχόμενο για το οποίο διαθέτει δικαιώματα πρόσβασης και χρήσης.\n"
-"\n"
-"ΑΠΟΡΡΗΤΟ\n"
-"Όταν είναι ενεργό το Open-Meteo, η επιλεγμένη πόλη και τοποθεσία αποστέλλονται στο Open-Meteo για την πρόγνωση καιρού. Όταν είναι ενεργό το TMDb, ο τίτλος ταινίας ή σειράς και το κλειδί ή διακριτικό TMDb που εισήγαγε ο χρήστης αποστέλλονται στο TMDb. Το όνομα χρήστη και ο κωδικός IPTV δεν αποστέλλονται σε αυτές τις υπηρεσίες."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nΠρόγραμμα αναπαραγωγής IPTV ανοικτού κώδικα για Enigma2. Υποστηρίζει λογαριασμούς Xtream Codes και Ζωντανή TV από τυπικές τοπικές, δικτυακά προσαρτημένες ή HTTP(S) λίστες αναπαραγωγής M3U. Οι απλές πηγές M3U παρέχουν μόνο Ζωντανή TV.\n\nΠΡΟΓΡΑΜΜΑΤΙΣΤΗΣ\n{}\n\nΝΟΜΙΚΗ ΣΗΜΕΙΩΣΗ\nΑυτό το πρόσθετο δεν παρέχει κανάλια, ροές, λογαριασμούς ή λίστες αναπαραγωγής. Ο χρήστης είναι υπεύθυνος να χρησιμοποιεί μόνο περιεχόμενο για το οποίο διαθέτει δικαιώματα πρόσβασης και χρήσης.\n\nΑΠΟΡΡΗΤΟ\nΌταν είναι ενεργό το Open-Meteo, η επιλεγμένη πόλη και τοποθεσία αποστέλλονται στο Open-Meteo για την πρόγνωση καιρού. Όταν είναι ενεργό το TMDb, ο τίτλος ταινίας ή σειράς και το κλειδί ή διακριτικό TMDb που εισήγαγε ο χρήστης αποστέλλονται στο TMDb. Το όνομα χρήστη και ο κωδικός IPTV δεν αποστέλλονται σε αυτές τις υπηρεσίες."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: sk\n"
-"Language: sk\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : (n >= 2 && n <= 4) ? 1 : 2;\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: sk\nLanguage: sk\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n == 1) ? 0 : (n >= 2 && n <= 4) ? 1 : 2;\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "ZVUK: {}"
 msgid "About"
 msgstr "O aplikácii"
 
+msgid "Access code"
+msgstr "Prístupový kód"
+
 msgid "Access your channels quickly"
 msgstr "Rýchly prístup ku kanálom"
 
@@ -197,6 +190,9 @@ msgstr "Arabčina"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Prehrávanie z archívu nie je pre tento kanál dostupné."
+
+msgid "Aspect ratio"
+msgstr "Pomer strán"
 
 msgid "Audio language changed"
 msgstr "Jazyk zvuku bol zmenený"
@@ -481,6 +477,9 @@ msgstr "Jasná obloha"
 msgid "Close"
 msgstr "Zavrieť"
 
+msgid "Close menu"
+msgstr "Zavrieť ponuku"
+
 msgid "Close the open screen before opening another one."
 msgstr "Pred otvorením ďalšej obrazovky zatvorte tú aktuálnu."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Požadovanú zvukovú stopu sa nepodarilo vybrať."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Nepodarilo sa spustiť zobrazenie nezávislých titulkov."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Nepodarilo sa spustiť online vyhľadávanie titulkov."
 
 msgid "Could not start the player."
 msgstr "Prehrávač nemožno spustiť."
@@ -771,6 +770,9 @@ msgstr "Predvolené poradie bolo obnovené. Uložte ho stlačením ZELENÉHO."
 msgid "Delete"
 msgstr "Odstrániť"
 
+msgid "Delete all"
+msgstr "Odstrániť všetko"
+
 msgid "Delete this item?"
 msgstr "Odstrániť túto položku?"
 
@@ -818,6 +820,12 @@ msgstr "Objavujte filmy"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Objavujte nové filmy s odporúčaniami TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "Zobraziť obsah 16:9 ako"
+
+msgid "Display 4:3 content as"
+msgstr "Zobraziť obsah 4:3 ako"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Do URL portálu nezahŕňajte dopyt ani fragment"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Najprv zadajte API kľúč SubDL."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Zadajte kľúč API SubDL v nastaveniach titulkov."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Zadajte API kľúč TMDb pre podrobnosti o filmoch a seriáloch."
@@ -1007,6 +1015,9 @@ msgstr "Zadajte šesťmiestny kód zobrazený na prijímači."
 msgid "Enter the username"
 msgstr "Zadajte používateľské meno"
 
+msgid "Enter the username / Enter the password"
+msgstr "Zadajte používateľské meno / Zadajte heslo"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Zadajte tento kód do prehliadača v telefóne a následne schváľte požiadavku na TV."
 
@@ -1061,6 +1072,9 @@ msgstr "OBĽÚBENÉ"
 
 msgid "FILE"
 msgstr "SÚBOR"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS sa skonvertuje"
@@ -1144,19 +1158,11 @@ msgstr "Celá obrazovka"
 msgid "GREEN"
 msgstr "ZELENÉ"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"FILM"
+msgid "GT\nMOVIE"
+msgstr "GT\nFILM"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"SERIÁL"
+msgid "GT\nSERIES"
+msgstr "GT\nSERIÁL"
 
 msgid "Genre unavailable"
 msgstr "Žáner nie je dostupný"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Náhľad nezávislých titulkov"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Synchronizácia nezávislých titulkov"
 
 msgid "Independent subtitles"
 msgstr "Nezávislé titulky"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Nezávislé titulky sú v nastaveniach vypnuté."
 
 msgid "Information"
 msgstr "Informácie"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Latencia"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Latencia: {} ms\n"
-"Stav účtu: {}\n"
-"Aktívne / Maximum: {}\n"
-"Platnosť: {}\n"
-"Čas servera: {}\n"
-"Časové pásmo: {}\n"
-"Protokol: {}\n"
-"Výstupný formát: {}\n"
-"Verzia servera: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Latencia: {} ms\nStav účtu: {}\nAktívne / Maximum: {}\nPlatnosť: {}\nČas servera: {}\nČasové pásmo: {}\nProtokol: {}\nVýstupný formát: {}\nVerzia servera: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Latencia: {} ms\n"
-"Stav účtu: {}\n"
-"Protokol: {}\n"
-"Výstupný formát: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Latencia: {} ms\nStav účtu: {}\nProtokol: {}\nVýstupný formát: {}\n\n{}"
 
 msgid "Left"
 msgstr "Vľavo"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Pred synchronizáciou načítajte titulky z tejto webovej stránky."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Pred synchronizáciou načítajte nezávislé titulky."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "Načítavajú sa služby DVB a kanály XMLTV z vyrovnávacej pamäte..."
@@ -1514,6 +1486,9 @@ msgstr "Odhlásiť sa"
 
 msgid "Lower"
 msgstr "Nižšie"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "HĽADANIE KANÁLOV M3U"
@@ -1668,6 +1643,9 @@ msgstr "Adresa MAC"
 
 msgid "MANAGE SOURCES"
 msgstr "SPRAVOVAŤ ZDROJE"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 s: Webové rozhranie"
 
 msgid "MOVIE CATEGORIES"
 msgstr "KATEGÓRIE FILMOV"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Nenašli sa žiadne zodpovedajúce titulky. Skontrolujte jazyk a stav poskytovateľa."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Na SubDL sa nenašli zodpovedajúce titulky."
 
 msgid "No movies found."
 msgstr "Nenašli sa žiadne filmy."
@@ -1946,14 +1924,8 @@ msgstr "Nie je dostupný žiadny zdroj na pripojenie."
 msgid "No source is selected for deletion."
 msgstr "Nie je vybraný žiadny zdroj na odstránenie."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Nenašiel sa žiadny zdroj.\n"
-"\n"
-"Vytvorte ho na paneli PRIDAŤ ZDROJ na domovskej obrazovke."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Nenašiel sa žiadny zdroj.\n\nVytvorte ho na paneli PRIDAŤ ZDROJ na domovskej obrazovke."
 
 msgid "No summary is available for this programme."
 msgstr "Pre tento program nie je dostupný žiadny súhrn."
@@ -1981,6 +1953,9 @@ msgstr "Nenašiel sa žiadny platný zdroj Xtream."
 
 msgid "No valid title was found for TMDb"
 msgstr "Pre TMDb sa nenašiel žiadny platný názov"
+
+msgid "No videos found at the selected quality."
+msgstr "Vo zvolenej kvalite sa nenašli žiadne videá."
 
 msgid "No weather forecast is available for this city."
 msgstr "Pre toto mesto nie je dostupná predpoveď počasia."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Otvoriť / Schváliť"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Otvorte nastavenia nezávislých titulkov."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Otvorte klávesnicu televízora a vložte sem text."
@@ -2107,8 +2082,14 @@ msgstr "Prehrať"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Najprv spustite film alebo epizódu na prijímači."
 
+msgid "Play next video automatically"
+msgstr "Automaticky prehrať ďalšie video"
+
 msgid "Play on TV"
 msgstr "Prehrať v TV"
+
+msgid "Playback history"
+msgstr "História prehrávania"
 
 msgid "Playback mode"
 msgstr "Režim prehrávania"
@@ -2269,6 +2250,9 @@ msgstr "Pripojenie k poskytovateľovi úspešné"
 msgid "Quality"
 msgstr "Kvalita"
 
+msgid "Quality changed. Search again."
+msgstr "Kvalita sa zmenila. Vyhľadajte znova."
+
 msgid "Queued"
 msgstr "Vo fronte"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Hodnotenie"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Čas čítania: {} ms\n"
-"Typ zdroja: {}\n"
-"Veľkosť: {} bajtov\n"
-"Kanály: {}\n"
-"Kategórie: {}\n"
-"Vek vyrovnávacej pamäte: {}\n"
-"Posledná zmena: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Čas čítania: {} ms\nTyp zdroja: {}\nVeľkosť: {} bajtov\nKanály: {}\nKategórie: {}\nVek vyrovnávacej pamäte: {}\nPosledná zmena: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Načítava sa dĺžka..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Opätovné pripájanie streamu..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Obnovenie bolo úspešné. Zapíšte si nový kód na obnovenie; zobrazí sa iba raz:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Obnovenie bolo úspešné. Zapíšte si nový kód na obnovenie; zobrazí sa iba raz:\n\n{}"
 
 msgid "Red"
 msgstr "Červená"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Obnoviť"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Obnoviť časovanie titulkov"
 
 msgid "Resolution: --"
 msgstr "Rozlíšenie: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Pokračovať"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Pokračovať v prehrávaní z uloženej pozície?\n"
-"\n"
-"Uložená pozícia: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Pokračovať v prehrávaní z uloženej pozície?\n\nUložená pozícia: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Pokračovať v nedokončených filmoch a epizódach seriálov"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "NASTAVENIA TITULKOV"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Rovnaký riadok začína v titulkoch (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Hľadať znova; platnosť tohto výsledku vypršala."
 msgid "Search for a spoken phrase"
 msgstr "Hľadať hovorenú frázu"
 
+msgid "Search history"
+msgstr "História vyhľadávania"
+
 msgid "Search in IPTV"
 msgstr "Hľadať v IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Hľadať hudbu, dokumenty alebo kanály"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Hľadať titulky pomocou SubDL"
 
 msgid "Search subtitles"
 msgstr "Hľadať titulky"
@@ -2550,6 +2507,9 @@ msgstr "Vyhľadávanie poskytovateľov..."
 
 msgid "Searching…"
 msgstr "Vyhľadávanie..."
+
+msgid "Season"
+msgstr "Séria"
 
 msgid "Seasons"
 msgstr "Série"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Zobraziť / Skryť"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Zobraziť o 0,5 sekundy skôr"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Zobraziť o 0,5 sekundy neskôr"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Zobraziť o 1 sekundu skôr"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Zobraziť o 1 sekundu neskôr"
 
 msgid "Show in device main menu"
 msgstr "Zobraziť v hlavnom menu zariadenia"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "Pripojenie k SubDL je pripravené."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL je dočasne nedostupný."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL je poskytovateľom v tejto verzii."
 
 msgid "SubDL key change cancelled."
 msgstr "Zmena kľúča SubDL bola zrušená."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL vrátil neplatnú odpoveď."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Titulky"
 
 msgid "Subtitle"
 msgstr "Titulok"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Poskytovatelia titulkov"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Výber titulkov nie je na tomto image dostupný."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "Vyhľadávanie titulkov vyžaduje funkčnú inštaláciu SubsSupport alebo SubsSupportPro."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Synchronizácia titulkov už prebieha."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Synchronizácia titulkov nie je v tomto image dostupná."
 
 msgid "Subtitle timing adjusted"
 msgstr "Časovanie titulkov upravené"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Časový posun titulkov: {:+.1f} s"
 
 msgid "Subtitles"
 msgstr "Titulky"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "API kľúč SubDL bol vymazaný."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "Kľúč API SubDL bol odmietnutý."
 
 msgid "The SubDL connection test is still running..."
 msgstr "Test pripojenia k SubDL stále prebieha..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "Bol dosiahnutý limit požiadaviek SubDL."
 
 msgid "The TMDb connection test is still running..."
 msgstr "Test pripojenia TMDb stále prebieha..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "Rozdiel nesmie presiahnuť 30 minút."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "Stiahnuté titulky sa nepodarilo uložiť."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "Súbor sa nepodarilo odstrániť. Skontrolujte úložné zariadenie a oprávnenia."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Prehrávaná služba sa zmenila. Znova otvorte výber zvukovej stopy."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Názov programu nie je dostupný na vyhľadávanie titulkov."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Hodiny prijímača ešte nie sú pripravené. Skontrolujte sieťový čas a skúste to znova."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "Podrobnosti vybraného filmu sa načítajú zo servera."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Titulky presahujú limit veľkosti"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Tento formát titulkov nie je podporovaný."
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "Odpoveď pre seriály používa nepodporovaný formát. Kategórie zostávajú dostupné."
@@ -3266,12 +3226,8 @@ msgstr "Tento obsah má iba jednu zvukovú stopu."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Tento priečinok je mimo povolených umiestnení úložiska."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Toto je náhľad titulkov.\n"
-"Zmeny sa tu prejavia okamžite."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Toto je náhľad titulkov.\nZmeny sa tu prejavia okamžite."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Tento náhľad používa aktuálne neuložené nastavenia vzhľadu."
@@ -3419,6 +3375,9 @@ msgstr "Zvislá poloha"
 msgid "Very large"
 msgstr "Veľmi veľká"
 
+msgid "Video"
+msgstr "Video"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Video nebolo možné na tomto prijímači prehrať. Skúste iné video alebo nastavenie kvality."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Biela"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Zapíšte si tento kód na obnovenie. Zobrazí sa iba raz:\n"
-"\n"
-"{}\n"
-"\n"
-"Ak zabudnete oba kódy, odstránenie a opätovná inštalácia doplnku vynuluje iba tento zámok."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Zapíšte si tento kód na obnovenie. Zobrazí sa iba raz:\n\n{}\n\nAk zabudnete oba kódy, odstránenie a opätovná inštalácia doplnku vynuluje iba tento zámok."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "XMLTV EPG je pre tento zdroj M3U vypnutý."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} odobrané z obľúbených."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Prehrávač IPTV s otvoreným zdrojovým kódom pre Enigma2. Podporuje účty Xtream Codes a živú TV zo štandardných lokálnych, pripojených sieťových alebo HTTP(S) playlistov M3U. Bežné zdroje M3U poskytujú iba živú TV.\n"
-"\n"
-"VÝVOJÁR\n"
-"{}\n"
-"\n"
-"PRÁVNE UPOZORNENIE\n"
-"Tento doplnok neposkytuje kanály, streamy, účty ani playlisty. Používateľ zodpovedá za používanie iba obsahu, ku ktorému má prístupové a používateľské práva.\n"
-"\n"
-"SÚKROMIE\n"
-"Keď je Open-Meteo zapnuté, vybrané mesto a poloha sa odošlú do Open-Meteo pre predpoveď počasia. Keď je TMDb zapnuté, názov filmu/seriálu a kľúč alebo token TMDb zadaný používateľom sa odošlú do TMDb. Používateľské meno a heslo IPTV sa do týchto služieb neodosielajú."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nPrehrávač IPTV s otvoreným zdrojovým kódom pre Enigma2. Podporuje účty Xtream Codes a živú TV zo štandardných lokálnych, pripojených sieťových alebo HTTP(S) playlistov M3U. Bežné zdroje M3U poskytujú iba živú TV.\n\nVÝVOJÁR\n{}\n\nPRÁVNE UPOZORNENIE\nTento doplnok neposkytuje kanály, streamy, účty ani playlisty. Používateľ zodpovedá za používanie iba obsahu, ku ktorému má prístupové a používateľské práva.\n\nSÚKROMIE\nKeď je Open-Meteo zapnuté, vybrané mesto a poloha sa odošlú do Open-Meteo pre predpoveď počasia. Keď je TMDb zapnuté, názov filmu/seriálu a kľúč alebo token TMDb zadaný používateľom sa odošlú do TMDb. Používateľské meno a heslo IPTV sa do týchto služieb neodosielajú."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

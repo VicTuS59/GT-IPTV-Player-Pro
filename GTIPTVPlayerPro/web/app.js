@@ -9,29 +9,55 @@
   var state = {
     clientVersion: scriptUrl ? String(scriptUrl.searchParams.get("v") || "") : "",
     youtubeResults: [],
+    youtubeHistory: [],
+    youtubeQuality: "",
+    youtubeSearchBusy: false,
     youtubePages: [],
     youtubePage: 1,
     youtubePagingBusy: false,
     youtubeQuery: "",
     youtubeSearchLocale: "",
     youtubeSearchSerial: 0,
+    youtubeSearchToken: "",
+    youtubePrefetch: null,
     youtubeJobToken: "",
+    youtubePlayingId: "",
     youtubeTimer: 0,
     mediaResults: [],
+    mediaDownloadPending: {},
     runtimeVersion: "",
     runtimeWarningForced: false,
     csrf: "",
     expiresIn: 0,
     language: "en",
     strings: {},
+    runtimeTexts: {},
+    languageRequestSerial: 0,
+    youtubeSettings: null,
+    youtubeStatus: null,
     sources: [],
     dashboard: null,
     automaticTest: null,
     automaticTestUnavailable: false,
     automaticTestLoading: false,
+    automaticTestRequestSerial: 0,
+    automaticTestDeleting: {},
     automaticTestTimer: 0,
     subtitleProviders: [],
     subtitleResults: null,
+    subtitleContext: null,
+    subtitleCurrentSerial: 0,
+    subtitleSearchSerial: 0,
+    subtitleApplySerial: 0,
+    subtitleSearchBusySerial: 0,
+    subtitleApplyBusySerial: 0,
+    subtitleCanSearch: false,
+    subtitleSelectedId: null,
+    subtitleScroll: 0,
+    subtitleFormDirty: false,
+    subtitleRestoreScroll: false,
+    subtitleSyncRevision: null,
+    subtitlePositionSerial: 0,
     audioCurrent: null,
     cueTimer: 0,
     cueQuerySerial: 0,
@@ -50,6 +76,45 @@
 
   function t(key, fallback) {
     return state.strings[key] || fallback || key;
+  }
+
+  function serverText(value) {
+    var text = String(value || "");
+    var messages = state.runtimeTexts;
+    if (messages[text]) { return messages[text]; }
+    var templates = Object.keys(messages);
+    for (var index = 0; index < templates.length; index += 1) {
+      var template = templates[index];
+      var parts = template.split("{}");
+      if (parts.length !== 2 || !text.startsWith(parts[0]) || !text.endsWith(parts[1])) { continue; }
+      var argument = text.slice(parts[0].length, parts[1] ? -parts[1].length : undefined);
+      return messages[template].replace("{}", messages[argument] || argument);
+    }
+    return text;
+  }
+
+  function audioTrackLabel(value) {
+    var label = String(value || "");
+    var numbered = /^(\d+\.\s*)(.*)$/.exec(label);
+    var prefix = numbered ? numbered[1] : "";
+    var details = numbered ? numbered[2] : label;
+    return prefix + details.split(" • ").map(serverText).join(" • ");
+  }
+
+  function translateCurrentMessages(previous) {
+    var keys = Object.keys(previous).sort(function (a, b) { return previous[b].length - previous[a].length; });
+    ["toast", "pairStatus", "sourceFormError", "youtubeMessage", "mediaMessage", "audioStatus", "subtitleSearchHint"].forEach(function (id) {
+      var element = byId(id);
+      var text = element.textContent;
+      keys.some(function (key) {
+        var old = previous[key];
+        if (text === old || text.startsWith(old + " · ") || text.startsWith(old + " ")) {
+          element.textContent = t(key) + text.slice(old.length);
+          return true;
+        }
+        return false;
+      });
+    });
   }
 
   function node(tag, className, textValue) {
@@ -159,25 +224,39 @@
   }
 
   async function loadLanguage(requested) {
+    var serial = ++state.languageRequestSerial;
     var language = requested || preferredLanguage();
-    var response = await window.fetch(apiUrl("/i18n?lang=" + encodeURIComponent(language)), {
-      credentials: "same-origin",
-      cache: "no-store",
-      headers: { "Accept": "application/json" }
-    });
-    var payload = await response.json();
+    var response;
+    var payload;
+    try {
+      response = await window.fetch(apiUrl("/i18n?lang=" + encodeURIComponent(language)), {
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: { "Accept": "application/json" }
+      });
+      payload = await response.json();
+    } catch (unusedError) {
+      if (serial !== state.languageRequestSerial) { return; }
+      throw new Error(t("request_failed", "Request failed"));
+    }
+    if (serial !== state.languageRequestSerial) { return; }
     if (!response.ok || !payload.ok) {
-      throw new Error("Language catalog unavailable");
+      throw new Error(t("request_failed", "Request failed"));
     }
     var catalog = payload.data || {};
+    var previous = state.strings;
     state.language = catalog.language || "en";
     state.strings = catalog.strings || {};
+    state.runtimeTexts = catalog.runtime_texts || {};
+    translateCurrentMessages(previous);
     document.documentElement.lang = state.language.replace(/_/g, "-");
     document.documentElement.dir = catalog.direction === "rtl" ? "rtl" : "ltr";
     safeStorageSet("gt-web-language", state.language);
     safeStorageSet("gt-web-browser-language", browserLanguage());
     document.querySelectorAll("[data-i18n]").forEach(function (element) {
       var key = element.getAttribute("data-i18n");
+      if (element.id === "youtubeMessage" && Object.keys(previous).length &&
+          element.textContent !== previous[key] && element.textContent !== t(key)) { return; }
       element.textContent = t(key, element.textContent);
     });
     document.querySelectorAll("[data-i18n-title]").forEach(function (element) {
@@ -191,8 +270,14 @@
     });
     fillLanguageSelect(byId("authLanguage"), catalog.languages || []);
     fillLanguageSelect(byId("languageSelect"), catalog.languages || []);
+    fillSubtitleLanguageSelect(catalog.languages || []);
     byId("youtubeLanguage").textContent = t("youtube_automatic", "Automatic") + " · " + browserLanguage();
     updateKeyboardLabel();
+    if (!byId("sourceModal").hidden) {
+      byId("sourceModalTitle").textContent = byId("sourceId").value ? t("edit", "Edit") : t("add_source", "Add Source");
+    }
+    var quality = String((state.youtubeSettings || {}).resolution || byId("youtubeResolution").value || "1440");
+    byId("youtubeSearchQuality").textContent = t("youtube_actual_quality", "Quality") + " · " + youTubeQualityLabel(quality);
     if (!byId("appView").hidden) {
       renderCurrentData();
     }
@@ -209,7 +294,87 @@
     select.replaceChildren(fragment);
   }
 
+  function fillSubtitleLanguageSelect(languages) {
+    var select = byId("subtitleLanguage");
+    var previous = select.dataset.populated ? select.value : state.language.split("_")[0];
+    var seen = {};
+    var fragment = document.createDocumentFragment();
+    languages.forEach(function (language) {
+      var code = String(language.code || "").split("_")[0].toLowerCase();
+      if (!/^[a-z]{2,3}$/.test(code) || seen[code]) { return; }
+      seen[code] = true;
+      var option = node("option", "", language.name || code);
+      option.value = code;
+      fragment.appendChild(option);
+    });
+    if (!Object.keys(seen).length) { return; }
+    select.replaceChildren(fragment);
+    select.value = seen[previous] ? previous : (seen.en ? "en" : Object.keys(seen)[0]);
+    select.dataset.populated = "1";
+  }
+
+  function mobileMenuLayout() {
+    return typeof window.matchMedia === "function" ?
+      window.matchMedia("(max-width: 1024px)").matches : Number(window.innerWidth || 1280) <= 1024;
+  }
+
+  function setMenuOpen(open, restoreFocus) {
+    var sidebar = byId("sidebar");
+    var wasOpen = sidebar.classList.contains("open");
+    var mobile = mobileMenuLayout();
+    var visible = Boolean(open && mobile && !byId("appView").hidden);
+    sidebar.classList.toggle("open", visible);
+    sidebar.inert = mobile && !visible;
+    byId("workspace").inert = visible;
+    byId("menuBackdrop").hidden = !visible;
+    byId("menuButton").setAttribute("aria-expanded", String(visible));
+    document.body.classList.toggle("menu-open", visible);
+    if (visible) {
+      sidebar.removeAttribute("aria-hidden");
+      sidebar.setAttribute("role", "dialog");
+      sidebar.setAttribute("aria-modal", "true");
+      if (!wasOpen) { byId("closeMenuButton").focus(); }
+    } else {
+      sidebar.removeAttribute("role");
+      sidebar.removeAttribute("aria-modal");
+      if (mobile) { sidebar.setAttribute("aria-hidden", "true"); }
+      else { sidebar.removeAttribute("aria-hidden"); }
+      if (wasOpen && restoreFocus !== false && !byId("appView").hidden) {
+        var target = mobile ? byId("menuButton") : sidebar.querySelector(".nav-button.active");
+        if (target) { target.focus(); }
+      }
+    }
+  }
+
+  function handleMenuKeyboard(event) {
+    var sidebar = byId("sidebar");
+    if (!sidebar.classList.contains("open")) { return; }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setMenuOpen(false);
+    } else if (event.key === "Tab") {
+      var buttons = Array.prototype.filter.call(sidebar.querySelectorAll("button"), function (button) {
+        return !button.disabled && !button.hidden;
+      });
+      var first = buttons[0];
+      var last = buttons[buttons.length - 1];
+      if (!first) { return; }
+      if (event.shiftKey && (document.activeElement === first || !sidebar.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !sidebar.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
   function showAuth(message, isError) {
+    setMenuOpen(false, false);
+    cancelYouTubeSearch();
+    ++state.youtubeSearchSerial;
+    state.youtubeSearchBusy = state.youtubePagingBusy = false;
+    setBusy(byId("youtubeSearchForm").querySelector("button"), false);
     window.clearInterval(state.refreshTimer);
     window.clearInterval(state.sessionTimer);
     window.clearTimeout(state.automaticTestTimer);
@@ -276,11 +441,30 @@
     }
   }
 
+  function formattedPairCode(value) {
+    var digits = String(value || "").replace(/\D/g, "").slice(0, 6);
+    return digits.length > 3 ? digits.slice(0, 3) + " " + digits.slice(3) : digits;
+  }
+
+  function formatPairCodeInput(event) {
+    var input = event.target;
+    var raw = String(input.value || "");
+    var cursor = input.selectionStart;
+    var digitsBefore = raw.slice(0, typeof cursor === "number" ? cursor : raw.length).replace(/\D/g, "").length;
+    input.value = formattedPairCode(raw);
+    if (typeof cursor === "number" && typeof input.setSelectionRange === "function") {
+      var afterSeparator = digitsBefore > 3 || (digitsBefore === 3 &&
+        (event.inputType === "deleteContentForward" || raw.charAt(cursor - 1) === " "));
+      var position = Math.min(input.value.length, digitsBefore + (afterSeparator && input.value.length > 3 ? 1 : 0));
+      input.setSelectionRange(position, position);
+    }
+  }
+
   async function submitPair(event) {
     event.preventDefault();
     var button = event.currentTarget.querySelector("button[type=submit]");
     var code = String(byId("pairCode").value || "").replace(/\D/g, "").slice(0, 6);
-    byId("pairCode").value = code;
+    byId("pairCode").value = formattedPairCode(code);
     if (code.length !== 6) {
       setPairStatus(t("pair_code", "Pairing code") + ": 6", true);
       return;
@@ -388,29 +572,30 @@
   function renderCurrentData() {
     if (state.dashboard) {
       renderDashboard(state.dashboard);
-      if (state.page === "sources") {
-        renderSources(state.sources);
-      } else if (state.page === "automatic-test" && state.automaticTest) {
-        renderAutomaticTest(state.automaticTest);
-      } else if (state.page === "downloads") {
-        loadDownloads();
-      } else if (state.page === "epg") {
-        loadEpg();
-      } else if (state.page === "favorites") {
-        loadFavorites();
-      } else if (state.page === "settings") {
-        loadSettings();
-      } else if (state.page === "subtitles") {
-        loadSubtitleCurrent();
-        if (state.subtitleResults) { renderSubtitleResults(state.subtitleResults); }
-      } else if (state.page === "audio" && state.audioCurrent) {
-        renderAudioCurrent(state.audioCurrent);
-      } else if (state.page === "youtube") {
-        renderYouTubeResults(state.youtubeResults);
-        renderYouTubePager();
-      } else if (state.page === "media") {
-        renderMediaResults(state.mediaResults);
-      }
+    }
+    if (state.page === "sources") {
+      renderSources(state.sources);
+    } else if (state.page === "automatic-test" && state.automaticTest) {
+      renderAutomaticTest(state.automaticTest);
+    } else if (state.page === "downloads") {
+      loadDownloads();
+    } else if (state.page === "epg") {
+      loadEpg();
+    } else if (state.page === "favorites") {
+      loadFavorites();
+    } else if (state.page === "settings") {
+      loadSettings();
+    } else if (state.page === "subtitles") {
+      loadSubtitleCurrent();
+    } else if (state.page === "audio" && state.audioCurrent) {
+      renderAudioCurrent(state.audioCurrent);
+    } else if (state.page === "youtube") {
+      renderYouTubeResults(state.youtubeResults);
+      renderYouTubeHistory(state.youtubeHistory);
+      renderYouTubePager();
+      if (state.youtubeStatus) { renderYouTubeStatus(state.youtubeStatus); }
+    } else if (state.page === "media") {
+      renderMediaResults(state.mediaResults);
     }
   }
 
@@ -436,11 +621,6 @@
     return type === "xtream" ? "XTREAM" : (type === "stalker" ? "STALKER / MAC" : String(type || "IPTV").toUpperCase());
   }
 
-  function revisionNumber(version) {
-    var match = /-r(\d+)$/i.exec(String(version || ""));
-    return match ? Number(match[1]) : 0;
-  }
-
   function updateRuntimeWarning(force) {
     if (force) {
       state.runtimeWarningForced = true;
@@ -458,6 +638,14 @@
     renderAutomaticTest(state.automaticTest);
     toast(t("restart_required", "The web interface was updated. Restart the Enigma2 interface and refresh this page to activate the changes."), true);
     return true;
+  }
+
+  function restoreAutomaticTestAvailability() {
+    if (state.automaticTestUnavailable) {
+      state.automaticTestUnavailable = false;
+      state.runtimeWarningForced = false;
+      updateRuntimeWarning(false);
+    }
   }
 
   function renderDashboard(data) {
@@ -483,10 +671,6 @@
     var usedPercent = total > 0 ? Math.max(0, Math.min(100, Math.round((1 - free / total) * 100))) : 0;
     byId("storageRing").parentElement.style.background = "conic-gradient(var(--cyan) 0 " + usedPercent + "%, #202d57 " + usedPercent + "%)";
     state.runtimeVersion = String((data.plugin || {}).version || "");
-    var runtimeRevision = revisionNumber(state.runtimeVersion);
-    if (runtimeRevision && runtimeRevision < 22) {
-      state.automaticTestUnavailable = true;
-    }
     updateRuntimeWarning(false);
     byId("sidebarVersion").textContent = (state.runtimeVersion || state.clientVersion || "").replace(/^.*-/, "").toUpperCase();
     byId("youtubeReceiver").textContent = receiver.name || "Enigma2";
@@ -509,13 +693,13 @@
   function downloadRow(item, withActions) {
     var row = node("article", "download-row");
     var head = node("div", "download-head");
-    append(head, statusDot(item.status === "downloading" ? "green" : (item.status === "error" ? "red" : "yellow")), node("strong", "", item.name || "Video"), node("small", "", String(item.percent || 0) + "%"));
+    append(head, statusDot(item.status === "downloading" ? "green" : (item.status === "error" ? "red" : "yellow")), node("strong", "", item.name || t("video", "Video")), node("small", "", String(item.percent || 0) + "%"));
     var track = node("div", "progress-track");
     var bar = node("i");
     bar.style.width = String(Math.max(0, Math.min(100, Number(item.percent || 0)))) + "%";
     track.appendChild(bar);
     var meta = node("div", "download-meta");
-    append(meta, node("span", "", (item.downloaded_text || "0 B") + (item.total_text ? " / " + item.total_text : "")), node("span", "", item.speed_text || (item.status === "stopping" ? t("test_stopping", "Stopping") : t(item.status, item.status))));
+    append(meta, node("span", "", (item.downloaded_text || "0 B") + (item.total_text ? " / " + item.total_text : "")), node("span", "", item.speed_text || (item.status === "stopping" ? t("test_stopping", "Stopping") : t(item.status, t("status", "Status")))));
     append(row, head, track, meta);
     if (withActions) {
       var actions = node("div", "row-actions");
@@ -555,7 +739,7 @@
 
   function scheduleAutomaticTestPolling() {
     stopAutomaticTestPolling();
-    if (state.page === "automatic-test" && automaticTestActive(state.automaticTest)) {
+    if (state.page === "automatic-test" && !byId("appView").hidden && automaticTestActive(state.automaticTest)) {
       state.automaticTestTimer = window.setTimeout(loadAutomaticTest, 800);
     }
   }
@@ -613,6 +797,10 @@
     return String(active) + " / " + (maximum === null || maximum === undefined ? "—" : String(maximum));
   }
 
+  function automaticTestAccountLabel(item) {
+    return item.account_hint ? t(item.type === "stalker" ? "mac_address" : "username") + " · " + item.account_hint : "";
+  }
+
   function automaticTestResultCard(item) {
     var status = ["green", "yellow", "red"].indexOf(item.status) >= 0 ? item.status : "neutral";
     var card = node("article", "test-result-card status-" + status);
@@ -622,29 +810,42 @@
       node("strong", "", item.name || sourceTypeLabel(item.type)),
       node("small", "", item.endpoint || sourceTypeLabel(item.type))
     );
-    append(head,
-      statusDot(status),
-      title,
+    if (item.account_hint) { title.appendChild(node("small", "test-result-account", automaticTestAccountLabel(item))); }
+    var badges = node("div", "test-result-badges");
+    append(badges,
       node("span", "type-badge", sourceTypeShortLabel(item.type)),
       node("span", "test-result-status", providerStatusLabel(item.provider_status, status))
     );
+    append(head, statusDot(status), title, badges);
     var details = node("div", "test-result-details");
     append(details,
       infoLine(t("connection_status", "Connection status"), providerStatusLabel(item.account_status || item.provider_status, status)),
-      infoLine(t("expiry_date", "Expiry date"), item.expiry || "—"),
+      infoLine(t("expiry_date", "Expiry date"), serverText(item.expiry) || "—"),
       infoLine(t("connections", "Connections"), automaticTestConnections(item)),
       infoLine(t("latency", "Latency"), Number(item.latency_ms || 0) > 0 ? String(item.latency_ms) + " ms" : "—")
     );
     append(card, head, details);
     if (item.detail) {
       card.appendChild(node("p", "test-result-message",
-        item.detail === "The source could not be checked." ? t("request_failed", "Request failed") : item.detail));
+        serverText(item.detail)));
+    }
+    if (item.id) {
+      var actions = node("div", "test-result-actions");
+      var remove = sourceButton(t("delete", "Delete"), "delete", item.id, true);
+      remove.classList.add("test-result-delete");
+      remove.setAttribute("aria-label", t("delete", "Delete") + " · " + (item.name || sourceTypeLabel(item.type)));
+      setBusy(remove, Boolean(state.automaticTestDeleting[item.id]));
+      remove.setAttribute("aria-busy", String(Boolean(state.automaticTestDeleting[item.id])));
+      actions.appendChild(remove);
+      card.appendChild(actions);
     }
     return card;
   }
 
   function renderAutomaticTest(data) {
     data = data || { state: "idle", type: "", total: 0, completed: 0, summary: {}, results: [] };
+    var previous = state.automaticTest;
+    if (previous && data.instance && data.instance === previous.instance && Number(data.revision) < Number(previous.revision)) { return; }
     state.automaticTest = data;
     var jobState = String(data.state || "idle");
     var total = Math.max(0, Number(data.total || 0));
@@ -687,19 +888,56 @@
       return;
     }
     state.automaticTestLoading = true;
+    var serial = ++state.automaticTestRequestSerial;
     var previousState = (state.automaticTest || {}).state;
     try {
       var result = await api("/automatic-test");
+      if (serial !== state.automaticTestRequestSerial) { return; }
+      restoreAutomaticTestAvailability();
       renderAutomaticTest(result);
       if (["running", "cancelling"].indexOf(previousState) >= 0 && !automaticTestActive(result)) {
         refreshAll(false);
       }
     } catch (error) {
+      if (serial !== state.automaticTestRequestSerial) { return; }
       if (!handleAutomaticTestUnavailable(error)) {
         toast(error.message || t("request_failed", "Request failed"), true);
       }
     } finally {
       state.automaticTestLoading = false;
+      scheduleAutomaticTestPolling();
+    }
+  }
+
+  async function deleteAutomaticTestSource(button) {
+    var identity = button.dataset.sourceId;
+    var item = ((state.automaticTest || {}).results || []).find(function (entry) { return entry.id === identity; });
+    if (!item || state.automaticTestDeleting[identity]) { return; }
+    var description = [item.name || sourceTypeLabel(item.type), item.endpoint, automaticTestAccountLabel(item)].filter(Boolean).join("\n");
+    if (!window.confirm(t("confirm_delete", "Delete this item?") + "\n\n" + description)) { return; }
+    state.automaticTestDeleting[identity] = true;
+    setBusy(button, true);
+    button.setAttribute("aria-busy", "true");
+    try {
+      var result = await api("/sources/" + encodeURIComponent(identity), { method: "DELETE", body: {} });
+      ++state.automaticTestRequestSerial;
+      state.sources = state.sources.filter(function (entry) { return entry.id !== identity; });
+      if (result.automatic_test) { renderAutomaticTest(result.automatic_test); }
+      else { await loadAutomaticTest(); }
+      toast(t("source_deleted", "Source deleted"));
+      refreshAll(false);
+    } catch (error) {
+      toast(error.message || t("request_failed", "Request failed"), true);
+    } finally {
+      delete state.automaticTestDeleting[identity];
+      setBusy(button, false);
+      button.setAttribute("aria-busy", "false");
+      document.querySelectorAll(".test-result-delete").forEach(function (current) {
+        if (current.dataset.sourceId === identity) {
+          setBusy(current, false);
+          current.setAttribute("aria-busy", "false");
+        }
+      });
       scheduleAutomaticTestPolling();
     }
   }
@@ -712,6 +950,7 @@
         method: "POST",
         body: { type: button.dataset.autoTestType }
       });
+      restoreAutomaticTestAvailability();
       renderAutomaticTest(result);
       toast(result.state === "empty" ? t("no_portals", "No saved portal was found for this type") : t("test_running", "Automatic test is running"), result.state === "empty");
     } catch (error) {
@@ -729,7 +968,9 @@
     stopAutomaticTestPolling();
     setBusy(button, true);
     try {
-      renderAutomaticTest(await api("/automatic-test/cancel", { method: "POST", body: {} }));
+      var result = await api("/automatic-test/cancel", { method: "POST", body: {} });
+      restoreAutomaticTestAvailability();
+      renderAutomaticTest(result);
     } catch (error) {
       if (!handleAutomaticTestUnavailable(error)) {
         toast(error.message || t("request_failed", "Request failed"), true);
@@ -765,7 +1006,7 @@
       append(body, node("strong", "", item.name || sourceTypeLabel(item.type)), node("small", "", item.endpoint || item.label || item.masked_secret));
       append(head, badge, body, statusDot(item.status));
       var health = item.health || {};
-      var details = node("div", "health-details", health.detail || item.label || t("masked_notice", "Sensitive account data is hidden."));
+      var details = node("div", "health-details", serverText(health.detail) || item.label || t("masked_notice", "Sensitive account data is hidden."));
       var actions = node("div", "row-actions");
       actions.appendChild(sourceButton(t("test", "Test"), "test", item.id));
       actions.appendChild(sourceButton(t("edit", "Edit"), "edit", item.id));
@@ -1157,11 +1398,57 @@
     byId("tmdbKey").placeholder = settings.configured ? t("subtitle_key_saved", "Key saved · enter a new key to replace it") : t("subtitle_api_key", "API key");
   }
 
+  function youTubeQualityLabel(value) {
+    return value === "2160" ? "4K (2160p)" : value === "1440" ? "2K (1440p)" : value + "p";
+  }
+
   function renderYouTubeSettings(settings) {
-    byId("youtubeResolution").value = settings.resolution || "720";
-    byId("youtubeStreamMode").value = settings.mode || (settings.dash ? "auto" : "compatible");
-    byId("youtubeAudioPreference").value = settings.audio_preference || "default";
+    state.youtubeSettings = settings || {};
+    var quality = String(settings.resolution || "1440");
+    state.youtubeQuality = quality;
+    byId("youtubeResolution").value = quality;
+    byId("youtubeAutoplay").value = settings.autoplay ? "on" : "off";
     byId("youtubeLanguage").textContent = t("youtube_automatic", "Automatic") + " · " + browserLanguage();
+    byId("youtubeSearchQuality").textContent = t("youtube_actual_quality", "Quality") + " · " + youTubeQualityLabel(quality);
+
+  }
+
+  function renderYouTubeHistory(queries) {
+    state.youtubeHistory = queries || [];
+    var rows = state.youtubeHistory.map(function (query) {
+      var row = node("div", "youtube-history-row");
+      var search = node("button", "youtube-history-query", query);
+      search.type = "button";
+      search.addEventListener("click", function () {
+        byId("youtubeQuery").value = query;
+        byId("youtubeHistory").hidden = true;
+        byId("youtubeHistoryToggle").setAttribute("aria-expanded", "false");
+        byId("youtubeSearchForm").requestSubmit();
+      });
+      var remove = node("button", "secondary-button small", t("delete", "Delete"));
+      remove.type = "button";
+      remove.setAttribute("aria-label", t("delete", "Delete") + " · " + query);
+      remove.addEventListener("click", function () { deleteYouTubeHistory(query, remove); });
+      append(row, search, remove);
+      return row;
+    });
+    if (!rows.length) { rows.push(node("p", "video-message", t("no_results", "No results found"))); }
+    byId("youtubeHistoryList").replaceChildren.apply(byId("youtubeHistoryList"), rows);
+    byId("youtubeHistoryClear").disabled = !state.youtubeHistory.length;
+  }
+
+  async function loadYouTubeHistory() {
+    try { renderYouTubeHistory((await api("/youtube/history")).queries); }
+    catch (error) { byId("youtubeMessage").textContent = error.message; }
+  }
+
+  async function deleteYouTubeHistory(query, button) {
+    setBusy(button, true);
+    try {
+      var payload = query === null ? {} : { query: query };
+      renderYouTubeHistory((await api("/youtube/history", { method: "DELETE", body: payload })).queries);
+    } catch (error) { toast(error.message, true); }
+    finally { setBusy(button, false); }
   }
 
   async function saveExternalSettings(kind, payload, button) {
@@ -1228,6 +1515,95 @@
     target.replaceChildren.apply(target, controls);
   }
 
+  function cancelYouTubeSearch() {
+    var token = state.youtubeSearchToken;
+    state.youtubeSearchToken = "";
+    if (token) {
+      api("/youtube/search-job", { method: "DELETE", body: { token: token } }).catch(function () {});
+    }
+    cancelYouTubePrefetch();
+  }
+
+  function cancelYouTubePrefetch() {
+    var task = state.youtubePrefetch;
+    state.youtubePrefetch = null;
+    if (task) {
+      task.cancelled = true;
+      if (task.token) {
+        api("/youtube/search-job", { method: "DELETE", body: { token: task.token } }).catch(function () {});
+      }
+    }
+  }
+
+  async function getYouTubeSearch(query, cursor, serial, update, button, task) {
+    var response = await api("/youtube/search?q=" + encodeURIComponent(query) + "&cursor=" + encodeURIComponent(cursor || "")
+      + "&lang=" + encodeURIComponent(state.youtubeSearchLocale) + "&progress=1");
+    var token = response.search_token || "";
+    function obsolete() {
+      if (serial === state.youtubeSearchSerial && !(task && task.cancelled)) { return false; }
+      if (token) {
+        api("/youtube/search-job", { method: "DELETE", body: { token: token } }).catch(function () {});
+      }
+      return true;
+    }
+    if (obsolete()) { return null; }
+    if (task) { task.token = token; }
+    else { state.youtubeSearchToken = token; }
+    if (button) { setBusy(button, false); }
+    try {
+      while (true) {
+        if (obsolete()) { return null; }
+        if (response.results.length || !response.error) { update(response); }
+        if (!response.pending) {
+          if (response.error) { throw new Error(t(response.error, t("request_failed", "Request failed"))); }
+          return response;
+        }
+        if (!token) { throw new Error(t("request_failed", "Request failed")); }
+        await new Promise(function (resolve) { window.setTimeout(resolve, 350); });
+        if (obsolete()) { return null; }
+        response = await api("/youtube/search-job?token=" + encodeURIComponent(token));
+      }
+    } catch (error) {
+      if (token) {
+        api("/youtube/search-job", { method: "DELETE", body: { token: token } }).catch(function () {});
+      }
+      throw error;
+    } finally {
+      if (task) { task.token = ""; }
+      else if (state.youtubeSearchToken === token) { state.youtubeSearchToken = ""; }
+    }
+  }
+
+  function showYouTubePage(page, response) {
+    state.youtubePages[page - 1] = response;
+    state.youtubePage = page;
+    renderYouTubeResults(response.results);
+    renderYouTubePager();
+    byId("youtubeMessage").textContent = response.pending ? t("searching", "Searching…") :
+      response.pagination_warning ? t(response.pagination_warning) : t("youtube_page_label", "Page") + " " + page;
+  }
+
+  function prepareNextYouTubePage() {
+    if (state.page !== "youtube" || state.youtubeSearchBusy || state.youtubePagingBusy) { return; }
+    var previous = state.youtubePages[state.youtubePage - 1];
+    var page = state.youtubePage + 1;
+    if (!previous || previous.pending || previous.error || !previous.has_more || !previous.cursor
+        || state.youtubePages[page - 1]) { return; }
+    if (state.youtubePrefetch && state.youtubePrefetch.page === page) { return; }
+    cancelYouTubePrefetch();
+    var task = { page: page, serial: state.youtubeSearchSerial, token: "", response: null,
+      promoted: false, cancelled: false, error: null, promise: null };
+    state.youtubePrefetch = task;
+    task.promise = getYouTubeSearch(state.youtubeQuery, previous.cursor, task.serial, function (response) {
+      task.response = response;
+      if (task.promoted) { showYouTubePage(page, response); }
+    }, null, task).catch(function (error) {
+      // A failed speculative request must leave the current page usable.
+      task.error = error;
+      return null;
+    });
+  }
+
   async function gotoYouTubePage(page, button) {
     if (state.youtubePagingBusy || page < 1 || page > state.youtubePages.length + 1 || page === state.youtubePage) { return; }
     if (state.youtubePages[page - 1]) {
@@ -1236,24 +1612,33 @@
       renderYouTubePager();
       byId("youtubeMessage").textContent = t("youtube_page_label", "Page") + " " + page;
       byId("youtubePager").scrollIntoView({ block: "nearest" });
+      prepareNextYouTubePage();
       return;
     }
     var previous = state.youtubePages[state.youtubePages.length - 1];
     if (!previous || !previous.cursor) { return; }
     var serial = state.youtubeSearchSerial;
+    var prepared = state.youtubePrefetch;
+    if (prepared && prepared.page === page && prepared.error) {
+      cancelYouTubePrefetch();
+      prepared = null;
+    }
     state.youtubePagingBusy = true;
     renderYouTubePager();
     byId("youtubeMessage").textContent = t("searching", "Searching…");
     try {
-      var path = "/youtube/search?q=" + encodeURIComponent(state.youtubeQuery) + "&cursor=" + encodeURIComponent(previous.cursor) + "&lang=" + encodeURIComponent(state.youtubeSearchLocale);
-      var response = await api(path);
-      if (serial !== state.youtubeSearchSerial) { return; }
-      state.youtubePages.push(response);
-      state.youtubePage = page;
-      renderYouTubeResults(response.results);
-      renderYouTubePager();
-      byId("youtubeMessage").textContent = response.pagination_warning ? t(response.pagination_warning) : t("youtube_page_label", "Page") + " " + page;
-      byId("youtubePager").scrollIntoView({ block: "nearest" });
+      if (prepared && prepared.page === page) {
+        prepared.promoted = true;
+        if (prepared.response) { showYouTubePage(page, prepared.response); }
+        await prepared.promise;
+        if (state.youtubePrefetch === prepared) { state.youtubePrefetch = null; }
+        if (prepared.error && serial === state.youtubeSearchSerial) { throw prepared.error; }
+      } else {
+        await getYouTubeSearch(state.youtubeQuery, previous.cursor, serial, function (response) {
+          showYouTubePage(page, response);
+        });
+      }
+      if (serial === state.youtubeSearchSerial) { byId("youtubePager").scrollIntoView({ block: "nearest" }); }
     } catch (error) {
       if (serial === state.youtubeSearchSerial) {
         byId("youtubeMessage").textContent = error.message;
@@ -1263,6 +1648,7 @@
       if (serial === state.youtubeSearchSerial) {
         state.youtubePagingBusy = false;
         renderYouTubePager();
+        prepareNextYouTubePage();
       }
     }
   }
@@ -1272,28 +1658,39 @@
     var query = byId("youtubeQuery").value.trim();
     var locale = browserLanguage();
     var serial = ++state.youtubeSearchSerial;
+    cancelYouTubeSearch();
     state.youtubePagingBusy = false;
+    state.youtubeSearchBusy = true;
+    state.youtubeQuery = query;
+    state.youtubeSearchLocale = locale;
+    state.youtubePages = [];
+    renderYouTubeResults([]);
+    renderYouTubePager();
     var button = event.currentTarget.querySelector("button");
     setBusy(button, true);
     byId("youtubeMessage").textContent = t("searching", "Searching…");
     try {
-      var result = await api("/youtube/search?q=" + encodeURIComponent(query) + "&lang=" + encodeURIComponent(locale));
-      if (serial !== state.youtubeSearchSerial) { return; }
-      state.youtubeQuery = query;
-      state.youtubeSearchLocale = locale;
-      state.youtubePages = [result];
-      state.youtubePage = 1;
-      renderYouTubeResults(result.results);
-      renderYouTubePager();
-      byId("youtubeMessage").textContent = result.pagination_warning ? t(result.pagination_warning) : (result.results.length ? "" : t("no_results", "No results found"));
+      await getYouTubeSearch(query, "", serial, function (result) {
+        state.youtubeQuality = String((state.youtubeSettings || {}).resolution || result.quality || "1440");
+        byId("youtubeSearchQuality").textContent = t("youtube_actual_quality", "Quality") + " · " + youTubeQualityLabel(state.youtubeQuality);
+        state.youtubePages = [result];
+        state.youtubePage = 1;
+        renderYouTubeResults(result.results);
+        renderYouTubePager();
+        byId("youtubeMessage").textContent = result.pending ? t("searching", "Searching…") :
+          result.pagination_warning ? t(result.pagination_warning) : (result.results.length ? "" : t("no_results", "No results found"));
+      }, button);
     } catch (error) { if (serial === state.youtubeSearchSerial) { byId("youtubeMessage").textContent = error.message; toast(error.message, true); } }
-    finally { setBusy(button, false); }
+    finally {
+      if (serial === state.youtubeSearchSerial) { state.youtubeSearchBusy = false; setBusy(button, false); }
+      if (serial === state.youtubeSearchSerial) { loadYouTubeHistory(); prepareNextYouTubePage(); }
+    }
   }
 
   async function playYouTube(entry, button) {
     setBusy(button, true);
     try {
-      var result = await api("/youtube/play", { method: "POST", body: { id: entry.id, title: entry.title } });
+      var result = await api("/youtube/play", { method: "POST", body: { id: entry.id, title: entry.title, context: (state.youtubePages[state.youtubePage - 1] || {}).context || "" } });
       state.youtubeJobToken = result.token;
       byId("youtubeMessage").textContent = t("youtube_resolving", "Preparing the video for TV…");
       pollYouTube();
@@ -1310,29 +1707,45 @@
     if (state.page !== "youtube" || byId("appView").hidden) { return; }
     try {
       var data = await api("/youtube/status?token=" + encodeURIComponent(state.youtubeJobToken || ""));
-      if (data.job && data.job.state === "failed") {
-        byId("youtubeMessage").textContent = t("youtube_play_failed", "Video could not be played on this receiver. Try another video or quality setting.");
-        state.youtubeJobToken = "";
-      } else if (data.job && data.job.state === "playing") {
-        byId("youtubeMessage").textContent = "";
-      }
-      byId("youtubeNow").hidden = !data.playing;
-      if (data.playing) {
-        byId("youtubeNowTitle").textContent = data.playing.title;
-        var entry = null;
-        state.youtubePages.some(function (page) {
-          entry = (page.results || []).find(function (item) { return item.id === data.playing.id; });
-          return Boolean(entry);
-        });
-        byId("youtubeNowImage").src = entry ? entry.thumbnail : "assets/logo.svg";
-        var channel = entry ? entry.channel : "YouTube";
-        var quality = Number(data.playing.quality) || 0;
-        var requested = String(data.playing.requested_quality || "");
-        byId("youtubeNowDetails").textContent = quality ? channel + " · " + t("youtube_actual_quality", "Quality") + " " + (requested && requested !== String(quality) ? requested + "p → " : "") + quality + "p" : channel;
-        byId("youtubeNowTime").textContent = data.playing.length ? clockTime(data.playing.position) + " / " + clockTime(data.playing.length) : "";
-        byId("youtubeProgress").style.width = data.playing.length ? Math.min(100, (data.playing.position / data.playing.length) * 100) + "%" : "0%";
-      }
+      if (data.settings) { renderYouTubeSettings(data.settings); }
+      if (!byId("youtubeHistory").hidden) { loadYouTubeHistory(); }
+      state.youtubeStatus = data;
+      renderYouTubeStatus(data);
     } catch (unusedError) { /* The next status poll retries. */ }
+  }
+
+  function renderYouTubeStatus(data) {
+    if (data.playing && data.playing.id !== state.youtubePlayingId) {
+      state.youtubePlayingId = data.playing.id;
+      if (!state.youtubeSearchBusy && !data.autoplay_pending) { byId("youtubeMessage").textContent = ""; }
+    }
+    if (data.job && data.job.state === "failed") {
+      byId("youtubeMessage").textContent = t(data.job.error || "youtube_play_failed", "Video could not be played on this receiver. Try another video or quality setting.")
+        + (data.job.error === "youtube_native_player_required" ? " · ServiceApp / ExtEplayer3 (5002)" : "");
+      state.youtubeJobToken = "";
+    } else if (data.job && data.job.state === "playing") {
+      if (!state.youtubeSearchBusy) { byId("youtubeMessage").textContent = ""; }
+      state.youtubeJobToken = "";
+    }
+    if (data.autoplay_pending && !state.youtubeSearchBusy) {
+      byId("youtubeMessage").textContent = t("youtube_resolving", "Preparing the video for TV…");
+    }
+    byId("youtubeNow").hidden = !data.playing;
+    if (data.playing) {
+      byId("youtubeNowTitle").textContent = data.playing.title;
+      var entry = null;
+      state.youtubePages.some(function (page) {
+        entry = (page.results || []).find(function (item) { return item.id === data.playing.id; });
+        return Boolean(entry);
+      });
+      byId("youtubeNowImage").src = entry ? entry.thumbnail : "assets/logo.svg";
+      var channel = entry ? entry.channel : "YouTube";
+      var quality = Number(data.playing.quality) || 0;
+      var requested = String(data.playing.requested_quality || "");
+      byId("youtubeNowDetails").textContent = quality ? channel + " · " + t("youtube_actual_quality", "Quality") + " " + (requested && requested !== String(quality) ? requested + "p → " : "") + quality + "p" : channel;
+      byId("youtubeNowTime").textContent = data.playing.length ? clockTime(data.playing.position) + " / " + clockTime(data.playing.length) : "";
+      byId("youtubeProgress").style.width = data.playing.length ? Math.min(100, (data.playing.position / data.playing.length) * 100) + "%" : "0%";
+    }
   }
 
   async function loadMediaSources() {
@@ -1355,11 +1768,27 @@
       var artwork = node("div", "video-media-artwork"); artwork.appendChild(icon(entry.kind === "movie" ? "device" : "calendar"));
       var details = node("div", "video-card-details");
       append(details, node("h2", "", entry.name), node("p", "video-channel", entry.source),
-        node("small", "", entry.season && entry.episode ? "S" + entry.season + " · E" + entry.episode : entry.kind === "movie" ? t("movies", "Movies") : t("series", "Series")));
+        node("small", "", entry.season && entry.episode ? t("season", "Season") + " " + entry.season + " · " + t("episode", "Episode") + " " + entry.episode : entry.kind === "movie" ? t("movies", "Movies") : t("series", "Series")));
       var button = node("button", "video-blue-button", entry.playable ? t("play_on_tv", "Play on TV") : t("choose_episode", "Choose episodes"));
       button.type = "button";
       button.addEventListener("click", function () { selectMedia(entry, button); });
-      append(card, artwork, details, button); return card;
+      var actions = node("div", "media-result-actions");
+      actions.appendChild(button);
+      if (entry.playable) {
+        var downloadButton = node("button", "video-blue-button media-download-button");
+        downloadButton.type = "button";
+        downloadButton.dataset.mediaToken = entry.token;
+        append(downloadButton, icon("download"), node("span", "", t("download", "Download")));
+        downloadButton.title = entry.downloadable ? t("download", "Download") + " · " + entry.name :
+          t("download_unsupported", "This stream is not a downloadable video file.");
+        downloadButton.setAttribute("aria-label", t("download", "Download") + " · " + entry.name);
+        downloadButton.setAttribute("aria-busy", String(Boolean(state.mediaDownloadPending[entry.token])));
+        setBusy(downloadButton, Boolean(state.mediaDownloadPending[entry.token]));
+        downloadButton.disabled = !entry.downloadable || Boolean(state.mediaDownloadPending[entry.token]);
+        downloadButton.addEventListener("click", function () { downloadMedia(entry, downloadButton); });
+        actions.appendChild(downloadButton);
+      }
+      append(card, artwork, details, actions); return card;
     });
     byId("mediaResults").replaceChildren.apply(byId("mediaResults"), cards);
   }
@@ -1392,6 +1821,32 @@
       }
     } catch (error) { toast(error.message, true); byId("mediaMessage").textContent = error.message; }
     finally { setBusy(button, false); }
+  }
+
+  async function downloadMedia(entry, button) {
+    if (!entry.downloadable || state.mediaDownloadPending[entry.token]) { return; }
+    state.mediaDownloadPending[entry.token] = true;
+    setBusy(button, true);
+    button.setAttribute("aria-busy", "true");
+    try {
+      var data = await api("/media/download", { method: "POST", body: { token: entry.token } });
+      toast(t("downloads", "Downloads") + " · " + t(data.status || "queued", "Queued") + " · " + entry.name);
+      refreshAll(false);
+    } catch (error) {
+      toast(error.message, true);
+      byId("mediaMessage").textContent = error.message;
+    } finally {
+      delete state.mediaDownloadPending[entry.token];
+      setBusy(button, false);
+      button.setAttribute("aria-busy", "false");
+      // A language change can replace the card while its request is pending.
+      document.querySelectorAll(".media-download-button").forEach(function (current) {
+        if (current.dataset.mediaToken === entry.token) {
+          setBusy(current, false);
+          current.setAttribute("aria-busy", "false");
+        }
+      });
+    }
   }
 
   function renderSubtitleProviders(providers) {
@@ -1481,27 +1936,83 @@
   }
 
   async function loadSubtitleCurrent() {
+    var serial = ++state.subtitleCurrentSerial;
     try {
       var data = await api("/subtitles/current");
+      if (serial !== state.subtitleCurrentSerial) { return; }
       var playing = data.playing !== false;
+      var context = playing ? (data.search_context || JSON.stringify([
+        data.title, data.year, data.content_type, data.season, data.episode])) : null;
+      var changed = context !== state.subtitleContext;
+      if (changed) {
+        state.subtitleSearchSerial += 1;
+        state.subtitleApplySerial += 1;
+        clearSubtitleList();
+        state.subtitleContext = context;
+        state.subtitleFormDirty = false;
+      }
       byId("subtitleCurrent").textContent = playing ? (data.title +
-        (data.content_type === "series" ? " · S" + String(data.season).padStart(2, "0") + "E" + String(data.episode).padStart(2, "0") :
+        (data.content_type === "series" ? " · " + t("season", "Season") + " " + data.season + " · " + t("episode", "Episode") + " " + data.episode :
           (data.year ? " (" + data.year + ")" : ""))) : t("vod_not_playing", "Play a movie or episode on the receiver first.");
-      byId("subtitleTitle").value = playing ? data.title : "";
-      byId("subtitleSearchButton").disabled = !playing;
-      byId("subtitleSearchHint").textContent = playing && !data.can_load ?
-        t("subssupport_required", "Install SubsSupport or SubsSupport Pro to load external subtitles.") : "";
+      if (changed || !byId("subtitleTitle").value) {
+        byId("subtitleTitle").value = playing ? data.title : "";
+      }
+      var independentDisabled = data.independent_enabled === false;
+      state.subtitleCanSearch = playing && !independentDisabled;
+      byId("subtitleSearchButton").disabled = !state.subtitleCanSearch
+        || Boolean(state.subtitleSearchBusySerial || state.subtitleApplyBusySerial);
+      byId("subtitleSearchHint").textContent = playing && independentDisabled ?
+        t("independent_subtitles_disabled", "Independent subtitles are turned off in settings.") :
+        (playing && !data.can_load ? t("subtitle_load_failed", "The receiver could not load this subtitle.") : "");
       renderSubtitleSync(data);
-      if (!playing) {
-        state.subtitleResults = null;
-        byId("subtitleResults").replaceChildren();
-        byId("subtitleProviderStatus").replaceChildren();
+      if (!playing || independentDisabled) {
+        clearSubtitleList();
+      } else {
+        if (!state.subtitleFormDirty && data.cached_results && data.cached_results.context === context) {
+          state.subtitleResults = data.cached_results;
+          byId("subtitleLanguage").value = data.cached_results.language;
+          byId("subtitleTitle").value = data.cached_results.title;
+          var selectedId = data.cached_results.selected_id || state.subtitleSelectedId;
+          state.subtitleSelectedId = (data.cached_results.items || []).some(function (item) {
+            return item.id === selectedId;
+          }) ? selectedId : null;
+        } else if (Object.prototype.hasOwnProperty.call(data, "cached_results")) {
+          clearSubtitleList();
+        }
+        if (state.subtitleResults && state.subtitleResults.context === context) {
+          state.subtitleResults.can_load = data.can_load;
+          renderSubtitleResults(state.subtitleResults);
+          if (state.subtitleRestoreScroll) {
+            state.subtitleRestoreScroll = false;
+            var restoreContext = context;
+            window.setTimeout(function () {
+              if (state.page === "subtitles" && state.subtitleContext === restoreContext
+                  && typeof window.scrollTo === "function") {
+                window.scrollTo(0, state.subtitleScroll);
+              }
+            }, 0);
+          }
+        }
       }
     } catch (error) {
+      if (serial !== state.subtitleCurrentSerial) { return; }
+      state.subtitleCanSearch = false;
       byId("subtitleSearchButton").disabled = true;
       byId("subtitleCurrent").textContent = t("receiver_unavailable", "Receiver unavailable");
       byId("subtitleSyncPanel").hidden = true;
+      if (state.subtitleResults) {
+        state.subtitleResults.can_load = false;
+        renderSubtitleResults(state.subtitleResults);
+      }
     }
+  }
+
+  function clearSubtitleList() {
+    state.subtitleResults = null;
+    state.subtitleSelectedId = null;
+    state.subtitleScroll = 0;
+    byId("subtitleResults").replaceChildren();
+    byId("subtitleProviderStatus").replaceChildren();
   }
 
   function formatSubtitleTime(milliseconds) {
@@ -1517,6 +2028,16 @@
 
   function renderSubtitleSync(data) {
     var available = Boolean(data.sync && data.sync.available);
+    var revision = available ? (data.sync.revision || null) : null;
+    if (revision !== state.subtitleSyncRevision) {
+      state.subtitleSyncRevision = revision;
+      state.subtitlePositionSerial += 1;
+      state.cueQuerySerial += 1;
+      byId("subtitleMovieTime").value = "";
+      byId("subtitleFileTime").value = "";
+      byId("subtitleCueQuery").value = "";
+      byId("subtitleCueResults").replaceChildren();
+    }
     byId("subtitleSyncPanel").hidden = !available;
     if (!available) {
       byId("subtitleCueResults").replaceChildren();
@@ -1530,28 +2051,42 @@
   }
 
   async function refreshSubtitlePosition() {
+    var serial = ++state.subtitlePositionSerial;
+    var revision = state.subtitleSyncRevision;
+    var context = state.subtitleContext;
     try {
       var data = await api("/subtitles/current");
+      if (serial !== state.subtitlePositionSerial || revision !== state.subtitleSyncRevision
+          || context !== state.subtitleContext) { return; }
+      if (!data.sync || data.sync.revision !== revision || !data.sync.available
+          || (data.search_context && data.search_context !== context)) {
+        await loadSubtitleCurrent();
+        return;
+      }
       renderSubtitleSync(data);
       var position = formatSubtitleTime(data.position_ms);
       if (!position) { throw new Error(t("subtitle_sync_position_missing", "Movie position is unavailable.")); }
       byId("subtitleMovieTime").value = position;
       await findSubtitleCues();
     } catch (error) {
-      toast(error.message, true);
+      if (serial === state.subtitlePositionSerial) { toast(error.message, true); }
     }
   }
 
   async function findSubtitleCues() {
     var serial = ++state.cueQuerySerial;
+    var revision = state.subtitleSyncRevision;
     if (byId("subtitleSyncPanel").hidden) { return; }
     try {
-      var result = await api("/subtitles/cues?q=" + encodeURIComponent(byId("subtitleCueQuery").value.trim()));
-      if (serial !== state.cueQuerySerial || byId("subtitleSyncPanel").hidden) { return; }
+      var result = await api("/subtitles/cues?q=" + encodeURIComponent(byId("subtitleCueQuery").value.trim())
+        + "&revision=" + encodeURIComponent(revision || ""));
+      if (serial !== state.cueQuerySerial || byId("subtitleSyncPanel").hidden
+          || revision !== state.subtitleSyncRevision || result.revision !== revision) { return; }
       var entries = (result.items || []).map(function (item) {
         var button = node("button", "subtitle-cue-button", item.time + " · " + item.text);
         button.type = "button";
         button.addEventListener("click", function () {
+          if (revision !== state.subtitleSyncRevision) { return; }
           byId("subtitleFileTime").value = item.time;
         });
         return button;
@@ -1565,29 +2100,35 @@
   async function submitSubtitleSync(event) {
     event.preventDefault();
     var button = byId("subtitleSyncButton");
+    var revision = state.subtitleSyncRevision;
     setBusy(button, true);
     try {
       await api("/subtitles/sync", { method: "POST", body: {
         film_time: byId("subtitleMovieTime").value.trim(),
-        subtitle_time: byId("subtitleFileTime").value.trim()
+        subtitle_time: byId("subtitleFileTime").value.trim(),
+        revision: revision
       } });
+      if (revision !== state.subtitleSyncRevision) { return; }
       await loadSubtitleCurrent();
-      toast(t("subtitle_sync_saved", "Subtitle timing adjusted"));
+      if (revision === state.subtitleSyncRevision) { toast(t("subtitle_sync_saved", "Subtitle timing adjusted")); }
     } catch (error) {
-      toast(error.message, true);
+      if (revision === state.subtitleSyncRevision) { toast(error.message, true); }
     } finally {
       setBusy(button, false);
     }
   }
 
   async function adjustSubtitleSync(payload, button) {
+    var revision = state.subtitleSyncRevision;
     setBusy(button, true);
     try {
-      await api("/subtitles/sync", { method: "POST", body: payload });
+      await api("/subtitles/sync", { method: "POST", body: Object.assign({}, payload,
+        { revision: revision }) });
+      if (revision !== state.subtitleSyncRevision) { return; }
       await loadSubtitleCurrent();
-      toast(t("subtitle_sync_saved", "Subtitle timing adjusted"));
+      if (revision === state.subtitleSyncRevision) { toast(t("subtitle_sync_saved", "Subtitle timing adjusted")); }
     } catch (error) {
-      toast(error.message, true);
+      if (revision === state.subtitleSyncRevision) { toast(error.message, true); }
     } finally {
       setBusy(button, false);
     }
@@ -1598,22 +2139,48 @@
     var button = byId("subtitleSearchButton");
     setBusy(button, true);
     byId("subtitleSearchHint").textContent = t("subtitle_searching", "Searching providers…");
+    var serial = ++state.subtitleSearchSerial;
+    state.subtitleSearchBusySerial = serial;
+    var context = state.subtitleContext;
+    var query = { language: byId("subtitleLanguage").value,
+      title: byId("subtitleTitle").value, refresh: true };
     try {
-      state.subtitleResults = await api("/subtitles/search", { method: "POST",
-        body: { language: byId("subtitleLanguage").value, title: byId("subtitleTitle").value } });
-      renderSubtitleResults(state.subtitleResults);
+      var data = await api("/subtitles/search", { method: "POST",
+        body: query });
+      if (serial !== state.subtitleSearchSerial || context !== state.subtitleContext
+          || query.language !== byId("subtitleLanguage").value
+          || query.title !== byId("subtitleTitle").value) { return; }
+      data.context = data.context || state.subtitleContext;
+      state.subtitleResults = data;
+      state.subtitleFormDirty = false;
+      state.subtitleSelectedId = null;
+      state.subtitleScroll = 0;
+      await loadSubtitleCurrent();
     } catch (error) {
-      toast(error.message, true);
+      if (serial === state.subtitleSearchSerial) { toast(error.message, true); }
     } finally {
-      byId("subtitleSearchHint").textContent = "";
-      setBusy(button, false);
+      if (state.subtitleSearchBusySerial === serial) {
+        state.subtitleSearchBusySerial = 0;
+        byId("subtitleSearchHint").textContent = "";
+        setBusy(button, false);
+        button.disabled = !state.subtitleCanSearch || Boolean(state.subtitleApplyBusySerial);
+      }
     }
   }
 
   function renderSubtitleResults(data) {
+    var names = { subdl: "SubDL", opensubtitles: "OpenSubtitles.com", subsource: "SubSource",
+      napiprojekt: "NapiProjekt", napisy24: "Napisy24" };
+    var compatibility = {
+      high: ["subtitleCompatibilityHigh", "High compatibility"],
+      possible: ["subtitleCompatibilityPossible", "Possible compatibility"],
+      fps_convert: ["subtitleCompatibilityConverted", "FPS will be converted"],
+      unknown: ["subtitleCompatibilityUnknown", "Compatibility unknown"],
+      different: ["subtitleCompatibilityDifferent", "Different version"]
+    };
     var status = (data.providers || []).map(function (entry) {
-      return node("span", "", (entry.provider || "") + " · " +
-        (entry.status === "ok" ? String(entry.count) : t(entry.status, "Unavailable")));
+      return node("span", "", (names[entry.provider] || entry.provider || "") + " · " +
+        (entry.status === "ok" ? String(entry.count) : t(entry.status, t("provider_unavailable", "Source unavailable"))));
     });
     if (!status.length) {
       status.push(node("span", "", t("subtitle_no_providers", "Enable a subtitle provider in Settings.")));
@@ -1621,9 +2188,24 @@
     byId("subtitleProviderStatus").replaceChildren.apply(byId("subtitleProviderStatus"), status);
     var items = (data.items || []).map(function (item) {
       var row = node("article", "subtitle-result");
+      row.classList.toggle("is-selected", item.id === state.subtitleSelectedId);
       var detail = node("div");
       append(detail, node("strong", "", item.release || item.title),
-        node("small", "", item.provider + " · " + item.language));
+        node("small", "", (names[item.provider] || item.provider) + " · " + item.language));
+      var metadata = [];
+      var fps = Number(item.subtitle_fps || item.fps || 0);
+      if (Number.isFinite(fps) && fps > 0) {
+        var fpsText = String(Math.round(fps * 1000) / 1000);
+        var targetFps = Number(item.video_fps || 0);
+        if (item.compatibility_status === "fps_convert" && Number.isFinite(targetFps) && targetFps > 0) {
+          fpsText += " > " + String(Math.round(targetFps * 1000) / 1000);
+        }
+        metadata.push(fpsText + " " + t("subtitleFps", "FPS"));
+      }
+      var label = compatibility[item.compatibility_status];
+      if (label) { metadata.push(t(label[0], label[1])); }
+      if (item.hearing_impaired) { metadata.push(t("subtitleHearingImpaired", "Hearing-impaired subtitles")); }
+      if (metadata.length) { detail.appendChild(node("small", "subtitle-result-metadata", metadata.join(" · "))); }
       var button = node("button", "secondary-button small", t("subtitle_use", "Download and use"));
       button.type = "button";
       button.disabled = !data.can_load;
@@ -1637,9 +2219,18 @@
   }
 
   async function applySubtitle(id, button) {
+    var serial = ++state.subtitleApplySerial;
+    var context = state.subtitleContext;
+    state.subtitleApplyBusySerial = serial;
+    byId("subtitleLanguage").disabled = true;
+    byId("subtitleTitle").disabled = true;
+    byId("subtitleSearchButton").disabled = true;
     setBusy(button, true);
     try {
       await api("/subtitles/apply", { method: "POST", body: { id: id } });
+      if (serial !== state.subtitleApplySerial || context !== state.subtitleContext) { return; }
+      state.subtitleSelectedId = id;
+      state.subtitleScroll = Number(window.scrollY || window.pageYOffset || 0);
       toast(t("subtitle_loaded", "Subtitle loaded on the receiver"));
       byId("subtitleMovieTime").value = "";
       byId("subtitleFileTime").value = "";
@@ -1647,9 +2238,15 @@
       await loadSubtitleCurrent();
       findSubtitleCues();
     } catch (error) {
-      toast(error.message, true);
+      if (serial === state.subtitleApplySerial) { toast(error.message, true); }
     } finally {
       setBusy(button, false);
+      if (state.subtitleApplyBusySerial === serial) {
+        state.subtitleApplyBusySerial = 0;
+        byId("subtitleLanguage").disabled = false;
+        byId("subtitleTitle").disabled = false;
+        byId("subtitleSearchButton").disabled = !state.subtitleCanSearch || Boolean(state.subtitleSearchBusySerial);
+      }
     }
   }
 
@@ -1667,7 +2264,7 @@
 
   function renderAudioCurrent(data) {
     var tracks = data.tracks || [];
-    byId("audioCurrentTitle").textContent = data.playing ? data.title :
+    byId("audioCurrentTitle").textContent = data.playing ? (data.title || t("movie", "Movie")) :
       t("vod_not_playing", "Play a movie or episode on the receiver first.");
     var message = "";
     if (data.playing && !tracks.length) {
@@ -1683,7 +2280,7 @@
     byId("audioStatus").textContent = message;
     var cards = tracks.map(function (track) {
       var row = node("article", "audio-track-row" + (track.selected ? " selected" : ""));
-      var label = node("strong", "", track.name);
+      var label = node("strong", "", audioTrackLabel(track.name));
       var button = node("button", "secondary-button small",
         track.selected ? t("audio_active", "Playing") : t("audio_select", "Use this audio"));
       button.type = "button";
@@ -1715,6 +2312,18 @@
   }
 
   function switchPage(page) {
+    state.subtitleRestoreScroll = page === "subtitles" && state.page !== "subtitles";
+    if (state.page === "subtitles" && page !== "subtitles") {
+      state.subtitleScroll = Number(window.scrollY || window.pageYOffset || 0);
+    }
+    if (state.page === "youtube" && page !== "youtube"
+        && (state.youtubeSearchToken || state.youtubeSearchBusy || state.youtubePagingBusy || state.youtubePrefetch)) {
+      cancelYouTubeSearch();
+      ++state.youtubeSearchSerial;
+      state.youtubeSearchBusy = state.youtubePagingBusy = false;
+      state.youtubePages = [];
+      setBusy(byId("youtubeSearchForm").querySelector("button"), false);
+    }
     stopAutomaticTestPolling();
     window.clearInterval(state.remoteTimer);
     window.clearInterval(state.youtubeTimer);
@@ -1728,7 +2337,7 @@
     document.querySelectorAll(".nav-button").forEach(function (button) {
       button.classList.toggle("active", button.dataset.page === page);
     });
-    byId("sidebar").classList.remove("open");
+    setMenuOpen(false);
     if (page === "sources") {
       loadSources();
     } else if (page === "automatic-test") {
@@ -1746,6 +2355,7 @@
     } else if (page === "audio") {
       loadAudioCurrent();
     } else if (page === "youtube") {
+      loadYouTubeHistory();
       pollYouTube();
       state.youtubeTimer = window.setInterval(pollYouTube, 3500);
     } else if (page === "media") {
@@ -1835,6 +2445,13 @@
 
   function bindEvents() {
     byId("youtubeSearchForm").addEventListener("submit", searchYouTube);
+    byId("youtubeHistoryToggle").addEventListener("click", function () {
+      var panel = byId("youtubeHistory");
+      panel.hidden = !panel.hidden;
+      byId("youtubeHistoryToggle").setAttribute("aria-expanded", String(!panel.hidden));
+      if (!panel.hidden) { loadYouTubeHistory(); }
+    });
+    byId("youtubeHistoryClear").addEventListener("click", function (event) { deleteYouTubeHistory(null, event.currentTarget); });
     byId("mediaSearchForm").addEventListener("submit", searchMedia);
     byId("tmdbSave").addEventListener("click", function () {
       if (byId("tmdbKey").value.trim()) { saveExternalSettings("tmdb", { key: byId("tmdbKey").value.trim() }, byId("tmdbSave")); }
@@ -1842,10 +2459,20 @@
     byId("tmdbRemove").addEventListener("click", function () { saveExternalSettings("tmdb", { remove: true }, byId("tmdbRemove")); });
     byId("tmdbTest").addEventListener("click", testTMDb);
     byId("youtubeSettingsSave").addEventListener("click", function () {
-      var payload = { resolution: byId("youtubeResolution").value, mode: byId("youtubeStreamMode").value, audio_preference: byId("youtubeAudioPreference").value };
+      var payload = { resolution: byId("youtubeResolution").value, autoplay: byId("youtubeAutoplay").value === "on" };
       saveExternalSettings("youtube", payload, byId("youtubeSettingsSave"));
     });
     byId("subtitleSearchForm").addEventListener("submit", searchSubtitles);
+    byId("subtitleLanguage").addEventListener("change", function () {
+      state.subtitleSearchSerial += 1;
+      state.subtitleFormDirty = true;
+      clearSubtitleList();
+    });
+    byId("subtitleTitle").addEventListener("input", function () {
+      state.subtitleSearchSerial += 1;
+      state.subtitleFormDirty = true;
+      clearSubtitleList();
+    });
     byId("audioRefresh").addEventListener("click", loadAudioCurrent);
     byId("subtitleSyncForm").addEventListener("submit", submitSubtitleSync);
     byId("subtitlePositionRefresh").addEventListener("click", refreshSubtitlePosition);
@@ -1872,10 +2499,7 @@
       if (event.inputType === "insertFromPaste") { window.setTimeout(sendToTv, 0); }
     });
     byId("pairForm").addEventListener("submit", submitPair);
-    byId("pairCode").addEventListener("input", function (event) {
-      var digits = event.target.value.replace(/\D/g, "").slice(0, 6);
-      event.target.value = digits;
-    });
+    byId("pairCode").addEventListener("input", formatPairCodeInput);
     [byId("authLanguage"), byId("languageSelect")].forEach(function (select) {
       select.addEventListener("change", function (event) {
         loadLanguage(event.target.value).catch(function () {
@@ -1886,7 +2510,20 @@
     document.querySelectorAll(".nav-button").forEach(function (button) {
       button.addEventListener("click", function () { switchPage(button.dataset.page); });
     });
-    byId("menuButton").addEventListener("click", function () { byId("sidebar").classList.toggle("open"); });
+    byId("menuButton").addEventListener("click", function () {
+      setMenuOpen(!byId("sidebar").classList.contains("open"));
+    });
+    byId("closeMenuButton").addEventListener("click", function () { setMenuOpen(false); });
+    byId("menuBackdrop").addEventListener("click", function () { setMenuOpen(false); });
+    window.addEventListener("resize", function () {
+      var sidebar = byId("sidebar");
+      var activeInSidebar = sidebar.contains(document.activeElement);
+      setMenuOpen(sidebar.classList.contains("open"));
+      if (mobileMenuLayout() && !sidebar.classList.contains("open") && activeInSidebar) {
+        byId("menuButton").focus();
+      }
+    });
+    setMenuOpen(false, false);
     byId("logoutButton").addEventListener("click", logout);
     document.querySelectorAll("[data-auto-test-type]").forEach(function (button) {
       button.addEventListener("click", function () { startAutomaticTest(button); });
@@ -1914,6 +2551,10 @@
         handleSourceAction(button);
       }
     });
+    byId("autoTestResults").addEventListener("click", function (event) {
+      var button = event.target.closest(".test-result-delete");
+      if (button) { deleteAutomaticTestSource(button); }
+    });
     byId("downloadsList").addEventListener("click", function (event) {
       var button = event.target.closest("[data-download-action]");
       if (button) {
@@ -1935,6 +2576,9 @@
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && !byId("sourceModal").hidden) {
         closeSourceModal();
+        event.preventDefault();
+      } else if (byId("sourceModal").hidden) {
+        handleMenuKeyboard(event);
       }
     });
   }

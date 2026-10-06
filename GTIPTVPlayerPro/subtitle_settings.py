@@ -20,6 +20,10 @@ MAX_OFFSET_MS = 30 * 60 * 1000
 MAX_SETTINGS_BYTES = 64 * 1024
 
 PROVIDERS = ("subdl", "opensubtitles", "subsource")
+# Preserve the historical default for missing/empty legacy values while giving
+# an explicit saved choice a distinct meaning. Providers receive an empty code
+# for this option and therefore never search a disabled fallback language.
+SECONDARY_LANGUAGE_OFF = "off"
 SEARCH_MODES = ("manual", "automatic")
 FONT_SIZES = ("small", "medium", "large", "extra_large")
 FONT_COLORS = ("white", "yellow", "cyan")
@@ -71,6 +75,33 @@ def _provider_document(document, canonical, aliases=()):
             if value not in (None, ""):
                 merged[name] = value
     return merged
+
+
+def clear_subtitle_credentials(document, name, include_login=False):
+    """Remove every accepted legacy copy before storing canonical values."""
+    aliases = {"subdl": ("sub_dl",), "subsource": ("sub_source",),
+               "opensubtitles": ("open_subtitles", "opensubtitles.com",
+                                  "opensubtitles_com")}
+    if name not in aliases or not isinstance(document, dict):
+        return
+    fields = ("key", "api_key", "apikey", "apiKey")
+    if include_login and name == "opensubtitles":
+        fields += ("username", "user", "login", "password", "pass", "passwd")
+    mappings = [document]
+    if isinstance(document.get("providers"), dict):
+        mappings.append(document["providers"])
+    for mapping in mappings:
+        for section in (name,) + aliases[name]:
+            value = mapping.get(section)
+            if isinstance(value, dict):
+                for field in fields:
+                    value.pop(field, None)
+    document.pop(name + "_api_key", None)
+    if name == "opensubtitles":
+        document.pop("opensubtitles_key", None)
+        if include_login:
+            document.pop("opensubtitles_username", None)
+            document.pop("opensubtitles_password", None)
 
 
 def _provider_language(value, fallback="en"):
@@ -198,8 +229,11 @@ class SubtitleSettings(object):
         self.primary_language = _provider_language(
             primary_language or default_primary, fallback=default_primary
         )
-        self.secondary_language = _provider_language(
-            secondary_language or default_secondary, fallback=default_secondary
+        self.secondary_language = (
+            "" if str(secondary_language or "").strip().lower() == SECONDARY_LANGUAGE_OFF
+            else _provider_language(
+                secondary_language or default_secondary, fallback=default_secondary
+            )
         )
         self.search_mode = (
             search_mode if search_mode in SEARCH_MODES else "automatic"
@@ -264,7 +298,7 @@ class SubtitleSettings(object):
             "enabled": self.enabled,
             "provider": self.provider,
             "primary_language": self.primary_language,
-            "secondary_language": self.secondary_language,
+            "secondary_language": self.secondary_language or SECONDARY_LANGUAGE_OFF,
             "search_mode": self.search_mode,
             "hearing_impaired": self.hearing_impaired,
             "font_size": self.font_size,
@@ -364,6 +398,8 @@ def save_subtitle_settings(settings, path=SUBTITLE_SETTINGS_PATH):
         return False
     def update(document):
         document[PREFERENCES_KEY] = settings.as_dict()
+        for name in PROVIDERS:
+            clear_subtitle_credentials(document, name, include_login=True)
         subdl = document.get("subdl")
         subdl = dict(subdl) if isinstance(subdl, dict) else {}
         subdl["key"] = _clean_api_key(settings.subdl_api_key)

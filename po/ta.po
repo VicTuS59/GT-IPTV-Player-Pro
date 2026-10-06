@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro Team\n"
-"Language-Team: Tamil\n"
-"Language: ta\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1); \n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Tamil\nLanguage: ta\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1); \n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "ஆடியோ: {}"
 msgid "About"
 msgstr "பற்றி"
 
+msgid "Access code"
+msgstr "அணுகல் குறியீடு"
+
 msgid "Access your channels quickly"
 msgstr "உங்கள் சேனல்களை அணுகவும்விரைவாக"
 
@@ -197,6 +190,9 @@ msgstr "அரபு"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "இந்தச் சேனலுக்குக் காப்பகத்திலிருந்து இயக்கும் வசதி இல்லை."
+
+msgid "Aspect ratio"
+msgstr "திரை விகிதம்"
 
 msgid "Audio language changed"
 msgstr "ஆடியோ மொழி மாற்றப்பட்டது"
@@ -481,6 +477,9 @@ msgstr "தெளிவான வானம்"
 msgid "Close"
 msgstr "மூடு"
 
+msgid "Close menu"
+msgstr "மெனுவை மூடு"
+
 msgid "Close the open screen before opening another one."
 msgstr "மற்றொரு திரையைத் திறப்பதற்கு முன் திறந்திருக்கும் திரையை மூடவும்."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "கோரப்பட்ட ஆடியோ டிராக்கைத் தேர்ந்தெடுக்க முடியவில்லை."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "தனித்த வசன வரிகளின் காட்சியைத் தொடங்க முடியவில்லை."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "இணையத்தில் வசன வரிகளைத் தேடத் தொடங்க முடியவில்லை."
 
 msgid "Could not start the player."
 msgstr "பிளேயரைத் தொடங்க முடியவில்லை."
@@ -771,6 +770,9 @@ msgstr "இயல்புநிலை வரிசை மீட்டமைக�
 msgid "Delete"
 msgstr "அழிக்கவும்"
 
+msgid "Delete all"
+msgstr "அனைத்தையும் நீக்கு"
+
 msgid "Delete this item?"
 msgstr "இந்த உருப்படியை நீக்கவா?"
 
@@ -818,6 +820,12 @@ msgstr "திரைப்படங்களைத் தேடிக் கண�
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "TMDB பரிந்துரைகளுடன் புதிய திரைப்படங்களைக் கண்டறியுங்கள்"
+
+msgid "Display 16:9 content as"
+msgstr "16:9 உள்ளடக்கத்தைக் காட்டும் முறை"
+
+msgid "Display 4:3 content as"
+msgstr "4:3 உள்ளடக்கத்தைக் காட்டும் முறை"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "போர்ட்டல் URL-இல் வினவல் அல்லது துண்டைச் சேர்க்க வேண்டாம்"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "முதலில் SubDL API விசையை உள்ளிடவும்."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "வசன வரி அமைப்புகளில் SubDL API விசையை உள்ளிடவும்."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "திரைப்படம் மற்றும் தொடர் விவரங்களுக்கான TMDb API சாவியை உள்ளிடவும்."
@@ -1007,6 +1015,9 @@ msgstr "ரிசீவரில் காட்டப்படும் ஆற�
 msgid "Enter the username"
 msgstr "பயனர்பெயர்"
 
+msgid "Enter the username / Enter the password"
+msgstr "பயனர்பெயர் / கடவுச்சொல்லை உள்ளிடவும்"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "இந்தக் குறியீட்டை உங்கள் தொலைபேசி உலாவியில் உள்ளிட்டு, பின்னர் டிவியில் கோரிக்கையை அங்கீகரிக்கவும்."
 
@@ -1061,6 +1072,9 @@ msgstr "விருப்பமானவை"
 
 msgid "FILE"
 msgstr "கோப்பு"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS மாற்றப்படும்"
@@ -1144,19 +1158,11 @@ msgstr "முழுத்திரை"
 msgid "GREEN"
 msgstr "பச்சை"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"திரைப்படம்"
+msgid "GT\nMOVIE"
+msgstr "GT\nதிரைப்படம்"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"தொடர்கள்"
+msgid "GT\nSERIES"
+msgstr "GT\nதொடர்கள்"
 
 msgid "Genre unavailable"
 msgstr "வகை கிடைக்கவில்லை"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "தனித்த வசன வரிகளின் முன்னோட்டம்"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "தனித்த வசன வரிகளை ஒத்திசைத்தல்"
 
 msgid "Independent subtitles"
 msgstr "தனித்த வசன வரிகள்"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "அமைப்புகளில் தனித்த வசன வரிகள் முடக்கப்பட்டுள்ளன."
 
 msgid "Information"
 msgstr "தகவல்"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "தாமத நேரம் (Latency)"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"தாமதம்: {} ms\n"
-"கணக்கு நிலை: {}\n"
-"செயலில் / அதிகபட்சம்: {}\n"
-"காலாவதி: {}\n"
-"சர்வர் நேரம்: {}\n"
-"நேர மண்டலம்: {}\n"
-"நெறிமுறை: {}\n"
-"வெளியீட்டு வடிவம்: {}\n"
-"சர்வர் பதிப்பு: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "தாமதம்: {} ms\nகணக்கு நிலை: {}\nசெயலில் / அதிகபட்சம்: {}\nகாலாவதி: {}\nசர்வர் நேரம்: {}\nநேர மண்டலம்: {}\nநெறிமுறை: {}\nவெளியீட்டு வடிவம்: {}\nசர்வர் பதிப்பு: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"தாமதம்: {} ms\n"
-"கணக்குநிலை: {}\n"
-"நெறிமுறை: {}\n"
-"வெளியீட்டு வடிவம்: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "தாமதம்: {} ms\nகணக்குநிலை: {}\nநெறிமுறை: {}\nவெளியீட்டு வடிவம்: {}\n\n{}"
 
 msgid "Left"
 msgstr "இடது"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "ஒத்திசைப்பதற்கு முன், இந்தப் இணையப் பக்கத்திலிருந்து ஒரு துணைத் தலைப்பை (subtitle) ஏற்றவும்."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "ஒத்திசைப்பதற்கு முன் தனித்த வசன வரிகளை ஏற்றவும்."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "DVB சேவைகள் மற்றும் தற்காலிகமாக சேமிக்கப்பட்ட XMLTV சேனல்கள் ஏற்றப்படுகின்றன..."
@@ -1514,6 +1486,9 @@ msgstr "வெளியேறு"
 
 msgid "Lower"
 msgstr "கீழே"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "M3U சேனல் தேடல்"
@@ -1668,6 +1643,9 @@ msgstr "MAC முகவரி"
 
 msgid "MANAGE SOURCES"
 msgstr "மூலங்களை நிர்வகித்தல்"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 வி: இணைய இடைமுகம்"
 
 msgid "MOVIE CATEGORIES"
 msgstr "திரைப்படப் பிரிவுகள்"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "பொருத்தமான துணைத் தலைப்புகள் எதுவும் கிடைக்கவில்லை. மொழி மற்றும் வழங்குநரின் நிலையைச் சரிபார்க்கவும்."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "SubDL இல் பொருத்தமான வசன வரிகள் கிடைக்கவில்லை."
 
 msgid "No movies found."
 msgstr "திரைப்படங்கள் எதுவும் கிடைக்கவில்லை."
@@ -1946,14 +1924,8 @@ msgstr "இணைப்பதற்கு எந்த மூலமும் க
 msgid "No source is selected for deletion."
 msgstr "நீக்குவதற்காக எந்த மூலமும் தேர்ந்தெடுக்கப்படவில்லை."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"மூலம் எதுவும் காணப்படவில்லை.\n"
-"\n"
-"முகப்புத் திரையில் உள்ள “மூலத்தைச் சேர்” பலகையிலிருந்து ஒன்றை உருவாக்கவும்."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "மூலம் எதுவும் காணப்படவில்லை.\n\nமுகப்புத் திரையில் உள்ள “மூலத்தைச் சேர்” பலகையிலிருந்து ஒன்றை உருவாக்கவும்."
 
 msgid "No summary is available for this programme."
 msgstr "இந்த நிகழ்ச்சிக்கு எந்தச் சுருக்கமும் கிடைக்கவில்லை."
@@ -1981,6 +1953,9 @@ msgstr "செல்லுபடியாகும் Xtream மூலம் எ
 
 msgid "No valid title was found for TMDb"
 msgstr "TMDb-க்கு செல்லுபடியாகும் தலைப்பு எதுவும் கண்டறியப்படவில்லை"
+
+msgid "No videos found at the selected quality."
+msgstr "தேர்ந்தெடுத்த தரத்தில் காணொளிகள் கிடைக்கவில்லை."
 
 msgid "No weather forecast is available for this city."
 msgstr "இந்த நகரத்திற்கு வானிலை முன்னறிவிப்பு எதுவும் கிடைக்கவில்லை."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "திற / ஒப்புதல் அளி"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "தனித்த வசன வரி அமைப்புகளைத் திறக்கவும்."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "டிவி விசைப்பலகையைத் திறந்து உரையை இங்கே ஒட்டவும்."
@@ -2107,8 +2082,14 @@ msgstr "இயக்கு"
 msgid "Play a movie or episode on the receiver first."
 msgstr "முதலில் ரிசீவரில் ஒரு திரைப்படம் அல்லது அத்தியாயத்தை இயக்கவும்."
 
+msgid "Play next video automatically"
+msgstr "அடுத்த காணொளியைத் தானாக இயக்கு"
+
 msgid "Play on TV"
 msgstr "தொலைக்காட்சியில் இயக்கவும்"
+
+msgid "Playback history"
+msgstr "இயக்க வரலாறு"
 
 msgid "Playback mode"
 msgstr "இயக்க முறை"
@@ -2269,6 +2250,9 @@ msgstr "வழங்குநர் இணைப்பு வெற்றி ப
 msgid "Quality"
 msgstr "தரம்"
 
+msgid "Quality changed. Search again."
+msgstr "தரம் மாற்றப்பட்டது. மீண்டும் தேடவும்."
+
 msgid "Queued"
 msgstr "வரிசையில் உள்ளது"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "மதிப்பீடு"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"படிக்கும் நேரம்: {} மில்லி விநாடிகள்\n"
-"மூல வகை: {}\n"
-"அளவு: {} பைட்டுகள்\n"
-"சேனல்கள்: {}\n"
-"பிரிவுகள்: {}\n"
-"தற்காலிக நினைவகத்தின் வயது: {}\n"
-"கடைசியாக மாற்றியமைக்கப்பட்டது: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "படிக்கும் நேரம்: {} மில்லி விநாடிகள்\nமூல வகை: {}\nஅளவு: {} பைட்டுகள்\nசேனல்கள்: {}\nபிரிவுகள்: {}\nதற்காலிக நினைவகத்தின் வயது: {}\nகடைசியாக மாற்றியமைக்கப்பட்டது: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "கால அளவு படிக்கப்படுகிறது..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "ஸ்ட்ரீமை மீண்டும் இணைக்கிறது..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"மீட்பு வெற்றியடைந்தது. புதிய மீட்புக் குறியீட்டை எழுதிக் கொள்ளவும்; இது ஒருமுறை மட்டுமே காட்டப்படும்:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "மீட்பு வெற்றியடைந்தது. புதிய மீட்புக் குறியீட்டை எழுதிக் கொள்ளவும்; இது ஒருமுறை மட்டுமே காட்டப்படும்:\n\n{}"
 
 msgid "Red"
 msgstr "சிவப்பு"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "மீட்டமைக்கவும்"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "வசன வரி நேரத்தை மீட்டமை"
 
 msgid "Resolution: --"
 msgstr "தெளிவுத்திறன்: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "தொடரவும்"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"சேமிக்கப்பட்ட நிலையிலிருந்து பின்னணியை மீண்டும் தொடங்கவா?\n"
-"\n"
-"சேமிக்கப்பட்ட நிலை: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "சேமிக்கப்பட்ட நிலையிலிருந்து பின்னணியை மீண்டும் தொடங்கவா?\n\nசேமிக்கப்பட்ட நிலை: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "முடிக்கப்படாத திரைப்படங்கள் மற்றும் தொடர்களை மீண்டும் தொடங்கவும்அத்தியாயங்கள்"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "வசன வரி அமைப்புகள்"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "துணைத் தலைப்பில் ஒரே வரியில் தொடங்குகிறது (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "மீண்டும் தேடவும்; இந்த முட�
 msgid "Search for a spoken phrase"
 msgstr "பேசப்படும் சொற்றொடரைத் தேடவும்"
 
+msgid "Search history"
+msgstr "தேடல் வரலாறு"
+
 msgid "Search in IPTV"
 msgstr "IPTV-இல் தேடு"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "இசை, ஆவணப்படங்கள் அல்லது சேனல்களைத் தேடவும்"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "SubDL உடன் வசனங்களைத் தேடு"
 
 msgid "Search subtitles"
 msgstr "துணைத் தலைப்புகளைத் தேடவும்"
@@ -2550,6 +2507,9 @@ msgstr "வழங்குநர்களைத் தேடுகிறது�
 
 msgid "Searching…"
 msgstr "தேடுகிறது…"
+
+msgid "Season"
+msgstr "பருவம்"
 
 msgid "Seasons"
 msgstr "சீசன்கள்"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "காட்டு / மறை"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "0.5 வினாடிகள் முன்னதாகக் காட்டு"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "0.5 வினாடிகள் பின்னதாகக் காட்டு"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "1 வினாடி முன்னதாகக் காட்டு"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "1 வினாடி பின்னதாகக் காட்டு"
 
 msgid "Show in device main menu"
 msgstr "சாதனத்தின் முதன்மை மெனுவில் காட்டு"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "SubDL இணைப்பு தயாராக உள்ளது."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL தற்காலிகமாகக் கிடைக்கவில்லை."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "இந்தப் பதிப்பில் SubDL வழங்குநராக உள்ளது."
 
 msgid "SubDL key change cancelled."
 msgstr "SubDL விசை மாற்றம் ரத்து செய்யப்பட்டது."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL தவறான பதிலை அளித்தது."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • வசனத் தலைப்புகள்"
 
 msgid "Subtitle"
 msgstr "வசனத் தலைப்பு"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "துணைத் தலைப்பு வழங்குநர்கள்"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "இந்த நிலைபொருள் பதிப்பில் வசனத் தேர்வு கிடைக்கவில்லை."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "வசனங்களைத் தேட, சரியாகச் செயல்படும் SubsSupport அல்லது SubsSupportPro நிறுவல் தேவை."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "துணைத் தலைப்பு ஒத்திசைவு ஏற்கனவே இயங்கிக்கொண்டிருக்கிறது."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "இந்தக் கணினி அமைப்புப் படிமத்தில் வசன வரி ஒத்திசைவு கிடைக்கவில்லை."
 
 msgid "Subtitle timing adjusted"
 msgstr "துணைத் தலைப்பு நேரம் சரிசெய்யப்பட்டது"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "வசன வரி நேர இடைவெளி: {:+.1f} வினாடிகள்"
 
 msgid "Subtitles"
 msgstr "வசனத் தலைப்புகள்"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "SubDL API விசை நீக்கப்பட்டது."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "SubDL API விசை நிராகரிக்கப்பட்டது."
 
 msgid "The SubDL connection test is still running..."
 msgstr "SubDL இணைப்புச் சோதனை இன்னும் நடைபெறுகிறது..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "SubDL கோரிக்கை வரம்பு எட்டப்பட்டது."
 
 msgid "The TMDb connection test is still running..."
 msgstr "TMDb இணைப்பு சோதனை இன்னும் நடந்து கொண்டிருக்கிறது..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "வித்தியாசம் 30 நிமிடங்களுக்கு மிகையாக இருக்கக்கூடாது."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "பதிவிறக்கிய வசன வரிகளைச் சேமிக்க முடியவில்லை."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "கோப்பை நீக்க முடியவில்லை. சேமிப்புச் சாதனத்தையும் அனுமதிகளையும் சரிபார்க்கவும்."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "இயங்கும் சேவை மாறியுள்ளது. ஆடியோ தேர்வை மீண்டும் திறக்கவும்."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "வசன வரிகளைத் தேட நிகழ்ச்சியின் தலைப்பு கிடைக்கவில்லை."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "ரிசீவர் கடிகாரம் தயாராக இல்லை. நெட்வொர்க் நேரத்தைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "தேர்ந்தெடுக்கப்பட்ட திரைப்படத்தின் விவரங்கள் சர்வரிலிருந்து ஏற்றப்படும்."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "துணைத் தலைப்பு அளவு வரம்பை மீறுகிறது"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "இந்த சப்டைட்டில் வடிவம் ஆதரிக்கப்படவில்லை."
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "சீரிஸ் பதில் ஆதரிக்கப்படாத வடிவத்தைப் பயன்படுத்துகிறது. வகைகள் தொடர்ந்து கிடைக்கின்றன."
@@ -3266,12 +3226,8 @@ msgstr "இந்த உள்ளடக்கத்தில் ஒரே ஒர
 msgid "This folder is outside the allowed storage locations."
 msgstr "இந்த கோப்புறை அனுமதிக்கப்பட்ட சேமிப்பக இடங்களுக்கு வெளியே உள்ளது."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"இது வசன வரிகளின் முன்னோட்டம்.\n"
-"மாற்றங்கள் இங்கே உடனடியாகத் தோன்றும்."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "இது வசன வரிகளின் முன்னோட்டம்.\nமாற்றங்கள் இங்கே உடனடியாகத் தோன்றும்."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "இந்த முன்னோட்டம் தற்போது சேமிக்கப்படாத தோற்ற அமைப்புகளைப் பயன்படுத்துகிறது."
@@ -3419,6 +3375,9 @@ msgstr "செங்குத்து நிலை"
 msgid "Very large"
 msgstr "மிகப் பெரியது"
 
+msgid "Video"
+msgstr "காணொளி"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "இந்த ரிசீவரில் வீடியோவை இயக்க முடியவில்லை. வேறொரு வீடியோ அல்லது தர அமைப்பை (quality setting) முயற்சிக்கவும்."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "வெள்ளை"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"இந்த மீட்புக் குறியீட்டை எழுதிக் கொள்ளவும். இது ஒருமுறை மட்டுமே காட்டப்படும்:\n"
-"\n"
-"{}\n"
-"\n"
-"இரண்டு குறியீடுகளையும் மறந்துவிட்டால், செருகுநிரலை நீக்கி மீண்டும் நிறுவுவது இந்தப் பூட்டை மட்டும் மீட்டமைக்கும்."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "இந்த மீட்புக் குறியீட்டை எழுதிக் கொள்ளவும். இது ஒருமுறை மட்டுமே காட்டப்படும்:\n\n{}\n\nஇரண்டு குறியீடுகளையும் மறந்துவிட்டால், செருகுநிரலை நீக்கி மீண்டும் நிறுவுவது இந்தப் பூட்டை மட்டும் மீட்டமைக்கும்."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "இந்த M3U மூலத்திற்கு XMLTV EPG முடக்கப்பட்டுள்ளது."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} விருப்பமானவற்றிலிருந்து நீக்கப்பட்டது."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Enigma2-க்கான திறந்த மூல IPTV இயக்கி. நிலையான உள்ளூர், இணைக்கப்பட்ட பிணைய அல்லது HTTP(S) M3U பட்டியல்களிலிருந்து Xtream Codes கணக்குகளையும் நேரலைத் தொலைக்காட்சியையும் ஆதரிக்கிறது. சாதாரண M3U மூலங்கள் நேரலைத் தொலைக்காட்சியை மட்டுமே வழங்குகின்றன.\n"
-"\n"
-"உருவாக்குநர்\n"
-"{}\n"
-"\n"
-"சட்ட அறிவிப்பு\n"
-"இந்தச் செருகுநிரல் சேனல்கள், ஸ்ட்ரீம்கள், கணக்குகள் அல்லது பட்டியல்களை வழங்காது. அணுகல் மற்றும் பயன்பாட்டு உரிமைகள் உள்ள உள்ளடக்கத்தை மட்டுமே பயன்படுத்துவதற்கு பயனரே பொறுப்பு.\n"
-"\n"
-"தனியுரிமை\n"
-"Open-Meteo இயக்கப்பட்டால், தேர்ந்தெடுக்கப்பட்ட நகரமும் இருப்பிடமும் வானிலை முன்னறிவிப்புக்காக Open-Meteo-விற்கு அனுப்பப்படும். TMDb இயக்கப்பட்டால், திரைப்படம்/தொடரின் தலைப்பும் பயனர் உள்ளிட்ட TMDb சாவி அல்லது டோக்கனும் TMDb-க்கு அனுப்பப்படும். IPTV பயனர்பெயரும் கடவுச்சொல்லும் இச்சேவைகளுக்கு அனுப்பப்படாது."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nEnigma2-க்கான திறந்த மூல IPTV இயக்கி. நிலையான உள்ளூர், இணைக்கப்பட்ட பிணைய அல்லது HTTP(S) M3U பட்டியல்களிலிருந்து Xtream Codes கணக்குகளையும் நேரலைத் தொலைக்காட்சியையும் ஆதரிக்கிறது. சாதாரண M3U மூலங்கள் நேரலைத் தொலைக்காட்சியை மட்டுமே வழங்குகின்றன.\n\nஉருவாக்குநர்\n{}\n\nசட்ட அறிவிப்பு\nஇந்தச் செருகுநிரல் சேனல்கள், ஸ்ட்ரீம்கள், கணக்குகள் அல்லது பட்டியல்களை வழங்காது. அணுகல் மற்றும் பயன்பாட்டு உரிமைகள் உள்ள உள்ளடக்கத்தை மட்டுமே பயன்படுத்துவதற்கு பயனரே பொறுப்பு.\n\nதனியுரிமை\nOpen-Meteo இயக்கப்பட்டால், தேர்ந்தெடுக்கப்பட்ட நகரமும் இருப்பிடமும் வானிலை முன்னறிவிப்புக்காக Open-Meteo-விற்கு அனுப்பப்படும். TMDb இயக்கப்பட்டால், திரைப்படம்/தொடரின் தலைப்பும் பயனர் உள்ளிட்ட TMDb சாவி அல்லது டோக்கனும் TMDb-க்கு அனுப்பப்படும். IPTV பயனர்பெயரும் கடவுச்சொல்லும் இச்சேவைகளுக்கு அனுப்பப்படாது."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

@@ -391,14 +391,23 @@ class GTWebApplication(object):
                 data = WEB_YOUTUBE.settings()
             elif path == "/api/v1/settings/youtube" and method == "PUT":
                 data = WEB_YOUTUBE.save(_parse_json(body))
+            elif path == "/api/v1/youtube/history" and method == "GET":
+                data = WEB_YOUTUBE.history()
+            elif path == "/api/v1/youtube/history" and method == "DELETE":
+                data = WEB_YOUTUBE.delete_history(_parse_json(body))
             elif path == "/api/v1/youtube/search" and method == "GET":
-                data = WEB_YOUTUBE.search((query.get("q") or [""])[0],
+                search = WEB_YOUTUBE.search_async if (query.get("progress") or [""])[0] == "1" else WEB_YOUTUBE.search
+                data = search((query.get("q") or [""])[0],
                                           (query.get("cursor") or [""])[0],
                                           (query.get("lang") or [""])[0]
                                           or _header(headers, "accept-language").split(",", 1)[0])
+            elif path == "/api/v1/youtube/search-job" and method == "GET":
+                data = WEB_YOUTUBE.search_status((query.get("token") or [""])[0])
+            elif path == "/api/v1/youtube/search-job" and method == "DELETE":
+                data = WEB_YOUTUBE.cancel_search(_parse_json(body).get("token"))
             elif path == "/api/v1/youtube/play" and method == "POST":
                 payload = _parse_json(body)
-                data = WEB_YOUTUBE.play(payload.get("id"), payload.get("title"))
+                data = WEB_YOUTUBE.play(payload.get("id"), payload.get("title"), payload.get("context", ""))
             elif path == "/api/v1/youtube/status" and method == "GET":
                 data = WEB_YOUTUBE.status((query.get("token") or [""])[0])
             elif path == "/api/v1/media/search" and method == "GET":
@@ -409,6 +418,8 @@ class GTWebApplication(object):
                 data = WEB_MEDIA.episodes((query.get("token") or [""])[0])
             elif path == "/api/v1/media/play" and method == "POST":
                 data = WEB_MEDIA.play(_parse_json(body).get("token"))
+            elif path == "/api/v1/media/download" and method == "POST":
+                data = WEB_MEDIA.download(_parse_json(body).get("token"))
             elif path == "/api/v1/subtitles/providers" and method == "GET":
                 data = WEB_SUBTITLES.providers()
             elif path.startswith("/api/v1/subtitles/providers/") and method in ("PUT", "POST"):
@@ -422,7 +433,10 @@ class GTWebApplication(object):
             elif path == "/api/v1/subtitles/current" and method == "GET":
                 data = WEB_SUBTITLES.current()
             elif path == "/api/v1/subtitles/cues" and method == "GET":
-                data = WEB_SUBTITLES.cues((query.get("q") or [""])[0])
+                data = WEB_SUBTITLES.cues(
+                    (query.get("q") or [""])[0],
+                    (query.get("revision") or [""])[0],
+                )
             elif path == "/api/v1/subtitles/sync" and method == "POST":
                 data = WEB_SUBTITLES.sync(_parse_json(body))
             elif path == "/api/v1/subtitles/search" and method == "POST":

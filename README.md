@@ -3,7 +3,7 @@
 GT IPTV Player Pro is an open-source, account-oriented IPTV browser and player
 for Enigma2 receivers.
 
-Current source version: **v1.2.0**
+Current source version: **v1.3.0**
 
 ## Features
 

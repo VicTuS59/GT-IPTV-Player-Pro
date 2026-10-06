@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro\n"
-"Language-Team: Croatian\n"
-"Language: hr\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11) ? 0 : (n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20)) ? 1 : 2;\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro\nLanguage-Team: Croatian\nLanguage: hr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11) ? 0 : (n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20)) ? 1 : 2;\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "ZVUK: {}"
 msgid "About"
 msgstr "O programu"
 
+msgid "Access code"
+msgstr "Pristupni kod"
+
 msgid "Access your channels quickly"
 msgstr "Brz pristup vašim kanalima"
 
@@ -197,6 +190,9 @@ msgstr "Arapski"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Reprodukcija iz arhive nije dostupna za ovaj kanal."
+
+msgid "Aspect ratio"
+msgstr "Omjer slike"
 
 msgid "Audio language changed"
 msgstr "Jezik zvuka je promijenjen"
@@ -481,6 +477,9 @@ msgstr "Vedro nebo"
 msgid "Close"
 msgstr "Zatvori"
 
+msgid "Close menu"
+msgstr "Zatvori izbornik"
+
 msgid "Close the open screen before opening another one."
 msgstr "Zatvorite otvoreni zaslon prije otvaranja drugog."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Nije moguće odabrati traženi audio-zapis."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Nije bilo moguće pokrenuti prikaz neovisnih titlova."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Nije bilo moguće pokrenuti mrežno traženje titlova."
 
 msgid "Could not start the player."
 msgstr "Nije moguće pokrenuti reproduktor."
@@ -771,6 +770,9 @@ msgstr "Zadani redoslijed je obnovljen. Pritisnite ZELENO za spremanje."
 msgid "Delete"
 msgstr "Izbriši"
 
+msgid "Delete all"
+msgstr "Izbriši sve"
+
 msgid "Delete this item?"
 msgstr "Izbrisati ovu stavku?"
 
@@ -818,6 +820,12 @@ msgstr "Otkrij filmove"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Otkrij nove filmove uz preporuke TMDB-a"
+
+msgid "Display 16:9 content as"
+msgstr "Prikaži sadržaj 16:9 kao"
+
+msgid "Display 4:3 content as"
+msgstr "Prikaži sadržaj 4:3 kao"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "U URL portala ne uključujte upit ni fragment"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Najprije unesite API ključ za SubDL."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Unesite API ključ za SubDL u postavkama titlova."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Unesite TMDb API ključ za detalje o filmovima i serijama."
@@ -1007,6 +1015,9 @@ msgstr "Unesite šesteroznamenkasti kod prikazan na prijamniku."
 msgid "Enter the username"
 msgstr "Unesite korisničko ime"
 
+msgid "Enter the username / Enter the password"
+msgstr "Unesite korisničko ime / Unesite lozinku"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Unesite ovaj kod u preglednik na telefonu, a zatim odobrite zahtjev na TV-u. 042 | Nije bilo moguće učitati epizode"
 
@@ -1061,6 +1072,9 @@ msgstr "FAVORITI"
 
 msgid "FILE"
 msgstr "DATOTEKA"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS će se pretvoriti"
@@ -1144,19 +1158,11 @@ msgstr "Cijeli zaslon"
 msgid "GREEN"
 msgstr "ZELENO"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"FILM"
+msgid "GT\nMOVIE"
+msgstr "GT\nFILM"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"SERIJA"
+msgid "GT\nSERIES"
+msgstr "GT\nSERIJA"
 
 msgid "Genre unavailable"
 msgstr "Žanr nije dostupan"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Pregled neovisnih titlova"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Sinkronizacija neovisnih titlova"
 
 msgid "Independent subtitles"
 msgstr "Neovisni titlovi"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Neovisni titlovi isključeni su u postavkama."
 
 msgid "Information"
 msgstr "Informacije"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Latencija"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Latencija: {} ms\n"
-"Stanje računa: {}\n"
-"Aktivno / Maksimalno: {}\n"
-"Ističe: {}\n"
-"Vrijeme poslužitelja: {}\n"
-"Vremenska zona: {}\n"
-"Protokol: {}\n"
-"Izlazni format: {}\n"
-"Verzija poslužitelja: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Latencija: {} ms\nStanje računa: {}\nAktivno / Maksimalno: {}\nIstiče: {}\nVrijeme poslužitelja: {}\nVremenska zona: {}\nProtokol: {}\nIzlazni format: {}\nVerzija poslužitelja: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Latencija: {} ms\n"
-"Status računa: {}\n"
-"Protokol: {}\n"
-"Izlazni format: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Latencija: {} ms\nStatus računa: {}\nProtokol: {}\nIzlazni format: {}\n\n{}"
 
 msgid "Left"
 msgstr "Lijevo"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Učitajte titl s ove web-stranice prije sinkronizacije."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Učitajte neovisne titlove prije sinkronizacije."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "Učitavanje DVB usluga i XMLTV kanala iz predmemorije..."
@@ -1514,6 +1486,9 @@ msgstr "Odjava"
 
 msgid "Lower"
 msgstr "Niže"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "PRETRAGA M3U KANALA"
@@ -1668,6 +1643,9 @@ msgstr "MAC adresa"
 
 msgid "MANAGE SOURCES"
 msgstr "UPRAVLJAJ IZVORIMA"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 s: Web sučelje"
 
 msgid "MOVIE CATEGORIES"
 msgstr "KATEGORIJE FILMOVA"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Nisu pronađeni odgovarajući titlovi. Provjerite jezik i status pružatelja usluge."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Na SubDL-u nisu pronađeni odgovarajući titlovi."
 
 msgid "No movies found."
 msgstr "Nema pronađenih filmova."
@@ -1946,14 +1924,8 @@ msgstr "Nema dostupnog izvora za povezivanje."
 msgid "No source is selected for deletion."
 msgstr "Nije odabran izvor za brisanje."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Nije pronađen izvor.\n"
-"\n"
-"Izradite ga na ploči DODAJ IZVOR na početnom zaslonu."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Nije pronađen izvor.\n\nIzradite ga na ploči DODAJ IZVOR na početnom zaslonu."
 
 msgid "No summary is available for this programme."
 msgstr "Za ovaj program nema dostupnog sažetka."
@@ -1981,6 +1953,9 @@ msgstr "Nije pronađen valjan Xtream izvor."
 
 msgid "No valid title was found for TMDb"
 msgstr "Nije pronađen valjan naslov za TMDb"
+
+msgid "No videos found at the selected quality."
+msgstr "Nema videozapisa s odabranom kvalitetom."
 
 msgid "No weather forecast is available for this city."
 msgstr "Za ovaj grad nema dostupne vremenske prognoze."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Otvori / Odobri"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Otvorite postavke neovisnih titlova."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Otvorite TV tipkovnicu i ovdje zalijepite tekst."
@@ -2107,8 +2082,14 @@ msgstr "Reproduciraj"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Prvo pokrenite film ili epizodu na prijamniku."
 
+msgid "Play next video automatically"
+msgstr "Automatski reproduciraj sljedeći video"
+
 msgid "Play on TV"
 msgstr "Reproduciraj na TV-u"
+
+msgid "Playback history"
+msgstr "Povijest reprodukcije"
 
 msgid "Playback mode"
 msgstr "Način reprodukcije"
@@ -2269,6 +2250,9 @@ msgstr "Uspješno povezivanje s pružateljem usluge"
 msgid "Quality"
 msgstr "Kvaliteta"
 
+msgid "Quality changed. Search again."
+msgstr "Kvaliteta je promijenjena. Pretražite ponovno."
+
 msgid "Queued"
 msgstr "Na čekanju"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Ocjena"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Vrijeme čitanja: {} ms\n"
-"Vrsta izvora: {}\n"
-"Veličina: {} bajtova\n"
-"Kanali: {}\n"
-"Kategorije: {}\n"
-"Starost predmemorije: {}\n"
-"Posljednja izmjena: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Vrijeme čitanja: {} ms\nVrsta izvora: {}\nVeličina: {} bajtova\nKanali: {}\nKategorije: {}\nStarost predmemorije: {}\nPosljednja izmjena: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Očitavanje trajanja..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Ponovno povezivanje streama..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Oporavak je uspio. Zapišite novi kod za oporavak; prikazuje se samo jednom:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Oporavak je uspio. Zapišite novi kod za oporavak; prikazuje se samo jednom:\n\n{}"
 
 msgid "Red"
 msgstr "Crvena"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Ponovno postavi"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Vrati vrijeme titlova na početnu vrijednost"
 
 msgid "Resolution: --"
 msgstr "Rezolucija: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Nastavi"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Nastaviti reprodukciju od spremljenog položaja?\n"
-"\n"
-"Spremljeni položaj: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Nastaviti reprodukciju od spremljenog položaja?\n\nSpremljeni položaj: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Nastavi nedovršene filmove i epizode serija"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "POSTAVKE TITLOVA"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Početak iste rečenice u titlovima (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Ponovno pretraži; ovaj je rezultat istekao."
 msgid "Search for a spoken phrase"
 msgstr "Pretraži izgovorenu frazu"
 
+msgid "Search history"
+msgstr "Povijest pretraživanja"
+
 msgid "Search in IPTV"
 msgstr "Traži u IPTV-u"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Pretraži glazbu, dokumentarce ili kanale"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Pretraži podnaslove dodatkom SubDL"
 
 msgid "Search subtitles"
 msgstr "Pretraži titlove"
@@ -2550,6 +2507,9 @@ msgstr "Pretraživanje pružatelja usluga..."
 
 msgid "Searching…"
 msgstr "Pretraživanje..."
+
+msgid "Season"
+msgstr "Sezona"
 
 msgid "Seasons"
 msgstr "Sezone"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Prikaži / Sakrij"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Prikaži 0,5 sekundi ranije"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Prikaži 0,5 sekundi kasnije"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Prikaži 1 sekundu ranije"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Prikaži 1 sekundu kasnije"
 
 msgid "Show in device main menu"
 msgstr "Prikaži u glavnom izborniku uređaja"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "Veza sa SubDL-om je spremna."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL je privremeno nedostupan."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL je pružatelj u ovoj inačici."
 
 msgid "SubDL key change cancelled."
 msgstr "Promjena ključa za SubDL je otkazana."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL je vratio nevaljan odgovor."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Podnaslovi"
 
 msgid "Subtitle"
 msgstr "Podnaslov"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Davatelji titlova"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Odabir podnaslova nije dostupan na ovoj slici sustava."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "Za pretraživanje podnaslova potrebna je ispravna instalacija dodatka SubsSupport ili SubsSupportPro."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Sinkronizacija titlova je već u tijeku."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Sinkronizacija titlova nije dostupna u ovoj slici sustava."
 
 msgid "Subtitle timing adjusted"
 msgstr "Vrijeme titla prilagođeno"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Vremenski pomak titlova: {:+.1f} sekundi"
 
 msgid "Subtitles"
 msgstr "Podnaslovi"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "API ključ za SubDL je izbrisan."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "API ključ za SubDL je odbijen."
 
 msgid "The SubDL connection test is still running..."
 msgstr "Testiranje veze sa SubDL-om još traje..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "Dosegnuto je ograničenje zahtjeva za SubDL."
 
 msgid "The TMDb connection test is still running..."
 msgstr "Test TMDb veze je još u tijeku..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "Razlika ne smije premašiti 30 minuta."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "Preuzete titlove nije bilo moguće spremiti."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "Datoteku nije moguće izbrisati. Provjerite uređaj za pohranu i dopuštenja."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Usluga reprodukcije se promijenila. Ponovno otvorite odabir audio-zapisa."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Naslov programa nije dostupan za traženje titlova."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Sat prijamnika još nije spreman. Provjerite mrežno vrijeme i pokušajte ponovno."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "Pojedinosti odabranog filma učitat će se s poslužitelja."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Titl premašuje ograničenje veličine"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Ovaj format titla nije podržan"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "Odgovor serije koristi nepodržani format. Kategorije ostaju dostupne."
@@ -3266,12 +3226,8 @@ msgstr "Ovaj sadržaj ima samo jedan audio-zapis."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Ova mapa je izvan dopuštenih lokacija za pohranu."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Ovo je pregled titlova.\n"
-"Promjene se ovdje prikazuju odmah."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Ovo je pregled titlova.\nPromjene se ovdje prikazuju odmah."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Ovaj pregled koristi trenutačne nespremljene postavke izgleda."
@@ -3419,6 +3375,9 @@ msgstr "Okomiti položaj"
 msgid "Very large"
 msgstr "Vrlo velika"
 
+msgid "Video"
+msgstr "Video"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Videozapis se nije mogao reproducirati na ovom prijamniku. Pokušajte s drugim videozapisom ili postavkom kvalitete."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Bijela"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Zapišite ovaj kod za oporavak. Prikazuje se samo jednom:\n"
-"\n"
-"{}\n"
-"\n"
-"Ako zaboravite oba koda, uklanjanje i ponovna instalacija dodatka poništit će samo ovo zaključavanje."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Zapišite ovaj kod za oporavak. Prikazuje se samo jednom:\n\n{}\n\nAko zaboravite oba koda, uklanjanje i ponovna instalacija dodatka poništit će samo ovo zaključavanje."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "XMLTV EPG je onemogućen za ovaj M3U izvor."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} uklonjeno je iz omiljenih."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"IPTV reproduktor otvorenog koda za Enigma2. Podržava račune Xtream Codes i TV uživo iz standardnih lokalnih, mrežno montiranih ili HTTP(S) M3U popisa za reprodukciju. Obični M3U izvori omogućuju samo TV uživo.\n"
-"\n"
-"RAZVOJNI PROGRAMER\n"
-"{}\n"
-"\n"
-"PRAVNA OBAVIJEST\n"
-"Ovaj dodatak ne pruža kanale, streamove, račune ni popise za reprodukciju. Korisnik je odgovoran za upotrebu isključivo sadržaja za koji ima prava pristupa i korištenja.\n"
-"\n"
-"PRIVATNOST\n"
-"Kada je Open-Meteo omogućen, odabrani grad i lokacija šalju se usluzi Open-Meteo radi vremenske prognoze. Kada je TMDb omogućen, naslov filma/serije te TMDb ključ ili token koji je korisnik unio šalju se usluzi TMDb. Korisničko ime i lozinka za IPTV ne šalju se tim uslugama."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nIPTV reproduktor otvorenog koda za Enigma2. Podržava račune Xtream Codes i TV uživo iz standardnih lokalnih, mrežno montiranih ili HTTP(S) M3U popisa za reprodukciju. Obični M3U izvori omogućuju samo TV uživo.\n\nRAZVOJNI PROGRAMER\n{}\n\nPRAVNA OBAVIJEST\nOvaj dodatak ne pruža kanale, streamove, račune ni popise za reprodukciju. Korisnik je odgovoran za upotrebu isključivo sadržaja za koji ima prava pristupa i korištenja.\n\nPRIVATNOST\nKada je Open-Meteo omogućen, odabrani grad i lokacija šalju se usluzi Open-Meteo radi vremenske prognoze. Kada je TMDb omogućen, naslov filma/serije te TMDb ključ ili token koji je korisnik unio šalju se usluzi TMDb. Korisničko ime i lozinka za IPTV ne šalju se tim uslugama."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

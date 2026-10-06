@@ -11,12 +11,52 @@ provider: searches receive only bounded movie or episode metadata.
 import os
 import stat
 import unicodedata
+import math
 
 from .i18n import N_
 
 
 _API_UNSET = object()
 _SUBSSUPPORT_API = _API_UNSET
+
+
+def normalize_external_subtitle_sync(value):
+    """Keep bounded public delay/FPS values without changing engine units."""
+    if not isinstance(value, dict):
+        return {}
+
+    def checked(item, limit, automatic=False):
+        if isinstance(item, bool):
+            return None
+        if automatic and isinstance(item, str) and item.lower() in ("auto", "default"):
+            return item
+        if not isinstance(item, (int, float, str)) or len(str(item)) > 40:
+            return None
+        try:
+            number = float(item)
+        except (TypeError, ValueError, OverflowError):
+            return None
+        if not math.isfinite(number) or not -limit <= number <= limit:
+            return None
+        if automatic and number < 0:
+            return None
+        return item
+
+    result = {}
+    delay = checked(value.get("delay"), 30 * 60 * 1000)
+    if delay is not None:
+        result["delay"] = delay
+    fps = value.get("fps")
+    if isinstance(fps, (tuple, list)) and len(fps) == 2:
+        numbers = tuple(checked(item, 120, automatic=True) if item is not None else None
+                        for item in fps)
+        if all(item is None or checked(item, 120, automatic=True) is not None for item in fps):
+            result["fps"] = numbers
+    else:
+        fps = checked(fps, 120, automatic=True)
+        if fps is not None:
+            result["fps"] = fps
+    return result
 
 
 def _log(message, error=None):
@@ -212,6 +252,25 @@ class SubsSupportBridge(object):
     def is_loaded(self):
         return self._engine is not None and self.loaded_path is not None
 
+    def snapshot_sync(self):
+        values = {}
+        if self.is_loaded:
+            for key, getter in (("delay", "getSubsDelay"), ("fps", "getSubsFps")):
+                method = getattr(self._engine, getter, None)
+                if callable(method):
+                    try:
+                        values[key] = method()
+                    except Exception:
+                        pass
+        return normalize_external_subtitle_sync(values)
+
+    @staticmethod
+    def _apply_sync(engine, sync):
+        for key, value in normalize_external_subtitle_sync(sync).items():
+            setter = getattr(engine, "setSubsDelay" if key == "delay" else "setSubsFps", None)
+            if callable(setter):
+                setter(value)
+
     def open_search(self, titles, callback):
         """Open SubsSearch directly; never expose the current service URL."""
         if self._closed or self._search_dialog is not None:
@@ -400,7 +459,7 @@ class SubsSupportBridge(object):
             raise AttributeError(name)
         return method(*args, **kwargs)
 
-    def load(self, path, paused=False, notify=True, before_activate=None):
+    def load(self, path, paused=False, notify=True, before_activate=None, sync=None):
         """Load a downloaded file, retaining the old external file on error."""
         if self._closed or _local_subtitle_path((path,)) is None:
             if notify:
@@ -444,6 +503,7 @@ class SubsSupportBridge(object):
             loaded = self._call(engine, "loadSubs", path, newService=True)
             if loaded is not True:
                 raise RuntimeError("SubsSupport rejected subtitle")
+            self._apply_sync(engine, sync)
             if callable(before_activate) and before_activate() is False:
                 raise RuntimeError("subtitle activation was cancelled")
             if paused:
@@ -627,4 +687,3 @@ class SubsSupportBridge(object):
         self._closed = True
         self.cancel_pending_search()
         self.disable()
-

@@ -493,6 +493,8 @@ class GTSubtitleSettingsScreen(Screen):
             return LANGUAGE_NAMES.get(self.settings.primary_language,
                                       self.settings.primary_language.upper())
         if index == 8:
+            if not self.settings.secondary_language:
+                return _("Off")
             return LANGUAGE_NAMES.get(self.settings.secondary_language,
                                       self.settings.secondary_language.upper())
         if index == 9:
@@ -642,6 +644,8 @@ class GTSubtitleSettingsScreen(Screen):
             return
         elif index in (7, 8):
             choices = tuple(code for code, unused_name in LANGUAGE_CHOICES)
+            if index == 8:
+                choices = ("",) + choices
             field = "primary_language" if index == 7 else "secondary_language"
             setattr(self.settings, field, self._cycled(
                 getattr(self.settings, field), choices, step
@@ -794,7 +798,7 @@ class GTSubtitleSettingsScreen(Screen):
             )
             return
         # YELLOW on a key row checks that service without changing the
-        # user's preferred provider for automatic subtitle selection.
+        # user's saved provider preference.
         provider = self._key_provider(self.selected_index) or self.settings.provider
         test_settings = self.settings.copy()
         test_settings.provider = provider

@@ -1,15 +1,5 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
-"Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
-"PO-Revision-Date: 2026-10-01 19:14+0000\n"
-"Last-Translator: GT IPTV Player Pro contributors\n"
-"Language-Team: Indonesian\n"
-"Language: id\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Indonesian\nLanguage: id\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
 
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
@@ -110,6 +100,9 @@ msgstr "AUDIO: {}"
 msgid "About"
 msgstr "Tentang"
 
+msgid "Access code"
+msgstr "Kode akses"
+
 msgid "Access your channels quickly"
 msgstr "Akses saluran Anda dengan cepat"
 
@@ -197,6 +190,9 @@ msgstr "Arab"
 
 msgid "Archive playback is unavailable for this channel."
 msgstr "Pemutaran arsip tidak tersedia untuk saluran ini."
+
+msgid "Aspect ratio"
+msgstr "Rasio aspek"
 
 msgid "Audio language changed"
 msgstr "Bahasa audio diubah"
@@ -481,6 +477,9 @@ msgstr "Langit cerah"
 msgid "Close"
 msgstr "Tutup"
 
+msgid "Close menu"
+msgstr "Tutup menu"
+
 msgid "Close the open screen before opening another one."
 msgstr "Tutup layar yang terbuka sebelum membuka layar lain."
 
@@ -678,10 +677,10 @@ msgid "Could not select the requested audio track."
 msgstr "Tidak dapat memilih trek audio yang diminta."
 
 msgid "Could not start the independent subtitle renderer."
-msgstr "Could not start the independent subtitle renderer."
+msgstr "Tidak dapat memulai tampilan subtitel mandiri."
 
 msgid "Could not start the online subtitle search."
-msgstr "Could not start the online subtitle search."
+msgstr "Tidak dapat memulai pencarian subtitel daring."
 
 msgid "Could not start the player."
 msgstr "Tidak dapat memulai pemutar."
@@ -771,6 +770,9 @@ msgstr "Urutan bawaan dipulihkan. Tekan HIJAU untuk menyimpan."
 msgid "Delete"
 msgstr "Hapus"
 
+msgid "Delete all"
+msgstr "Hapus semua"
+
 msgid "Delete this item?"
 msgstr "Hapus item ini?"
 
@@ -818,6 +820,12 @@ msgstr "Jelajahi Film"
 
 msgid "Discover new movies with TMDB recommendations"
 msgstr "Temukan film baru dengan rekomendasi TMDB"
+
+msgid "Display 16:9 content as"
+msgstr "Tampilkan konten 16:9 sebagai"
+
+msgid "Display 4:3 content as"
+msgstr "Tampilkan konten 4:3 sebagai"
 
 msgid "Do not include a query or fragment in the portal URL"
 msgstr "Jangan sertakan kueri atau fragmen dalam URL portal"
@@ -929,7 +937,7 @@ msgid "Enter a SubDL API key first."
 msgstr "Masukkan kunci API SubDL terlebih dahulu."
 
 msgid "Enter a SubDL API key in subtitle settings."
-msgstr "Enter a SubDL API key in subtitle settings."
+msgstr "Masukkan kunci API SubDL di pengaturan subtitel."
 
 msgid "Enter a TMDb API key for movie and series details."
 msgstr "Masukkan kunci API TMDb untuk detail film dan serial."
@@ -1007,6 +1015,9 @@ msgstr "Masukkan kode enam digit yang ditampilkan pada perangkat penerima."
 msgid "Enter the username"
 msgstr "Masukkan nama pengguna"
 
+msgid "Enter the username / Enter the password"
+msgstr "Masukkan nama pengguna / Masukkan kata sandi"
+
 msgid "Enter this code in your phone browser, then approve the request on TV."
 msgstr "Masukkan kode ini di peramban ponsel Anda, lalu setujui permintaan di TV. 042 | Episode"
 
@@ -1061,6 +1072,9 @@ msgstr "FAVORIT"
 
 msgid "FILE"
 msgstr "BERKAS"
+
+msgid "FPS"
+msgstr "FPS"
 
 msgid "FPS will be converted"
 msgstr "FPS akan dikonversi"
@@ -1144,19 +1158,11 @@ msgstr "Layar penuh"
 msgid "GREEN"
 msgstr "HIJAU"
 
-msgid ""
-"GT\n"
-"MOVIE"
-msgstr ""
-"GT\n"
-"FILM"
+msgid "GT\nMOVIE"
+msgstr "GT\nFILM"
 
-msgid ""
-"GT\n"
-"SERIES"
-msgstr ""
-"GT\n"
-"SERIAL"
+msgid "GT\nSERIES"
+msgstr "GT\nSERIAL"
 
 msgid "Genre unavailable"
 msgstr "Genre tidak tersedia"
@@ -1278,13 +1284,13 @@ msgid "Independent subtitle preview"
 msgstr "Pratinjau subtitel mandiri"
 
 msgid "Independent subtitle synchronization"
-msgstr "Independent subtitle synchronization"
+msgstr "Sinkronisasi subtitel mandiri"
 
 msgid "Independent subtitles"
 msgstr "Subtitel mandiri"
 
 msgid "Independent subtitles are turned off in settings."
-msgstr "Independent subtitles are turned off in settings."
+msgstr "Subtitel mandiri dinonaktifkan dalam pengaturan."
 
 msgid "Information"
 msgstr "Informasi"
@@ -1392,46 +1398,12 @@ msgid "Latency"
 msgstr "Latensi"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Active / Maximum: {}\n"
-"Expiry: {}\n"
-"Server time: {}\n"
-"Time zone: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"Server version: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Latensi: {} ms\n"
-"Status akun: {}\n"
-"Aktif / Maksimum: {}\n"
-"Kedaluwarsa: {}\n"
-"Waktu server: {}\n"
-"Zona waktu: {}\n"
-"Protokol: {}\n"
-"Format keluaran: {}\n"
-"Versi server: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nActive / Maximum: {}\nExpiry: {}\nServer time: {}\nTime zone: {}\nProtocol: {}\nOutput format: {}\nServer version: {}\n\n{}"
+msgstr "Latensi: {} ms\nStatus akun: {}\nAktif / Maksimum: {}\nKedaluwarsa: {}\nWaktu server: {}\nZona waktu: {}\nProtokol: {}\nFormat keluaran: {}\nVersi server: {}\n\n{}"
 
 #, python-brace-format
-msgid ""
-"Latency: {} ms\n"
-"Account status: {}\n"
-"Protocol: {}\n"
-"Output format: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Latensi: {} ms\n"
-"Status akun: {}\n"
-"Protokol: {}\n"
-"Format keluaran: {}\n"
-"\n"
-"{}"
+msgid "Latency: {} ms\nAccount status: {}\nProtocol: {}\nOutput format: {}\n\n{}"
+msgstr "Latensi: {} ms\nStatus akun: {}\nProtokol: {}\nFormat keluaran: {}\n\n{}"
 
 msgid "Left"
 msgstr "Kiri"
@@ -1456,7 +1428,7 @@ msgid "Load a subtitle from this web page before synchronizing."
 msgstr "Muat takarir dari halaman web ini sebelum melakukan sinkronisasi."
 
 msgid "Load an independent subtitle before synchronizing it."
-msgstr "Load an independent subtitle before synchronizing it."
+msgstr "Muat subtitel mandiri sebelum menyinkronkannya."
 
 msgid "Loading DVB services and cached XMLTV channels..."
 msgstr "Memuat layanan DVB dan saluran XMLTV yang tersimpan dalam cache..."
@@ -1514,6 +1486,9 @@ msgstr "Keluar"
 
 msgid "Lower"
 msgstr "Lebih rendah"
+
+msgid "M3U"
+msgstr "M3U"
 
 msgid "M3U CHANNEL SEARCH"
 msgstr "PENCARIAN SALURAN M3U"
@@ -1668,6 +1643,9 @@ msgstr "Alamat MAC"
 
 msgid "MANAGE SOURCES"
 msgstr "KELOLA SUMBER"
+
+msgid "MENU 3s: Web interface"
+msgstr "MENU 3 dtk: Antarmuka web"
 
 msgid "MOVIE CATEGORIES"
 msgstr "KATEGORI FILM"
@@ -1905,7 +1883,7 @@ msgid "No matching subtitles found. Check the language and provider status."
 msgstr "Tidak ditemukan takarir yang cocok. Periksa bahasa dan status penyedia."
 
 msgid "No matching subtitles were found on SubDL."
-msgstr "No matching subtitles were found on SubDL."
+msgstr "Tidak ditemukan subtitel yang cocok di SubDL."
 
 msgid "No movies found."
 msgstr "Tidak ada film ditemukan."
@@ -1946,14 +1924,8 @@ msgstr "Tidak ada sumber yang tersedia untuk disambungkan."
 msgid "No source is selected for deletion."
 msgstr "Tidak ada sumber yang dipilih untuk dihapus."
 
-msgid ""
-"No source was found.\n"
-"\n"
-"Create one from the ADD SOURCE panel on the home screen."
-msgstr ""
-"Sumber tidak ditemukan.\n"
-"\n"
-"Buat sumber melalui panel TAMBAH SUMBER di layar beranda."
+msgid "No source was found.\n\nCreate one from the ADD SOURCE panel on the home screen."
+msgstr "Sumber tidak ditemukan.\n\nBuat sumber melalui panel TAMBAH SUMBER di layar beranda."
 
 msgid "No summary is available for this programme."
 msgstr "Ringkasan acara ini tidak tersedia."
@@ -1981,6 +1953,9 @@ msgstr "Sumber Xtream yang valid tidak ditemukan."
 
 msgid "No valid title was found for TMDb"
 msgstr "Judul yang dapat digunakan untuk TMDb tidak ditemukan"
+
+msgid "No videos found at the selected quality."
+msgstr "Tidak ada video dengan kualitas yang dipilih."
 
 msgid "No weather forecast is available for this city."
 msgstr "Prakiraan cuaca untuk kota ini tidak tersedia."
@@ -2032,7 +2007,7 @@ msgid "Open / Approve"
 msgstr "Buka / Setujui"
 
 msgid "Open independent subtitle settings."
-msgstr "Open independent subtitle settings."
+msgstr "Buka pengaturan subtitel mandiri."
 
 msgid "Open the TV keyboard, then paste here."
 msgstr "Buka papan ketik TV, lalu tempel teks di sini."
@@ -2107,8 +2082,14 @@ msgstr "Putar"
 msgid "Play a movie or episode on the receiver first."
 msgstr "Putar film atau episode di perangkat penerima terlebih dahulu."
 
+msgid "Play next video automatically"
+msgstr "Putar video berikutnya secara otomatis"
+
 msgid "Play on TV"
 msgstr "Putar di TV"
+
+msgid "Playback history"
+msgstr "Riwayat pemutaran"
 
 msgid "Playback mode"
 msgstr "Mode pemutaran"
@@ -2269,6 +2250,9 @@ msgstr "Koneksi penyedia berhasil"
 msgid "Quality"
 msgstr "Kualitas"
 
+msgid "Quality changed. Search again."
+msgstr "Kualitas berubah. Cari lagi."
+
 msgid "Queued"
 msgstr "Dalam antrean"
 
@@ -2288,26 +2272,8 @@ msgid "Rating"
 msgstr "Peringkat"
 
 #, python-brace-format
-msgid ""
-"Read time: {} ms\n"
-"Source type: {}\n"
-"Size: {} bytes\n"
-"Channels: {}\n"
-"Categories: {}\n"
-"Cache age: {}\n"
-"Last modified: {}\n"
-"\n"
-"{}"
-msgstr ""
-"Waktu baca: {} ms\n"
-"Jenis sumber: {}\n"
-"Ukuran: {} byte\n"
-"Saluran: {}\n"
-"Kategori: {}\n"
-"Usia cache: {}\n"
-"Terakhir diubah: {}\n"
-"\n"
-"{}"
+msgid "Read time: {} ms\nSource type: {}\nSize: {} bytes\nChannels: {}\nCategories: {}\nCache age: {}\nLast modified: {}\n\n{}"
+msgstr "Waktu baca: {} ms\nJenis sumber: {}\nUkuran: {} byte\nSaluran: {}\nKategori: {}\nUsia cache: {}\nTerakhir diubah: {}\n\n{}"
 
 msgid "Reading duration..."
 msgstr "Membaca durasi..."
@@ -2331,14 +2297,8 @@ msgid "Reconnecting the stream..."
 msgstr "Menyambungkan kembali aliran..."
 
 #, python-brace-format
-msgid ""
-"Recovery succeeded. Write down the new recovery code; it is shown only once:\n"
-"\n"
-"{}"
-msgstr ""
-"Pemulihan berhasil. Catat kode pemulihan baru; kode ini hanya ditampilkan sekali:\n"
-"\n"
-"{}"
+msgid "Recovery succeeded. Write down the new recovery code; it is shown only once:\n\n{}"
+msgstr "Pemulihan berhasil. Catat kode pemulihan baru; kode ini hanya ditampilkan sekali:\n\n{}"
 
 msgid "Red"
 msgstr "Merah"
@@ -2377,7 +2337,7 @@ msgid "Reset"
 msgstr "Atur ulang"
 
 msgid "Reset subtitle timing"
-msgstr "Reset subtitle timing"
+msgstr "Atur ulang waktu subtitel"
 
 msgid "Resolution: --"
 msgstr "Resolusi: --"
@@ -2392,14 +2352,8 @@ msgid "Resume"
 msgstr "Lanjutkan"
 
 #, python-brace-format
-msgid ""
-"Resume playback from the saved position?\n"
-"\n"
-"Saved position: {}"
-msgstr ""
-"Lanjutkan pemutaran dari posisi tersimpan?\n"
-"\n"
-"Posisi tersimpan: {}"
+msgid "Resume playback from the saved position?\n\nSaved position: {}"
+msgstr "Lanjutkan pemutaran dari posisi tersimpan?\n\nPosisi tersimpan: {}"
 
 msgid "Resume unfinished movies and series episodes"
 msgstr "Lanjutkan menonton film dan episode serial yang belum selesai"
@@ -2465,7 +2419,7 @@ msgid "SSA"
 msgstr "SSA"
 
 msgid "SUBTITLE SETTINGS"
-msgstr "SUBTITLE SETTINGS"
+msgstr "PENGATURAN SUBTITEL"
 
 msgid "Same line starts in subtitle (MM:SS)"
 msgstr "Baris yang sama dimulai pada subtitle (MM:SS)"
@@ -2515,6 +2469,9 @@ msgstr "Cari lagi; hasil ini sudah kedaluwarsa."
 msgid "Search for a spoken phrase"
 msgstr "Cari frasa ucapan"
 
+msgid "Search history"
+msgstr "Riwayat pencarian"
+
 msgid "Search in IPTV"
 msgstr "Cari di IPTV"
 
@@ -2528,7 +2485,7 @@ msgid "Search music, documentaries or channels"
 msgstr "Cari musik, dokumenter, atau saluran"
 
 msgid "Search online subtitles with SubDL"
-msgstr "Search online subtitles with SubDL"
+msgstr "Cari subtitel dengan SubDL"
 
 msgid "Search subtitles"
 msgstr "Cari subtitle"
@@ -2550,6 +2507,9 @@ msgstr "Mencari penyedia…"
 
 msgid "Searching…"
 msgstr "Mencari…"
+
+msgid "Season"
+msgstr "Musim"
 
 msgid "Seasons"
 msgstr "Musim"
@@ -2717,16 +2677,16 @@ msgid "Show / Hide"
 msgstr "Tampilkan / Sembunyikan"
 
 msgid "Show 0.5 seconds earlier"
-msgstr "Show 0.5 seconds earlier"
+msgstr "Tampilkan 0,5 detik lebih awal"
 
 msgid "Show 0.5 seconds later"
-msgstr "Show 0.5 seconds later"
+msgstr "Tampilkan 0,5 detik lebih lambat"
 
 msgid "Show 1 second earlier"
-msgstr "Show 1 second earlier"
+msgstr "Tampilkan 1 detik lebih awal"
 
 msgid "Show 1 second later"
-msgstr "Show 1 second later"
+msgstr "Tampilkan 1 detik lebih lambat"
 
 msgid "Show in device main menu"
 msgstr "Tampilkan di menu utama perangkat"
@@ -2849,19 +2809,19 @@ msgid "SubDL connection is ready."
 msgstr "Koneksi SubDL siap."
 
 msgid "SubDL is temporarily unavailable."
-msgstr "SubDL is temporarily unavailable."
+msgstr "SubDL sementara tidak tersedia."
 
 msgid "SubDL is the provider in this release."
-msgstr "SubDL is the provider in this release."
+msgstr "SubDL adalah penyedia dalam versi ini."
 
 msgid "SubDL key change cancelled."
 msgstr "Perubahan kunci SubDL dibatalkan."
 
 msgid "SubDL returned an invalid response."
-msgstr "SubDL returned an invalid response."
+msgstr "SubDL mengembalikan respons yang tidak valid."
 
 msgid "SubDL subtitles"
-msgstr "SubDL subtitles"
+msgstr "SubDL • Subtitel"
 
 msgid "Subtitle"
 msgstr "Subtitel"
@@ -2882,7 +2842,7 @@ msgid "Subtitle providers"
 msgstr "Penyedia takarir"
 
 msgid "Subtitle result selection is unavailable on this image."
-msgstr "Subtitle result selection is unavailable on this image."
+msgstr "Pemilihan subtitel tidak tersedia pada citra sistem ini."
 
 msgid "Subtitle search requires a working SubsSupport or SubsSupportPro installation."
 msgstr "Pencarian subtitel memerlukan instalasi SubsSupport atau SubsSupportPro yang berfungsi."
@@ -2897,14 +2857,14 @@ msgid "Subtitle synchronization is already running."
 msgstr "Sinkronisasi takarir sedang berjalan."
 
 msgid "Subtitle synchronization is unavailable on this image."
-msgstr "Subtitle synchronization is unavailable on this image."
+msgstr "Sinkronisasi subtitel tidak tersedia pada image ini."
 
 msgid "Subtitle timing adjusted"
 msgstr "Pengaturan waktu takarir disesuaikan"
 
 #, python-brace-format
 msgid "Subtitle timing offset: {:+.1f} seconds"
-msgstr "Subtitle timing offset: {:+.1f} seconds"
+msgstr "Pergeseran waktu subtitel: {:+.1f} detik"
 
 msgid "Subtitles"
 msgstr "Subtitel"
@@ -3120,13 +3080,13 @@ msgid "The SubDL API key was cleared."
 msgstr "Kunci API SubDL telah dihapus."
 
 msgid "The SubDL API key was rejected."
-msgstr "The SubDL API key was rejected."
+msgstr "Kunci API SubDL ditolak."
 
 msgid "The SubDL connection test is still running..."
 msgstr "Pengujian koneksi SubDL masih berlangsung..."
 
 msgid "The SubDL request limit has been reached."
-msgstr "The SubDL request limit has been reached."
+msgstr "Batas permintaan SubDL telah tercapai."
 
 msgid "The TMDb connection test is still running..."
 msgstr "Pengujian koneksi TMDb masih berjalan..."
@@ -3159,7 +3119,7 @@ msgid "The difference cannot exceed 30 minutes."
 msgstr "Selisih waktu tidak boleh melebihi 30 menit."
 
 msgid "The downloaded subtitle could not be saved."
-msgstr "The downloaded subtitle could not be saved."
+msgstr "Subtitel yang diunduh tidak dapat disimpan."
 
 msgid "The file could not be deleted. Check the storage device and permissions."
 msgstr "File tidak dapat dihapus. Periksa perangkat penyimpanan dan izin akses."
@@ -3186,7 +3146,7 @@ msgid "The playing service changed. Open audio selection again."
 msgstr "Layanan yang sedang diputar berubah. Buka kembali pemilihan audio."
 
 msgid "The programme title is not available for subtitle search."
-msgstr "The programme title is not available for subtitle search."
+msgstr "Judul acara tidak tersedia untuk pencarian subtitel."
 
 msgid "The receiver clock is not ready. Check network time and try again."
 msgstr "Jam penerima belum siap. Periksa waktu jaringan lalu coba lagi."
@@ -3210,10 +3170,10 @@ msgid "The selected movie's details will be loaded from the server."
 msgstr "Detail film yang dipilih akan dimuat dari server."
 
 msgid "The selected subtitle file is too large."
-msgstr "The selected subtitle file is too large."
+msgstr "Ukuran takarir (subtitle) melebihi batas"
 
 msgid "The selected subtitle format is not supported."
-msgstr "The selected subtitle format is not supported."
+msgstr "Format takarir ini tidak didukung"
 
 msgid "The series response uses an unsupported format. Categories remain available."
 msgstr "Respons serial menggunakan format yang tidak didukung. Kategori tetap tersedia."
@@ -3266,12 +3226,8 @@ msgstr "Konten ini hanya memiliki satu trek audio."
 msgid "This folder is outside the allowed storage locations."
 msgstr "Direktori ini berada di luar lokasi penyimpanan yang diizinkan."
 
-msgid ""
-"This is a subtitle preview.\n"
-"Changes appear here immediately."
-msgstr ""
-"Ini adalah pratinjau subtitel.\n"
-"Perubahan langsung ditampilkan di sini."
+msgid "This is a subtitle preview.\nChanges appear here immediately."
+msgstr "Ini adalah pratinjau subtitel.\nPerubahan langsung ditampilkan di sini."
 
 msgid "This preview uses the current unsaved appearance settings."
 msgstr "Pratinjau ini menggunakan pengaturan tampilan saat ini yang belum disimpan."
@@ -3419,6 +3375,9 @@ msgstr "Posisi vertikal"
 msgid "Very large"
 msgstr "Sangat besar"
 
+msgid "Video"
+msgstr "Video"
+
 msgid "Video could not be played on this receiver. Try another video or quality setting."
 msgstr "Video tidak dapat diputar di perangkat penerima ini. Coba video atau pengaturan kualitas lain."
 
@@ -3507,18 +3466,8 @@ msgid "White"
 msgstr "Putih"
 
 #, python-brace-format
-msgid ""
-"Write down this recovery code. It is shown only once:\n"
-"\n"
-"{}\n"
-"\n"
-"If you forget both codes, removing and reinstalling the plugin resets only this lock."
-msgstr ""
-"Catat kode pemulihan ini. Kode ini hanya ditampilkan sekali:\n"
-"\n"
-"{}\n"
-"\n"
-"Jika Anda lupa kedua kode, menghapus lalu menginstal ulang plugin hanya akan mereset kunci ini."
+msgid "Write down this recovery code. It is shown only once:\n\n{}\n\nIf you forget both codes, removing and reinstalling the plugin resets only this lock."
+msgstr "Catat kode pemulihan ini. Kode ini hanya ditampilkan sekali:\n\n{}\n\nJika Anda lupa kedua kode, menghapus lalu menginstal ulang plugin hanya akan mereset kunci ini."
 
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr "EPG XMLTV dinonaktifkan untuk sumber M3U ini."
@@ -3663,30 +3612,8 @@ msgid "{} removed from favorites."
 msgstr "{} dihapus dari favorit."
 
 #, python-brace-format
-msgid ""
-"{} v{}\n"
-"Open-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n"
-"\n"
-"DEVELOPER\n"
-"{}\n"
-"\n"
-"LEGAL NOTICE\n"
-"This plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n"
-"\n"
-"PRIVACY\n"
-"When Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
-msgstr ""
-"{} v{}\n"
-"Pemutar IPTV sumber terbuka untuk Enigma2. Mendukung akun Xtream Codes serta TV Langsung dari daftar putar M3U standar berupa berkas lokal, berkas pada penyimpanan jaringan terpasang, atau tautan HTTP(S). Sumber M3U biasa hanya menyediakan TV Langsung.\n"
-"\n"
-"PENGEMBANG\n"
-"{}\n"
-"\n"
-"PEMBERITAHUAN HUKUM\n"
-"Plugin ini tidak menyediakan saluran, aliran, akun, atau daftar putar. Pengguna bertanggung jawab untuk hanya menggunakan konten yang secara sah berhak mereka akses dan gunakan.\n"
-"\n"
-"PRIVASI\n"
-"Saat Open-Meteo diaktifkan, kota dan lokasi yang dipilih dikirim ke Open-Meteo untuk menyediakan prakiraan cuaca. Saat TMDb diaktifkan, judul film atau serial serta kunci API atau token akses TMDb yang dimasukkan pengguna dikirim ke TMDb. Nama pengguna dan kata sandi IPTV tidak dikirim ke layanan tersebut."
+msgid "{} v{}\nOpen-source IPTV player for Enigma2. Supports Xtream Codes accounts and Live TV from standard local, mounted-network or HTTP(S) M3U playlists. Plain M3U sources provide Live TV only.\n\nDEVELOPER\n{}\n\nLEGAL NOTICE\nThis plugin does not provide channels, streams, accounts or playlists. The user is responsible for using only content for which they have access and usage rights.\n\nPRIVACY\nWhen Open-Meteo is enabled, the selected city and location are sent to Open-Meteo for the weather forecast. When TMDb is enabled, the movie/series title and the TMDb key or token entered by the user are sent to TMDb. The IPTV username and password are not sent to these services."
+msgstr "{} v{}\nPemutar IPTV sumber terbuka untuk Enigma2. Mendukung akun Xtream Codes serta TV Langsung dari daftar putar M3U standar berupa berkas lokal, berkas pada penyimpanan jaringan terpasang, atau tautan HTTP(S). Sumber M3U biasa hanya menyediakan TV Langsung.\n\nPENGEMBANG\n{}\n\nPEMBERITAHUAN HUKUM\nPlugin ini tidak menyediakan saluran, aliran, akun, atau daftar putar. Pengguna bertanggung jawab untuk hanya menggunakan konten yang secara sah berhak mereka akses dan gunakan.\n\nPRIVASI\nSaat Open-Meteo diaktifkan, kota dan lokasi yang dipilih dikirim ke Open-Meteo untuk menyediakan prakiraan cuaca. Saat TMDb diaktifkan, judul film atau serial serta kunci API atau token akses TMDb yang dimasukkan pengguna dikirim ke TMDb. Nama pengguna dan kata sandi IPTV tidak dikirim ke layanan tersebut."
 
 #, python-brace-format
 msgid "{} was deleted ({} records)."

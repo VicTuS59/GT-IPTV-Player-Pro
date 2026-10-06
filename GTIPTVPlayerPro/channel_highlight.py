@@ -101,6 +101,22 @@ def selection_border_art(value):
     return plugin_path("skin", "images", name)
 
 
+def welcome_selection_art(value):
+    """A transparent rounded outline matching the welcome action cards."""
+    name = "welcome-card-focus-{}.png".format(normalize_selection_border(value))
+    return plugin_path("skin", "images", name)
+
+
+def dashboard_selection_art(value, kind="hero"):
+    """Transparent rounded outlines matching the dashboard artwork."""
+    if kind not in ("hero", "movie", "series", "continue", "favorites"):
+        raise ValueError("unknown dashboard selection asset")
+    name = "dashboard-card-focus-{}-{}.png".format(
+        kind, normalize_selection_border(value)
+    )
+    return plugin_path("skin", "images", name)
+
+
 _WIDGET = re.compile(r"<widget\b[^>]*?/>", re.DOTALL)
 _NAME = re.compile(r'\bname="([^"]+)"')
 _BACKGROUND = re.compile(r'\bbackgroundColor="[^"]+"')
@@ -110,7 +126,11 @@ _GLOW = re.compile(r"(?:^|_)glow(?:_|$)")
 _SELECTION_ROW = re.compile(r"(?:^|_)selected_\d+(?:_|$)")
 _SELECTED_BACKGROUND = re.compile(r"(?:^|_)selected_\d+$")
 _DASHBOARD_ART = re.compile(r"dashboard-menu-focus-(?:r39|[a-z]+)\.png")
+_DASHBOARD_CARD_ART = re.compile(
+    r"dashboard-card-focus-(hero|movie|series|continue|favorites)-[a-z]+\.png"
+)
 _ROW_ART = re.compile(r"(?:channel-focus-[a-z]+|focus-r64)\.png")
+_WELCOME_ART = re.compile(r"welcome-card-focus-[a-z]+\.png")
 
 
 def saved_selection_palette():
@@ -162,7 +182,6 @@ def apply_selection_color(skin, value=None, border_value=None):
             _FOCUS.search(name)
             or _GLOW.search(name)
             or _SELECTION_ROW.search(name)
-            or name.startswith("tab_active_")
         )
 
     def focus_is_fill(name):
@@ -185,8 +204,16 @@ def apply_selection_color(skin, value=None, border_value=None):
             widget = _DASHBOARD_ART.sub(
                 "dashboard-menu-focus-{}.png".format(border_value), widget
             )
+            widget = _DASHBOARD_CARD_ART.sub(
+                lambda art: "dashboard-card-focus-{}-{}.png".format(
+                    art.group(1), border_value
+                ), widget
+            )
             widget = _ROW_ART.sub(
                 "channel-focus-{}.png".format(border_value), widget
+            )
+            widget = _WELCOME_ART.sub(
+                "welcome-card-focus-{}.png".format(border_value), widget
             )
         background = _BACKGROUND.search(widget)
         if background is None:
@@ -226,8 +253,7 @@ def refresh_screen_selection(screen, value, border_value=None):
             continue
         name = name_match.group(1)
         if not (_FOCUS.search(name) or _GLOW.search(name)
-                or _SELECTION_ROW.search(name)
-                or name.startswith("tab_active_")):
+                or _SELECTION_ROW.search(name)):
             continue
         try:
             component = screen[name]
@@ -247,6 +273,8 @@ def refresh_screen_selection(screen, value, border_value=None):
         if art is not None and (
             "channel-focus-" in art.group(0)
             or "dashboard-menu-focus-" in art.group(0)
+            or "dashboard-card-focus-" in art.group(0)
+            or "welcome-card-focus-" in art.group(0)
         ):
             path = art.group(0).split('"')[1]
             for target in (component, instance):
@@ -270,4 +298,3 @@ def refresh_screen_selection(screen, value, border_value=None):
     except (AttributeError, TypeError):
         pass
     return refreshed
-
