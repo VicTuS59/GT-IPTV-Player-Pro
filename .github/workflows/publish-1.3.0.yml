@@ -34,6 +34,13 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
 
+      - name: Install gettext validation tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y gettext
+
       - name: Build and verify the approved package
         shell: bash
         run: |
