@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: lt\n"
+
+#: live_alternative_ui.py
+msgid "Searching sources: {}/{}"
+msgstr "Ieškoma šaltiniuose: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Testing streams: {}/{}"
+msgstr "Tikrinami srautai: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Opening the best tested stream..."
+msgstr "Atidaromas geriausias patikrintas srautas..."
+
+#: live_alternative_ui.py
+msgid "Search incomplete."
+msgstr "Paieška nebaigta."

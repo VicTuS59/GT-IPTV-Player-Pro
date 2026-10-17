@@ -18,3 +18,10 @@ YouTube may change its player format and require an extractor update.
 
 Search availability reads video resolution metadata across codecs separately
 from native AVC/VP9/AAC playback capability and signed URL extraction.
+
+Revision 1.3.0-r1 prefers original language metadata, with the default track
+as a fallback. Native AAC inputs are ranked by their reported bitrate,
+preferring stereo and the normal dynamic range at equal bitrate.
+HLS audio groups use the same original/default selection rules. The native
+backend receives the signed URLs unchanged; audio is never re-encoded.
+Opus remains outside the established native AAC compatibility contract.

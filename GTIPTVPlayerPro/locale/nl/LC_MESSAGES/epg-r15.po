@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: nl\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "EPG-programmagids"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Dagen"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Beschikbare dagen: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Dagprogramma"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Geselecteerd programma"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Dag"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Programma"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Morgen"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Nu"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Nu op televisie"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Afgelopen"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Binnenkort"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Duur: {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Nog {} min"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Terug naar volledig scherm"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Geen programma’s voor deze dag."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "De programmagids kon niet worden geladen."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Livevoorbeeld is niet beschikbaar op dit image."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Programmabeschrijving niet beschikbaar."

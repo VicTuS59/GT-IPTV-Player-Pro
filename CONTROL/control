@@ -1,89 +1,18 @@
 Package: enigma2-plugin-extensions-gtiptvplayerpro
-Version: 1.3.0-r0
+Version: 1.4.0-r0
 Section: extra
 Priority: optional
 Architecture: all
 Maintainer: VicTuS59
 Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-math, python3-netclient, python3-netserver, python3-stringold, python3-threading, python3-xml
-Installed-Size: 46342
+Installed-Size: 48618
 Homepage: https://github.com/VicTuS59/GT-IPTV-Player-Pro
 License: GPL-2.0-or-later
 Description: GT IPTV Player Pro for Enigma2
- Complete native and browser translations across all 43 gettext catalogues.
- Localize web audio labels and native EPG weekdays without changing device language.
- Remove the unused python3-crypt dependency for Python 3.13 and newer images.
- Validate Python 3.9 through 3.14 syntax, imports and localization behavior.
- Open videos selected in YouTube playback history directly in fullscreen.
- Transfer pending resume positions without reopening the native stream.
- Fix empty-result OK routing after returning from fullscreen playback.
- Reserve both Play and Full screen widths in the YouTube remote guide.
- Fit translated YouTube captions and live badges to their native label geometry.
- Redesign YouTube search with larger rounded result cards and a right video pane.
- First OK starts mini playback; a later OK reveals the same stream fullscreen.
- EXIT returns to mini playback without reopening the video or audio streams.
- Preserve quality selection, playback history, resume and automatic next video.
- Native 2160p, 1080p, 720p and SD skin art with all 43 receiver languages.
- Restore matching FPS ahead of secondary source, resolution and codec hints.
- Keep full releases and supported groups ahead of inferred matching profiles.
- Verify matching release titles with returned IDs despite IPTV title tags.
- Preserve soft FPS differences, SubDL metadata and subtitle timing.
- Treat decoder and uploader FPS differences as subtitle matching hints.
- Prioritize full releases, supported groups and agreeing version evidence.
- Preserve wrong-title, episode, cut, revision, CD and timeline safeguards.
- Request and rank SubDL release lists and decode upload framerate codes.
- Keep exact 24 and 30 FPS distinct from fractional 23.976 and 29.97 FPS.
- Preserve timestamped subtitle timing unless conversion is explicitly verified.
- Recognize high IPTV subtitle compatibility without requiring a release group.
- Combine catalogue or title/year/episode identity with FPS and agreeing hints.
- Preserve cut, revision, part, platform and known release conflict safeguards.
- Use encoded video width to recognize cropped HD and UHD matching profiles.
- Show high subtitle compatibility for strongly supported release-group matches.
- Keep missing evidence, cut conflicts and FPS conversion classified separately.
- Keep the welcome source-status text above the lower panel stroke.
- Fit the status row between the action cards and border on UHD, HD and SD.
- Match subtitle cuts, revisions and CD parts conservatively.
- Rank full release matches before provider quotas and scan bounded extra pages.
- Preserve automatic result preparation and explicit subtitle selection.
- Prepare subtitle search results automatically for movie and series playback.
- Show configured-provider results without automatic download or selection.
- Reuse pending or completed searches and download after explicit selection.
- Hide the independent subtitle window completely between cues.
- Preserve subtitle and web UI hiding across reloads and service changes.
- Restore current cues only after all covering dialogs close.
- Prevent native automatic embedded subtitles inside GT movie and series playback.
- Preserve explicit subtitle choices, online fallback languages and image preferences.
- Cover synchronous startup, engine changes and interrupted web playback.
- Hold MENU for three seconds to open web access from every plugin screen.
- Preserve existing short MENU actions on release without premature menus.
- Handle OpenPLi and OpenATV native long/release flags and held-key repeats.
- Preserve playback and paused/seek state while displaying web approval.
- Reuse the current pairing code and prevent duplicate web access dialogs.
- Add a localized MENU hold hint with all 43 receiver language catalogs.
- Preserve selected subtitles and timing across movie and series engine changes.
- Persist SubsSupport delay and FPS, including interrupted playback and rollback.
- Clear stale subtitle text and correctly render overlapping SRT/WebVTT cues.
- Accept short film titles through catalogue IDs and normalize numeric IMDb IDs.
- Rank SubSource release alternatives and validate SubDL subtitle ownership.
- Retain localized-title ID matching with year and conflicting-ID safeguards.
- Remove migrated credential copies when receiver settings are cleared.
- Offer all 43 subtitle language codes on the web, including Polish providers.
- Preserve web movie years and try the configured second subtitle language.
- One centered rounded access-code field matching the web form 3+3 format.
- Larger adaptive code text on UHD, HD and SD, with the existing backdrop.
- Rounded glass web-session screen with prominent URL and access code.
- Native resolution artwork for 2160p, 1080p, 720p and SD desktops.
- Readable SD remote controls and 43 localized access-code headings.
- Rounded dashboard selectors align with the hero and four quick-access cards.
- Native alpha frames and hero corner masking preserve all 17 outline colors.
- Card geometry follows the wallpaper on UHD, HD and SD desktops.
- Movie discovery shows one focus selector across tabs and posters.
- Removed the persistent category underline from selection theming.
- Responsive source cards with stacked mobile headings and aligned actions.
- Long translated labels, source names and status details stay within the panel.
- Responsive automatic test results and localized source deletion.
- Deleted accounts are removed from test results and progress counters.
- Responsive web download buttons for movies and series episodes.
- Localized download actions and existing receiver queue integration.
- Independent subtitle episode, decoding and timing-state fixes.
- Current playback compatibility revalidation and web synchronization.
- Improved cached selection and bounded subtitle search operations.
+ Xtream Codes, M3U and Stalker/MAC accounts with Live TV, Movies and Series.
+ Selectable user-data backup and restore with section sizes and safety copies.
+ Multi-day EPG guide, previous-channel recall and redesigned information bar.
+ Shared weather and receiver incoming network rate in Mbps.
+ Faster artwork and favourites handling, download-queue and image fixes.
+ Provider metadata language preference and original YouTube audio selection.
+ User interface translated into 43 device languages.

@@ -1,0 +1,95 @@
+name: Publish GT IPTV Player Pro 1.4.0
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-1.4.0.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-gtiptvplayerpro-1.4.0
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.repository == 'VicTuS59/GT-IPTV-Player-Pro' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event.head_commit.message == 'Release 1.4.0 stable')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      IPK: dist/enigma2-plugin-extensions-gtiptvplayerpro_1.4.0-r0_all.ipk
+      EXPECTED_SHA256: 625f9d6133c4be7f846445fef822ffcdfc371f70902f902ef353ea2b58d78468
+      RELEASE_NOTES_BASE64: R1QgSVBUViBQbGF5ZXIgUHJvIHYxLjQuMCDigJQgU3RhYmxlIFJlbGVhc2UKCkhpZ2hsaWdodHM6Ci0gU2VsZWN0YWJsZSBiYWNrdXAgYW5kIHJlc3RvcmUgZGFzaGJvYXJkcyB3aXRoIHNlY3Rpb24gc2l6ZXMsIGRlc3RpbmF0aW9uIHBhdGhzLCBhcmNoaXZlIHZlcmlmaWNhdGlvbiBhbmQgc2FmZXR5IGJhY2t1cHMuCi0gSW1wcm92ZWQgYmFja3VwIHJlc3RvcmF0aW9uIG9uIHJlY2VpdmVycyB3aXRoIGRpZmZlcmVudCBkaXNrIGFuZCBtb3VudCBsYXlvdXRzOyBleGlzdGluZyAxLjMuMCB1c2VyLWRhdGEgYmFja3VwcyByZW1haW4gc3VwcG9ydGVkLgotIE11bHRpLWRheSBFUEcgZ3VpZGUgd2l0aCBwcm9ncmFtbWUgZGV0YWlscyBhbmQgY29udGludWluZyBsaXZlIHByZXZpZXcsIHdoZXJlIHByb3ZpZGVkIGJ5IHRoZSBzb3VyY2UuCi0gU2hvcnQgMCByZWNhbGxzIHRoZSBwcmV2aW91cyBMaXZlIFRWIGNoYW5uZWwgYWNyb3NzIFh0cmVhbSwgTTNVIGFuZCBTdGFsa2VyIHNvdXJjZXM7IGhvbGQgMCByZXN0YXJ0cyB0aGUgY3VycmVudCBsaXZlIHN0cmVhbS4KLSBDb21wYWN0IHJlZGVzaWduZWQgaW5mb3JtYXRpb24gYmFyIHdpdGggY29ycmVjdGVkIHRleHQgcmVuZGVyaW5nLCBwcm9ncmVzcywgcmVtYWluaW5nIHRpbWUsIHdlYXRoZXIgYW5kIHJlY2VpdmVyIG5ldHdvcmsgcmF0ZS4KLSBTaGFyZWQgd2VhdGhlciBwcmVwYXJhdGlvbiBhdCBwbHVnaW4gc3RhcnR1cCwgaW5jbHVkaW5nIHBsYXliYWNrIG9wZW5lZCB0aHJvdWdoIFlvdVR1YmUuCi0gRmFzdGVyIHBhZ2UgdHJhbnNpdGlvbnMsIFJBTS1hd2FyZSBVSEQgaW1hZ2UgY2FjaGluZywgZmF2b3VyaXRlcyBsb2FkaW5nIGFuZCBwcm9ncmVzc2l2ZSBtb3ZpZS9zZXJpZXMgZGV0YWlscy4KLSBEb3dubG9hZCBxdWV1ZXMgY29udGludWUgYWZ0ZXIgYW4gaW5kaXZpZHVhbCBjb25uZWN0aW9uL3NlcnZlciBmYWlsdXJlLiBBY2NvdW50IHRlc3RpbmcsIHBvcnRhbCB0ZXh0IGltcG9ydCBhbmQgZXhwaXJ5IGhhbmRsaW5nIGhhdmUgYmVlbiBpbXByb3ZlZC4KLSBPcGVuQVRWIG5hdmlnYXRpb24vc2Vla2luZyBmaXhlcywgaWRlbnRpZmllZCBPcGVuUExpIGNvbXBhdGliaWxpdHkgZml4ZXMsIG1ldGFkYXRhIGxhbmd1YWdlIHByZWZlcmVuY2UgYW5kIG9yaWdpbmFsL2RlZmF1bHQgWW91VHViZSBhdWRpbyBzZWxlY3Rpb24uCi0gQWxsIG5ldyBpbnRlcmZhY2UgdGV4dCBpcyBhdmFpbGFibGUgaW4gdGhlIGV4aXN0aW5nIDQzIGRldmljZSBsYW5ndWFnZXMuCgpUaGUgbmV0d29yayBpbmRpY2F0b3Igc2FtcGxlcyBpbmNvbWluZyByZWNlaXZlci1pbnRlcmZhY2UgdHJhZmZpYyBvbmNlIHBlciBzZWNvbmQgd2hpbGUgdGhlIGluZm9ybWF0aW9uIGJhciBpcyB2aXNpYmxlLiBJdCBpbmNsdWRlcyBvdGhlciByZWNlaXZlciBkb3dubG9hZHMgYW5kIGlzIG5vdCBhIHBlci1zdHJlYW0gYml0cmF0ZSBvciBpbnRlcm5ldCBzcGVlZCB0ZXN0LgoKUGFja2FnZToKLSBQbHVnaW4gdmVyc2lvbjogMS40LjAKLSBQYWNrYWdlIHZlcnNpb246IDEuNC4wLXIwCi0gQXJjaGl0ZWN0dXJlOiBhbGwKLSBQeXRob246IDMuOSBvciBuZXdlcgotIEZpbGU6IGVuaWdtYTItcGx1Z2luLWV4dGVuc2lvbnMtZ3RpcHR2cGxheWVycHJvXzEuNC4wLXIwX2FsbC5pcGsKClJlc3RhcnQgdGhlIEVuaWdtYTIgR1VJIGFmdGVyIGluc3RhbGxhdGlvbi4KClNIQS0yNTY6CjYyNWY5ZDYxMzNjNGJlN2Y4NDY0NDVmZWY4MjJmZmNkZmMzNzFmNzA5MDJmOTAyZWYzNTNlYTJiNThkNzg0NjgK
+    steps:
+      - name: Check out approved stable sources
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Install gettext validation tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y gettext
+
+      - name: Build and verify the approved package
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          root = Path('GTIPTVPlayerPro')
+          metadata = (root / '__init__.py').read_text()
+          assert 'PLUGIN_VERSION = "1.4.0"' in metadata
+          assert '\nVersion: 1.4.0-r0\n' in Path('CONTROL/control').read_text()
+          for path in root.rglob('*.py'):
+              ast.parse(path.read_text(), filename=str(path), feature_version=(3, 9))
+          PY
+          python3 -m unittest discover -s tests -v
+          make -C po check
+          node --check GTIPTVPlayerPro/web/app.js
+          sh -n CONTROL/postinst CONTROL/prerm CONTROL/postrm scripts/build-ipk.sh
+          scripts/build-ipk.sh
+          printf '%s  %s\n' "$EXPECTED_SHA256" "$IPK" | sha256sum --check --strict -
+          (cd dist && sha256sum "$(basename "$IPK")" > "$(basename "$IPK").sha256")
+          python3 - <<'PY'
+          import base64, os
+          from pathlib import Path
+          body = base64.b64decode(os.environ['RELEASE_NOTES_BASE64'], validate=True)
+          assert os.environ['EXPECTED_SHA256'].encode() in body
+          Path(os.environ['RUNNER_TEMP'], 'release-notes.txt').write_bytes(body)
+          PY
+
+      - name: Add the verified IPK to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'VicTuS59'
+          git config user.email 'guner.taylan59@icloud.com'
+          git add -f -- "$IPK" "$IPK.sha256"
+          if ! git diff --cached --quiet; then
+            git commit -m 'Add verified 1.4.0 release package'
+          fi
+          git push origin HEAD:main
+          printf 'RELEASE_COMMIT=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Publish v1.4.0 and both download assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create v1.4.0 "$IPK" "$IPK.sha256" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$RELEASE_COMMIT" \
+            --title 'GT IPTV Player Pro v1.4.0' \
+            --notes-file "$RUNNER_TEMP/release-notes.txt" \
+            --latest

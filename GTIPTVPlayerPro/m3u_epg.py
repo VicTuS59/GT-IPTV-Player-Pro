@@ -409,6 +409,7 @@ def refresh_source(
     diagnostics=None,
     archive_days=None,
     persist=True,
+    guide_all_dates=False,
 ):
     """Read, match, and publish one external XMLTV source.
 
@@ -425,6 +426,8 @@ def refresh_source(
     kind, location = _binding_location(binding, source_id)
     fingerprint = binding_fingerprint(binding, source_id)
     wanted = _normalise_wanted_ids(wanted_ids)
+    if guide_all_dates and (len(wanted) != 1 or persist or store is None or archive_days is not None):
+        raise ValueError("full XMLTV guide reads require one channel and an isolated nonpersistent store")
     if archive_days is not None:
         if (isinstance(archive_days, bool) or not isinstance(archive_days, int)
                 or not 1 <= archive_days <= 31 or len(wanted) != 1
@@ -530,6 +533,7 @@ def refresh_source(
                 cancel_event,
                 deadline,
                 **({"archive_days": archive_days} if archive_days is not None else {}),
+                **({"guide_all_dates": True} if guide_all_dates else {}),
             )
         finally:
             _record_refresh_elapsed(timing, "xml_scan_ms", scan_started)
@@ -538,7 +542,7 @@ def refresh_source(
         payload["redirect_count"] = int(redirect_count)
         compact_started = time.monotonic()
         try:
-            fit_budget = (_fit_archive_snapshot_budget if archive_days is not None
+            fit_budget = (_fit_archive_snapshot_budget if archive_days is not None or guide_all_dates
                           else _fit_snapshot_budget)
             payload = fit_budget(
                 payload,
@@ -642,6 +646,11 @@ def read_archive_events(source_id, binding, tvg_id, days, **options):
     refresh_source(source_id, binding, (tvg_id,), store=result,
                    archive_days=days, persist=False, **options)
     return result.rows
+
+
+def read_guide_events(source_id, binding, tvg_id, **options):
+    """Read every dated event for one selected channel without live-cache writes."""
+    return read_archive_events(source_id, binding, tvg_id, None, guide_all_dates=True, **options)
 
 
 def binding_fingerprint(binding, source_id=None):
@@ -1230,6 +1239,7 @@ def _build_snapshot(
     cancel_event,
     deadline,
     archive_days=None,
+    guide_all_dates=False,
 ):
     normalised_wanted = set(normalise_tvg_id(value) for value in wanted)
     channels = OrderedDict()
@@ -1298,6 +1308,8 @@ def _build_snapshot(
     retained_text = 0
     earliest = int(now) - (archive_days * 86400 if archive_days is not None else DEFAULT_PAST_SECONDS)
     latest = int(now) if archive_days is not None else int(now) + DEFAULT_FUTURE_SECONDS
+    if guide_all_dates:
+        earliest, latest = 0, 4102444800
     selected_ids = frozenset(matched_channels)
 
     # The second bounded pass collects text only for the already resolved

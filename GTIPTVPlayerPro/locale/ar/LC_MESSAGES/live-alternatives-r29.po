@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ar\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "مصادر بث بديلة"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "إعادة الاختبار"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "مستقر"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "قابل للتشغيل"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "غير مستقر"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "لم يُختبر"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "تم تأجيل الاختبار"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "تطابق تام"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "اسم مشابه"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "رقم قناة مختلف"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "بلد مختلف"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "الأكثر استقرارًا"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "مدة الاختبار: {} ث"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "انقطاعات البيانات: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "تم الاختبار قبل {} ث"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "اختر بثًا؛ يستمر التشغيل الحالي."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "البحث في الخلفية: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "موصى به بناءً على آخر اختبار للبث."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "جارٍ فتح البث..."

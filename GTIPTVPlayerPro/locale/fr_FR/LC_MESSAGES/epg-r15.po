@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fr_FR\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "Guide des programmes EPG"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Jours"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Jours disponibles : {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Programme du jour"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Émission sélectionnée"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Jour"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Émission"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Demain"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Maintenant"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "En cours de diffusion"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Terminé"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "À venir"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Durée : {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "{} min restantes"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Retour au plein écran"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Aucune émission pour ce jour."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Impossible de charger le guide des programmes."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "L’aperçu en direct n’est pas disponible sur cette image."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Description de l’émission indisponible."

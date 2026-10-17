@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: sv\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Alternativa strömmar"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Testa igen"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stabil"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Spelbar"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Instabil"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Inte testad"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Test uppskjutet"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Exakt matchning"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Liknande namn"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Annat kanalnummer"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Annat land"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Mest stabil"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Testlängd: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Dataavbrott: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Testad för {} s sedan"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Välj en ström; den aktuella uppspelningen fortsätter."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Bakgrundssökning: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Rekommenderad utifrån senaste strömtestet."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Öppnar ström..."

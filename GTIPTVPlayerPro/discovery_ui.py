@@ -42,7 +42,6 @@ SECTIONS = (("popular", N_("Popular")), ("top", N_("Top Rated")),
             ("new", N_("New Releases")), ("genres", N_("Genres")))
 LOADING = N_("Loading data... Please wait.")
 KEY_REQUIRED = N_("Please enter your TMDB API key to use Discover Movies.")
-NAVIGATION_BOUNCE_SECONDS = 0.09
 HERO_SCRIM_PATH = plugin_path("skin", "images", "discovery-hero-scrim.png")
 FOOTER = (
     footer_item("ok", N_("Movie information")),
@@ -139,7 +138,6 @@ class GTMovieDiscoveryScreen(Screen):
         self._similar_title = ""
         self._tab_index = 0
         self._tabs_focused = False
-        self._last_navigation = None
         self._history = []
         self._details = {}
         self._jobs = {}
@@ -179,16 +177,23 @@ class GTMovieDiscoveryScreen(Screen):
         install_remote_footer(self, FOOTER, stacked=True)
         self["actions"] = ActionMap(
             ["OkCancelActions", "DirectionActions", "ColorActions", "MenuActions",
-             "InfobarMoviePlayerActions", "InfobarSeekActions", "MediaPlayerActions",
              "ChannelSelectBaseActions", "InfobarChannelSelection"],
             {"ok": self.open_selected, "cancel": self.go_back, "back": self.go_back,
              "red": self.go_back, "left": lambda: self.move(-1), "right": lambda: self.move(1),
+             "leftRepeated": lambda: self.move(-1), "rightRepeated": lambda: self.move(1),
              "up": lambda: self.focus_tabs(True), "down": lambda: self.focus_tabs(False),
              "green": self.search_iptv, "yellow": self.choose_genre, "blue": self.similar,
-             "menu": self.open_menu, "play": self.play_trailer, "playpauseService": self.play_trailer,
-             "playpause": self.play_trailer, "playService": self.play_trailer,
+             "menu": self.open_menu,
              "nextBouquet": lambda: self.move(6), "prevBouquet": lambda: self.move(-6),
              "channelUp": lambda: self.move(-6), "channelDown": lambda: self.move(6)}, -1)
+        # Player contexts also map LEFT/RIGHT on key-up in some images.
+        # Keep only trailer actions here so a release cannot navigate again.
+        # The normal map has priority for color/channel keys that MediaPlayer
+        # aliases to playback (for example GREEN -> play on OpenATV).
+        self["trailer_actions"] = ActionMap(
+            ["InfobarMoviePlayerActions", "InfobarSeekActions", "MediaPlayerActions"],
+            {"play": self.play_trailer, "playpauseService": self.play_trailer,
+             "playpause": self.play_trailer, "playService": self.play_trailer}, 0)
         self.onShown.append(self._shown)
         self.onLayoutFinish.append(self._layout_ready)
         self.onClose.append(self._stop)
@@ -586,18 +591,8 @@ class GTMovieDiscoveryScreen(Screen):
     def move(self, step):
         if self._closed or self._child_open or self._busy or not step:
             return
-        # Some image/remote combinations deliver the same direction through
-        # two actions almost together. Keep one step while allowing held-key
-        # repeats and immediate changes of direction or focus area.
-        now = time.monotonic()
-        direction = (self._tabs_focused, 1 if step > 0 else -1)
-        previous = self._last_navigation
-        if (previous is not None and previous[0] == direction
-                and now - previous[1] < NAVIGATION_BOUNCE_SECONDS):
-            return
-        self._last_navigation = (direction, now)
         if self._tabs_focused:
-            self._tab_index = (self._tab_index + direction[1]) % len(SECTIONS)
+            self._tab_index = (self._tab_index + (1 if step > 0 else -1)) % len(SECTIONS)
             self._render()
             return
         target = self._selected_index + step
@@ -622,7 +617,6 @@ class GTMovieDiscoveryScreen(Screen):
         active_index = self._active_tab_index()
         if active_index >= 0:
             self._tab_index = active_index
-        self._last_navigation = None
         self._render()
 
     def open_selected(self):

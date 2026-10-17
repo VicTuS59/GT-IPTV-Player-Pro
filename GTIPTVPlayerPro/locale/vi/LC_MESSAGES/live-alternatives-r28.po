@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: vi\n"
+
+#: live_alternative_ui.py
+msgid "Searching sources: {}/{}"
+msgstr "Đang tìm trong các nguồn: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Testing streams: {}/{}"
+msgstr "Đang kiểm tra luồng: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Opening the best tested stream..."
+msgstr "Đang mở luồng đã kiểm tra tốt nhất..."
+
+#: live_alternative_ui.py
+msgid "Search incomplete."
+msgstr "Tìm kiếm chưa hoàn tất."

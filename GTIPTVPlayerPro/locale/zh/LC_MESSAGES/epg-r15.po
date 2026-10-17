@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "EPG节目指南"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "日期"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "可用天数：{}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "每日节目表"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "所选节目"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "日期"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "节目"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "明天"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "现在"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "正在播出"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "已结束"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "即将播出"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "时长：{}分钟"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "剩余{}分钟"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "返回全屏"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "当天没有节目。"
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "无法加载节目指南。"
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "此系统版本不支持直播预览。"
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "暂无节目简介。"

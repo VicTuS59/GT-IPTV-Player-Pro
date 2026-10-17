@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: mk\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "Се бараат алтернативни текови..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "Не е најден функционален алтернативен тек."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "Алтернативен тек: {} ({} ms)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "Пребарувањето алтернативни текови е откажано."

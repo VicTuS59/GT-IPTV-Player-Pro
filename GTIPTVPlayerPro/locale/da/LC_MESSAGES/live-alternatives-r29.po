@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: da\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Alternative streams"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Test igen"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stabil"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Kan afspilles"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Ustabil"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Ikke testet"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Test udsat"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Præcist match"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Lignende navn"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Andet kanalnummer"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Andet land"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Mest stabil"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Testvarighed: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Dataafbrydelser: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Testet for {} s siden"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Vælg en stream; den aktuelle afspilning fortsætter."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Baggrundssøgning: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Anbefalet ud fra den seneste streamtest."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Åbner stream..."

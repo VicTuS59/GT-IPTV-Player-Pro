@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: hu\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Alternatív adatfolyamok"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Újratesztelés"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stabil"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Lejátszható"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Instabil"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Nincs tesztelve"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Teszt elhalasztva"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Pontos egyezés"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Hasonló név"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Eltérő csatornaszám"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Eltérő ország"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Legstabilabb"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Teszt időtartama: {} mp"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Adatkimaradások: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Tesztelve {} mp-cel ezelőtt"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Válasszon adatfolyamot; a jelenlegi lejátszás folytatódik."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Keresés a háttérben: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Ajánlás az utolsó adatfolyamteszt alapján."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Adatfolyam megnyitása..."

@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: lv\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Alternatīvas straumes"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Pārbaudīt vēlreiz"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stabila"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Atskaņojama"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Nestabila"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Nav pārbaudīta"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Pārbaude atlikta"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Precīza atbilstība"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Līdzīgs nosaukums"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Cits kanāla numurs"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Cita valsts"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Visstabilākā"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Pārbaudes ilgums: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Datu pārtraukumi: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Pārbaudīta pirms {} s"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Izvēlieties straumi; pašreizējā atskaņošana turpinās."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Meklēšana fonā: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Ieteikums pēc pēdējās straumes pārbaudes."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Straumes atvēršana..."

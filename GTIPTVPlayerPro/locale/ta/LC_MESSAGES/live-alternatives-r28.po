@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ta\n"
+
+#: live_alternative_ui.py
+msgid "Searching sources: {}/{}"
+msgstr "மூலங்களில் தேடுகிறது: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Testing streams: {}/{}"
+msgstr "ஒளிபரப்புகளைச் சோதிக்கிறது: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Opening the best tested stream..."
+msgstr "சோதித்தவற்றில் சிறந்த ஒளிபரப்பைத் திறக்கிறது..."
+
+#: live_alternative_ui.py
+msgid "Search incomplete."
+msgstr "தேடல் முடியவில்லை."

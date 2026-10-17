@@ -8,6 +8,7 @@ import json
 import os
 import threading
 import time
+from collections import OrderedDict
 from urllib.parse import urlsplit
 
 from .portal_identity import safe_composite_id
@@ -20,6 +21,10 @@ MAX_FAVORITES = 2000
 # maximum-length safe poster URLs and multibyte titles.
 MAX_FAVORITES_BYTES = 8 * 1024 * 1024
 _STORE_LOCK = threading.RLock()
+_READ_CACHE_LOCK = threading.Lock()
+_READ_CACHE = OrderedDict()
+_READ_CACHE_LIMIT = 8
+_PRELOADS = set()
 _CONTENT_TYPES = frozenset(("live", "movie", "series"))
 _M3U_STREAM_PREFIX = "m3u:"
 _M3U_STREAM_HEX_LENGTH = 64
@@ -193,6 +198,83 @@ class FavoriteStore(object):
         self.path = path
         self.clock = clock or time.time
 
+    def _read_cache_key(self):
+        return os.path.abspath(self.path)
+
+    def _file_signature(self):
+        try:
+            status = os.stat(self.path)
+            return (status.st_dev, status.st_ino, status.st_size,
+                    status.st_mtime_ns, status.st_ctime_ns)
+        except (IOError, OSError, TypeError, ValueError):
+            return None
+
+    def _cached_snapshot(self):
+        signature = self._file_signature()
+        key = self._read_cache_key()
+        with _READ_CACHE_LOCK:
+            snapshot = _READ_CACHE.get(key)
+            if snapshot is not None and snapshot[0] == signature:
+                _READ_CACHE.move_to_end(key)
+                return snapshot
+        return None
+
+    def _read_snapshot(self):
+        cached = self._cached_snapshot()
+        if cached is not None:
+            return cached
+        with _STORE_LOCK:
+            cached = self._cached_snapshot()
+            if cached is not None:
+                return cached
+            signature = self._file_signature()
+            items, order, unused_mutable = self._load_state()
+            entries, keys = [], {}
+            for key in order:
+                valid = self._valid_entry(key, items.get(key))
+                if valid is not None:
+                    entries.append(valid)
+                    keys.setdefault(valid["account_scope"], set()).add(valid["key"])
+                    if len(entries) >= MAX_FAVORITES:
+                        break
+            snapshot = (signature, tuple(entries[:MAX_FAVORITES]),
+                        {scope: frozenset(values) for scope, values in keys.items()})
+            if signature == self._file_signature():
+                with _READ_CACHE_LOCK:
+                    cache_key = self._read_cache_key()
+                    _READ_CACHE[cache_key] = snapshot
+                    _READ_CACHE.move_to_end(cache_key)
+                    while len(_READ_CACHE) > _READ_CACHE_LIMIT:
+                        _READ_CACHE.popitem(last=False)
+            return snapshot
+
+    def cached_keys(self, account_scope):
+        """Return a cheap fresh snapshot, or None while a reload is needed."""
+        snapshot = self._cached_snapshot()
+        return (set(snapshot[2].get(str(account_scope or ""), ()))
+                if snapshot is not None else None)
+
+    def preload(self):
+        """Load/validate once per file away from the GUI, shared across pages."""
+        key = self._read_cache_key()
+        with _READ_CACHE_LOCK:
+            if key in _PRELOADS:
+                return
+            _PRELOADS.add(key)
+        def load():
+            try:
+                self._read_snapshot()
+            finally:
+                with _READ_CACHE_LOCK:
+                    _PRELOADS.discard(key)
+        worker = threading.Thread(target=load, name="gt-favorites-load")
+        worker.daemon = True
+        worker.start()
+
+    def _invalidate_read_cache(self):
+        with _READ_CACHE_LOCK:
+            _READ_CACHE.pop(self._read_cache_key(), None)
+
     def _load_state(self):
         """Return stored state and whether a mutator may replace it."""
         try:
@@ -292,6 +374,7 @@ class FavoriteStore(object):
                     pass
             replacer = getattr(os, "replace", os.rename)
             replacer(temporary, self.path)
+            self._invalidate_read_cache()
             return True
         except (IOError, OSError, TypeError, ValueError):
             return False
@@ -345,21 +428,10 @@ class FavoriteStore(object):
         content_type = str(content_type or "").lower()
         if not account_scope or (content_type and content_type not in _CONTENT_TYPES):
             return []
-        with _STORE_LOCK:
-            items, order, unused_mutable = self._load_state()
-            del unused_mutable
-        results = []
-        for key in order:
-            entry = items.get(key)
-            valid = self._valid_entry(
-                key,
-                entry,
-                account_scope=account_scope,
-                content_type=content_type,
-            )
-            if valid is not None:
-                results.append(valid)
-        return results[:MAX_FAVORITES]
+        snapshot = self._read_snapshot()
+        return [dict(entry, item=dict(entry["item"])) for entry in snapshot[1]
+                if entry["account_scope"] == account_scope
+                and (not content_type or entry["item"]["content_type"] == content_type)]
 
     def list_all_entries(self, content_type=""):
         """Return credential-free favorites across every account scope.
@@ -372,25 +444,12 @@ class FavoriteStore(object):
         content_type = str(content_type or "").lower()
         if content_type and content_type not in _CONTENT_TYPES:
             return []
-        with _STORE_LOCK:
-            items, order, unused_mutable = self._load_state()
-            del unused_mutable
-        results = []
-        for key in order:
-            valid = self._valid_entry(
-                key,
-                items.get(key),
-                content_type=content_type,
-            )
-            if valid is not None:
-                results.append(valid)
-        return results[:MAX_FAVORITES]
+        snapshot = self._read_snapshot()
+        return [dict(entry, item=dict(entry["item"])) for entry in snapshot[1]
+                if not content_type or entry["item"]["content_type"] == content_type]
 
     def keys(self, account_scope=""):
-        return {
-            entry["key"]
-            for entry in self.list_entries(account_scope)
-        }
+        return set(self._read_snapshot()[2].get(str(account_scope or ""), ()))
 
     @staticmethod
     def _prune(items, order):

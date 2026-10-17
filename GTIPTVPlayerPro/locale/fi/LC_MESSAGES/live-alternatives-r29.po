@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fi\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Vaihtoehtoiset lähetykset"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Testaa uudelleen"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Vakaa"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Toistettavissa"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Epävakaa"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Ei testattu"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Testi siirretty"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Täsmällinen osuma"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Samankaltainen nimi"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Eri kanavanumero"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Eri maa"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Vakain"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Testin kesto: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Datakatkot: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Testattu {} s sitten"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Valitse lähetys; nykyinen toisto jatkuu."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Taustahaku: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Suositus viimeisimmän lähetystestin perusteella."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Avataan lähetystä..."

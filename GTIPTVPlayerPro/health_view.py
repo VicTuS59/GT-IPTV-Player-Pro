@@ -151,12 +151,13 @@ def account_test_signal(
     expiry="",
     now=None,
 ):
-    """Classify an automatic account test without deleting transient errors.
+    """Classify confirmed inactivity independently of an unsuccessful check.
 
     The source manager uses a stricter contract than the general traffic-light
     screen: only provider-confirmed disabled/invalid/expired accounts are red.
-    Network, timeout and malformed-response failures remain neutral so a
-    temporary outage can never place an account in the bulk-deletion set.
+    Network, timeout and malformed-response failures remain neutral here so
+    they never claim provider-confirmed inactivity. The account manager can
+    separately offer ERROR results for deletion with explicit user approval.
     """
     status_key = str(status or "").strip().casefold()
     account_key = str(account_status or "").strip().casefold()

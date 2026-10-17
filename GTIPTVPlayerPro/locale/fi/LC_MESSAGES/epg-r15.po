@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fi\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "EPG-ohjelmaopas"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Päivät"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Päiviä saatavilla: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Päivän ohjelmat"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Valittu ohjelma"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Päivä"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Ohjelma"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Huomenna"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Nyt"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Parhaillaan lähetyksessä"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Päättynyt"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Tulossa"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Kesto: {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "{} min jäljellä"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Takaisin koko näyttöön"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Tälle päivälle ei ole ohjelmia."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Ohjelmaopasta ei voitu ladata."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Suora esikatselu ei ole käytettävissä tässä järjestelmäversiossa."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Ohjelman kuvausta ei ole saatavilla."

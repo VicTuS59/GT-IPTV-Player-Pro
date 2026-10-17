@@ -5,6 +5,7 @@
 from collections import OrderedDict
 from math import ceil, gcd
 import os
+import time
 
 try:
     from Components.Pixmap import Pixmap
@@ -19,8 +20,13 @@ except ImportError:  # ePicLoad is absent on a few minimal Enigma2 images.
 
 _BACKGROUND_CACHE = OrderedDict()
 _BACKGROUND_CACHE_LIMIT = 32
-_BACKGROUND_CACHE_MAX_BYTES = 32 * 1024 * 1024
-_BACKGROUND_CACHE_MAX_PIXELS = 8 * 1000 * 1000
+_BACKGROUND_CACHE_DEFAULT_BYTES = 32 * 1024 * 1024
+_BACKGROUND_CACHE_MAX_BYTES = 192 * 1024 * 1024
+_BACKGROUND_CACHE_MAX_PIXELS = _BACKGROUND_CACHE_MAX_BYTES // 4
+_BACKGROUND_CACHE_UHD_PIXELS = 3840 * 2160
+_BACKGROUND_CACHE_BUDGET_BYTES = [_BACKGROUND_CACHE_DEFAULT_BYTES]
+_BACKGROUND_CACHE_UHD_CONFIGURED = [False]
+_BACKGROUND_CACHE_RECHECK_AT = [0.0]
 _BACKGROUND_CACHE_BYTES = [0]
 _BACKGROUND_CACHE_PIXELS = [0]
 
@@ -65,6 +71,69 @@ def _cache_get(key):
     return None
 
 
+def _cache_prepare_uhd(pixels):
+    """Retain more UHD pages when RAM allows; shrink under memory pressure."""
+    now = time.monotonic()
+    if (
+        pixels < _BACKGROUND_CACHE_UHD_PIXELS
+        or (_BACKGROUND_CACHE_UHD_CONFIGURED[0]
+            and now < _BACKGROUND_CACHE_RECHECK_AT[0])
+    ):
+        return
+    _BACKGROUND_CACHE_UHD_CONFIGURED[0] = True
+    _BACKGROUND_CACHE_RECHECK_AT[0] = now + 5.0
+    try:
+        with open("/proc/meminfo", "r") as handle:
+            lines = handle.read(65536).splitlines()
+        memory = {}
+        for line in lines:
+            fields = line.split()
+            if (
+                len(fields) == 3
+                and fields[0] in ("MemTotal:", "MemAvailable:")
+                and fields[2] == "kB"
+            ):
+                memory[fields[0]] = int(fields[1]) * 1024
+        total = memory["MemTotal:"]
+        available = memory["MemAvailable:"]
+        if total <= 0 or not 0 <= available <= total:
+            return
+    except (IOError, OSError, KeyError, TypeError, ValueError, OverflowError):
+        _BACKGROUND_CACHE_BUDGET_BYTES[0] = _BACKGROUND_CACHE_DEFAULT_BYTES
+        _cache_trim()
+        return
+    # At most one eighth of total RAM and one quarter of the available/cache
+    # pool, capped at 192 MiB. Cached bytes are already in MemAvailable's cost;
+    # include them once so repeated checks do not continually shrink the pool.
+    _BACKGROUND_CACHE_BUDGET_BYTES[0] = max(
+        _BACKGROUND_CACHE_DEFAULT_BYTES,
+        min(
+            _BACKGROUND_CACHE_MAX_BYTES,
+            total // 8,
+            (available + _BACKGROUND_CACHE_BYTES[0]) // 4,
+        ),
+    )
+    _cache_trim()
+
+
+def _cache_trim():
+    budget = _BACKGROUND_CACHE_BUDGET_BYTES[0]
+    while (
+        len(_BACKGROUND_CACHE) > _BACKGROUND_CACHE_LIMIT
+        or _BACKGROUND_CACHE_BYTES[0] > budget
+        or _BACKGROUND_CACHE_PIXELS[0] > budget // 4
+    ):
+        # Poster/hero churn must not evict the full-screen page wallpapers.
+        victim = next((key for key in _BACKGROUND_CACHE
+                       if not (len(key) > 3 and key[-1] == "fill"
+                               and key[1] >= 1280 and key[2] >= 720)), None)
+        if victim is None:
+            victim = next(iter(_BACKGROUND_CACHE))
+        removed = _BACKGROUND_CACHE.pop(victim)
+        _BACKGROUND_CACHE_BYTES[0] -= removed[1]
+        _BACKGROUND_CACHE_PIXELS[0] -= removed[2]
+
+
 def _cache_put(key, pixmap, width, height):
     try:
         pixels = max(1, int(width)) * max(1, int(height))
@@ -76,6 +145,10 @@ def _cache_put(key, pixmap, width, height):
         or pixels > _BACKGROUND_CACHE_MAX_PIXELS
     ):
         return
+    _cache_prepare_uhd(pixels)
+    budget = _BACKGROUND_CACHE_BUDGET_BYTES[0]
+    if cost > budget:
+        return
     previous = _BACKGROUND_CACHE.pop(key, None)
     if previous is not None:
         _BACKGROUND_CACHE_BYTES[0] -= previous[1]
@@ -83,14 +156,7 @@ def _cache_put(key, pixmap, width, height):
     _BACKGROUND_CACHE[key] = (pixmap, cost, pixels)
     _BACKGROUND_CACHE_BYTES[0] += cost
     _BACKGROUND_CACHE_PIXELS[0] += pixels
-    while (
-        len(_BACKGROUND_CACHE) > _BACKGROUND_CACHE_LIMIT
-        or _BACKGROUND_CACHE_BYTES[0] > _BACKGROUND_CACHE_MAX_BYTES
-        or _BACKGROUND_CACHE_PIXELS[0] > _BACKGROUND_CACHE_MAX_PIXELS
-    ):
-        removed = _BACKGROUND_CACHE.popitem(last=False)[1]
-        _BACKGROUND_CACHE_BYTES[0] -= removed[1]
-        _BACKGROUND_CACHE_PIXELS[0] -= removed[2]
+    _cache_trim()
 
 
 class AsyncBackgroundLoader(object):
@@ -208,6 +274,7 @@ class AsyncBackgroundLoader(object):
         key = (self.path, width, height)
         if stretch:
             key += ("fill",)
+        _cache_prepare_uhd(width * height)
         cached = _cache_get(key)
         if cached is not None:
             instance.setPixmap(cached)

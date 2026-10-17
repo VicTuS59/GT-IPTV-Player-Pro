@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fi\n"
+
+#: live_alternative_ui.py
+msgid "Searching sources: {}/{}"
+msgstr "Etsitään lähteistä: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Testing streams: {}/{}"
+msgstr "Testataan lähetyksiä: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Opening the best tested stream..."
+msgstr "Avataan paras testattu lähetys..."
+
+#: live_alternative_ui.py
+msgid "Search incomplete."
+msgstr "Haku jäi kesken."

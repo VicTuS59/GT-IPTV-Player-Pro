@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: uk\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Альтернативні потоки"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Повторити тест"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Стабільний"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Відтворюється"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Нестабільний"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Не перевірено"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Тест відкладено"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Точний збіг"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Схожа назва"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Інший номер каналу"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Інша країна"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Найстабільніший"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Тривалість тесту: {} с"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Перерви даних: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Перевірено {} с тому"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Виберіть потік; поточне відтворення триває."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Фоновий пошук: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Рекомендація за останнім тестом потоку."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Відкриття потоку..."

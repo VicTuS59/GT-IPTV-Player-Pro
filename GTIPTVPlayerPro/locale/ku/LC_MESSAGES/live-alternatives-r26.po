@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ku\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "Li weşanên alternatîf digere..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "Weşaneke alternatîf a dixebite nehat dîtin."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "Weşana alternatîf: {} ({} ms)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "Lêgerîna weşanên alternatîf hat betalkirin."

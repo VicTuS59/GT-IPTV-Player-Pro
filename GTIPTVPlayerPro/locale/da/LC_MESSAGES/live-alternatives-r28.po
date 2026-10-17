@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: da\n"
+
+#: live_alternative_ui.py
+msgid "Searching sources: {}/{}"
+msgstr "Søger i kilder: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Testing streams: {}/{}"
+msgstr "Tester streams: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Opening the best tested stream..."
+msgstr "Åbner den bedste testede stream..."
+
+#: live_alternative_ui.py
+msgid "Search incomplete."
+msgstr "Søgningen er ikke fuldført."

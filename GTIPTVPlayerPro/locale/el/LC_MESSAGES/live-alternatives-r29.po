@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: el\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Εναλλακτικές ροές"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Νέα δοκιμή"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Σταθερή"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Αναπαράγεται"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Ασταθής"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Δεν δοκιμάστηκε"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Η δοκιμή αναβλήθηκε"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Ακριβής αντιστοίχιση"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Παρόμοιο όνομα"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Διαφορετικός αριθμός καναλιού"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Διαφορετική χώρα"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Η πιο σταθερή"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Διάρκεια δοκιμής: {} δ"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Διακοπές δεδομένων: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Δοκιμάστηκε πριν από {} δ"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Επιλέξτε ροή· η τρέχουσα αναπαραγωγή συνεχίζεται."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Αναζήτηση στο παρασκήνιο: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Πρόταση βάσει της τελευταίας δοκιμής ροής."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Άνοιγμα ροής..."

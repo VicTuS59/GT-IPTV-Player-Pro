@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: lt\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "EPG programų gidas"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Dienos"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Galimos dienos: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Dienos programa"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Pasirinkta laida"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Diena"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Laida"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Rytoj"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Dabar"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Dabar rodoma"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Pasibaigė"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Netrukus"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Trukmė: {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Liko {} min"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Grįžti į visą ekraną"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Šiai dienai laidų nėra."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Nepavyko įkelti programų gido."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Tiesioginė peržiūra šioje sistemos versijoje negalima."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Laidos aprašo nėra."

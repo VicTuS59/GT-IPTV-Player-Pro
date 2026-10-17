@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: tr\n"
+
+#: live_alternative_ui.py
+msgid "Searching sources: {}/{}"
+msgstr "Kaynaklar aranıyor: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Testing streams: {}/{}"
+msgstr "Yayınlar test ediliyor: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Opening the best tested stream..."
+msgstr "Test edilen en iyi yayın açılıyor..."
+
+#: live_alternative_ui.py
+msgid "Search incomplete."
+msgstr "Tarama tamamlanmadı."

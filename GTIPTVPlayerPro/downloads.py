@@ -184,6 +184,37 @@ def snapshot():
                 for key in ("jobs", "folder", "limit", "hold", "worker")}
 
 
+def reload_after_restore():
+    """Discard current-boot queue state after restoring persistent history.
+
+Completed media stays available. Old queued/paused work becomes cancelled,
+because process ownership and provider commands do not belong in a backup.
+"""
+    with transaction(persist=True) as state:
+        if any(job.get("status") in ACTIVE + ("queued", "deleting")
+               for job in state.get("jobs", [])):
+            raise DownloadError("busy")
+        restored = _read(HISTORY)
+        restored.setdefault("jobs", [])
+        for job in restored["jobs"]:
+            job.pop("command", None)
+            job.pop("delete_owner", None)
+            job.pop("delete_previous", None)
+            if job.get("status") not in TERMINAL:
+                job.update(status="cancelled", error="reboot", speed=0, eta=0)
+            try:
+                parent = folder_ready(os.path.dirname(job.get("path") or ""))
+                job["device"] = os.stat(parent).st_dev
+            except (DownloadError, OSError):
+                pass
+        restored.update(boot=boot_id(), private={}, players={}, reservations={},
+                        urls={}, worker={}, hold=True, shutdown=False)
+        restored.setdefault("limit", DEFAULT_SPEED)
+        restored.setdefault("folder", "")
+        state.clear()
+        state.update(restored)
+
+
 def active_for(state, scope):
     return any(job.get("scope") == scope and job.get("status") in ACTIVE
                for job in state["jobs"])

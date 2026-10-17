@@ -1,0 +1,48 @@
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro\nLanguage-Team: Romanian\nLanguage: ro\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Source: {}"
+msgstr "Sursă: {}"
+
+#: infobar.py browser.py
+msgid "Stream"
+msgstr "Flux"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Audio: {}"
+msgstr "Audio: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Subtitles: {}"
+msgstr "Subtitrări: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Remaining: {}"
+msgstr "Rămas: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "{} h {} min"
+msgstr "{} h {} min"
+
+#: infobar.py browser.py
+msgid "Programme guide"
+msgstr "Ghid de programe"
+
+#: infobar.py browser.py
+msgid "Audio / Subtitles"
+msgstr "Audio / Subtitrări"
+
+#: infobar.py browser.py
+msgid "Web interface"
+msgstr "Interfață web"
+
+#: infobar.py browser.py
+msgid "MENU 3s"
+msgstr "MENU 3 s"
+

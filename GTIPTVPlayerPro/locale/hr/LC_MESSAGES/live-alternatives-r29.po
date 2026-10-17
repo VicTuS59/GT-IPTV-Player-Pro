@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: hr\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Alternativni tokovi"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Ponovi test"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stabilan"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Može se reproducirati"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Nestabilan"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Nije testirano"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Test odgođen"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Potpuno podudaranje"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Sličan naziv"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Drugi broj kanala"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Druga država"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Najstabilniji"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Trajanje testa: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Prekidi podataka: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Testirano prije {} s"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Odaberite tok; trenutačna reprodukcija se nastavlja."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Pretraga u pozadini: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Preporuka prema posljednjem testu toka."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Otvaranje toka..."

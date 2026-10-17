@@ -30,6 +30,7 @@ from . import (
     PLUGIN_VERSION,
 )
 from .background import attach_background, attach_pixmap
+from .account_test_cache import account_test_fingerprint
 from .channel_highlight import (
     CHANNEL_HIGHLIGHT_KEYS,
     DEFAULT_CHANNEL_HIGHLIGHT,
@@ -73,6 +74,7 @@ from .health_view import (
 from .paths import plugin_path
 from .remote_footer import (
     decorate_remote_footer,
+    prepared_skin,
     footer_item,
     install_remote_footer,
     set_remote_footer,
@@ -134,7 +136,9 @@ from .weather import (
     WeatherSettings,
     last_weather_update,
     load_weather_settings,
+    prefetch_weather,
     save_weather_settings,
+    shared_weather_service,
 )
 try:
     from boxbranding import (
@@ -156,7 +160,6 @@ UI_SOURCE_DELETE_TIMEOUT_SECONDS = 8
 WELCOME_ACCOUNT_QUERY_TIMEOUT_SECONDS = 3.0
 WELCOME_ACCOUNT_QUERY_DEBOUNCE_MS = 300
 WELCOME_ACCOUNT_QUERY_POLL_MS = 100
-ACCOUNT_BATCH_QUERY_TIMEOUT_SECONDS = 4.0
 ACCOUNT_BATCH_QUERY_POLL_MS = 100
 ACCOUNT_BATCH_DELETE_TIMEOUT_SECONDS = 12.0
 ACCOUNT_BATCH_OPEN_DELAY_MS = 50
@@ -307,6 +310,11 @@ def _source_result_key(source):
 
 
 def _account_test_status_text(result):
+    # An unsuccessful check is an error, not missing account information.
+    # Keep it distinct from provider-confirmed inactivity, including when
+    # the user chooses to review and delete failed tests after a batch.
+    if str(getattr(result, "status", "") or "").strip().casefold() == "error":
+        return _("Error"), HEALTH_SIGNAL_RED
     signal_name = account_test_signal(
         getattr(result, "status", ""),
         getattr(result, "account_status", ""),
@@ -319,6 +327,30 @@ def _account_test_status_text(result):
         HEALTH_SIGNAL_YELLOW: _("Connection limit reached"),
         HEALTH_SIGNAL_RED: _("Inactive"),
     }.get(signal_name, _("Unknown")), signal_name
+
+
+def _account_test_is_delete_candidate(result):
+    """Offer failed and confirmed inactive checks for explicit deletion review."""
+    return (
+        str(getattr(result, "status", "") or "").strip().casefold() == "error"
+        or account_test_is_inactive(result)
+    )
+
+
+def _account_test_review_summary(error_count, inactive_count):
+    parts = []
+    for count, label in ((error_count, _("Error")), (inactive_count, _("Inactive"))):
+        if count:
+            parts.append("{}: {}".format(localized_upper(label), count))
+    return "  •  ".join(parts)
+
+
+def _run_account_health_check(account, checker, cancel_event=None):
+    """Use the same full provider check and timeout in auto/manual screens."""
+    if checker is check_source_health:
+        return checker(account, cancel_event=cancel_event)
+    # Preserve the established one-argument custom/injected checker contract.
+    return checker(account)
 
 
 def _account_test_expiry_text(result):
@@ -3691,7 +3723,7 @@ def _health_skin():
 class GTFeatureScreen(Screen):
     def __init__(self, session, title, message):
         self.skin = decorate_remote_footer(
-            _feature_skin(),
+            prepared_skin(_feature_skin),
             FEATURE_FOOTER_ITEMS,
         )
         Screen.__init__(self, session)
@@ -3818,7 +3850,7 @@ class GTWeatherLocationSearchScreen(Screen):
 
     def __init__(self, session, query, searcher=None):
         self.skin = decorate_remote_footer(
-            _weather_location_search_skin(),
+            prepared_skin(_weather_location_search_skin),
             WEATHER_LOCATION_FOOTER_ITEMS,
         )
         Screen.__init__(self, session)
@@ -4115,13 +4147,13 @@ class GTWeatherSettingsScreen(Screen):
         location_searcher=None,
     ):
         self.skin = decorate_remote_footer(
-            _weather_settings_skin(),
+            prepared_skin(_weather_settings_skin),
             WEATHER_FOOTER_ITEMS,
         )
         Screen.__init__(self, session)
         self.settings_loader = settings_loader or load_weather_settings
         self.settings_saver = settings_saver or save_weather_settings
-        self.weather_service = weather_service or WeatherService(OpenMeteoClient())
+        self.weather_service = weather_service or shared_weather_service()
         weather_client = getattr(self.weather_service, "client", None)
         self.location_searcher = location_searcher or getattr(
             weather_client,
@@ -4437,7 +4469,7 @@ class GTAppearanceSettingsScreen(Screen):
         selection_border=None,
     ):
         self.skin = decorate_remote_footer(
-            _appearance_settings_skin(),
+            prepared_skin(_appearance_settings_skin),
             APPEARANCE_FOOTER_ITEMS,
             skin_fonts_scaled=True,
         )
@@ -4622,6 +4654,8 @@ class GTPlayerSettingsScreen(Screen):
         N_("Weather"),
         N_("Web Interface"),
         N_("YouTube"),
+        N_("Backup"),
+        N_("Restore backup"),
     )
 
     def __init__(
@@ -4634,7 +4668,7 @@ class GTPlayerSettingsScreen(Screen):
         category_lock_store=None,
     ):
         self.skin = decorate_remote_footer(
-            _player_settings_skin(),
+            prepared_skin(_player_settings_skin),
             PLAYER_SETTINGS_FOOTER_ITEMS,
             transparent_panel=True,
             skin_fonts_scaled=True,
@@ -4771,7 +4805,7 @@ class GTPlayerSettingsScreen(Screen):
         return []
 
     def _value_text(self, index):
-        if index in (5, 7, 8, 9, 10, 11, 12, 13):
+        if index in (5, 7, 8, 9, 10, 11, 12, 13, 14, 15):
             return _("Open")
         if index == 6:
             status = getattr(self, "_category_lock_status", None)
@@ -4830,6 +4864,9 @@ class GTPlayerSettingsScreen(Screen):
         self._refresh()
 
     def _change(self, step):
+        if self.selected_index in (14, 15):
+            self["message"].setText(_(self.LABELS[self.selected_index]))
+            return
         if self.selected_index == 13:
             self["message"].setText(_("YouTube settings"))
             return
@@ -4913,10 +4950,35 @@ class GTPlayerSettingsScreen(Screen):
                 self._youtube_settings_closed, GTYouTubeSettingsScreen,
                 self.settings.copy(),
             )
+        elif self.selected_index in (14, 15):
+            self.open_backup("restore" if self.selected_index == 15 else "backup")
         elif self.selected_index == 4:
             self.edit_tmdb_key()
         else:
             self.change_right()
+
+    def open_backup(self, mode):
+        # Capture edits visible on this page before creating either a full
+        # backup or the automatic safety backup used by restoration.
+        try:
+            saved = self.settings_saver(self.settings)
+        except Exception:
+            saved = False
+        if not saved:
+            self["message"].setText(_("Settings could not be saved. Check the receiver storage."))
+            return
+        from .backup_ui import GTBackupScreen
+        self.session.openWithCallback(self._backup_closed, GTBackupScreen, mode)
+
+    def _backup_closed(self, unused_result=None):
+        try:
+            loaded = self.settings_loader()
+            self.settings = loaded.copy() if isinstance(loaded, PlayerSettings) else PlayerSettings.from_dict(loaded)
+            self._category_lock_status = self.category_lock_store.status()
+        except Exception:
+            pass
+        self._original_metadata_signature = self._metadata_signature()
+        self._refresh()
 
     def _youtube_settings_closed(self, values):
         if values:
@@ -4924,7 +4986,7 @@ class GTPlayerSettingsScreen(Screen):
                 setattr(self.settings, field, values[field])
             self.settings.youtube_dash = True
             self.settings.youtube_stream_mode = "auto"
-            self.settings.youtube_audio_preference = "default"
+            self.settings.youtube_audio_preference = "original"
             self["message"].setText(_("Settings saved"))
             self._refresh()
 
@@ -5544,7 +5606,7 @@ class _DirectAccountConnection(object):
 
 
 class GTAccountBatchTestScreen(Screen):
-    """Sequential, cancellable account scan with inactive-account review."""
+    """Sequential account scan with explicit failed/inactive deletion review."""
 
     page_size = 8
 
@@ -5556,7 +5618,7 @@ class GTAccountBatchTestScreen(Screen):
         batch_deleter=None,
     ):
         self.skin = decorate_remote_footer(
-            _account_batch_test_skin(),
+            prepared_skin(_account_batch_test_skin),
             ACCOUNT_BATCH_REVIEW_FOOTER_ITEMS,
             alternate_items=ACCOUNT_BATCH_RUNNING_FOOTER_ITEMS,
         )
@@ -5571,6 +5633,7 @@ class GTAccountBatchTestScreen(Screen):
         self._started = False
         self._closed = False
         self._completed = 0
+        self._tests_complete = False
         self._current_account = None
         self._current_pending = False
         self._results = {}
@@ -5680,15 +5743,9 @@ class GTAccountBatchTestScreen(Screen):
                 return
             self._queue_event("started", index, account)
             try:
-                if self.account_checker is check_source_health:
-                    result = self.account_checker(
-                        account,
-                        timeout=ACCOUNT_BATCH_QUERY_TIMEOUT_SECONDS,
-                        cancel_event=self._cancel_event,
-                        summary_only=True,
-                    )
-                else:
-                    result = self.account_checker(account)
+                result = _run_account_health_check(
+                    account, self.account_checker, cancel_event=self._cancel_event,
+                )
             except Exception:
                 result = ServerHealth(
                     "ERROR",
@@ -5828,10 +5885,15 @@ class GTAccountBatchTestScreen(Screen):
     def _finish_testing(self):
         if self._closed or self._state != "testing":
             return
+        self._tests_complete = (
+            not self._cancel_event.is_set()
+            and self._completed == len(self.accounts)
+            and all(result is not None for result in self._indexed_results)
+        )
         self._inactive_accounts = [
             account
             for index, account in enumerate(self.accounts)
-            if account_test_is_inactive(self._indexed_results[index])
+            if _account_test_is_delete_candidate(self._indexed_results[index])
         ]
         self._current_account = None
         self._current_pending = False
@@ -5845,6 +5907,15 @@ class GTAccountBatchTestScreen(Screen):
         self._refresh_review()
         self._arm_inactive_confirmation()
 
+    def _review_counts(self):
+        results = [self._results.get(_source_result_key(account)) for account in self._inactive_accounts]
+        errors = sum(
+            str(getattr(result, "status", "") or "").strip().casefold() == "error"
+            for result in results
+        )
+        inactive = sum(account_test_is_inactive(result) for result in results)
+        return errors, inactive
+
     def _refresh_review(self):
         if self._state not in ("review", "confirming"):
             return
@@ -5853,14 +5924,8 @@ class GTAccountBatchTestScreen(Screen):
         self._review_page = max(0, min(self._review_page, page_count - 1))
         start = self._review_page * self.page_size
         page_accounts = self._inactive_accounts[start : start + self.page_size]
-        self["header"].setText(localized_upper(_("Inactive")))
-        self["subtitle"].setText(
-            "{}: {}  •  {}?".format(
-                localized_upper(_("Accounts")),
-                count,
-                localized_upper(_("Delete")),
-            )
-        )
+        self["header"].setText(localized_upper(_("Accounts")))
+        self["subtitle"].setText(_account_test_review_summary(*self._review_counts()))
         self["review_page"].setText(
             "{} / {} {}".format(
                 self._review_page + 1,
@@ -5870,7 +5935,7 @@ class GTAccountBatchTestScreen(Screen):
         )
         self._render_entries(
             [
-                (account, _("Inactive"), HEALTH_SIGNAL_RED)
+                (account,) + _account_test_status_text(self._results.get(_source_result_key(account)))
                 for account in page_accounts
             ]
         )
@@ -5921,9 +5986,8 @@ class GTAccountBatchTestScreen(Screen):
             return False
         self._confirmation_attempts += 1
         self._confirmation_open = True
-        question = "{}: {}\n\n{}".format(
-            localized_upper(_("Inactive")),
-            len(self._inactive_accounts),
+        question = "{}\n\n{}".format(
+            _account_test_review_summary(*self._review_counts()),
             _("Delete {}?").format(localized_upper(_("Accounts"))),
         )
         try:
@@ -6039,9 +6103,12 @@ class GTAccountBatchTestScreen(Screen):
         self.close(self._result_payload(deleted=removed))
 
     def _result_payload(self, deleted=0, cancelled=False):
+        errors, inactive = self._review_counts()
         return {
             "results": dict(self._results),
-            "inactive_count": len(self._inactive_accounts),
+            "completed": self._tests_complete,
+            "inactive_count": inactive,
+            "error_count": errors,
             "deleted": max(0, int(deleted or 0)),
             "cancelled": bool(cancelled),
         }
@@ -6100,7 +6167,7 @@ class GTAccountsScreen(Screen):
             else ACCOUNTS_FOOTER_ITEMS
         )
         self.skin = decorate_remote_footer(
-            _accounts_skin(),
+            prepared_skin(_accounts_skin),
             footer_items,
             # The R64 account panel reaches below the old footer stage's
             # top edge. The stage would cover the seventh row and its status.
@@ -6129,6 +6196,10 @@ class GTAccountsScreen(Screen):
         self.load_result = None
         self.selected_index = 0
         self._health_results = {}
+        self._account_fingerprints = {}
+        self._automatic_test_attempted = set()
+        self._automatic_test_accounts = ()
+        self._account_screen_shown = False
         self._automatic_test_started = False
         self._automatic_test_open = False
         self._automatic_test_armed = False
@@ -6279,7 +6350,38 @@ class GTAccountsScreen(Screen):
             self.load_result = PlaylistLoadResult([], [], str(error))
         if self.selected_index >= len(self.accounts):
             self.selected_index = max(0, len(self.accounts) - 1)
+        fingerprints = {
+            _source_result_key(account): account_test_fingerprint(account)
+            for account in self.accounts
+        }
+        self._health_results = {
+            key: result for key, result in self._health_results.items()
+            if key in fingerprints
+            and fingerprints[key] == self._account_fingerprints.get(key)
+        }
+        self._account_fingerprints = fingerprints
+        self._automatic_test_attempted.intersection_update(
+            fingerprint or key for key, fingerprint in fingerprints.items()
+        )
+        if not self._automatic_test_open and self._pending_automatic_test_accounts():
+            self._automatic_test_started = False
+            self._automatic_test_open_attempts = 0
         self._refresh()
+        if self._account_screen_shown:
+            self._arm_automatic_test()
+
+    def _pending_automatic_test_accounts(self):
+        # Completion belongs to this visit only. Opening the IPTV/MAC account
+        # page again starts a fresh scan, even after a completed/manual test.
+        # Within one visit keep the attempted set so onShown, cancellation or
+        # the deletion review cannot reopen the test dialog in a loop.
+        if self.source_type not in ("xtream", "stalker"):
+            return ()
+        return tuple(
+            account for account in self.accounts
+            if (account_test_fingerprint(account) or _source_result_key(account))
+            not in self._automatic_test_attempted
+        )
 
     def _delete_accounts_one_by_one(self, accounts):
         """Compatibility path for injected legacy single-account deleters."""
@@ -6290,6 +6392,7 @@ class GTAccountsScreen(Screen):
 
     def _arm_automatic_test(self):
         """Defer the child dialog until this account screen is fully modal."""
+        self._account_screen_shown = True
         if (
             self._account_screen_closed
             or self._automatic_test_started
@@ -6298,7 +6401,7 @@ class GTAccountsScreen(Screen):
             or self._automatic_test_open_attempts
             >= ACCOUNT_BATCH_OPEN_MAX_ATTEMPTS
             or self.source_type not in ("xtream", "stalker")
-            or not self.accounts
+            or not self._pending_automatic_test_accounts()
         ):
             return False
         self._automatic_test_armed = True
@@ -6321,7 +6424,7 @@ class GTAccountsScreen(Screen):
             or self._automatic_test_open_attempts
             >= ACCOUNT_BATCH_OPEN_MAX_ATTEMPTS
             or self.source_type not in ("xtream", "stalker")
-            or not self.accounts
+            or not self._pending_automatic_test_accounts()
         ):
             return False
         opener = getattr(self.session, "openWithCallback", None)
@@ -6330,17 +6433,28 @@ class GTAccountsScreen(Screen):
         self._automatic_test_open_attempts += 1
         self._automatic_test_started = True
         self._automatic_test_open = True
+        pending = self._pending_automatic_test_accounts()
+        self._automatic_test_accounts = tuple(
+            (account, account_test_fingerprint(account)) for account in pending
+        )
+        previous_attempted = set(self._automatic_test_attempted)
+        self._automatic_test_attempted.update(
+            fingerprint or _source_result_key(account)
+            for account, fingerprint in self._automatic_test_accounts
+        )
         try:
             opener(
                 self._automatic_test_closed,
                 GTAccountBatchTestScreen,
-                tuple(self.accounts),
+                pending,
                 self.account_checker,
                 self.account_batch_deleter,
             )
         except RuntimeError as error:
             self._automatic_test_started = False
             self._automatic_test_open = False
+            self._automatic_test_accounts = ()
+            self._automatic_test_attempted = previous_attempted
             if not _is_modal_open_error(error):
                 raise
             # Some Enigma2 images emit onShown immediately before the parent
@@ -6351,6 +6465,8 @@ class GTAccountsScreen(Screen):
 
     def _automatic_test_closed(self, payload=None):
         self._automatic_test_open = False
+        tested = self._automatic_test_accounts
+        self._automatic_test_accounts = ()
         if self._account_screen_closed:
             return
         if not isinstance(payload, dict):
@@ -6358,7 +6474,16 @@ class GTAccountsScreen(Screen):
             return
         results = payload.get("results")
         if isinstance(results, dict):
-            self._health_results.update(results)
+            current = {
+                _source_result_key(account): account_test_fingerprint(account)
+                for account in self.accounts
+            }
+            for account, fingerprint in tested:
+                key = _source_result_key(account)
+                result = results.get(key)
+                if result is not None and key in current and current[key] == fingerprint:
+                    result = _sanitized_account_preview(result, _source_type(account))
+                    self._health_results[key] = result
         try:
             deleted = max(0, int(payload.get("deleted", 0) or 0))
         except (TypeError, ValueError, OverflowError):
@@ -6370,6 +6495,10 @@ class GTAccountsScreen(Screen):
             )
         except (TypeError, ValueError, OverflowError):
             inactive_count = 0
+        try:
+            error_count = max(0, int(payload.get("error_count", 0) or 0))
+        except (TypeError, ValueError, OverflowError):
+            error_count = 0
         if deleted:
             self.reload_accounts()
             ellipsize_dynamic_text(
@@ -6384,10 +6513,8 @@ class GTAccountsScreen(Screen):
         self._refresh()
         if bool(payload.get("cancelled")):
             self["message"].setText(_("Request cancelled"))
-        elif inactive_count:
-            self["message"].setText(
-                "{}: {}".format(_("Inactive"), inactive_count)
-            )
+        elif inactive_count or error_count:
+            self["message"].setText(_account_test_review_summary(error_count, inactive_count))
 
     def _stop_automatic_test_timer(self):
         self._account_screen_closed = True
@@ -6890,11 +7017,30 @@ class GTAccountsScreen(Screen):
     def test_selected(self):
         account = self._selected_action_account()
         if account is not None:
+            fingerprint = account_test_fingerprint(account)
             self.session.open(
                 GTServerHealthScreen,
                 account,
                 checker=self.account_checker,
+                on_result=lambda result: self._manual_test_result(account, result, fingerprint),
             )
+
+    def _manual_test_result(self, account, result, fingerprint=None):
+        if self._account_screen_closed:
+            return
+        key = _source_result_key(account)
+        if fingerprint is None:
+            fingerprint = account_test_fingerprint(account)
+        if not any(_source_result_key(current) == key
+                   and account_test_fingerprint(current) == fingerprint
+                   for current in self.accounts):
+            return
+        self._health_results[key] = _sanitized_account_preview(result, _source_type(account))
+        if self.source_type in ("xtream", "stalker"):
+            # Returning from a manual check must not immediately open another
+            # automatic check for the same account in this screen instance.
+            self._automatic_test_attempted.add(fingerprint or key)
+        self._refresh()
 
     def open_m3u_epg_settings(self):
         account = self._m3u_action_account()
@@ -7011,7 +7157,7 @@ class GTManageSourcesScreen(Screen):
 
     def __init__(self, session):
         self.skin = decorate_remote_footer(
-            _manage_sources_skin(),
+            prepared_skin(_manage_sources_skin),
             MANAGE_SOURCES_FOOTER_ITEMS,
             transparent_panel=True,
         )
@@ -7185,7 +7331,7 @@ class GTAddSourceTypeScreen(Screen):
 
     def __init__(self, session):
         self.skin = decorate_remote_footer(
-            _add_source_type_skin(),
+            prepared_skin(_add_source_type_skin),
             ADD_SOURCE_TYPE_FOOTER_ITEMS,
             transparent_panel=True,
         )
@@ -7309,7 +7455,7 @@ class GTAddStalkerSourceScreen(Screen):
 
     def __init__(self, session, portal_saver=None):
         self.skin = decorate_remote_footer(
-            _add_stalker_source_skin(),
+            prepared_skin(_add_stalker_source_skin),
             ADD_STALKER_SOURCE_FOOTER_ITEMS,
         )
         Screen.__init__(self, session)
@@ -7571,7 +7717,7 @@ class GTM3UFileBrowserScreen(Screen):
 
     def __init__(self, session, current_path=""):
         self.skin = decorate_remote_footer(
-            _m3u_file_browser_skin(),
+            prepared_skin(_m3u_file_browser_skin),
             M3U_FILE_BROWSER_FOOTER_ITEMS,
         )
         Screen.__init__(self, session)
@@ -7720,7 +7866,7 @@ class GTPlaylistTypeScreen(Screen):
 
     def __init__(self, session):
         self.skin = decorate_remote_footer(
-            _playlist_type_skin(),
+            prepared_skin(_playlist_type_skin),
             PLAYLIST_TYPE_FOOTER_ITEMS,
         )
         Screen.__init__(self, session)
@@ -7820,7 +7966,7 @@ class GTPlaylistManagerScreen(Screen):
 
     def __init__(self, session, source_type, registry=None):
         self.skin = decorate_remote_footer(
-            _playlist_manager_skin(),
+            prepared_skin(_playlist_manager_skin),
             PLAYLIST_MANAGER_FOOTER_ITEMS,
         )
         Screen.__init__(self, session)
@@ -8202,7 +8348,7 @@ class GTTXTFileBrowserScreen(Screen):
 
     def __init__(self, session, current_path=""):
         self.skin = decorate_remote_footer(
-            _txt_file_browser_skin(),
+            prepared_skin(_txt_file_browser_skin),
             TXT_FILE_BROWSER_FOOTER_ITEMS,
         )
         Screen.__init__(self, session)
@@ -8345,7 +8491,7 @@ class GTAddM3USourceScreen(Screen):
 
     def __init__(self, session, source_saver=None):
         self.skin = decorate_remote_footer(
-            _add_m3u_source_skin(),
+            prepared_skin(_add_m3u_source_skin),
             ADD_M3U_SOURCE_FOOTER_ITEMS,
         )
         Screen.__init__(self, session)
@@ -8648,7 +8794,7 @@ class GTAddAccountScreen(Screen):
         credential_saver=None,
     ):
         self.skin = decorate_remote_footer(
-            _add_account_skin(),
+            prepared_skin(_add_account_skin),
             ADD_ACCOUNT_FOOTER_ITEMS,
         )
         Screen.__init__(self, session)
@@ -8846,19 +8992,20 @@ class GTAddAccountScreen(Screen):
 
 
 class GTServerHealthScreen(Screen):
-    def __init__(self, session, account, checker=None):
+    def __init__(self, session, account, checker=None, on_result=None):
         source_type = _source_type(account)
         is_m3u = source_type == "m3u"
         is_stalker = source_type == "stalker"
         footer_items = M3U_HEALTH_FOOTER_ITEMS if is_m3u else HEALTH_FOOTER_ITEMS
         self.skin = decorate_remote_footer(
-            _health_skin(),
+            prepared_skin(_health_skin),
             footer_items,
         )
         Screen.__init__(self, session)
         attach_background(self, "app_bg", APP_BACKGROUND)
         self.account = account
         self.checker = checker or check_source_health
+        self._on_result = on_result
         self._checking = False
         self._result = None
         self._result_ready = False
@@ -9144,7 +9291,10 @@ class GTServerHealthScreen(Screen):
         try:
             if job is not None:
                 job.check()
-            result = self.checker(self.account)
+            result = _run_account_health_check(
+                self.account, self.checker,
+                cancel_event=getattr(job, "cancel_event", None),
+            )
         except Exception:
             result = ServerHealth(
                 "ERROR",
@@ -9156,7 +9306,7 @@ class GTServerHealthScreen(Screen):
         self._result_ready = True
 
     def _poll_result(self):
-        if self._closed:
+        if self._closed or not self._checking:
             return
         if not self._result_ready:
             if self._health_job is not None and self._health_job.expired():
@@ -9170,13 +9320,19 @@ class GTServerHealthScreen(Screen):
                 self["details_left"].setText("")
                 self["details_right"].setText("")
                 self["details"].setText(_("The health check could not be completed."))
+                self._publish_result(ServerHealth(
+                    "ERROR", detail=N_("The health check could not be completed."),
+                    source_type=_source_type(self.account),
+                ))
                 return
             self._timer.start(150, True)
             return
         self._checking = False
         self._health_job = None
         result = self._result
+        self._result_ready = False
         self._show_result_visual(result)
+        self._publish_result(result)
         if (
             str(getattr(result, "source_type", "") or "").lower() == "m3u"
             or _source_type(self.account) == "m3u"
@@ -9318,6 +9474,15 @@ class GTServerHealthScreen(Screen):
             fallback_chars=66,
         )
 
+    def _publish_result(self, result):
+        callback = getattr(self, "_on_result", None)
+        if self._closed or not callable(callback):
+            return
+        try:
+            callback(result)
+        except Exception as error:
+            log_event("health", "manual-result-refresh-failed", error)
+
     def _stop(self):
         self._closed = True
         _cancel_ui_job(self._health_job)
@@ -9331,7 +9496,7 @@ class GTServerHealthScreen(Screen):
 class GTDashboardScreen(Screen):
     def __init__(self, session, account, health=None):
         self.skin = decorate_remote_footer(
-            _dashboard_skin(),
+            prepared_skin(_dashboard_skin),
             DASHBOARD_FOOTER_ITEMS,
             alternate_items=DASHBOARD_MOVE_FOOTER_ITEMS,
             transparent_panel=True,
@@ -9847,7 +10012,7 @@ def _check_account_preview(account, checker, timeout):
 class GTIPTVPlayerProScreen(Screen):
     def __init__(self, session, account_loader=None, account_checker=None):
         self.skin = decorate_remote_footer(
-            _welcome_skin(),
+            prepared_skin(_welcome_skin),
             WELCOME_FOOTER_ITEMS,
             # R88 wallpaper has no baked footer; the legacy cover would paint
             # a dark strip above and around the shared remote guide.
@@ -9952,11 +10117,17 @@ class GTIPTVPlayerProScreen(Screen):
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._cover_live_video)
             self.onLayoutFinish.append(self._refresh)
+            self.onLayoutFinish.append(self._prefetch_weather)
         if hasattr(self, "onClose"):
             self.onClose.append(self._stop_direct_connection)
             self.onClose.append(self._stop_account_preview)
             self.onClose.append(self._dvb_background_guard.restore)
         self.setTitle("{} v{}".format(PLUGIN_NAME, PLUGIN_VERSION))
+
+    def _prefetch_weather(self):
+        # OpenPLi dispatches bound methods here; plain functions are passed
+        # to exec() as skin code and raise TypeError before the screen opens.
+        prefetch_weather()
 
     def _cover_live_video(self):
         # Draw the full desktop before the asynchronously decoded artwork arrives.

@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: lt\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "Ieškoma alternatyvių srautų..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "Veikiantis alternatyvus srautas nerastas."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "Alternatyvus srautas: {} ({} ms)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "Alternatyvių srautų paieška atšaukta."

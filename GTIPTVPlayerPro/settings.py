@@ -4,6 +4,7 @@
 
 import json
 import os
+import shutil
 
 from .youtube_options import YOUTUBE_QUALITIES, DEFAULT_YOUTUBE_QUALITY
 
@@ -36,10 +37,10 @@ DEFAULT_SETTINGS_PATH = "/etc/enigma2/gtiptvplayerpro-settings.json"
 TEXT_SIZE_CHOICES = ("standard", "large", "very_large")
 SUPPORTED_SERVICE_TYPES = (1, 4097, 5001, 5002)
 SERVICE_ENGINE_EXECUTABLES = {
-    5001: ("/usr/bin/gstplayer", "/usr/bin/gstplayer_gst-1.0"),
+    5001: ("/usr/bin/gstplayer2", "/usr/bin/gstplayer", "/usr/bin/gstplayer_gst-1.0"),
     5002: ("/usr/bin/exteplayer3",),
 }
-_AVAILABLE_SERVICE_TYPES_CACHE = [None]
+SERVICEAPP_REPLACE_MARKER = "/etc/enigma2/serviceapp_replaceservicemp3"
 _CONFIG_SECTION = [None]
 
 
@@ -91,7 +92,7 @@ def _player_config():
         section.youtube_mode_migrated = ConfigYesNo(default=False)
     if not hasattr(section, "youtube_audio_preference"):
         section.youtube_audio_preference = ConfigSelection(
-            default="default", choices=["default", "original"]
+            default="original", choices=["default", "original"]
         )
     if not hasattr(section, "youtube_search_language"):
         # Kept for older Enigma2 config files; searches now follow the device
@@ -103,6 +104,10 @@ def _player_config():
         section.show_in_main_menu = ConfigYesNo(default=True)
     if not hasattr(section, "dashboard_order"):
         section.dashboard_order = ConfigText(default="", fixed_size=False)
+    if not hasattr(section, "backup_folder"):
+        section.backup_folder = ConfigText(default="/media/hdd", fixed_size=False)
+    if not hasattr(section, "restore_folder"):
+        section.restore_folder = ConfigText(default="/media/hdd", fixed_size=False)
     if not hasattr(section, "legacy_json_migrated"):
         section.legacy_json_migrated = ConfigYesNo(default=False)
     if not hasattr(section, "weather_enabled"):
@@ -227,24 +232,61 @@ def save_plugin_config(section):
 
 
 def available_service_types(path_exists=None):
-    """Return only playback engines that can actually run on this receiver."""
-    if path_exists is None and _AVAILABLE_SERVICE_TYPES_CACHE[0] is not None:
-        return _AVAILABLE_SERVICE_TYPES_CACHE[0]
+    """Discover engine executables without retaining stale install results.
+
+    Executable presence is a candidate hint, not proof that ServiceApp has
+    registered its service factory. Explicit user choices remain independent.
+    """
     available = [1, 4097]
     for service_type in (5001, 5002):
         if any(
             (
                 bool(path_exists(path))
                 if path_exists is not None
-                else os.path.isfile(path) and os.access(path, os.X_OK)
+                else (
+                    os.path.isfile(path) and os.access(path, os.X_OK)
+                ) or shutil.which(os.path.basename(path)) is not None
             )
             for path in SERVICE_ENGINE_EXECUTABLES[service_type]
         ):
             available.append(service_type)
-    result = tuple(available)
-    if path_exists is None:
-        _AVAILABLE_SERVICE_TYPES_CACHE[0] = result
-    return result
+    return tuple(available)
+
+
+def serviceapp_uses_async_seek(service_type):
+    """Recognize external seek queues, including ServiceApp replacing 4097.
+
+    Read existing ServiceApp configuration/marker only; never import its
+    settings plugin or change the receiver's selected playback system.
+    """
+    try:
+        service_type = int(service_type)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    if service_type in (5001, 5002):
+        return True
+    if service_type != 4097:
+        return False
+    try:
+        plugins = getattr(config, "plugins", None)
+        section = getattr(plugins, "serviceapp", None)
+        servicemp3 = getattr(section, "servicemp3", None)
+        replace = getattr(servicemp3, "replace", None)
+        value = getattr(replace, "value", False)
+        if str(value).strip().lower() in ("true", "1", "yes", "on"):
+            return True
+    except Exception:
+        pass
+    marker = SERVICEAPP_REPLACE_MARKER
+    try:
+        from enigma import eEnv
+        resolved = eEnv.resolve("$sysconfdir/enigma2/serviceapp_replaceservicemp3")
+        if isinstance(resolved, str) and resolved:
+            marker = resolved
+    except Exception:
+        # Optional native integration must not reject an accepted seek.
+        pass
+    return os.path.isfile(marker)
 
 
 def configurable_service_types():
@@ -323,7 +365,7 @@ class PlayerSettings(object):
         youtube_dash=True,
         youtube_search_language="tr",
         youtube_stream_mode=None,
-        youtube_audio_preference="default",
+        youtube_audio_preference="original",
         ui_text_size="standard",
         cinematic_view=True,
         show_in_main_menu=True,
@@ -345,10 +387,10 @@ class PlayerSettings(object):
         self.youtube_resolution = str(youtube_resolution) if str(youtube_resolution) in YOUTUBE_QUALITIES else DEFAULT_YOUTUBE_QUALITY
         self.youtube_autoplay = bool(youtube_autoplay)
         # Legacy mode/audio values remain readable for upgrades, but YouTube
-        # now always uses automatic native playback and the default audio.
+        # now uses automatic native playback and prefers the original audio.
         self.youtube_stream_mode = "auto"
         self.youtube_dash = True
-        self.youtube_audio_preference = "default"
+        self.youtube_audio_preference = "original"
         self.youtube_search_language = str(youtube_search_language) if str(youtube_search_language) in ("tr", "en", "de", "fr", "es", "ar") else "tr"
         self.ui_text_size = normalize_text_size(ui_text_size)
         self.cinematic_view = bool(cinematic_view)
@@ -372,7 +414,7 @@ class PlayerSettings(object):
             youtube_dash=payload.get("youtube_dash", True),
             youtube_search_language=payload.get("youtube_search_language", "tr"),
             youtube_stream_mode=payload.get("youtube_stream_mode"),
-            youtube_audio_preference=payload.get("youtube_audio_preference", "default"),
+            youtube_audio_preference=payload.get("youtube_audio_preference", "original"),
             ui_text_size=payload.get(
                 "ui_text_size",
                 payload.get("text_size", "standard"),

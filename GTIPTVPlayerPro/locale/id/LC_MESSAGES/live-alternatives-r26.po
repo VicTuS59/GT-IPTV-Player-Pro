@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: id\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "Mencari siaran alternatif..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "Tidak ditemukan siaran alternatif yang berfungsi."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "Siaran alternatif: {} ({} md)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "Pencarian siaran alternatif dibatalkan."

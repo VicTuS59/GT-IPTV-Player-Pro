@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: da\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "Søger efter alternative streams..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "Ingen fungerende alternativ stream fundet."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "Alternativ stream: {} ({} ms)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "Søgning efter alternative streams annulleret."

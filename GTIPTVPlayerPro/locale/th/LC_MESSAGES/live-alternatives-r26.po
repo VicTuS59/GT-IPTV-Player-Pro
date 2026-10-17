@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: th\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "กำลังค้นหาสตรีมสำรอง..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "ไม่พบสตรีมสำรองที่ใช้งานได้"
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "สตรีมสำรอง: {} ({} มิลลิวินาที)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "ยกเลิกการค้นหาสตรีมสำรองแล้ว"

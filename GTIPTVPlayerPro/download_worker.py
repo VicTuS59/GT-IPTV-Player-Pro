@@ -2,15 +2,17 @@
 # SPDX-FileCopyrightText: 2026 VicTuS59
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Standalone, single-stream HTTP downloader; imports no Enigma2 widgets."""
+import errno
 import fcntl
 import os
 import re
 import signal
 import socket
+import ssl
 import sys
 import threading
 import time
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qsl, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
@@ -23,6 +25,27 @@ from .content import ContentItem, XtreamContentClient
 from .playlist import PlaylistAccount
 from .diagnostics import log_event
 from .local_media import MediaFileError, inspect_media, matching_extension
+
+
+def _failure_code(failure):
+    """Separate per-stream failures from storage errors that stop the queue."""
+    if isinstance(failure, store.DownloadError):
+        return failure.code
+    # SSL error numbers overlap POSIX errno values. Never mistake a TLS or
+    # URL connection failure for a local filesystem permission failure.
+    if isinstance(failure, (URLError, ConnectionError, TimeoutError, ssl.SSLError)):
+        return "failed"
+    if isinstance(failure, OSError):
+        if failure.errno in (errno.ENOSPC, errno.EDQUOT, errno.EFBIG):
+            return "space"
+        if failure.errno in (
+            errno.EACCES, errno.EPERM, errno.ENOENT, errno.ENOTDIR,
+            errno.EISDIR, errno.EEXIST, errno.EIO, errno.ENODEV,
+            errno.ENXIO, errno.EROFS, errno.ELOOP, errno.ENAMETOOLONG,
+            errno.ESTALE,
+        ):
+            return "folder"
+    return "failed"
 
 
 class MediaRedirect(HTTPRedirectHandler):
@@ -310,11 +333,9 @@ class Worker(object):
         success, error = False, ""
         try:
             success = self._download(job, payload)
-        except store.DownloadError as failure:
-            error = failure.code
-        except Exception:
+        except Exception as failure:
             # Provider URLs, tokens and HTTP exception details are never logged.
-            error = "failed"
+            error = _failure_code(failure)
         finally:
             done.set()
             watcher.join(1)
@@ -336,7 +357,12 @@ class Worker(object):
                 target.update(status="paused", error="resume")
             else:
                 target.update(status="error", error=error or "failed")
-            if not success:
+            # A failed URL/file must not suspend unrelated queued downloads.
+            # Keep an existing user hold, and explicitly stop for storage or
+            # lifecycle commands. A resume mismatch pauses only this file so
+            # its partial data awaits the user's restart decision.
+            if (action in ("pause", "cancel") or self.stopping.is_set()
+                    or state.get("shutdown") or error in ("space", "folder")):
                 state["hold"] = True
             cancelled = target["status"] == "cancelled"
         if cancelled:

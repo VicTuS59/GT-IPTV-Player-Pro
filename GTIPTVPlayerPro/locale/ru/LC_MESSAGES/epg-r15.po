@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ru\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "Программа передач EPG"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Дни"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Доступно дней: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Программа на день"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Выбранная передача"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "День"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Передача"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Завтра"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Сейчас"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Сейчас в эфире"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Завершено"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Далее"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Длительность: {} мин"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Осталось {} мин"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "На полный экран"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "На этот день нет передач."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Не удалось загрузить программу передач."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Предпросмотр прямого эфира недоступен в этом образе."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Описание передачи недоступно."

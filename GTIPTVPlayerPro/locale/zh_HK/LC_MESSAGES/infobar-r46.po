@@ -1,0 +1,48 @@
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: zh_HK\nLanguage: zh_HK\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Source: {}"
+msgstr "來源：{}"
+
+#: infobar.py browser.py
+msgid "Stream"
+msgstr "串流"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Audio: {}"
+msgstr "音訊：{}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Subtitles: {}"
+msgstr "字幕：{}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Remaining: {}"
+msgstr "剩餘：{}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "{} h {} min"
+msgstr "{}小時{}分鐘"
+
+#: infobar.py browser.py
+msgid "Programme guide"
+msgstr "節目指南"
+
+#: infobar.py browser.py
+msgid "Audio / Subtitles"
+msgstr "音訊 / 字幕"
+
+#: infobar.py browser.py
+msgid "Web interface"
+msgstr "網頁介面"
+
+#: infobar.py browser.py
+msgid "MENU 3s"
+msgstr "MENU 3秒"
+

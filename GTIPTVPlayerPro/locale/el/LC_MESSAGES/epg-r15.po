@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: el\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "Οδηγός προγράμματος EPG"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Ημέρες"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Διαθέσιμες ημέρες: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Ημερήσιο πρόγραμμα"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Επιλεγμένη εκπομπή"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Ημέρα"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Εκπομπή"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Αύριο"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Τώρα"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Προβάλλεται τώρα"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Ολοκληρώθηκε"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Προσεχώς"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Διάρκεια: {} λεπτά"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Απομένουν {} λεπτά"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Επιστροφή σε πλήρη οθόνη"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Δεν υπάρχουν εκπομπές για αυτή την ημέρα."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Δεν ήταν δυνατή η φόρτωση του οδηγού προγράμματος."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Η ζωντανή προεπισκόπηση δεν είναι διαθέσιμη σε αυτό το σύστημα."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Δεν υπάρχει περιγραφή της εκπομπής."

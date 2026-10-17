@@ -5,6 +5,7 @@
 import datetime
 import json
 import os
+import threading
 import time
 from urllib.error import HTTPError
 from urllib.parse import urlencode
@@ -23,6 +24,8 @@ from .settings import (
 SETTINGS_PATH = "/etc/enigma2/gtiptvplayerpro-weather.json"
 CACHE_PATH = "/etc/enigma2/gtiptvplayerpro-weather-cache.json"
 CACHE_SECONDS = 30 * 60
+PREFETCH_TIMEOUT_SECONDS = 20
+RETRY_SECONDS = 60
 DEFAULT_CITY = "Tekirdağ"
 DEFAULT_UNIT = "C"
 USER_AGENT = "GT-IPTV-Player-Pro/{}".format(PLUGIN_VERSION)
@@ -762,6 +765,15 @@ class WeatherService(object):
         self.client = client or OpenMeteoClient()
         self.cache_path = cache_path or CACHE_PATH
         self.now = now or time.time
+        self._request_lock = threading.Lock()
+        self._state_lock = threading.Lock()
+        self._prefetch_lock = threading.Lock()
+        self._prefetch_thread = None
+        self._memory_data = None
+        self._memory_file_signature = None
+        self._retry_after = 0.0
+        self._retry_settings = None
+        self._last_error = ""
 
     @staticmethod
     def _from_dict(data, stale=False):
@@ -796,10 +808,15 @@ class WeatherService(object):
         except (AttributeError, TypeError, ValueError):
             return None
 
-    def cached(self, settings, allow_stale=True):
-        data = _read_json(self.cache_path)
-        if not data:
-            return None
+    @staticmethod
+    def matches_settings(forecast, settings):
+        """Validate a snapshot/cache against the selected city and unit."""
+        try:
+            data = forecast if isinstance(forecast, dict) else forecast.as_dict()
+        except (AttributeError, TypeError, ValueError):
+            return False
+        if not data or not getattr(settings, "enabled", True):
+            return False
         location = getattr(settings, "location", None)
         if location is not None:
             cached_latitude = _optional_coordinate(
@@ -809,15 +826,18 @@ class WeatherService(object):
                 data.get("longitude"), -180.0, 180.0
             )
             if cached_latitude is None or cached_longitude is None:
-                return None
+                return False
             if (
                 abs(cached_latitude - location.latitude) > 0.00001
                 or abs(cached_longitude - location.longitude) > 0.00001
             ):
-                return None
+                return False
         elif str(data.get("city", "")).casefold() != settings.city.casefold():
-            return None
-        if data.get("unit") != settings.unit:
+            return False
+        return data.get("unit") == settings.unit
+
+    def _cached_data(self, data, settings, allow_stale):
+        if not self.matches_settings(data, settings):
             return None
         try:
             age = max(0, float(self.now()) - float(data.get("cached_at", 0)))
@@ -826,6 +846,39 @@ class WeatherService(object):
         if age > CACHE_SECONDS and not allow_stale:
             return None
         return self._from_dict(data, stale=age > CACHE_SECONDS)
+
+    def peek(self, settings):
+        """Return a fresh RAM snapshot without disk/network I/O on the GUI."""
+        with self._state_lock:
+            data = self._memory_data
+        return self._cached_data(data, settings, allow_stale=False)
+
+    def _cache_file_signature(self):
+        try:
+            info = os.stat(self.cache_path)
+            return (info.st_dev, info.st_ino, info.st_size,
+                    info.st_mtime_ns, info.st_ctime_ns)
+        except OSError:
+            return None
+
+    def cached(self, settings, allow_stale=True):
+        if not settings.enabled:
+            return None
+        # Worker reads also recognise a cache changed by restore or another
+        # service instance. GUI peek deliberately never stats or opens files.
+        signature = self._cache_file_signature()
+        with self._state_lock:
+            memory = self._memory_data
+            previous_signature = self._memory_file_signature
+        if signature == previous_signature:
+            forecast = self._cached_data(memory, settings, allow_stale)
+            if forecast is not None:
+                return forecast
+        data = _read_json(self.cache_path)
+        with self._state_lock:
+            self._memory_data = dict(data) if isinstance(data, dict) else None
+            self._memory_file_signature = signature
+        return self._cached_data(data, settings, allow_stale)
 
     @staticmethod
     def _cancelled(cancel_event=None, deadline=None):
@@ -838,6 +891,20 @@ class WeatherService(object):
         )
 
     def get(self, settings, force=False, cancel_event=None, deadline=None):
+        """Share one bounded request among startup, category and player workers."""
+        if not settings.enabled:
+            return None
+        while True:
+            if self._cancelled(cancel_event, deadline):
+                raise WeatherError(N_("Weather request cancelled"))
+            if self._request_lock.acquire(timeout=0.05):
+                break
+        try:
+            return self._get_locked(settings, force, cancel_event, deadline)
+        finally:
+            self._request_lock.release()
+
+    def _get_locked(self, settings, force=False, cancel_event=None, deadline=None):
         if not settings.enabled:
             return None
         if self._cancelled(cancel_event, deadline):
@@ -846,6 +913,12 @@ class WeatherService(object):
             cached = self.cached(settings, allow_stale=False)
             if cached is not None:
                 return cached
+            if (time.monotonic() < self._retry_after
+                    and self.matches_settings(self._retry_settings, settings)):
+                cached = self.cached(settings, allow_stale=True)
+                if cached is not None:
+                    return cached
+                raise WeatherError(self._last_error or N_("Could not load the weather forecast"))
         try:
             location = getattr(settings, "location", None)
             location_forecast = getattr(self.client, "forecast_location", None)
@@ -870,15 +943,69 @@ class WeatherService(object):
             # Forecasts are disposable cache data. Avoid fsync contention with
             # video startup while preserving durable writes for user settings.
             _write_json(self.cache_path, data, durable=False)
+            signature = self._cache_file_signature()
+            with self._state_lock:
+                self._memory_data = dict(data)
+                self._memory_file_signature = signature
+            self._retry_after = 0.0
+            self._retry_settings = None
+            self._last_error = ""
             return forecast
-        except WeatherError:
+        except WeatherError as error:
             if self._cancelled(cancel_event, deadline):
                 raise
+            self._retry_after = time.monotonic() + RETRY_SECONDS
+            self._retry_settings = settings.as_dict()
+            self._last_error = str(error)
             cached = self.cached(settings, allow_stale=True)
             if cached is not None:
                 cached.stale = True
                 return cached
             raise
+
+    def prefetch(self, settings):
+        """Warm the shared cache without retaining or touching any screen."""
+        if not settings.enabled:
+            return False
+        with self._prefetch_lock:
+            if self._prefetch_thread is not None and self._prefetch_thread.is_alive():
+                return False
+
+            def run():
+                try:
+                    self.get(settings, deadline=time.monotonic() + PREFETCH_TIMEOUT_SECONDS)
+                except Exception:
+                    # Existing player/category placeholders report unavailable
+                    # data. Startup warming must never interrupt plugin entry.
+                    pass
+
+            worker = threading.Thread(target=run, name="GTWeatherPrefetch")
+            worker.daemon = True
+            self._prefetch_thread = worker
+            worker.start()
+        return True
+
+
+_SHARED_WEATHER_SERVICE = None
+_SHARED_WEATHER_LOCK = threading.Lock()
+
+
+def shared_weather_service():
+    global _SHARED_WEATHER_SERVICE
+    with _SHARED_WEATHER_LOCK:
+        if _SHARED_WEATHER_SERVICE is None:
+            _SHARED_WEATHER_SERVICE = WeatherService()
+        return _SHARED_WEATHER_SERVICE
+
+
+def prefetch_weather():
+    """Called once after the welcome screen's first layout, never on every zap."""
+    try:
+        settings = load_weather_settings()
+        if settings.enabled:
+            shared_weather_service().prefetch(settings)
+    except Exception:
+        pass
 
 
 def last_weather_update(cache_path=None):

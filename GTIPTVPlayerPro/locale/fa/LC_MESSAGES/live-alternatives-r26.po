@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fa\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "در حال جستجوی پخش جایگزین..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "هیچ پخش جایگزین فعالی پیدا نشد."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "پخش جایگزین: {} ({} میلی‌ثانیه)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "جستجوی پخش جایگزین لغو شد."

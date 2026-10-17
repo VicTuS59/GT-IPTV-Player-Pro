@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: tr\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "Alternatif yayın aranıyor..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "Çalışan alternatif yayın bulunamadı."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "Alternatif yayın: {} ({} ms)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "Alternatif yayın araması iptal edildi."

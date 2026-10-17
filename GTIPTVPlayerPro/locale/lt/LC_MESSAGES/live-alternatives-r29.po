@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: lt\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Alternatyvūs srautai"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Tikrinti dar kartą"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stabilus"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Atkuriamas"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Nestabilus"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Netikrintas"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Patikra atidėta"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Tikslus atitikmuo"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Panašus pavadinimas"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Kitas kanalo numeris"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Kita šalis"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Stabiliausias"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Patikros trukmė: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Duomenų pertrūkiai: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Tikrinta prieš {} s"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Pasirinkite srautą; dabartinis atkūrimas tęsiamas."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Paieška fone: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Rekomendacija pagal paskutinę srauto patikrą."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Atidaromas srautas..."

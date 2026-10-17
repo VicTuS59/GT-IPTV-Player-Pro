@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: et\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Alternatiivsed vood"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Testi uuesti"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stabiilne"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Esitatav"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Ebastabiilne"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Testimata"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Test edasi lükatud"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Täpne vaste"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Sarnane nimi"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Erinev kanalinumber"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Erinev riik"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Kõige stabiilsem"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Testi kestus: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Andmekatkestused: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Testitud {} s tagasi"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Valige voog; praegune esitus jätkub."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Taustaotsing: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Soovitus viimase vootesti põhjal."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Voo avamine..."

@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ca\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "Guia de programes EPG"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Dies"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Dies disponibles: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Programació del dia"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Programa seleccionat"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Dia"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Programa"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Demà"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Ara"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "En emissió"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Finalitzat"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Properament"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Durada: {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Queden {} min"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Torna a pantalla completa"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "No hi ha programes per a aquest dia."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "No s’ha pogut carregar la guia de programes."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "La previsualització en directe no està disponible en aquesta imatge."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "La descripció del programa no està disponible."

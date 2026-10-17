@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: nn\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "EPG-programguide"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Dagar"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Tilgjengelege dagar: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Dagens program"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Valt program"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Dag"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Program"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "I morgon"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "No"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Blir sendt no"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Avslutta"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Komande"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Lengd: {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "{} min att"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Tilbake til fullskjerm"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Ingen program for denne dagen."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Kunne ikkje laste programguiden."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Direkte førehandsvising er ikkje tilgjengeleg i dette systemet."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Programomtalen er ikkje tilgjengeleg."

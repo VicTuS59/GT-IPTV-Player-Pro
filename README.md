@@ -3,7 +3,10 @@
 GT IPTV Player Pro is an open-source, account-oriented IPTV browser and player
 for Enigma2 receivers.
 
-Current source version: **v1.3.0**
+Current source version: **v1.4.0** — package **1.4.0-r0**.
+
+[Download the latest release](https://github.com/VicTuS59/GT-IPTV-Player-Pro/releases/latest)
+or read the [1.4.0 change log](CHANGELOG.md).
 
 ## Features
 
@@ -13,6 +16,20 @@ Current source version: **v1.3.0**
 - Movie/series details and Continue Watching
 - Device-language user interface with safe English fallback
 - Open-Meteo weather and optional TMDb metadata integration
+- Selectable backup and restore with section sizes, archive verification and a
+  safety backup before restoring selected data
+- Multi-day EPG guide with continuing live preview, using the information
+  available from the selected provider
+- Short **0** recalls the previous Live TV channel; hold **0** to restart the
+  current live stream
+- Redesigned information bar with weather, playback progress and the receiver's
+  incoming network rate in Mbps
+- Improved UHD image caching, favourites loading and image compatibility
+
+Backups contain plugin user data and selected local source documents. Downloaded
+videos, plugin code and rebuildable caches are excluded. The network indicator
+shows incoming traffic on the selected receiver interface, including other
+downloads; it is not a per-stream bitrate or an internet speed test.
 
 ## Requirements
 
@@ -45,5 +62,5 @@ service.
 ## License
 
 The source code and original project assets are distributed under
-`GPL-2.0-or-later`. See `LICENSE.txt`, `LICENSING.md` and
+`GPL-2.0-or-later`. See `LICENSE`, `LICENSING.md` and
 `ASSET_PROVENANCE.md`.

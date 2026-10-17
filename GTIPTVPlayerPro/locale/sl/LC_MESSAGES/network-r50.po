@@ -1,0 +1,10 @@
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro\nLanguage-Team: Slovenian\nLanguage: sl\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=4; plural=(n%100==1) ? 1 : (n%100==2) ? 2 : (n%100==3 || n%100==4) ? 3 : 0;\n"
+
+#: infobar.py
+msgid "Network speed"
+msgstr "Hitrost omrežja"
+
+#: infobar.py
+msgid "Net"
+msgstr "Omrežje"

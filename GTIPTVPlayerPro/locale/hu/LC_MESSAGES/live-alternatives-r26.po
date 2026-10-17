@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: hu\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "Alternatív adatfolyamok keresése..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "Nem található működő alternatív adatfolyam."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "Alternatív adatfolyam: {} ({} ms)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "Alternatív adatfolyamok keresése megszakítva."

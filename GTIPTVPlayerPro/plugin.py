@@ -22,6 +22,14 @@ def _log_scheduler_failure(message, error):
 
 
 def _prepare_storage():
+    # Finish or roll back an interrupted restore before any first-run writer
+    # or scheduler touches the plugin's persistent state.
+    try:
+        from .backup import BackupManager
+        BackupManager().recover()
+    except Exception as error:
+        _log_scheduler_failure("Backup recovery failed", error)
+        return False
     # Create both first-run account files before registering their TXT banks.
     from .playlist import ensure_playlist_file
 
@@ -44,12 +52,16 @@ def _prepare_storage():
         default_registry().slots("xtream")
     except (IOError, OSError, TypeError, ValueError):
         pass
+    return True
 
 
 def main(session, **kwargs):
     from .main import GTIPTVPlayerProScreen
 
-    _prepare_storage()
+    if not _prepare_storage():
+        from Screens.MessageBox import MessageBox
+        session.open(MessageBox, _("Restore failed. Use the safety backup."), MessageBox.TYPE_ERROR)
+        return
     from .web_shortcut import install as install_web_shortcut
     install_web_shortcut(session)
     from .download_guard import install as install_download_guard
@@ -79,7 +91,8 @@ def menu(menuid, **kwargs):
 def session_start(reason, session=None, **kwargs):
     """Start or stop the optional EPG schedulers with the GUI session."""
     if reason == 0 and session is not None:
-        _prepare_storage()
+        if not _prepare_storage():
+            return
         from .web_shortcut import install as install_web_shortcut
         install_web_shortcut(session)
         from .web_remote import WEB_REMOTE

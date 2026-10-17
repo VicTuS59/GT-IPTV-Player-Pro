@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ro\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "Se caută fluxuri alternative..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "Nu a fost găsit niciun flux alternativ funcțional."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "Flux alternativ: {} ({} ms)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "Căutarea fluxurilor alternative a fost anulată."

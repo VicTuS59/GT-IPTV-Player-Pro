@@ -556,6 +556,7 @@ class GTWebService(object):
                         portal_url,
                         mac,
                         path=current.source_path,
+                        expiry_annotation=getattr(current, "expiry_annotation", ""),
                     )
                     delete_portal_account(current, path=current.source_path)
             elif source_type == "m3u":

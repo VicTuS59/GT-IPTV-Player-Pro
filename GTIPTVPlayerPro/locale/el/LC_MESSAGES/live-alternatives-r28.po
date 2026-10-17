@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: el\n"
+
+#: live_alternative_ui.py
+msgid "Searching sources: {}/{}"
+msgstr "Αναζήτηση πηγών: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Testing streams: {}/{}"
+msgstr "Δοκιμή ροών: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Opening the best tested stream..."
+msgstr "Άνοιγμα της καλύτερης δοκιμασμένης ροής..."
+
+#: live_alternative_ui.py
+msgid "Search incomplete."
+msgstr "Η αναζήτηση δεν ολοκληρώθηκε."

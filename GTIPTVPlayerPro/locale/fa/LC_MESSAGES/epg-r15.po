@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fa\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "راهنمای الکترونیکی برنامه‌ها"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "روزها"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "روزهای موجود: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "برنامه‌های روز"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "برنامهٔ انتخاب‌شده"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "روز"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "برنامه"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "فردا"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "اکنون"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "در حال پخش"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "پایان‌یافته"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "پیش رو"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "مدت: {} دقیقه"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "{} دقیقه باقی مانده"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "بازگشت به تمام‌صفحه"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "برای این روز برنامه‌ای وجود ندارد."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "بارگیری راهنمای برنامه‌ها ممکن نشد."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "پیش‌نمایش زنده در این نسخهٔ سیستم موجود نیست."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "توضیحات برنامه موجود نیست."

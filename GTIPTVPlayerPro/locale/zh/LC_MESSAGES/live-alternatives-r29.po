@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "备用直播源"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "重新测试"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "稳定"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "可播放"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "不稳定"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "未测试"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "测试已推迟"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "完全匹配"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "名称相似"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "频道编号不同"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "国家不同"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "最稳定"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "测试时长：{} 秒"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "数据中断：{}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "{} 秒前测试"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "选择直播源，当前播放继续。"
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "后台搜索：{}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "根据最近一次直播源测试推荐。"
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "正在打开直播源..."

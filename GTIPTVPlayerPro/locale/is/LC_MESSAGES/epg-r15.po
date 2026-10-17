@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: is\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "EPG-dagskrárvísir"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Dagar"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Tiltækir dagar: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Dagskrá dagsins"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Valinn dagskrárliður"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Dagur"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Dagskrárliður"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Á morgun"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Núna"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Í útsendingu núna"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Lokið"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Væntanlegt"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Lengd: {} mín."
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "{} mín. eftir"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Aftur á allan skjáinn"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Engir dagskrárliðir fyrir þennan dag."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Ekki tókst að hlaða dagskrárvísinum."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Forskoðun í beinni er ekki tiltæk í þessari kerfisútgáfu."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Lýsing á dagskrárlið er ekki tiltæk."

@@ -1,0 +1,48 @@
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: el\nLanguage: el\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Source: {}"
+msgstr "Πηγή: {}"
+
+#: infobar.py browser.py
+msgid "Stream"
+msgstr "Ροή"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Audio: {}"
+msgstr "Ήχος: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Subtitles: {}"
+msgstr "Υπότιτλοι: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Remaining: {}"
+msgstr "Απομένουν: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "{} h {} min"
+msgstr "{} ώ {} λ"
+
+#: infobar.py browser.py
+msgid "Programme guide"
+msgstr "Οδηγός προγράμματος"
+
+#: infobar.py browser.py
+msgid "Audio / Subtitles"
+msgstr "Ήχος / Υπότιτλοι"
+
+#: infobar.py browser.py
+msgid "Web interface"
+msgstr "Διεπαφή ιστού"
+
+#: infobar.py browser.py
+msgid "MENU 3s"
+msgstr "MENU 3 δ"
+

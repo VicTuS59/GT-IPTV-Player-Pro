@@ -159,6 +159,13 @@ STALKER_EPG_EMPTY_CACHE_LIMIT = 128
 _MAC_PATTERN = re.compile(
     r"^(?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$"
 )
+_PORTAL_EXPORT_FIELD = re.compile(
+    r"^[\s\u2500-\u257f|+`.\-\u2022\u25cf]*"
+    r"(?P<field>panel|mac|expires)\b\s*"
+    r"(?:[:>\u25b6\u25ba\u27a4\u2192]\s*)*"
+    r"(?P<value>.*)$",
+    re.IGNORECASE,
+)
 _CONTROL_PATTERN = re.compile(r"[\x00-\x1f\x7f]")
 _COMMAND_PREFIX = re.compile(r"^(?:ffmpeg|ffrt|auto)\s+", re.IGNORECASE)
 _MEDIA_COMMAND_PATH_ID = re.compile(
@@ -506,9 +513,12 @@ class PortalAccount(object):
         ("live", "movie", "series", "continue", "favorites")
     )
 
-    def __init__(self, portal_url, mac, source_path=""):
+    def __init__(self, portal_url, mac, source_path="", expiry_annotation=""):
         self.portal_url = normalise_portal_url(portal_url)
         self.mac = normalise_mac(mac)
+        self.expiry_annotation = str(expiry_annotation or "").strip()
+        if _CONTROL_PATTERN.search(self.expiry_annotation):
+            raise ValueError(N_("Enter a valid MAC address"))
         parsed = urlsplit(self.portal_url)
         self.scheme = parsed.scheme.lower()
         self.netloc = parsed.netloc
@@ -516,6 +526,12 @@ class PortalAccount(object):
         self.output_format = "portal"
         self.provider = PORTAL_PROVIDER
         self.source_path = str(source_path or "")
+
+    @property
+    def file_expiry(self):
+        # Keep the original TXT annotation for rewrites, but only display a
+        # validated whole date. It never forms part of the MAG identity.
+        return portal_expiry({"exp_date": self.expiry_annotation})
 
     @property
     def host(self):
@@ -575,6 +591,40 @@ def normalise_mac(value):
     if not _MAC_PATTERN.match(value):
         raise ValueError(N_("Enter a valid MAC address"))
     return value
+
+
+def _split_portal_mac_line(value):
+    mac, separator, annotation = str(value or "").partition("#")
+    if separator:
+        return normalise_mac(mac), annotation.strip()
+    parts = mac.split(None, 1)
+    mac = normalise_mac(parts[0] if parts else "")
+    annotation = parts[1].strip() if len(parts) > 1 else ""
+    # Plain exports may separate the MAC and its expiry with a dash.
+    # The remaining value still has to be one complete, valid expiry.
+    if annotation.startswith(("-", "\u2013", "\u2014")):
+        annotation = annotation[1:].strip()
+        if not annotation:
+            raise ValueError(N_("Enter a valid MAC address"))
+    # Unmarked trailing text is accepted only when it is a whole expiry value.
+    # The explicit # form still preserves arbitrary notes as it did in r8.
+    if annotation and not portal_expiry({"exp_date": annotation}):
+        raise ValueError(N_("Enter a valid MAC address"))
+    return mac, annotation
+
+
+def _portal_export_expiry(value):
+    """Read Expires exports as day/month/year; ignore their stale day count."""
+    value = str(value or "").strip()
+    if len(value) > 120:
+        return ""
+    value = re.sub(
+        r"\s*\([+-]?\d+\s+days?\)\s*$", "", value, flags=re.IGNORECASE,
+    )
+    parts = re.fullmatch(r"(\d{1,2})/(\d{1,2})/(\d{4})", value)
+    if parts is not None:
+        value = "{}.{}.{}".format(*parts.groups())
+    return portal_expiry({"exp_date": value})
 
 
 def normalise_portal_url(value):
@@ -1165,6 +1215,24 @@ def _portal_session_for(account, opener=None, clock=None, mag_compat=False):
     return session
 
 
+def reuse_portal_health_session(account, session):
+    """Reuse a retained verified session without pinning channel catalogues."""
+    if (not isinstance(session, _PortalSession) or not session.shared or session.revoked
+            or session.identity != tuple(getattr(account, "identity", ()) or ())):
+        return False
+    with _PORTAL_SESSIONS_LOCK:
+        current = _PORTAL_SESSIONS.get(session.identity)
+        # A newer shared session wins; never replace its credentials/cookies.
+        if current is not None and not current.revoked:
+            return True
+        _PORTAL_SESSIONS[session.identity] = session
+        _PORTAL_SESSIONS.move_to_end(session.identity)
+        _register_portal_session_locked(session)
+        while len(_PORTAL_SESSIONS) > PORTAL_SESSION_CACHE_LIMIT:
+            _PORTAL_SESSIONS.popitem(last=False)
+    return True
+
+
 def _remember_mag_session(client, previous_session):
     """Publish a verified alternate session without disturbing live clients."""
     session = client._session
@@ -1465,14 +1533,35 @@ def _read_portal_lines(path):
 
 def _parse_portal_lines(lines, limit=None):
     accounts = []
-    seen = set()
+    seen = {}
     invalid_lines = 0
     current_url = ""
+    pending_account = None
     for line in lines:
         value = str(line or "").strip()
         if not value or value.startswith("#"):
             continue
-        if value.lower().startswith(("http://", "https://")):
+        field = _PORTAL_EXPORT_FIELD.fullmatch(value)
+        field_name = field.group("field").lower() if field else ""
+        if accounts and limit is not None and len(accounts) >= limit:
+            # A block's expiry follows its MAC. Read that last metadata line
+            # before stopping at the next account or portal.
+            if field_name != "expires":
+                break
+        if field:
+            value = field.group("value").strip()
+        if field_name == "expires":
+            expiry = _portal_export_expiry(value)
+            if pending_account is None or not expiry:
+                invalid_lines += 1
+            elif not pending_account.expiry_annotation:
+                pending_account.expiry_annotation = expiry
+            pending_account = None
+            continue
+        pending_account = None
+        if field_name == "panel" or (
+            not field and value.lower().startswith(("http://", "https://"))
+        ):
             try:
                 current_url = normalise_portal_url(value)
             except ValueError:
@@ -1480,21 +1569,27 @@ def _parse_portal_lines(lines, limit=None):
                 invalid_lines += 1
             continue
         try:
-            mac = normalise_mac(value)
+            mac, annotation = _split_portal_mac_line(value)
         except ValueError:
             invalid_lines += 1
             continue
         if not current_url:
             invalid_lines += 1
             continue
-        account = PortalAccount(current_url, mac)
+        try:
+            account = PortalAccount(current_url, mac, expiry_annotation=annotation)
+        except ValueError:
+            invalid_lines += 1
+            continue
         key = (account.portal_url.lower(), account.mac)
         if key in seen:
+            if not seen[key].expiry_annotation:
+                seen[key].expiry_annotation = account.expiry_annotation
+            pending_account = seen[key]
             continue
-        seen.add(key)
+        seen[key] = account
         accounts.append(account)
-        if limit is not None and len(accounts) >= limit:
-            break
+        pending_account = account
     return accounts, invalid_lines
 
 
@@ -1543,8 +1638,8 @@ def _group_accounts(accounts):
             indexes[key] = len(groups)
             groups.append([account.portal_url, []])
             index = len(groups) - 1
-        if account.mac not in groups[index][1]:
-            groups[index][1].append(account.mac)
+        if not any(item.mac == account.mac for item in groups[index][1]):
+            groups[index][1].append(account)
     return groups
 
 
@@ -1568,7 +1663,12 @@ def _write_portal_accounts(
     deadline=None,
 ):
     blocks = []
-    for portal_url, macs in _group_accounts(accounts):
+    for portal_url, grouped in _group_accounts(accounts):
+        macs = [
+            "{} #{}".format(account.mac, account.expiry_annotation)
+            if account.expiry_annotation else account.mac
+            for account in grouped
+        ]
         blocks.append("\n".join([portal_url] + macs))
     payload = (("\n\n".join(blocks) + "\n") if blocks else "").encode("utf-8")
     if len(payload) > MAX_PORTAL_BYTES:
@@ -1627,7 +1727,7 @@ def _write_portal_accounts(
                 pass
 
 
-def save_portal_account(portal_url, mac, path=None):
+def save_portal_account(portal_url, mac, path=None, expiry_annotation=""):
     register_path = path is None
     if register_path:
         from .playlist_files import playlist_write_path
@@ -1635,7 +1735,15 @@ def save_portal_account(portal_url, mac, path=None):
         path = playlist_write_path("stalker", DEFAULT_PORTAL_PATH)
         if not os.path.lexists(path):
             ensure_portal_file(path)
-    account = PortalAccount(portal_url, mac)
+    mac_value, inline_annotation = _split_portal_mac_line(mac)
+    account = PortalAccount(
+        portal_url,
+        mac_value,
+        expiry_annotation=(
+            inline_annotation
+            if inline_annotation or "#" in str(mac or "") else expiry_annotation
+        ),
+    )
     lines, unused_readable = _read_portal_lines(path)
     del unused_readable
     accounts, unused_invalid = _parse_portal_lines(lines)
@@ -2033,7 +2141,7 @@ class StalkerPortalClient(object):
         self._session.category_cache.pop("live", None)
         return False
 
-    def refresh_profile_for_health(self):
+    def refresh_profile_for_health(self, strict=False):
         """Refresh profile-only health data even when catalogues are cached."""
         with self._session_critical():
             previous_attempted = self._profile_attempted
@@ -2049,7 +2157,7 @@ class StalkerPortalClient(object):
             self._session.profile_identity_verified = False
             try:
                 self._ensure_profile(
-                    raise_transient=self._live_category_cache_is_fresh(),
+                    raise_transient=bool(strict) or self._live_category_cache_is_fresh(),
                     raise_access=True,
                 )
             except Exception:
@@ -2071,15 +2179,19 @@ class StalkerPortalClient(object):
         cancel_event=None,
     ):
         """Best-effort expiry for this health run, within its original budget."""
+        fallback = (
+            getattr(self.account, "file_expiry", "")
+            or N_("Server does not report expiry")
+        )
         expiry_deadline = min(
             float(deadline), time.monotonic() + ACCOUNT_INFO_HEALTH_TIMEOUT,
         )
         remaining = expiry_deadline - time.monotonic()
         if remaining <= 0:
-            return N_("Server does not report expiry")
+            return fallback
         acquired = self._session_lock.acquire(timeout=remaining)
         if not acquired:
-            return N_("Server does not report expiry")
+            return fallback
         try:
             if self._session.revoked:
                 return N_("Server does not report expiry")
@@ -2093,7 +2205,7 @@ class StalkerPortalClient(object):
                 not self._endpoint or not self._token
                 or expiry_deadline - time.monotonic() < 0.25
             ):
-                return N_("Server does not report expiry")
+                return fallback
             # Keep the same authenticated MAG session. Do not re-handshake or
             # retry an unsupported optional endpoint, and never cache its raw
             # response (which can contain account credentials/phone numbers).
@@ -2108,11 +2220,11 @@ class StalkerPortalClient(object):
                         (("type", "account_info"), ("action", "get_main_info")),
                     )
                     expiry = portal_expiry(value, account_info=True)
-            return expiry or N_("Server does not report expiry")
+            return expiry or fallback
         except (ContentError, ValueError, TypeError):
             # Categories already proved that the portal is available. A slow,
             # unavailable or unsupported expiry endpoint cannot undo that.
-            return N_("Server does not report expiry")
+            return fallback
         finally:
             self._session_lock.release()
 
@@ -3139,6 +3251,11 @@ class StalkerPortalClient(object):
 
     def _renew_session_after_access_denied(self, error=None):
         """Renew once, or reuse a credential another waiter already renewed."""
+
+        if getattr(self, "_passive_probe", False):
+            if error is not None:
+                raise error
+            raise ContentError(N_("Portal access denied"), ContentError.ACCESS_DENIED)
 
         failed_token = getattr(error, "portal_request_token", None)
         failed_generation = getattr(
@@ -8673,6 +8790,8 @@ class StalkerContentClient(object):
             )
 
     def _try_compatible(self, original, name, args, kwargs, error):
+        if getattr(self, "_passive_probe", False):
+            raise error
         if original._session.mag_compat or not _mag_compatibility_error(error):
             raise error
         probe_lock = original._session.compat_probe_lock

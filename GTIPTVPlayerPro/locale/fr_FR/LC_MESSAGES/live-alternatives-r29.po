@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fr_FR\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Flux alternatifs"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Retester"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stable"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Lisible"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Instable"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Non testé"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Test différé"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Correspondance exacte"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Nom similaire"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Numéro de chaîne différent"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Pays différent"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Le plus stable"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Durée du test : {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Interruptions de données : {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Testé il y a {} s"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Choisissez un flux ; la lecture actuelle continue."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Recherche en arrière-plan : {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Recommandation selon le dernier test du flux."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Ouverture du flux..."

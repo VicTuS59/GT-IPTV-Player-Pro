@@ -1,0 +1,48 @@
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: sk\nLanguage: sk\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n == 1) ? 0 : (n >= 2 && n <= 4) ? 1 : 2;\n"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Source: {}"
+msgstr "Zdroj: {}"
+
+#: infobar.py browser.py
+msgid "Stream"
+msgstr "Tok"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Audio: {}"
+msgstr "Zvuk: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Subtitles: {}"
+msgstr "Titulky: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Remaining: {}"
+msgstr "Zostáva: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "{} h {} min"
+msgstr "{} h {} min"
+
+#: infobar.py browser.py
+msgid "Programme guide"
+msgstr "Programový sprievodca"
+
+#: infobar.py browser.py
+msgid "Audio / Subtitles"
+msgstr "Zvuk / Titulky"
+
+#: infobar.py browser.py
+msgid "Web interface"
+msgstr "Webové rozhranie"
+
+#: infobar.py browser.py
+msgid "MENU 3s"
+msgstr "MENU 3 s"
+

@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ku\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Weşanên alternatîf"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Dîsa biceribîne"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Bîstîqar"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Dikare were lîstin"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Nebîstîqar"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Nehatiye ceribandin"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Ceribandin hate paşxistin"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Lihevhatina tam"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Navê mîna hev"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Hejmara kanalê cuda"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Welatekî cuda"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Herî bîstîqar"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Demê ceribandinê: {} ç"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Qutbûnên daneyan: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "{} ç berê hate ceribandin"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Weşanekê hilbijêre; lîstina heyî berdewam dike."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Lêgerîna paşplanê: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Li gorî ceribandina dawî ya weşanê tê pêşniyarkirin."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Weşan tê vekirin..."

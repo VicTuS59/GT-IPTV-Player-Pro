@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: GT IPTV Player Pro 1.2.0\n"
+"Project-Id-Version: GT IPTV Player Pro 1.4.0\n"
 "Report-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\n"
 "POT-Creation-Date: 2023-11-14 22:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -15,331 +15,594 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../GTIPTVPlayerPro/browser.py:181 ../GTIPTVPlayerPro/browser.py:7679
-#: ../GTIPTVPlayerPro/browser.py:7688 ../GTIPTVPlayerPro/browser.py:7758
-#: ../GTIPTVPlayerPro/browser.py:7783 ../GTIPTVPlayerPro/discovery_ui.py:702
+#: ../GTIPTVPlayerPro/backup_dashboard.py:21
+msgid "Accounts and API keys"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:21
+msgid "Servers, passwords and API information"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:22
+msgid "Plugin settings"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:22
+msgid "Appearance, language and player preferences"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:23 ../GTIPTVPlayerPro/browser.py:6351
+#: ../GTIPTVPlayerPro/browser.py:6374 ../GTIPTVPlayerPro/browser.py:6600
+#: ../GTIPTVPlayerPro/browser.py:6614 ../GTIPTVPlayerPro/browser.py:6632
+#: catalog_messages.py:358
+msgid "Favorites"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:23
+msgid "Your saved channels and lists"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:24
+msgid "History and resume"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:24
+msgid "Viewing history and playback positions"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:25
+msgid "Subtitles and sync"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:25
+msgid "Downloaded subtitles and timing settings"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:26
+msgid "Local source files"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:26
+msgid "M3U, XMLTV and source documents"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:49
+#: ../GTIPTVPlayerPro/restore_dashboard.py:32
+msgid "Select / Deselect"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:50
+#: ../GTIPTVPlayerPro/backup_dashboard.py:114
+#: ../GTIPTVPlayerPro/backup_ui.py:81 ../GTIPTVPlayerPro/main.py:4657
+msgid "Backup"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:50
+msgid "Select all"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:51
+#: ../GTIPTVPlayerPro/backup_dashboard.py:109
+#: ../GTIPTVPlayerPro/backup_ui.py:82 ../GTIPTVPlayerPro/main.py:8589
+#: catalog_messages.py:361
+msgid "File path"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:108
+msgid "Select the sections you want to back up."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:109
+msgid "Save location"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:110
+msgid "Backup summary"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:112
+msgid "Size of selected files"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:112
+#: ../GTIPTVPlayerPro/backup_ui.py:623 ../GTIPTVPlayerPro/downloads_ui.py:308
+#: catalog_messages.py:374
+msgid "Free space"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:113
+msgid "Press green to start the backup."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:141
+#, python-brace-format
+msgid "{} / {} sections selected"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:148
+#: ../GTIPTVPlayerPro/browser.py:25650 ../GTIPTVPlayerPro/browser.py:25665
+#: ../GTIPTVPlayerPro/main.py:8144 ../GTIPTVPlayerPro/main.py:8173
+#: ../GTIPTVPlayerPro/main.py:8215 ../GTIPTVPlayerPro/main.py:8256
+#: ../GTIPTVPlayerPro/main.py:9927 catalog_messages.py:643
+msgid "Not available"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_dashboard.py:155
+msgid "Select sections with OK. The total updates automatically."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:29
+msgid "Invalid or damaged backup."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:30 ../GTIPTVPlayerPro/backup_ui.py:384
+msgid "No files in the selected sections."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:31
+msgid "Backup version is not supported."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:32
+msgid "Storage is unavailable or not writable."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:33 ../GTIPTVPlayerPro/downloads.py:48
+#: catalog_messages.py:646
+msgid "Not enough free space."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:34
+msgid "Pause downloads before backup or restore."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:35
+msgid "A source file is missing or unreadable."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:36
+msgid "Files changed during backup. Try again."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:37 ../GTIPTVPlayerPro/downloads.py:41
+#: catalog_messages.py:107
+msgid "Cancelled"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:38
+msgid "Backup or restore failed."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:39 ../GTIPTVPlayerPro/plugin.py:63
+msgid "Restore failed. Use the safety backup."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:42 ../GTIPTVPlayerPro/backup_ui.py:498
+#: ../GTIPTVPlayerPro/backup_ui.py:659 ../GTIPTVPlayerPro/browser.py:4825
+#: ../GTIPTVPlayerPro/browser.py:7227 ../GTIPTVPlayerPro/browser.py:7551
+#: ../GTIPTVPlayerPro/browser.py:7759 ../GTIPTVPlayerPro/browser.py:7816
+#: ../GTIPTVPlayerPro/browser.py:7905 ../GTIPTVPlayerPro/browser.py:9048
+#: ../GTIPTVPlayerPro/browser.py:9347 ../GTIPTVPlayerPro/browser.py:9354
+#: ../GTIPTVPlayerPro/browser.py:9357 ../GTIPTVPlayerPro/browser.py:11312
+#: ../GTIPTVPlayerPro/browser.py:12160 ../GTIPTVPlayerPro/browser.py:12445
+#: ../GTIPTVPlayerPro/browser.py:13420 ../GTIPTVPlayerPro/browser.py:13511
+#: ../GTIPTVPlayerPro/browser.py:13539 ../GTIPTVPlayerPro/browser.py:13979
+#: ../GTIPTVPlayerPro/browser.py:15044 ../GTIPTVPlayerPro/browser.py:15432
+#: ../GTIPTVPlayerPro/browser.py:15553 ../GTIPTVPlayerPro/browser.py:17975
+#: ../GTIPTVPlayerPro/browser.py:17993 ../GTIPTVPlayerPro/browser.py:19965
+#: ../GTIPTVPlayerPro/browser.py:21175 ../GTIPTVPlayerPro/browser.py:23585
+#: ../GTIPTVPlayerPro/browser.py:23665 ../GTIPTVPlayerPro/browser.py:23973
+#: ../GTIPTVPlayerPro/browser.py:25890 ../GTIPTVPlayerPro/discovery.py:268
+#: ../GTIPTVPlayerPro/downloads.py:38 ../GTIPTVPlayerPro/downloads.py:40
+#: ../GTIPTVPlayerPro/downloads_ui.py:318 ../GTIPTVPlayerPro/dvb_epg_ui.py:1295
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1920 ../GTIPTVPlayerPro/main.py:6060
+#: ../GTIPTVPlayerPro/main.py:6128 ../GTIPTVPlayerPro/main.py:6851
+#: ../GTIPTVPlayerPro/main.py:6881 ../GTIPTVPlayerPro/main.py:6887
+#: ../GTIPTVPlayerPro/main.py:7001 ../GTIPTVPlayerPro/main.py:7097
+#: ../GTIPTVPlayerPro/web_ui.py:304 ../GTIPTVPlayerPro/youtube_ui.py:827
+#: catalog_messages.py:692
+msgid "Please wait"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:43 ../GTIPTVPlayerPro/backup_ui.py:527
+msgid "Creating backup..."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:44 ../GTIPTVPlayerPro/backup_ui.py:86
+#: ../GTIPTVPlayerPro/backup_ui.py:435 ../GTIPTVPlayerPro/backup_ui.py:588
+#: ../GTIPTVPlayerPro/restore_dashboard.py:33
+#: ../GTIPTVPlayerPro/restore_dashboard.py:102
+msgid "Safety backup"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:45
+#: ../GTIPTVPlayerPro/restore_dashboard.py:135
+msgid "Checking backup..."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:46 ../GTIPTVPlayerPro/backup_ui.py:527
+msgid "Restoring backup..."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:48
+msgid ""
+"Includes accounts, passwords, settings, favorites, history and local source "
+"files."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:49
+msgid "Videos, plugin files and rebuildable caches are excluded."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:50
+msgid "Required space"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:51
+msgid ""
+"Restore this backup? Current plugin data will be replaced. A safety backup "
+"will be created first."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:81 ../GTIPTVPlayerPro/main.py:4658
+msgid "Restore backup"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:121 ../GTIPTVPlayerPro/backup_ui.py:605
+#: ../GTIPTVPlayerPro/restore_dashboard.py:34
+#: ../GTIPTVPlayerPro/restore_dashboard.py:100
+msgid "Backup file"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:121 ../GTIPTVPlayerPro/backup_ui.py:435
+msgid "Backup folder"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:124 ../GTIPTVPlayerPro/backup_ui.py:144
+#: ../GTIPTVPlayerPro/backup_ui.py:622 ../GTIPTVPlayerPro/downloads_ui.py:627
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:472 ../GTIPTVPlayerPro/m3u_epg_ui.py:663
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:718 ../GTIPTVPlayerPro/main.py:7710
+#: ../GTIPTVPlayerPro/main.py:7782 ../GTIPTVPlayerPro/main.py:7827
+#: ../GTIPTVPlayerPro/main.py:8340 ../GTIPTVPlayerPro/main.py:8408
+#: ../GTIPTVPlayerPro/main.py:8449 ../GTIPTVPlayerPro/remote_footer.py:213
+#: catalog_messages.py:916
+msgid "Storage"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:241 ../GTIPTVPlayerPro/backup_ui.py:269
+msgid "Restore from backup"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:241 ../GTIPTVPlayerPro/backup_ui.py:269
+msgid "Backup dashboard"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:322 ../GTIPTVPlayerPro/backup_ui.py:603
+#: ../GTIPTVPlayerPro/backup_ui.py:606
+msgid "Backup completed."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:379
+msgid "Select at least one section."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:587
+msgid "Restore completed. Restart the Enigma2 interface."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:589 catalog_messages.py:768
+msgid "Restart required"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:604
+#, python-brace-format
+msgid "Files: {} | Size: {}"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:639
+msgid ""
+"Restore the selected sections? Unselected sections are preserved. A safety "
+"backup will be created first."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/backup_ui.py:640
+msgid "Create backup?"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/browser.py:205 ../GTIPTVPlayerPro/browser.py:7539
+#: ../GTIPTVPlayerPro/browser.py:7548 ../GTIPTVPlayerPro/browser.py:7618
+#: ../GTIPTVPlayerPro/browser.py:7643 ../GTIPTVPlayerPro/discovery_ui.py:696
 #: catalog_messages.py:1063
 msgid "This source does not support the selected content type."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:393 catalog_messages.py:574
+#: ../GTIPTVPlayerPro/browser.py:417 catalog_messages.py:574
 msgid "NO RATING"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:730 ../GTIPTVPlayerPro/browser.py:7722
-#: ../GTIPTVPlayerPro/browser.py:7807 ../GTIPTVPlayerPro/content.py:233
-#: ../GTIPTVPlayerPro/metadata.py:888 catalog_messages.py:561
+#: ../GTIPTVPlayerPro/browser.py:754 ../GTIPTVPlayerPro/browser.py:7582
+#: ../GTIPTVPlayerPro/browser.py:7667 ../GTIPTVPlayerPro/content.py:233
+#: ../GTIPTVPlayerPro/metadata.py:929 catalog_messages.py:561
 msgid "Movie"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:731 ../GTIPTVPlayerPro/browser.py:5946
-#: ../GTIPTVPlayerPro/browser.py:6430 ../GTIPTVPlayerPro/browser.py:6462
-#: ../GTIPTVPlayerPro/browser.py:6673 ../GTIPTVPlayerPro/browser.py:13547
-#: ../GTIPTVPlayerPro/content.py:44 ../GTIPTVPlayerPro/main.py:7054
-#: ../GTIPTVPlayerPro/main.py:7062 ../GTIPTVPlayerPro/main.py:7226
-#: ../GTIPTVPlayerPro/main.py:7238 catalog_messages.py:845
+#: ../GTIPTVPlayerPro/browser.py:755 ../GTIPTVPlayerPro/browser.py:5806
+#: ../GTIPTVPlayerPro/browser.py:6290 ../GTIPTVPlayerPro/browser.py:6322
+#: ../GTIPTVPlayerPro/browser.py:6533 ../GTIPTVPlayerPro/browser.py:13522
+#: ../GTIPTVPlayerPro/content.py:44 ../GTIPTVPlayerPro/main.py:7200
+#: ../GTIPTVPlayerPro/main.py:7208 ../GTIPTVPlayerPro/main.py:7372
+#: ../GTIPTVPlayerPro/main.py:7384 catalog_messages.py:845
 msgid "Series"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:886 catalog_messages.py:1172
+#: ../GTIPTVPlayerPro/browser.py:963 catalog_messages.py:1172
 #, python-brace-format
 msgid "{} added to favorites."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:888 ../GTIPTVPlayerPro/browser.py:6970
+#: ../GTIPTVPlayerPro/browser.py:965 ../GTIPTVPlayerPro/browser.py:6830
 #: catalog_messages.py:1180
 #, python-brace-format
 msgid "{} removed from favorites."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:889 ../GTIPTVPlayerPro/browser.py:6953
+#: ../GTIPTVPlayerPro/browser.py:966 ../GTIPTVPlayerPro/browser.py:6813
 #: catalog_messages.py:223
 msgid "Could not update favorites."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:4872 catalog_messages.py:99
+#: ../GTIPTVPlayerPro/browser.py:4732 catalog_messages.py:99
 msgid "CONTENT BROWSER"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:4946 ../GTIPTVPlayerPro/browser.py:5878
-#: ../GTIPTVPlayerPro/browser.py:13568 ../GTIPTVPlayerPro/browser.py:13608
+#: ../GTIPTVPlayerPro/browser.py:4806 ../GTIPTVPlayerPro/browser.py:5738
+#: ../GTIPTVPlayerPro/browser.py:13543 ../GTIPTVPlayerPro/browser.py:13583
 #: ../GTIPTVPlayerPro/youtube_ui.py:1005 catalog_messages.py:605
 msgid "No content found."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:4964 catalog_messages.py:469
+#: ../GTIPTVPlayerPro/browser.py:4824 catalog_messages.py:469
 msgid "Loading content..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:4965 ../GTIPTVPlayerPro/browser.py:7367
-#: ../GTIPTVPlayerPro/browser.py:7691 ../GTIPTVPlayerPro/browser.py:7899
-#: ../GTIPTVPlayerPro/browser.py:7956 ../GTIPTVPlayerPro/browser.py:8045
-#: ../GTIPTVPlayerPro/browser.py:9160 ../GTIPTVPlayerPro/browser.py:9459
-#: ../GTIPTVPlayerPro/browser.py:9466 ../GTIPTVPlayerPro/browser.py:9469
-#: ../GTIPTVPlayerPro/browser.py:11357 ../GTIPTVPlayerPro/browser.py:12204
-#: ../GTIPTVPlayerPro/browser.py:12480 ../GTIPTVPlayerPro/browser.py:13445
-#: ../GTIPTVPlayerPro/browser.py:13536 ../GTIPTVPlayerPro/browser.py:13564
-#: ../GTIPTVPlayerPro/browser.py:13989 ../GTIPTVPlayerPro/browser.py:15046
-#: ../GTIPTVPlayerPro/browser.py:15434 ../GTIPTVPlayerPro/browser.py:15555
-#: ../GTIPTVPlayerPro/browser.py:17936 ../GTIPTVPlayerPro/browser.py:17954
-#: ../GTIPTVPlayerPro/browser.py:19839 ../GTIPTVPlayerPro/browser.py:21030
-#: ../GTIPTVPlayerPro/browser.py:23260 ../GTIPTVPlayerPro/browser.py:23340
-#: ../GTIPTVPlayerPro/browser.py:23648 ../GTIPTVPlayerPro/browser.py:25474
-#: ../GTIPTVPlayerPro/discovery.py:268 ../GTIPTVPlayerPro/downloads.py:38
-#: ../GTIPTVPlayerPro/downloads.py:40 ../GTIPTVPlayerPro/downloads_ui.py:318
-#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1295 ../GTIPTVPlayerPro/dvb_epg_ui.py:1920
-#: ../GTIPTVPlayerPro/main.py:5996 ../GTIPTVPlayerPro/main.py:6061
-#: ../GTIPTVPlayerPro/main.py:6724 ../GTIPTVPlayerPro/main.py:6754
-#: ../GTIPTVPlayerPro/main.py:6760 ../GTIPTVPlayerPro/main.py:6874
-#: ../GTIPTVPlayerPro/main.py:6951 ../GTIPTVPlayerPro/web_ui.py:304
-#: ../GTIPTVPlayerPro/youtube_ui.py:827 catalog_messages.py:692
-msgid "Please wait"
-msgstr ""
-
-#: ../GTIPTVPlayerPro/browser.py:4994 ../GTIPTVPlayerPro/browser.py:5019
-#: ../GTIPTVPlayerPro/browser.py:7670 ../GTIPTVPlayerPro/browser.py:14122
+#: ../GTIPTVPlayerPro/browser.py:4854 ../GTIPTVPlayerPro/browser.py:4879
+#: ../GTIPTVPlayerPro/browser.py:7530 ../GTIPTVPlayerPro/browser.py:14114
 #: ../GTIPTVPlayerPro/catchup.py:192 ../GTIPTVPlayerPro/content.py:628
-#: ../GTIPTVPlayerPro/content.py:642 ../GTIPTVPlayerPro/discovery_ui.py:362
+#: ../GTIPTVPlayerPro/content.py:642 ../GTIPTVPlayerPro/discovery_ui.py:367
 #: ../GTIPTVPlayerPro/m3u.py:405 ../GTIPTVPlayerPro/m3u.py:1003
 #: ../GTIPTVPlayerPro/m3u.py:1011 ../GTIPTVPlayerPro/playlist.py:856
-#: ../GTIPTVPlayerPro/stalker.py:1561 catalog_messages.py:763
+#: ../GTIPTVPlayerPro/stalker.py:1656 catalog_messages.py:763
 msgid "Request timed out"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:4996 ../GTIPTVPlayerPro/browser.py:7672
+#: ../GTIPTVPlayerPro/browser.py:4856 ../GTIPTVPlayerPro/browser.py:7532
 #: ../GTIPTVPlayerPro/catchup.py:190 ../GTIPTVPlayerPro/catchup_m3u.py:198
 #: ../GTIPTVPlayerPro/content.py:623 ../GTIPTVPlayerPro/content.py:937
 #: ../GTIPTVPlayerPro/content.py:960 ../GTIPTVPlayerPro/content.py:1006
 #: ../GTIPTVPlayerPro/content.py:1017 ../GTIPTVPlayerPro/content.py:1042
 #: ../GTIPTVPlayerPro/content.py:1142 ../GTIPTVPlayerPro/m3u.py:403
 #: ../GTIPTVPlayerPro/m3u.py:998 ../GTIPTVPlayerPro/m3u_epg_ui.py:526
-#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1177 ../GTIPTVPlayerPro/main.py:6386
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1177 ../GTIPTVPlayerPro/main.py:6515
 #: ../GTIPTVPlayerPro/playlist.py:848 ../GTIPTVPlayerPro/playlist.py:1350
 #: ../GTIPTVPlayerPro/playlist.py:1361 ../GTIPTVPlayerPro/playlist.py:1396
-#: ../GTIPTVPlayerPro/playlist.py:1494 ../GTIPTVPlayerPro/stalker.py:1553
+#: ../GTIPTVPlayerPro/playlist.py:1494 ../GTIPTVPlayerPro/stalker.py:1648
 #: catalog_messages.py:760
 msgid "Request cancelled"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5001 ../GTIPTVPlayerPro/browser.py:14243
+#: ../GTIPTVPlayerPro/browser.py:4861 ../GTIPTVPlayerPro/browser.py:14235
 #: ../GTIPTVPlayerPro/youtube_ui.py:472 ../GTIPTVPlayerPro/youtube_ui.py:564
 #: ../GTIPTVPlayerPro/youtube_ui.py:584 ../GTIPTVPlayerPro/youtube_ui.py:599
 #: ../GTIPTVPlayerPro/youtube_ui.py:750 catalog_messages.py:193
 msgid "Could not load content"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5031 ../GTIPTVPlayerPro/browser.py:7056
-#: ../GTIPTVPlayerPro/browser.py:8704 ../GTIPTVPlayerPro/browser.py:9036
-#: ../GTIPTVPlayerPro/browser.py:9048 ../GTIPTVPlayerPro/browser.py:9463
-#: ../GTIPTVPlayerPro/browser.py:9479 ../GTIPTVPlayerPro/browser.py:9513
-#: ../GTIPTVPlayerPro/browser.py:13471 catalog_messages.py:210
+#: ../GTIPTVPlayerPro/browser.py:4891 ../GTIPTVPlayerPro/browser.py:6916
+#: ../GTIPTVPlayerPro/browser.py:8571 ../GTIPTVPlayerPro/browser.py:8924
+#: ../GTIPTVPlayerPro/browser.py:8936 ../GTIPTVPlayerPro/browser.py:9351
+#: ../GTIPTVPlayerPro/browser.py:9367 ../GTIPTVPlayerPro/browser.py:9401
+#: ../GTIPTVPlayerPro/browser.py:13446 catalog_messages.py:210
 msgid "Could not open the content list."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5041 catalog_messages.py:723
+#: ../GTIPTVPlayerPro/browser.py:4901 catalog_messages.py:723
 msgid "Press GREEN to try again"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5127 catalog_messages.py:451
+#: ../GTIPTVPlayerPro/browser.py:4987 catalog_messages.py:451
 msgid "LIVE TV CATEGORY SETTINGS"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5128 catalog_messages.py:539
+#: ../GTIPTVPlayerPro/browser.py:4988 catalog_messages.py:539
 msgid "MOVIE CATEGORY SETTINGS"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5129 catalog_messages.py:785
+#: ../GTIPTVPlayerPro/browser.py:4989 catalog_messages.py:785
 msgid "SERIES CATEGORY SETTINGS"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5178 catalog_messages.py:111
+#: ../GTIPTVPlayerPro/browser.py:5038 catalog_messages.py:111
 msgid "Category Manager"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5179 ../GTIPTVPlayerPro/discovery_ui.py:223
-#: ../GTIPTVPlayerPro/discovery_ui.py:773
+#: ../GTIPTVPlayerPro/browser.py:5039 ../GTIPTVPlayerPro/discovery_ui.py:228
+#: ../GTIPTVPlayerPro/discovery_ui.py:767
 #: ../GTIPTVPlayerPro/downloads_ui.py:198 ../GTIPTVPlayerPro/dvb_epg_ui.py:624
-#: ../GTIPTVPlayerPro/dvb_epg_ui.py:841 ../GTIPTVPlayerPro/main.py:4153
-#: ../GTIPTVPlayerPro/main.py:4494 ../GTIPTVPlayerPro/main.py:4688
-#: ../GTIPTVPlayerPro/remote_footer.py:108
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:841 ../GTIPTVPlayerPro/main.py:4185
+#: ../GTIPTVPlayerPro/main.py:4526 ../GTIPTVPlayerPro/main.py:4722
+#: ../GTIPTVPlayerPro/remote_footer.py:182
 #: ../GTIPTVPlayerPro/subtitle_ui.py:343 catalog_messages.py:869
 msgid "Settings"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5280 ../GTIPTVPlayerPro/browser.py:8688
+#: ../GTIPTVPlayerPro/browser.py:5140 ../GTIPTVPlayerPro/browser.py:8555
 #: catalog_messages.py:602
 msgid "No category found."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5302 ../GTIPTVPlayerPro/content.py:130
+#: ../GTIPTVPlayerPro/browser.py:5162 ../GTIPTVPlayerPro/content.py:130
 #: catalog_messages.py:110
 msgid "Category"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5310 ../GTIPTVPlayerPro/browser.py:5357
+#: ../GTIPTVPlayerPro/browser.py:5170 ../GTIPTVPlayerPro/browser.py:5217
 #: catalog_messages.py:387
 msgid "Hidden"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5355 catalog_messages.py:1111
+#: ../GTIPTVPlayerPro/browser.py:5215 catalog_messages.py:1111
 msgid "Visible"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5364 ../GTIPTVPlayerPro/browser.py:5367
+#: ../GTIPTVPlayerPro/browser.py:5224 ../GTIPTVPlayerPro/browser.py:5227
 #: catalog_messages.py:552
 msgid "Marked"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5445 catalog_messages.py:1177
+#: ../GTIPTVPlayerPro/browser.py:5305 catalog_messages.py:1177
 #, python-brace-format
 msgid "{} is always visible."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5452 catalog_messages.py:122
+#: ../GTIPTVPlayerPro/browser.py:5312 catalog_messages.py:122
 msgid "Category shown."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5455 ../GTIPTVPlayerPro/browser.py:5462
+#: ../GTIPTVPlayerPro/browser.py:5315 ../GTIPTVPlayerPro/browser.py:5322
 #: catalog_messages.py:120
 msgid "Category hidden."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5470 catalog_messages.py:551
+#: ../GTIPTVPlayerPro/browser.py:5330 catalog_messages.py:551
 msgid "Mark categories with RED first."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5485 catalog_messages.py:146
+#: ../GTIPTVPlayerPro/browser.py:5345 catalog_messages.py:146
 msgid ""
 "Choose the destination with the arrows. OK places marked categories below "
 "the line; EXIT cancels."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5516 catalog_messages.py:713
+#: ../GTIPTVPlayerPro/browser.py:5376 catalog_messages.py:713
 msgid "Position updated. Press GREEN to save."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5533 ../GTIPTVPlayerPro/browser.py:6929
+#: ../GTIPTVPlayerPro/browser.py:5393 ../GTIPTVPlayerPro/browser.py:6789
 #: catalog_messages.py:560
 msgid "Move cancelled."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5548 catalog_messages.py:249
+#: ../GTIPTVPlayerPro/browser.py:5408 catalog_messages.py:249
 msgid "Default order restored. Press GREEN to save."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5667 ../GTIPTVPlayerPro/main.py:5408
-#: ../GTIPTVPlayerPro/main.py:9567 ../GTIPTVPlayerPro/playlist.py:38
-#: ../GTIPTVPlayerPro/youtube_ui.py:164 ../GTIPTVPlayerPro/youtube_ui.py:911
-#: ../GTIPTVPlayerPro/youtube_ui.py:1022 ../GTIPTVPlayerPro/youtube_ui.py:1052
-#: catalog_messages.py:873
+#: ../GTIPTVPlayerPro/browser.py:5527 ../GTIPTVPlayerPro/main.py:4968
+#: ../GTIPTVPlayerPro/main.py:5470 ../GTIPTVPlayerPro/main.py:9732
+#: ../GTIPTVPlayerPro/playlist.py:38 ../GTIPTVPlayerPro/youtube_ui.py:164
+#: ../GTIPTVPlayerPro/youtube_ui.py:911 ../GTIPTVPlayerPro/youtube_ui.py:1022
+#: ../GTIPTVPlayerPro/youtube_ui.py:1052 catalog_messages.py:873
 msgid "Settings could not be saved. Check the receiver storage."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5681 catalog_messages.py:1173
+#: ../GTIPTVPlayerPro/browser.py:5541 catalog_messages.py:1173
 #, python-brace-format
 msgid "{} cannot be moved."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5757 catalog_messages.py:182
+#: ../GTIPTVPlayerPro/browser.py:5617 catalog_messages.py:182
 msgid "Continue Watching"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5770 catalog_messages.py:1081
+#: ../GTIPTVPlayerPro/browser.py:5630 catalog_messages.py:1081
 msgid "Unfinished movies and series episodes"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5946 ../GTIPTVPlayerPro/browser.py:6430
-#: ../GTIPTVPlayerPro/browser.py:6461 ../GTIPTVPlayerPro/browser.py:6672
-#: ../GTIPTVPlayerPro/content.py:43 ../GTIPTVPlayerPro/main.py:7053
-#: ../GTIPTVPlayerPro/main.py:7061 ../GTIPTVPlayerPro/main.py:7225
-#: ../GTIPTVPlayerPro/main.py:7237 catalog_messages.py:570
+#: ../GTIPTVPlayerPro/browser.py:5806 ../GTIPTVPlayerPro/browser.py:6290
+#: ../GTIPTVPlayerPro/browser.py:6321 ../GTIPTVPlayerPro/browser.py:6532
+#: ../GTIPTVPlayerPro/content.py:43 ../GTIPTVPlayerPro/main.py:7199
+#: ../GTIPTVPlayerPro/main.py:7207 ../GTIPTVPlayerPro/main.py:7371
+#: ../GTIPTVPlayerPro/main.py:7383 catalog_messages.py:570
 msgid "Movies"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5954 catalog_messages.py:946
+#: ../GTIPTVPlayerPro/browser.py:5814 catalog_messages.py:946
 #, python-brace-format
 msgid "S{}  •  E{}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:5973 catalog_messages.py:10
+#: ../GTIPTVPlayerPro/browser.py:5833 catalog_messages.py:10
 #, python-brace-format
 msgid "%{} • {} min remaining"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:6459
+#: ../GTIPTVPlayerPro/browser.py:6319
 #: ../GTIPTVPlayerPro/subtitle_browser.py:620 catalog_messages.py:48
 msgid "All"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:6460 ../GTIPTVPlayerPro/browser.py:6671
-#: ../GTIPTVPlayerPro/content.py:42 ../GTIPTVPlayerPro/main.py:7052
-#: ../GTIPTVPlayerPro/main.py:7057 ../GTIPTVPlayerPro/main.py:7060
-#: ../GTIPTVPlayerPro/main.py:7210 ../GTIPTVPlayerPro/main.py:7224
-#: ../GTIPTVPlayerPro/main.py:7236 ../GTIPTVPlayerPro/main.py:7241
+#: ../GTIPTVPlayerPro/browser.py:6320 ../GTIPTVPlayerPro/browser.py:6531
+#: ../GTIPTVPlayerPro/content.py:42 ../GTIPTVPlayerPro/main.py:7198
+#: ../GTIPTVPlayerPro/main.py:7203 ../GTIPTVPlayerPro/main.py:7206
+#: ../GTIPTVPlayerPro/main.py:7356 ../GTIPTVPlayerPro/main.py:7370
+#: ../GTIPTVPlayerPro/main.py:7382 ../GTIPTVPlayerPro/main.py:7387
 #: catalog_messages.py:461
 msgid "Live TV"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:6491 ../GTIPTVPlayerPro/browser.py:6514
-#: ../GTIPTVPlayerPro/browser.py:6740 ../GTIPTVPlayerPro/browser.py:6754
-#: ../GTIPTVPlayerPro/browser.py:6772 catalog_messages.py:358
-msgid "Favorites"
-msgstr ""
-
-#: ../GTIPTVPlayerPro/browser.py:6493 catalog_messages.py:355
+#: ../GTIPTVPlayerPro/browser.py:6353 catalog_messages.py:355
 msgid "Favorite channels, movies and series"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:6552 ../GTIPTVPlayerPro/main.py:251
-#: ../GTIPTVPlayerPro/main.py:6409 ../GTIPTVPlayerPro/main.py:7117
-#: ../GTIPTVPlayerPro/main.py:9384 ../GTIPTVPlayerPro/remote_footer.py:105
+#: ../GTIPTVPlayerPro/browser.py:6412 ../GTIPTVPlayerPro/main.py:254
+#: ../GTIPTVPlayerPro/main.py:6536 ../GTIPTVPlayerPro/main.py:7263
+#: ../GTIPTVPlayerPro/main.py:9549 ../GTIPTVPlayerPro/remote_footer.py:179
 #: catalog_messages.py:889
 msgid "Source"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:6666 catalog_messages.py:611
+#: ../GTIPTVPlayerPro/browser.py:6526 catalog_messages.py:611
 msgid "No favorites have been added."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:6675 ../GTIPTVPlayerPro/browser.py:20837
-#: ../GTIPTVPlayerPro/browser.py:24002 ../GTIPTVPlayerPro/remote_footer.py:143
+#: ../GTIPTVPlayerPro/browser.py:6535 ../GTIPTVPlayerPro/browser.py:20969
+#: ../GTIPTVPlayerPro/browser.py:24338 ../GTIPTVPlayerPro/remote_footer.py:217
 #: catalog_messages.py:354
 msgid "Favorite"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:6740 ../GTIPTVPlayerPro/browser.py:6754
-#: ../GTIPTVPlayerPro/browser.py:6773 ../GTIPTVPlayerPro/browser.py:12678
-#: ../GTIPTVPlayerPro/main.py:5868 ../GTIPTVPlayerPro/main.py:6417
-#: ../GTIPTVPlayerPro/main.py:6423 ../GTIPTVPlayerPro/remote_footer.py:124
-#: ../GTIPTVPlayerPro/remote_footer.py:148
+#: ../GTIPTVPlayerPro/browser.py:6600 ../GTIPTVPlayerPro/browser.py:6614
+#: ../GTIPTVPlayerPro/browser.py:6633 ../GTIPTVPlayerPro/browser.py:12643
+#: ../GTIPTVPlayerPro/main.py:5933 ../GTIPTVPlayerPro/main.py:6544
+#: ../GTIPTVPlayerPro/main.py:6550 ../GTIPTVPlayerPro/remote_footer.py:198
+#: ../GTIPTVPlayerPro/remote_footer.py:222
 #: ../GTIPTVPlayerPro/subtitle_browser.py:672
 #: ../GTIPTVPlayerPro/youtube_ui.py:748 catalog_messages.py:670
 msgid "Page"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:6913 catalog_messages.py:217
+#: ../GTIPTVPlayerPro/browser.py:6773 catalog_messages.py:217
 msgid "Could not save the favorite order."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:6917 catalog_messages.py:357
+#: ../GTIPTVPlayerPro/browser.py:6777 catalog_messages.py:357
 msgid "Favorite order saved."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:6981 ../GTIPTVPlayerPro/browser.py:7001
+#: ../GTIPTVPlayerPro/browser.py:6841 ../GTIPTVPlayerPro/browser.py:6861
 #: catalog_messages.py:1056
 msgid "This channel is no longer present in the M3U source."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7142 ../GTIPTVPlayerPro/browser.py:7224
-#: ../GTIPTVPlayerPro/browser.py:7273 ../GTIPTVPlayerPro/browser.py:9744
+#: ../GTIPTVPlayerPro/browser.py:7002 ../GTIPTVPlayerPro/browser.py:7084
+#: ../GTIPTVPlayerPro/browser.py:7133 ../GTIPTVPlayerPro/browser.py:9634
 #: catalog_messages.py:801
 msgid "Search All Movies"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7150 ../GTIPTVPlayerPro/browser.py:13586
-#: ../GTIPTVPlayerPro/browser.py:13625 ../GTIPTVPlayerPro/dvb_epg_ui.py:2147
-#: ../GTIPTVPlayerPro/main.py:3842 ../GTIPTVPlayerPro/main.py:4079
-#: ../GTIPTVPlayerPro/remote_footer.py:141
+#: ../GTIPTVPlayerPro/browser.py:7010 ../GTIPTVPlayerPro/browser.py:13561
+#: ../GTIPTVPlayerPro/browser.py:13600 ../GTIPTVPlayerPro/dvb_epg_ui.py:2147
+#: ../GTIPTVPlayerPro/main.py:3874 ../GTIPTVPlayerPro/main.py:4111
+#: ../GTIPTVPlayerPro/remote_footer.py:215
 #: ../GTIPTVPlayerPro/subtitle_browser.py:604
 #: ../GTIPTVPlayerPro/youtube_ui.py:400 ../GTIPTVPlayerPro/youtube_ui.py:412
 #: ../GTIPTVPlayerPro/youtube_ui.py:705 ../GTIPTVPlayerPro/youtube_ui.py:707
@@ -347,48 +610,48 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7151 ../GTIPTVPlayerPro/browser.py:7169
-#: ../GTIPTVPlayerPro/browser.py:7170 ../GTIPTVPlayerPro/browser.py:7312
-#: ../GTIPTVPlayerPro/browser.py:7685 ../GTIPTVPlayerPro/browser.py:7790
+#: ../GTIPTVPlayerPro/browser.py:7011 ../GTIPTVPlayerPro/browser.py:7029
+#: ../GTIPTVPlayerPro/browser.py:7030 ../GTIPTVPlayerPro/browser.py:7172
+#: ../GTIPTVPlayerPro/browser.py:7545 ../GTIPTVPlayerPro/browser.py:7650
 #: catalog_messages.py:308
 msgid "Enter a movie name."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7154 ../GTIPTVPlayerPro/browser.py:9743
-#: ../GTIPTVPlayerPro/content.py:43 ../GTIPTVPlayerPro/discovery_ui.py:668
+#: ../GTIPTVPlayerPro/browser.py:7014 ../GTIPTVPlayerPro/browser.py:9633
+#: ../GTIPTVPlayerPro/content.py:43 ../GTIPTVPlayerPro/discovery_ui.py:662
 #: catalog_messages.py:50
 msgid "All Movies"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7164 ../GTIPTVPlayerPro/browser.py:7775
-#: ../GTIPTVPlayerPro/browser.py:9244 ../GTIPTVPlayerPro/browser.py:10661
+#: ../GTIPTVPlayerPro/browser.py:7024 ../GTIPTVPlayerPro/browser.py:7635
+#: ../GTIPTVPlayerPro/browser.py:9132 ../GTIPTVPlayerPro/browser.py:10606
 #: catalog_messages.py:837
 msgid "Selecting movie..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7168 ../GTIPTVPlayerPro/browser.py:9248
+#: ../GTIPTVPlayerPro/browser.py:7028 ../GTIPTVPlayerPro/browser.py:9136
 #: catalog_messages.py:540
 msgid "MOVIE SUMMARY"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7263 ../GTIPTVPlayerPro/browser.py:8051
-#: ../GTIPTVPlayerPro/browser.py:13574 ../GTIPTVPlayerPro/dvb_epg_ui.py:2229
-#: ../GTIPTVPlayerPro/m3u_epg_ui.py:985 ../GTIPTVPlayerPro/main.py:4071
-#: ../GTIPTVPlayerPro/main.py:4266 ../GTIPTVPlayerPro/main.py:5282
-#: ../GTIPTVPlayerPro/main.py:7424 ../GTIPTVPlayerPro/main.py:8074
-#: ../GTIPTVPlayerPro/main.py:8534 ../GTIPTVPlayerPro/main.py:8785
+#: ../GTIPTVPlayerPro/browser.py:7123 ../GTIPTVPlayerPro/browser.py:7911
+#: ../GTIPTVPlayerPro/browser.py:13549 ../GTIPTVPlayerPro/dvb_epg_ui.py:2229
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:985 ../GTIPTVPlayerPro/main.py:4103
+#: ../GTIPTVPlayerPro/main.py:4298 ../GTIPTVPlayerPro/main.py:5344
+#: ../GTIPTVPlayerPro/main.py:7570 ../GTIPTVPlayerPro/main.py:8220
+#: ../GTIPTVPlayerPro/main.py:8680 ../GTIPTVPlayerPro/main.py:8931
 #: ../GTIPTVPlayerPro/subtitle_browser.py:796
 #: ../GTIPTVPlayerPro/subtitle_ui.py:698 ../GTIPTVPlayerPro/subtitle_ui.py:741
 #: ../GTIPTVPlayerPro/youtube_ui.py:392 catalog_messages.py:1050
 msgid "The virtual keyboard is unavailable on this image."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7268 ../GTIPTVPlayerPro/browser.py:8056
-#: ../GTIPTVPlayerPro/browser.py:13580 ../GTIPTVPlayerPro/dvb_epg_ui.py:2232
-#: ../GTIPTVPlayerPro/m3u_epg_ui.py:989 ../GTIPTVPlayerPro/main.py:4074
-#: ../GTIPTVPlayerPro/main.py:4269 ../GTIPTVPlayerPro/main.py:5285
-#: ../GTIPTVPlayerPro/main.py:7428 ../GTIPTVPlayerPro/main.py:8078
-#: ../GTIPTVPlayerPro/main.py:8538 ../GTIPTVPlayerPro/main.py:8788
+#: ../GTIPTVPlayerPro/browser.py:7128 ../GTIPTVPlayerPro/browser.py:7916
+#: ../GTIPTVPlayerPro/browser.py:13555 ../GTIPTVPlayerPro/dvb_epg_ui.py:2232
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:989 ../GTIPTVPlayerPro/main.py:4106
+#: ../GTIPTVPlayerPro/main.py:4301 ../GTIPTVPlayerPro/main.py:5347
+#: ../GTIPTVPlayerPro/main.py:7574 ../GTIPTVPlayerPro/main.py:8224
+#: ../GTIPTVPlayerPro/main.py:8684 ../GTIPTVPlayerPro/main.py:8934
 #: ../GTIPTVPlayerPro/subtitle_browser.py:801
 #: ../GTIPTVPlayerPro/subtitle_browser.py:812
 #: ../GTIPTVPlayerPro/subtitle_ui.py:702 ../GTIPTVPlayerPro/subtitle_ui.py:713
@@ -398,180 +661,180 @@ msgstr ""
 msgid "Could not open the virtual keyboard."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7674 ../GTIPTVPlayerPro/playlist.py:1429
+#: ../GTIPTVPlayerPro/browser.py:7534 ../GTIPTVPlayerPro/playlist.py:1429
 #: catalog_messages.py:859
 msgid "Server denied access"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7676 ../GTIPTVPlayerPro/content.py:767
+#: ../GTIPTVPlayerPro/browser.py:7536 ../GTIPTVPlayerPro/content.py:767
 #: ../GTIPTVPlayerPro/playlist.py:1431 catalog_messages.py:865
 msgid "Server request limit reached"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7681 ../GTIPTVPlayerPro/browser.py:7763
-#: ../GTIPTVPlayerPro/browser.py:7786 ../GTIPTVPlayerPro/browser.py:9884
-#: ../GTIPTVPlayerPro/browser.py:9951 ../GTIPTVPlayerPro/discovery.py:208
-#: ../GTIPTVPlayerPro/discovery_ui.py:289 catalog_messages.py:195
+#: ../GTIPTVPlayerPro/browser.py:7541 ../GTIPTVPlayerPro/browser.py:7623
+#: ../GTIPTVPlayerPro/browser.py:7646 ../GTIPTVPlayerPro/browser.py:9775
+#: ../GTIPTVPlayerPro/browser.py:9842 ../GTIPTVPlayerPro/discovery.py:208
+#: ../GTIPTVPlayerPro/discovery_ui.py:294 catalog_messages.py:195
 msgid "Could not load movies"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7694 catalog_messages.py:1166
+#: ../GTIPTVPlayerPro/browser.py:7554 catalog_messages.py:1166
 #, python-brace-format
 msgid "{movies} movies • {results} results"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7765 ../GTIPTVPlayerPro/browser.py:7788
+#: ../GTIPTVPlayerPro/browser.py:7625 ../GTIPTVPlayerPro/browser.py:7648
 #: catalog_messages.py:618
 msgid "No movies matched this search."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7826 ../GTIPTVPlayerPro/browser.py:11265
-#: ../GTIPTVPlayerPro/browser.py:11289 ../GTIPTVPlayerPro/browser.py:13172
-#: ../GTIPTVPlayerPro/browser.py:13208 catalog_messages.py:424
+#: ../GTIPTVPlayerPro/browser.py:7686 ../GTIPTVPlayerPro/browser.py:11220
+#: ../GTIPTVPlayerPro/browser.py:11244 ../GTIPTVPlayerPro/browser.py:13147
+#: ../GTIPTVPlayerPro/browser.py:13183 catalog_messages.py:424
 msgid "Information unavailable."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7841 ../GTIPTVPlayerPro/browser.py:11298
-#: ../GTIPTVPlayerPro/discovery_ui.py:494
-#: ../GTIPTVPlayerPro/discovery_ui.py:655 catalog_messages.py:569
+#: ../GTIPTVPlayerPro/browser.py:7701 ../GTIPTVPlayerPro/browser.py:11253
+#: ../GTIPTVPlayerPro/discovery_ui.py:499
+#: ../GTIPTVPlayerPro/discovery_ui.py:649 catalog_messages.py:569
 msgid "Movie summary unavailable."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:7918 ../GTIPTVPlayerPro/browser.py:8588
+#: ../GTIPTVPlayerPro/browser.py:7778 ../GTIPTVPlayerPro/browser.py:8455
 #: catalog_messages.py:833
 msgid "Select content before using favorites."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8007 ../GTIPTVPlayerPro/browser.py:8061
+#: ../GTIPTVPlayerPro/browser.py:7867 ../GTIPTVPlayerPro/browser.py:7921
 #: catalog_messages.py:800
 msgid "Search All Channels"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8010 ../GTIPTVPlayerPro/content.py:42
+#: ../GTIPTVPlayerPro/browser.py:7870 ../GTIPTVPlayerPro/content.py:42
 #: ../GTIPTVPlayerPro/m3u.py:1223 catalog_messages.py:49
 msgid "All Channels"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8013 catalog_messages.py:486
+#: ../GTIPTVPlayerPro/browser.py:7873 catalog_messages.py:486
 msgid "M3U CHANNEL SEARCH"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8097 catalog_messages.py:604
+#: ../GTIPTVPlayerPro/browser.py:7957 catalog_messages.py:604
 msgid "No channels matched this search."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8098 catalog_messages.py:307
+#: ../GTIPTVPlayerPro/browser.py:7958 catalog_messages.py:307
 msgid "Enter a channel name."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8110 catalog_messages.py:370
+#: ../GTIPTVPlayerPro/browser.py:7970 catalog_messages.py:370
 #, python-brace-format
 msgid "First {} matching channels"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8114 catalog_messages.py:1174
+#: ../GTIPTVPlayerPro/browser.py:7974 catalog_messages.py:1174
 #, python-brace-format
 msgid "{} channels found"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8456 catalog_messages.py:1169
+#: ../GTIPTVPlayerPro/browser.py:8322 catalog_messages.py:1169
 #, python-brace-format
 msgid "{}  |  Select a category"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8477 catalog_messages.py:450
+#: ../GTIPTVPlayerPro/browser.py:8343 catalog_messages.py:450
 msgid "LIVE TV CATEGORIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8490 catalog_messages.py:11
+#: ../GTIPTVPlayerPro/browser.py:8356 catalog_messages.py:11
 msgid "5-DAY WEATHER FORECAST"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8496 catalog_messages.py:974
+#: ../GTIPTVPlayerPro/browser.py:8362 catalog_messages.py:974
 msgid "TODAY"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8498 ../GTIPTVPlayerPro/browser.py:20842
-#: ../GTIPTVPlayerPro/browser.py:26047 catalog_messages.py:476
+#: ../GTIPTVPlayerPro/browser.py:8364 ../GTIPTVPlayerPro/browser.py:20974
+#: ../GTIPTVPlayerPro/browser.py:26464 catalog_messages.py:476
 msgid "Loading weather data"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8715 catalog_messages.py:601
+#: ../GTIPTVPlayerPro/browser.py:8582 catalog_messages.py:601
 msgid "No categories found; press GREEN to try again."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8759 ../GTIPTVPlayerPro/browser.py:9423
-#: ../GTIPTVPlayerPro/browser.py:11788 catalog_messages.py:109
+#: ../GTIPTVPlayerPro/browser.py:8645 ../GTIPTVPlayerPro/browser.py:9311
+#: ../GTIPTVPlayerPro/browser.py:11743 catalog_messages.py:109
 msgid "Categories"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8836 ../GTIPTVPlayerPro/main.py:5001
+#: ../GTIPTVPlayerPro/browser.py:8724 ../GTIPTVPlayerPro/main.py:5063
 #: catalog_messages.py:116
 msgid ""
 "Category edit lock data is damaged. Remove and reinstall the plugin to reset "
 "only this lock."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8849 catalog_messages.py:119
+#: ../GTIPTVPlayerPro/browser.py:8737 catalog_messages.py:119
 msgid "Category editor locked"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8850 catalog_messages.py:320
+#: ../GTIPTVPlayerPro/browser.py:8738 catalog_messages.py:320
 msgid "Enter the 4-digit category edit PIN."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8869 ../GTIPTVPlayerPro/browser.py:8890
-#: ../GTIPTVPlayerPro/main.py:4957 ../GTIPTVPlayerPro/main.py:4978
+#: ../GTIPTVPlayerPro/browser.py:8757 ../GTIPTVPlayerPro/browser.py:8778
+#: ../GTIPTVPlayerPro/main.py:5019 ../GTIPTVPlayerPro/main.py:5040
 #: catalog_messages.py:997
 msgid "The PIN entry screen is unavailable on this image."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8901 ../GTIPTVPlayerPro/main.py:5106
+#: ../GTIPTVPlayerPro/browser.py:8789 ../GTIPTVPlayerPro/main.py:5168
 #: catalog_messages.py:121
 msgid "Category lock recovery"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8902 ../GTIPTVPlayerPro/main.py:5107
+#: ../GTIPTVPlayerPro/browser.py:8790 ../GTIPTVPlayerPro/main.py:5169
 #: catalog_messages.py:319
 msgid "Enter the 12-digit recovery code."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8911 catalog_messages.py:414
+#: ../GTIPTVPlayerPro/browser.py:8799 catalog_messages.py:414
 msgid "Incorrect PIN. Category editor remains locked."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8930 catalog_messages.py:416
+#: ../GTIPTVPlayerPro/browser.py:8818 catalog_messages.py:416
 msgid "Incorrect recovery code. Category editor remains locked."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8941 catalog_messages.py:224
+#: ../GTIPTVPlayerPro/browser.py:8829 catalog_messages.py:224
 msgid "Create a new category edit PIN"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8942 ../GTIPTVPlayerPro/main.py:5038
+#: ../GTIPTVPlayerPro/browser.py:8830 ../GTIPTVPlayerPro/main.py:5100
 #: catalog_messages.py:310
 msgid "Enter a new 4-digit PIN."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8951 catalog_messages.py:170
+#: ../GTIPTVPlayerPro/browser.py:8839 catalog_messages.py:170
 msgid "Confirm the new category edit PIN"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8952 ../GTIPTVPlayerPro/main.py:5048
+#: ../GTIPTVPlayerPro/browser.py:8840 ../GTIPTVPlayerPro/main.py:5110
 #: catalog_messages.py:327
 msgid "Enter the same 4-digit PIN again."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8963 ../GTIPTVPlayerPro/main.py:5060
+#: ../GTIPTVPlayerPro/browser.py:8851 ../GTIPTVPlayerPro/main.py:5122
 #: catalog_messages.py:996
 msgid "The PIN entries do not match. Nothing was changed."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8980 catalog_messages.py:1029
+#: ../GTIPTVPlayerPro/browser.py:8868 catalog_messages.py:1029
 msgid "The new PIN could not be saved. Category editor remains locked."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8991 catalog_messages.py:753
+#: ../GTIPTVPlayerPro/browser.py:8879 catalog_messages.py:753
 #, python-brace-format
 msgid ""
 "Recovery succeeded. Write down the new recovery code; it is shown only "
@@ -580,339 +843,341 @@ msgid ""
 "{}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:8994 catalog_messages.py:112
+#: ../GTIPTVPlayerPro/browser.py:8882 catalog_messages.py:112
 msgid "Category edit PIN renewed."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:9234 catalog_messages.py:538
+#: ../GTIPTVPlayerPro/browser.py:9122 catalog_messages.py:538
 msgid "MOVIE CATEGORIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:9240 catalog_messages.py:378
+#: ../GTIPTVPlayerPro/browser.py:9128 catalog_messages.py:378
 msgid ""
 "GT\n"
 "MOVIE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:9250 catalog_messages.py:1039
+#: ../GTIPTVPlayerPro/browser.py:9138 catalog_messages.py:1039
 msgid "The selected movie's details will be loaded from the server."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:9258 catalog_messages.py:542
+#: ../GTIPTVPlayerPro/browser.py:9146 catalog_messages.py:542
 msgid "MOVIES IN THE SELECTED CATEGORY"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:9364 catalog_messages.py:562
+#: ../GTIPTVPlayerPro/browser.py:9252 catalog_messages.py:562
 msgid "Movie category not found"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:9748 catalog_messages.py:718
+#: ../GTIPTVPlayerPro/browser.py:9638 catalog_messages.py:718
 msgid "Press BLUE to search all movies."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:9847 catalog_messages.py:1186
+#: ../GTIPTVPlayerPro/browser.py:9738 catalog_messages.py:1186
 #, python-brace-format
 msgid "{} • LOADING MOVIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:9981 catalog_messages.py:1188
+#: ../GTIPTVPlayerPro/browser.py:9872 catalog_messages.py:1188
 #, python-brace-format
 msgid "{} • {} MOVIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:10059 catalog_messages.py:567
+#: ../GTIPTVPlayerPro/browser.py:9950 catalog_messages.py:567
 msgid "Movie request timed out"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:10676 catalog_messages.py:473
+#: ../GTIPTVPlayerPro/browser.py:10621 catalog_messages.py:473
 msgid "Loading movie information from the server."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:10684 catalog_messages.py:101
+#: ../GTIPTVPlayerPro/browser.py:10629 catalog_messages.py:101
 msgid "COULD NOT LOAD MOVIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:10689 catalog_messages.py:573
+#: ../GTIPTVPlayerPro/browser.py:10634 catalog_messages.py:573
 msgid "NO MOVIES FOUND IN THIS CATEGORY"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:10690 catalog_messages.py:1078
+#: ../GTIPTVPlayerPro/browser.py:10635 catalog_messages.py:1078
 msgid "Try another category."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11268 catalog_messages.py:564
+#: ../GTIPTVPlayerPro/browser.py:11223 catalog_messages.py:564
 msgid "Movie information unavailable."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11294 catalog_messages.py:380
+#: ../GTIPTVPlayerPro/browser.py:11249 catalog_messages.py:380
 msgid "Genre unavailable"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11303 ../GTIPTVPlayerPro/browser.py:13218
-#: ../GTIPTVPlayerPro/discovery_ui.py:492
-#: ../GTIPTVPlayerPro/discovery_ui.py:654 catalog_messages.py:261
+#: ../GTIPTVPlayerPro/browser.py:11258 ../GTIPTVPlayerPro/browser.py:13193
+#: ../GTIPTVPlayerPro/discovery_ui.py:497
+#: ../GTIPTVPlayerPro/discovery_ui.py:648 catalog_messages.py:261
 #, python-brace-format
 msgid "Director: {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11307 ../GTIPTVPlayerPro/browser.py:13220
+#: ../GTIPTVPlayerPro/browser.py:11262 ../GTIPTVPlayerPro/browser.py:13195
 #: catalog_messages.py:108
 #, python-brace-format
 msgid "Cast: {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11597 catalog_messages.py:1167
+#: ../GTIPTVPlayerPro/browser.py:11552 catalog_messages.py:1167
 #, python-brace-format
 msgid "{}   |   CONTENT BROWSER"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11623 catalog_messages.py:94
+#: ../GTIPTVPlayerPro/browser.py:11578 catalog_messages.py:94
 msgid "CATEGORIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11631 catalog_messages.py:379
+#: ../GTIPTVPlayerPro/browser.py:11586 catalog_messages.py:379
 msgid ""
 "GT\n"
 "SERIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11633 ../GTIPTVPlayerPro/browser.py:21024
-#: ../GTIPTVPlayerPro/main.py:464 ../GTIPTVPlayerPro/main.py:9408
+#: ../GTIPTVPlayerPro/browser.py:11588 ../GTIPTVPlayerPro/browser.py:21169
+#: ../GTIPTVPlayerPro/main.py:496 ../GTIPTVPlayerPro/main.py:9573
 #: catalog_messages.py:784
 msgid "SERIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11648 ../GTIPTVPlayerPro/browser.py:12442
+#: ../GTIPTVPlayerPro/browser.py:11603 ../GTIPTVPlayerPro/browser.py:12407
 #: catalog_messages.py:838
 msgid "Selecting series..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11651 catalog_messages.py:788
+#: ../GTIPTVPlayerPro/browser.py:11606 catalog_messages.py:788
 msgid "SERIES SUMMARY"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11652 ../GTIPTVPlayerPro/browser.py:12457
+#: ../GTIPTVPlayerPro/browser.py:11607 ../GTIPTVPlayerPro/browser.py:12422
 #: catalog_messages.py:475
 msgid "Loading series information from the server."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11757 catalog_messages.py:846
+#: ../GTIPTVPlayerPro/browser.py:11712 catalog_messages.py:846
 msgid "Series category not found"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11950 catalog_messages.py:1187
+#: ../GTIPTVPlayerPro/browser.py:11906 catalog_messages.py:1187
 #, python-brace-format
 msgid "{} • LOADING SERIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:11991 ../GTIPTVPlayerPro/browser.py:12065
+#: ../GTIPTVPlayerPro/browser.py:11947 ../GTIPTVPlayerPro/browser.py:12021
 #: catalog_messages.py:196
 msgid "Could not load series"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:12112 catalog_messages.py:848
+#: ../GTIPTVPlayerPro/browser.py:12068 catalog_messages.py:848
 #, python-brace-format
 msgid "Series scan • {} pages"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:12155 catalog_messages.py:1189
+#: ../GTIPTVPlayerPro/browser.py:12111 catalog_messages.py:1189
 #, python-brace-format
 msgid "{} • {} SERIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:12259 catalog_messages.py:847
+#: ../GTIPTVPlayerPro/browser.py:12215 catalog_messages.py:847
 msgid "Series request timed out"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:12471 catalog_messages.py:102
+#: ../GTIPTVPlayerPro/browser.py:12436 catalog_messages.py:102
 msgid "COULD NOT LOAD SERIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:12486 catalog_messages.py:786
+#: ../GTIPTVPlayerPro/browser.py:12451 catalog_messages.py:786
 msgid "SERIES DATA COULD NOT BE READ"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:12488 catalog_messages.py:1042
+#: ../GTIPTVPlayerPro/browser.py:12453 catalog_messages.py:1042
 msgid ""
 "The series response uses an unsupported format. Categories remain available."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:12491 catalog_messages.py:787
+#: ../GTIPTVPlayerPro/browser.py:12456 catalog_messages.py:787
 msgid "SERIES DATA UNAVAILABLE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:12493 catalog_messages.py:1044
+#: ../GTIPTVPlayerPro/browser.py:12458 catalog_messages.py:1044
 msgid ""
 "The server did not answer the series request. Categories remain available."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:12497 catalog_messages.py:575
+#: ../GTIPTVPlayerPro/browser.py:12462 catalog_messages.py:575
 msgid "NO SERIES FOUND IN THIS CATEGORY"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:12500 catalog_messages.py:627
+#: ../GTIPTVPlayerPro/browser.py:12465 catalog_messages.py:627
 msgid "No series were found on this server or in this category."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13176 ../GTIPTVPlayerPro/browser.py:13212
+#: ../GTIPTVPlayerPro/browser.py:13151 ../GTIPTVPlayerPro/browser.py:13187
 #: catalog_messages.py:850
 msgid "Series summary unavailable."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13200 ../GTIPTVPlayerPro/browser.py:13201
+#: ../GTIPTVPlayerPro/browser.py:13175 ../GTIPTVPlayerPro/browser.py:13176
 #: catalog_messages.py:824
 msgid "Seasons"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13714 ../GTIPTVPlayerPro/browser.py:26044
-#: ../GTIPTVPlayerPro/browser.py:26064 catalog_messages.py:1127
+#: ../GTIPTVPlayerPro/browser.py:13689 ../GTIPTVPlayerPro/browser.py:26461
+#: ../GTIPTVPlayerPro/browser.py:26481 catalog_messages.py:1127
 msgid "Weather is disabled"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13715 catalog_messages.py:1156
+#: ../GTIPTVPlayerPro/browser.py:13690 catalog_messages.py:1156
 msgid "You can enable it in Settings."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13718 catalog_messages.py:472
+#: ../GTIPTVPlayerPro/browser.py:13693 catalog_messages.py:472
 msgid "Loading forecast"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13821 ../GTIPTVPlayerPro/weather.py:497
-#: ../GTIPTVPlayerPro/weather.py:539 ../GTIPTVPlayerPro/weather.py:573
+#: ../GTIPTVPlayerPro/browser.py:13796 ../GTIPTVPlayerPro/weather.py:500
+#: ../GTIPTVPlayerPro/weather.py:542 ../GTIPTVPlayerPro/weather.py:576
 #: catalog_messages.py:1129
 msgid "Weather request timed out"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13822 ../GTIPTVPlayerPro/browser.py:13834
-#: ../GTIPTVPlayerPro/main.py:3940 ../GTIPTVPlayerPro/main.py:3954
-#: ../GTIPTVPlayerPro/main.py:4297 ../GTIPTVPlayerPro/main.py:4363
+#: ../GTIPTVPlayerPro/browser.py:13797 ../GTIPTVPlayerPro/browser.py:13809
+#: ../GTIPTVPlayerPro/main.py:3972 ../GTIPTVPlayerPro/main.py:3986
+#: ../GTIPTVPlayerPro/main.py:4329 ../GTIPTVPlayerPro/main.py:4395
 #: catalog_messages.py:1123
 msgid "Weather data unavailable."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13859 catalog_messages.py:391
+#: ../GTIPTVPlayerPro/browser.py:13834 catalog_messages.py:391
 #, python-brace-format
 msgid "Humidity {}% • Wind {:.0f} km/h"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13864 catalog_messages.py:7
+#: ../GTIPTVPlayerPro/browser.py:13839 catalog_messages.py:7
 msgid "  •  Cached"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13866 catalog_messages.py:1096
+#: ../GTIPTVPlayerPro/browser.py:13841 catalog_messages.py:1096
 #, python-brace-format
 msgid "Updated: {}{}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:13876 catalog_messages.py:1072
+#: ../GTIPTVPlayerPro/browser.py:13851 ../GTIPTVPlayerPro/epg_guide_ui.py:51
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:397 catalog_messages.py:1072
 msgid "Today"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:14297 catalog_messages.py:9
+#: ../GTIPTVPlayerPro/browser.py:14289 catalog_messages.py:9
 #, python-brace-format
 msgid "%{}  •  {} MIN REMAINING"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:14766 ../GTIPTVPlayerPro/browser.py:20980
-#: ../GTIPTVPlayerPro/browser.py:20994 ../GTIPTVPlayerPro/browser.py:21001
-#: ../GTIPTVPlayerPro/browser.py:21010 ../GTIPTVPlayerPro/browser.py:21019
-#: ../GTIPTVPlayerPro/main.py:444 catalog_messages.py:449
+#: ../GTIPTVPlayerPro/browser.py:14764 ../GTIPTVPlayerPro/browser.py:21125
+#: ../GTIPTVPlayerPro/browser.py:21139 ../GTIPTVPlayerPro/browser.py:21146
+#: ../GTIPTVPlayerPro/browser.py:21155 ../GTIPTVPlayerPro/browser.py:21164
+#: ../GTIPTVPlayerPro/main.py:476 catalog_messages.py:449
 msgid "LIVE TV"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:14816 catalog_messages.py:95
+#: ../GTIPTVPlayerPro/browser.py:14814 catalog_messages.py:95
 msgid "CHANNEL LIST"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:14842 ../GTIPTVPlayerPro/browser.py:17464
-#: ../GTIPTVPlayerPro/browser.py:20827 ../GTIPTVPlayerPro/browser.py:23966
+#: ../GTIPTVPlayerPro/browser.py:14840 ../GTIPTVPlayerPro/browser.py:17503
+#: ../GTIPTVPlayerPro/browser.py:20959 ../GTIPTVPlayerPro/browser.py:24302
 #: catalog_messages.py:576
 msgid "NOW"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:14843 ../GTIPTVPlayerPro/browser.py:14861
-#: ../GTIPTVPlayerPro/browser.py:14897 ../GTIPTVPlayerPro/browser.py:14940
-#: ../GTIPTVPlayerPro/browser.py:15422 ../GTIPTVPlayerPro/browser.py:15465
+#: ../GTIPTVPlayerPro/browser.py:14841 ../GTIPTVPlayerPro/browser.py:14859
+#: ../GTIPTVPlayerPro/browser.py:14895 ../GTIPTVPlayerPro/browser.py:14938
+#: ../GTIPTVPlayerPro/browser.py:15420 ../GTIPTVPlayerPro/browser.py:15463
 #: catalog_messages.py:782
 msgid "SELECT A CHANNEL"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:14844 ../GTIPTVPlayerPro/browser.py:14875
-#: ../GTIPTVPlayerPro/browser.py:17402 ../GTIPTVPlayerPro/browser.py:17415
+#: ../GTIPTVPlayerPro/browser.py:14842 ../GTIPTVPlayerPro/browser.py:14873
+#: ../GTIPTVPlayerPro/browser.py:17441 ../GTIPTVPlayerPro/browser.py:17454
 #: catalog_messages.py:1117
 msgid "Waiting for programme information"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:14847 ../GTIPTVPlayerPro/browser.py:14866
-#: ../GTIPTVPlayerPro/browser.py:17404 ../GTIPTVPlayerPro/browser.py:17424
-#: ../GTIPTVPlayerPro/browser.py:17467 ../GTIPTVPlayerPro/browser.py:17497
-#: ../GTIPTVPlayerPro/browser.py:20829 ../GTIPTVPlayerPro/browser.py:20996
-#: ../GTIPTVPlayerPro/browser.py:23969 catalog_messages.py:572
+#: ../GTIPTVPlayerPro/browser.py:14845 ../GTIPTVPlayerPro/browser.py:14864
+#: ../GTIPTVPlayerPro/browser.py:17443 ../GTIPTVPlayerPro/browser.py:17463
+#: ../GTIPTVPlayerPro/browser.py:17506 ../GTIPTVPlayerPro/browser.py:17536
+#: ../GTIPTVPlayerPro/browser.py:20961 ../GTIPTVPlayerPro/browser.py:21141
+#: ../GTIPTVPlayerPro/browser.py:24305 catalog_messages.py:572
 msgid "NEXT"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:14874 catalog_messages.py:669
+#: ../GTIPTVPlayerPro/browser.py:14872 catalog_messages.py:669
 msgid "PROGRAMME SUMMARY"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:15081 ../GTIPTVPlayerPro/browser.py:15096
-#: ../GTIPTVPlayerPro/browser.py:15754 ../GTIPTVPlayerPro/browser.py:15757
-#: ../GTIPTVPlayerPro/browser.py:17983 ../GTIPTVPlayerPro/browser.py:17988
-#: ../GTIPTVPlayerPro/browser.py:18079 ../GTIPTVPlayerPro/browser.py:18092
-#: ../GTIPTVPlayerPro/browser.py:18101 ../GTIPTVPlayerPro/browser.py:19968
-#: ../GTIPTVPlayerPro/browser.py:22670 ../GTIPTVPlayerPro/browser.py:22745
-#: ../GTIPTVPlayerPro/browser.py:23550 ../GTIPTVPlayerPro/browser.py:23826
+#: ../GTIPTVPlayerPro/browser.py:15079 ../GTIPTVPlayerPro/browser.py:15094
+#: ../GTIPTVPlayerPro/browser.py:15771 ../GTIPTVPlayerPro/browser.py:15774
+#: ../GTIPTVPlayerPro/browser.py:18022 ../GTIPTVPlayerPro/browser.py:18027
+#: ../GTIPTVPlayerPro/browser.py:18126 ../GTIPTVPlayerPro/browser.py:18139
+#: ../GTIPTVPlayerPro/browser.py:18148 ../GTIPTVPlayerPro/browser.py:20094
+#: ../GTIPTVPlayerPro/browser.py:22909 ../GTIPTVPlayerPro/browser.py:22984
+#: ../GTIPTVPlayerPro/browser.py:23875 ../GTIPTVPlayerPro/browser.py:24151
 #: catalog_messages.py:212
 msgid "Could not open the stream."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:15243 catalog_messages.py:603
+#: ../GTIPTVPlayerPro/browser.py:15241 catalog_messages.py:603
 msgid "No channels found; press GREEN to try again."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:17422 ../GTIPTVPlayerPro/browser.py:17427
-#: ../GTIPTVPlayerPro/browser.py:17447 ../GTIPTVPlayerPro/browser.py:17505
-#: ../GTIPTVPlayerPro/browser.py:22028 ../GTIPTVPlayerPro/browser.py:22039
-#: ../GTIPTVPlayerPro/browser.py:23973 catalog_messages.py:287
+#: ../GTIPTVPlayerPro/browser.py:17461 ../GTIPTVPlayerPro/browser.py:17466
+#: ../GTIPTVPlayerPro/browser.py:17486 ../GTIPTVPlayerPro/browser.py:17544
+#: ../GTIPTVPlayerPro/browser.py:22263 ../GTIPTVPlayerPro/browser.py:22274
+#: ../GTIPTVPlayerPro/browser.py:24309 ../GTIPTVPlayerPro/epg_guide_ui.py:419
+#: catalog_messages.py:287
 msgid "EPG information unavailable."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:17440 ../GTIPTVPlayerPro/browser.py:17524
+#: ../GTIPTVPlayerPro/browser.py:17479 ../GTIPTVPlayerPro/browser.py:17563
 #: catalog_messages.py:631
 msgid "No summary is available for this programme."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:17467 catalog_messages.py:444
+#: ../GTIPTVPlayerPro/browser.py:17506 catalog_messages.py:444
 msgid "LATER"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:18194 ../GTIPTVPlayerPro/browser.py:21876
-#: ../GTIPTVPlayerPro/browser.py:23464 ../GTIPTVPlayerPro/browser.py:23830
-#: ../GTIPTVPlayerPro/browser.py:24640 ../GTIPTVPlayerPro/browser.py:24693
-#: ../GTIPTVPlayerPro/browser.py:26899 ../GTIPTVPlayerPro/browser.py:26990
+#: ../GTIPTVPlayerPro/browser.py:18317 ../GTIPTVPlayerPro/browser.py:22051
+#: ../GTIPTVPlayerPro/browser.py:23789 ../GTIPTVPlayerPro/browser.py:24155
+#: ../GTIPTVPlayerPro/browser.py:25037 ../GTIPTVPlayerPro/browser.py:25090
+#: ../GTIPTVPlayerPro/browser.py:27333 ../GTIPTVPlayerPro/browser.py:27430
 #: catalog_messages.py:438
 msgid "Keeping the current stream"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:18365 catalog_messages.py:1168
+#: ../GTIPTVPlayerPro/browser.py:18491 catalog_messages.py:1168
 #, python-brace-format
 msgid "{}  >  Series  >  Select season and episode"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:18383 ../GTIPTVPlayerPro/browser.py:18386
+#: ../GTIPTVPlayerPro/browser.py:18509 ../GTIPTVPlayerPro/browser.py:18512
 #: catalog_messages.py:291
 msgid "EPISODES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:18478 catalog_messages.py:609
+#: ../GTIPTVPlayerPro/browser.py:18604 catalog_messages.py:609
 msgid "No episodes were found for this series."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:18603 catalog_messages.py:303
+#: ../GTIPTVPlayerPro/browser.py:18729 catalog_messages.py:303
 msgid "Enigma2 player service support is unavailable"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:19694 catalog_messages.py:771
+#: ../GTIPTVPlayerPro/browser.py:19820 catalog_messages.py:771
 #, python-brace-format
 msgid ""
 "Resume playback from the saved position?\n"
@@ -920,121 +1185,141 @@ msgid ""
 "Saved position: {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:19885 ../GTIPTVPlayerPro/browser.py:19899
+#: ../GTIPTVPlayerPro/browser.py:20011 ../GTIPTVPlayerPro/browser.py:20025
 #: catalog_messages.py:917
 msgid "Stream link timed out"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:19966 ../GTIPTVPlayerPro/catchup_ui.py:544
+#: ../GTIPTVPlayerPro/browser.py:20092 ../GTIPTVPlayerPro/catchup_ui.py:544
 #: catalog_messages.py:208
 msgid "Could not open the archived programme."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:20818 catalog_messages.py:687
+#: ../GTIPTVPlayerPro/browser.py:20945 catalog_messages.py:687
 msgid "Player"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:20822 ../GTIPTVPlayerPro/browser.py:23953
-#: catalog_messages.py:747
+#: ../GTIPTVPlayerPro/browser.py:20946 ../GTIPTVPlayerPro/browser.py:21002
+msgid "Web interface"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/browser.py:20954 catalog_messages.py:747
 msgid "Reading resolution"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:20824 ../GTIPTVPlayerPro/browser.py:23962
-#: ../GTIPTVPlayerPro/browser.py:26529 catalog_messages.py:1101
+#: ../GTIPTVPlayerPro/browser.py:20956 catalog_messages.py:1101
 msgid "VIDEO: --"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:20825 ../GTIPTVPlayerPro/browser.py:23963
-#: ../GTIPTVPlayerPro/browser.py:26537 catalog_messages.py:30
+#: ../GTIPTVPlayerPro/browser.py:20957 catalog_messages.py:30
 msgid "AUDIO: --"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:20828 ../GTIPTVPlayerPro/browser.py:23975
-#: catalog_messages.py:467
+#: ../GTIPTVPlayerPro/browser.py:20960 ../GTIPTVPlayerPro/browser.py:24311
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:156
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:246
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:417 catalog_messages.py:467
 msgid "Loading EPG..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:20980 catalog_messages.py:286
+#: ../GTIPTVPlayerPro/browser.py:20998
+msgid "Programme guide"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/browser.py:20999
+msgid "Audio / Subtitles"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/browser.py:21000 ../GTIPTVPlayerPro/browser.py:25650
+#: ../GTIPTVPlayerPro/browser.py:25665 ../GTIPTVPlayerPro/browser.py:25714
+#: ../GTIPTVPlayerPro/video_aspect.py:9 catalog_messages.py:63
+msgid "Aspect ratio"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/browser.py:21001
+msgid "MENU 3s"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/browser.py:21125 catalog_messages.py:286
 msgid "EPG information unavailable"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:21016 ../GTIPTVPlayerPro/browser.py:21044
-#: ../GTIPTVPlayerPro/browser.py:23969 catalog_messages.py:741
+#: ../GTIPTVPlayerPro/browser.py:21161 ../GTIPTVPlayerPro/browser.py:21189
+#: ../GTIPTVPlayerPro/browser.py:24305 catalog_messages.py:741
 msgid "REMAINING"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:21023 ../GTIPTVPlayerPro/catchup_ui.py:242
-#: ../GTIPTVPlayerPro/catchup_ui.py:483 ../GTIPTVPlayerPro/main.py:449
+#: ../GTIPTVPlayerPro/browser.py:21168 ../GTIPTVPlayerPro/catchup_ui.py:242
+#: ../GTIPTVPlayerPro/catchup_ui.py:483 ../GTIPTVPlayerPro/main.py:481
 #: catalog_messages.py:975
 msgid "TV Archive"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:21024 ../GTIPTVPlayerPro/main.py:454
-#: ../GTIPTVPlayerPro/main.py:9407 catalog_messages.py:541
+#: ../GTIPTVPlayerPro/browser.py:21169 ../GTIPTVPlayerPro/main.py:486
+#: ../GTIPTVPlayerPro/main.py:9572 catalog_messages.py:541
 msgid "MOVIES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:21119 ../GTIPTVPlayerPro/browser.py:25514
-#: ../GTIPTVPlayerPro/browser.py:25857 catalog_messages.py:780
+#: ../GTIPTVPlayerPro/browser.py:21264 ../GTIPTVPlayerPro/browser.py:25930
+#: ../GTIPTVPlayerPro/browser.py:26270 catalog_messages.py:780
 msgid "SEEK FORWARD"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:21124 ../GTIPTVPlayerPro/downloads_ui.py:568
-#: ../GTIPTVPlayerPro/main.py:4086 ../GTIPTVPlayerPro/remote_footer.py:128
+#: ../GTIPTVPlayerPro/browser.py:21269 ../GTIPTVPlayerPro/downloads_ui.py:568
+#: ../GTIPTVPlayerPro/main.py:4118 ../GTIPTVPlayerPro/remote_footer.py:202
 #: catalog_messages.py:103
 msgid "Cancel"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:21158 ../GTIPTVPlayerPro/browser.py:25858
+#: ../GTIPTVPlayerPro/browser.py:21303 ../GTIPTVPlayerPro/browser.py:26271
 #: ../GTIPTVPlayerPro/playlist.py:1460 catalog_messages.py:1179
 #, python-brace-format
 msgid "{} minutes"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:22567
+#: ../GTIPTVPlayerPro/browser.py:22806
 #: ../GTIPTVPlayerPro/youtube_preview.py:263
 #: ../GTIPTVPlayerPro/youtube_ui.py:629 ../GTIPTVPlayerPro/youtube_ui.py:806
 #: ../GTIPTVPlayerPro/youtube_ui.py:825 catalog_messages.py:222
 msgid "Could not start the player."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:23259 ../GTIPTVPlayerPro/browser.py:23338
-#: ../GTIPTVPlayerPro/browser.py:23646 catalog_messages.py:752
+#: ../GTIPTVPlayerPro/browser.py:23462 ../GTIPTVPlayerPro/epg_guide_ui.py:274
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:286
+msgid "Could not load the programme guide."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/browser.py:23584 ../GTIPTVPlayerPro/browser.py:23663
+#: ../GTIPTVPlayerPro/browser.py:23971 catalog_messages.py:752
 msgid "Reconnecting the stream..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:23960 ../GTIPTVPlayerPro/remote_footer.py:153
-#: ../GTIPTVPlayerPro/youtube_ui.py:637 ../GTIPTVPlayerPro/youtube_ui.py:909
-#: catalog_messages.py:737
-msgid "Quality"
-msgstr ""
-
-#: ../GTIPTVPlayerPro/browser.py:23966 catalog_messages.py:668
+#: ../GTIPTVPlayerPro/browser.py:24302 catalog_messages.py:668
 msgid "PREVIOUS"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:23980 catalog_messages.py:746
+#: ../GTIPTVPlayerPro/browser.py:24316 catalog_messages.py:746
 msgid "Reading duration..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24081 catalog_messages.py:69
+#: ../GTIPTVPlayerPro/browser.py:24417 catalog_messages.py:69
 msgid "Audio track"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24190 ../GTIPTVPlayerPro/main.py:4469
-#: ../GTIPTVPlayerPro/main.py:4856 ../GTIPTVPlayerPro/main.py:4862
-#: ../GTIPTVPlayerPro/main.py:5217 ../GTIPTVPlayerPro/main.py:8452
-#: ../GTIPTVPlayerPro/remote_footer.py:107
-#: ../GTIPTVPlayerPro/remote_footer.py:110 catalog_messages.py:828
+#: ../GTIPTVPlayerPro/browser.py:24526 ../GTIPTVPlayerPro/main.py:4501
+#: ../GTIPTVPlayerPro/main.py:4893 ../GTIPTVPlayerPro/main.py:4899
+#: ../GTIPTVPlayerPro/main.py:5279 ../GTIPTVPlayerPro/main.py:8598
+#: ../GTIPTVPlayerPro/remote_footer.py:181
+#: ../GTIPTVPlayerPro/remote_footer.py:184 catalog_messages.py:828
 msgid "Select"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24191 ../GTIPTVPlayerPro/browser.py:24277
-#: ../GTIPTVPlayerPro/browser.py:24286 catalog_messages.py:71
+#: ../GTIPTVPlayerPro/browser.py:24527 ../GTIPTVPlayerPro/browser.py:24613
+#: ../GTIPTVPlayerPro/browser.py:24622 catalog_messages.py:71
 msgid "Audio tracks"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24191 ../GTIPTVPlayerPro/main.py:4619
+#: ../GTIPTVPlayerPro/browser.py:24527 ../GTIPTVPlayerPro/main.py:4651
 #: ../GTIPTVPlayerPro/subtitle_browser.py:330
 #: ../GTIPTVPlayerPro/subtitle_browser.py:365
 #: ../GTIPTVPlayerPro/subtitle_browser.py:601
@@ -1046,81 +1331,62 @@ msgstr ""
 msgid "Subtitles"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24219 catalog_messages.py:598
+#: ../GTIPTVPlayerPro/browser.py:24555 catalog_messages.py:598
 msgid "No audio tracks are available."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24223 catalog_messages.py:1057
+#: ../GTIPTVPlayerPro/browser.py:24559 catalog_messages.py:1057
 msgid "This content has only one audio track."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24228 ../GTIPTVPlayerPro/browser.py:24238
-#: ../GTIPTVPlayerPro/browser.py:24292 ../GTIPTVPlayerPro/browser.py:24297
-#: ../GTIPTVPlayerPro/browser.py:24340 catalog_messages.py:70
+#: ../GTIPTVPlayerPro/browser.py:24564 ../GTIPTVPlayerPro/browser.py:24574
+#: ../GTIPTVPlayerPro/browser.py:24628 ../GTIPTVPlayerPro/browser.py:24633
+#: ../GTIPTVPlayerPro/browser.py:24676 catalog_messages.py:70
 msgid "Audio track selection is unavailable on this image."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24307 catalog_messages.py:1031
+#: ../GTIPTVPlayerPro/browser.py:24643 catalog_messages.py:1031
 msgid "The playing service changed. Open audio selection again."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24325 ../GTIPTVPlayerPro/browser.py:24334
+#: ../GTIPTVPlayerPro/browser.py:24661 ../GTIPTVPlayerPro/browser.py:24670
 #: catalog_messages.py:73
 msgid "Audio tracks changed. Open audio selection again."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24350 catalog_messages.py:219
+#: ../GTIPTVPlayerPro/browser.py:24686 catalog_messages.py:219
 msgid "Could not select the requested audio track."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24362 ../GTIPTVPlayerPro/browser.py:26532
-#: catalog_messages.py:31
-#, python-brace-format
-msgid "AUDIO: {}"
-msgstr ""
-
-#: ../GTIPTVPlayerPro/browser.py:24481 catalog_messages.py:124
+#: ../GTIPTVPlayerPro/browser.py:24878 catalog_messages.py:124
 msgid "Changing channel..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24636 ../GTIPTVPlayerPro/browser.py:24689
+#: ../GTIPTVPlayerPro/browser.py:25033 ../GTIPTVPlayerPro/browser.py:25086
 #: catalog_messages.py:209
 msgid "Could not open the channel."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24798 ../GTIPTVPlayerPro/browser.py:24998
-#: ../GTIPTVPlayerPro/browser.py:25191 ../GTIPTVPlayerPro/browser.py:25986
+#: ../GTIPTVPlayerPro/browser.py:25208 ../GTIPTVPlayerPro/browser.py:25414
+#: ../GTIPTVPlayerPro/browser.py:25607 ../GTIPTVPlayerPro/browser.py:26399
 #: catalog_messages.py:665
 msgid "PAUSED"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24798 catalog_messages.py:781
+#: ../GTIPTVPlayerPro/browser.py:25208 catalog_messages.py:781
 msgid "SEEK MODE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24799 catalog_messages.py:445
+#: ../GTIPTVPlayerPro/browser.py:25209 catalog_messages.py:445
 msgid "LEFT / RIGHT to select time   •   OK to continue"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:24999 ../GTIPTVPlayerPro/browser.py:25192
-#: ../GTIPTVPlayerPro/browser.py:25987 catalog_messages.py:667
+#: ../GTIPTVPlayerPro/browser.py:25415 ../GTIPTVPlayerPro/browser.py:25608
+#: ../GTIPTVPlayerPro/browser.py:26400 catalog_messages.py:667
 msgid "PLAY / PAUSE to continue   •   STOP to close the video"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:25234 ../GTIPTVPlayerPro/browser.py:25249
-#: ../GTIPTVPlayerPro/browser.py:25298 ../GTIPTVPlayerPro/video_aspect.py:9
-#: catalog_messages.py:63
-msgid "Aspect ratio"
-msgstr ""
-
-#: ../GTIPTVPlayerPro/browser.py:25234 ../GTIPTVPlayerPro/browser.py:25249
-#: ../GTIPTVPlayerPro/main.py:7998 ../GTIPTVPlayerPro/main.py:8027
-#: ../GTIPTVPlayerPro/main.py:8069 ../GTIPTVPlayerPro/main.py:8110
-#: ../GTIPTVPlayerPro/main.py:9762 catalog_messages.py:643
-msgid "Not available"
-msgstr ""
-
-#: ../GTIPTVPlayerPro/browser.py:25474 ../GTIPTVPlayerPro/main.py:4004
+#: ../GTIPTVPlayerPro/browser.py:25890 ../GTIPTVPlayerPro/main.py:4036
 #: ../GTIPTVPlayerPro/subtitle_browser.py:575
 #: ../GTIPTVPlayerPro/subtitle_browser.py:850
 #: ../GTIPTVPlayerPro/subtitle_browser.py:864
@@ -1129,50 +1395,42 @@ msgstr ""
 msgid "Loading..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:25483 catalog_messages.py:949
+#: ../GTIPTVPlayerPro/browser.py:25899 catalog_messages.py:949
 msgid "THIS STREAM CANNOT BE SEEKED"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:25484 catalog_messages.py:1045
+#: ../GTIPTVPlayerPro/browser.py:25900 catalog_messages.py:1045
 msgid "The server or playback format does not support seeking"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:25516 catalog_messages.py:779
+#: ../GTIPTVPlayerPro/browser.py:25932 catalog_messages.py:779
 msgid "SEEK BACKWARD"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:25520 catalog_messages.py:446
+#: ../GTIPTVPlayerPro/browser.py:25936 catalog_messages.py:446
 msgid "LEFT / RIGHT to select time   •   OK to continue   •   EXIT to cancel"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:25966 catalog_messages.py:664
+#: ../GTIPTVPlayerPro/browser.py:26379 catalog_messages.py:664
 msgid "PAUSE IS NOT AVAILABLE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:25967 catalog_messages.py:1062
+#: ../GTIPTVPlayerPro/browser.py:26380 catalog_messages.py:1062
 msgid "This server or playback format does not support pausing"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:26066 catalog_messages.py:1125
+#: ../GTIPTVPlayerPro/browser.py:26483 catalog_messages.py:1125
 msgid "Weather information is not ready"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:26141 catalog_messages.py:206
+#: ../GTIPTVPlayerPro/browser.py:26582 ../GTIPTVPlayerPro/weather.py:921
+#: catalog_messages.py:206
 msgid "Could not load the weather forecast"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/browser.py:26166 ../GTIPTVPlayerPro/browser.py:26179
+#: ../GTIPTVPlayerPro/browser.py:26606 ../GTIPTVPlayerPro/browser.py:26619
 #: catalog_messages.py:1126
 msgid "Weather information unavailable."
-msgstr ""
-
-#: ../GTIPTVPlayerPro/browser.py:26507 catalog_messages.py:767
-msgid "Resolution: --"
-msgstr ""
-
-#: ../GTIPTVPlayerPro/browser.py:26524 catalog_messages.py:1102
-#, python-brace-format
-msgid "VIDEO: {}"
 msgstr ""
 
 #: ../GTIPTVPlayerPro/catchup.py:91 ../GTIPTVPlayerPro/content.py:298
@@ -1191,8 +1449,8 @@ msgstr ""
 #: ../GTIPTVPlayerPro/catchup.py:363 ../GTIPTVPlayerPro/catchup.py:410
 #: ../GTIPTVPlayerPro/catchup.py:477 ../GTIPTVPlayerPro/content.py:1743
 #: ../GTIPTVPlayerPro/m3u.py:886 ../GTIPTVPlayerPro/m3u.py:892
-#: ../GTIPTVPlayerPro/stalker.py:7852 ../GTIPTVPlayerPro/stalker.py:7987
-#: ../GTIPTVPlayerPro/stalker.py:8074 catalog_messages.py:432
+#: ../GTIPTVPlayerPro/stalker.py:7969 ../GTIPTVPlayerPro/stalker.py:8104
+#: ../GTIPTVPlayerPro/stalker.py:8191 catalog_messages.py:432
 msgid "Invalid playback item"
 msgstr ""
 
@@ -1217,24 +1475,26 @@ msgstr ""
 msgid "Configure an XMLTV guide for this M3U source to use TV archive."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/catchup_stalker.py:426 ../GTIPTVPlayerPro/stalker.py:2779
+#: ../GTIPTVPlayerPro/catchup_stalker.py:426 ../GTIPTVPlayerPro/stalker.py:2891
 #: catalog_messages.py:709
 msgid "Portal request limit reached"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/catchup_stalker.py:430 ../GTIPTVPlayerPro/stalker.py:1975
-#: ../GTIPTVPlayerPro/stalker.py:2553 ../GTIPTVPlayerPro/stalker.py:2573
-#: ../GTIPTVPlayerPro/stalker.py:2587 ../GTIPTVPlayerPro/stalker.py:2765
-#: ../GTIPTVPlayerPro/stalker.py:3125 catalog_messages.py:702
+#: ../GTIPTVPlayerPro/catchup_stalker.py:430 ../GTIPTVPlayerPro/stalker.py:2083
+#: ../GTIPTVPlayerPro/stalker.py:2665 ../GTIPTVPlayerPro/stalker.py:2685
+#: ../GTIPTVPlayerPro/stalker.py:2699 ../GTIPTVPlayerPro/stalker.py:2877
+#: ../GTIPTVPlayerPro/stalker.py:3237 ../GTIPTVPlayerPro/stalker.py:3258
+#: catalog_messages.py:702
 msgid "Portal access denied"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/catchup_ui.py:484 ../GTIPTVPlayerPro/remote_footer.py:131
+#: ../GTIPTVPlayerPro/catchup_ui.py:484 ../GTIPTVPlayerPro/remote_footer.py:205
 #: catalog_messages.py:128
 msgid "Channels"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/catchup_ui.py:523 catalog_messages.py:1178
+#: ../GTIPTVPlayerPro/catchup_ui.py:523 ../GTIPTVPlayerPro/infobar.py:81
+#: catalog_messages.py:1178
 #, python-brace-format
 msgid "{} min"
 msgstr ""
@@ -1360,12 +1620,12 @@ msgstr ""
 msgid "Could not load series episodes"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/content.py:1535 ../GTIPTVPlayerPro/stalker.py:5954
-#: ../GTIPTVPlayerPro/stalker.py:6348 catalog_messages.py:333
+#: ../GTIPTVPlayerPro/content.py:1535 ../GTIPTVPlayerPro/stalker.py:6071
+#: ../GTIPTVPlayerPro/stalker.py:6465 catalog_messages.py:333
 msgid "Episode"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/content.py:1536 ../GTIPTVPlayerPro/stalker.py:5957
+#: ../GTIPTVPlayerPro/content.py:1536 ../GTIPTVPlayerPro/stalker.py:6074
 #: catalog_messages.py:947
 #, python-brace-format
 msgid "S{} E{}"
@@ -1381,7 +1641,7 @@ msgid "Could not create the stream URL"
 msgstr ""
 
 #: ../GTIPTVPlayerPro/discovery.py:67 ../GTIPTVPlayerPro/metadata.py:364
-#: ../GTIPTVPlayerPro/metadata.py:754 ../GTIPTVPlayerPro/metadata.py:822
+#: ../GTIPTVPlayerPro/metadata.py:762 ../GTIPTVPlayerPro/metadata.py:830
 #: catalog_messages.py:953
 msgid "TMDb API key is not configured"
 msgstr ""
@@ -1394,13 +1654,13 @@ msgid "TMDb returned an invalid response"
 msgstr ""
 
 #: ../GTIPTVPlayerPro/discovery.py:260 ../GTIPTVPlayerPro/discovery.py:279
-#: ../GTIPTVPlayerPro/discovery_ui.py:288
-#: ../GTIPTVPlayerPro/discovery_ui.py:360
-#: ../GTIPTVPlayerPro/discovery_ui.py:753 catalog_messages.py:1047
+#: ../GTIPTVPlayerPro/discovery_ui.py:293
+#: ../GTIPTVPlayerPro/discovery_ui.py:365
+#: ../GTIPTVPlayerPro/discovery_ui.py:747 catalog_messages.py:1047
 msgid "The trailer could not be played."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery.py:266 ../GTIPTVPlayerPro/discovery_ui.py:741
+#: ../GTIPTVPlayerPro/discovery.py:266 ../GTIPTVPlayerPro/discovery_ui.py:735
 #: catalog_messages.py:632
 msgid "No trailer is available for this movie."
 msgstr ""
@@ -1417,9 +1677,9 @@ msgstr ""
 msgid "New Releases"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:42 ../GTIPTVPlayerPro/discovery_ui.py:50
-#: ../GTIPTVPlayerPro/discovery_ui.py:667
-#: ../GTIPTVPlayerPro/discovery_ui.py:772 catalog_messages.py:381
+#: ../GTIPTVPlayerPro/discovery_ui.py:42 ../GTIPTVPlayerPro/discovery_ui.py:49
+#: ../GTIPTVPlayerPro/discovery_ui.py:661
+#: ../GTIPTVPlayerPro/discovery_ui.py:766 catalog_messages.py:381
 msgid "Genres"
 msgstr ""
 
@@ -1432,68 +1692,68 @@ msgstr ""
 msgid "Please enter your TMDB API key to use Discover Movies."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:48 catalog_messages.py:563
+#: ../GTIPTVPlayerPro/discovery_ui.py:47 catalog_messages.py:563
 msgid "Movie information"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:49 ../GTIPTVPlayerPro/discovery_ui.py:706
+#: ../GTIPTVPlayerPro/discovery_ui.py:48 ../GTIPTVPlayerPro/discovery_ui.py:700
 #: catalog_messages.py:811
 msgid "Search in IPTV"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:51 ../GTIPTVPlayerPro/discovery_ui.py:423
+#: ../GTIPTVPlayerPro/discovery_ui.py:50 ../GTIPTVPlayerPro/discovery_ui.py:428
 #: catalog_messages.py:884
 msgid "Similar Movies"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:52 ../GTIPTVPlayerPro/discovery_ui.py:374
-#: ../GTIPTVPlayerPro/discovery_ui.py:735
-#: ../GTIPTVPlayerPro/discovery_ui.py:756
-#: ../GTIPTVPlayerPro/discovery_ui.py:773 catalog_messages.py:1075
+#: ../GTIPTVPlayerPro/discovery_ui.py:51 ../GTIPTVPlayerPro/discovery_ui.py:379
+#: ../GTIPTVPlayerPro/discovery_ui.py:729
+#: ../GTIPTVPlayerPro/discovery_ui.py:750
+#: ../GTIPTVPlayerPro/discovery_ui.py:767 catalog_messages.py:1075
 msgid "Trailer"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:177
-#: ../GTIPTVPlayerPro/discovery_ui.py:178
-#: ../GTIPTVPlayerPro/discovery_ui.py:195
-#: ../GTIPTVPlayerPro/discovery_ui.py:463
-#: ../GTIPTVPlayerPro/discovery_ui.py:771 ../GTIPTVPlayerPro/main.py:459
+#: ../GTIPTVPlayerPro/discovery_ui.py:175
+#: ../GTIPTVPlayerPro/discovery_ui.py:176
+#: ../GTIPTVPlayerPro/discovery_ui.py:200
+#: ../GTIPTVPlayerPro/discovery_ui.py:468
+#: ../GTIPTVPlayerPro/discovery_ui.py:765 ../GTIPTVPlayerPro/main.py:491
 #: catalog_messages.py:265
 msgid "Discover Movies"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:223
-#: ../GTIPTVPlayerPro/discovery_ui.py:773
-#: ../GTIPTVPlayerPro/remote_footer.py:127 catalog_messages.py:85
+#: ../GTIPTVPlayerPro/discovery_ui.py:228
+#: ../GTIPTVPlayerPro/discovery_ui.py:767
+#: ../GTIPTVPlayerPro/remote_footer.py:201 catalog_messages.py:85
 msgid "Back"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:361 ../GTIPTVPlayerPro/metadata.py:406
+#: ../GTIPTVPlayerPro/discovery_ui.py:366 ../GTIPTVPlayerPro/metadata.py:406
 #: catalog_messages.py:183
 msgid "Could not connect to the TMDb service"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:374 ../GTIPTVPlayerPro/main.py:6991
-#: ../GTIPTVPlayerPro/remote_footer.py:122 ../GTIPTVPlayerPro/youtube_ui.py:472
+#: ../GTIPTVPlayerPro/discovery_ui.py:379 ../GTIPTVPlayerPro/main.py:7137
+#: ../GTIPTVPlayerPro/remote_footer.py:196 ../GTIPTVPlayerPro/youtube_ui.py:472
 #: ../GTIPTVPlayerPro/youtube_ui.py:564 ../GTIPTVPlayerPro/youtube_ui.py:584
 #: ../GTIPTVPlayerPro/youtube_ui.py:599 ../GTIPTVPlayerPro/youtube_ui.py:750
 #: catalog_messages.py:773
 msgid "Retry"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:400
-#: ../GTIPTVPlayerPro/discovery_ui.py:718
-#: ../GTIPTVPlayerPro/discovery_ui.py:765
-#: ../GTIPTVPlayerPro/discovery_ui.py:803 catalog_messages.py:819
+#: ../GTIPTVPlayerPro/discovery_ui.py:405
+#: ../GTIPTVPlayerPro/discovery_ui.py:712
+#: ../GTIPTVPlayerPro/discovery_ui.py:759
+#: ../GTIPTVPlayerPro/discovery_ui.py:797 catalog_messages.py:819
 msgid "Search the selected movie in your active IPTV account."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:401 catalog_messages.py:617
+#: ../GTIPTVPlayerPro/discovery_ui.py:406 catalog_messages.py:617
 msgid "No movies found."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/discovery_ui.py:772
-#: ../GTIPTVPlayerPro/remote_footer.py:126 catalog_messages.py:755
+#: ../GTIPTVPlayerPro/discovery_ui.py:766 ../GTIPTVPlayerPro/epg_guide_ui.py:52
+#: ../GTIPTVPlayerPro/remote_footer.py:200 catalog_messages.py:755
 msgid "Refresh"
 msgstr ""
 
@@ -1514,16 +1774,13 @@ msgstr ""
 msgid "Completed"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/downloads.py:41 catalog_messages.py:107
-msgid "Cancelled"
-msgstr ""
-
-#: ../GTIPTVPlayerPro/downloads.py:41 ../GTIPTVPlayerPro/main.py:4788
-#: ../GTIPTVPlayerPro/main.py:7906 ../GTIPTVPlayerPro/main.py:7958
-#: ../GTIPTVPlayerPro/main.py:8044 ../GTIPTVPlayerPro/main.py:8100
-#: ../GTIPTVPlayerPro/main.py:8137 ../GTIPTVPlayerPro/main.py:8934
-#: ../GTIPTVPlayerPro/main.py:9057 ../GTIPTVPlayerPro/main.py:9166
-#: ../GTIPTVPlayerPro/main.py:9168 ../GTIPTVPlayerPro/subtitle_browser.py:819
+#: ../GTIPTVPlayerPro/downloads.py:41 ../GTIPTVPlayerPro/main.py:317
+#: ../GTIPTVPlayerPro/main.py:342 ../GTIPTVPlayerPro/main.py:4822
+#: ../GTIPTVPlayerPro/main.py:8052 ../GTIPTVPlayerPro/main.py:8104
+#: ../GTIPTVPlayerPro/main.py:8190 ../GTIPTVPlayerPro/main.py:8246
+#: ../GTIPTVPlayerPro/main.py:8283 ../GTIPTVPlayerPro/main.py:9081
+#: ../GTIPTVPlayerPro/main.py:9204 ../GTIPTVPlayerPro/main.py:9316
+#: ../GTIPTVPlayerPro/main.py:9318 ../GTIPTVPlayerPro/subtitle_browser.py:819
 #: ../GTIPTVPlayerPro/subtitle_browser.py:839
 #: ../GTIPTVPlayerPro/subtitle_browser.py:865
 #: ../GTIPTVPlayerPro/subtitle_browser.py:874
@@ -1534,7 +1791,7 @@ msgid "Error"
 msgstr ""
 
 #: ../GTIPTVPlayerPro/downloads.py:42 ../GTIPTVPlayerPro/downloads_ui.py:370
-#: ../GTIPTVPlayerPro/m3u.py:146 ../GTIPTVPlayerPro/main.py:7231
+#: ../GTIPTVPlayerPro/m3u.py:146 ../GTIPTVPlayerPro/main.py:7377
 #: catalog_messages.py:481
 msgid "Local file"
 msgstr ""
@@ -1550,10 +1807,6 @@ msgstr ""
 
 #: ../GTIPTVPlayerPro/downloads.py:47 catalog_messages.py:139
 msgid "Choose a writable recording folder first."
-msgstr ""
-
-#: ../GTIPTVPlayerPro/downloads.py:48 catalog_messages.py:646
-msgid "Not enough free space."
 msgstr ""
 
 #: ../GTIPTVPlayerPro/downloads.py:49 catalog_messages.py:276
@@ -1589,10 +1842,9 @@ msgstr ""
 msgid "Pause / Resume"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/downloads_ui.py:33 ../GTIPTVPlayerPro/main.py:5861
-#: ../GTIPTVPlayerPro/main.py:5995 ../GTIPTVPlayerPro/main.py:8150
-#: ../GTIPTVPlayerPro/remote_footer.py:118
-#: ../GTIPTVPlayerPro/remote_footer.py:120 catalog_messages.py:250
+#: ../GTIPTVPlayerPro/downloads_ui.py:33 ../GTIPTVPlayerPro/main.py:6059
+#: ../GTIPTVPlayerPro/main.py:8296 ../GTIPTVPlayerPro/remote_footer.py:192
+#: ../GTIPTVPlayerPro/remote_footer.py:194 catalog_messages.py:250
 msgid "Delete"
 msgstr ""
 
@@ -1614,8 +1866,8 @@ msgstr ""
 
 #: ../GTIPTVPlayerPro/downloads_ui.py:198
 #: ../GTIPTVPlayerPro/downloads_ui.py:199
-#: ../GTIPTVPlayerPro/downloads_ui.py:224 ../GTIPTVPlayerPro/main.py:4621
-#: ../GTIPTVPlayerPro/main.py:4843 catalog_messages.py:282
+#: ../GTIPTVPlayerPro/downloads_ui.py:224 ../GTIPTVPlayerPro/main.py:4653
+#: ../GTIPTVPlayerPro/main.py:4880 catalog_messages.py:282
 msgid "Downloads"
 msgstr ""
 
@@ -1623,14 +1875,10 @@ msgstr ""
 msgid "Download details"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/downloads_ui.py:308 catalog_messages.py:374
-msgid "Free space"
-msgstr ""
-
 #: ../GTIPTVPlayerPro/downloads_ui.py:309 ../GTIPTVPlayerPro/m3u_epg_ui.py:848
-#: ../GTIPTVPlayerPro/main.py:4798 ../GTIPTVPlayerPro/subtitle_ui.py:479
-#: ../GTIPTVPlayerPro/subtitle_ui.py:484 ../GTIPTVPlayerPro/subtitle_ui.py:490
-#: catalog_messages.py:645
+#: ../GTIPTVPlayerPro/main.py:4832 ../GTIPTVPlayerPro/restore_dashboard.py:136
+#: ../GTIPTVPlayerPro/subtitle_ui.py:479 ../GTIPTVPlayerPro/subtitle_ui.py:484
+#: ../GTIPTVPlayerPro/subtitle_ui.py:490 catalog_messages.py:645
 msgid "Not configured"
 msgstr ""
 
@@ -1663,18 +1911,9 @@ msgstr ""
 msgid "File not found."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/downloads_ui.py:568 ../GTIPTVPlayerPro/main.py:7333
-#: ../GTIPTVPlayerPro/remote_footer.py:115 catalog_messages.py:795
+#: ../GTIPTVPlayerPro/downloads_ui.py:568 ../GTIPTVPlayerPro/main.py:7479
+#: ../GTIPTVPlayerPro/remote_footer.py:189 catalog_messages.py:795
 msgid "Save"
-msgstr ""
-
-#: ../GTIPTVPlayerPro/downloads_ui.py:627 ../GTIPTVPlayerPro/m3u_epg_ui.py:472
-#: ../GTIPTVPlayerPro/m3u_epg_ui.py:663 ../GTIPTVPlayerPro/m3u_epg_ui.py:718
-#: ../GTIPTVPlayerPro/main.py:7564 ../GTIPTVPlayerPro/main.py:7636
-#: ../GTIPTVPlayerPro/main.py:7681 ../GTIPTVPlayerPro/main.py:8194
-#: ../GTIPTVPlayerPro/main.py:8262 ../GTIPTVPlayerPro/main.py:8303
-#: ../GTIPTVPlayerPro/remote_footer.py:139 catalog_messages.py:916
-msgid "Storage"
 msgstr ""
 
 #: ../GTIPTVPlayerPro/downloads_ui.py:673 catalog_messages.py:277
@@ -1705,7 +1944,7 @@ msgid "Update in normal standby"
 msgstr ""
 
 #: ../GTIPTVPlayerPro/dvb_epg_ui.py:586 ../GTIPTVPlayerPro/m3u_epg_ui.py:752
-#: ../GTIPTVPlayerPro/main.py:4105 catalog_messages.py:453
+#: ../GTIPTVPlayerPro/main.py:4137 catalog_messages.py:453
 msgid "Last update"
 msgstr ""
 
@@ -1763,26 +2002,28 @@ msgid "{} hours"
 msgstr ""
 
 #: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
-#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
-#: ../GTIPTVPlayerPro/main.py:793 ../GTIPTVPlayerPro/main.py:794
-#: ../GTIPTVPlayerPro/main.py:4189 ../GTIPTVPlayerPro/main.py:4522
-#: ../GTIPTVPlayerPro/main.py:4525 ../GTIPTVPlayerPro/main.py:4785
-#: ../GTIPTVPlayerPro/main.py:4793 ../GTIPTVPlayerPro/subtitle_ui.py:473
-#: ../GTIPTVPlayerPro/youtube_ui.py:124 catalog_messages.py:652
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/infobar.py:114
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:850 ../GTIPTVPlayerPro/main.py:825
+#: ../GTIPTVPlayerPro/main.py:826 ../GTIPTVPlayerPro/main.py:4221
+#: ../GTIPTVPlayerPro/main.py:4554 ../GTIPTVPlayerPro/main.py:4557
+#: ../GTIPTVPlayerPro/main.py:4819 ../GTIPTVPlayerPro/main.py:4827
+#: ../GTIPTVPlayerPro/subtitle_ui.py:473 ../GTIPTVPlayerPro/youtube_ui.py:124
+#: catalog_messages.py:652
 msgid "On"
 msgstr ""
 
 #: ../GTIPTVPlayerPro/dvb_epg_ui.py:674 ../GTIPTVPlayerPro/dvb_epg_ui.py:677
-#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/m3u_epg_ui.py:850
-#: ../GTIPTVPlayerPro/main.py:798 ../GTIPTVPlayerPro/main.py:799
-#: ../GTIPTVPlayerPro/main.py:802 ../GTIPTVPlayerPro/main.py:4189
-#: ../GTIPTVPlayerPro/main.py:4522 ../GTIPTVPlayerPro/main.py:4525
-#: ../GTIPTVPlayerPro/main.py:4787 ../GTIPTVPlayerPro/main.py:4793
-#: ../GTIPTVPlayerPro/main.py:10151 ../GTIPTVPlayerPro/main.py:10157
-#: ../GTIPTVPlayerPro/subtitle_ui.py:473 ../GTIPTVPlayerPro/subtitle_ui.py:497
-#: ../GTIPTVPlayerPro/subtitles.py:203 ../GTIPTVPlayerPro/subtitles.py:682
-#: ../GTIPTVPlayerPro/web_ui.py:307 ../GTIPTVPlayerPro/web_ui.py:343
-#: ../GTIPTVPlayerPro/youtube_ui.py:124 catalog_messages.py:651
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:982 ../GTIPTVPlayerPro/infobar.py:114
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:850 ../GTIPTVPlayerPro/main.py:830
+#: ../GTIPTVPlayerPro/main.py:831 ../GTIPTVPlayerPro/main.py:834
+#: ../GTIPTVPlayerPro/main.py:4221 ../GTIPTVPlayerPro/main.py:4554
+#: ../GTIPTVPlayerPro/main.py:4557 ../GTIPTVPlayerPro/main.py:4821
+#: ../GTIPTVPlayerPro/main.py:4827 ../GTIPTVPlayerPro/main.py:10322
+#: ../GTIPTVPlayerPro/main.py:10328 ../GTIPTVPlayerPro/subtitle_ui.py:473
+#: ../GTIPTVPlayerPro/subtitle_ui.py:497 ../GTIPTVPlayerPro/subtitles.py:203
+#: ../GTIPTVPlayerPro/subtitles.py:682 ../GTIPTVPlayerPro/web_ui.py:307
+#: ../GTIPTVPlayerPro/web_ui.py:343 ../GTIPTVPlayerPro/youtube_ui.py:124
+#: catalog_messages.py:651
 msgid "Off"
 msgstr ""
 
@@ -1809,8 +2050,8 @@ msgstr ""
 
 #: ../GTIPTVPlayerPro/dvb_epg_ui.py:745 ../GTIPTVPlayerPro/dvb_epg_ui.py:1062
 #: ../GTIPTVPlayerPro/m3u_epg_ui.py:955 ../GTIPTVPlayerPro/m3u_epg_ui.py:1012
-#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1031 ../GTIPTVPlayerPro/main.py:4709
-#: ../GTIPTVPlayerPro/main.py:4878 ../GTIPTVPlayerPro/main.py:5269
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1031 ../GTIPTVPlayerPro/main.py:4743
+#: ../GTIPTVPlayerPro/main.py:4915 ../GTIPTVPlayerPro/main.py:5331
 #: ../GTIPTVPlayerPro/subtitle_ui.py:369 ../GTIPTVPlayerPro/subtitle_ui.py:679
 #: ../GTIPTVPlayerPro/youtube_ui.py:109 catalog_messages.py:721
 msgid "Press GREEN to save the changes."
@@ -1990,9 +2231,9 @@ msgid ""
 "matching."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1783 ../GTIPTVPlayerPro/main.py:800
-#: ../GTIPTVPlayerPro/main.py:801 ../GTIPTVPlayerPro/main.py:8932
-#: ../GTIPTVPlayerPro/main.py:9055 catalog_messages.py:88
+#: ../GTIPTVPlayerPro/dvb_epg_ui.py:1783 ../GTIPTVPlayerPro/main.py:832
+#: ../GTIPTVPlayerPro/main.py:833 ../GTIPTVPlayerPro/main.py:9079
+#: ../GTIPTVPlayerPro/main.py:9202 catalog_messages.py:88
 msgid "Blocked"
 msgstr ""
 
@@ -2069,6 +2310,82 @@ msgstr ""
 
 #: ../GTIPTVPlayerPro/dvb_epg_ui.py:2263 catalog_messages.py:1145
 msgid "XMLTV channel filter cleared."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:50
+msgid "Day"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:50
+msgid "Programme"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:51
+msgid "Now"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:52
+msgid "Return to fullscreen"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:152
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:197
+msgid "EPG programme guide"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:153
+msgid "Days"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:154
+msgid "Daily schedule"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:155
+msgid "Selected programme"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:176
+msgid "Live preview is unavailable on this image."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:390
+#, python-brace-format
+msgid "Available days: {}"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:397
+msgid "Tomorrow"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:418
+msgid "No programmes for this day."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:426
+#, python-brace-format
+msgid "Duration: {} min"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:429
+msgid "Programme description unavailable."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:438
+msgid "On air now"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:438
+msgid "Upcoming"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:438
+msgid "Finished"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/epg_guide_ui.py:439
+#, python-brace-format
+msgid "{} min remaining"
 msgstr ""
 
 #: ../GTIPTVPlayerPro/i18n.py:147 ../GTIPTVPlayerPro/i18n.py:148
@@ -2176,6 +2493,43 @@ msgstr ""
 msgid "Chinese"
 msgstr ""
 
+#: ../GTIPTVPlayerPro/infobar.py:63
+msgid "Stream"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/infobar.py:73
+msgid "Net"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/infobar.py:73
+msgid "Network speed"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/infobar.py:80
+#, python-brace-format
+msgid "{} h {} min"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/infobar.py:82
+#, python-brace-format
+msgid "Remaining: {}"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/infobar.py:106
+#, python-brace-format
+msgid "Audio: {}"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/infobar.py:117
+#, python-brace-format
+msgid "Subtitles: {}"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/infobar.py:126
+#, python-brace-format
+msgid "Source: {}"
+msgstr ""
+
 #: ../GTIPTVPlayerPro/local_player.py:190 catalog_messages.py:1066
 msgid ""
 "This video could not be played. Check the playback engine and file format."
@@ -2194,8 +2548,8 @@ msgid "M3U source location is invalid."
 msgstr ""
 
 #: ../GTIPTVPlayerPro/m3u.py:121 ../GTIPTVPlayerPro/m3u.py:1730
-#: ../GTIPTVPlayerPro/main.py:7690 ../GTIPTVPlayerPro/main.py:7698
-#: ../GTIPTVPlayerPro/main.py:8522 ../GTIPTVPlayerPro/main.py:8554
+#: ../GTIPTVPlayerPro/main.py:7836 ../GTIPTVPlayerPro/main.py:7844
+#: ../GTIPTVPlayerPro/main.py:8668 ../GTIPTVPlayerPro/main.py:8700
 #: catalog_messages.py:496
 msgid "M3U file path is invalid."
 msgstr ""
@@ -2458,13 +2812,13 @@ msgstr ""
 msgid "Enable external XMLTV EPG"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/m3u_epg_ui.py:748 ../GTIPTVPlayerPro/main.py:7112
-#: ../GTIPTVPlayerPro/main.py:7272 ../GTIPTVPlayerPro/main.py:7731
-#: ../GTIPTVPlayerPro/main.py:7778 catalog_messages.py:899
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:748 ../GTIPTVPlayerPro/main.py:7258
+#: ../GTIPTVPlayerPro/main.py:7418 ../GTIPTVPlayerPro/main.py:7877
+#: ../GTIPTVPlayerPro/main.py:7924 catalog_messages.py:899
 msgid "Source type"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/m3u_epg_ui.py:753 ../GTIPTVPlayerPro/main.py:6630
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:753 ../GTIPTVPlayerPro/main.py:6757
 #: ../GTIPTVPlayerPro/web_ui.py:303 ../GTIPTVPlayerPro/web_ui.py:307
 #: ../GTIPTVPlayerPro/web_ui.py:316 ../GTIPTVPlayerPro/web_ui.py:326
 #: ../GTIPTVPlayerPro/web_ui.py:330 ../GTIPTVPlayerPro/web_ui.py:334
@@ -2485,13 +2839,13 @@ msgstr ""
 msgid "Updates run in the background. Channel changes never download EPG data."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8380
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8526
 #: catalog_messages.py:478
 msgid "Local / NAS"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8381
-#: ../GTIPTVPlayerPro/main.py:8443 ../GTIPTVPlayerPro/playlist.py:1559
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:851 ../GTIPTVPlayerPro/main.py:8527
+#: ../GTIPTVPlayerPro/main.py:8589 ../GTIPTVPlayerPro/playlist.py:1559
 #: ../GTIPTVPlayerPro/web_ui.py:214 ../GTIPTVPlayerPro/web_ui.py:299
 #: catalog_messages.py:1133
 msgid "Web URL"
@@ -2513,8 +2867,8 @@ msgstr ""
 msgid "File selection cancelled."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1018 ../GTIPTVPlayerPro/main.py:7440
-#: ../GTIPTVPlayerPro/main.py:8577 ../GTIPTVPlayerPro/main.py:8803
+#: ../GTIPTVPlayerPro/m3u_epg_ui.py:1018 ../GTIPTVPlayerPro/main.py:7586
+#: ../GTIPTVPlayerPro/main.py:8723 ../GTIPTVPlayerPro/main.py:8949
 #: catalog_messages.py:359
 msgid "Field entry cancelled."
 msgstr ""
@@ -2553,38 +2907,37 @@ msgstr ""
 msgid "The XMLTV update could not be queued. Try again shortly."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:318 ../GTIPTVPlayerPro/main.py:7477
-#: ../GTIPTVPlayerPro/main.py:7956 ../GTIPTVPlayerPro/main.py:8930
-#: ../GTIPTVPlayerPro/main.py:9049 ../GTIPTVPlayerPro/stalker.py:8895
+#: ../GTIPTVPlayerPro/main.py:326 ../GTIPTVPlayerPro/main.py:7623
+#: ../GTIPTVPlayerPro/main.py:8102 ../GTIPTVPlayerPro/main.py:9077
+#: ../GTIPTVPlayerPro/main.py:9196 ../GTIPTVPlayerPro/stalker.py:9014
 #: ../GTIPTVPlayerPro/web_ui.py:316 catalog_messages.py:39
 msgid "Active"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:319 ../GTIPTVPlayerPro/playlist.py:1289
-#: ../GTIPTVPlayerPro/stalker.py:8900 catalog_messages.py:176
+#: ../GTIPTVPlayerPro/main.py:327 ../GTIPTVPlayerPro/playlist.py:1289
+#: ../GTIPTVPlayerPro/stalker.py:9019 catalog_messages.py:176
 msgid "Connection limit reached"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:320 ../GTIPTVPlayerPro/main.py:5856
-#: ../GTIPTVPlayerPro/main.py:5873 ../GTIPTVPlayerPro/main.py:5925
-#: ../GTIPTVPlayerPro/main.py:6389 catalog_messages.py:413
+#: ../GTIPTVPlayerPro/main.py:328 ../GTIPTVPlayerPro/main.py:342
+#: catalog_messages.py:413
 msgid "Inactive"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:321 ../GTIPTVPlayerPro/main.py:325
-#: ../GTIPTVPlayerPro/main.py:331 ../GTIPTVPlayerPro/main.py:781
-#: ../GTIPTVPlayerPro/main.py:825 ../GTIPTVPlayerPro/main.py:6608
-#: ../GTIPTVPlayerPro/main.py:6609 ../GTIPTVPlayerPro/main.py:8913
-#: ../GTIPTVPlayerPro/main.py:8942 ../GTIPTVPlayerPro/main.py:9006
-#: ../GTIPTVPlayerPro/main.py:9026 ../GTIPTVPlayerPro/main.py:9058
-#: ../GTIPTVPlayerPro/main.py:9116 ../GTIPTVPlayerPro/main.py:9195
-#: ../GTIPTVPlayerPro/main.py:9200 ../GTIPTVPlayerPro/main.py:9212
-#: ../GTIPTVPlayerPro/main.py:9213 ../GTIPTVPlayerPro/main.py:9214
-#: ../GTIPTVPlayerPro/main.py:9232 ../GTIPTVPlayerPro/main.py:9826
-#: ../GTIPTVPlayerPro/main.py:9830 ../GTIPTVPlayerPro/main.py:10122
-#: ../GTIPTVPlayerPro/main.py:10135 ../GTIPTVPlayerPro/main.py:10161
-#: ../GTIPTVPlayerPro/main.py:10162 ../GTIPTVPlayerPro/main.py:10249
-#: ../GTIPTVPlayerPro/main.py:10250 ../GTIPTVPlayerPro/playlist.py:245
+#: ../GTIPTVPlayerPro/main.py:329 ../GTIPTVPlayerPro/main.py:357
+#: ../GTIPTVPlayerPro/main.py:363 ../GTIPTVPlayerPro/main.py:813
+#: ../GTIPTVPlayerPro/main.py:857 ../GTIPTVPlayerPro/main.py:6735
+#: ../GTIPTVPlayerPro/main.py:6736 ../GTIPTVPlayerPro/main.py:9060
+#: ../GTIPTVPlayerPro/main.py:9089 ../GTIPTVPlayerPro/main.py:9153
+#: ../GTIPTVPlayerPro/main.py:9173 ../GTIPTVPlayerPro/main.py:9205
+#: ../GTIPTVPlayerPro/main.py:9263 ../GTIPTVPlayerPro/main.py:9351
+#: ../GTIPTVPlayerPro/main.py:9356 ../GTIPTVPlayerPro/main.py:9368
+#: ../GTIPTVPlayerPro/main.py:9369 ../GTIPTVPlayerPro/main.py:9370
+#: ../GTIPTVPlayerPro/main.py:9388 ../GTIPTVPlayerPro/main.py:9991
+#: ../GTIPTVPlayerPro/main.py:9995 ../GTIPTVPlayerPro/main.py:10293
+#: ../GTIPTVPlayerPro/main.py:10306 ../GTIPTVPlayerPro/main.py:10332
+#: ../GTIPTVPlayerPro/main.py:10333 ../GTIPTVPlayerPro/main.py:10420
+#: ../GTIPTVPlayerPro/main.py:10421 ../GTIPTVPlayerPro/playlist.py:245
 #: ../GTIPTVPlayerPro/playlist.py:1241 ../GTIPTVPlayerPro/playlist.py:1297
 #: ../GTIPTVPlayerPro/playlist.py:1301 ../GTIPTVPlayerPro/playlist.py:1303
 #: ../GTIPTVPlayerPro/playlist.py:1304 ../GTIPTVPlayerPro/playlist.py:1305
@@ -2593,61 +2946,61 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:408 catalog_messages.py:635
+#: ../GTIPTVPlayerPro/main.py:440 catalog_messages.py:635
 msgid "No valid M3U source was found"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:422 catalog_messages.py:1087
+#: ../GTIPTVPlayerPro/main.py:454 catalog_messages.py:1087
 msgid "Unsupported source type"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:445 catalog_messages.py:34
+#: ../GTIPTVPlayerPro/main.py:477 catalog_messages.py:34
 msgid "Access your channels quickly"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:450 catalog_messages.py:1121
+#: ../GTIPTVPlayerPro/main.py:482 catalog_messages.py:1121
 msgid "Watch programmes you missed"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:455 catalog_messages.py:342
+#: ../GTIPTVPlayerPro/main.py:487 catalog_messages.py:342
 msgid "Explore your movie library"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:460 catalog_messages.py:266
+#: ../GTIPTVPlayerPro/main.py:492 catalog_messages.py:266
 msgid "Discover new movies with TMDB recommendations"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:465 catalog_messages.py:91
+#: ../GTIPTVPlayerPro/main.py:497 catalog_messages.py:91
 msgid "Browse seasons and episodes"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:469 ../GTIPTVPlayerPro/main.py:9409
+#: ../GTIPTVPlayerPro/main.py:501 ../GTIPTVPlayerPro/main.py:9574
 #: catalog_messages.py:100
 msgid "CONTINUE WATCHING"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:470 catalog_messages.py:772
+#: ../GTIPTVPlayerPro/main.py:502 catalog_messages.py:772
 msgid "Resume unfinished movies and series episodes"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:474 ../GTIPTVPlayerPro/main.py:9419
-#: ../GTIPTVPlayerPro/main.py:9421 catalog_messages.py:348
+#: ../GTIPTVPlayerPro/main.py:506 ../GTIPTVPlayerPro/main.py:9584
+#: ../GTIPTVPlayerPro/main.py:9586 catalog_messages.py:348
 msgid "FAVORITES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:475 catalog_messages.py:356
+#: ../GTIPTVPlayerPro/main.py:507 catalog_messages.py:356
 msgid "Favorite channels, movies and series in one place"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:479 catalog_messages.py:789
+#: ../GTIPTVPlayerPro/main.py:511 catalog_messages.py:789
 msgid "SETTINGS"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:480 catalog_messages.py:545
+#: ../GTIPTVPlayerPro/main.py:512 catalog_messages.py:545
 msgid "Manage the player and appearance"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:487 catalog_messages.py:1181
+#: ../GTIPTVPlayerPro/main.py:519 catalog_messages.py:1181
 #, python-brace-format
 msgid ""
 "{} v{}\n"
@@ -2670,41 +3023,41 @@ msgid ""
 "username and password are not sent to these services."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:517 catalog_messages.py:790
+#: ../GTIPTVPlayerPro/main.py:549 catalog_messages.py:790
 msgid "SOURCE CODE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:517 catalog_messages.py:742
+#: ../GTIPTVPlayerPro/main.py:549 catalog_messages.py:742
 msgid "REPORT AN ISSUE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:517 catalog_messages.py:447
+#: ../GTIPTVPlayerPro/main.py:549 catalog_messages.py:447
 msgid "LICENSE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:795 ../GTIPTVPlayerPro/web_ui.py:326
+#: ../GTIPTVPlayerPro/main.py:827 ../GTIPTVPlayerPro/web_ui.py:326
 #: ../GTIPTVPlayerPro/web_ui.py:327 catalog_messages.py:172
 msgid "Connected"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:796 ../GTIPTVPlayerPro/main.py:8932
-#: ../GTIPTVPlayerPro/main.py:9054 catalog_messages.py:93
+#: ../GTIPTVPlayerPro/main.py:828 ../GTIPTVPlayerPro/main.py:9079
+#: ../GTIPTVPlayerPro/main.py:9201 catalog_messages.py:93
 msgid "Busy"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:797 ../GTIPTVPlayerPro/main.py:9052
+#: ../GTIPTVPlayerPro/main.py:829 ../GTIPTVPlayerPro/main.py:9199
 #: catalog_messages.py:1118
 msgid "Warning"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:803 ../GTIPTVPlayerPro/main.py:8012
-#: ../GTIPTVPlayerPro/main.py:8317 ../GTIPTVPlayerPro/main.py:8322
-#: ../GTIPTVPlayerPro/main.py:8326 ../GTIPTVPlayerPro/main.py:9057
-#: ../GTIPTVPlayerPro/stalker.py:8923 catalog_messages.py:426
+#: ../GTIPTVPlayerPro/main.py:835 ../GTIPTVPlayerPro/main.py:8158
+#: ../GTIPTVPlayerPro/main.py:8463 ../GTIPTVPlayerPro/main.py:8468
+#: ../GTIPTVPlayerPro/main.py:8472 ../GTIPTVPlayerPro/main.py:9204
+#: ../GTIPTVPlayerPro/stalker.py:9042 catalog_messages.py:426
 msgid "Invalid"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:807 catalog_messages.py:745
+#: ../GTIPTVPlayerPro/main.py:839 catalog_messages.py:745
 #, python-brace-format
 msgid ""
 "Read time: {} ms\n"
@@ -2718,7 +3071,7 @@ msgid ""
 "{}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:817 catalog_messages.py:457
+#: ../GTIPTVPlayerPro/main.py:849 catalog_messages.py:457
 #, python-brace-format
 msgid ""
 "Latency: {} ms\n"
@@ -2729,234 +3082,234 @@ msgid ""
 "{}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:3841 ../GTIPTVPlayerPro/main.py:3877
-#: ../GTIPTVPlayerPro/main.py:4622 ../GTIPTVPlayerPro/main.py:4840
+#: ../GTIPTVPlayerPro/main.py:3873 ../GTIPTVPlayerPro/main.py:3909
+#: ../GTIPTVPlayerPro/main.py:4654 ../GTIPTVPlayerPro/main.py:4877
 #: catalog_messages.py:1122
 msgid "Weather"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4013 catalog_messages.py:613
+#: ../GTIPTVPlayerPro/main.py:4045 catalog_messages.py:613
 msgid "No items found."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4102 catalog_messages.py:883
+#: ../GTIPTVPlayerPro/main.py:4134 catalog_messages.py:883
 msgid "Show weather"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4103 ../GTIPTVPlayerPro/main.py:4274
+#: ../GTIPTVPlayerPro/main.py:4135 ../GTIPTVPlayerPro/main.py:4306
 #: catalog_messages.py:150
 msgid "City"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4104 catalog_messages.py:982
+#: ../GTIPTVPlayerPro/main.py:4136 catalog_messages.py:982
 msgid "Temperature unit"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4154 catalog_messages.py:1114
+#: ../GTIPTVPlayerPro/main.py:4186 catalog_messages.py:1114
 msgid "WEATHER"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4161 catalog_messages.py:725
+#: ../GTIPTVPlayerPro/main.py:4193 catalog_messages.py:725
 msgid "Press OK on the City row to open the keyboard."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4185 catalog_messages.py:872
+#: ../GTIPTVPlayerPro/main.py:4217 catalog_messages.py:872
 msgid "Settings - Weather"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4227 catalog_messages.py:874
+#: ../GTIPTVPlayerPro/main.py:4259 catalog_messages.py:874
 #, python-brace-format
 msgid "Settings could not be saved: {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4240 catalog_messages.py:1124
+#: ../GTIPTVPlayerPro/main.py:4272 catalog_messages.py:1124
 msgid "Weather display updated."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4244 catalog_messages.py:983
+#: ../GTIPTVPlayerPro/main.py:4276 catalog_messages.py:983
 msgid "Temperature unit updated."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4257 catalog_messages.py:1026
+#: ../GTIPTVPlayerPro/main.py:4289 catalog_messages.py:1026
 msgid "The last-update time refreshes when weather data is received."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4281 catalog_messages.py:151
+#: ../GTIPTVPlayerPro/main.py:4313 catalog_messages.py:151
 msgid "City change cancelled."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4310 catalog_messages.py:133
+#: ../GTIPTVPlayerPro/main.py:4342 catalog_messages.py:133
 #, python-brace-format
 msgid "Checking {}..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4375 catalog_messages.py:641
+#: ../GTIPTVPlayerPro/main.py:4407 catalog_messages.py:641
 msgid "No weather forecast is available for this city."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4393 catalog_messages.py:1185
+#: ../GTIPTVPlayerPro/main.py:4425 catalog_messages.py:1185
 #, python-brace-format
 msgid "{} was saved."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4418 catalog_messages.py:908
+#: ../GTIPTVPlayerPro/main.py:4450 catalog_messages.py:908
 msgid "Standard"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4419 ../GTIPTVPlayerPro/subtitle_ui.py:506
+#: ../GTIPTVPlayerPro/main.py:4451 ../GTIPTVPlayerPro/subtitle_ui.py:506
 #: catalog_messages.py:452
 msgid "Large"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4420 catalog_messages.py:1107
+#: ../GTIPTVPlayerPro/main.py:4452 catalog_messages.py:1107
 msgid "Very large"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4423 catalog_messages.py:992
+#: ../GTIPTVPlayerPro/main.py:4455 catalog_messages.py:992
 msgid "Text size"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4424 catalog_messages.py:149
+#: ../GTIPTVPlayerPro/main.py:4456 catalog_messages.py:149
 msgid "Cinematic view"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4425 catalog_messages.py:882
+#: ../GTIPTVPlayerPro/main.py:4457 catalog_messages.py:882
 msgid "Show in device main menu"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4426 catalog_messages.py:840
+#: ../GTIPTVPlayerPro/main.py:4458 catalog_messages.py:840
 msgid "Selection color"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4427 catalog_messages.py:839
+#: ../GTIPTVPlayerPro/main.py:4459 catalog_messages.py:839
 msgid "Selection border color"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4456 ../GTIPTVPlayerPro/main.py:4459
-#: ../GTIPTVPlayerPro/main.py:4494 ../GTIPTVPlayerPro/main.py:4618
+#: ../GTIPTVPlayerPro/main.py:4488 ../GTIPTVPlayerPro/main.py:4491
+#: ../GTIPTVPlayerPro/main.py:4526 ../GTIPTVPlayerPro/main.py:4650
 #: ../GTIPTVPlayerPro/subtitle_ui.py:352 catalog_messages.py:60
 msgid "Appearance"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4611 catalog_messages.py:463
+#: ../GTIPTVPlayerPro/main.py:4643 catalog_messages.py:463
 msgid "Live TV service type"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4612 catalog_messages.py:568
+#: ../GTIPTVPlayerPro/main.py:4644 catalog_messages.py:568
 msgid "Movie service type"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4613 catalog_messages.py:849
+#: ../GTIPTVPlayerPro/main.py:4645 catalog_messages.py:849
 msgid "Series service type"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4614 catalog_messages.py:962
+#: ../GTIPTVPlayerPro/main.py:4646 catalog_messages.py:962
 msgid "TMDb metadata enrichment"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4615 catalog_messages.py:951
+#: ../GTIPTVPlayerPro/main.py:4647 catalog_messages.py:951
 msgid "TMDb API key / token"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4616 catalog_messages.py:232
+#: ../GTIPTVPlayerPro/main.py:4648 catalog_messages.py:232
 msgid "DVB EPG"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4617 catalog_messages.py:113
+#: ../GTIPTVPlayerPro/main.py:4649 catalog_messages.py:113
 msgid "Category edit lock"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4620 ../GTIPTVPlayerPro/main.py:7730
-#: ../GTIPTVPlayerPro/main.py:7772 ../GTIPTVPlayerPro/main.py:7840
-#: ../GTIPTVPlayerPro/main.py:7879 ../GTIPTVPlayerPro/main.py:8210
-#: ../GTIPTVPlayerPro/main.py:8255 catalog_messages.py:834
+#: ../GTIPTVPlayerPro/main.py:4652 ../GTIPTVPlayerPro/main.py:7876
+#: ../GTIPTVPlayerPro/main.py:7918 ../GTIPTVPlayerPro/main.py:7986
+#: ../GTIPTVPlayerPro/main.py:8025 ../GTIPTVPlayerPro/main.py:8356
+#: ../GTIPTVPlayerPro/main.py:8401 catalog_messages.py:834
 msgid "Select playlist"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4623 ../GTIPTVPlayerPro/main.py:4837
+#: ../GTIPTVPlayerPro/main.py:4655 ../GTIPTVPlayerPro/main.py:4874
 #: ../GTIPTVPlayerPro/web_ui.py:211 ../GTIPTVPlayerPro/web_ui.py:248
 #: ../GTIPTVPlayerPro/web_ui.py:297 catalog_messages.py:1132
 msgid "Web Interface"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4624 ../GTIPTVPlayerPro/youtube_ui.py:865
+#: ../GTIPTVPlayerPro/main.py:4656 ../GTIPTVPlayerPro/youtube_ui.py:865
 #: catalog_messages.py:1157
 msgid "YouTube"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4692 catalog_messages.py:688
+#: ../GTIPTVPlayerPro/main.py:4726 catalog_messages.py:688
 msgid "Player / Codec"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4694 catalog_messages.py:443
+#: ../GTIPTVPlayerPro/main.py:4728 catalog_messages.py:443
 msgid "LANGUAGE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4744 catalog_messages.py:871
+#: ../GTIPTVPlayerPro/main.py:4778 catalog_messages.py:871
 msgid "Settings - Player / Codec"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4775 ../GTIPTVPlayerPro/remote_footer.py:125
+#: ../GTIPTVPlayerPro/main.py:4809 ../GTIPTVPlayerPro/remote_footer.py:199
 #: catalog_messages.py:654
 msgid "Open"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4796 catalog_messages.py:168
+#: ../GTIPTVPlayerPro/main.py:4830 catalog_messages.py:168
 #, python-brace-format
 msgid "Configured ••••{}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4834 ../GTIPTVPlayerPro/youtube_ui.py:101
+#: ../GTIPTVPlayerPro/main.py:4871 ../GTIPTVPlayerPro/youtube_ui.py:101
 #: ../GTIPTVPlayerPro/youtube_ui.py:119 catalog_messages.py:1163
 msgid "YouTube settings"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4847 catalog_messages.py:728
+#: ../GTIPTVPlayerPro/main.py:4884 catalog_messages.py:728
 msgid "Press OK to open the DVB EPG settings."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4852 catalog_messages.py:729
+#: ../GTIPTVPlayerPro/main.py:4889 catalog_messages.py:729
 msgid "Press OK to turn the category edit lock on or off."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4859 catalog_messages.py:657
+#: ../GTIPTVPlayerPro/main.py:4896 catalog_messages.py:657
 msgid "Open independent subtitle settings."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4866 catalog_messages.py:727
+#: ../GTIPTVPlayerPro/main.py:4903 catalog_messages.py:727
 msgid "Press OK to enter or change the TMDb key."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:4928 catalog_messages.py:875
+#: ../GTIPTVPlayerPro/main.py:4990 catalog_messages.py:875
 msgid "Settings saved"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5012 ../GTIPTVPlayerPro/main.py:5032
-#: ../GTIPTVPlayerPro/main.py:8114 catalog_messages.py:1021
+#: ../GTIPTVPlayerPro/main.py:5074 ../GTIPTVPlayerPro/main.py:5094
+#: ../GTIPTVPlayerPro/main.py:8260 catalog_messages.py:1021
 msgid "The confirmation screen is unavailable on this image."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5025 catalog_messages.py:263
+#: ../GTIPTVPlayerPro/main.py:5087 catalog_messages.py:263
 msgid "Disable the category edit lock?"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5037 catalog_messages.py:226
+#: ../GTIPTVPlayerPro/main.py:5099 catalog_messages.py:226
 msgid "Create category edit PIN"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5047 catalog_messages.py:169
+#: ../GTIPTVPlayerPro/main.py:5109 catalog_messages.py:169
 msgid "Confirm category edit PIN"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5073 catalog_messages.py:115
+#: ../GTIPTVPlayerPro/main.py:5135 catalog_messages.py:115
 msgid "Category edit lock could not be saved. Check the receiver storage."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5081 catalog_messages.py:118
+#: ../GTIPTVPlayerPro/main.py:5143 catalog_messages.py:118
 msgid "Category edit lock enabled."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5084 catalog_messages.py:1138
+#: ../GTIPTVPlayerPro/main.py:5146 catalog_messages.py:1138
 #, python-brace-format
 msgid ""
 "Write down this recovery code. It is shown only once:\n"
@@ -2967,635 +3320,630 @@ msgid ""
 "this lock."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5095 catalog_messages.py:262
+#: ../GTIPTVPlayerPro/main.py:5157 catalog_messages.py:262
 msgid "Disable category edit lock"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5096 catalog_messages.py:325
+#: ../GTIPTVPlayerPro/main.py:5158 catalog_messages.py:325
 msgid "Enter the current 4-digit PIN."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5116 catalog_messages.py:415
+#: ../GTIPTVPlayerPro/main.py:5178 catalog_messages.py:415
 msgid "Incorrect PIN. Lock unchanged."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5129 catalog_messages.py:417
+#: ../GTIPTVPlayerPro/main.py:5191 catalog_messages.py:417
 msgid "Incorrect recovery code. Lock unchanged."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5142 catalog_messages.py:117
+#: ../GTIPTVPlayerPro/main.py:5204 catalog_messages.py:117
 msgid "Category edit lock disabled."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5147 catalog_messages.py:114
+#: ../GTIPTVPlayerPro/main.py:5209 catalog_messages.py:114
 msgid "Category edit lock could not be removed. Check the receiver storage."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5158 catalog_messages.py:234
+#: ../GTIPTVPlayerPro/main.py:5220 catalog_messages.py:234
 msgid "DVB EPG settings are unavailable on this image."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5274 catalog_messages.py:235
+#: ../GTIPTVPlayerPro/main.py:5336 catalog_messages.py:235
 msgid "DVB EPG settings closed."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5291 catalog_messages.py:323
+#: ../GTIPTVPlayerPro/main.py:5353 catalog_messages.py:323
 msgid "Enter the TMDb API key or access token"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5298 catalog_messages.py:958
+#: ../GTIPTVPlayerPro/main.py:5360 catalog_messages.py:958
 msgid "TMDb key change cancelled."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5304 catalog_messages.py:960
+#: ../GTIPTVPlayerPro/main.py:5366 catalog_messages.py:960
 msgid "TMDb key saved; press BLUE to test and GREEN to save."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5306 catalog_messages.py:959
+#: ../GTIPTVPlayerPro/main.py:5368 catalog_messages.py:959
 msgid "TMDb key cleared; press GREEN to save."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5312 catalog_messages.py:1013
+#: ../GTIPTVPlayerPro/main.py:5374 catalog_messages.py:1013
 msgid "The TMDb connection test is still running..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5316 catalog_messages.py:591
+#: ../GTIPTVPlayerPro/main.py:5378 catalog_messages.py:591
 msgid "No TMDb key is configured. Press OK on the key row."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5321 catalog_messages.py:991
+#: ../GTIPTVPlayerPro/main.py:5383 catalog_messages.py:991
 msgid "Testing the TMDb connection and API key..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5350 catalog_messages.py:957
+#: ../GTIPTVPlayerPro/main.py:5412 catalog_messages.py:957
 msgid "TMDb connection successful; the API key is valid."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5354 catalog_messages.py:8
+#: ../GTIPTVPlayerPro/main.py:5416 catalog_messages.py:8
 msgid " Metadata enrichment is currently disabled."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5360 catalog_messages.py:973
+#: ../GTIPTVPlayerPro/main.py:5422 catalog_messages.py:973
 #, python-brace-format
 msgid "TMDb test failed: {}."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5363 ../GTIPTVPlayerPro/main.py:5381
+#: ../GTIPTVPlayerPro/main.py:5425 ../GTIPTVPlayerPro/main.py:5443
 #: catalog_messages.py:972
 msgid "TMDb test failed: could not connect."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5482 ../GTIPTVPlayerPro/main.py:5498
-#: ../GTIPTVPlayerPro/main.py:5695 ../GTIPTVPlayerPro/main.py:9172
-#: catalog_messages.py:1025
+#: ../GTIPTVPlayerPro/main.py:5544 ../GTIPTVPlayerPro/main.py:5560
+#: ../GTIPTVPlayerPro/main.py:5752 ../GTIPTVPlayerPro/main.py:9322
+#: ../GTIPTVPlayerPro/main.py:9324 catalog_messages.py:1025
 msgid "The health check could not be completed."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5611 ../GTIPTVPlayerPro/main.py:5654
-#: ../GTIPTVPlayerPro/main.py:9206 ../GTIPTVPlayerPro/main.py:9247
-#: ../GTIPTVPlayerPro/main.py:9286 catalog_messages.py:422
+#: ../GTIPTVPlayerPro/main.py:5674 ../GTIPTVPlayerPro/main.py:5717
+#: ../GTIPTVPlayerPro/main.py:9362 ../GTIPTVPlayerPro/main.py:9403
+#: ../GTIPTVPlayerPro/main.py:9442 catalog_messages.py:422
 msgid "Information"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5771 ../GTIPTVPlayerPro/main.py:5859
-#: ../GTIPTVPlayerPro/main.py:5878 ../GTIPTVPlayerPro/main.py:5927
-#: ../GTIPTVPlayerPro/main.py:6378 ../GTIPTVPlayerPro/main.py:6408
-#: ../GTIPTVPlayerPro/remote_footer.py:137 catalog_messages.py:37
+#: ../GTIPTVPlayerPro/main.py:5828 ../GTIPTVPlayerPro/main.py:5927
+#: ../GTIPTVPlayerPro/main.py:5943 ../GTIPTVPlayerPro/main.py:5991
+#: ../GTIPTVPlayerPro/main.py:6507 ../GTIPTVPlayerPro/main.py:6535
+#: ../GTIPTVPlayerPro/remote_footer.py:211 catalog_messages.py:37
 msgid "Accounts"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5772 ../GTIPTVPlayerPro/main.py:5783
-#: ../GTIPTVPlayerPro/main.py:9114 ../GTIPTVPlayerPro/main.py:10109
+#: ../GTIPTVPlayerPro/main.py:5829 ../GTIPTVPlayerPro/main.py:5840
+#: ../GTIPTVPlayerPro/main.py:9261 ../GTIPTVPlayerPro/main.py:10280
 #: catalog_messages.py:948
 msgid "TESTING..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5797 ../GTIPTVPlayerPro/main.py:6409
-#: ../GTIPTVPlayerPro/main.py:7117 ../GTIPTVPlayerPro/remote_footer.py:104
+#: ../GTIPTVPlayerPro/main.py:5854 ../GTIPTVPlayerPro/main.py:6536
+#: ../GTIPTVPlayerPro/main.py:7263 ../GTIPTVPlayerPro/remote_footer.py:178
 #: catalog_messages.py:35
 msgid "Account"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:5927 ../GTIPTVPlayerPro/main.py:6737
-#: ../GTIPTVPlayerPro/main.py:8121 catalog_messages.py:254
+#: ../GTIPTVPlayerPro/main.py:5991 ../GTIPTVPlayerPro/main.py:6864
+#: ../GTIPTVPlayerPro/main.py:8267 catalog_messages.py:254
 #, python-brace-format
 msgid "Delete {}?"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6033 ../GTIPTVPlayerPro/main.py:6818
-#: ../GTIPTVPlayerPro/main.py:8137 catalog_messages.py:188
+#: ../GTIPTVPlayerPro/main.py:6097 ../GTIPTVPlayerPro/main.py:6945
+#: ../GTIPTVPlayerPro/main.py:8283 catalog_messages.py:188
 #, python-brace-format
 msgid "Could not delete the source: {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6179 catalog_messages.py:783
+#: ../GTIPTVPlayerPro/main.py:6250 catalog_messages.py:783
 msgid "SELECTED SOURCE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6189 ../GTIPTVPlayerPro/main.py:6658
-#: ../GTIPTVPlayerPro/remote_footer.py:119
-#: ../GTIPTVPlayerPro/remote_footer.py:121 catalog_messages.py:171
+#: ../GTIPTVPlayerPro/main.py:6260 ../GTIPTVPlayerPro/main.py:6785
+#: ../GTIPTVPlayerPro/remote_footer.py:193
+#: ../GTIPTVPlayerPro/remote_footer.py:195 catalog_messages.py:171
 msgid "Connect"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6264 ../GTIPTVPlayerPro/main.py:7044
+#: ../GTIPTVPlayerPro/main.py:6335 ../GTIPTVPlayerPro/main.py:7190
 #: catalog_messages.py:1151
 msgid "Xtream Codes Accounts"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6265 ../GTIPTVPlayerPro/main.py:7045
+#: ../GTIPTVPlayerPro/main.py:6336 ../GTIPTVPlayerPro/main.py:7191
 #: catalog_messages.py:487
 msgid "M3U Sources"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6266 ../GTIPTVPlayerPro/main.py:7046
+#: ../GTIPTVPlayerPro/main.py:6337 ../GTIPTVPlayerPro/main.py:7192
 #: catalog_messages.py:907
 msgid "Stalker / MAC Portal Accounts"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6267 ../GTIPTVPlayerPro/main.py:6408
-#: ../GTIPTVPlayerPro/main.py:10040 ../GTIPTVPlayerPro/remote_footer.py:138
+#: ../GTIPTVPlayerPro/main.py:6338 ../GTIPTVPlayerPro/main.py:6535
+#: ../GTIPTVPlayerPro/main.py:10211 ../GTIPTVPlayerPro/remote_footer.py:212
 #: catalog_messages.py:901
 msgid "Sources"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6377 ../GTIPTVPlayerPro/main.py:6839
+#: ../GTIPTVPlayerPro/main.py:6506 ../GTIPTVPlayerPro/main.py:6966
 #: catalog_messages.py:1182
 #, python-brace-format
 msgid "{} was deleted ({} records)."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6428 catalog_messages.py:630
+#: ../GTIPTVPlayerPro/main.py:6555 catalog_messages.py:630
 msgid ""
 "No source was found.\n"
 "\n"
 "Create one from the ADD SOURCE panel on the home screen."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6458 ../GTIPTVPlayerPro/main.py:6477
-#: ../GTIPTVPlayerPro/main.py:7196 ../GTIPTVPlayerPro/main.py:7265
-#: ../GTIPTVPlayerPro/main.py:7324 ../GTIPTVPlayerPro/main.py:7371
+#: ../GTIPTVPlayerPro/main.py:6585 ../GTIPTVPlayerPro/main.py:6604
+#: ../GTIPTVPlayerPro/main.py:7342 ../GTIPTVPlayerPro/main.py:7411
+#: ../GTIPTVPlayerPro/main.py:7470 ../GTIPTVPlayerPro/main.py:7517
 #: catalog_messages.py:43
 msgid "Add Source"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6508 ../GTIPTVPlayerPro/main.py:6598
-#: ../GTIPTVPlayerPro/main.py:8015 ../GTIPTVPlayerPro/main.py:8103
-#: ../GTIPTVPlayerPro/main.py:10006 ../GTIPTVPlayerPro/web_ui.py:334
+#: ../GTIPTVPlayerPro/main.py:6635 ../GTIPTVPlayerPro/main.py:6725
+#: ../GTIPTVPlayerPro/main.py:8161 ../GTIPTVPlayerPro/main.py:8249
+#: ../GTIPTVPlayerPro/main.py:10177 ../GTIPTVPlayerPro/web_ui.py:334
 #: catalog_messages.py:749
 msgid "Ready to connect"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6608 ../GTIPTVPlayerPro/main.py:6644
-#: ../GTIPTVPlayerPro/main.py:9261 ../GTIPTVPlayerPro/main.py:10112
-#: ../GTIPTVPlayerPro/main.py:10125 ../GTIPTVPlayerPro/main.py:10168
+#: ../GTIPTVPlayerPro/main.py:6735 ../GTIPTVPlayerPro/main.py:6771
+#: ../GTIPTVPlayerPro/main.py:9417 ../GTIPTVPlayerPro/main.py:10283
+#: ../GTIPTVPlayerPro/main.py:10296 ../GTIPTVPlayerPro/main.py:10339
 #: catalog_messages.py:341
 #, python-brace-format
 msgid "Expiry: {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6712 catalog_messages.py:138
+#: ../GTIPTVPlayerPro/main.py:6839 catalog_messages.py:138
 msgid "Choose a source type first."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6727 catalog_messages.py:629
+#: ../GTIPTVPlayerPro/main.py:6854 catalog_messages.py:629
 msgid "No source is selected for deletion."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6731 catalog_messages.py:211
+#: ../GTIPTVPlayerPro/main.py:6858 catalog_messages.py:211
 msgid "Could not open the deletion confirmation."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6748 catalog_messages.py:892
+#: ../GTIPTVPlayerPro/main.py:6875 catalog_messages.py:892
 msgid "Source deletion cancelled."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6877 ../GTIPTVPlayerPro/main.py:6915
-#: ../GTIPTVPlayerPro/main.py:10328 catalog_messages.py:12
+#: ../GTIPTVPlayerPro/main.py:7004 ../GTIPTVPlayerPro/main.py:7061
+#: ../GTIPTVPlayerPro/main.py:10499 catalog_messages.py:12
 msgid "A source connection is already in progress."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6906 ../GTIPTVPlayerPro/main.py:9078
+#: ../GTIPTVPlayerPro/main.py:7052 ../GTIPTVPlayerPro/main.py:9225
 #: catalog_messages.py:1142
 msgid "XMLTV EPG settings could not be opened."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6912 ../GTIPTVPlayerPro/main.py:8022
+#: ../GTIPTVPlayerPro/main.py:7058 ../GTIPTVPlayerPro/main.py:8168
 #: catalog_messages.py:628
 msgid "No source is available to connect."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6943 ../GTIPTVPlayerPro/main.py:10348
+#: ../GTIPTVPlayerPro/main.py:7089 ../GTIPTVPlayerPro/main.py:10519
 #: catalog_messages.py:98
 msgid "CONNECTING..."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6957 catalog_messages.py:175
+#: ../GTIPTVPlayerPro/main.py:7103 catalog_messages.py:175
 #, python-brace-format
 msgid "Connecting to {}, please wait."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6968 ../GTIPTVPlayerPro/main.py:10359
+#: ../GTIPTVPlayerPro/main.py:7114 ../GTIPTVPlayerPro/main.py:10530
 #: catalog_messages.py:97
 msgid "CONNECTED"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6972 catalog_messages.py:650
+#: ../GTIPTVPlayerPro/main.py:7118 catalog_messages.py:650
 msgid "OPENING MAIN PANEL"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6975 catalog_messages.py:173
+#: ../GTIPTVPlayerPro/main.py:7121 catalog_messages.py:173
 #, python-brace-format
 msgid "Connected to {}."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:6995 ../GTIPTVPlayerPro/main.py:10376
+#: ../GTIPTVPlayerPro/main.py:7141 ../GTIPTVPlayerPro/main.py:10547
 #: catalog_messages.py:186
 #, python-brace-format
 msgid "Could not connect to {}: {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7031 ../GTIPTVPlayerPro/main.py:7091
+#: ../GTIPTVPlayerPro/main.py:7177 ../GTIPTVPlayerPro/main.py:7237
 #: catalog_messages.py:544
 msgid "Manage Sources"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7034 ../GTIPTVPlayerPro/main.py:7733
+#: ../GTIPTVPlayerPro/main.py:7180 ../GTIPTVPlayerPro/main.py:7879
 #: catalog_messages.py:148
 msgid "Choose the source type you want to manage."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7047 ../GTIPTVPlayerPro/main.py:7214
-#: ../GTIPTVPlayerPro/main.py:7744 catalog_messages.py:856
+#: ../GTIPTVPlayerPro/main.py:7193 ../GTIPTVPlayerPro/main.py:7360
+#: ../GTIPTVPlayerPro/main.py:7890 catalog_messages.py:856
 msgid "Server URL, username and password"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7048 ../GTIPTVPlayerPro/main.py:7217
+#: ../GTIPTVPlayerPro/main.py:7194 ../GTIPTVPlayerPro/main.py:7363
 #: catalog_messages.py:482
 msgid "Local file, NAS or web link"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7049 ../GTIPTVPlayerPro/main.py:7220
-#: ../GTIPTVPlayerPro/main.py:7747 ../GTIPTVPlayerPro/main.py:9386
+#: ../GTIPTVPlayerPro/main.py:7195 ../GTIPTVPlayerPro/main.py:7366
+#: ../GTIPTVPlayerPro/main.py:7893 ../GTIPTVPlayerPro/main.py:9551
 #: catalog_messages.py:695
 msgid "Portal"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7140 catalog_messages.py:293
+#: ../GTIPTVPlayerPro/main.py:7286 catalog_messages.py:293
 msgid ""
 "Each source type is listed separately. Each section can contain up to 500 "
 "sources."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7175 catalog_messages.py:1152
+#: ../GTIPTVPlayerPro/main.py:7321 catalog_messages.py:1152
 msgid "Xtream Codes provides Live TV, Movies and Series."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7177 catalog_messages.py:533
+#: ../GTIPTVPlayerPro/main.py:7323 catalog_messages.py:533
 msgid ""
 "M3U sources provide Live TV only. Categories, search and favorites are "
 "supported."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7181 ../GTIPTVPlayerPro/main.py:7344
-#: ../GTIPTVPlayerPro/main.py:8921 catalog_messages.py:1000
+#: ../GTIPTVPlayerPro/main.py:7327 ../GTIPTVPlayerPro/main.py:7490
+#: ../GTIPTVPlayerPro/main.py:9068 catalog_messages.py:1000
 msgid ""
 "The Stalker / MAC portal will be checked automatically when this screen "
 "opens."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7199 catalog_messages.py:147
+#: ../GTIPTVPlayerPro/main.py:7345 catalog_messages.py:147
 msgid "Choose the source type to add."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7306 ../GTIPTVPlayerPro/stalker.py:583
-#: ../GTIPTVPlayerPro/stalker.py:587 ../GTIPTVPlayerPro/stalker.py:596
-#: ../GTIPTVPlayerPro/stalker.py:598 catalog_messages.py:314
+#: ../GTIPTVPlayerPro/main.py:7452 ../GTIPTVPlayerPro/stalker.py:633
+#: ../GTIPTVPlayerPro/stalker.py:637 ../GTIPTVPlayerPro/stalker.py:646
+#: ../GTIPTVPlayerPro/stalker.py:648 catalog_messages.py:314
 msgid "Enter a valid portal URL"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7307 ../GTIPTVPlayerPro/stalker.py:576
-#: catalog_messages.py:312
+#: ../GTIPTVPlayerPro/main.py:7453 ../GTIPTVPlayerPro/stalker.py:521
+#: ../GTIPTVPlayerPro/stalker.py:592 ../GTIPTVPlayerPro/stalker.py:608
+#: ../GTIPTVPlayerPro/stalker.py:612 catalog_messages.py:312
 msgid "Enter a valid MAC address"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7327 ../GTIPTVPlayerPro/main.py:8364
+#: ../GTIPTVPlayerPro/main.py:7473 ../GTIPTVPlayerPro/main.py:8510
 #: catalog_messages.py:893
 msgid "Source details"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7331 catalog_messages.py:699
+#: ../GTIPTVPlayerPro/main.py:7477 catalog_messages.py:699
 msgid "Portal URL / MAC"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7332 catalog_messages.py:377
+#: ../GTIPTVPlayerPro/main.py:7478 catalog_messages.py:377
 msgid "GREEN"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7387 catalog_messages.py:698
+#: ../GTIPTVPlayerPro/main.py:7533 catalog_messages.py:698
 msgid "Portal URL"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7395 catalog_messages.py:535
+#: ../GTIPTVPlayerPro/main.py:7541 catalog_messages.py:535
 msgid "MAC address"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7450 ../GTIPTVPlayerPro/main.py:8570
-#: ../GTIPTVPlayerPro/main.py:8583 ../GTIPTVPlayerPro/main.py:8810
+#: ../GTIPTVPlayerPro/main.py:7596 ../GTIPTVPlayerPro/main.py:8716
+#: ../GTIPTVPlayerPro/main.py:8729 ../GTIPTVPlayerPro/main.py:8956
 #: catalog_messages.py:423
 msgid "Information received. Edit the next field or press GREEN to save."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7579 ../GTIPTVPlayerPro/main.py:7625
+#: ../GTIPTVPlayerPro/main.py:7725 ../GTIPTVPlayerPro/main.py:7771
 #: ../GTIPTVPlayerPro/playlist.py:1557 catalog_messages.py:479
 msgid "Local / NAS file"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7582 ../GTIPTVPlayerPro/main.py:8213
-#: ../GTIPTVPlayerPro/main.py:8383 catalog_messages.py:257
+#: ../GTIPTVPlayerPro/main.py:7728 ../GTIPTVPlayerPro/main.py:8359
+#: ../GTIPTVPlayerPro/main.py:8529 catalog_messages.py:257
 msgid "Device, USB or mounted network storage"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:7947 catalog_messages.py:45
+#: ../GTIPTVPlayerPro/main.py:8093 catalog_messages.py:45
 msgid "Add playlist"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8038 ../GTIPTVPlayerPro/playlist.py:1121
+#: ../GTIPTVPlayerPro/main.py:8184 ../GTIPTVPlayerPro/playlist.py:1121
 #: catalog_messages.py:634
 msgid "No valid IPTV source was found"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8084 ../GTIPTVPlayerPro/remote_footer.py:113
+#: ../GTIPTVPlayerPro/main.py:8230 ../GTIPTVPlayerPro/remote_footer.py:187
 #: catalog_messages.py:759
 msgid "Rename"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8341 catalog_messages.py:309
+#: ../GTIPTVPlayerPro/main.py:8487 catalog_messages.py:309
 msgid "Enter a name for the M3U source"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8343 catalog_messages.py:321
+#: ../GTIPTVPlayerPro/main.py:8489 catalog_messages.py:321
 msgid "Enter the M3U file path or HTTP(S) URL"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8362 ../GTIPTVPlayerPro/main.py:8419
+#: ../GTIPTVPlayerPro/main.py:8508 ../GTIPTVPlayerPro/main.py:8565
 #: catalog_messages.py:41
 msgid "Add M3U Source"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8367 catalog_messages.py:383
+#: ../GTIPTVPlayerPro/main.py:8513 catalog_messages.py:383
 msgid "Give the source a name and choose its location."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8370 catalog_messages.py:894
+#: ../GTIPTVPlayerPro/main.py:8516 catalog_messages.py:894
 msgid "Source name"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8386 catalog_messages.py:260
+#: ../GTIPTVPlayerPro/main.py:8532 catalog_messages.py:260
 msgid "Direct HTTP(S) M3U link"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8424 catalog_messages.py:490
+#: ../GTIPTVPlayerPro/main.py:8570 catalog_messages.py:490
 msgid "M3U URL must start with http:// or https://."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8441 catalog_messages.py:311
+#: ../GTIPTVPlayerPro/main.py:8587 catalog_messages.py:311
 msgid "Enter a source name"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8443 catalog_messages.py:361
-msgid "File path"
-msgstr ""
-
-#: ../GTIPTVPlayerPro/main.py:8452 ../GTIPTVPlayerPro/remote_footer.py:112
+#: ../GTIPTVPlayerPro/main.py:8598 ../GTIPTVPlayerPro/remote_footer.py:186
 #: ../GTIPTVPlayerPro/subtitle_browser.py:808 catalog_messages.py:294
 msgid "Edit"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8618 catalog_messages.py:215
+#: ../GTIPTVPlayerPro/main.py:8764 catalog_messages.py:215
 #, python-brace-format
 msgid "Could not save the M3U source: {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8627 catalog_messages.py:1183
+#: ../GTIPTVPlayerPro/main.py:8773 catalog_messages.py:1183
 #, python-brace-format
 msgid "{} was saved as an M3U Live TV source."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8640 catalog_messages.py:328
+#: ../GTIPTVPlayerPro/main.py:8786 catalog_messages.py:328
 msgid "Enter the server URL"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8641 ../GTIPTVPlayerPro/main.py:8714
+#: ../GTIPTVPlayerPro/main.py:8787 ../GTIPTVPlayerPro/main.py:8860
 #: ../GTIPTVPlayerPro/subtitle_runtime.py:1306
 #: ../GTIPTVPlayerPro/subtitle_ui.py:298 ../GTIPTVPlayerPro/subtitle_ui.py:588
 #: ../GTIPTVPlayerPro/subtitle_ui.py:755 catalog_messages.py:330
 msgid "Enter the username"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8642 ../GTIPTVPlayerPro/main.py:8718
+#: ../GTIPTVPlayerPro/main.py:8788 ../GTIPTVPlayerPro/main.py:8864
 #: ../GTIPTVPlayerPro/subtitle_runtime.py:1306
 #: ../GTIPTVPlayerPro/subtitle_ui.py:299 ../GTIPTVPlayerPro/subtitle_ui.py:591
 #: ../GTIPTVPlayerPro/subtitle_ui.py:762 catalog_messages.py:326
 msgid "Enter the password"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8664 ../GTIPTVPlayerPro/main.py:8701
+#: ../GTIPTVPlayerPro/main.py:8810 ../GTIPTVPlayerPro/main.py:8847
 #: catalog_messages.py:14
 msgid "ADD NEW ACCOUNT"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8666 ../GTIPTVPlayerPro/main.py:8704
+#: ../GTIPTVPlayerPro/main.py:8812 ../GTIPTVPlayerPro/main.py:8850
 #: catalog_messages.py:724
 msgid "Press OK in a text field; use LEFT / RIGHT on the output row."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8675 catalog_messages.py:720
+#: ../GTIPTVPlayerPro/main.py:8821 catalog_messages.py:720
 msgid ""
 "Press GREEN to save  |  Select a TS or M3U8 output supported by the server."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8698 ../GTIPTVPlayerPro/main.py:8702
+#: ../GTIPTVPlayerPro/main.py:8844 ../GTIPTVPlayerPro/main.py:8848
 #: catalog_messages.py:42
 msgid "Add New Account"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8721 catalog_messages.py:5
+#: ../GTIPTVPlayerPro/main.py:8867 catalog_messages.py:5
 #, python-brace-format
 msgid "  SERVER URL        {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8726 catalog_messages.py:6
+#: ../GTIPTVPlayerPro/main.py:8872 catalog_messages.py:6
 #, python-brace-format
 msgid "  USERNAME          {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8730 catalog_messages.py:4
+#: ../GTIPTVPlayerPro/main.py:8876 catalog_messages.py:4
 #, python-brace-format
 msgid "  PASSWORD          {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8733 catalog_messages.py:3
+#: ../GTIPTVPlayerPro/main.py:8879 catalog_messages.py:3
 #, python-brace-format
 msgid "  OUTPUT FORMAT     {}     Change with LEFT / RIGHT"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8766 catalog_messages.py:462
+#: ../GTIPTVPlayerPro/main.py:8912 catalog_messages.py:462
 #, python-brace-format
 msgid "Live TV output selected: {}."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8825 catalog_messages.py:216
+#: ../GTIPTVPlayerPro/main.py:8971 catalog_messages.py:216
 #, python-brace-format
 msgid "Could not save the account: {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8835 catalog_messages.py:1184
+#: ../GTIPTVPlayerPro/main.py:8981 catalog_messages.py:1184
 #, python-brace-format
 msgid "{} was saved with {} output."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8893 ../GTIPTVPlayerPro/main.py:8966
+#: ../GTIPTVPlayerPro/main.py:9040 ../GTIPTVPlayerPro/main.py:9113
 #: catalog_messages.py:890
 msgid "Source Health"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8895 ../GTIPTVPlayerPro/main.py:8968
+#: ../GTIPTVPlayerPro/main.py:9042 ../GTIPTVPlayerPro/main.py:9115
 #: catalog_messages.py:697
 msgid "Portal Health"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8895 ../GTIPTVPlayerPro/main.py:8968
+#: ../GTIPTVPlayerPro/main.py:9042 ../GTIPTVPlayerPro/main.py:9115
 #: catalog_messages.py:852
 msgid "Server Health"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8909 ../GTIPTVPlayerPro/main.py:8940
+#: ../GTIPTVPlayerPro/main.py:9056 ../GTIPTVPlayerPro/main.py:9087
 #: catalog_messages.py:1113
 msgid "WAITING FOR TEST"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8917 catalog_messages.py:995
+#: ../GTIPTVPlayerPro/main.py:9064 catalog_messages.py:995
 msgid "The M3U source will be checked automatically when this screen opens."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:8925 catalog_messages.py:1018
+#: ../GTIPTVPlayerPro/main.py:9072 catalog_messages.py:1018
 msgid ""
 "The Xtream API connection will be tested automatically when this screen "
 "opens."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9098 catalog_messages.py:1139
+#: ../GTIPTVPlayerPro/main.py:9245 catalog_messages.py:1139
 msgid "XMLTV EPG is disabled for this M3U source."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9102 catalog_messages.py:1141
+#: ../GTIPTVPlayerPro/main.py:9249 catalog_messages.py:1141
 msgid "XMLTV EPG is ready from the local cache."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9104 catalog_messages.py:1140
+#: ../GTIPTVPlayerPro/main.py:9251 catalog_messages.py:1140
 msgid "XMLTV EPG is enabled and waiting for its first update."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9122 catalog_messages.py:130
+#: ../GTIPTVPlayerPro/main.py:9269 catalog_messages.py:130
 msgid "Checking M3U access, catalogue size and cache status."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9125 catalog_messages.py:131
+#: ../GTIPTVPlayerPro/main.py:9272 catalog_messages.py:131
 msgid "Checking portal authentication, categories and latency."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9128 catalog_messages.py:129
+#: ../GTIPTVPlayerPro/main.py:9275 catalog_messages.py:129
 msgid "Checking API access, account status, latency and connection limits."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9254 ../GTIPTVPlayerPro/stalker.py:2079
-#: ../GTIPTVPlayerPro/stalker.py:2082 ../GTIPTVPlayerPro/stalker.py:2085
-#: ../GTIPTVPlayerPro/stalker.py:2096 ../GTIPTVPlayerPro/stalker.py:2111
-#: ../GTIPTVPlayerPro/stalker.py:2115 ../GTIPTVPlayerPro/stalker.py:8848
+#: ../GTIPTVPlayerPro/main.py:9410 ../GTIPTVPlayerPro/stalker.py:2184
+#: ../GTIPTVPlayerPro/stalker.py:2197 ../GTIPTVPlayerPro/stalker.py:8967
 #: catalog_messages.py:862
 msgid "Server does not report expiry"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9386 catalog_messages.py:851
+#: ../GTIPTVPlayerPro/main.py:9551 catalog_messages.py:851
 msgid "Server"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9568 ../GTIPTVPlayerPro/remote_footer.py:147
+#: ../GTIPTVPlayerPro/main.py:9733 ../GTIPTVPlayerPro/remote_footer.py:221
 #: catalog_messages.py:559
 msgid "Move"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9763 catalog_messages.py:909
+#: ../GTIPTVPlayerPro/main.py:9928 catalog_messages.py:909
 msgid "Standard M3U sources support Live TV only."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9818 ../GTIPTVPlayerPro/remote_footer.py:161
+#: ../GTIPTVPlayerPro/main.py:9983 ../GTIPTVPlayerPro/remote_footer.py:235
 #: catalog_messages.py:32
 msgid "About"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9900 catalog_messages.py:778
+#: ../GTIPTVPlayerPro/main.py:10065 catalog_messages.py:778
 msgid "SECURE SOURCE CONNECTION"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9901 catalog_messages.py:1135
+#: ../GTIPTVPlayerPro/main.py:10066 catalog_messages.py:1135
 msgid "Welcome"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9903 catalog_messages.py:832
+#: ../GTIPTVPlayerPro/main.py:10068 catalog_messages.py:832
 msgid "Select and connect to a saved source to start watching."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:9906 catalog_messages.py:777
+#: ../GTIPTVPlayerPro/main.py:10071 catalog_messages.py:777
 msgid "SAVED SOURCE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10025 catalog_messages.py:898
+#: ../GTIPTVPlayerPro/main.py:10196 catalog_messages.py:898
 msgid "Source status is checked automatically when connecting."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10029 catalog_messages.py:625
+#: ../GTIPTVPlayerPro/main.py:10200 catalog_messages.py:625
 msgid "No saved source found"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10032 catalog_messages.py:225
+#: ../GTIPTVPlayerPro/main.py:10203 catalog_messages.py:225
 msgid "Create a new source from the ADD SOURCE panel."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10042 catalog_messages.py:626
+#: ../GTIPTVPlayerPro/main.py:10213 catalog_messages.py:626
 msgid "No saved source. Create one from the ADD SOURCE panel."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10045 catalog_messages.py:96
+#: ../GTIPTVPlayerPro/main.py:10216 catalog_messages.py:96
 msgid "CONNECT SOURCE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10046 catalog_messages.py:536
+#: ../GTIPTVPlayerPro/main.py:10217 catalog_messages.py:536
 msgid "MANAGE SOURCES"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10047 catalog_messages.py:15
+#: ../GTIPTVPlayerPro/main.py:10218 catalog_messages.py:15
 msgid "ADD SOURCE"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10156 ../GTIPTVPlayerPro/playlist.py:1282
+#: ../GTIPTVPlayerPro/main.py:10327 ../GTIPTVPlayerPro/playlist.py:1282
 #: catalog_messages.py:36
 #, python-brace-format
 msgid "Account status: {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10351 catalog_messages.py:132
+#: ../GTIPTVPlayerPro/main.py:10522 catalog_messages.py:132
 #, python-brace-format
 msgid "Checking {}, please wait."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10362 catalog_messages.py:174
+#: ../GTIPTVPlayerPro/main.py:10533 catalog_messages.py:174
 #, python-brace-format
 msgid "Connected to {}; opening the dashboard."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/main.py:10395 catalog_messages.py:158
+#: ../GTIPTVPlayerPro/main.py:10566 catalog_messages.py:158
 msgid "Close the open screen before opening another one."
 msgstr ""
 
@@ -3649,24 +3997,24 @@ msgstr ""
 msgid "TMDb request was rejected"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/metadata.py:752 ../GTIPTVPlayerPro/metadata.py:820
+#: ../GTIPTVPlayerPro/metadata.py:760 ../GTIPTVPlayerPro/metadata.py:828
 #: catalog_messages.py:963
 msgid "TMDb metadata enrichment is disabled"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/metadata.py:761 ../GTIPTVPlayerPro/metadata.py:828
+#: ../GTIPTVPlayerPro/metadata.py:769 ../GTIPTVPlayerPro/metadata.py:836
 #: catalog_messages.py:639
 msgid "No valid title was found for TMDb"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/metadata.py:789 ../GTIPTVPlayerPro/metadata.py:808
-#: ../GTIPTVPlayerPro/metadata.py:857 ../GTIPTVPlayerPro/metadata.py:876
+#: ../GTIPTVPlayerPro/metadata.py:797 ../GTIPTVPlayerPro/metadata.py:816
+#: ../GTIPTVPlayerPro/metadata.py:865 ../GTIPTVPlayerPro/metadata.py:884
 #: catalog_messages.py:592
 msgid "No TMDb match was found"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/metadata.py:798 ../GTIPTVPlayerPro/metadata.py:799
-#: ../GTIPTVPlayerPro/metadata.py:866 ../GTIPTVPlayerPro/metadata.py:867
+#: ../GTIPTVPlayerPro/metadata.py:806 ../GTIPTVPlayerPro/metadata.py:807
+#: ../GTIPTVPlayerPro/metadata.py:874 ../GTIPTVPlayerPro/metadata.py:875
 #: catalog_messages.py:192
 msgid "Could not load TMDb information"
 msgstr ""
@@ -3861,7 +4209,7 @@ msgstr ""
 #: ../GTIPTVPlayerPro/playlist.py:1246 ../GTIPTVPlayerPro/playlist.py:1255
 #: ../GTIPTVPlayerPro/playlist.py:1415 ../GTIPTVPlayerPro/playlist.py:1434
 #: ../GTIPTVPlayerPro/playlist.py:1445 ../GTIPTVPlayerPro/playlist.py:1493
-#: ../GTIPTVPlayerPro/playlist.py:1541 ../GTIPTVPlayerPro/stalker.py:8921
+#: ../GTIPTVPlayerPro/playlist.py:1541 ../GTIPTVPlayerPro/stalker.py:9040
 #: catalog_messages.py:292
 msgid "ERROR"
 msgstr ""
@@ -3871,7 +4219,7 @@ msgstr ""
 msgid "API response is invalid"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/playlist.py:1272 ../GTIPTVPlayerPro/stalker.py:8921
+#: ../GTIPTVPlayerPro/playlist.py:1272 ../GTIPTVPlayerPro/stalker.py:9040
 #: catalog_messages.py:393
 msgid "INVALID"
 msgstr ""
@@ -3884,7 +4232,7 @@ msgstr ""
 msgid "DISABLED"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/playlist.py:1288 ../GTIPTVPlayerPro/stalker.py:8893
+#: ../GTIPTVPlayerPro/playlist.py:1288 ../GTIPTVPlayerPro/stalker.py:9012
 #: catalog_messages.py:84
 msgid "BUSY"
 msgstr ""
@@ -3935,7 +4283,7 @@ msgstr ""
 msgid "The source is unavailable; a stale cache is in use."
 msgstr ""
 
-#: ../GTIPTVPlayerPro/plugin.py:138 catalog_messages.py:557
+#: ../GTIPTVPlayerPro/plugin.py:151 catalog_messages.py:557
 msgid "Modern Enigma2 IPTV player"
 msgstr ""
 
@@ -3944,256 +4292,312 @@ msgstr ""
 msgid "Unlimited"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:61 catalog_messages.py:537
+#: ../GTIPTVPlayerPro/remote_footer.py:65 catalog_messages.py:537
 msgid "MENU 3s: Web interface"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:106 catalog_messages.py:38
+#: ../GTIPTVPlayerPro/remote_footer.py:180 catalog_messages.py:38
 msgid "Action"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:109 catalog_messages.py:338
+#: ../GTIPTVPlayerPro/remote_footer.py:183 catalog_messages.py:338
 msgid "Exit"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:111
-#: ../GTIPTVPlayerPro/remote_footer.py:135
-#: ../GTIPTVPlayerPro/remote_footer.py:136 catalog_messages.py:123
+#: ../GTIPTVPlayerPro/remote_footer.py:185
+#: ../GTIPTVPlayerPro/remote_footer.py:209
+#: ../GTIPTVPlayerPro/remote_footer.py:210 catalog_messages.py:123
 msgid "Change"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:114 catalog_messages.py:181
+#: ../GTIPTVPlayerPro/remote_footer.py:188 catalog_messages.py:181
 msgid "Continue"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:116 catalog_messages.py:984
+#: ../GTIPTVPlayerPro/remote_footer.py:190 catalog_messages.py:984
 msgid "Test"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:117 catalog_messages.py:28
+#: ../GTIPTVPlayerPro/remote_footer.py:191 catalog_messages.py:28
 msgid "API test"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:123 catalog_messages.py:579
+#: ../GTIPTVPlayerPro/remote_footer.py:197 catalog_messages.py:579
 msgid "Navigate"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:129 ../GTIPTVPlayerPro/youtube_ui.py:873
+#: ../GTIPTVPlayerPro/remote_footer.py:203 ../GTIPTVPlayerPro/youtube_ui.py:873
 #: catalog_messages.py:680
 msgid "Play"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:130 catalog_messages.py:272
+#: ../GTIPTVPlayerPro/remote_footer.py:204 catalog_messages.py:272
 msgid "Download"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:132 catalog_messages.py:290
+#: ../GTIPTVPlayerPro/remote_footer.py:206 catalog_messages.py:290
 msgid "EPG settings"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:134 ../GTIPTVPlayerPro/youtube_ui.py:873
+#: ../GTIPTVPlayerPro/remote_footer.py:208 ../GTIPTVPlayerPro/youtube_ui.py:873
 #: catalog_messages.py:376
 msgid "Full screen"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:140
-#: ../GTIPTVPlayerPro/remote_footer.py:144 catalog_messages.py:757
+#: ../GTIPTVPlayerPro/remote_footer.py:214
+#: ../GTIPTVPlayerPro/remote_footer.py:218 catalog_messages.py:757
 msgid "Remove"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:142 catalog_messages.py:154
+#: ../GTIPTVPlayerPro/remote_footer.py:216 catalog_messages.py:154
 msgid "Clear search"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:145
+#: ../GTIPTVPlayerPro/remote_footer.py:219
 #: ../GTIPTVPlayerPro/subtitle_browser.py:664 catalog_messages.py:363
 msgid "Filter"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:146 catalog_messages.py:584
+#: ../GTIPTVPlayerPro/remote_footer.py:220 catalog_messages.py:584
 msgid "New"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:149 catalog_messages.py:765
+#: ../GTIPTVPlayerPro/remote_footer.py:223 catalog_messages.py:765
 msgid "Reset"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:150 catalog_messages.py:877
+#: ../GTIPTVPlayerPro/remote_footer.py:224 catalog_messages.py:877
 msgid "Show / Hide"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:151 catalog_messages.py:550
+#: ../GTIPTVPlayerPro/remote_footer.py:225 catalog_messages.py:550
 msgid "Mark"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:152 catalog_messages.py:389
+#: ../GTIPTVPlayerPro/remote_footer.py:226 catalog_messages.py:389
 msgid "Hide All"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:154 catalog_messages.py:587
+#: ../GTIPTVPlayerPro/remote_footer.py:227 ../GTIPTVPlayerPro/youtube_ui.py:637
+#: ../GTIPTVPlayerPro/youtube_ui.py:909 catalog_messages.py:737
+msgid "Quality"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/remote_footer.py:228 catalog_messages.py:587
 msgid "New search"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:155 ../GTIPTVPlayerPro/youtube_ui.py:932
+#: ../GTIPTVPlayerPro/remote_footer.py:229 ../GTIPTVPlayerPro/youtube_ui.py:932
 #: catalog_messages.py:810
 msgid "Search history"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:156
+#: ../GTIPTVPlayerPro/remote_footer.py:230
 #: ../GTIPTVPlayerPro/youtube_ui.py:1028 catalog_messages.py:684
 msgid "Playback history"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:157 catalog_messages.py:251
+#: ../GTIPTVPlayerPro/remote_footer.py:231 catalog_messages.py:251
 msgid "Delete all"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:158 catalog_messages.py:153
+#: ../GTIPTVPlayerPro/remote_footer.py:232 catalog_messages.py:153
 msgid "Clear"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:159 ../GTIPTVPlayerPro/youtube_ui.py:864
+#: ../GTIPTVPlayerPro/remote_footer.py:233 ../GTIPTVPlayerPro/youtube_ui.py:864
 #: catalog_messages.py:732
 msgid "Preview"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/remote_footer.py:160 catalog_messages.py:764
+#: ../GTIPTVPlayerPro/remote_footer.py:234 catalog_messages.py:764
 msgid "Rescan"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:589 catalog_messages.py:700
+#: ../GTIPTVPlayerPro/restore_dashboard.py:23
+msgid "Select a backup file, then choose the sections to restore."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:24
+msgid "Unselected sections are preserved."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:33
+#: ../GTIPTVPlayerPro/restore_dashboard.py:105
+msgid "Restore"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:101
+msgid "Select file"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:101
+msgid "Restore summary"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:102
+msgid "Data to restore"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:103
+msgid "Change location"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:104
+msgid "Current data is backed up before restoring."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:121
+msgid "Not in this backup"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:133 catalog_messages.py:1105
+msgid "Version"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:134
+msgid "Backup verified"
+msgstr ""
+
+#: ../GTIPTVPlayerPro/restore_dashboard.py:135
+#: ../GTIPTVPlayerPro/restore_dashboard.py:137
+#: ../GTIPTVPlayerPro/restore_dashboard.py:139
+msgid "Select a backup file first."
+msgstr ""
+
+#: ../GTIPTVPlayerPro/stalker.py:639 catalog_messages.py:700
 msgid "Portal URL must start with http:// or https://"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:600 catalog_messages.py:701
+#: ../GTIPTVPlayerPro/stalker.py:650 catalog_messages.py:701
 msgid "Portal URL port is invalid"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:602 catalog_messages.py:269
+#: ../GTIPTVPlayerPro/stalker.py:652 catalog_messages.py:269
 msgid "Do not include a query or fragment in the portal URL"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1373 ../GTIPTVPlayerPro/stalker.py:1378
+#: ../GTIPTVPlayerPro/stalker.py:1441 ../GTIPTVPlayerPro/stalker.py:1446
 #: catalog_messages.py:1001
 msgid "The Stalker account directory could not be created"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1385 catalog_messages.py:1002
+#: ../GTIPTVPlayerPro/stalker.py:1453 catalog_messages.py:1002
 msgid "The Stalker account directory is unsafe"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1397 catalog_messages.py:1007
+#: ../GTIPTVPlayerPro/stalker.py:1465 catalog_messages.py:1007
 msgid "The Stalker account file is unsafe"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1413 ../GTIPTVPlayerPro/stalker.py:1422
+#: ../GTIPTVPlayerPro/stalker.py:1481 ../GTIPTVPlayerPro/stalker.py:1490
 #: catalog_messages.py:1004
 msgid "The Stalker account file could not be created"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1443 ../GTIPTVPlayerPro/stalker.py:1462
-#: ../GTIPTVPlayerPro/stalker.py:1575 catalog_messages.py:1006
+#: ../GTIPTVPlayerPro/stalker.py:1511 ../GTIPTVPlayerPro/stalker.py:1530
+#: ../GTIPTVPlayerPro/stalker.py:1675 catalog_messages.py:1006
 msgid "The Stalker account file is too large"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1454 catalog_messages.py:1003
+#: ../GTIPTVPlayerPro/stalker.py:1522 catalog_messages.py:1003
 msgid "The Stalker account file changed while opening"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1515 ../GTIPTVPlayerPro/stalker.py:1530
+#: ../GTIPTVPlayerPro/stalker.py:1610 ../GTIPTVPlayerPro/stalker.py:1625
 #: catalog_messages.py:636
 msgid "No valid Stalker / MAC account was found"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1528 ../GTIPTVPlayerPro/stalker.py:1678
+#: ../GTIPTVPlayerPro/stalker.py:1623 ../GTIPTVPlayerPro/stalker.py:1786
 #: catalog_messages.py:1008
 msgid "The Stalker account file was not found"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1599 catalog_messages.py:1005
+#: ../GTIPTVPlayerPro/stalker.py:1699 catalog_messages.py:1005
 msgid "The Stalker account file could not be saved"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1645 catalog_messages.py:1053
+#: ../GTIPTVPlayerPro/stalker.py:1753 catalog_messages.py:1053
 msgid "This Stalker / MAC account already exists"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1647 catalog_messages.py:998
+#: ../GTIPTVPlayerPro/stalker.py:1755 catalog_messages.py:998
 msgid "The Stalker / MAC account limit was reached"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1665 ../GTIPTVPlayerPro/stalker.py:1716
-#: ../GTIPTVPlayerPro/stalker.py:1796 catalog_messages.py:428
+#: ../GTIPTVPlayerPro/stalker.py:1773 ../GTIPTVPlayerPro/stalker.py:1824
+#: ../GTIPTVPlayerPro/stalker.py:1904 catalog_messages.py:428
 msgid "Invalid Stalker / MAC account"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1688 ../GTIPTVPlayerPro/stalker.py:1765
+#: ../GTIPTVPlayerPro/stalker.py:1796 ../GTIPTVPlayerPro/stalker.py:1873
 #: catalog_messages.py:999
 msgid "The Stalker / MAC account was not found"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:1977 ../GTIPTVPlayerPro/stalker.py:2773
-#: ../GTIPTVPlayerPro/stalker.py:2982 ../GTIPTVPlayerPro/stalker.py:3012
+#: ../GTIPTVPlayerPro/stalker.py:2085 ../GTIPTVPlayerPro/stalker.py:2885
+#: ../GTIPTVPlayerPro/stalker.py:3094 ../GTIPTVPlayerPro/stalker.py:3124
 #: catalog_messages.py:703
 msgid "Portal authentication failed"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:2163 ../GTIPTVPlayerPro/stalker.py:2168
-#: ../GTIPTVPlayerPro/stalker.py:8668 ../GTIPTVPlayerPro/stalker.py:8832
+#: ../GTIPTVPlayerPro/stalker.py:2275 ../GTIPTVPlayerPro/stalker.py:2280
+#: ../GTIPTVPlayerPro/stalker.py:8785 ../GTIPTVPlayerPro/stalker.py:8951
 #: catalog_messages.py:707
 msgid "Portal request cancelled"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:2173 ../GTIPTVPlayerPro/stalker.py:8672
-#: ../GTIPTVPlayerPro/stalker.py:8816 catalog_messages.py:710
+#: ../GTIPTVPlayerPro/stalker.py:2285 ../GTIPTVPlayerPro/stalker.py:8789
+#: ../GTIPTVPlayerPro/stalker.py:8935 catalog_messages.py:710
 msgid "Portal request timed out"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:2384 catalog_messages.py:180
+#: ../GTIPTVPlayerPro/stalker.py:2496 catalog_messages.py:180
 msgid "Content type unavailable"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:2544 ../GTIPTVPlayerPro/stalker.py:2811
-#: ../GTIPTVPlayerPro/stalker.py:2822 ../GTIPTVPlayerPro/stalker.py:3727
-#: ../GTIPTVPlayerPro/stalker.py:3739 catalog_messages.py:433
+#: ../GTIPTVPlayerPro/stalker.py:2656 ../GTIPTVPlayerPro/stalker.py:2923
+#: ../GTIPTVPlayerPro/stalker.py:2934 ../GTIPTVPlayerPro/stalker.py:3844
+#: ../GTIPTVPlayerPro/stalker.py:3856 catalog_messages.py:433
 msgid "Invalid portal response"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:2577 ../GTIPTVPlayerPro/stalker.py:5813
-#: ../GTIPTVPlayerPro/stalker.py:6707 ../GTIPTVPlayerPro/stalker.py:6721
+#: ../GTIPTVPlayerPro/stalker.py:2689 ../GTIPTVPlayerPro/stalker.py:5930
+#: ../GTIPTVPlayerPro/stalker.py:6824 ../GTIPTVPlayerPro/stalker.py:6838
 #: catalog_messages.py:708
 msgid "Portal request failed"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:2784 catalog_messages.py:696
+#: ../GTIPTVPlayerPro/stalker.py:2896 catalog_messages.py:696
 msgid "Portal HTTP request failed"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:2791 catalog_messages.py:706
+#: ../GTIPTVPlayerPro/stalker.py:2903 catalog_messages.py:706
 msgid "Portal is unavailable"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:2804 catalog_messages.py:711
+#: ../GTIPTVPlayerPro/stalker.py:2916 catalog_messages.py:711
 msgid "Portal response is too large"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:5675 catalog_messages.py:704
+#: ../GTIPTVPlayerPro/stalker.py:5792 catalog_messages.py:704
 msgid "Portal catalogue did not make progress"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:6818 ../GTIPTVPlayerPro/stalker.py:6830
-#: ../GTIPTVPlayerPro/stalker.py:6839 ../GTIPTVPlayerPro/stalker.py:7143
+#: ../GTIPTVPlayerPro/stalker.py:6935 ../GTIPTVPlayerPro/stalker.py:6947
+#: ../GTIPTVPlayerPro/stalker.py:6956 ../GTIPTVPlayerPro/stalker.py:7260
 #: catalog_messages.py:436
 msgid "Invalid stream link"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:7740 ../GTIPTVPlayerPro/stalker.py:7858
-#: ../GTIPTVPlayerPro/stalker.py:7993 ../GTIPTVPlayerPro/stalker.py:8128
+#: ../GTIPTVPlayerPro/stalker.py:7857 ../GTIPTVPlayerPro/stalker.py:7975
+#: ../GTIPTVPlayerPro/stalker.py:8110 ../GTIPTVPlayerPro/stalker.py:8245
 #: catalog_messages.py:918
 msgid "Stream link unavailable"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/stalker.py:8902 catalog_messages.py:705
+#: ../GTIPTVPlayerPro/stalker.py:9021 catalog_messages.py:705
 msgid "Portal connection successful"
 msgstr ""
 
@@ -4596,84 +5000,85 @@ msgstr ""
 msgid "Display 16:9 content as"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:435 catalog_messages.py:218
+#: ../GTIPTVPlayerPro/weather.py:438 catalog_messages.py:218
 msgid "Could not save weather settings through Enigma2 config"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:445 catalog_messages.py:155
+#: ../GTIPTVPlayerPro/weather.py:448 catalog_messages.py:155
 msgid "Clear skies"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:447 catalog_messages.py:672
+#: ../GTIPTVPlayerPro/weather.py:450 catalog_messages.py:672
 msgid "Partly cloudy"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:449 catalog_messages.py:159
+#: ../GTIPTVPlayerPro/weather.py:452 catalog_messages.py:159
 msgid "Cloudy"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:451 catalog_messages.py:371
+#: ../GTIPTVPlayerPro/weather.py:454 catalog_messages.py:371
 msgid "Foggy"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:453 catalog_messages.py:283
+#: ../GTIPTVPlayerPro/weather.py:456 catalog_messages.py:283
 msgid "Drizzle"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:455 catalog_messages.py:743
+#: ../GTIPTVPlayerPro/weather.py:458 catalog_messages.py:743
 msgid "Rainy"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:457 catalog_messages.py:887
+#: ../GTIPTVPlayerPro/weather.py:460 catalog_messages.py:887
 msgid "Snowy"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:459 catalog_messages.py:1068
+#: ../GTIPTVPlayerPro/weather.py:462 catalog_messages.py:1068
 msgid "Thunderstorms"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:460 catalog_messages.py:1104
+#: ../GTIPTVPlayerPro/weather.py:463 catalog_messages.py:1104
 msgid "Variable"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:495 ../GTIPTVPlayerPro/weather.py:844
-#: ../GTIPTVPlayerPro/weather.py:867 catalog_messages.py:1128
+#: ../GTIPTVPlayerPro/weather.py:498 ../GTIPTVPlayerPro/weather.py:899
+#: ../GTIPTVPlayerPro/weather.py:911 ../GTIPTVPlayerPro/weather.py:940
+#: catalog_messages.py:1128
 msgid "Weather request cancelled"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:588 catalog_messages.py:1130
+#: ../GTIPTVPlayerPro/weather.py:591 catalog_messages.py:1130
 msgid "Weather service response is too large"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:599 ../GTIPTVPlayerPro/weather.py:602
+#: ../GTIPTVPlayerPro/weather.py:602 ../GTIPTVPlayerPro/weather.py:605
 #: catalog_messages.py:659
 msgid "Open-Meteo request failed"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:600 ../GTIPTVPlayerPro/weather.py:603
+#: ../GTIPTVPlayerPro/weather.py:603 ../GTIPTVPlayerPro/weather.py:606
 #: catalog_messages.py:214
 msgid "Could not reach the weather service"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:605 ../GTIPTVPlayerPro/weather.py:696
+#: ../GTIPTVPlayerPro/weather.py:608 ../GTIPTVPlayerPro/weather.py:699
 #: catalog_messages.py:1131
 msgid "Weather service returned an invalid response"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:617 catalog_messages.py:152
+#: ../GTIPTVPlayerPro/weather.py:620 catalog_messages.py:152
 msgid "City name cannot be empty"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:661 catalog_messages.py:191
+#: ../GTIPTVPlayerPro/weather.py:664 catalog_messages.py:191
 #, python-brace-format
 msgid "Could not find {}"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:745 catalog_messages.py:205
+#: ../GTIPTVPlayerPro/weather.py:748 catalog_messages.py:205
 msgid "Could not load the five-day forecast"
 msgstr ""
 
-#: ../GTIPTVPlayerPro/weather.py:886 catalog_messages.py:647
+#: ../GTIPTVPlayerPro/weather.py:1013 catalog_messages.py:647
 msgid "Not fetched yet"
 msgstr ""
 
@@ -4758,6 +5163,11 @@ msgstr ""
 
 #: catalog_messages.py:25
 msgid "API key was rejected"
+msgstr ""
+
+#: catalog_messages.py:31
+#, python-brace-format
+msgid "AUDIO: {}"
 msgstr ""
 
 #: catalog_messages.py:40
@@ -5264,8 +5674,8 @@ msgstr ""
 msgid "Request failed"
 msgstr ""
 
-#: catalog_messages.py:768
-msgid "Restart required"
+#: catalog_messages.py:767
+msgid "Resolution: --"
 msgstr ""
 
 #: catalog_messages.py:769
@@ -5598,8 +6008,9 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: catalog_messages.py:1105
-msgid "Version"
+#: catalog_messages.py:1102
+#, python-brace-format
+msgid "VIDEO: {}"
 msgstr ""
 
 #: catalog_messages.py:1108
@@ -5650,4 +6061,136 @@ msgstr ""
 
 #: catalog_messages.py:1162
 msgid "YouTube search is unavailable"
+msgstr ""
+
+#: catalog_messages.py:1192
+msgid "Alternative search cancelled."
+msgstr ""
+
+#: catalog_messages.py:1193
+#, python-brace-format
+msgid "Alternative stream: {} ({} ms)"
+msgstr ""
+
+#: catalog_messages.py:1194
+msgid "Alternative streams"
+msgstr ""
+
+#: catalog_messages.py:1195
+#, python-brace-format
+msgid "Background scan: {}/{}"
+msgstr ""
+
+#: catalog_messages.py:1196
+msgid "Backup date"
+msgstr ""
+
+#: catalog_messages.py:1197
+msgid "Choose a stream; current playback continues."
+msgstr ""
+
+#: catalog_messages.py:1198
+msgid "Create full backup?"
+msgstr ""
+
+#: catalog_messages.py:1199
+#, python-brace-format
+msgid "Data gaps: {}"
+msgstr ""
+
+#: catalog_messages.py:1200
+msgid "Different channel number"
+msgstr ""
+
+#: catalog_messages.py:1201
+msgid "Different country"
+msgstr ""
+
+#: catalog_messages.py:1202
+msgid "Exact match"
+msgstr ""
+
+#: catalog_messages.py:1203
+msgid "Full backup"
+msgstr ""
+
+#: catalog_messages.py:1204
+msgid "Healthiest"
+msgstr ""
+
+#: catalog_messages.py:1205
+msgid "Healthy"
+msgstr ""
+
+#: catalog_messages.py:1206
+msgid ""
+"Includes accounts, passwords, settings, plugin files and downloaded videos."
+msgstr ""
+
+#: catalog_messages.py:1207
+msgid "No working alternative stream was found."
+msgstr ""
+
+#: catalog_messages.py:1208
+msgid "Not tested"
+msgstr ""
+
+#: catalog_messages.py:1209
+msgid "Opening stream..."
+msgstr ""
+
+#: catalog_messages.py:1210
+msgid "Opening the best tested stream..."
+msgstr ""
+
+#: catalog_messages.py:1211
+msgid "Playable"
+msgstr ""
+
+#: catalog_messages.py:1212
+msgid "Recommended based on the last stream test."
+msgstr ""
+
+#: catalog_messages.py:1213
+msgid "Retest"
+msgstr ""
+
+#: catalog_messages.py:1214
+msgid "Search incomplete."
+msgstr ""
+
+#: catalog_messages.py:1215
+msgid "Searching alternative streams..."
+msgstr ""
+
+#: catalog_messages.py:1216
+#, python-brace-format
+msgid "Searching sources: {}/{}"
+msgstr ""
+
+#: catalog_messages.py:1217
+msgid "Similar name"
+msgstr ""
+
+#: catalog_messages.py:1218
+msgid "Test deferred"
+msgstr ""
+
+#: catalog_messages.py:1219
+#, python-brace-format
+msgid "Test duration: {} s"
+msgstr ""
+
+#: catalog_messages.py:1220
+#, python-brace-format
+msgid "Tested {} s ago"
+msgstr ""
+
+#: catalog_messages.py:1221
+#, python-brace-format
+msgid "Testing streams: {}/{}"
+msgstr ""
+
+#: catalog_messages.py:1222
+msgid "Unstable"
 msgstr ""

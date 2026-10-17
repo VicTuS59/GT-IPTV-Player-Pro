@@ -1,6 +1,6 @@
 # Asset provenance
 
-Last reviewed: 2026-09-13
+Last reviewed: 2026-10-17
 
 The project owner confirmed on 2026-08-20 that the original background images
 below were made for GT IPTV Player Pro. Later project artwork is documented
@@ -175,3 +175,105 @@ director/cast line readable without an opaque information band.
   `0c7c810eaf937f685d6259a17b1ef401b7df233f856498745d87e4224da3ed04`
 - Generator SHA-256:
   `9602a05e56127e8511f87a44711c056867e3c897afc47c594f9a8f989a647993`
+
+## 1.4.0 backup, restore, EPG and infobar panels
+
+These interface panels are carried from the approved 1.3.0-r56 distribution.
+They are pre-rendered project UI artwork; no image generation runs on the
+receiver. Existing project artwork and third-party attribution remain under
+the notices above. The exact new distributed PNG files are listed below.
+
+| File | SHA-256 |
+| --- | --- |
+| `skin/images/backup-r5-background-1080.png` | `4a229f6f4185878254af42a827bce6114fd563c2ad55395e163448e41d15340b` |
+| `skin/images/backup-r5-background-2160.png` | `771e4e293945a3b8b156962bb4fe662d0205b106a3ccdd104568303102aa3dea` |
+| `skin/images/backup-r5-background-720.png` | `9635ac476cc146c950b234b562b23adf4a0ad57d5dae63193ff9b52ac55bf8fc` |
+| `skin/images/backup-r5-background-sd480.png` | `ca43c9b85dd71e8a67367387a56425ed5ede3dc4e01d2d98553de9ccc1e23faf` |
+| `skin/images/backup-r5-background-sd576.png` | `d0ae0459b2cf1ad8856a5ce24652df855eb9934eb8b2062f59cd63a75c6ee1c6` |
+| `skin/images/backup-r5-background-sd640.png` | `b09be95fea1be38ad78acfe0da4d88c66fd3cdfb83d115cdb4e153da63818aaa` |
+| `skin/images/backup-r5-checked-1080.png` | `0dbc3fce00e2e0abf0d7e0e8ac356fdb689c4cc32552ad6ad50a9625caff9172` |
+| `skin/images/backup-r5-checked-2160.png` | `a33b048704bca2244db5efc60454518a08f41b334a4c7f3a9c75ce90ee9765b8` |
+| `skin/images/backup-r5-checked-720.png` | `dff1c21e1e2a1fd07168d599bcedd230954af6b2fc4029736601e8999f446543` |
+| `skin/images/backup-r5-checked-sd480.png` | `e23684c7335239d7c19240e1295c0fc7a947e8a60e72f4be0fcb48b81b45d8ab` |
+| `skin/images/backup-r5-checked-sd576.png` | `ab3f3352803a91e188b7fe069577746bd6b9d7c2540e802cee7c9fa4af905fa1` |
+| `skin/images/backup-r5-checked-sd640.png` | `693e28abee362f6daebecb45a37aed200efaddaa0eee04efa1b6f9a7a60a7ceb` |
+| `skin/images/backup-r5-focus-1080.png` | `10806397c04328d8f1f3f8341de74e86d6364eae45e9c7f571b1238b36fae0fa` |
+| `skin/images/backup-r5-focus-2160.png` | `9e3a83fec0a79111aa58417f884a49ee5e3e48270afdb2f2bced5939dfb97b78` |
+| `skin/images/backup-r5-focus-720.png` | `5c3b20a7332816dc07199150d23e72bb70bce71112fffe95aa6aa3d9b1db326f` |
+| `skin/images/backup-r5-focus-sd480.png` | `d1f407c5cb857db0004a2a6cf8ecc48ec58c597c2c5b1d7bc34e869e5bd59950` |
+| `skin/images/backup-r5-focus-sd576.png` | `e7153c364586b4a0e5060f1156e3bcc81a79c3b9adf8bd4e94a4938104543587` |
+| `skin/images/backup-r5-focus-sd640.png` | `d75ba394ad9e54bffdae756eca8f50a9a5e69471260b650d664c32b914d3e96f` |
+| `skin/images/backup-r5-operation-1080.png` | `2d96e7e971e35001c1bb33efa8a038798daf4b108f1f734c92bad27dbc21a905` |
+| `skin/images/backup-r5-operation-2160.png` | `c4bc19f2d59f62f2c3443240dd81ea0643e5a3d410984da83da4b945210b0668` |
+| `skin/images/backup-r5-operation-720.png` | `61f93515aa3c49cf3ad4f951a41d1f6fd878991216cb7f2d0bfedb61293a6b76` |
+| `skin/images/backup-r5-operation-sd480.png` | `4db0fa09e58b5840cf47071521bb2b500c0c185d0d4be0345a89cf7b9705d7ea` |
+| `skin/images/backup-r5-operation-sd576.png` | `f77ba4d095ad803475847483d26bd83676d749f895a4f13caa2cfb03bedacb35` |
+| `skin/images/backup-r5-operation-sd640.png` | `dbf809d870ee94b1f46b2afef06c268d5c24c484c63a5cef831ccf2f4275a767` |
+| `skin/images/backup-r5-unchecked-1080.png` | `9a63fa6f8e8f650211145f9ceb415df0f49c6aa688c5301eb63b9db49d0222fe` |
+| `skin/images/backup-r5-unchecked-2160.png` | `43a2e5ada5230a45cae2b98792dc699bb0298e530794310ff86bd004abed036d` |
+| `skin/images/backup-r5-unchecked-720.png` | `eefa2d58a258d99b4847cfe71598bd486bd7aa4d674326112a139c87e482e063` |
+| `skin/images/backup-r5-unchecked-sd480.png` | `2a2bd506c04a66065426d69f7ddcd9eaf9764412880c0344d1c52061d06fe50b` |
+| `skin/images/backup-r5-unchecked-sd576.png` | `3605985cdc4ac6b47bc90c6976418c2788c0a752089a583bc2e9267d9cdd5516` |
+| `skin/images/backup-r5-unchecked-sd640.png` | `b43e2c8ba667cd682909f0e08cddd93729af5f29e73a095c9d56d6086a8d4f83` |
+| `skin/images/epg-r15-background-1080.png` | `842fb8e3b6e5aa6cb55586f75604eb69d7ca055b9c43d8ec3ac921ab93a2672c` |
+| `skin/images/epg-r15-background-2160.png` | `b7b75bb91370083d69583e04e096a6aa23bf905649b3259c8f9576fcfe54331f` |
+| `skin/images/epg-r15-background-720.png` | `b1b621ba30df78633ffc5d6d2ac8bdbff9566055701f6a533ea005e2948226f4` |
+| `skin/images/epg-r15-background-sd480.png` | `1dceedbfacbb90cbaf8a34fdd1ab13bd406320adf1dc96db8a59c865a44720ff` |
+| `skin/images/epg-r15-background-sd576.png` | `c03b3780c0f57f69480f871f98291e2dc2848b278b3f32abba3314b97280f20e` |
+| `skin/images/epg-r15-background-sd640.png` | `9b36fcea1b941659949cf18180fd0d477b0f652d17130ead236f4ba72b5c52f1` |
+| `skin/images/epg-r15-day-focus-1080.png` | `df28ccc61bdbecbacfaedcc9f92326d0d30dfeeee75b809a3f264254dfaa609b` |
+| `skin/images/epg-r15-day-focus-2160.png` | `ba71fa232e7918c61ab2c6ca02f1fc44bdc0843fc905dbfd957a5048e35aa5a1` |
+| `skin/images/epg-r15-day-focus-720.png` | `0f0428d9b75e3a1c46d28b09b4f61b960067fb5165779898b8e739fe38546350` |
+| `skin/images/epg-r15-day-focus-sd480.png` | `d4e32409e5dea4004f0995749dbbc62a460c5f28bb60316c141524910ac2e5af` |
+| `skin/images/epg-r15-day-focus-sd576.png` | `d4131036aa97e8bd01df58bff24c733cfcebd9f91b43e63195efac7ee1407e36` |
+| `skin/images/epg-r15-day-focus-sd640.png` | `12b487894c278cbbd5ba28062f52f0228d79cdb79381efd2856ce7dcd26f1c6a` |
+| `skin/images/epg-r15-live-badge-1080.png` | `f43400288fe09be9f60a29e1f530af919ef55ea985dbd63af93c2038c5a87b58` |
+| `skin/images/epg-r15-live-badge-2160.png` | `a898321f24f58c1c31e4186620917ff8a4d4455cafe067109d7b514d55e28212` |
+| `skin/images/epg-r15-live-badge-720.png` | `534d24ba9977c10db90dddd75321c8cb601de9114e68db57016e05d20194dded` |
+| `skin/images/epg-r15-live-badge-sd480.png` | `742a51cc2c8d487cbcb90f1e354002def45442a921db8f8fa92fdb620c60b65e` |
+| `skin/images/epg-r15-live-badge-sd576.png` | `e0ad2f24792dc3a70b04763bce7ffb8cc8e030a58b5187f4461a608c4ed594ad` |
+| `skin/images/epg-r15-live-badge-sd640.png` | `72c52906a216aa06a6e261ea18fb724c7913b9f63389dcbfdb015956911a95b9` |
+| `skin/images/epg-r15-programme-focus-1080.png` | `5c699548fa0d0721ae5a7d9e1276f5f692b5d0bed96e7be1c9dd7414c4a511f6` |
+| `skin/images/epg-r15-programme-focus-2160.png` | `2844ea026047e95dce3fc50e3ba5f205fd5f9f46727b93da13e406116fd768db` |
+| `skin/images/epg-r15-programme-focus-720.png` | `3dd348c51d34b29608581fb56f834af97ffa45b94c6873a438a109fc4d05c126` |
+| `skin/images/epg-r15-programme-focus-sd480.png` | `d0de57ea8f7c0eddfdb1c3c49d5a3f67ef2f1c09b3a0320ae3536e3748f10028` |
+| `skin/images/epg-r15-programme-focus-sd576.png` | `b56322989e63f165185ca7cda185874a41d14dd6fa34752c43db37a882052306` |
+| `skin/images/epg-r15-programme-focus-sd640.png` | `549b61d0d6a3f0debbc3d4e5f7260ad73673bfd58eb9cf4029ea9899644baa46` |
+| `skin/images/infobar-r46-panel-live-1080.png` | `6fe0ff1976ec424d27f3eca92d8ef70d9186b1a1ee68b9210d2fefae46e6f68d` |
+| `skin/images/infobar-r46-panel-live-2160.png` | `62b52c6c4ef66ea16e844a8a145d50fdfac2f17016ed74e6e47475a31fdf1b5b` |
+| `skin/images/infobar-r46-panel-live-720.png` | `39c764cafe53f6ccd22b2891cb61c716a90affa74747a3a2e2707585075a5348` |
+| `skin/images/infobar-r46-panel-live-sd640.png` | `aed1b8ab6fd4cb25cae26f5010d471564e81064a5dc46806ba996bab64bd80f1` |
+| `skin/images/infobar-r46-panel-live-sd720.png` | `ee8d74d5a4f6081003784c953c96d0e0b5c01a701b695d549e056e561565f7ef` |
+| `skin/images/infobar-r46-panel-vod-1080.png` | `ffd6d1a158e476a9cb681021b69d6579ddf8ca45e29af74a9bf6a9607a7941a0` |
+| `skin/images/infobar-r46-panel-vod-2160.png` | `cdf970c239f386f7f997a72ffc7313937bb33e49a9fa5e032fa19dfa4d9d1a00` |
+| `skin/images/infobar-r46-panel-vod-720.png` | `af9a0c03ddc72dbdbd6b244a6cb5a937582cb0a1d3578954ebbe5809060ad4fc` |
+| `skin/images/infobar-r46-panel-vod-sd640.png` | `9020a15c9e7fff91955675bca641556b78b6df9a2befd3c897dc2a5eb0b4b92e` |
+| `skin/images/infobar-r46-panel-vod-sd720.png` | `a8b3f5f3bde82805b121d4fbc1f075364ea0b9348edccfc377d0a21dcbb614c5` |
+| `skin/images/infobar-r52-panel-live-1080.png` | `e80b99ca0d275f24939680ca692ec10128433bdbe02feb80209bd3bf6a363c2b` |
+| `skin/images/infobar-r52-panel-live-2160.png` | `50d9ece10c389278b988119e0eb74770f2eefc321f891f48be7bb21bff2e2d86` |
+| `skin/images/infobar-r52-panel-live-720.png` | `07eabd4f67cdb4f87fc706a2203ac4b8c3b5c25e446c9cb0792839eaff06cea6` |
+| `skin/images/infobar-r52-panel-live-sd640.png` | `fe5149a9f007e5836a126fb442d4f8bc95c6a6ed112c315ce2d5644ee6323ceb` |
+| `skin/images/infobar-r52-panel-live-sd720.png` | `27f822aa0a02c41f62fbbe96a1d803409d1aabc0e696f3c12b9b386e6cff5a89` |
+| `skin/images/infobar-r52-panel-vod-1080.png` | `0469505cdeeaa6257f08a2fd39d2029fe03b3c6439595b4c557247ed779a98d2` |
+| `skin/images/infobar-r52-panel-vod-2160.png` | `15c575aa3ae62384d3195c595bffb504d0f8daf87247e339f83137b7d783d84f` |
+| `skin/images/infobar-r52-panel-vod-720.png` | `39eb8f6c657e4d09c0be0a0ecbd63af8268e71d9827687ed18475a67af304440` |
+| `skin/images/infobar-r52-panel-vod-sd640.png` | `930bc6c55ec054259f99a4b7229454549967b358623d1f0fd60e8bf1e73d3ed1` |
+| `skin/images/infobar-r52-panel-vod-sd720.png` | `d681d32a7789a6cd1de71e6f58fe2dd3ed5fdde542d4b65a76825bc575a54965` |
+| `skin/images/restore-r7-background-1080.png` | `509e3f8aefd43a81aa2a14c460a9568f02e4e5e53bff797677ea6d8f199a0930` |
+| `skin/images/restore-r7-background-2160.png` | `befd1e3ec586a538c67fdf8226a2e79138f90d5c283028c98b6044de96516c9d` |
+| `skin/images/restore-r7-background-720.png` | `81fd20f13fb2c33e40cdb052d6b0c1bc852b9b69e1f3a8884ee67889782a0709` |
+| `skin/images/restore-r7-background-sd480.png` | `886f4cd976c19bb4b145fd61af9dd020d7b2d13d94b980943579cab6f6663cc3` |
+| `skin/images/restore-r7-background-sd576.png` | `cedbd0070f9c1ee60879d87fbcd41bc7572d17af17bd6e67d23e976a8ff39def` |
+| `skin/images/restore-r7-background-sd640.png` | `13c65287ddab9464f3b14935ddd3cd39042438dc0c8f4645d6a9e91cd08ac468` |
+| `skin/images/restore-r7-disabled-1080.png` | `bbb384838ed035109da5f74425f4946bdac6451c1a82299f2e41ea0b9817a80d` |
+| `skin/images/restore-r7-disabled-2160.png` | `2cfaf54c3142e3d10fe3e4d00eb7863f611e666b0515073a29286dd69fba655c` |
+| `skin/images/restore-r7-disabled-720.png` | `c8e6be3c17f9c4eabf546a44ec950fca97bea6502698d3d4b6da0ecd47852789` |
+| `skin/images/restore-r7-disabled-sd480.png` | `6227086cbf89d9490ea2776640e468b25b252f5bc728a403d48f94366fb3c7ca` |
+| `skin/images/restore-r7-disabled-sd576.png` | `2049f47c3a5c138c4e05da998b86a2fd8adbb2af6004dd808cda3c6b279250c4` |
+| `skin/images/restore-r7-disabled-sd640.png` | `76199df0cdbc734d2961297548fe8219ce1176f6607bec0d4cbfdc878e17974d` |
+| `skin/images/restore-r7-shade-1080.png` | `e035cc4649f7250a3dbd7e0502a3eddc26fe807792a51cad73647411b0d1df04` |
+| `skin/images/restore-r7-shade-2160.png` | `46c03b015cad09c9141e63ecfbcb1f95eeb3b91c7fe19fe06132856139ff8125` |
+| `skin/images/restore-r7-shade-720.png` | `2ce72309603e14f699b88ba3e959aefd5124a174bda102518ce1b10bc30c401f` |
+| `skin/images/restore-r7-shade-sd480.png` | `f9124233e4ee596fa80660ae05f7d6a365a30776e2907aef66fc617313f9c568` |
+| `skin/images/restore-r7-shade-sd576.png` | `0b43b4c2343467487f12e1e18baedc9dc6b216a31b311efd6805e1d16ba3ae0d` |
+| `skin/images/restore-r7-shade-sd640.png` | `478acce35e69e37082e8a4eb9d3aea571b03cc9d1c79461c56662e079973df70` |

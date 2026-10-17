@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ca\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Emissions alternatives"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Repeteix la prova"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Estable"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Reproduïble"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Inestable"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "No provada"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Prova ajornada"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Coincidència exacta"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Nom semblant"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Número de canal diferent"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "País diferent"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "La més estable"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Durada de la prova: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Talls de dades: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Provada fa {} s"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Trieu una emissió; la reproducció actual continua."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Cerca en segon pla: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Recomanació segons l’última prova de l’emissió."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "S’està obrint l’emissió..."

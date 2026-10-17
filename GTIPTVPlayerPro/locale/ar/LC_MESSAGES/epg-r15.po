@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ar\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "دليل البرامج الإلكتروني"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "الأيام"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "الأيام المتاحة: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "برامج اليوم"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "البرنامج المحدد"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "اليوم"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "البرنامج"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "غداً"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "الآن"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "يُعرض الآن"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "انتهى"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "قادم"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "المدة: {} دقيقة"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "المتبقي {} دقيقة"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "العودة إلى ملء الشاشة"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "لا توجد برامج لهذا اليوم."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "تعذر تحميل دليل البرامج."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "المعاينة المباشرة غير متاحة على هذا النظام."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "وصف البرنامج غير متاح."

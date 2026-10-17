@@ -716,10 +716,11 @@ class WebYouTube(object):
                     raise ValueError("invalid video stream quality")
                 duration_seconds = int(getattr(resolver, "duration_seconds", 0) or 0)
                 print("[GTYouTube] video_id={} requested={} selected={} "
-                      "video_itag={} audio_itag={} engine={} native_audio={} duration={}".format(
+                      "video_itag={} audio_itag={} audio_bitrate={} engine={} native_audio={} duration={}".format(
                           video_id, player.youtube_resolution, selected_quality,
                           getattr(resolver, "selected_video_itag", ""),
                           getattr(resolver, "selected_audio_itag", ""),
+                          getattr(resolver, "selected_audio_bitrate", 0),
                           service_type, bool(audio), duration_seconds))
                 log_event(
                     "youtube",

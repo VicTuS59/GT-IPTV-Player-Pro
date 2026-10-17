@@ -26,7 +26,7 @@ class _Section(object):
     searchLanguage = _Value("search_language", "tr")
     useDashMP4 = _Value("use_dash", True)
     streamMode = _Value("stream_mode", "auto")
-    audioPreference = _Value("audio_preference", "default")
+    audioPreference = _Value("audio_preference", "original")
 
 
 class _Plugins(object):
@@ -40,7 +40,7 @@ class _Config(object):
 config = _Config()
 
 
-def set_preferences(resolution, language, dash, stream_mode=None, audio_preference="default"):
+def set_preferences(resolution, language, dash, stream_mode=None, audio_preference="original"):
     _local.max_resolution = {
         "360": "18", "480": "35", "720": "22",
         "1080": "37", "1440": "264", "2160": "38",
@@ -49,4 +49,4 @@ def set_preferences(resolution, language, dash, stream_mode=None, audio_preferen
     _local.use_dash = bool(dash)
     mode = str(stream_mode) if stream_mode is not None else ("auto" if dash else "compatible")
     _local.stream_mode = mode if mode in ("auto", "compatible", "dash") else "auto"
-    _local.audio_preference = audio_preference if audio_preference in ("default", "original") else "default"
+    _local.audio_preference = audio_preference if audio_preference in ("default", "original") else "original"

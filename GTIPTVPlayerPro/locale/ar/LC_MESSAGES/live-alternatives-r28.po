@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ar\n"
+
+#: live_alternative_ui.py
+msgid "Searching sources: {}/{}"
+msgstr "جارٍ البحث في المصادر: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Testing streams: {}/{}"
+msgstr "جارٍ اختبار البث: {}/{}"
+
+#: live_alternative_ui.py
+msgid "Opening the best tested stream..."
+msgstr "جارٍ فتح أفضل بث تم اختباره..."
+
+#: live_alternative_ui.py
+msgid "Search incomplete."
+msgstr "البحث غير مكتمل."

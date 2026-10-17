@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ta\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "மாற்று ஒளிபரப்புகள்"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "மீண்டும் சோதி"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "நிலையானது"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "இயக்கக்கூடியது"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "நிலையற்றது"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "சோதிக்கப்படவில்லை"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "சோதனை ஒத்திவைக்கப்பட்டது"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "துல்லியப் பொருத்தம்"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "ஒத்த பெயர்"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "வேறு சேனல் எண்"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "வேறு நாடு"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "மிக நிலையானது"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "சோதனை நேரம்: {} வி"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "தரவுத் தடைகள்: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "{} வி முன்பு சோதிக்கப்பட்டது"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "ஒளிபரப்பைத் தேர்ந்தெடுக்கவும்; தற்போதைய இயக்கம் தொடரும்."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "பின்னணித் தேடல்: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "கடைசி ஒளிபரப்புச் சோதனையின்படி பரிந்துரை."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "ஒளிபரப்பைத் திறக்கிறது..."

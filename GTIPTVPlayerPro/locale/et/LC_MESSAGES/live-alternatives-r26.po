@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: et\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "Alternatiivsete voogude otsimine..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "Töötavat alternatiivset voogu ei leitud."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "Alternatiivne voog: {} ({} ms)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "Alternatiivsete voogude otsing tühistati."

@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: lv\n"
+
+#: live_alternative_ui.py
+msgid "Searching alternative streams..."
+msgstr "Tiek meklētas alternatīvas straumes..."
+
+#: live_alternative_ui.py
+msgid "No working alternative stream was found."
+msgstr "Netika atrasta strādājoša alternatīva straume."
+
+#: live_alternative_ui.py
+msgid "Alternative stream: {} ({} ms)"
+msgstr "Alternatīva straume: {} ({} ms)"
+
+#: live_alternative_ui.py
+msgid "Alternative search cancelled."
+msgstr "Alternatīvo straumju meklēšana atcelta."

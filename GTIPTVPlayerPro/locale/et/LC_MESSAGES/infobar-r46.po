@@ -1,0 +1,48 @@
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: et\nLanguage: et\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Source: {}"
+msgstr "Allikas: {}"
+
+#: infobar.py browser.py
+msgid "Stream"
+msgstr "Voog"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Audio: {}"
+msgstr "Heli: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Subtitles: {}"
+msgstr "Subtiitrid: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Remaining: {}"
+msgstr "Jäänud: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "{} h {} min"
+msgstr "{} t {} min"
+
+#: infobar.py browser.py
+msgid "Programme guide"
+msgstr "Saatekava"
+
+#: infobar.py browser.py
+msgid "Audio / Subtitles"
+msgstr "Heli / Subtiitrid"
+
+#: infobar.py browser.py
+msgid "Web interface"
+msgstr "Veebiliides"
+
+#: infobar.py browser.py
+msgid "MENU 3s"
+msgstr "MENU 3 s"
+

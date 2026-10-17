@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: sq_AL\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Transmetime alternative"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Testo sërish"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "I qëndrueshëm"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Mund të luhet"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "I paqëndrueshëm"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "I patestuar"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Testi u shty"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Përputhje e saktë"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Emër i ngjashëm"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Numër tjetër kanali"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Shtet tjetër"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Më i qëndrueshmi"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Kohëzgjatja e testit: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Ndërprerje të dhënash: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Testuar {} s më parë"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Zgjidhni një transmetim; luajtja aktuale vazhdon."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Kërkim në sfond: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Rekomandohet sipas testit të fundit të transmetimit."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Duke hapur transmetimin..."

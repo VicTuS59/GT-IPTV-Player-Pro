@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: vi\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "Lịch chương trình EPG"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Ngày"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Số ngày có sẵn: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Lịch phát sóng trong ngày"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Chương trình đã chọn"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Ngày"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Chương trình"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Ngày mai"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Bây giờ"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Đang phát sóng"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Đã kết thúc"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Sắp phát"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Thời lượng: {} phút"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Còn {} phút"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Trở lại toàn màn hình"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Không có chương trình cho ngày này."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Không thể tải lịch chương trình."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Bản hệ thống này không hỗ trợ xem trước trực tiếp."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Không có mô tả chương trình."

@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: da\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "EPG-programguide"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Dage"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Tilgængelige dage: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Dagens program"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Valgt udsendelse"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Dag"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Udsendelse"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "I morgen"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Nu"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Sendes nu"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Afsluttet"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Kommende"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Varighed: {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "{} min tilbage"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Tilbage til fuld skærm"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Ingen udsendelser denne dag."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Programguiden kunne ikke indlæses."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Livevisning er ikke tilgængelig i dette image."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Ingen beskrivelse af udsendelsen."

@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: is\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Aðrir straumar"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Prófa aftur"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stöðugur"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Spilanlegur"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Óstöðugur"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Ekki prófaður"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Prófun frestað"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Nákvæm samsvörun"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Svipað nafn"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Annað rásarnúmer"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Annað land"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Stöðugastur"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Lengd prófunar: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Gagnarof: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Prófað fyrir {} s"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Veldu straum; núverandi spilun heldur áfram."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Bakgrunnsleit: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Ráðlagt miðað við síðustu straumprófun."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Opna straum..."

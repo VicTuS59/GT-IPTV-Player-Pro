@@ -1,0 +1,48 @@
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: pl\nLanguage: pl\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n == 1) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2;\n"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Source: {}"
+msgstr "Źródło: {}"
+
+#: infobar.py browser.py
+msgid "Stream"
+msgstr "Strumień"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Audio: {}"
+msgstr "Dźwięk: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Subtitles: {}"
+msgstr "Napisy: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Remaining: {}"
+msgstr "Pozostało: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "{} h {} min"
+msgstr "{} godz. {} min"
+
+#: infobar.py browser.py
+msgid "Programme guide"
+msgstr "Przewodnik TV"
+
+#: infobar.py browser.py
+msgid "Audio / Subtitles"
+msgstr "Dźwięk / Napisy"
+
+#: infobar.py browser.py
+msgid "Web interface"
+msgstr "Interfejs WWW"
+
+#: infobar.py browser.py
+msgid "MENU 3s"
+msgstr "MENU 3 s"
+

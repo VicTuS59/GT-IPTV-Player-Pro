@@ -33,8 +33,8 @@ MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 RESPONSE_READ_CHUNK_BYTES = 64 * 1024
 DEFAULT_TIMEOUT = 6
 CACHE_FILE_VERSION = 2
-CACHE_MATCH_VERSION = 3
-CACHE_PAYLOAD_VERSION = 3
+CACHE_MATCH_VERSION = 4
+CACHE_PAYLOAD_VERSION = 4
 
 
 class MetadataError(Exception):
@@ -178,7 +178,7 @@ def _image_url(path, size):
 
 
 class TMDbMetadataClient(object):
-    """Small dependency-free TMDb fallback used only for missing metadata."""
+    """Localized summaries and a dependency-free fallback for missing metadata."""
 
     def __init__(
         self,
@@ -547,10 +547,12 @@ class TMDbMetadataClient(object):
                 pass
             return False
 
-    @staticmethod
-    def _cache_key(media_type, title, year):
-        raw = "{}|{}|{}|{}".format(
+    def _cache_key(self, media_type, title, year):
+        # Both exact-ID and title searches contain translated text. Old
+        # language-less entries must never satisfy a lookup in another locale.
+        raw = "{}|{}|{}|{}|{}".format(
             CACHE_MATCH_VERSION,
+            self.language.replace("_", "-").lower(),
             media_type,
             _normalised(title),
             year,
@@ -691,8 +693,13 @@ class TMDbMetadataClient(object):
             tmdb_id,
         )
         detail = self._request_json(path, {}, self.language)
+        # A search result may have come from the English search fallback.
+        # Only the requested-language detail can establish a localized plot.
+        localized_plot = _text(detail.get("overview"))[:2000]
+        if not localized_plot:
+            detail["overview"] = ""
         detail = self._merge_payload(detail, selected or {})
-        if not detail.get("overview"):
+        if not _text(detail.get("overview")) and self.language.lower() != "en-us":
             english = self._request_json(path, {}, "en-US")
             detail = self._merge_payload(detail, english)
         date_key = "release_date" if media_type == "movie" else "first_air_date"
@@ -722,6 +729,7 @@ class TMDbMetadataClient(object):
                 )
             ),
             "plot": _text(detail.get("overview"))[:2000],
+            "localized_plot": localized_plot,
             "rating": _format_rating(detail.get("vote_average")),
             "year": _year(detail.get(date_key)),
             "duration": runtime,
@@ -876,6 +884,39 @@ class TMDbMetadataClient(object):
             self.last_error = "" if value else N_("No TMDb match was found")
             return value
 
+    def _lookup_for_completion(self, media_type, item, title, year, tmdb_id):
+        """Fetch localized metadata while retaining provider details on failure."""
+        external = None
+        try:
+            if tmdb_id:
+                external = self.lookup_by_id(
+                    media_type,
+                    tmdb_id,
+                    required_payload_version=CACHE_PAYLOAD_VERSION,
+                )
+                if (
+                    external is not None
+                    and getattr(item, "portal_request_type", "")
+                    and not self._provider_identity_matches(
+                        media_type, title, year, external,
+                    )
+                ):
+                    external = None
+                    tmdb_id = ""
+            if external is None:
+                external = self.lookup(
+                    media_type,
+                    title,
+                    year,
+                    required_payload_version=CACHE_PAYLOAD_VERSION,
+                )
+        except MetadataError as error:
+            self.last_error = str(error)
+            # A missing translation or failed service must not erase the
+            # provider's summary; cancellation/deadlines still stop the worker.
+            self._check_request_limits()
+        return external or {}, tmdb_id
+
     def complete_movie(
         self,
         item,
@@ -887,7 +928,7 @@ class TMDbMetadataClient(object):
         title = getattr(info, "title", "")
         if not title or title == N_("Movie"):
             title = getattr(item, "name", "")
-        plot = getattr(info, "plot", "")
+        plot = getattr(info, "_provider_plot", getattr(info, "plot", ""))
         rating = getattr(info, "rating", "") or getattr(item, "rating", "")
         year = getattr(info, "year", "") or getattr(item, "year", "")
         cover = (
@@ -904,43 +945,19 @@ class TMDbMetadataClient(object):
             or getattr(item, "imdb_id", "")
         )
         external = None
-        missing = (
-            bool(force_cover_fallback)
+        needs_lookup = (
+            self.available
+            or bool(force_cover_fallback)
             or not cover
             or not plot
             or not _has_rating(rating)
             or (bool(require_backdrop) and not backdrop)
             or bool(collect_backdrop_fallback)
         )
-        if missing:
-            required_version = (
-                CACHE_PAYLOAD_VERSION if require_backdrop else 1
+        if needs_lookup:
+            external, tmdb_id = self._lookup_for_completion(
+                "movie", item, title or getattr(item, "name", ""), year, tmdb_id,
             )
-            if tmdb_id:
-                external = self.lookup_by_id(
-                    "movie",
-                    tmdb_id,
-                    required_payload_version=required_version,
-                )
-                if (
-                    external is not None
-                    and getattr(item, "portal_request_type", "")
-                    and not self._provider_identity_matches(
-                        "movie",
-                        title or getattr(item, "name", ""),
-                        year,
-                        external,
-                    )
-                ):
-                    external = None
-                    tmdb_id = ""
-            if external is None:
-                external = self.lookup(
-                    "movie",
-                    title or getattr(item, "name", ""),
-                    year,
-                    required_payload_version=required_version,
-                )
         else:
             self.last_error = ""
         external = external or {}
@@ -949,7 +966,7 @@ class TMDbMetadataClient(object):
             completed_cover = external.get("cover")
         completed = MovieInfo(
             title=title or external.get("title"),
-            plot=plot or external.get("plot"),
+            plot=external.get("localized_plot") or plot or external.get("plot"),
             rating=rating if _has_rating(rating) else external.get("rating"),
             year=year or external.get("year"),
             duration=getattr(info, "duration", "") or external.get("duration"),
@@ -961,6 +978,7 @@ class TMDbMetadataClient(object):
             tmdb_id=tmdb_id or external.get("tmdb_id"),
             imdb_id=imdb_id or external.get("imdb_id"),
         )
+        completed._provider_plot = plot
         external_backdrop = str(external.get("backdrop") or "").strip()
         completed.fallback_backdrop = (
             external_backdrop
@@ -989,7 +1007,7 @@ class TMDbMetadataClient(object):
         collect_backdrop_fallback=False,
     ):
         title = getattr(info, "title", "") or getattr(item, "name", "")
-        plot = getattr(info, "plot", "")
+        plot = getattr(info, "_provider_plot", getattr(info, "plot", ""))
         rating = getattr(info, "rating", "") or getattr(item, "rating", "")
         year = getattr(info, "year", "") or getattr(item, "year", "")
         cover = getattr(info, "cover", "") or getattr(item, "icon", "")
@@ -1003,43 +1021,19 @@ class TMDbMetadataClient(object):
             or getattr(item, "imdb_id", "")
         )
         external = None
-        missing = (
-            bool(force_cover_fallback)
+        needs_lookup = (
+            self.available
+            or bool(force_cover_fallback)
             or not cover
             or not plot
             or not _has_rating(rating)
             or (bool(require_backdrop) and not backdrop)
             or bool(collect_backdrop_fallback)
         )
-        if missing:
-            required_version = (
-                CACHE_PAYLOAD_VERSION if require_backdrop else 1
+        if needs_lookup:
+            external, tmdb_id = self._lookup_for_completion(
+                "series", item, title or getattr(item, "name", ""), year, tmdb_id,
             )
-            if tmdb_id:
-                external = self.lookup_by_id(
-                    "series",
-                    tmdb_id,
-                    required_payload_version=required_version,
-                )
-                if (
-                    external is not None
-                    and getattr(item, "portal_request_type", "")
-                    and not self._provider_identity_matches(
-                        "series",
-                        title or getattr(item, "name", ""),
-                        year,
-                        external,
-                    )
-                ):
-                    external = None
-                    tmdb_id = ""
-            if external is None:
-                external = self.lookup(
-                    "series",
-                    title or getattr(item, "name", ""),
-                    year,
-                    required_payload_version=required_version,
-                )
         else:
             self.last_error = ""
         external = external or {}
@@ -1048,7 +1042,7 @@ class TMDbMetadataClient(object):
             completed_cover = external.get("cover")
         completed = SeriesInfo(
             title=title or external.get("title"),
-            plot=plot or external.get("plot"),
+            plot=external.get("localized_plot") or plot or external.get("plot"),
             rating=rating if _has_rating(rating) else external.get("rating"),
             year=year or external.get("year"),
             genre=getattr(info, "genre", "") or external.get("genre"),
@@ -1060,6 +1054,7 @@ class TMDbMetadataClient(object):
             tmdb_id=tmdb_id or external.get("tmdb_id"),
             imdb_id=imdb_id or external.get("imdb_id"),
         )
+        completed._provider_plot = plot
         external_backdrop = str(external.get("backdrop") or "").strip()
         completed.fallback_backdrop = (
             external_backdrop

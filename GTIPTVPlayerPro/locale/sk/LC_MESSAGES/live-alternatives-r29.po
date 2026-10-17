@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: sk\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Alternatívne streamy"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Znova otestovať"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stabilný"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Prehrateľný"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Nestabilný"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Netestované"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Test odložený"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Presná zhoda"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Podobný názov"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Iné číslo kanála"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Iná krajina"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Najstabilnejší"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Trvanie testu: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Výpadky dát: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Testované pred {} s"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Vyberte stream; aktuálne prehrávanie pokračuje."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Hľadanie na pozadí: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Odporúčanie podľa posledného testu streamu."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Otváranie streamu..."

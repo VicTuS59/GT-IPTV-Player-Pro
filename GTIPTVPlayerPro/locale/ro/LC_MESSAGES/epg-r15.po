@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ro\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "Ghid de programe EPG"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Zile"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Zile disponibile: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Programul zilei"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Emisiunea selectată"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Zi"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Emisiune"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Mâine"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Acum"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "În direct acum"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Încheiat"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Urmează"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Durată: {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Au rămas {} min"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Înapoi la ecran complet"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Nu există emisiuni pentru această zi."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Ghidul de programe nu a putut fi încărcat."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Previzualizarea în direct nu este disponibilă pe acest sistem."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Descrierea emisiunii nu este disponibilă."

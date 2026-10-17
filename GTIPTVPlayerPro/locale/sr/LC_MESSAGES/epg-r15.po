@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: sr\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "ЕПГ програмски водич"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Дани"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Доступни дани: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Дневни програм"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Изабрана емисија"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Дан"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Емисија"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Сутра"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Сада"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Тренутно се емитује"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Завршено"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Следи"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Трајање: {} мин"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Преостало {} мин"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Назад на цео екран"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Нема емисија за овај дан."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Програмски водич није могуће учитати."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Преглед уживо није доступан у овом систему."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Опис емисије није доступан."

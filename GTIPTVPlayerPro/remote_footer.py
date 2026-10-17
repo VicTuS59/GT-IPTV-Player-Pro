@@ -5,7 +5,11 @@
 import math
 import os
 import re
+import sys
+import threading
 import unicodedata
+from collections import OrderedDict
+from functools import wraps
 from types import MethodType
 
 try:
@@ -83,6 +87,76 @@ _FOOTER_WIDGET = re.compile(
     re.DOTALL,
 )
 _SCREEN_SIZE = re.compile(r'<screen\b[^>]*\bsize="(\d+),(\d+)"')
+
+# Store XML only, never native widgets or account/content data. This is much
+# smaller than the decoded artwork cache and is shared by page instances.
+_SKIN_CACHE = OrderedDict()
+_SKIN_CACHE_LOCK = threading.Lock()
+_SKIN_CACHE_BYTES = 0
+_SKIN_CACHE_MAX_BYTES = 2 * 1024 * 1024
+_SKIN_CACHE_MAX_ENTRIES = 32
+
+
+def _skin_context():
+    try:
+        from enigma import getDesktop
+        size = getDesktop(0).size()
+        desktop = (int(size.width()), int(size.height()))
+    except (ImportError, AttributeError, TypeError, ValueError, RuntimeError):
+        desktop = (0, 0)
+    return (desktop, device_language(), current_text_size(),
+            tuple(_current_selection_palette()))
+
+
+def clear_prepared_skin_cache():
+    global _SKIN_CACHE_BYTES
+    with _SKIN_CACHE_LOCK:
+        _SKIN_CACHE.clear()
+        _SKIN_CACHE_BYTES = 0
+
+
+def prepared_skin(builder, *args, **kwargs):
+    """Reuse bounded skin XML for the exact GUI/language/appearance context."""
+    global _SKIN_CACHE_BYTES
+    key = (builder, _skin_context(), args, tuple(sorted(kwargs.items())))
+    try:
+        hash(key)
+    except TypeError:
+        return builder(*args, **kwargs)
+    with _SKIN_CACHE_LOCK:
+        cached = _SKIN_CACHE.get(key)
+        if cached is not None:
+            _SKIN_CACHE.move_to_end(key)
+            return cached[0]
+    skin = builder(*args, **kwargs)
+    if not isinstance(skin, str):
+        return skin
+    # Count both the produced XML and string arguments (the footer receives
+    # the base XML). getsizeof includes Python's Unicode storage width.
+    cost = sys.getsizeof(skin) + sum(
+        sys.getsizeof(value) for value in args + tuple(kwargs.values())
+        if isinstance(value, str)
+    )
+    if cost > _SKIN_CACHE_MAX_BYTES:
+        return skin
+    with _SKIN_CACHE_LOCK:
+        previous = _SKIN_CACHE.pop(key, None)
+        if previous is not None:
+            _SKIN_CACHE_BYTES -= previous[1]
+        _SKIN_CACHE[key] = (skin, cost)
+        _SKIN_CACHE_BYTES += cost
+        while (len(_SKIN_CACHE) > _SKIN_CACHE_MAX_ENTRIES
+               or _SKIN_CACHE_BYTES > _SKIN_CACHE_MAX_BYTES):
+            unused_key, removed = _SKIN_CACHE.popitem(last=False)
+            _SKIN_CACHE_BYTES -= removed[1]
+    return skin
+
+
+def _cached_skin(builder):
+    @wraps(builder)
+    def cached(*args, **kwargs):
+        return prepared_skin(builder, *args, **kwargs)
+    return cached
 
 _KEY_WIDTH_FACTORS = {
     "left_right": FOOTER_KEY_WIDTH_FACTOR,
@@ -282,6 +356,7 @@ def _web_hint_horizontal_space(skin, left, right, top, height, gap):
     return max(spaces, key=lambda space: space[1] - space[0]) if spaces else (left, right)
 
 
+@_cached_skin
 def decorate_remote_footer(
     skin,
     items,

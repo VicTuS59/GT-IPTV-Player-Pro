@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: id\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Siaran alternatif"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Uji ulang"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stabil"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Dapat diputar"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Tidak stabil"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Belum diuji"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Pengujian ditunda"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Cocok persis"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Nama serupa"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Nomor saluran berbeda"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Negara berbeda"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Paling stabil"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Durasi pengujian: {} dtk"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Jeda data: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Diuji {} dtk lalu"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Pilih siaran; pemutaran saat ini tetap berlanjut."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Pencarian latar belakang: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Disarankan berdasarkan pengujian siaran terakhir."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Membuka siaran..."

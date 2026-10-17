@@ -156,7 +156,7 @@ class GTYouTubeSettingsScreen(Screen):
             shared.youtube_autoplay = self.settings.youtube_autoplay
             shared.youtube_dash = True
             shared.youtube_stream_mode = "auto"
-            shared.youtube_audio_preference = "default"
+            shared.youtube_audio_preference = "original"
             saved = save_player_settings(shared)
         except Exception:
             saved = False

@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: cs\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "Programový průvodce EPG"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Dny"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Dostupné dny: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Denní program"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Vybraný pořad"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Den"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Pořad"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Zítra"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Nyní"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Právě se vysílá"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Skončilo"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Následuje"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Délka: {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Zbývá {} min"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Zpět na celou obrazovku"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Pro tento den nejsou žádné pořady."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Programového průvodce se nepodařilo načíst."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Živý náhled není v tomto systému dostupný."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Popis pořadu není k dispozici."

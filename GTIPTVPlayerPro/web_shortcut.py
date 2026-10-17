@@ -143,6 +143,11 @@ class WebMenuShortcut(object):
         if self._pressed_at is None:
             if flag != 0 or not plugin_owns_focus(self.session):
                 return 0
+            # MENU's higher-priority hook consumes this make before the
+            # fullscreen player can cancel an unfinished 0 gesture itself.
+            zero_key = getattr(self.session.current_dialog, "_live_zero_key", None)
+            if zero_key is not None:
+                zero_key.cancel()
             self._press_dialog = self.session.current_dialog
             self._pressed_at = self._clock()
             self._fired = False

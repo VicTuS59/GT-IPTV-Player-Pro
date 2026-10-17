@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fy\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Alternative streamen"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Opnij teste"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Stabyl"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Ofspielber"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Ynstabyl"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Net test"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Test útsteld"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Krekte oerienkomst"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Fergelykbere namme"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Oar kanaalnûmer"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Oar lân"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Meast stabyl"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Testdoer: {} s"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Gegevensûnderbrekkingen: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "{} s lyn test"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Kies in stream; it hjoeddeiske ôfspieljen giet troch."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Sykjen op de eftergrûn: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Oanrikkemandearre op basis fan de lêste streamtest."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Stream iepenje..."

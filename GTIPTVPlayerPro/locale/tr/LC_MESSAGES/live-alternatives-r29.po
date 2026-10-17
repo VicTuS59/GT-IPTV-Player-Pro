@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: tr\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Alternatif yayınlar"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Yeniden test et"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Sağlıklı"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Açılabilir"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Kararsız"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Test edilmedi"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Test ertelendi"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Tam eşleşme"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Benzer ad"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Kanal numarası farklı"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Ülke farklı"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "En sağlıklı"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Test süresi: {} sn"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Veri kesintisi: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "{} sn önce test edildi"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Bir yayın seçin; mevcut yayın devam eder."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Arka plan taraması: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Son yayın testine göre önerilir."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Yayın açılıyor..."

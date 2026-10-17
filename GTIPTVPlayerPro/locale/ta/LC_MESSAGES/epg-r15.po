@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ta\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "EPG நிகழ்ச்சி வழிகாட்டி"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "நாட்கள்"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "கிடைக்கும் நாட்கள்: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "தினசரி அட்டவணை"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "தேர்ந்தெடுத்த நிகழ்ச்சி"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "நாள்"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "நிகழ்ச்சி"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "நாளை"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "இப்போது"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "இப்போது ஒளிபரப்பாகிறது"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "முடிந்தது"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "அடுத்து"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "நேரம்: {} நிமிடம்"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "{} நிமிடம் மீதம்"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "முழுத்திரைக்குத் திரும்பு"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "இந்த நாளுக்கு நிகழ்ச்சிகள் இல்லை."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "நிகழ்ச்சி வழிகாட்டியை ஏற்ற முடியவில்லை."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "இந்தக் கணினி பதிப்பில் நேரலை முன்னோட்டம் கிடைக்கவில்லை."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "நிகழ்ச்சி விளக்கம் கிடைக்கவில்லை."

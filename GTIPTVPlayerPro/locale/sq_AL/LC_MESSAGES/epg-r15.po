@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: sq_AL\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "Udhëzuesi i programeve EPG"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Ditët"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Ditë të disponueshme: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Programi ditor"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Programi i zgjedhur"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Ditë"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Program"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Nesër"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Tani"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Në transmetim tani"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Përfunduar"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Së shpejti"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Kohëzgjatja: {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Mbeten {} min"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Kthehu në ekran të plotë"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Nuk ka programe për këtë ditë."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Udhëzuesi i programeve nuk u ngarkua."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Pamja paraprake drejtpërdrejt nuk ofrohet në këtë sistem."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Përshkrimi i programit nuk është i disponueshëm."

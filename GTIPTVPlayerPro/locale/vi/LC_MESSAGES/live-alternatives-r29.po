@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: vi\n"
+
+#: live_alternative_page.py
+msgid "Alternative streams"
+msgstr "Luồng thay thế"
+
+#: live_alternative_page.py
+msgid "Retest"
+msgstr "Kiểm tra lại"
+
+#: live_alternative_page.py
+msgid "Healthy"
+msgstr "Ổn định"
+
+#: live_alternative_page.py
+msgid "Playable"
+msgstr "Phát được"
+
+#: live_alternative_page.py
+msgid "Unstable"
+msgstr "Không ổn định"
+
+#: live_alternative_page.py
+msgid "Not tested"
+msgstr "Chưa kiểm tra"
+
+#: live_alternative_page.py
+msgid "Test deferred"
+msgstr "Hoãn kiểm tra"
+
+#: live_alternative_page.py
+msgid "Exact match"
+msgstr "Khớp chính xác"
+
+#: live_alternative_page.py
+msgid "Similar name"
+msgstr "Tên tương tự"
+
+#: live_alternative_page.py
+msgid "Different channel number"
+msgstr "Số kênh khác"
+
+#: live_alternative_page.py
+msgid "Different country"
+msgstr "Quốc gia khác"
+
+#: live_alternative_page.py
+msgid "Healthiest"
+msgstr "Ổn định nhất"
+
+#: live_alternative_page.py
+msgid "Test duration: {} s"
+msgstr "Thời gian kiểm tra: {} giây"
+
+#: live_alternative_page.py
+msgid "Data gaps: {}"
+msgstr "Lần gián đoạn dữ liệu: {}"
+
+#: live_alternative_page.py
+msgid "Tested {} s ago"
+msgstr "Đã kiểm tra {} giây trước"
+
+#: live_alternative_page.py
+msgid "Choose a stream; current playback continues."
+msgstr "Chọn luồng; nội dung hiện tại vẫn tiếp tục phát."
+
+#: live_alternative_page.py
+msgid "Background scan: {}/{}"
+msgstr "Tìm kiếm nền: {}/{}"
+
+#: live_alternative_page.py
+msgid "Recommended based on the last stream test."
+msgstr "Đề xuất dựa trên lần kiểm tra luồng gần nhất."
+
+#: live_alternative_page.py
+msgid "Opening stream..."
+msgstr "Đang mở luồng..."

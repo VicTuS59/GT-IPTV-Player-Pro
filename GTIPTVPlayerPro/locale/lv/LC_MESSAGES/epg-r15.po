@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: lv\n"
+
+#: epg_guide_ui.py
+msgid "EPG programme guide"
+msgstr "EPG programmu ceļvedis"
+
+#: epg_guide_ui.py
+msgid "Days"
+msgstr "Dienas"
+
+#: epg_guide_ui.py
+msgid "Available days: {}"
+msgstr "Pieejamās dienas: {}"
+
+#: epg_guide_ui.py
+msgid "Daily schedule"
+msgstr "Dienas programma"
+
+#: epg_guide_ui.py
+msgid "Selected programme"
+msgstr "Atlasītais raidījums"
+
+#: epg_guide_ui.py
+msgid "Day"
+msgstr "Diena"
+
+#: epg_guide_ui.py
+msgid "Programme"
+msgstr "Raidījums"
+
+#: epg_guide_ui.py
+msgid "Tomorrow"
+msgstr "Rīt"
+
+#: epg_guide_ui.py
+msgid "Now"
+msgstr "Tagad"
+
+#: epg_guide_ui.py
+msgid "On air now"
+msgstr "Pašlaik ēterā"
+
+#: epg_guide_ui.py
+msgid "Finished"
+msgstr "Beidzies"
+
+#: epg_guide_ui.py
+msgid "Upcoming"
+msgstr "Drīzumā"
+
+#: epg_guide_ui.py
+msgid "Duration: {} min"
+msgstr "Ilgums: {} min"
+
+#: epg_guide_ui.py
+msgid "{} min remaining"
+msgstr "Atlikušas {} min"
+
+#: epg_guide_ui.py
+msgid "Return to fullscreen"
+msgstr "Atgriezties pilnekrānā"
+
+#: epg_guide_ui.py
+msgid "No programmes for this day."
+msgstr "Šai dienai nav raidījumu."
+
+#: epg_guide_ui.py
+msgid "Could not load the programme guide."
+msgstr "Neizdevās ielādēt programmu ceļvedi."
+
+#: epg_guide_ui.py
+msgid "Live preview is unavailable on this image."
+msgstr "Tiešraides priekšskatījums šajā sistēmas versijā nav pieejams."
+
+#: epg_guide_ui.py
+msgid "Programme description unavailable."
+msgstr "Raidījuma apraksts nav pieejams."

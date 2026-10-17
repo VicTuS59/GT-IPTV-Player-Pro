@@ -22,7 +22,8 @@ from .compat import compat_urlopen
 from .compat import compat_URLError
 from .compat import SUBURI
 from .jsinterp import JSInterpreter
-from ..youtube_playback import youtube_stream_parts
+from ..youtube_playback import youtube_stream_parts, native_audio_player_available
+from ..youtube_audio import audio_bitrate, audio_sort_key, hls_audio_format
 
 
 IGNORE_VIDEO_FORMAT = (
@@ -49,7 +50,7 @@ DASH_VIDEO_FORMAT = frozenset((
 )) | VP9_VIDEO_FORMAT
 H264_VIDEO_FORMAT = DASH_VIDEO_FORMAT - VP9_VIDEO_FORMAT | frozenset(('18', '22', '37', '38'))
 VP9_HDR_VIDEO_FORMAT = frozenset(str(value) for value in range(330, 338))
-DASH_AUDIO_FORMAT = ('140', '141', '139')
+DASH_AUDIO_FORMAT = ('141', '140', '139')
 
 # Use the response's height when present.  Older YouTube responses sometimes
 # omit it, so retain the established itag groups as a bounded fallback.
@@ -151,6 +152,7 @@ class YouTubeVideoUrl():
 		self.selected_video_itag = ''
 		self.selected_video_codec = ''
 		self.selected_audio_itag = ''
+		self.selected_audio_bitrate = 0
 		self.duration_seconds = 0
 		self._code_cache = {}
 		self._player_cache = {}
@@ -357,25 +359,30 @@ class YouTubeVideoUrl():
 	def _parse_m3u8_attributes(attrib):
 		return {key: val[1:-1] if val.startswith('"') else val for (key, val) in findall(r'(?P<key>[A-Z0-9-]+)=(?P<val>"[^"]+"|[^",]+)(?:,|$)', attrib)}
 
-	def _get_m3u8_audio_urls(self, manifest):
-		audio_urls = {}
+	def _get_m3u8_audio_urls(self, manifest, include_metadata=False):
+		audio_groups = {}
+		preference = config.plugins.YouTube.audioPreference.value
 		if '#EXT-X-MEDIA:' in manifest:
 			for line in manifest.splitlines():
+				line = line.strip()
 				if line.startswith('#EXT-X-MEDIA:'):
 					audio_info = self._parse_m3u8_attributes(line)
-					if audio_info.get('TYPE') == 'AUDIO' and audio_info.get('URI'):
-						audio_urls[audio_info.get('GROUP-ID')] = audio_info['URI']
-		return audio_urls
+					if audio_info.get('TYPE') == 'AUDIO' and audio_info.get('URI') and audio_info.get('GROUP-ID'):
+						audio_groups.setdefault(audio_info['GROUP-ID'], []).append(audio_info)
+		selected = {group: min(tracks, key=lambda info: audio_sort_key(hls_audio_format(info), preference))
+			for group, tracks in audio_groups.items()}
+		return selected if include_metadata else {group: info['URI'] for group, info in selected.items()}
 
 	def _extract_from_m3u8(self, manifest_url, limit=None, allow_separate=True):
 		"""Read the manifest's real resolution and codecs for VOD and live video."""
 		url_map = []
+		allow_separate = allow_separate and native_audio_player_available()
 		if limit is None:
 			limit = RESOLUTION_LIMIT.get(str(config.plugins.YouTube.maxResolution.value), 1440)
 		manifest = self._download_webpage(manifest_url)
 		if '#EXTM3U' not in manifest:
 			raise RuntimeError('Invalid quality manifest')
-		audio_urls = self._get_m3u8_audio_urls(manifest)
+		audio_tracks = self._get_m3u8_audio_urls(manifest, include_metadata=True)
 		attributes = None
 		for line in manifest.splitlines():
 			line = line.strip()
@@ -404,15 +411,18 @@ class YouTubeVideoUrl():
 			if not 0 < height <= limit:
 				continue
 			audio_id = info.get('AUDIO')
+			audio_key = audio_sort_key({}, config.plugins.YouTube.audioPreference.value)
 			if audio_id:
-				if not allow_separate or audio_id not in audio_urls:
+				if not allow_separate or audio_id not in audio_tracks:
 					continue
-				audio_url = urljoin(manifest_url, audio_urls[audio_id])
+				audio_info = audio_tracks[audio_id]
+				audio_url = urljoin(manifest_url, audio_info['URI'])
 				if not audio_url.startswith('https://'):
 					continue
 				url += SUBURI + audio_url
-			url_map.append({'url': url, 'itag': itag, 'height': height, 'codec': codec})
-		return sorted(url_map, key=lambda fmt: (-fmt['height'], fmt['codec'] != 'h264'))
+				audio_key = audio_sort_key(hls_audio_format(audio_info), config.plugins.YouTube.audioPreference.value)
+			url_map.append({'url': url, 'itag': itag, 'height': height, 'codec': codec, 'audio_key': audio_key})
+		return sorted(url_map, key=lambda fmt: (-fmt['height'], fmt['codec'] != 'h264', fmt['audio_key']))
 
 	def _skip_fmt(self, fmt, itag):
 		return (
@@ -439,20 +449,6 @@ class YouTubeVideoUrl():
 			prefer = 20 if codec == 'h264' else 30 if codec == 'vp9' else 200
 		return prefer
 
-	@staticmethod
-	def _audio_pref(fmt, prefer, get_audio):
-		audio_track = fmt.get('audioTrack') or {}
-		name = (audio_track.get('displayName') or '').lower()
-		original = audio_track.get('isOriginal') or any(value in name for value in (
-			'original', 'orijinal', 'originale', 'originalton', 'الأصل'))
-		if prefer == 100:
-			prefer = 20 if 'audio/mp4' in (fmt.get('mimeType') or '').lower() else 200
-		if get_audio == 'original' and original:
-			prefer -= 400
-		elif audio_track.get('audioIsDefault'):
-			prefer -= 200
-		return prefer
-
 	def _sort_formats(self, priority_formats, streaming_formats, get_audio=None):
 		sorted_fmt = []
 		for fmt in streaming_formats:
@@ -460,20 +456,26 @@ class YouTubeVideoUrl():
 			if self._skip_fmt(fmt, itag):
 				continue
 			prefer = priority_formats.index(itag) if itag in priority_formats else 100
-			prefer = self._video_pref(fmt, prefer) if get_audio is None else self._audio_pref(fmt, prefer, get_audio)
+			if get_audio is None:
+				prefer = self._video_pref(fmt, prefer)
+			elif prefer == 100:
+				prefer = 20 if 'audio/mp4' in (fmt.get('mimeType') or '').lower() else 200
 			if prefer < 200:
 				fmt['preference'] = prefer
 				sorted_fmt.append(fmt)
-		return sorted(sorted_fmt, key=lambda k: k['preference'])
+		return sorted(sorted_fmt, key=(lambda fmt: audio_sort_key(fmt, get_audio))
+			if get_audio is not None else (lambda fmt: fmt['preference']))
 
-	def _extract_fmt_video_format(self, streaming_formats, player_id, stream_mode='auto', audio_preference='default'):
+	def _extract_fmt_video_format(self, streaming_formats, player_id, stream_mode='auto', audio_preference='original'):
 		print('[YouTubeVideoUrl] Try fmt url')
 		formats = self._sort_formats(PRIORITY_VIDEO_FORMAT, streaming_formats)
 		limit = 2160 if self.preferred_quality else RESOLUTION_LIMIT.get(str(config.plugins.YouTube.maxResolution.value), 720)
+		allow_separate = stream_mode != 'compatible' and native_audio_player_available()
+		# At the same resolution/codec, use the independently ranked audio
+		# when the native backend is available, including 360p/720p playback.
 		formats.sort(key=lambda fmt: (bool(self.preferred_quality and _format_height(fmt) != self.preferred_quality),
-			-_format_height(fmt),
-			stream_mode == 'dash' and not _video_uses_separate_audio(fmt),
-			_native_video_codec(fmt) != 'h264', fmt['preference']))
+			-_format_height(fmt), _native_video_codec(fmt) != 'h264',
+			allow_separate and not _video_uses_separate_audio(fmt), fmt['preference']))
 		for fmt in formats:
 			itag = str(fmt.get('itag', ''))
 			height = _format_height(fmt)
@@ -484,7 +486,7 @@ class YouTubeVideoUrl():
 			if not codec:
 				continue
 			separate = _video_uses_separate_audio(fmt)
-			if separate and stream_mode == 'compatible':
+			if separate and not allow_separate:
 				continue
 			if not separate and mime and 'codecs=' in mime and 'mp4a' not in mime:
 				continue
@@ -513,11 +515,14 @@ class YouTubeVideoUrl():
 				self.selected_video_itag = itag
 				self.selected_video_codec = codec
 				self.selected_audio_itag = str(audio_fmt.get('itag', '')) if audio_fmt else ''
+				self.selected_audio_bitrate = audio_bitrate(audio_fmt) if audio_fmt else 0
 				print('[YouTubeVideoUrl] selected video itag=%s codec=%s audio itag=%s codec=%s mode=%s' % (
 					itag, mime.split('codecs=')[-1][:56] if 'codecs=' in mime else 'unknown',
 					str(audio_fmt.get('itag')) if audio_fmt else 'embedded',
 					(audio_fmt.get('mimeType') or '').lower().split('codecs=')[-1][:56] if audio_fmt else 'embedded',
 					stream_mode))
+				print('[YouTubeVideoUrl] audio bitrate=%s original_preference=%s' % (
+					self.selected_audio_bitrate, audio_preference == 'original'))
 				return url + (SUBURI + audio_url if audio_url else ''), itag
 		return '', ''
 
@@ -907,7 +912,7 @@ class YouTubeVideoUrl():
 				if url:
 					choices.append({'url': url, 'height': self.selected_quality,
 						'codec': self.selected_video_codec, 'itag': self.selected_video_itag,
-						'audio_itag': self.selected_audio_itag})
+						'audio_itag': self.selected_audio_itag, 'audio_bitrate': self.selected_audio_bitrate})
 			if (streaming.get('hlsManifestUrl')
 					and not any(choice['height'] == self.preferred_quality for choice in choices)):
 				try:
@@ -922,7 +927,9 @@ class YouTubeVideoUrl():
 			if choices:
 				candidates.append(max(choices, key=rank))
 
-		sources = ('web', 3, 5) if self.preferred_quality >= 1440 else (3, 'web', 5)
+		# The web response exposes language/original markers that alternative
+		# clients may omit. Retain the existing clients as network fallbacks.
+		sources = ('web', 3, 5) if audio_preference == 'original' or self.preferred_quality >= 1440 else (3, 'web', 5)
 		for source in sources:
 			try:
 				if source == 'web':
@@ -947,6 +954,7 @@ class YouTubeVideoUrl():
 		self.selected_video_itag = chosen.get('itag', '')
 		self.selected_video_codec = chosen['codec']
 		self.selected_audio_itag = chosen.get('audio_itag', '')
+		self.selected_audio_bitrate = chosen.get('audio_bitrate', 0)
 		self.duration_seconds = duration
 		return chosen['url']
 
@@ -954,6 +962,7 @@ class YouTubeVideoUrl():
 		url = ''
 		self.selected_quality = 0
 		self.selected_video_itag = self.selected_audio_itag = self.selected_video_codec = ''
+		self.selected_audio_bitrate = 0
 		self.duration_seconds = 0
 		lang = config.plugins.YouTube.searchLanguage.value
 		stream_mode = config.plugins.YouTube.streamMode.value
@@ -1014,6 +1023,7 @@ class YouTubeVideoUrl():
 					self.selected_video_itag = fmt.get('itag', '')
 					self.selected_video_codec = fmt.get('codec', '')
 					self.selected_audio_itag = ''
+					self.selected_audio_bitrate = 0
 					print('[YouTubeVideoUrl] Found manifest url')
 					break
 

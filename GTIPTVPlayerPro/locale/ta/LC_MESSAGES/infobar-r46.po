@@ -1,0 +1,48 @@
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.2.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Tamil\nLanguage: ta\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1); \n"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Source: {}"
+msgstr "மூலம்: {}"
+
+#: infobar.py browser.py
+msgid "Stream"
+msgstr "தரவு ஓட்டம்"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Audio: {}"
+msgstr "ஒலி: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Subtitles: {}"
+msgstr "வசனம்: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "Remaining: {}"
+msgstr "மீதம்: {}"
+
+#: infobar.py browser.py
+#, python-brace-format
+msgid "{} h {} min"
+msgstr "{} மணி {} நிமி"
+
+#: infobar.py browser.py
+msgid "Programme guide"
+msgstr "நிகழ்ச்சி வழிகாட்டி"
+
+#: infobar.py browser.py
+msgid "Audio / Subtitles"
+msgstr "ஒலி / வசனம்"
+
+#: infobar.py browser.py
+msgid "Web interface"
+msgstr "வலை இடைமுகம்"
+
+#: infobar.py browser.py
+msgid "MENU 3s"
+msgstr "MENU 3 வி"
+
