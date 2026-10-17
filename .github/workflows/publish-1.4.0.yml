@@ -19,14 +19,15 @@ jobs:
       github.repository == 'VicTuS59/GT-IPTV-Player-Pro' &&
       github.ref == 'refs/heads/main' &&
       (github.event_name == 'workflow_dispatch' ||
-       github.event.head_commit.message == 'Release 1.4.0 stable')
+       github.event.head_commit.message == 'Release 1.4.0 stable' ||
+       github.event.head_commit.message == 'Restore 1.4.0 release presentation')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       GH_TOKEN: ${{ github.token }}
       IPK: dist/enigma2-plugin-extensions-gtiptvplayerpro_1.4.0-r0_all.ipk
       EXPECTED_SHA256: 625f9d6133c4be7f846445fef822ffcdfc371f70902f902ef353ea2b58d78468
-      RELEASE_NOTES_BASE64: R1QgSVBUViBQbGF5ZXIgUHJvIHYxLjQuMCDigJQgU3RhYmxlIFJlbGVhc2UKCkhpZ2hsaWdodHM6Ci0gU2VsZWN0YWJsZSBiYWNrdXAgYW5kIHJlc3RvcmUgZGFzaGJvYXJkcyB3aXRoIHNlY3Rpb24gc2l6ZXMsIGRlc3RpbmF0aW9uIHBhdGhzLCBhcmNoaXZlIHZlcmlmaWNhdGlvbiBhbmQgc2FmZXR5IGJhY2t1cHMuCi0gSW1wcm92ZWQgYmFja3VwIHJlc3RvcmF0aW9uIG9uIHJlY2VpdmVycyB3aXRoIGRpZmZlcmVudCBkaXNrIGFuZCBtb3VudCBsYXlvdXRzOyBleGlzdGluZyAxLjMuMCB1c2VyLWRhdGEgYmFja3VwcyByZW1haW4gc3VwcG9ydGVkLgotIE11bHRpLWRheSBFUEcgZ3VpZGUgd2l0aCBwcm9ncmFtbWUgZGV0YWlscyBhbmQgY29udGludWluZyBsaXZlIHByZXZpZXcsIHdoZXJlIHByb3ZpZGVkIGJ5IHRoZSBzb3VyY2UuCi0gU2hvcnQgMCByZWNhbGxzIHRoZSBwcmV2aW91cyBMaXZlIFRWIGNoYW5uZWwgYWNyb3NzIFh0cmVhbSwgTTNVIGFuZCBTdGFsa2VyIHNvdXJjZXM7IGhvbGQgMCByZXN0YXJ0cyB0aGUgY3VycmVudCBsaXZlIHN0cmVhbS4KLSBDb21wYWN0IHJlZGVzaWduZWQgaW5mb3JtYXRpb24gYmFyIHdpdGggY29ycmVjdGVkIHRleHQgcmVuZGVyaW5nLCBwcm9ncmVzcywgcmVtYWluaW5nIHRpbWUsIHdlYXRoZXIgYW5kIHJlY2VpdmVyIG5ldHdvcmsgcmF0ZS4KLSBTaGFyZWQgd2VhdGhlciBwcmVwYXJhdGlvbiBhdCBwbHVnaW4gc3RhcnR1cCwgaW5jbHVkaW5nIHBsYXliYWNrIG9wZW5lZCB0aHJvdWdoIFlvdVR1YmUuCi0gRmFzdGVyIHBhZ2UgdHJhbnNpdGlvbnMsIFJBTS1hd2FyZSBVSEQgaW1hZ2UgY2FjaGluZywgZmF2b3VyaXRlcyBsb2FkaW5nIGFuZCBwcm9ncmVzc2l2ZSBtb3ZpZS9zZXJpZXMgZGV0YWlscy4KLSBEb3dubG9hZCBxdWV1ZXMgY29udGludWUgYWZ0ZXIgYW4gaW5kaXZpZHVhbCBjb25uZWN0aW9uL3NlcnZlciBmYWlsdXJlLiBBY2NvdW50IHRlc3RpbmcsIHBvcnRhbCB0ZXh0IGltcG9ydCBhbmQgZXhwaXJ5IGhhbmRsaW5nIGhhdmUgYmVlbiBpbXByb3ZlZC4KLSBPcGVuQVRWIG5hdmlnYXRpb24vc2Vla2luZyBmaXhlcywgaWRlbnRpZmllZCBPcGVuUExpIGNvbXBhdGliaWxpdHkgZml4ZXMsIG1ldGFkYXRhIGxhbmd1YWdlIHByZWZlcmVuY2UgYW5kIG9yaWdpbmFsL2RlZmF1bHQgWW91VHViZSBhdWRpbyBzZWxlY3Rpb24uCi0gQWxsIG5ldyBpbnRlcmZhY2UgdGV4dCBpcyBhdmFpbGFibGUgaW4gdGhlIGV4aXN0aW5nIDQzIGRldmljZSBsYW5ndWFnZXMuCgpUaGUgbmV0d29yayBpbmRpY2F0b3Igc2FtcGxlcyBpbmNvbWluZyByZWNlaXZlci1pbnRlcmZhY2UgdHJhZmZpYyBvbmNlIHBlciBzZWNvbmQgd2hpbGUgdGhlIGluZm9ybWF0aW9uIGJhciBpcyB2aXNpYmxlLiBJdCBpbmNsdWRlcyBvdGhlciByZWNlaXZlciBkb3dubG9hZHMgYW5kIGlzIG5vdCBhIHBlci1zdHJlYW0gYml0cmF0ZSBvciBpbnRlcm5ldCBzcGVlZCB0ZXN0LgoKUGFja2FnZToKLSBQbHVnaW4gdmVyc2lvbjogMS40LjAKLSBQYWNrYWdlIHZlcnNpb246IDEuNC4wLXIwCi0gQXJjaGl0ZWN0dXJlOiBhbGwKLSBQeXRob246IDMuOSBvciBuZXdlcgotIEZpbGU6IGVuaWdtYTItcGx1Z2luLWV4dGVuc2lvbnMtZ3RpcHR2cGxheWVycHJvXzEuNC4wLXIwX2FsbC5pcGsKClJlc3RhcnQgdGhlIEVuaWdtYTIgR1VJIGFmdGVyIGluc3RhbGxhdGlvbi4KClNIQS0yNTY6CjYyNWY5ZDYxMzNjNGJlN2Y4NDY0NDVmZWY4MjJmZmNkZmMzNzFmNzA5MDJmOTAyZWYzNTNlYTJiNThkNzg0NjgK
+      RELEASE_NOTES_BASE64: R1QgSVBUViBQbGF5ZXIgUHJvIHYxLjQuMCDigJMgU3RhYmxlIFJlbGVhc2UKCkhpZ2hsaWdodHM6Ci0gWHRyZWFtIENvZGVzLCBNM1UgYW5kIFN0YWxrZXIvTUFDIFBvcnRhbCBzdXBwb3J0Ci0gTGl2ZSBUViwgTW92aWVzLCBTZXJpZXMgYW5kIHByb3ZpZGVyIFRWIEFyY2hpdmUKLSBJbXByb3ZlZCBFUEcgZGlzcGxheSBhbmQgTTNVIFhNTFRWIHNldHRpbmdzCi0gQWNjb3VudCBtYW5hZ2VtZW50LCBleHBpcnkgaW5mb3JtYXRpb24gYW5kIHNpbmdsZS1hY2NvdW50IGhlYWx0aCBjaGVja3MKLSBPcHRpb25hbCBjaW5lbWF0aWMgTW92aWVzIGFuZCBTZXJpZXMgbGF5b3V0Ci0gVXNlciBpbnRlcmZhY2UgdHJhbnNsYXRlZCBpbnRvIDQzIGxhbmd1YWdlcwoKUGFja2FnZToKLSBQbHVnaW4gdmVyc2lvbjogMS40LjAKLSBQYWNrYWdlIHZlcnNpb246IDEuNC4wLXIwCi0gQXJjaGl0ZWN0dXJlOiAzLjkgLSAzLjEwIC0gMy4xMSAtIDMuMTIgLSAzLjEzIC0gMy4xNCBQeXRob24KLSBlbmlnbWEyLXBsdWdpbi1leHRlbnNpb25zLWd0aXB0dnBsYXllcnByb18xLjQuMC1yMF9hbGwuaXBrCgpTSEEtMjU2Ogo2MjVmOWQ2MTMzYzRiZTdmODQ2NDQ1ZmVmODIyZmZjZGZjMzcxZjcwOTAyZjkwMmVmMzUzZWEyYjU4ZDc4NDY4
     steps:
       - name: Check out approved stable sources
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -83,13 +84,21 @@ jobs:
           git push origin HEAD:main
           printf 'RELEASE_COMMIT=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
-      - name: Publish v1.4.0 and both download assets
+      - name: Publish or update v1.4.0 release details
         shell: bash
         run: |
           set -euo pipefail
-          gh release create v1.4.0 "$IPK" "$IPK.sha256" \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$RELEASE_COMMIT" \
-            --title 'GT IPTV Player Pro v1.4.0' \
-            --notes-file "$RUNNER_TEMP/release-notes.txt" \
-            --latest
+          if gh release view v1.4.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.4.0 \
+              --repo "$GITHUB_REPOSITORY" \
+              --title 'GT IPTV Player Pro v1.4.0' \
+              --notes-file "$RUNNER_TEMP/release-notes.txt" \
+              --latest
+          else
+            gh release create v1.4.0 "$IPK" "$IPK.sha256" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$RELEASE_COMMIT" \
+              --title 'GT IPTV Player Pro v1.4.0' \
+              --notes-file "$RUNNER_TEMP/release-notes.txt" \
+              --latest
+          fi
