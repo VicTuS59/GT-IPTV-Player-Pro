@@ -1,0 +1,120 @@
+name: Publish GT IPTV Player Pro 1.5.0
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-1.5.0.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-gtiptvplayerpro-1.5.0
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.repository == 'VicTuS59/GT-IPTV-Player-Pro' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event.head_commit.message == 'Release 1.5.0 stable')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      IPK: dist/enigma2-plugin-extensions-gtiptvplayerpro_1.5.0-r0_all.ipk
+      EXPECTED_SHA256: e8979990db67ebd880e9366364eccf83894f2ee20e4bf9ea2d126fc3d92c9f57
+      PAYLOAD_SHA256: a60e210503b7b218284b3b98bfe9c49bbcd4dad17c791ffc8c8ecfd5999dd066
+    steps:
+      - name: Check out approved stable sources
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Restore the approved r56 source files
+        if: hashFiles('.github/release-payload-1.5.0.tar.gz') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, tarfile
+          from pathlib import Path, PurePosixPath
+
+          payload = Path('.github/release-payload-1.5.0.tar.gz')
+          if hashlib.sha256(payload.read_bytes()).hexdigest() != os.environ['PAYLOAD_SHA256']:
+              raise SystemExit('Release source archive checksum mismatch')
+          allowed = ('GTIPTVPlayerPro/', 'CONTROL/', 'po/')
+          exact = {'README.md', 'scripts/build-ipk.sh', '.github/release-notes-1.5.0.md'}
+          def checked(value):
+              path = PurePosixPath(value)
+              if path.is_absolute() or '..' in path.parts or not (value.startswith(allowed) or value in exact):
+                  raise SystemExit('Invalid release source path')
+              target = Path(value)
+              if target.is_symlink() or any(p.is_symlink() for p in target.parents):
+                  raise SystemExit('Unexpected release source symlink')
+              return target
+
+          with tarfile.open(payload, 'r:gz') as archive:
+              manifest = json.loads(archive.extractfile('manifest.json').read())
+              if manifest['version'] != '1.5.0-r0':
+                  raise SystemExit('Unexpected release source version')
+              for value in manifest['remove']:
+                  if not value.startswith('GTIPTVPlayerPro/'):
+                      raise SystemExit('Invalid obsolete runtime path')
+                  target = checked(value)
+                  if target.is_file():
+                      target.unlink()
+              for value, info in manifest['updates'].items():
+                  target = checked(value)
+                  member = archive.getmember('files/' + value)
+                  if not member.isfile() or member.size != info['size']:
+                      raise SystemExit('Invalid release source member')
+                  content = archive.extractfile(member).read()
+                  if hashlib.sha256(content).hexdigest() != info['sha256']:
+                      raise SystemExit('Release source file checksum mismatch')
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(content)
+                  target.chmod(info['mode'])
+          actual = {str(p): hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in Path('GTIPTVPlayerPro').rglob('*') if p.is_file()}
+          if actual != manifest['runtime']:
+              raise SystemExit('Runtime differs from approved r56 sources')
+          payload.unlink()
+          PY
+
+      - name: Build the approved package and verify its checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          sh scripts/build-ipk.sh
+          printf '%s  %s\n' "$EXPECTED_SHA256" "$IPK" | sha256sum --check --strict -
+          (cd dist && sha256sum "$(basename "$IPK")" > "$(basename "$IPK").sha256")
+
+      - name: Add the stable sources and IPK to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'VicTuS59'
+          git config user.email 'guner.taylan59@icloud.com'
+          git add -A -- GTIPTVPlayerPro CONTROL po scripts/build-ipk.sh README.md .github
+          git add -f -- "$IPK" "$IPK.sha256"
+          if ! git diff --cached --quiet; then
+            git commit -m 'Add verified 1.5.0 release package'
+          fi
+          git push origin HEAD:main
+          printf 'RELEASE_COMMIT=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Publish v1.5.0 and its download assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v1.5.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v1.5.0 "$IPK" "$IPK.sha256" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit v1.5.0 --repo "$GITHUB_REPOSITORY" --title 'GT IPTV Player Pro v1.5.0' --notes-file .github/release-notes-1.5.0.md --latest
+          else
+            gh release create v1.5.0 "$IPK" "$IPK.sha256" --repo "$GITHUB_REPOSITORY" --target "$RELEASE_COMMIT" --title 'GT IPTV Player Pro v1.5.0' --notes-file .github/release-notes-1.5.0.md --latest
+          fi
+
