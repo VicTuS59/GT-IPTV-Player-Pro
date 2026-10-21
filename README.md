@@ -47,4 +47,3 @@ service.
 The source code and original project assets are distributed under
 `GPL-2.0-or-later`. See `LICENSE.txt`, `LICENSING.md` and
 `ASSET_PROVENANCE.md`.
-
