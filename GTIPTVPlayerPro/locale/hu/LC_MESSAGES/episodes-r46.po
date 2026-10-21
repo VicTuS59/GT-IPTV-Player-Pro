@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: hu\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Sorozat"
+
+msgid "Season"
+msgstr "Évad"
+
+msgid "Navigate"
+msgstr "Navigálás"
+
+msgid "Page"
+msgstr "Oldal"
+
+msgid "Play"
+msgstr "Lejátszás"
+
+msgid "Favorite"
+msgstr "Kedvenc"
+
+msgid "Refresh"
+msgstr "Frissítés"
+
+msgid "Download"
+msgstr "Letöltés"
+
+msgid "Back"
+msgstr "Vissza"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "{}. évad"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} évad"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} epizód"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "{}. epizód"
+
+msgid "Watched"
+msgstr "Megnézve"
+
+msgid "Not played"
+msgstr "Még nem játszott"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Folytatás innen: {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "{}. epizód folytatása"
+
+msgid "Continue watching"
+msgstr "Megtekintés folytatása"
+
+msgid "Add to favorites"
+msgstr "Hozzáadás a kedvencekhez"
+
+msgid "Remove from favorites"
+msgstr "Eltávolítás a kedvencek közül"
+
+msgid "Download episode"
+msgstr "Epizód letöltése"
+
+msgid "SEASON PROGRESS"
+msgstr "ÉVAD ELŐREHALADÁSA"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "Befejezett epizódok: {} / {}"
+
+msgid "CAST"
+msgstr "SZEREPLŐK"
+
+msgid "GENRE"
+msgstr "MŰFAJ"
+
+msgid "Unknown season"
+msgstr "Ismeretlen évad"
+
+msgid "No episodes in this season."
+msgstr "Ebben az évadban nincsenek epizódok."
+
+msgid "Marked as watched"
+msgstr "Megnézettként megjelölve"
+
+msgid "Marked as not watched"
+msgstr "Nem megnézettként megjelölve"
+
+msgid "Could not save watched status."
+msgstr "Nem sikerült menteni a megtekintési állapotot."
+
+msgid "Mark watched"
+msgstr "Megjelölés megnézettként"
+
+msgid "Hold OK"
+msgstr "OK nyomva tartása"
+
+msgid "Episodes"
+msgstr "Epizódok"
+
+msgid "No information available."
+msgstr "Nincs elérhető információ."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "{season}. évad · {episode}. epizód · Folytatás innen: {time}"

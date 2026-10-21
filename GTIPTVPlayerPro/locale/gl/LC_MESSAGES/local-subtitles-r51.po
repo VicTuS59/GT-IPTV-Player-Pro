@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: gl\nLanguage: gl\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Escoller un ficheiro de subtítulos"
+
+msgid "Download folder"
+msgstr "Cartafol de descargas"
+
+msgid "Use this folder"
+msgstr "Usar este cartafol"
+
+msgid "Local subtitles"
+msgstr "Subtítulos locais"
+
+msgid "GT subtitle downloads"
+msgstr "Descargas de subtítulos de GT"
+
+msgid "Search subtitle files"
+msgstr "Buscar ficheiros de subtítulos"
+
+msgid "No subtitle files found."
+msgstr "Non se atoparon ficheiros de subtítulos."
+
+msgid "Could not read this folder."
+msgstr "Non se puido ler este cartafol."
+
+msgid "Could not load this subtitle file."
+msgstr "Non se puido cargar este ficheiro de subtítulos."
+
+msgid "Could not save the download folder."
+msgstr "Non se puido gardar o cartafol de descargas."
+
+msgid "Download folder saved."
+msgstr "Cartafol de descargas gardado."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "O cartafol de descargas de subtítulos non está dispoñible. Escolle outro cartafol."
+
+msgid "Subtitle file is too large."
+msgstr "O ficheiro de subtítulos é demasiado grande."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Só se admiten ficheiros de subtítulos SRT e VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Buscando ficheiros de subtítulos..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Acadouse o límite de busca. Acouta a busca."
+
+msgid "Temporary folder"
+msgstr "Cartafol temporal"
+
+msgid "Device storage"
+msgstr "Almacenamento do dispositivo"
+
+msgid "Up one folder"
+msgstr "Subir un cartafol"
+
+msgid "Subtitle language"
+msgstr "Idioma dos subtítulos"
+
+msgid "Search this folder"
+msgstr "Buscar neste cartafol"
+
+msgid "Local subtitle loaded."
+msgstr "Subtítulos locais cargados."
+
+msgid "Automatic detection"
+msgstr "Detección automática"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Escolle un cartafol nun HDD, nun dispositivo USB ou nun NAS conectado."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Elimínase o contido do cartafol temporal cando se reinicia o receptor."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Cartafol de descargas: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Idioma dos subtítulos: {}"
+
+msgid "Folder is not available."
+msgstr "O cartafol non está dispoñible."
+
+msgid "Use temporary folder"
+msgstr "Usar o cartafol temporal"
+
+msgid "Device folders"
+msgstr "Cartafoles do dispositivo"
+
+msgid "Downloaded subtitles"
+msgstr "Subtítulos descargados"
+
+msgid "Search results"
+msgstr "Resultados da busca"

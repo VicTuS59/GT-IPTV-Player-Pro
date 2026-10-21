@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: sv\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Serie"
+
+msgid "Season"
+msgstr "Säsong"
+
+msgid "Navigate"
+msgstr "Navigera"
+
+msgid "Page"
+msgstr "Sida"
+
+msgid "Play"
+msgstr "Spela"
+
+msgid "Favorite"
+msgstr "Favorit"
+
+msgid "Refresh"
+msgstr "Uppdatera"
+
+msgid "Download"
+msgstr "Ladda ned"
+
+msgid "Back"
+msgstr "Tillbaka"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Säsong {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} säsonger"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} avsnitt"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Avsnitt {}"
+
+msgid "Watched"
+msgstr "Sett"
+
+msgid "Not played"
+msgstr "Inte spelat"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Fortsätt från {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Fortsätt med avsnitt {}"
+
+msgid "Continue watching"
+msgstr "Fortsätt titta"
+
+msgid "Add to favorites"
+msgstr "Lägg till i favoriter"
+
+msgid "Remove from favorites"
+msgstr "Ta bort från favoriter"
+
+msgid "Download episode"
+msgstr "Ladda ner avsnitt"
+
+msgid "SEASON PROGRESS"
+msgstr "SÄSONGSFÖRLOPP"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} avsnitt färdigtittade"
+
+msgid "CAST"
+msgstr "SKÅDESPELARE"
+
+msgid "GENRE"
+msgstr "GENRE"
+
+msgid "Unknown season"
+msgstr "Okänd säsong"
+
+msgid "No episodes in this season."
+msgstr "Inga avsnitt i den här säsongen."
+
+msgid "Marked as watched"
+msgstr "Markerat som sett"
+
+msgid "Marked as not watched"
+msgstr "Markerat som inte sett"
+
+msgid "Could not save watched status."
+msgstr "Kunde inte spara visningsstatus."
+
+msgid "Mark watched"
+msgstr "Markera som sett"
+
+msgid "Hold OK"
+msgstr "Håll OK nedtryckt"
+
+msgid "Episodes"
+msgstr "Avsnitt"
+
+msgid "No information available."
+msgstr "Ingen information tillgänglig."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Säsong {season} · Avsnitt {episode} · Fortsätt från {time}"

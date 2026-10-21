@@ -185,9 +185,10 @@ def _active_downloads():
 
 def apply_native_settings():
     """Update live ConfigElements so GUI shutdown cannot overwrite restored keys."""
-    from .settings import plugin_config_section
+    from .settings import plugin_config_section, complete_native_restore
     section = plugin_config_section()
     if section is None:
+        complete_native_restore()
         return
     from .backup import native_settings
     with open(SETTINGS_PATH, "rb") as handle:
@@ -205,6 +206,24 @@ def apply_native_settings():
     for name, element in section.dict().items():
         element.saved_value = values.get(name)
     section.load()
+    complete_native_restore()
+
+
+def _reload_restored_native_settings():
+    """Retry on the GUI; a failed reload keeps native saves blocked until restart."""
+    try:
+        apply_native_settings()
+        return True
+    except Exception as error:
+        log_event("backup", "Live settings refresh failed; interface restart is required", error)
+    try:
+        from Components.config import configfile
+        configfile.load()
+        apply_native_settings()
+        return True
+    except Exception as error:
+        log_event("backup", "Live settings refresh requires receiver restart", error)
+        return False
 
 
 class GTBackupScreen(Screen):
@@ -565,24 +584,15 @@ class GTBackupScreen(Screen):
         if self.mode == "restore":
             from . import downloads
             try:
-                downloads.reload_after_restore()
+                if not self._result.get("downloads_published", False):
+                    downloads.reload_after_restore()
             except Exception as error:
                 log_event("backup", "Download state refresh failed", error)
                 # Never let current-boot process state hide restored history.
                 runtime_state = os.path.join(downloads.RUNTIME, "state.json")
                 if os.path.isfile(runtime_state) and not os.path.islink(runtime_state):
                     os.unlink(runtime_state)
-            try:
-                apply_native_settings()
-            except Exception as error:
-                log_event("backup", "Live settings refresh failed; interface restart is required", error)
-                # Reload the stored values before shutdown as an image fallback.
-                from Components.config import configfile
-                configfile.load()
-                try:
-                    apply_native_settings()
-                except Exception as retry_error:
-                    log_event("backup", "Live settings refresh requires receiver restart", retry_error)
+            _reload_restored_native_settings()
             self._restored = True
             self["detail"].setText(_("Restore completed. Restart the Enigma2 interface.")
                 + "\n\n" + _("Safety backup") + ":\n" + self._result["safety"])
@@ -613,7 +623,13 @@ class GTBackupScreen(Screen):
 
     def failed(self):
         self.state = "error"
-        self._resume()
+        restart_required = bool(getattr(self._error, "restart_required", False))
+        if restart_required:
+            # Keep background producers suspended until journal recovery.
+            self._restored = True
+            _reload_restored_native_settings()
+        else:
+            self._resume()
         code = getattr(self._error, "code", "failed")
         message = _(ERROR_MESSAGES.get(code, ERROR_MESSAGES["failed"]))
         detail = getattr(self._error, "detail", "")
@@ -623,7 +639,7 @@ class GTBackupScreen(Screen):
                 _("Free space") + ": " + _size(self._error.available_bytes),
                 _(REQUIRED_SPACE_MESSAGE) + ": " + _size(self._error.required_bytes)))
         self["detail"].setText(message + ("\n\n" + detail if detail else ""))
-        self["message"].setText(message)
+        self["message"].setText(_("Restart required") if restart_required else message)
         log_event("backup", "Backup operation failed: " + code)
         self.refresh_dashboard()
 

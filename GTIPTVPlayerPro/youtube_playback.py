@@ -102,14 +102,21 @@ class YouTubeEndWatcher(object):
         self.reference = self.dialog.reference
         self.started = self.clock()
         self.position = -1
+        self.last_positive_position = -1
         self.length = 0
         self.pending = self.ended = False
 
     def sample(self, position, length):
         if position >= 0:
             self.position = position
+            if position > 0:
+                self.last_positive_position = position
         if length > 0:
             self.length = length
+
+    def reset_position(self):
+        """Discard pre-seek EOF evidence without inventing a landing sample."""
+        self.position = self.last_positive_position = -1
 
     def _owns_service(self):
         if (self.closed or getattr(self.dialog, "_closed", False)
@@ -129,12 +136,17 @@ class YouTubeEndWatcher(object):
             return
         try:
             position, length = self.dialog._seek_position()
+            # Some decoders reset PTS before delivering EOF. Keep the most
+            # recent credible sample, including one captured by the poll
+            # before this event, instead of interpreting zero as completion.
+            if position <= 1 < self.last_positive_position:
+                position = self.last_positive_position
             self.sample(position, length)
         except Exception:
             pass
-        # Ignore a premature EOF from a broken input when we have observed
-        # its clock. A native EOF without a usable clock remains supported.
-        if self.position > 0 and self.length > 0 and self.position < self.length - 1:
+        # A known duration needs credible near-end evidence. Preserve the
+        # existing native EOF policy when no duration is available.
+        if self.length > 0 and self.position < self.length - 1:
             return
         self.pending = True
         self.timer.start(120, True)

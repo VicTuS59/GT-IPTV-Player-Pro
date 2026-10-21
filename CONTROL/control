@@ -1,18 +1,61 @@
 Package: enigma2-plugin-extensions-gtiptvplayerpro
-Version: 1.4.0-r0
+Version: 1.5.0-r0
 Section: extra
 Priority: optional
 Architecture: all
 Maintainer: VicTuS59
-Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-math, python3-netclient, python3-netserver, python3-stringold, python3-threading, python3-xml
-Installed-Size: 48618
+Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-math, python3-netclient, python3-netserver, python3-sqlite3, python3-stringold, python3-threading, python3-xml
+Installed-Size: 50623
 Homepage: https://github.com/VicTuS59/GT-IPTV-Player-Pro
 License: GPL-2.0-or-later
 Description: GT IPTV Player Pro for Enigma2
  Xtream Codes, M3U and Stalker/MAC accounts with Live TV, Movies and Series.
  Selectable user-data backup and restore with section sizes and safety copies.
  Multi-day EPG guide, previous-channel recall and redesigned information bar.
+ All Movies browsing and account-wide movie search for Xtream and Stalker.
+ Persistent, progressive movie search with resumable category checkpoints.
+ Paged normal movie browsing through the same streaming catalogue on Xtream.
+ Streamed All Series and category browsing with an independent series cache.
+ Persistent watched-episode ticks across playback, resume, seeking and receiver restarts.
+ Immediate BLUE-key account-wide series search with season/episode selection.
+ Optional 14-poster movie/series grid with details and vertical page navigation.
+ Writable cache selection and a portable backend for images without SQLite.
+ Optional single-account automatic login with a translated connection overlay.
  Shared weather and receiver incoming network rate in Mbps.
- Faster artwork and favourites handling, download-queue and image fixes.
+ Actual video resolution in information bars and YouTube previews.
+ YouTube infobar thumbnails, a local logo fallback and correct source details.
+ Live guide with the upcoming schedule on the left and a large poster below mini-TV.
+ Current-programme posters use TMDb, TVmaze and a bounded 10 MiB temporary cache.
+ Permanent removal from Downloads with a separate choice to keep or delete files.
+ Bounded background jobs, fair artwork caching and batched native image updates.
+ Prepared page backgrounds with bounded, cancellation-safe screen handoffs.
+ Visible-only CPU/RAM dial percentages and a one-second information-bar clock.
+ Nonblocking account/download/favorite actions and ordered asynchronous resume saves.
+ Bounded movie/series windows, batched catalogue queries and cancellable image transfers.
  Provider metadata language preference and original YouTube audio selection.
  User interface translated into 43 device languages.
+ TMDb-verified subtitle identities, strict episode checks and conservative release matching.
+ Seven portrait cinema cards and bounded visible-poster download/decode recovery.
+ Independent subtitle timing keys 4/5/6, minute-range offsets and non-modal feedback.
+ Configurable infobar auto-hide: Off or 1-10 seconds, default 4, localized in 43 languages.
+ Bounded artwork and XMLTV caches, shared glass surfaces and background subtitle restore.
+ Remove baked empty poster frames from movie and series backgrounds; existing glass theme retained.
+ Prepare adjacent VOD posters and cinematic artwork with bounded native caching and immediate cached details.
+ Prioritize selected and adjacent cinematic heroes independently of full metadata while preserving bounded page preparation.
+ Keep the displayed cinematic hero visible until replacement artwork is decoded; preserve selection cancellation and bounded preparation.
+ Remove the MENU hold shortcut caption and badge from playback information bars.
+ Cinematic season and episode browser with shaded series artwork and native remote navigation.
+ Durable completion dates, season progress and direct resume with watched/unwatched control.
+ Refined series title size and transparent borderless episode remote guide.
+ Native-size episode action frames retain complete borders across receiver resolutions.
+ Localized subtitle timing feedback, plural-aware counters and refreshed language headings.
+ Browser-language server diagnostics, validation reasons, delete confirmations and M3U labels.
+ Preserve pending resumes and restored history; report durable-save failures accurately.
+ Nonblocking portal refresh, retryable catalog pages and verified complete M3U bodies.
+ Transactional download state, safe concurrent metadata/artwork and YouTube start/end checks.
+ Bounded standalone web requests and paged episode selection.
+ Local SRT/VTT subtitle browser with HDD/USB/NAS storage and readable download filenames.
+ Local subtitle synchronization and resume; translated local-file controls in all 43 languages.
+ Immediate cached live-programme posters with bounded latest-selection workers and cancellable transfers.
+ Combined movie/TV poster lookup, limited selected-channel EPG recovery and per-stage timing diagnostics.
+ Full receiver-folder navigation for local subtitle search and download destinations, including linked directories.

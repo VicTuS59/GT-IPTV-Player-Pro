@@ -22,7 +22,7 @@ from Screens.Screen import Screen
 from enigma import getDesktop
 
 from .background import attach_background
-from .i18n import N_, _, localized_upper
+from .i18n import N_, _, localized_upper, ngettext
 from .m3u_epg_settings import (
     Binding,
     get_m3u_epg_binding,
@@ -851,7 +851,8 @@ class GTM3UXMLTVSettingsScreen(Screen):
             _("Local / NAS") if self.binding.kind == "file" else _("Web URL"),
             endpoint,
             _("Automatic") if automatic else _("Manual"),
-            _("{} hours").format(self.binding.interval_hours) if automatic else "-",
+            ngettext("{} hour", "{} hours", self.binding.interval_hours).format(
+                self.binding.interval_hours) if automatic else "-",
             _utc_text(self.binding.last_success_utc),
             _status_text(self.binding, self._refresh_runtime_state),
         )

@@ -6,7 +6,7 @@
 from .i18n import N_, _, localized_language_name
 from .online_subtitles import parse_subtitle
 from .subtitle_settings import load_subtitle_settings
-from .subtitle_runtime import OnlineSubtitleController
+from .subtitle_runtime import IndependentSubtitleRenderer, OnlineSubtitleController
 from .subtitle_language import normalize_subtitle_language
 from .subssupport_bridge import SubsSupportBridge, subtitle_search_titles
 from .native_subtitle_guard import NativeSubtitleAutoGuard
@@ -105,6 +105,14 @@ def _online_subtitle_browser_class():
         from .subtitle_browser import GTOnlineSubtitleBrowserScreen
 
         return GTOnlineSubtitleBrowserScreen
+    except Exception:
+        return None
+
+
+def _local_subtitle_browser_class():
+    try:
+        from .local_subtitle_browser import GTLocalSubtitleBrowserScreen
+        return GTLocalSubtitleBrowserScreen
     except Exception:
         return None
 
@@ -669,6 +677,7 @@ class MovieSubtitleController(object):
         choices = [
             (_("Embedded subtitles"), "embedded"),
             ("GT IPTV PLAYER PRO • " + _("Subtitles"), "online_browser"),
+            (_("Choose a subtitle file"), "local_file"),
         ]
         choices.append((search_label, "search"))
         if self.online.is_loaded:
@@ -717,6 +726,8 @@ class MovieSubtitleController(object):
             self._open_embedded_selection(include_off=False)
         elif action == "online_browser":
             self._open_online_browser()
+        elif action == "local_file":
+            self._open_local_browser()
         elif (
             isinstance(action, (tuple, list))
             and len(action) == 2
@@ -757,6 +768,12 @@ class MovieSubtitleController(object):
             self._end_menu()
         else:
             self._end_menu()
+
+    def adjust_online_timing(self, delta_ms=0, reset=False):
+        """Numeric shortcuts never change embedded or SubsSupport tracks."""
+        if self._closed or self._menu_open:
+            return None
+        return self.online.adjust_timing(delta_ms=delta_ms, reset=reset)
 
     def _synchronization_finished(self, generation, service_generation):
         if not self._closed and service_generation == self._service_generation:
@@ -836,6 +853,68 @@ class MovieSubtitleController(object):
             return True
         except Exception:
             self._notify(N_("Subtitle result selection is unavailable on this image."))
+            finished()
+            return False
+
+    def _open_local_browser(self):
+        if self._closed:
+            return False
+        browser_class = _local_subtitle_browser_class()
+        opener = getattr(self.session, "openWithCallback", None)
+        if browser_class is None or not callable(opener):
+            self._notify(N_("Could not load this subtitle file."))
+            self._end_menu()
+            return False
+        self._search_generation += 1
+        generation, menu_generation = self._search_generation, self._menu_generation
+        self._search_paused_by_us = False
+        if callable(self.pause_for_search):
+            try:
+                self._search_paused_by_us = bool(self.pause_for_search())
+            except Exception:
+                pass
+        obscurer = getattr(self.online, "set_ui_obscured", None)
+        acquirer = getattr(self.online, "acquire_ui_obscured", None)
+        releaser = getattr(self.online, "release_ui_obscured", None)
+        ui_token = None
+        if callable(acquirer) and callable(releaser):
+            try:
+                ui_token = acquirer()
+            except Exception:
+                pass
+        if ui_token is None and callable(obscurer):
+            try:
+                obscurer(True)
+            except Exception:
+                pass
+        completed = False
+
+        def finished(unused_result=None):
+            nonlocal completed
+            if completed:
+                return
+            completed = True
+            self._resume_after_search(generation)
+            if ui_token is not None:
+                try:
+                    releaser(ui_token)
+                except Exception:
+                    pass
+            elif (not self._closed and generation == self._search_generation
+                  and callable(obscurer)):
+                try:
+                    obscurer(False)
+                except Exception:
+                    pass
+            if generation == self._search_generation:
+                self._search_generation += 1
+            self._end_menu(menu_generation)
+
+        try:
+            opener(finished, browser_class, self.online, self._search_metadata())
+            return True
+        except Exception:
+            self._notify(N_("Could not load this subtitle file."))
             finished()
             return False
 
@@ -1081,7 +1160,7 @@ class MovieSubtitleController(object):
         """Keep just the loaded file and per-film timing, without API keys."""
         state = self.online.snapshot()
         if state:
-            return {"kind": "online", "path": state.get("path"),
+            return {"kind": "local" if state.get("local") else "online", "path": state.get("path"),
                     "offset_ms": state.get("offset_ms", 0)}
         if self.bridge.loaded_path:
             return {"kind": "external", "path": self.bridge.loaded_path,
@@ -1089,6 +1168,31 @@ class MovieSubtitleController(object):
         if self.embedded.selected_track is not None:
             return {"kind": "embedded", "track": self.embedded.selected_track}
         return None
+
+    @staticmethod
+    def prepare_resume_state(state):
+        """Read and parse saved online subtitles on the existing player worker."""
+        if not isinstance(state, dict) or state.get("kind") not in ("online", "local"):
+            return state
+        path = state.get("path")
+        if not isinstance(path, str) or not path:
+            return None
+        settings = load_subtitle_settings()
+        if not settings.enabled and state.get("kind") != "local":
+            return None
+        try:
+            with open(path, "rb") as handle:
+                content = handle.read(2 * 1024 * 1024 + 1)
+            if len(content) > 2 * 1024 * 1024:
+                return None
+            cues = parse_subtitle(content, hearing_impaired=settings.hearing_impaired)
+            if not cues:
+                return None
+            result = dict(state)
+            result["_prepared_online"] = IndependentSubtitleRenderer.prepare(cues)
+            return result
+        except (OSError, TypeError, ValueError, OverflowError):
+            return None
 
     def restore_resume_state(self, state):
         if self._closed or not isinstance(state, dict):
@@ -1124,22 +1228,20 @@ class MovieSubtitleController(object):
         if kind == "external":
             return self.restore_state({"external": path,
                                        "external_sync": state.get("external_sync")})
-        if kind != "online":
+        if kind not in ("online", "local"):
             return False
         try:
             settings = load_subtitle_settings()
-            if not settings.enabled:
+            if not settings.enabled and kind != "local":
                 return False
-            with open(path, "rb") as handle:
-                content = handle.read(2 * 1024 * 1024 + 1)
-            if len(content) > 2 * 1024 * 1024:
+            prepared_state = state if state.get("_prepared_online") is not None else self.prepare_resume_state(state)
+            if prepared_state is None:
                 return False
-            cues = parse_subtitle(content, hearing_impaired=settings.hearing_impaired)
-            if not cues:
-                return False
+            prepared = prepared_state["_prepared_online"]
             return self.restore_state({"online": {
-                "path": path, "cues": cues, "settings": settings,
+                "path": path, "cues": prepared.cues, "prepared": prepared, "settings": settings,
                 "offset_ms": state.get("offset_ms", 0),
+                "local": kind == "local",
             }})
         except (OSError, TypeError, ValueError, OverflowError):
             return False

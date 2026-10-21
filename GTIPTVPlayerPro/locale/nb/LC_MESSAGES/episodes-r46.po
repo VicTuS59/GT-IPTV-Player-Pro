@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: nb\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Serier"
+
+msgid "Season"
+msgstr "Sesong"
+
+msgid "Navigate"
+msgstr "Naviger"
+
+msgid "Page"
+msgstr "Side"
+
+msgid "Play"
+msgstr "Spill av"
+
+msgid "Favorite"
+msgstr "Favoritt"
+
+msgid "Refresh"
+msgstr "Oppdater"
+
+msgid "Download"
+msgstr "Last ned"
+
+msgid "Back"
+msgstr "Tilbake"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Sesong {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} sesonger"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} episoder"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Episode {}"
+
+msgid "Watched"
+msgstr "Sett"
+
+msgid "Not played"
+msgstr "Ikke spilt"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Fortsett fra {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Fortsett episode {}"
+
+msgid "Continue watching"
+msgstr "Fortsett å se"
+
+msgid "Add to favorites"
+msgstr "Legg til i favoritter"
+
+msgid "Remove from favorites"
+msgstr "Fjern fra favoritter"
+
+msgid "Download episode"
+msgstr "Last ned episode"
+
+msgid "SEASON PROGRESS"
+msgstr "SESONGFREMDRIFT"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} episoder fullført"
+
+msgid "CAST"
+msgstr "SKUESPILLERE"
+
+msgid "GENRE"
+msgstr "SJANGER"
+
+msgid "Unknown season"
+msgstr "Ukjent sesong"
+
+msgid "No episodes in this season."
+msgstr "Ingen episoder i denne sesongen."
+
+msgid "Marked as watched"
+msgstr "Merket som sett"
+
+msgid "Marked as not watched"
+msgstr "Merket som ikke sett"
+
+msgid "Could not save watched status."
+msgstr "Kunne ikke lagre visningsstatus."
+
+msgid "Mark watched"
+msgstr "Merk som sett"
+
+msgid "Hold OK"
+msgstr "Hold OK inne"
+
+msgid "Episodes"
+msgstr "Episoder"
+
+msgid "No information available."
+msgstr "Ingen informasjon tilgjengelig."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Sesong {season} · Episode {episode} · Fortsett fra {time}"

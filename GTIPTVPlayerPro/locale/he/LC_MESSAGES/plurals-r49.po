@@ -1,0 +1,53 @@
+# GT IPTV Player Pro — r49 count-aware templates
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Hebrew\nLanguage: he\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=4; plural=(n == 1 ? 0 : n == 2 ? 1 : (n > 10 && n % 10 == 0) ? 2 : 3); \n"
+
+#, python-brace-format
+msgid "{} minute"
+msgid_plural "{} minutes"
+msgstr[0] "{} דקה"
+msgstr[1] "דקות: {}"
+msgstr[2] "{} דקות"
+msgstr[3] "{} דקות"
+
+#, python-brace-format
+msgid "{} hour"
+msgid_plural "{} hours"
+msgstr[0] "{} שעה"
+msgstr[1] "שעות: {}"
+msgstr[2] "{} שעות"
+msgstr[3] "{} שעות"
+
+#, python-brace-format
+msgid "{} day"
+msgid_plural "{} days"
+msgstr[0] "{} יום"
+msgstr[1] "ימים: {}"
+msgstr[2] "{} ימים"
+msgstr[3] "{} ימים"
+
+#, python-brace-format
+msgid "{} episode"
+msgid_plural "{} episodes"
+msgstr[0] "{} פרק"
+msgstr[1] "פרקים: {}"
+msgstr[2] "{} פרקים"
+msgstr[3] "{} פרקים"
+
+#, python-brace-format
+msgid "{} season"
+msgid_plural "{} seasons"
+msgstr[0] "{} עונה"
+msgstr[1] "עונות: {}"
+msgstr[2] "{} עונות"
+msgstr[3] "{} עונות"
+
+#, python-brace-format
+msgid "{} / {} episode completed"
+msgid_plural "{} / {} episodes completed"
+msgstr[0] "{} / {} פרק הושלם"
+msgstr[1] "פרקים שהושלמו: {} / {}"
+msgstr[2] "{} / {} פרקים הושלמו"
+msgstr[3] "{} / {} פרקים הושלמו"

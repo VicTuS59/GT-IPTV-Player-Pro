@@ -13,10 +13,22 @@ from .web_api import GTWebService, WebServiceError, _source_key, _source_name
 from .web_remote import WEB_REMOTE
 
 
+SELECTION_LIFETIME = 600
+EPISODE_PAGE_SIZE = 120
+MAX_EPISODE_CONTEXTS = 4
+MAX_CACHED_EPISODES = 4000
+MAX_ORDINARY_SELECTIONS = 200
+MAX_ITEM_SELECTIONS = MAX_ORDINARY_SELECTIONS + MAX_EPISODE_CONTEXTS * EPISODE_PAGE_SIZE
+
+
 class WebMedia(object):
     def __init__(self):
         self._lock = threading.RLock()
         self._items = {}
+        # Parent selections have their own bounded lifetime: visiting later
+        # pages must not evict the series token along with old episode cards.
+        self._episode_contexts = {}
+        self._episode_request_serial = 0
         self._service = GTWebService()
 
     @staticmethod
@@ -33,15 +45,22 @@ class WebMedia(object):
         return (str(getattr(source, "source_type", "xtream") or "xtream")
                 in ("xtream", "stalker") and cls._playable(source, item))
 
-    def _put(self, source, item):
+    def _put(self, source, item, episode_context=None):
         token = secrets.token_urlsafe(24)
         with self._lock:
             now = time.monotonic()
+            self._prune_episode_contexts_locked(now)
             self._items = {key: value for key, value in self._items.items()
-                           if now - value[0] < 600}
+                           if now - value[0] < SELECTION_LIFETIME}
             self._items[token] = (now, _source_key(source), item)
-            if len(self._items) > 200:
-                self._items.pop(next(iter(self._items)))
+            if episode_context is not None:
+                episode_context["tokens"].add(token)
+            protected = set().union(*(value["tokens"] for value in self._episode_contexts.values()))
+            ordinary = sum(key not in protected for key in self._items)
+            while ordinary > MAX_ORDINARY_SELECTIONS or len(self._items) > MAX_ITEM_SELECTIONS:
+                victim = next(key for key in self._items if key not in protected)
+                self._items.pop(victim)
+                ordinary -= 1
         return {"token": token, "name": str(item.name)[:160],
                 "kind": str(item.content_type), "source": _source_name(source),
                 "playable": self._playable(source, item),
@@ -52,7 +71,7 @@ class WebMedia(object):
     def _get(self, token):
         with self._lock:
             entry = self._items.get(str(token or ""))
-        if entry is None or time.monotonic() - entry[0] >= 600:
+        if entry is None or time.monotonic() - entry[0] >= SELECTION_LIFETIME:
             raise WebServiceError("selection_expired", "Search again to select this title", 410)
         return self._service._find_source(entry[1]), entry[2]
 
@@ -87,20 +106,113 @@ class WebMedia(object):
             raise WebServiceError("media_search_failed", "Source search failed or timed out", 502)
         return {"results": [self._put(source, item) for item in items]}
 
-    def episodes(self, token):
-        from .browser import content_client_for
+    def _prune_episode_contexts_locked(self, now):
+        self._episode_contexts = {
+            key: value for key, value in self._episode_contexts.items()
+            if now - value["created"] < SELECTION_LIFETIME
+        }
+
+    def _episode_context(self, token):
+        token = str(token or "")
+        with self._lock:
+            self._prune_episode_contexts_locked(time.monotonic())
+            context = self._episode_contexts.get(token)
+        if context is not None:
+            return context, self._service._find_source(context["source"])
         source, item = self._get(token)
         if item.content_type != "series" or getattr(item, "episode", ""):
             raise WebServiceError("invalid_type", "Choose a series", 400)
-        client = content_client_for(source)
-        try:
-            with self._scope(client):
-                episodes = client.load_episodes(item.stream_id)
-        except Exception:
-            raise WebServiceError("episodes_failed", "Episodes could not be loaded", 502)
-        for episode in episodes[:120]:
-            episode.favorite_parent = item
-        return {"results": [self._put(source, episode) for episode in episodes[:120]]}
+        with self._lock:
+            # Another request may have installed the same context while the
+            # source was being read. Never replace its already loaded list.
+            context = self._episode_contexts.get(token)
+            if context is None:
+                while len(self._episode_contexts) >= MAX_EPISODE_CONTEXTS:
+                    self._episode_contexts.pop(next(iter(self._episode_contexts)))
+                context = {"created": time.monotonic(), "source": _source_key(source),
+                           "item": item, "episodes": None, "loading": False,
+                           "tokens": set(), "request_serial": 0}
+                self._episode_contexts[token] = context
+        return context, source
+
+    def _cache_episodes_locked(self, context, episodes):
+        if (len(episodes) > MAX_CACHED_EPISODES
+                or not any(value is context for value in self._episode_contexts.values())):
+            return
+        cached = sum(len(value["episodes"] or ())
+                     for value in self._episode_contexts.values() if value is not context)
+        for value in self._episode_contexts.values():
+            if cached + len(episodes) <= MAX_CACHED_EPISODES:
+                break
+            if value is not context and value["episodes"] is not None:
+                cached -= len(value["episodes"])
+                value["episodes"] = None
+        context["episodes"] = episodes
+
+    def episodes(self, token, page=1):
+        from .browser import content_client_for
+        if (isinstance(page, bool) or not isinstance(page, (str, int))
+                or not str(page).isascii() or not str(page).isdigit()
+                or len(str(page)) > 8 or int(page) < 1):
+            raise WebServiceError("episodes_failed", "Episodes could not be loaded", 400)
+        page = int(page)
+        with self._lock:
+            # Assign before source lookup: a slow older lookup must not
+            # supersede a newer completed request for the same series.
+            self._episode_request_serial += 1
+            request_serial = self._episode_request_serial
+        context, source = self._episode_context(token)
+        item = context["item"]
+        with self._lock:
+            episodes = context["episodes"]
+            if request_serial < context["request_serial"]:
+                raise WebServiceError("episodes_failed", "Episodes could not be loaded", 409)
+            if episodes is None:
+                if context["loading"]:
+                    raise WebServiceError("episodes_failed", "Episodes could not be loaded", 409)
+                context["loading"] = True
+            context["request_serial"] = request_serial
+        if episodes is None:
+            try:
+                client = content_client_for(source)
+                with self._scope(client):
+                    episodes = tuple(client.load_episodes(item.stream_id))
+                with self._lock:
+                    # Large series remain fully pageable by bounded explicit
+                    # refetches. They are not silently cut to the cache budget.
+                    if context["request_serial"] == request_serial:
+                        self._cache_episodes_locked(context, episodes)
+            except Exception:
+                raise WebServiceError("episodes_failed", "Episodes could not be loaded", 502)
+            finally:
+                with self._lock:
+                    context["loading"] = False
+        total = len(episodes)
+        pages = max(1, (total + EPISODE_PAGE_SIZE - 1) // EPISODE_PAGE_SIZE)
+        if page > pages:
+            raise WebServiceError("episodes_failed", "Episodes could not be loaded", 400)
+        start = (page - 1) * EPISODE_PAGE_SIZE
+        selected = episodes[start:start + EPISODE_PAGE_SIZE]
+        # Commit a page's selection tokens together, so the returned page
+        # never evicts its own first cards while replacing the previous page.
+        with self._lock:
+            if (self._episode_contexts.get(str(token or "")) is not context
+                    or time.monotonic() - context["created"] >= SELECTION_LIFETIME):
+                raise WebServiceError("selection_expired", "Search again to select this title", 410)
+            if context["request_serial"] != request_serial:
+                raise WebServiceError("episodes_failed", "Episodes could not be loaded", 409)
+            # Only the current page remains pinned for this context. Other
+            # contexts retain their current page even if an older browser
+            # response finishes later or one series is paged repeatedly.
+            for previous_token in context["tokens"]:
+                self._items.pop(previous_token, None)
+            context["tokens"] = set()
+            for episode in selected:
+                episode.favorite_parent = item
+            results = [self._put(source, episode, context) for episode in selected]
+        return {"results": results, "page": page, "page_size": EPISODE_PAGE_SIZE,
+                "total": total, "total_pages": pages,
+                "has_previous": page > 1, "has_more": page < pages}
 
     def download(self, token):
         source, item = self._get(token)

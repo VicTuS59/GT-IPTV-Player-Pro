@@ -3,11 +3,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """One decoder shared by the YouTube result page and its fullscreen player."""
 
-from enigma import ePoint, eSize, eTimer
+from enigma import ePoint, eSize, eTimer, iServiceInformation
 
 from .i18n import _
 from .main import _connect_timer
 from .youtube_playback import YouTubeEndWatcher, youtube_duration_seconds
+from .stream_resolution import ResolutionTracker
 
 
 def same_reference(left, right):
@@ -42,6 +43,7 @@ class YouTubePreviewMixin(object):
         self._youtube_end_watcher = None
         self._preview_play_started_at = 0.0
         self._preview_ended = False
+        self._youtube_resolution_tracker = ResolutionTracker()
         self._preview_timer = eTimer()
         _connect_timer(self._preview_timer, self._preview_tick)
 
@@ -54,6 +56,18 @@ class YouTubePreviewMixin(object):
     def _preview_owns_service(self):
         return bool(self._started and same_reference(
             self.reference, self._preview_current_reference()))
+
+    def _youtube_resolution_snapshot(self):
+        if not self._preview_owns_service() or not self._preview_is_foreground():
+            self._youtube_resolution_tracker.reset()
+            return None
+        try:
+            service = self.session.nav.getCurrentService()
+            reference = self.reference.toString()
+        except Exception:
+            service, reference = None, ""
+        return self._youtube_resolution_tracker.sample(
+            service, iServiceInformation, reference, item=self.current_item)
 
     def _preview_is_foreground(self):
         return bool(not self._closed and not self._fullscreen_active
@@ -102,7 +116,8 @@ class YouTubePreviewMixin(object):
         if getattr(self._youtube_end_watcher, "ended", False):
             position = length
         try:
-            self._preview_resume_store.save(
+            from .persistence import queue_playback_save
+            queue_playback_save(self._preview_resume_store,
                 self.current_item.stream_id, position, length)
         except (OSError, AttributeError):
             pass
@@ -117,7 +132,9 @@ class YouTubePreviewMixin(object):
             self._preview_old_reference = previous
             self._preview_old_captured = True
         try:
-            self.session.nav.playService(reference)
+            result = self.session.nav.playService(reference)
+            if isinstance(result, int) and result != 0:
+                raise RuntimeError("playService returned {}".format(result))
         except Exception:
             # A failed start may release the decoder. Restore only that slot,
             # and never replace a different service opened in the meantime.
@@ -137,6 +154,7 @@ class YouTubePreviewMixin(object):
         self._preview_window_applied = False
         self._preview_play_started_at = 0.0
         self._preview_ended = False
+        self._youtube_resolution_tracker.reset()
         self._render_preview()
         self._resume_youtube_window()
         self._preview_timer.start(200, True)
@@ -208,6 +226,9 @@ class YouTubePreviewMixin(object):
             return
         if self._preview_is_foreground():
             self._resume_youtube_window()
+            updater = getattr(self, "_refresh_youtube_resolution", None)
+            if callable(updater):
+                updater()
             position, length = self._seek_position()
             if self._youtube_end_watcher is not None:
                 self._youtube_end_watcher.sample(position, length)

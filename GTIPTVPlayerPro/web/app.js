@@ -25,6 +25,12 @@
     youtubeTimer: 0,
     mediaResults: [],
     mediaDownloadPending: {},
+    mediaEpisodePage: null,
+    mediaEpisodeBusy: false,
+    mediaLoadingToken: "",
+    mediaRequestSerial: 0,
+    mediaSearchBusy: false,
+    mediaSearchPath: "",
     runtimeVersion: "",
     runtimeWarningForced: false,
     csrf: "",
@@ -32,6 +38,7 @@
     language: "en",
     strings: {},
     runtimeTexts: {},
+    validationTexts: {},
     languageRequestSerial: 0,
     youtubeSettings: null,
     youtubeStatus: null,
@@ -210,9 +217,13 @@
       payload = { ok: false, error: "request_failed", message: t("request_failed", "Request failed") };
     }
     if (!response.ok || !payload.ok) {
-      var localizedError = state.strings[payload.error || ""];
-      var english = /^en(?:_|$)/i.test(state.language);
-      var error = new Error(localizedError || (english && payload.message) || t("request_failed", "Request failed"));
+      var localizedError = Object.prototype.hasOwnProperty.call(state.strings, payload.error || "") ?
+        state.strings[payload.error] : "";
+      var validationMessage = String(payload.message || "");
+      var validationError = payload.error === "source_save_failed" &&
+        Object.prototype.hasOwnProperty.call(state.validationTexts, validationMessage) ?
+          state.validationTexts[validationMessage] : "";
+      var error = new Error(localizedError || validationError || t("request_failed", "Request failed"));
       error.code = payload.error || "request_failed";
       error.status = response.status;
       if (response.status === 401 && path !== "/bootstrap") {
@@ -248,6 +259,7 @@
     state.language = catalog.language || "en";
     state.strings = catalog.strings || {};
     state.runtimeTexts = catalog.runtime_texts || {};
+    state.validationTexts = catalog.validation_texts || {};
     translateCurrentMessages(previous);
     document.documentElement.lang = state.language.replace(/_/g, "-");
     document.documentElement.dir = catalog.direction === "rtl" ? "rtl" : "ltr";
@@ -374,6 +386,10 @@
     cancelYouTubeSearch();
     ++state.youtubeSearchSerial;
     state.youtubeSearchBusy = state.youtubePagingBusy = false;
+    ++state.mediaRequestSerial;
+    state.mediaEpisodeBusy = state.mediaSearchBusy = false;
+    state.mediaLoadingToken = "";
+    setBusy(byId("mediaSearchForm").querySelector("button"), false);
     setBusy(byId("youtubeSearchForm").querySelector("button"), false);
     window.clearInterval(state.refreshTimer);
     window.clearInterval(state.sessionTimer);
@@ -619,6 +635,14 @@
 
   function sourceTypeShortLabel(type) {
     return type === "xtream" ? "XTREAM" : (type === "stalker" ? "STALKER / MAC" : String(type || "IPTV").toUpperCase());
+  }
+
+  function sourceDetailLabel(source) {
+    if (source.type === "m3u" && (source.kind === "file" || source.kind === "url")) {
+      return "M3U • " + (source.kind === "file" ?
+        t("local_file", "Local file") : t("web_url", "Web URL"));
+    }
+    return source.label || "";
   }
 
   function updateRuntimeWarning(force) {
@@ -1003,10 +1027,10 @@
       var head = node("div", "management-card-head");
       var badge = node("span", "type-badge", sourceTypeLabel(item.type));
       var body = node("div");
-      append(body, node("strong", "", item.name || sourceTypeLabel(item.type)), node("small", "", item.endpoint || item.label || item.masked_secret));
+      append(body, node("strong", "", item.name || sourceTypeLabel(item.type)), node("small", "", item.endpoint || sourceDetailLabel(item) || item.masked_secret));
       append(head, badge, body, statusDot(item.status));
       var health = item.health || {};
-      var details = node("div", "health-details", serverText(health.detail) || item.label || t("masked_notice", "Sensitive account data is hidden."));
+      var details = node("div", "health-details", serverText(health.detail) || sourceDetailLabel(item) || t("masked_notice", "Sensitive account data is hidden."));
       var actions = node("div", "row-actions");
       actions.appendChild(sourceButton(t("test", "Test"), "test", item.id));
       actions.appendChild(sourceButton(t("edit", "Edit"), "edit", item.id));
@@ -1791,34 +1815,111 @@
       append(card, artwork, details, actions); return card;
     });
     byId("mediaResults").replaceChildren.apply(byId("mediaResults"), cards);
+    renderMediaPager();
+  }
+
+  function renderMediaPager() {
+    var target = byId("mediaPager");
+    var listing = state.mediaEpisodePage;
+    target.hidden = !listing || listing.total_pages <= 1;
+    if (target.hidden) { target.replaceChildren(); return; }
+    function control(label, page, disabled) {
+      var button = node("button", "video-page-button", label);
+      button.type = "button";
+      button.disabled = disabled || state.mediaEpisodeBusy || state.mediaSearchBusy;
+      button.addEventListener("click", function () { gotoMediaEpisodePage(page, button); });
+      return button;
+    }
+    var count = node("span", "", String(listing.page) + " / " + String(listing.total_pages));
+    target.replaceChildren(
+      control(t("previous_page", "Previous"), listing.page - 1, !listing.has_previous),
+      count,
+      control(t("next_page", "Next"), listing.page + 1, !listing.has_more)
+    );
+  }
+
+  function gotoMediaEpisodePage(page, button) {
+    var listing = state.mediaEpisodePage;
+    if (!listing || state.mediaEpisodeBusy || state.mediaSearchBusy ||
+        page < 1 || page > listing.total_pages) { return; }
+    return loadMediaEpisodePage(listing.entry, page, button);
+  }
+
+  async function loadMediaEpisodePage(entry, page, button) {
+    if (state.mediaEpisodeBusy && state.mediaLoadingToken === entry.token) { return; }
+    var serial = ++state.mediaRequestSerial;
+    state.mediaSearchBusy = false;
+    state.mediaEpisodeBusy = true;
+    state.mediaLoadingToken = entry.token;
+    setBusy(byId("mediaSearchForm").querySelector("button"), false);
+    setBusy(button, true);
+    renderMediaPager();
+    byId("mediaMessage").textContent = t("loading_episodes", "Loading episodes…");
+    try {
+      var data = await api("/media/episodes?token=" + encodeURIComponent(entry.token) +
+        "&page=" + encodeURIComponent(page));
+      if (serial !== state.mediaRequestSerial) { return; }
+      state.mediaEpisodePage = {
+        entry: entry, page: Number(data.page || page),
+        total_pages: Number(data.total_pages || 1),
+        has_previous: Boolean(data.has_previous), has_more: Boolean(data.has_more)
+      };
+      renderMediaResults(data.results);
+      byId("mediaMessage").textContent = data.results.length ? entry.name : t("no_results", "No results found");
+    } catch (error) {
+      if (serial !== state.mediaRequestSerial) { return; }
+      // A failed next/previous request keeps the last usable page and tokens.
+      toast(error.message, true);
+      byId("mediaMessage").textContent = error.message;
+    } finally {
+      setBusy(button, false);
+      if (serial === state.mediaRequestSerial) {
+        state.mediaEpisodeBusy = false;
+        state.mediaLoadingToken = "";
+        renderMediaPager();
+      }
+    }
   }
 
   async function searchMedia(event) {
     event.preventDefault();
     var button = event.currentTarget.querySelector("button");
+    var path = "/media/search?source=" + encodeURIComponent(byId("mediaSource").value) + "&kind=" + encodeURIComponent(byId("mediaKind").value) + "&q=" + encodeURIComponent(byId("mediaQuery").value.trim());
+    if (state.mediaSearchBusy && state.mediaSearchPath === path) { return; }
+    var serial = ++state.mediaRequestSerial;
+    state.mediaSearchBusy = true;
+    state.mediaSearchPath = path;
+    state.mediaEpisodeBusy = false;
+    state.mediaLoadingToken = "";
+    state.mediaEpisodePage = null;
+    renderMediaPager();
     setBusy(button, true);
     byId("mediaMessage").textContent = t("searching", "Searching…");
     try {
-      var path = "/media/search?source=" + encodeURIComponent(byId("mediaSource").value) + "&kind=" + encodeURIComponent(byId("mediaKind").value) + "&q=" + encodeURIComponent(byId("mediaQuery").value.trim());
       var data = await api(path);
+      if (serial !== state.mediaRequestSerial) { return; }
       renderMediaResults(data.results);
       byId("mediaMessage").textContent = data.results.length ? "" : t("no_results", "No results found");
-    } catch (error) { renderMediaResults([]); byId("mediaMessage").textContent = error.message; }
-    finally { setBusy(button, false); }
+    } catch (error) {
+      if (serial === state.mediaRequestSerial) {
+        renderMediaResults([]);
+        byId("mediaMessage").textContent = error.message;
+      }
+    } finally {
+      if (serial === state.mediaRequestSerial) {
+        state.mediaSearchBusy = false;
+        setBusy(button, false);
+        renderMediaPager();
+      }
+    }
   }
 
   async function selectMedia(entry, button) {
+    if (!entry.playable) { return loadMediaEpisodePage(entry, 1, button); }
     setBusy(button, true);
     try {
-      if (entry.playable) {
-        await api("/media/play", { method: "POST", body: { token: entry.token } });
-        toast(t("play_requested", "Playback requested on TV"));
-      } else {
-        byId("mediaMessage").textContent = t("loading_episodes", "Loading episodes…");
-        var data = await api("/media/episodes?token=" + encodeURIComponent(entry.token));
-        renderMediaResults(data.results);
-        byId("mediaMessage").textContent = data.results.length ? entry.name : t("no_results", "No results found");
-      }
+      await api("/media/play", { method: "POST", body: { token: entry.token } });
+      toast(t("play_requested", "Playback requested on TV"));
     } catch (error) { toast(error.message, true); byId("mediaMessage").textContent = error.message; }
     finally { setBusy(button, false); }
   }

@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: zh_HK\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "劇集"
+
+msgid "Season"
+msgstr "季"
+
+msgid "Navigate"
+msgstr "導航"
+
+msgid "Page"
+msgstr "頁面"
+
+msgid "Play"
+msgstr "播放"
+
+msgid "Favorite"
+msgstr "收藏"
+
+msgid "Refresh"
+msgstr "重新整理"
+
+msgid "Download"
+msgstr "下載"
+
+msgid "Back"
+msgstr "返回"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "第{}季"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{}季"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{}集"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "第{}集"
+
+msgid "Watched"
+msgstr "已觀看"
+
+msgid "Not played"
+msgstr "尚未播放"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "從{}繼續"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "繼續第{}集"
+
+msgid "Continue watching"
+msgstr "繼續觀看"
+
+msgid "Add to favorites"
+msgstr "加入收藏"
+
+msgid "Remove from favorites"
+msgstr "從收藏移除"
+
+msgid "Download episode"
+msgstr "下載本集"
+
+msgid "SEASON PROGRESS"
+msgstr "本季進度"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "已看完{} / {}集"
+
+msgid "CAST"
+msgstr "演員"
+
+msgid "GENRE"
+msgstr "類型"
+
+msgid "Unknown season"
+msgstr "未知季度"
+
+msgid "No episodes in this season."
+msgstr "本季暫無劇集。"
+
+msgid "Marked as watched"
+msgstr "已標記為看過"
+
+msgid "Marked as not watched"
+msgstr "已標記為未看"
+
+msgid "Could not save watched status."
+msgstr "無法儲存觀看狀態。"
+
+msgid "Mark watched"
+msgstr "標記為已看"
+
+msgid "Hold OK"
+msgstr "長按 OK"
+
+msgid "Episodes"
+msgstr "集數"
+
+msgid "No information available."
+msgstr "暫無資料。"
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "第{season}季 · 第{episode}集 · 從{time}繼續"

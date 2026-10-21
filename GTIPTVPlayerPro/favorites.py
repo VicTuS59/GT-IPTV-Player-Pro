@@ -12,10 +12,15 @@ from collections import OrderedDict
 from urllib.parse import urlsplit
 
 from .portal_identity import safe_composite_id
+from .persistence import PersistenceWriter, guarded_mutation
+from copy import deepcopy
+import atexit
 
 
 DEFAULT_FAVORITES_PATH = "/etc/enigma2/gtiptvplayerpro-favorites.json"
 MAX_FAVORITES = 2000
+_FAVORITE_WRITER = PersistenceWriter(max_pending=MAX_FAVORITES)
+atexit.register(_FAVORITE_WRITER.flush)
 # R41 stores an explicit 64-character key order in addition to the unchanged
 # legacy items dictionary.  Eight MiB safely accommodates MAX_FAVORITES with
 # maximum-length safe poster URLs and multibyte titles.
@@ -248,11 +253,25 @@ class FavoriteStore(object):
                         _READ_CACHE.popitem(last=False)
             return snapshot
 
+    def _visible_entries(self, snapshot):
+        overlay = _FAVORITE_WRITER.snapshot(("favorite", self._read_cache_key()))
+        entries = OrderedDict((entry["key"], entry) for entry in snapshot[1])
+        for key, value in overlay.items():
+            if not value["desired"]:
+                entries.pop(key, None)
+            elif key not in entries:
+                entries[key] = dict(key=key, account_scope=value["scope"],
+                    item=value["item"], updated_at=value["updated_at"])
+                entries.move_to_end(key, last=False)
+        return list(entries.values())[:MAX_FAVORITES]
+
     def cached_keys(self, account_scope):
-        """Return a cheap fresh snapshot, or None while a reload is needed."""
+        """Return committed state plus all accepted optimistic mutations."""
         snapshot = self._cached_snapshot()
-        return (set(snapshot[2].get(str(account_scope or ""), ()))
-                if snapshot is not None else None)
+        if snapshot is None:
+            return None
+        return {entry["key"] for entry in self._visible_entries(snapshot)
+                if entry["account_scope"] == str(account_scope or "")}
 
     def preload(self):
         """Load/validate once per file away from the GUI, shared across pages."""
@@ -370,7 +389,7 @@ class FavoriteStore(object):
                 handle.flush()
                 try:
                     os.fsync(handle.fileno())
-                except (AttributeError, OSError):
+                except AttributeError:
                     pass
             replacer = getattr(os, "replace", os.rename)
             replacer(temporary, self.path)
@@ -390,6 +409,7 @@ class FavoriteStore(object):
             except OSError:
                 pass
 
+    @guarded_mutation
     def _write(self, items, order=None):
         with _STORE_LOCK:
             return self._write_locked(items, order)
@@ -429,7 +449,7 @@ class FavoriteStore(object):
         if not account_scope or (content_type and content_type not in _CONTENT_TYPES):
             return []
         snapshot = self._read_snapshot()
-        return [dict(entry, item=dict(entry["item"])) for entry in snapshot[1]
+        return [dict(entry, item=dict(entry["item"])) for entry in self._visible_entries(snapshot)
                 if entry["account_scope"] == account_scope
                 and (not content_type or entry["item"]["content_type"] == content_type)]
 
@@ -445,11 +465,12 @@ class FavoriteStore(object):
         if content_type and content_type not in _CONTENT_TYPES:
             return []
         snapshot = self._read_snapshot()
-        return [dict(entry, item=dict(entry["item"])) for entry in snapshot[1]
+        return [dict(entry, item=dict(entry["item"])) for entry in self._visible_entries(snapshot)
                 if not content_type or entry["item"]["content_type"] == content_type]
 
     def keys(self, account_scope=""):
-        return set(self._read_snapshot()[2].get(str(account_scope or ""), ()))
+        return {entry["key"] for entry in self._visible_entries(self._read_snapshot())
+                if entry["account_scope"] == str(account_scope or "")}
 
     @staticmethod
     def _prune(items, order):
@@ -462,6 +483,7 @@ class FavoriteStore(object):
             keep_order,
         )
 
+    @guarded_mutation
     def add(self, account_scope, item):
         account_scope = str(account_scope or "")
         key = favorite_key(account_scope, item)
@@ -482,6 +504,7 @@ class FavoriteStore(object):
             items, order = self._prune(items, order)
             return self._write_locked(items, order)
 
+    @guarded_mutation
     def remove(self, key, account_scope=""):
         key = str(key or "")
         if not key:
@@ -505,7 +528,38 @@ class FavoriteStore(object):
         """Compatibility helper for the shared poster-grid controller."""
         return self.remove(key)
 
-    def toggle(self, account_scope, item):
+    def toggle_async(self, account_scope, item, desired=None):
+        scope = str(account_scope or "")
+        key = favorite_key(scope, item)
+        metadata = favorite_item_metadata(item)
+        if not key or not metadata:
+            return None, None
+        write_key = ("favorite", self._read_cache_key(), key)
+        with _FAVORITE_WRITER._condition:
+            keys = self.cached_keys(scope)
+            if keys is None:
+                self.preload()
+                return None, None
+            desired = (key not in keys) if desired is None else bool(desired)
+            item = deepcopy(item)
+            result = {"done": False, "ok": False}
+            def commit():
+                try:
+                    result["ok"] = self.toggle(scope, item, desired=desired) is desired
+                    self._read_snapshot()
+                    return result["ok"]
+                finally:
+                    result["done"] = True
+            def finished():
+                if not result["done"]:
+                    result.update(done=True, ok=True)  # superseded by a newer intent
+            if not _FAVORITE_WRITER.submit(write_key, commit, cleanup=finished,
+                    value={"scope": scope, "desired": desired, "item": metadata, "updated_at": int(self.clock())}, essential=True):
+                return None, None
+        return desired, result
+
+    @guarded_mutation(failure=None)
+    def toggle(self, account_scope, item, desired=None):
         account_scope = str(account_scope or "")
         key = favorite_key(account_scope, item)
         metadata = favorite_item_metadata(item)
@@ -515,11 +569,10 @@ class FavoriteStore(object):
             items, order, mutable = self._load_state()
             if not mutable:
                 return None
-            if self._valid_entry(
-                key,
-                items.get(key),
-                account_scope=account_scope,
-            ) is not None:
+            present = self._valid_entry(key, items.get(key), account_scope=account_scope) is not None
+            if desired is not None and bool(desired) == present:
+                return present
+            if present:
                 items.pop(key, None)
                 order = [entry_key for entry_key in order if entry_key != key]
                 return False if self._write_locked(items, order) else None
@@ -533,6 +586,7 @@ class FavoriteStore(object):
             items, order = self._prune(items, order)
             return True if self._write_locked(items, order) else None
 
+    @guarded_mutation
     def remember(self, key, item, account_scope=""):
         """Refresh safe metadata without moving an existing favorite."""
         key = str(key or "")
@@ -560,6 +614,7 @@ class FavoriteStore(object):
             items[key] = updated
             return self._write_locked(items, order)
 
+    @guarded_mutation
     def remember_many(self, entries, account_scope=""):
         """Refresh several poster URLs with one flash write at most."""
         account_scope = str(account_scope or "")
@@ -592,6 +647,40 @@ class FavoriteStore(object):
                 return eligible
             return self._write_locked(items, order)
 
+    def reorder_async(self, account_scope, ordered_keys, content_type=""):
+        keys = tuple(str(key) for key in ordered_keys)
+        result = {"done": False, "ok": False}
+        def commit():
+            try:
+                # Toggles queued on either side of a coalesced reorder can
+                # add/remove a key before this job runs. Apply the requested
+                # order to the still-present subset and keep other keys in
+                # their existing order; never recreate a removed favorite.
+                with _STORE_LOCK:
+                    items, current_order, mutable = self._load_state()
+                    if not mutable:
+                        result["ok"] = False
+                    else:
+                        current = [key for key in current_order if self._valid_entry(
+                            key, items.get(key), account_scope=str(account_scope),
+                            content_type=str(content_type)) is not None]
+                        selected = set(current)
+                        ordered = [key for key in keys if key in selected]
+                        requested = set(ordered)
+                        ordered.extend(key for key in current if key not in requested)
+                        result["ok"] = self.reorder(account_scope, ordered, content_type) if ordered else True
+                self._read_snapshot()
+                return result["ok"]
+            finally:
+                result["done"] = True
+        def finished():
+            if not result["done"]:
+                result.update(done=True, ok=True)
+        accepted = _FAVORITE_WRITER.submit(("favorite-order", self._read_cache_key(), str(account_scope), str(content_type)),
+            commit, cleanup=finished, essential=True)
+        return result if accepted else None
+
+    @guarded_mutation
     def reorder(self, account_scope, ordered_keys, content_type=""):
         """Persist one account/filter order without touching timestamps.
 

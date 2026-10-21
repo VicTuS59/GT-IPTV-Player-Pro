@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: fr_FR\nLanguage: fr_FR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Choisir un fichier de sous-titres"
+
+msgid "Download folder"
+msgstr "Dossier de téléchargement"
+
+msgid "Use this folder"
+msgstr "Utiliser ce dossier"
+
+msgid "Local subtitles"
+msgstr "Sous-titres locaux"
+
+msgid "GT subtitle downloads"
+msgstr "Sous-titres téléchargés avec GT"
+
+msgid "Search subtitle files"
+msgstr "Rechercher des fichiers de sous-titres"
+
+msgid "No subtitle files found."
+msgstr "Aucun fichier de sous-titres trouvé."
+
+msgid "Could not read this folder."
+msgstr "Impossible de lire ce dossier."
+
+msgid "Could not load this subtitle file."
+msgstr "Impossible de charger ce fichier de sous-titres."
+
+msgid "Could not save the download folder."
+msgstr "Impossible d'enregistrer le dossier de téléchargement."
+
+msgid "Download folder saved."
+msgstr "Dossier de téléchargement enregistré."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Le dossier de téléchargement des sous-titres est indisponible. Choisissez un autre dossier."
+
+msgid "Subtitle file is too large."
+msgstr "Le fichier de sous-titres est trop volumineux."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Seuls les fichiers de sous-titres SRT et VTT sont pris en charge."
+
+msgid "Searching subtitle files..."
+msgstr "Recherche de fichiers de sous-titres..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Limite de recherche atteinte. Affinez votre recherche."
+
+msgid "Temporary folder"
+msgstr "Dossier temporaire"
+
+msgid "Device storage"
+msgstr "Stockage de l'appareil"
+
+msgid "Up one folder"
+msgstr "Dossier parent"
+
+msgid "Subtitle language"
+msgstr "Langue des sous-titres"
+
+msgid "Search this folder"
+msgstr "Rechercher dans ce dossier"
+
+msgid "Local subtitle loaded."
+msgstr "Sous-titres locaux chargés."
+
+msgid "Automatic detection"
+msgstr "Détection automatique"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Choisissez un dossier sur un HDD, un support USB ou un NAS connecté."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Le dossier temporaire est vidé au redémarrage du récepteur."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Dossier de téléchargement : {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Langue des sous-titres : {}"
+
+msgid "Folder is not available."
+msgstr "Dossier indisponible."
+
+msgid "Use temporary folder"
+msgstr "Utiliser le dossier temporaire"
+
+msgid "Device folders"
+msgstr "Dossiers de l'appareil"
+
+msgid "Downloaded subtitles"
+msgstr "Sous-titres téléchargés"
+
+msgid "Search results"
+msgstr "Résultats de recherche"

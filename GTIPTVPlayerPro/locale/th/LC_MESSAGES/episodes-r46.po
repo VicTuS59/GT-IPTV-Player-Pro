@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: th\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "ซีรีส์"
+
+msgid "Season"
+msgstr "ซีซัน"
+
+msgid "Navigate"
+msgstr "นำทาง"
+
+msgid "Page"
+msgstr "หน้า"
+
+msgid "Play"
+msgstr "เล่น"
+
+msgid "Favorite"
+msgstr "รายการโปรด"
+
+msgid "Refresh"
+msgstr "รีเฟรช"
+
+msgid "Download"
+msgstr "ดาวน์โหลด"
+
+msgid "Back"
+msgstr "ย้อนกลับ"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "ซีซัน {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} ซีซัน"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} ตอน"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "ตอนที่ {}"
+
+msgid "Watched"
+msgstr "ดูแล้ว"
+
+msgid "Not played"
+msgstr "ยังไม่ได้เล่น"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "เล่นต่อจาก {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "เล่นตอนที่ {} ต่อ"
+
+msgid "Continue watching"
+msgstr "ดูต่อ"
+
+msgid "Add to favorites"
+msgstr "เพิ่มในรายการโปรด"
+
+msgid "Remove from favorites"
+msgstr "นำออกจากรายการโปรด"
+
+msgid "Download episode"
+msgstr "ดาวน์โหลดตอน"
+
+msgid "SEASON PROGRESS"
+msgstr "ความคืบหน้าของซีซัน"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "ดูจบแล้ว {} / {} ตอน"
+
+msgid "CAST"
+msgstr "นักแสดง"
+
+msgid "GENRE"
+msgstr "ประเภท"
+
+msgid "Unknown season"
+msgstr "ไม่ทราบซีซัน"
+
+msgid "No episodes in this season."
+msgstr "ไม่มีตอนในซีซันนี้"
+
+msgid "Marked as watched"
+msgstr "ทำเครื่องหมายว่าดูแล้ว"
+
+msgid "Marked as not watched"
+msgstr "ทำเครื่องหมายว่ายังไม่ได้ดู"
+
+msgid "Could not save watched status."
+msgstr "ไม่สามารถบันทึกสถานะการดูได้"
+
+msgid "Mark watched"
+msgstr "ทำเครื่องหมายว่าดูแล้ว"
+
+msgid "Hold OK"
+msgstr "กด OK ค้างไว้"
+
+msgid "Episodes"
+msgstr "ตอน"
+
+msgid "No information available."
+msgstr "ไม่มีข้อมูล"
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "ซีซัน {season} · ตอนที่ {episode} · เล่นต่อจาก {time}"

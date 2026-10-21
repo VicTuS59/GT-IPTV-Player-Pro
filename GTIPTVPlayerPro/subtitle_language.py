@@ -45,18 +45,34 @@ def normalize_subtitle_language(value):
 
 
 _EPISODE_MARKER = re.compile(
-    r"(?<![a-z0-9])S(\d{1,2})[ ._-]*E(\d{1,3})(?![a-z0-9])|"
-    r"(?<![a-z0-9])(\d{1,2})x(\d{1,3})(?![a-z0-9])", re.I
+    r"(?<![a-z0-9])(?:S(\d{1,2})[ ._-]*E(\d{1,3})|"
+    r"(\d{1,2})x(\d{1,3}))"
+    r"((?:(?:[ ._-]*E|[-+])\d{1,3})*)(?![a-z0-9])", re.I
 )
 
 
+def subtitle_episode_markers(value):
+    """Retain every episode in a name; combined files are not single episodes."""
+    pairs = []
+    for match in _EPISODE_MARKER.finditer(str(value or "")[:512]):
+        season, episode = match.group(1, 2) if match.group(1) else match.group(3, 4)
+        season, episode = int(season), int(episode)
+        pairs.append((season, episode))
+        for extra in re.findall(r"\d{1,3}", match.group(5) or ""):
+            last = int(extra)
+            # Only membership/ambiguity is needed; never expand a large range.
+            if 0 < last - episode <= 50:
+                pairs.extend((season, number) for number in range(episode + 1, last + 1))
+            else:
+                pairs.append((season, last))
+            episode = last
+    return tuple(dict.fromkeys(pairs))
+
+
 def subtitle_episode_numbers(value):
-    """Read one bounded explicit S/E marker, including underscore releases."""
-    match = _EPISODE_MARKER.search(str(value or "")[:512])
-    if match is None:
-        return ()
-    parts = match.group(1, 2) if match.group(1) else match.group(3, 4)
-    return tuple(int(part) for part in parts)
+    """Return an unambiguous single episode, including S00 specials."""
+    pairs = subtitle_episode_markers(value)
+    return pairs[0] if len(pairs) == 1 else ()
 
 
 def _episode_number(value):
@@ -68,20 +84,30 @@ def _episode_number(value):
 
 
 def subtitle_episode_matches(item, season, episode):
-    """Share provider and archive S/E checks without guessing unknown episodes."""
-    season, episode = _episode_number(season), _episode_number(episode)
-    if not season or not episode:
+    """Cross-check provider fields and filenames, including season zero."""
+    if season is None or str(season).strip() == "" or not _episode_number(episode):
         return True
+    season, episode = _episode_number(season), _episode_number(episode)
     item = item if isinstance(item, dict) else {}
-    found_season = _episode_number(item.get("season", item.get("season_number", item.get("seasonNumber"))))
-    found_episode = _episode_number(item.get("episode", item.get("episode_number", item.get("episodeNumber"))))
-    if found_season and found_episode:
-        return (found_season, found_episode) == (season, episode)
-    release = (item.get("release_name") or item.get("releaseInfo") or
-               item.get("release") or item.get("name") or "")
-    if isinstance(release, (tuple, list)):
-        release = " | ".join(str(value or "")[:240] for value in release[:8])
-    return subtitle_episode_numbers(release) == (season, episode)
+    def first(names):
+        return next((item[name] for name in names
+                     if item.get(name) is not None and str(item[name]).strip() != ""), None)
+    raw_season = first(("season", "season_number", "seasonNumber"))
+    found_episode = _episode_number(first(("episode", "episode_number", "episodeNumber")))
+    explicit = raw_season is not None and found_episode > 0
+    expected = (season, episode)
+    if explicit and (_episode_number(raw_season), found_episode) != expected:
+        return False
+    pairs = []
+    for field in ("release_name", "releaseInfo", "release", "name", "file_name"):
+        value = item.get(field)
+        values = value[:8] if isinstance(value, (tuple, list)) else (value,)
+        for entry in values:
+            pairs.extend(subtitle_episode_markers(entry))
+    known = set(pairs)
+    if known and known != {expected}:
+        return False
+    return explicit or known == {expected}
 
 
 def text_matches_language(text, language):

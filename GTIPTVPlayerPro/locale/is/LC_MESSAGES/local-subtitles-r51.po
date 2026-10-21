@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Icelandic\nLanguage: is\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Veldu skjátextaskrá"
+
+msgid "Download folder"
+msgstr "Niðurhalsmappa"
+
+msgid "Use this folder"
+msgstr "Nota þessa möppu"
+
+msgid "Local subtitles"
+msgstr "Staðbundnir skjátextar"
+
+msgid "GT subtitle downloads"
+msgstr "Skjátextar sóttir með GT"
+
+msgid "Search subtitle files"
+msgstr "Leita að skjátextaskrám"
+
+msgid "No subtitle files found."
+msgstr "Engar skjátextaskrár fundust."
+
+msgid "Could not read this folder."
+msgstr "Ekki tókst að lesa þessa möppu."
+
+msgid "Could not load this subtitle file."
+msgstr "Ekki tókst að hlaða inn þessari skjátextaskrá."
+
+msgid "Could not save the download folder."
+msgstr "Ekki tókst að vista niðurhalsmöppuna."
+
+msgid "Download folder saved."
+msgstr "Niðurhalsmappa vistuð."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Niðurhalsmappa skjátexta er ekki tiltæk. Veldu aðra möppu."
+
+msgid "Subtitle file is too large."
+msgstr "Skjátextaskráin er of stór."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Aðeins SRT- og VTT-skjátextaskrár eru studdar."
+
+msgid "Searching subtitle files..."
+msgstr "Leitað að skjátextaskrám..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Leitarmörkum náð. Þrengdu leitina."
+
+msgid "Temporary folder"
+msgstr "Tímabundin mappa"
+
+msgid "Device storage"
+msgstr "Geymsla tækis"
+
+msgid "Up one folder"
+msgstr "Upp um eina möppu"
+
+msgid "Subtitle language"
+msgstr "Tungumál skjátexta"
+
+msgid "Search this folder"
+msgstr "Leita í þessari möppu"
+
+msgid "Local subtitle loaded."
+msgstr "Staðbundnir skjátextar hlaðnir."
+
+msgid "Automatic detection"
+msgstr "Sjálfvirk greining"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Veldu möppu á HDD-diski, USB-drifi eða tengdri NAS-geymslu."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Tímabundna mappan er tæmd þegar móttakarinn er endurræstur."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Niðurhalsmappa: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Tungumál skjátexta: {}"
+
+msgid "Folder is not available."
+msgstr "Mappan er ekki tiltæk."
+
+msgid "Use temporary folder"
+msgstr "Nota tímabundna möppu"
+
+msgid "Device folders"
+msgstr "Möppur tækis"
+
+msgid "Downloaded subtitles"
+msgstr "Sóttir skjátextar"
+
+msgid "Search results"
+msgstr "Leitarniðurstöður"

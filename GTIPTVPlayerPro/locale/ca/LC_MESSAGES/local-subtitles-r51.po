@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: ca\nLanguage: ca\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Tria un fitxer de subtítols"
+
+msgid "Download folder"
+msgstr "Carpeta de baixades"
+
+msgid "Use this folder"
+msgstr "Utilitza aquesta carpeta"
+
+msgid "Local subtitles"
+msgstr "Subtítols locals"
+
+msgid "GT subtitle downloads"
+msgstr "Subtítols baixats amb GT"
+
+msgid "Search subtitle files"
+msgstr "Cerca fitxers de subtítols"
+
+msgid "No subtitle files found."
+msgstr "No s'ha trobat cap fitxer de subtítols."
+
+msgid "Could not read this folder."
+msgstr "No s'ha pogut llegir aquesta carpeta."
+
+msgid "Could not load this subtitle file."
+msgstr "No s'ha pogut carregar aquest fitxer de subtítols."
+
+msgid "Could not save the download folder."
+msgstr "No s'ha pogut desar la carpeta de baixades."
+
+msgid "Download folder saved."
+msgstr "Carpeta de baixades desada."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "La carpeta de baixades de subtítols no està disponible. Tria una altra carpeta."
+
+msgid "Subtitle file is too large."
+msgstr "El fitxer de subtítols és massa gran."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Només s'admeten fitxers de subtítols SRT i VTT."
+
+msgid "Searching subtitle files..."
+msgstr "S'estan cercant fitxers de subtítols..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "S'ha assolit el límit de cerca. Acota la cerca."
+
+msgid "Temporary folder"
+msgstr "Carpeta temporal"
+
+msgid "Device storage"
+msgstr "Emmagatzematge del dispositiu"
+
+msgid "Up one folder"
+msgstr "Carpeta superior"
+
+msgid "Subtitle language"
+msgstr "Idioma dels subtítols"
+
+msgid "Search this folder"
+msgstr "Cerca en aquesta carpeta"
+
+msgid "Local subtitle loaded."
+msgstr "Subtítols locals carregats."
+
+msgid "Automatic detection"
+msgstr "Detecció automàtica"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Tria una carpeta en un HDD, un dispositiu USB o un NAS connectat."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "La carpeta temporal es buida quan es reinicia el receptor."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Carpeta de baixades: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Idioma dels subtítols: {}"
+
+msgid "Folder is not available."
+msgstr "La carpeta no està disponible."
+
+msgid "Use temporary folder"
+msgstr "Utilitza la carpeta temporal"
+
+msgid "Device folders"
+msgstr "Carpetes del dispositiu"
+
+msgid "Downloaded subtitles"
+msgstr "Subtítols baixats"
+
+msgid "Search results"
+msgstr "Resultats de la cerca"

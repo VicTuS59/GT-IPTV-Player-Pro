@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Ukrainian\nLanguage: uk\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Виберіть файл субтитрів"
+
+msgid "Download folder"
+msgstr "Тека завантаження"
+
+msgid "Use this folder"
+msgstr "Використати цю теку"
+
+msgid "Local subtitles"
+msgstr "Локальні субтитри"
+
+msgid "GT subtitle downloads"
+msgstr "Завантаження субтитрів GT"
+
+msgid "Search subtitle files"
+msgstr "Пошук файлів субтитрів"
+
+msgid "No subtitle files found."
+msgstr "Файлів субтитрів не знайдено."
+
+msgid "Could not read this folder."
+msgstr "Не вдалося прочитати цю теку."
+
+msgid "Could not load this subtitle file."
+msgstr "Не вдалося завантажити цей файл субтитрів."
+
+msgid "Could not save the download folder."
+msgstr "Не вдалося зберегти теку завантаження."
+
+msgid "Download folder saved."
+msgstr "Теку завантаження збережено."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Тека завантаження субтитрів недоступна. Виберіть іншу теку."
+
+msgid "Subtitle file is too large."
+msgstr "Файл субтитрів завеликий."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Підтримуються лише файли субтитрів SRT і VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Пошук файлів субтитрів..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Досягнуто межі пошуку. Уточніть запит."
+
+msgid "Temporary folder"
+msgstr "Тимчасова тека"
+
+msgid "Device storage"
+msgstr "Сховище пристрою"
+
+msgid "Up one folder"
+msgstr "На теку вище"
+
+msgid "Subtitle language"
+msgstr "Мова субтитрів"
+
+msgid "Search this folder"
+msgstr "Шукати в цій теці"
+
+msgid "Local subtitle loaded."
+msgstr "Локальні субтитри завантажено."
+
+msgid "Automatic detection"
+msgstr "Автоматичне визначення"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Виберіть теку на HDD, USB або підключеному NAS."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Тимчасова тека очищується після перезапуску приймача."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Тека завантаження: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Мова субтитрів: {}"
+
+msgid "Folder is not available."
+msgstr "Тека недоступна."
+
+msgid "Use temporary folder"
+msgstr "Використати тимчасову теку"
+
+msgid "Device folders"
+msgstr "Теки пристрою"
+
+msgid "Downloaded subtitles"
+msgstr "Завантажені субтитри"
+
+msgid "Search results"
+msgstr "Результати пошуку"

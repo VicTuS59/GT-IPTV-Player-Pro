@@ -10,6 +10,7 @@ import time
 from urllib.parse import urlsplit
 
 from .portal_identity import safe_composite_id
+from .persistence import WRITER, guarded_mutation, resume_write_key
 
 
 DEFAULT_RESUME_PATH = "/etc/enigma2/gtiptvplayerpro-resume.json"
@@ -220,10 +221,10 @@ class PlaybackResumeStore(object):
         return items, True
 
     def _load(self):
-        with _RESUME_STORE_LOCK:
-            items, unused_mutable = self._load_state()
-            del unused_mutable
-            return items
+        # Writers replace the complete document atomically. A reader can use
+        # the previous complete version without waiting for a flash fsync.
+        items, unused_mutable = self._load_state()
+        return items
 
     def _write_locked(self, items):
         directory = os.path.dirname(self.path)
@@ -252,7 +253,7 @@ class PlaybackResumeStore(object):
                 handle.flush()
                 try:
                     os.fsync(handle.fileno())
-                except (AttributeError, OSError):
+                except AttributeError:
                     pass
             replacer = getattr(os, "replace", os.rename)
             replacer(temporary, self.path)
@@ -271,6 +272,7 @@ class PlaybackResumeStore(object):
             except OSError:
                 pass
 
+    @guarded_mutation
     def _write(self, items):
         with _RESUME_STORE_LOCK:
             return self._write_locked(items)
@@ -278,6 +280,9 @@ class PlaybackResumeStore(object):
     def get(self, key):
         if not key:
             return None
+        pending, value = WRITER.peek(resume_write_key(self, key))
+        if pending:
+            return value if should_save_resume(value["position"], value["length"]) else None
         entry = self._load().get(key)
         if not isinstance(entry, dict):
             return None
@@ -295,13 +300,64 @@ class PlaybackResumeStore(object):
             "updated_at": updated_at,
         }
 
+    def get_many(self, keys):
+        """Read requested bookmarks once, including queued saves/deletions.
+
+        Episode browsing also needs legacy bookmarks without stored content
+        metadata. Unlike list_entries(), the supplied anonymous keys already
+        establish account/content identity, so those entries remain usable.
+        Call this from a loader rather than from direction-key rendering.
+        """
+        if isinstance(keys, str):
+            keys = (keys,)
+        requested = tuple(dict.fromkeys(
+            key for key in (keys or ()) if isinstance(key, str) and key
+        ))
+        if not requested:
+            return {}
+        prefix = resume_write_key(self, "")[:-1]
+        # Preserve an in-flight mutation even when it finishes during the
+        # atomic disk read; a newer queued value wins over that first sample.
+        overlay = WRITER.snapshot(prefix)
+        items = self._load()
+        overlay.update(WRITER.snapshot(prefix))
+        results = {}
+        for key in requested:
+            entry = overlay[key] if key in overlay else items.get(key)
+            if not isinstance(entry, dict):
+                continue
+            try:
+                position = int(entry.get("position", 0))
+                length = int(entry.get("length", 0))
+                updated_at = int(entry.get("updated_at", 0) or 0)
+                resumable = should_save_resume(position, length)
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if resumable:
+                results[key] = {
+                    "position": position,
+                    "length": length,
+                    "updated_at": updated_at,
+                }
+        return results
+
     def list_entries(self, account_scope=""):
         """List resumable entries newest-first for one anonymous account."""
         account_scope = str(account_scope or "")
         if not account_scope:
             return []
+        prefix = resume_write_key(self, "")[:-1]
+        # Keep writes that finish while the atomic disk snapshot is read.
+        overlay = WRITER.snapshot(prefix)
+        items = self._load()
+        overlay.update(WRITER.snapshot(prefix))
+        for key, value in overlay.items():
+            previous = items.get(key)
+            merged = dict(previous) if isinstance(previous, dict) else {}
+            merged.update(value)
+            items[key] = merged
         results = []
-        for key, entry in self._load().items():
+        for key, entry in items.items():
             if not isinstance(entry, dict):
                 continue
             if str(entry.get("account_scope", "")) != account_scope:
@@ -343,6 +399,13 @@ class PlaybackResumeStore(object):
         )
         return results[:MAX_RESUME_ITEMS]
 
+    def remember_async(self, key, item, account_scope=""):
+        from copy import deepcopy
+        item = deepcopy(item)
+        return WRITER.submit(("enrich", self.path, key),
+                             lambda: self.remember(key, item, account_scope))
+
+    @guarded_mutation
     def remember(self, key, item, account_scope=""):
         """Enrich a valid legacy bookmark without changing its watch time."""
         if not key:
@@ -373,6 +436,7 @@ class PlaybackResumeStore(object):
             items[key] = entry
             return self._write_locked(items)
 
+    @guarded_mutation
     def remember_many(self, entries, account_scope=""):
         """Enrich several bookmarks with one read and at most one disk write."""
         with _RESUME_STORE_LOCK:
@@ -408,6 +472,7 @@ class PlaybackResumeStore(object):
                 return True
             return self._write_locked(items)
 
+    @guarded_mutation
     def save(self, key, position, length, item=None, account_scope=""):
         if not key:
             return False
@@ -448,6 +513,7 @@ class PlaybackResumeStore(object):
                     items.pop(old_key, None)
             return self._write_locked(items)
 
+    @guarded_mutation
     def clear(self, key):
         if not key:
             return False

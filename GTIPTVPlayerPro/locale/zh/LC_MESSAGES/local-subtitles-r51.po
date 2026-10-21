@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: zh\nLanguage: zh\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Choose a subtitle file"
+msgstr "选择字幕文件"
+
+msgid "Download folder"
+msgstr "下载文件夹"
+
+msgid "Use this folder"
+msgstr "使用此文件夹"
+
+msgid "Local subtitles"
+msgstr "本地字幕"
+
+msgid "GT subtitle downloads"
+msgstr "GT 字幕下载"
+
+msgid "Search subtitle files"
+msgstr "搜索字幕文件"
+
+msgid "No subtitle files found."
+msgstr "未找到字幕文件。"
+
+msgid "Could not read this folder."
+msgstr "无法读取此文件夹。"
+
+msgid "Could not load this subtitle file."
+msgstr "无法加载此字幕文件。"
+
+msgid "Could not save the download folder."
+msgstr "无法保存下载文件夹。"
+
+msgid "Download folder saved."
+msgstr "下载文件夹已保存。"
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "字幕下载文件夹不可用。请选择其他文件夹。"
+
+msgid "Subtitle file is too large."
+msgstr "字幕文件过大。"
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "仅支持 SRT 和 VTT 字幕文件。"
+
+msgid "Searching subtitle files..."
+msgstr "正在搜索字幕文件..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "已达到搜索上限。请缩小搜索范围。"
+
+msgid "Temporary folder"
+msgstr "临时文件夹"
+
+msgid "Device storage"
+msgstr "设备存储"
+
+msgid "Up one folder"
+msgstr "上一级文件夹"
+
+msgid "Subtitle language"
+msgstr "字幕语言"
+
+msgid "Search this folder"
+msgstr "搜索此文件夹"
+
+msgid "Local subtitle loaded."
+msgstr "本地字幕已加载。"
+
+msgid "Automatic detection"
+msgstr "自动检测"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "请选择 HDD、USB 或已连接 NAS 上的文件夹。"
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "接收机重启时会清空临时文件夹。"
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "下载文件夹：{}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "字幕语言：{}"
+
+msgid "Folder is not available."
+msgstr "文件夹不可用。"
+
+msgid "Use temporary folder"
+msgstr "使用临时文件夹"
+
+msgid "Device folders"
+msgstr "设备文件夹"
+
+msgid "Downloaded subtitles"
+msgstr "已下载的字幕"
+
+msgid "Search results"
+msgstr "搜索结果"

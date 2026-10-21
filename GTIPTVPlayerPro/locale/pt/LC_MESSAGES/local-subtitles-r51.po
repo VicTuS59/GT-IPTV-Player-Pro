@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: pt\nLanguage: pt\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Escolher um ficheiro de legendas"
+
+msgid "Download folder"
+msgstr "Pasta de transferências"
+
+msgid "Use this folder"
+msgstr "Usar esta pasta"
+
+msgid "Local subtitles"
+msgstr "Legendas locais"
+
+msgid "GT subtitle downloads"
+msgstr "Legendas transferidas pelo GT"
+
+msgid "Search subtitle files"
+msgstr "Procurar ficheiros de legendas"
+
+msgid "No subtitle files found."
+msgstr "Não foram encontrados ficheiros de legendas."
+
+msgid "Could not read this folder."
+msgstr "Não foi possível ler esta pasta."
+
+msgid "Could not load this subtitle file."
+msgstr "Não foi possível carregar este ficheiro de legendas."
+
+msgid "Could not save the download folder."
+msgstr "Não foi possível guardar a pasta de transferências."
+
+msgid "Download folder saved."
+msgstr "Pasta de transferências guardada."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "A pasta de transferências de legendas não está disponível. Escolha outra pasta."
+
+msgid "Subtitle file is too large."
+msgstr "O ficheiro de legendas é demasiado grande."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Só são suportados ficheiros de legendas SRT e VTT."
+
+msgid "Searching subtitle files..."
+msgstr "A procurar ficheiros de legendas..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Limite de pesquisa atingido. Restrinja a pesquisa."
+
+msgid "Temporary folder"
+msgstr "Pasta temporária"
+
+msgid "Device storage"
+msgstr "Armazenamento do dispositivo"
+
+msgid "Up one folder"
+msgstr "Subir uma pasta"
+
+msgid "Subtitle language"
+msgstr "Idioma das legendas"
+
+msgid "Search this folder"
+msgstr "Procurar nesta pasta"
+
+msgid "Local subtitle loaded."
+msgstr "Legendas locais carregadas."
+
+msgid "Automatic detection"
+msgstr "Deteção automática"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Escolha uma pasta num HDD, dispositivo USB ou NAS ligado."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "A pasta temporária é esvaziada quando o recetor reinicia."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Pasta de transferências: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Idioma das legendas: {}"
+
+msgid "Folder is not available."
+msgstr "A pasta não está disponível."
+
+msgid "Use temporary folder"
+msgstr "Usar pasta temporária"
+
+msgid "Device folders"
+msgstr "Pastas do dispositivo"
+
+msgid "Downloaded subtitles"
+msgstr "Legendas transferidas"
+
+msgid "Search results"
+msgstr "Resultados da pesquisa"

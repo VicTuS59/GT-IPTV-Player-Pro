@@ -1,6 +1,6 @@
 DOMAIN := GTIPTVPlayerPro
 PACKAGE_NAME := GT IPTV Player Pro
-PACKAGE_VERSION := 1.4.0
+PACKAGE_VERSION := 1.5.0
 BUGS_ADDRESS := https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues
 SOURCE_DATE_EPOCH ?= 1700000000
 export SOURCE_DATE_EPOCH
@@ -137,3 +137,4 @@ check:
 	done
 
 FORCE:
+

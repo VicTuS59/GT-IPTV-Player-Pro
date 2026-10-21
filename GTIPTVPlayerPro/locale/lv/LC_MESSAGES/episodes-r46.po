@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: lv\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Seriāli"
+
+msgid "Season"
+msgstr "Sezona"
+
+msgid "Navigate"
+msgstr "Naviģēt"
+
+msgid "Page"
+msgstr "Lapa"
+
+msgid "Play"
+msgstr "Atskaņot"
+
+msgid "Favorite"
+msgstr "Mīļākais"
+
+msgid "Refresh"
+msgstr "Atsvaidzināt"
+
+msgid "Download"
+msgstr "Lejupielādēt"
+
+msgid "Back"
+msgstr "Atpakaļ"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "{}. sezona"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "Sezonas: {}"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "Sērijas: {}"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "{}. sērija"
+
+msgid "Watched"
+msgstr "Noskatīts"
+
+msgid "Not played"
+msgstr "Nav atskaņots"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Turpināt no {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Turpināt {}. sēriju"
+
+msgid "Continue watching"
+msgstr "Turpināt skatīties"
+
+msgid "Add to favorites"
+msgstr "Pievienot izlasei"
+
+msgid "Remove from favorites"
+msgstr "Izņemt no izlases"
+
+msgid "Download episode"
+msgstr "Lejupielādēt sēriju"
+
+msgid "SEASON PROGRESS"
+msgstr "SEZONAS PROGRESS"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "Pabeigtās sērijas: {} / {}"
+
+msgid "CAST"
+msgstr "LOMĀS"
+
+msgid "GENRE"
+msgstr "ŽANRS"
+
+msgid "Unknown season"
+msgstr "Nezināma sezona"
+
+msgid "No episodes in this season."
+msgstr "Šajā sezonā nav sēriju."
+
+msgid "Marked as watched"
+msgstr "Atzīmēts kā noskatīts"
+
+msgid "Marked as not watched"
+msgstr "Atzīmēts kā neskatīts"
+
+msgid "Could not save watched status."
+msgstr "Neizdevās saglabāt skatīšanās statusu."
+
+msgid "Mark watched"
+msgstr "Atzīmēt kā noskatītu"
+
+msgid "Hold OK"
+msgstr "Turēt OK"
+
+msgid "Episodes"
+msgstr "Sērijas"
+
+msgid "No information available."
+msgstr "Informācija nav pieejama."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "{season}. sezona · {episode}. sērija · Turpināt no {time}"

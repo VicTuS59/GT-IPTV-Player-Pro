@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: el\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Σειρά"
+
+msgid "Season"
+msgstr "Σεζόν"
+
+msgid "Navigate"
+msgstr "Πλοήγηση"
+
+msgid "Page"
+msgstr "Σελίδα"
+
+msgid "Play"
+msgstr "Αναπαραγωγή"
+
+msgid "Favorite"
+msgstr "Αγαπημένο"
+
+msgid "Refresh"
+msgstr "Ανανέωση"
+
+msgid "Download"
+msgstr "Λήψη"
+
+msgid "Back"
+msgstr "Πίσω"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Σεζόν {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} σεζόν"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "Επεισόδια: {}"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Επεισόδιο {}"
+
+msgid "Watched"
+msgstr "Προβλήθηκε"
+
+msgid "Not played"
+msgstr "Δεν έχει προβληθεί"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Συνέχεια από {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Συνέχεια επεισοδίου {}"
+
+msgid "Continue watching"
+msgstr "Συνέχεια προβολής"
+
+msgid "Add to favorites"
+msgstr "Προσθήκη στα αγαπημένα"
+
+msgid "Remove from favorites"
+msgstr "Αφαίρεση από τα αγαπημένα"
+
+msgid "Download episode"
+msgstr "Λήψη επεισοδίου"
+
+msgid "SEASON PROGRESS"
+msgstr "ΠΡΟΟΔΟΣ ΣΕΖΟΝ"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "Ολοκληρωμένα επεισόδια: {} / {}"
+
+msgid "CAST"
+msgstr "ΗΘΟΠΟΙΟΙ"
+
+msgid "GENRE"
+msgstr "ΕΙΔΟΣ"
+
+msgid "Unknown season"
+msgstr "Άγνωστη σεζόν"
+
+msgid "No episodes in this season."
+msgstr "Δεν υπάρχουν επεισόδια σε αυτή τη σεζόν."
+
+msgid "Marked as watched"
+msgstr "Επισημάνθηκε ως προβληθέν"
+
+msgid "Marked as not watched"
+msgstr "Επισημάνθηκε ως μη προβληθέν"
+
+msgid "Could not save watched status."
+msgstr "Δεν ήταν δυνατή η αποθήκευση της κατάστασης προβολής."
+
+msgid "Mark watched"
+msgstr "Επισήμανση ως προβληθέν"
+
+msgid "Hold OK"
+msgstr "Παρατεταμένο OK"
+
+msgid "Episodes"
+msgstr "Επεισόδια"
+
+msgid "No information available."
+msgstr "Δεν υπάρχουν διαθέσιμες πληροφορίες."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Σεζόν {season} · Επεισόδιο {episode} · Συνέχεια από {time}"

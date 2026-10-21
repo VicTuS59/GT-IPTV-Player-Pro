@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Thai\nLanguage: th\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Choose a subtitle file"
+msgstr "เลือกไฟล์คำบรรยาย"
+
+msgid "Download folder"
+msgstr "โฟลเดอร์ดาวน์โหลด"
+
+msgid "Use this folder"
+msgstr "ใช้โฟลเดอร์นี้"
+
+msgid "Local subtitles"
+msgstr "คำบรรยายในเครื่อง"
+
+msgid "GT subtitle downloads"
+msgstr "คำบรรยายที่ดาวน์โหลดผ่าน GT"
+
+msgid "Search subtitle files"
+msgstr "ค้นหาไฟล์คำบรรยาย"
+
+msgid "No subtitle files found."
+msgstr "ไม่พบไฟล์คำบรรยาย"
+
+msgid "Could not read this folder."
+msgstr "ไม่สามารถอ่านโฟลเดอร์นี้ได้"
+
+msgid "Could not load this subtitle file."
+msgstr "ไม่สามารถโหลดไฟล์คำบรรยายนี้ได้"
+
+msgid "Could not save the download folder."
+msgstr "ไม่สามารถบันทึกโฟลเดอร์ดาวน์โหลดได้"
+
+msgid "Download folder saved."
+msgstr "บันทึกโฟลเดอร์ดาวน์โหลดแล้ว"
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "โฟลเดอร์ดาวน์โหลดคำบรรยายไม่พร้อมใช้งาน โปรดเลือกโฟลเดอร์อื่น"
+
+msgid "Subtitle file is too large."
+msgstr "ไฟล์คำบรรยายมีขนาดใหญ่เกินไป"
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "รองรับเฉพาะไฟล์คำบรรยาย SRT และ VTT"
+
+msgid "Searching subtitle files..."
+msgstr "กำลังค้นหาไฟล์คำบรรยาย..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "ถึงขีดจำกัดการค้นหาแล้ว โปรดจำกัดขอบเขตการค้นหาให้แคบลง"
+
+msgid "Temporary folder"
+msgstr "โฟลเดอร์ชั่วคราว"
+
+msgid "Device storage"
+msgstr "ที่เก็บข้อมูลของอุปกรณ์"
+
+msgid "Up one folder"
+msgstr "ขึ้นไปหนึ่งโฟลเดอร์"
+
+msgid "Subtitle language"
+msgstr "ภาษาคำบรรยาย"
+
+msgid "Search this folder"
+msgstr "ค้นหาในโฟลเดอร์นี้"
+
+msgid "Local subtitle loaded."
+msgstr "โหลดคำบรรยายในเครื่องแล้ว"
+
+msgid "Automatic detection"
+msgstr "ตรวจหาอัตโนมัติ"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "เลือกโฟลเดอร์บน HDD, USB หรือ NAS ที่เชื่อมต่ออยู่"
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "โฟลเดอร์ชั่วคราวจะถูกล้างเมื่อรีสตาร์ตเครื่องรับสัญญาณ"
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "โฟลเดอร์ดาวน์โหลด: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "ภาษาคำบรรยาย: {}"
+
+msgid "Folder is not available."
+msgstr "โฟลเดอร์ไม่พร้อมใช้งาน"
+
+msgid "Use temporary folder"
+msgstr "ใช้โฟลเดอร์ชั่วคราว"
+
+msgid "Device folders"
+msgstr "โฟลเดอร์ในอุปกรณ์"
+
+msgid "Downloaded subtitles"
+msgstr "คำบรรยายที่ดาวน์โหลด"
+
+msgid "Search results"
+msgstr "ผลการค้นหา"

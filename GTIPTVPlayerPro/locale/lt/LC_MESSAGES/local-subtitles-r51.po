@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: lt\nLanguage: lt\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : n%10==0 || (n%100>=11 && n%100<=19) ? 2 : 3);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Pasirinkite subtitrų failą"
+
+msgid "Download folder"
+msgstr "Atsisiuntimo aplankas"
+
+msgid "Use this folder"
+msgstr "Naudoti šį aplanką"
+
+msgid "Local subtitles"
+msgstr "Vietiniai subtitrai"
+
+msgid "GT subtitle downloads"
+msgstr "GT subtitrų atsisiuntimai"
+
+msgid "Search subtitle files"
+msgstr "Ieškoti subtitrų failų"
+
+msgid "No subtitle files found."
+msgstr "Subtitrų failų nerasta."
+
+msgid "Could not read this folder."
+msgstr "Nepavyko perskaityti šio aplanko."
+
+msgid "Could not load this subtitle file."
+msgstr "Nepavyko įkelti šio subtitrų failo."
+
+msgid "Could not save the download folder."
+msgstr "Nepavyko išsaugoti atsisiuntimo aplanko."
+
+msgid "Download folder saved."
+msgstr "Atsisiuntimo aplankas išsaugotas."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Subtitrų atsisiuntimo aplankas nepasiekiamas. Pasirinkite kitą aplanką."
+
+msgid "Subtitle file is too large."
+msgstr "Subtitrų failas per didelis."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Palaikomi tik SRT ir VTT subtitrų failai."
+
+msgid "Searching subtitle files..."
+msgstr "Ieškoma subtitrų failų..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Pasiekta paieškos riba. Susiaurinkite paiešką."
+
+msgid "Temporary folder"
+msgstr "Laikinasis aplankas"
+
+msgid "Device storage"
+msgstr "Įrenginio saugykla"
+
+msgid "Up one folder"
+msgstr "Vienu aplanku aukštyn"
+
+msgid "Subtitle language"
+msgstr "Subtitrų kalba"
+
+msgid "Search this folder"
+msgstr "Ieškoti šiame aplanke"
+
+msgid "Local subtitle loaded."
+msgstr "Vietiniai subtitrai įkelti."
+
+msgid "Automatic detection"
+msgstr "Automatinis aptikimas"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Pasirinkite aplanką HDD, USB arba prijungtame NAS įrenginyje."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Laikinasis aplankas išvalomas iš naujo paleidus imtuvą."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Atsisiuntimo aplankas: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Subtitrų kalba: {}"
+
+msgid "Folder is not available."
+msgstr "Aplankas nepasiekiamas."
+
+msgid "Use temporary folder"
+msgstr "Naudoti laikinąjį aplanką"
+
+msgid "Device folders"
+msgstr "Įrenginio aplankai"
+
+msgid "Downloaded subtitles"
+msgstr "Atsisiųsti subtitrai"
+
+msgid "Search results"
+msgstr "Paieškos rezultatai"

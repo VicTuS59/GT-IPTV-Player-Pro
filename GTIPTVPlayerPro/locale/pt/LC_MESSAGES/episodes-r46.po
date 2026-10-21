@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: pt\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Série"
+
+msgid "Season"
+msgstr "Temporada"
+
+msgid "Navigate"
+msgstr "Navegar"
+
+msgid "Page"
+msgstr "Página"
+
+msgid "Play"
+msgstr "Reproduzir"
+
+msgid "Favorite"
+msgstr "Favorito"
+
+msgid "Refresh"
+msgstr "Atualizar"
+
+msgid "Download"
+msgstr "Transferir"
+
+msgid "Back"
+msgstr "Voltar"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Temporada {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} temporadas"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} episódios"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Episódio {}"
+
+msgid "Watched"
+msgstr "Visto"
+
+msgid "Not played"
+msgstr "Não reproduzido"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Continuar a partir de {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Continuar episódio {}"
+
+msgid "Continue watching"
+msgstr "Continuar a ver"
+
+msgid "Add to favorites"
+msgstr "Adicionar aos favoritos"
+
+msgid "Remove from favorites"
+msgstr "Remover dos favoritos"
+
+msgid "Download episode"
+msgstr "Transferir episódio"
+
+msgid "SEASON PROGRESS"
+msgstr "PROGRESSO DA TEMPORADA"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} episódios concluídos"
+
+msgid "CAST"
+msgstr "ELENCO"
+
+msgid "GENRE"
+msgstr "GÉNERO"
+
+msgid "Unknown season"
+msgstr "Temporada desconhecida"
+
+msgid "No episodes in this season."
+msgstr "Não há episódios nesta temporada."
+
+msgid "Marked as watched"
+msgstr "Marcado como visto"
+
+msgid "Marked as not watched"
+msgstr "Marcado como não visto"
+
+msgid "Could not save watched status."
+msgstr "Não foi possível guardar o estado de visualização."
+
+msgid "Mark watched"
+msgstr "Marcar como visto"
+
+msgid "Hold OK"
+msgstr "Manter OK premido"
+
+msgid "Episodes"
+msgstr "Episódios"
+
+msgid "No information available."
+msgstr "Nenhuma informação disponível."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Temporada {season} · Episódio {episode} · Continuar a partir de {time}"

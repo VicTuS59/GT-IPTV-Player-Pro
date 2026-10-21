@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: fi\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Sarja"
+
+msgid "Season"
+msgstr "Kausi"
+
+msgid "Navigate"
+msgstr "Selaa"
+
+msgid "Page"
+msgstr "Sivu"
+
+msgid "Play"
+msgstr "Toista"
+
+msgid "Favorite"
+msgstr "Suosikki"
+
+msgid "Refresh"
+msgstr "Päivitä"
+
+msgid "Download"
+msgstr "Lataa"
+
+msgid "Back"
+msgstr "Takaisin"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Kausi {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} kautta"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} jaksoa"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Jakso {}"
+
+msgid "Watched"
+msgstr "Katsottu"
+
+msgid "Not played"
+msgstr "Ei toistettu"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Jatka kohdasta {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Jatka jaksoa {}"
+
+msgid "Continue watching"
+msgstr "Jatka katselua"
+
+msgid "Add to favorites"
+msgstr "Lisää suosikkeihin"
+
+msgid "Remove from favorites"
+msgstr "Poista suosikeista"
+
+msgid "Download episode"
+msgstr "Lataa jakso"
+
+msgid "SEASON PROGRESS"
+msgstr "KAUDEN EDISTYMINEN"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} jaksoa katsottu"
+
+msgid "CAST"
+msgstr "NÄYTTELIJÄT"
+
+msgid "GENRE"
+msgstr "LAJITYYPPI"
+
+msgid "Unknown season"
+msgstr "Tuntematon kausi"
+
+msgid "No episodes in this season."
+msgstr "Tällä kaudella ei ole jaksoja."
+
+msgid "Marked as watched"
+msgstr "Merkitty katsotuksi"
+
+msgid "Marked as not watched"
+msgstr "Merkitty katsomattomaksi"
+
+msgid "Could not save watched status."
+msgstr "Katselutilan tallentaminen epäonnistui."
+
+msgid "Mark watched"
+msgstr "Merkitse katsotuksi"
+
+msgid "Hold OK"
+msgstr "Pidä OK painettuna"
+
+msgid "Episodes"
+msgstr "Jaksot"
+
+msgid "No information available."
+msgstr "Tietoja ei ole saatavilla."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Kausi {season} · Jakso {episode} · Jatka kohdasta {time}"

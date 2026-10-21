@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: is\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Þættir"
+
+msgid "Season"
+msgstr "Þáttaröð"
+
+msgid "Navigate"
+msgstr "Fletta"
+
+msgid "Page"
+msgstr "Síða"
+
+msgid "Play"
+msgstr "Spila"
+
+msgid "Favorite"
+msgstr "Uppáhald"
+
+msgid "Refresh"
+msgstr "Endurnýja"
+
+msgid "Download"
+msgstr "Sækja"
+
+msgid "Back"
+msgstr "Til baka"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Þáttaröð {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} þáttaraðir"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} þættir"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Þáttur {}"
+
+msgid "Watched"
+msgstr "Séð"
+
+msgid "Not played"
+msgstr "Óspilað"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Halda áfram frá {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Halda áfram með þátt {}"
+
+msgid "Continue watching"
+msgstr "Halda áfram að horfa"
+
+msgid "Add to favorites"
+msgstr "Bæta við eftirlæti"
+
+msgid "Remove from favorites"
+msgstr "Fjarlægja úr eftirlæti"
+
+msgid "Download episode"
+msgstr "Sækja þátt"
+
+msgid "SEASON PROGRESS"
+msgstr "FRAMVINDA ÞÁTTARAÐAR"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} þáttum lokið"
+
+msgid "CAST"
+msgstr "LEIKARAR"
+
+msgid "GENRE"
+msgstr "TEGUND"
+
+msgid "Unknown season"
+msgstr "Óþekkt þáttaröð"
+
+msgid "No episodes in this season."
+msgstr "Engir þættir í þessari þáttaröð."
+
+msgid "Marked as watched"
+msgstr "Merkt sem séð"
+
+msgid "Marked as not watched"
+msgstr "Merkt sem óséð"
+
+msgid "Could not save watched status."
+msgstr "Ekki tókst að vista áhorfsstöðu."
+
+msgid "Mark watched"
+msgstr "Merkja sem séð"
+
+msgid "Hold OK"
+msgstr "Halda OK inni"
+
+msgid "Episodes"
+msgstr "Þættir"
+
+msgid "No information available."
+msgstr "Engar upplýsingar tiltækar."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Þáttaröð {season} · Þáttur {episode} · Halda áfram frá {time}"

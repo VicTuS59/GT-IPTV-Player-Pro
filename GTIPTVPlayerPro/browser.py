@@ -33,11 +33,19 @@ except ImportError:
     _PlayableServiceEvents = None
 
 from . import PLUGIN_VERSION
+from .artwork_cache import PICON_CACHE as _PICON_CACHE_BUDGET
+from .source_loader import SourceLoader
+from .artwork import (
+    RETRY_DELAY_SECONDS, artwork_failure_ttl, artwork_request_profile,
+    is_tmdb_artwork_url, poster_batch_timeout, prepare_webp,
+    retryable_artwork_error, tmdb_poster_url, webp_dimensions,
+)
 from .content import ContentCategory, ContentItem, CONTENT_LABELS, ContentError, XtreamContentClient
 from .diagnostics import log_event, redact
 from .i18n import (
     N_,
     _,
+    ngettext,
     localized_date_text,
     localized_short_weekday,
     localized_language_name,
@@ -46,6 +54,7 @@ from .i18n import (
 )
 from .live_recovery import media_snapshot as _decoder_media_snapshot
 from .live_zero import LiveZeroKey
+from .subtitle_sync import GTSubtitleSyncOverlay, SubtitleSyncKeys
 from .live_history import (
     LiveChannelListContext,
     clear_live_channel_history,
@@ -56,6 +65,7 @@ from .live_history import (
 )
 from .background import (
     attach_background,
+    attach_background_window,
     attach_native_alpha_pixmap,
     attach_pixmap,
 )
@@ -87,6 +97,13 @@ from .category_lock_ui import (
     RECOVERY_REQUEST,
 )
 from .metadata import MetadataError, TMDbMetadataClient
+from .live_programme_art_ui import LiveProgrammePosterMixin, live_guide_side_geometry
+from .movie_catalog import MovieCatalogIndex, SeriesCatalogIndex, CatalogStorageError, CatalogLimitError
+from .movie_browse import MovieBrowseCatalog
+from .vod_grid import (CINEMATIC_POSTER_COLUMNS, GRID_COLUMNS, GRID_PAGE_SIZE,
+                       LatestPosterWorkers, PosterRetryQueue, cinematic_poster_geometry,
+                       grid_geometry, grid_move, page_position, poster_grid_skin)
+from .vod_prepare import VODPreparation
 from .favorites import FavoriteStore, favorite_key
 from .network_security import (
     NetworkSecurityError,
@@ -99,19 +116,26 @@ from .playback import (
     resume_key,
     should_save_resume,
 )
+from .episode_history import EpisodeCompletionWatcher, WatchedEpisodeStore, episode_watch_key
+from .episode_design import (EPISODE_ROWS, EPISODE_LABEL_NAMES, EPISODE_PIXMAP_NAMES,
+                             episode_geometry, episode_skin, episode_focus_assets)
+from .episode_model import (group_episode_seasons, episode_number, episode_title,
+                            format_episode_time, progress_percent, preferred_resume_index)
 from .subtitle_resume import SubtitleResumeStore
+from .persistence import queue_playback_save, queue_playback_clear
+from .native_browse import NativeBrowseWindow
 from .paths import plugin_path
 from .infobar import (
-    audio_language_text,
     infobar_progress_geometry,
     infobar_skin,
     network_rate_text,
     remaining_time_text,
     source_account_text,
     split_epg_text,
-    subtitle_status_text,
 )
 from .network_rate import NetworkRateSampler
+from .device_usage import DeviceUsageSampler, DeviceUsageGauge, usage_text
+from .stream_resolution import ResolutionTracker, resolution_text, youtube_resolution_hint
 from .portal_identity import safe_composite_id
 from .remote_footer import (
     web_shortcut_hint_text,
@@ -128,8 +152,10 @@ from .scrollbar import (
 )
 from .smooth_scroll import GTSmoothScrollLabel
 from .settings import (
+    DEFAULT_INFOBAR_TIMEOUT,
     available_service_types,
     load_player_settings,
+    normalize_infobar_timeout,
     serviceapp_uses_async_seek,
     service_engine_label,
 )
@@ -139,6 +165,7 @@ from .youtube_playback import youtube_duration_seconds, NATIVE_AUDIO_SERVICE_TYP
 from .youtube_history import youtube_resume_position
 from .typography import (
     _grapheme_boundaries,
+    _line_fits,
     _text_units,
     clean_dynamic_text,
     current_text_size,
@@ -259,7 +286,7 @@ def _stream_diag_pts_progress(previous, current):
     return 0 < delta < limit // 2
 
 
-INFO_TIMEOUT_MS = 3000
+SUBTITLE_MESSAGE_TIMEOUT_SECONDS = 3
 DIRECTION_HOLD_MS = 650
 NAVIGATION_DEBOUNCE_MS = 250
 MAX_AUDIO_TRACKS = 64
@@ -282,6 +309,7 @@ LIVE_DETAIL_DWELL_MS = 100
 STALKER_LIVE_DETAIL_DWELL_MS = 350
 LIVE_DETAIL_CACHE_TTL_SECONDS = 60 * 60
 LIVE_DETAIL_EMPTY_RETRY_SECONDS = 30
+LIVE_DETAIL_EPG_RETRY_LIMIT = 2
 LIVE_DETAIL_PREFETCH_DELAY_MS = 450
 LIVE_DETAIL_PREFETCH_CHANNELS = 4
 LIVE_DETAIL_EPG_TIMEOUT_SECONDS = 10
@@ -345,7 +373,6 @@ LIVE_PICON_HEADER_BYTES = 256 * 1024
 LIVE_PICON_VALIDATION_CACHE_MAX_ENTRIES = 512
 PICON_CACHE_DIR = "/tmp/gtiptvplayer-picons"
 PICON_DOWNLOAD_TIMEOUT = 8
-PICON_FAST_FALLBACK_TIMEOUT = 3
 PICON_DOWNLOAD_WORKERS = 4
 BACKGROUND_POSTER_WORKERS = 2
 CONTINUE_POSTER_WORKERS = 2
@@ -353,12 +380,11 @@ DETAIL_INFO_CACHE_MAX_ENTRIES = 128
 PICON_CACHE_MAX_BYTES = 32 * 1024 * 1024
 PICON_CACHE_MAX_FILES = 300
 PICON_CACHE_MAX_AGE_SECONDS = 14 * 24 * 60 * 60
-PICON_FAILURE_TTL_SECONDS = 300
 PICON_FAILURE_MAX_ENTRIES = 512
 PICON_CLEANUP_INTERVAL_SECONDS = 300
 PICON_PATH_CACHE_TTL_SECONDS = 60
 PICON_PATH_CACHE_MAX_ENTRIES = 256
-PICON_CACHE_SUFFIXES = (".jpg", ".png", ".gif", ".bmp")
+PICON_CACHE_SUFFIXES = (".jpg", ".png", ".gif", ".bmp", ".webp")
 _PICON_DOWNLOAD_LOCKS = {}
 _PICON_DOWNLOAD_LOCKS_GUARD = threading.Lock()
 _PICON_DOWNLOAD_SLOTS = threading.BoundedSemaphore(PICON_DOWNLOAD_WORKERS)
@@ -369,6 +395,7 @@ _PICON_LAST_CLEANUP = [0.0]
 _PICON_PATH_CACHE = {}
 _PICON_PATH_CACHE_GUARD = threading.Lock()
 _PICON_VALIDATION_CACHE = OrderedDict()
+_CINEMATIC_PICON_HEADER_CACHE = OrderedDict()
 _PICON_VALIDATION_CACHE_GUARD = threading.Lock()
 _EPG_STATE_GUARD = threading.Lock()
 WORKER_LIST_TIMEOUT_SECONDS = 30
@@ -390,9 +417,9 @@ LIVE_PREVIEW_VIDEO_INITIAL_MS = 40
 LIVE_PREVIEW_VIDEO_RETRY_MS = 180
 LIVE_PREVIEW_VIDEO_ERROR_CHECKS = 18
 LIVE_PREVIEW_VIDEO_MAX_CHECKS = 50
-EPISODE_PAGE_SIZE = 10
+EPISODE_PAGE_SIZE = EPISODE_ROWS
 MOVIE_CATEGORY_PAGE_SIZE = 10
-MOVIE_RAIL_PAGE_SIZE = 5
+MOVIE_RAIL_PAGE_SIZE = CINEMATIC_POSTER_COLUMNS
 ALL_MOVIES_SEARCH_PAGE_SIZE = 10
 M3U_SEARCH_RESULT_LIMIT = 500
 SERIES_CATEGORY_PAGE_SIZE = 8
@@ -471,6 +498,7 @@ def _allow_live_detail_epg_prefetch(client):
 
 
 PLUGIN_PATH = plugin_path()
+LIVE_PREVIEW_FRAME_PATH = plugin_path("skin", "images", "live-preview-frame-r16.png")
 WEATHER_ICON_DIR = os.path.join(PLUGIN_PATH, "skin", "images", "weather")
 APP_BACKGROUND_PATH = os.path.join(
     PLUGIN_PATH,
@@ -591,6 +619,15 @@ ALL_MOVIES_SEARCH_FOOTER_ITEMS = (
     footer_item("menu", "download", 1.00),
     footer_item("exit", "back", 0.86),
 )
+ALL_SERIES_SEARCH_FOOTER_ITEMS = (
+    footer_item("arrows", "navigate", 1.10),
+    footer_item("ok", "open", 0.86),
+    footer_item("red", "favorite", 0.92),
+    footer_item("green", "refresh", 0.88),
+    footer_item("blue", "search", 0.88),
+    footer_item("menu", "download", 1.00),
+    footer_item("exit", "back", 0.86),
+)
 SERIES_FOOTER_ITEMS = (
     footer_item("arrows", "navigate", 1.15),
     footer_item("channel", "page", 0.95),
@@ -603,14 +640,17 @@ SERIES_FOOTER_ITEMS = (
     footer_item("exit", "back"),
 )
 EPISODE_FOOTER_ITEMS = (
-    footer_item("arrows", "navigate", 1.15),
-    footer_item("channel", "page", 0.95),
-    footer_item("ok", "play"),
-    footer_item("red", "favorite"),
-    footer_item("green", "refresh"),
-    footer_item("menu", "download"),
-    footer_item("exit", "back"),
+    footer_item("up_down", "navigate", 0.9),
+    footer_item("left_right", "Season", 0.9),
+    footer_item("channel", "page", 0.9),
+    footer_item("ok", "play", 0.8),
+    footer_item("ok_long", "Mark watched", 1.2),
+    footer_item("red", "favorite", 0.9),
+    footer_item("green", "refresh", 0.9),
+    footer_item("menu", "download", 0.9),
+    footer_item("exit", "back", 0.8),
 )
+
 # MENU on a series opens the episode picker in download mode, where OK
 # already requests a download. Keep its guide aligned with that action.
 EPISODE_DOWNLOAD_FOOTER_ITEMS = tuple(
@@ -802,6 +842,28 @@ class _WorkerToken(object):
             raise _WorkerCancelled()
 
 
+def _poster_metadata_token(parent):
+    token = _WorkerToken(WORKER_DETAIL_TIMEOUT_SECONDS)
+    if parent is not None:
+        token.cancel_event = parent.cancel_event
+        token.deadline = min(token.deadline, parent.deadline)
+    return token
+
+
+def _poster_jobs(jobs, state, token=None):
+    if "queued_jobs" not in state:
+        yield from jobs
+        return
+    while True:
+        if token is not None:
+            token.check()
+        with state["lock"]:
+            if not state["queued_jobs"]:
+                return
+            job = state["queued_jobs"].popleft()
+        yield job
+
+
 def _cancel_worker_token(token):
     if token is not None:
         try:
@@ -860,6 +922,7 @@ class _FavoriteSupport(_DownloadSupport):
             favorite_store if favorite_store is not None else FavoriteStore()
         )
         self.favorite_scope = resume_account_scope(self.client)
+        self._favorite_mutations = {}
         self._favorite_keys_timer = None
         self._favorite_load_deadline = 0.0
         self._favorite_close_hooked = False
@@ -909,11 +972,20 @@ class _FavoriteSupport(_DownloadSupport):
             timer.stop()
 
     def _poll_favorite_keys(self):
+        pending = getattr(self, "_favorite_mutations", {})
+        for key, result in list(pending.items()):
+            if result["done"]:
+                pending.pop(key, None)
+                if not result["ok"]:
+                    self["message"].setText(_("Could not update favorites."))
         if (getattr(self, "_closed", False)
-                or time.monotonic() >= self._favorite_load_deadline):
+                or (not pending and time.monotonic() >= self._favorite_load_deadline)):
             self._stop_favorite_keys()
             return
-        if not self._reload_favorite_keys():
+        changed = self._reload_favorite_keys()
+        if pending:
+            self._arm_favorite_keys()
+        if not changed:
             return
         kind = getattr(self, "content_type", "")
         renderer = None
@@ -947,7 +1019,17 @@ class _FavoriteSupport(_DownloadSupport):
         if not key:
             return None
         try:
-            added = self.favorite_store.toggle(self.favorite_scope, item)
+            submit = getattr(self.favorite_store, "toggle_async", None)
+            if callable(submit):
+                added, result = submit(self.favorite_scope, item)
+                if result is not None:
+                    pending = getattr(self, "_favorite_mutations", None)
+                    if pending is None:
+                        pending = self._favorite_mutations = {}
+                    pending[key] = result
+                    self._arm_favorite_keys()
+            else:
+                added = self.favorite_store.toggle(self.favorite_scope, item)
         except Exception:
             added = None
         if added is True:
@@ -1359,174 +1441,9 @@ def _browser_skin(screen_name):
 
 
 def _episode_list_skin():
-    """Native episode rows matching the Live TV list focus treatment."""
     width, height, px = _scale()
-    margin = px(64)
-    content_width = width - (margin * 2)
-    footer_y = height - px(92)
-    panel_y = px(112)
-    panel_h = px(828)
-    row_x = margin + px(38)
-    row_w = content_width - px(100)
-    row_start = 224
-    row_step = 62
-    rows = []
-    for index in range(EPISODE_PAGE_SIZE):
-        y = px(row_start + (index * row_step))
-        rows.append(
-            """
-    <widget name="episode_row_bg_{index}" position="{row_x},{row_y}"
-            size="{row_w},{row_h}" font="Regular;1"
-            backgroundColor="#111D31" transparent="0" zPosition="1" />
-    <widget name="episode_number_{index}" position="{number_x},{row_y}"
-            size="{number_w},{row_h}" font="Regular;{number_font}"
-            foregroundColor="#D9E2F1" transparent="1" zPosition="3"
-            valign="center" halign="right" />
-    <widget name="episode_name_{index}" position="{name_x},{row_y}"
-            size="{name_w},{row_h}" font="Regular;{name_font}"
-            foregroundColor="#F8FAFC" transparent="1" zPosition="3"
-            valign="center" halign="left" noWrap="1" />
-    <widget name="episode_focus_{index}_fill" position="{focus_x},{focus_y}"
-            size="{focus_w},{focus_box_h}" font="Regular;1"
-            backgroundColor="#172A45" transparent="0" zPosition="2" />
-    <widget name="episode_focus_{index}_top" position="{focus_x},{focus_y}"
-            size="{focus_w},{focus_h}" font="Regular;1"
-            backgroundColor="#8B5CF6" transparent="0" zPosition="4" />
-    <widget name="episode_focus_{index}_bottom"
-            position="{focus_x},{focus_bottom_y}"
-            size="{focus_w},{focus_h}" font="Regular;1"
-            backgroundColor="#8B5CF6" transparent="0" zPosition="4" />
-    <widget name="episode_focus_{index}_left" position="{focus_x},{focus_y}"
-            size="{focus_h},{focus_box_h}" font="Regular;1"
-            backgroundColor="#22D3EE" transparent="0" zPosition="4" />
-    <widget name="episode_focus_{index}_right"
-            position="{focus_right_x},{focus_y}"
-            size="{focus_h},{focus_box_h}" font="Regular;1"
-            backgroundColor="#D946EF" transparent="0" zPosition="4" />""".format(
-                index=index,
-                row_x=row_x,
-                row_y=y,
-                row_w=row_w,
-                row_h=px(55),
-                number_x=row_x + px(20),
-                number_w=px(110),
-                number_font=px(19),
-                name_x=row_x + px(150),
-                name_w=row_w - px(180),
-                name_font=px(23),
-                focus_x=row_x - px(2),
-                focus_y=y - px(2),
-                focus_w=row_w + px(4),
-                focus_h=px(3),
-                focus_bottom_y=y + px(54),
-                focus_box_h=px(59),
-                focus_right_x=row_x + row_w - px(1),
-            )
-        )
-
-    return """
-<screen name="GTEpisodeListScreen" position="0,0" size="{width},{height}"
-        flags="wfNoBorder" backgroundColor="#050914">
-    <widget name="app_bg" position="0,0" size="{width},{height}"
-            zPosition="0" />
-    <widget name="top_accent" position="0,0" size="{width},{accent_h}"
-            font="Regular;1" backgroundColor="#8B5CF6" transparent="0" />
-    <widget name="header" position="{margin},{header_y}"
-            size="{header_w},{header_h}" font="Regular;{title_font}"
-            foregroundColor="#FFFFFF" transparent="1"
-            valign="center" halign="left" noWrap="1" />
-    <widget name="screen_label" position="{screen_x},{header_y}"
-            size="{screen_w},{header_h}" font="Regular;{screen_font}"
-            foregroundColor="#7F8DA5" transparent="1"
-            valign="center" halign="right" />
-    <widget name="content_panel" position="{margin},{panel_y}"
-            size="{content_width},{panel_h}" font="Regular;1"
-            backgroundColor="#0D1729" transparent="0" />
-    <widget name="episode_panel_accent_cyan"
-            position="{margin},{panel_y}" size="{panel_accent_w},{panel_accent_h}"
-            font="Regular;1" backgroundColor="#22D3EE"
-            transparent="0" zPosition="2" />
-    <widget name="episode_panel_accent_magenta"
-            position="{panel_accent_x},{panel_y}"
-            size="{panel_accent_w},{panel_accent_h}" font="Regular;1"
-            backgroundColor="#D946EF" transparent="0" zPosition="2" />
-    <widget name="list_accent" position="{margin},{panel_y}"
-            size="{list_accent_w},{panel_h}" font="Regular;1"
-            backgroundColor="#8B5CF6" transparent="0" />
-    <widget name="breadcrumb" position="{inner_x},{crumb_y}"
-            size="{inner_w},{crumb_h}" font="Regular;{crumb_font}"
-            foregroundColor="#22D3EE" transparent="1"
-            valign="center" halign="left" noWrap="1" />
-    <widget name="episode_caption" position="{inner_x},{caption_y}"
-            size="{inner_w},{caption_h}" font="Regular;{caption_font}"
-            foregroundColor="#D8E2F1" transparent="1"
-            valign="center" halign="left" />
-    <widget name="episode_caption_accent"
-            position="{inner_x},{caption_accent_y}"
-            size="{caption_accent_w},{caption_accent_h}" font="Regular;1"
-            backgroundColor="#A855F7" transparent="0" />
-    {rows}
-    <widget name="items" position="0,0" size="1,1" font="Regular;1"
-            transparent="1" zPosition="0" />
-    <widget name="list_scroll_track"
-            position="{scroll_x},{scroll_y}" size="{scroll_w},{scroll_h}"
-            font="Regular;1" backgroundColor="#26344E"
-            transparent="0" zPosition="5" />
-    <widget name="list_scroll_thumb"
-            position="{scroll_x},{scroll_y}" size="{scroll_w},{scroll_h}"
-            font="Regular;1" backgroundColor="#22D3EE"
-            transparent="0" zPosition="6" />
-    <widget name="message" position="{inner_x},{message_y}"
-            size="{inner_w},{message_h}" font="Regular;{message_font}"
-            foregroundColor="#9AA8BE" transparent="1"
-            valign="center" halign="right" />
-    <widget name="footer" position="0,{footer_y}" size="{width},{footer_h}"
-            font="Regular;{footer_font}" foregroundColor="#C8D2E3"
-            backgroundColor="#080E1A" transparent="0"
-            valign="center" halign="center" />
-</screen>
-""".format(
-        width=width,
-        height=height,
-        accent_h=px(5),
-        margin=margin,
-        header_y=px(28),
-        header_w=width - (margin * 2) - px(500),
-        header_h=px(64),
-        title_font=px(34),
-        screen_x=width - margin - px(480),
-        screen_w=px(480),
-        screen_font=px(19),
-        panel_y=panel_y,
-        content_width=content_width,
-        panel_h=panel_h,
-        panel_accent_w=int(content_width / 2),
-        panel_accent_h=px(4),
-        panel_accent_x=margin + int(content_width / 2),
-        list_accent_w=px(7),
-        inner_x=margin + px(38),
-        inner_w=content_width - px(76),
-        crumb_y=px(132),
-        crumb_h=px(42),
-        crumb_font=px(20),
-        caption_y=px(174),
-        caption_h=px(36),
-        caption_font=px(22),
-        caption_accent_y=px(211),
-        caption_accent_w=px(260),
-        caption_accent_h=px(3),
-        rows="".join(rows),
-        scroll_x=margin + content_width - px(50),
-        scroll_y=px(row_start),
-        scroll_w=px(8),
-        scroll_h=px(613),
-        message_y=px(856),
-        message_h=px(52),
-        message_font=px(20),
-        footer_y=footer_y,
-        footer_h=height - footer_y,
-        footer_font=px(20),
-    )
+    return episode_skin(width, height, px,
+        plugin_path("skin", "images", "category-check-tick-r83.png"))
 
 
 def _continue_watching_skin(screen_name="GTContinueWatchingScreen"):
@@ -2467,33 +2384,31 @@ def _live_category_manager_skin():
     )
 
 
-def _wrap_live_summary(text, capacity):
-    """Wrap an EPG synopsis for the native Label without dropping words."""
+def _wrap_live_summary(text, capacity, fits=None):
+    """Keep the complete synopsis, using native pixel widths when available."""
     capacity = max(8, int(capacity))
+    if fits is None:
+        fits = lambda value: _text_units(value) <= capacity
     lines = []
     current = ""
     for word in str(text or "").split():
-        if current and _text_units(current + " " + word) <= capacity:
+        if current and fits(current + " " + word):
             current += " " + word
             continue
         if current:
             lines.append(current)
             current = ""
-        if _text_units(word) <= capacity:
+        if fits(word):
             current = word
             continue
         boundaries = _grapheme_boundaries(word)
         segment = ""
-        units = 0.0
         for index in range(len(boundaries) - 1):
             cluster = word[boundaries[index]:boundaries[index + 1]]
-            cluster_units = _text_units(cluster)
-            if segment and units + cluster_units > capacity:
+            if segment and not fits(segment + cluster):
                 lines.append(segment)
                 segment = ""
-                units = 0.0
             segment += cluster
-            units += cluster_units
         current = segment
     if current:
         lines.append(current)
@@ -2517,16 +2432,19 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
     footer_y = height - px(112)
     panel_y = top_h
     panel_h = max(1, footer_y - panel_y - px(8))
-    gap = px(10)
-    left_x, left_w = px(8), px(414)
-    list_x, list_w = left_x + left_w + gap, px(952)
-    right_x = list_x + list_w + gap
-    right_w = width - right_x - px(8)
+    side_geometry = live_guide_side_geometry(width, height, px)
+    left_x, unused_y, left_w, unused_h = side_geometry["left_panel"]
+    list_x, unused_y, list_w, unused_h = side_geometry["list_panel"]
+    right_x, unused_y, right_w, unused_h = side_geometry["right_panel"]
     row_x = list_x + px(14)
     row_w = list_w - px(28)
     row_h = px(72)
     row_step = px(78)
     row_first_y = px(166)
+    progress_x = row_x + row_w - px(112)
+    program_x = progress_x - px(192)
+    name_x = row_x + px(239)
+    name_w = program_x - px(11) - name_x
     rows = []
     for index in range(LIVE_STREAM_PAGE_SIZE):
         y = row_first_y + (index * row_step)
@@ -2564,10 +2482,10 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
     <widget name="stream_picon_{index}" position="{picon_x},{picon_y}"
             size="{picon_w},{picon_h}" backgroundColor="transparent"
             transparent="1" alphatest="blend" scale="1" zPosition="9" />
-    <widget name="stream_name_{index}" position="{name_x},{row_y}"
-            size="{name_w},{row_h}" font="Regular;{name_font}"
+    <widget name="stream_name_{index}" position="{name_x},{name_y}"
+            size="{name_w},{name_h}" font="Regular;{name_font}"
             foregroundColor="#F8FAFC" transparent="1" zPosition="9"
-            valign="center" halign="left" noWrap="1" />
+            valign="center" halign="left" noWrap="0" />
     <widget name="stream_program_{index}" position="{program_x},{row_y}"
             size="{program_w},{row_h}" font="Regular;{program_font}"
             foregroundColor="#CCD3DD" transparent="1" zPosition="9"
@@ -2601,13 +2519,15 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
                 picon_y=y + px(6),
                 picon_w=px(110),
                 picon_h=px(60),
-                name_x=row_x + px(239),
-                name_w=px(370),
+                name_x=name_x,
+                name_y=y + px(4),
+                name_w=name_w,
+                name_h=row_h - px(8),
                 name_font=name_font,
-                program_x=row_x + px(620),
+                program_x=program_x,
                 program_w=px(178),
                 program_font=font_px(px, 22, max_height=72, vertical_padding=14),
-                progress_x=row_x + px(812),
+                progress_x=progress_x,
                 progress_y=y + px(31),
                 progress_w=px(96),
                 progress_h=px(10),
@@ -2618,12 +2538,14 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
             )
         )
 
-    preview_x = right_x + px(14)
-    preview_w = right_w - px(28)
-    preview_h = max(1, int(round(preview_w * 9.0 / 16.0)))
+    preview_x, preview_y, preview_w, preview_h = side_geometry["preview"]
+    frame_x, frame_y, frame_w, frame_h = side_geometry["preview_frame"]
+    poster_x, poster_y, poster_w, poster_h = side_geometry["poster"]
+    unused_x, summary_y, summary_w, summary_h = side_geometry["summary"]
+    pagination_x, pagination_y, pagination_w, pagination_h = side_geometry["summary_pagination"]
     schedule_rows = []
     for offset, row in enumerate(("next", "third", "fourth", "fifth")):
-        y = px(610 + (offset * 74))
+        y = px(174 + (offset * 78))
         schedule_rows.append(
             """
     <widget name="epg_{row}_time" position="{time_x},{row_y}"
@@ -2633,18 +2555,18 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
     <widget name="epg_{row}_title" position="{title_x},{row_y}"
             size="{title_w},{row_h}" font="Regular;{title_font}"
             foregroundColor="#F5F7FA" transparent="1" zPosition="7"
-            valign="center" halign="left" noWrap="1" />
+            valign="center" halign="left" noWrap="0" />
     <widget name="epg_{row}_status" position="0,0" size="1,1"
             font="Regular;1" transparent="1" />""".format(
                 row=row,
-                time_x=right_x + px(22),
+                time_x=left_x + px(26),
                 row_y=y,
-                time_w=px(112),
-                row_h=px(56),
-                time_font=font_px(px, 22, max_height=56, vertical_padding=10),
-                title_x=right_x + px(138),
-                title_w=right_w - px(160),
-                title_font=font_px(px, 22, max_height=56, vertical_padding=10),
+                time_w=px(92),
+                row_h=px(64),
+                time_font=font_px(px, 22, max_height=64, vertical_padding=8),
+                title_x=left_x + px(126),
+                title_w=left_w - px(152),
+                title_font=font_px(px, 22, max_height=64, vertical_padding=8),
             )
         )
 
@@ -2701,10 +2623,13 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
     <widget name="list_accent" position="{list_x},{panel_y}"
             size="{list_w},{panel_border_h}" font="Regular;1"
             backgroundColor="#244050" transparent="0" zPosition="3" />
-    <widget name="detail_picon" position="{detail_picon_x},{detail_picon_y}"
-            size="{detail_picon_w},{detail_picon_h}"
+    <widget name="detail_picon" position="0,0" size="1,1"
             backgroundColor="transparent" transparent="1" alphatest="blend"
             scale="1" zPosition="6" />
+    <widget name="detail_programme_poster" position="{poster_x},{poster_y}"
+            size="{poster_w},{poster_h}"
+            backgroundColor="transparent" transparent="1" alphatest="blend"
+            scale="1" zPosition="7" />
     <widget name="ribbon_channel" position="{detail_text_x},{channel_y}"
             size="{detail_text_w},{channel_h}" font="Regular;{channel_font}"
             foregroundColor="#F8FAFC" transparent="1" zPosition="6"
@@ -2740,9 +2665,9 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
     <widget name="summary" position="{detail_text_x},{summary_y}"
             size="{summary_w},{summary_h}" font="Regular;{summary_font}"
             foregroundColor="#D2D9E1" transparent="1" zPosition="6"
-            valign="top" halign="left" />
-    <widget name="summary_scroll" position="{summary_scroll_x},{summary_y}"
-            size="{summary_scroll_w},{summary_h}" font="Regular;{summary_scroll_font}"
+            valign="top" halign="left" noWrap="1" />
+    <widget name="summary_scroll" position="{summary_scroll_x},{summary_scroll_y}"
+            size="{summary_scroll_w},{summary_scroll_h}" font="Regular;{summary_scroll_font}"
             foregroundColor="#718091" transparent="1" zPosition="7"
             valign="bottom" halign="right" />
     <widget name="summary_scrollbar_track" position="{summary_bar_x},{summary_y}"
@@ -2772,8 +2697,8 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
             size="{list_scroll_w},{list_scroll_h}" font="Regular;1"
             backgroundColor="#32B8F2" transparent="0" zPosition="9" />
     <widget name="preview_frame" position="{preview_frame_x},{preview_frame_y}"
-            size="{preview_frame_w},{preview_frame_h}" font="Regular;1"
-            backgroundColor="#3C718A" transparent="0" zPosition="4" />
+            size="{preview_frame_w},{preview_frame_h}" pixmap="{preview_frame_art}"
+            transparent="1" alphatest="blend" scale="1" zPosition="4" />
     <widget name="preview_video" position="{preview_x},{preview_y}"
             size="{preview_w},{preview_h}" backgroundColor="transparent"
             zPosition="5" />
@@ -2784,21 +2709,16 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
             size="{preview_w},{preview_hint_h}" font="Regular;{preview_hint_font}"
             foregroundColor="#8092A3" transparent="1" zPosition="9"
             valign="center" halign="center" />
-    <widget name="epg_now_time" position="{right_now_time_x},{right_now_y}"
-            size="{right_now_time_w},{right_now_h}" font="Regular;{right_now_font}"
-            foregroundColor="#E3E8EE" transparent="1" zPosition="6"
-            valign="center" halign="left" noWrap="1" />
-    <widget name="epg_now_title" position="{right_now_title_x},{right_now_y}"
-            size="{right_now_title_w},{right_now_h}" font="Regular;{right_now_font}"
-            foregroundColor="#FFFFFF" transparent="1" zPosition="6"
-            valign="center" halign="left" noWrap="1" />
+    <widget name="epg_now_time" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="epg_now_title" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
     <widget name="epg_now_status" position="0,0" size="1,1"
             font="Regular;1" transparent="1" />
-    <widget name="epg_panel" position="{right_inner_x},{right_sep_y}"
-            size="{right_inner_w},{divider_h}" font="Regular;1"
-            backgroundColor="#26343F" transparent="0" zPosition="4" />
-    <widget name="epg_title" position="{right_inner_x},{right_title_y}"
-            size="{right_inner_w},{right_title_h}" font="Regular;{right_title_font}"
+    <widget name="epg_panel" position="0,0" size="1,1"
+            font="Regular;1" transparent="1" />
+    <widget name="epg_title" position="{detail_text_x},{schedule_title_y}"
+            size="{detail_text_w},{schedule_title_h}" font="Regular;{schedule_title_font}"
             foregroundColor="#49BFFF" transparent="1" zPosition="6"
             valign="center" halign="left" />
     {schedule_rows}
@@ -2857,41 +2777,43 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
         panel_y=panel_y,
         panel_h=panel_h,
         panel_border_h=max(1, px(2)),
-        detail_picon_x=left_x + px(34),
-        detail_picon_y=px(112),
-        detail_picon_w=left_w - px(68),
-        detail_picon_h=px(226),
+        poster_x=poster_x,
+        poster_y=poster_y,
+        poster_w=poster_w,
+        poster_h=poster_h,
         detail_text_x=left_x + px(26),
         detail_text_w=left_w - px(52),
-        channel_y=px(342),
-        channel_h=px(64),
-        channel_font=font_px(px, 30, role="title", max_height=64, vertical_padding=9),
-        divider_y=px(414),
+        channel_y=px(498),
+        channel_h=px(52),
+        channel_font=font_px(px, 30, role="title", max_height=52, vertical_padding=7),
+        divider_y=px(484),
         divider_h=max(1, px(2)),
-        now_caption_y=px(426),
-        now_caption_h=px(43),
-        now_caption_font=font_px(px, 25, role="title", max_height=43, vertical_padding=7),
-        now_title_y=px(470),
-        now_title_h=px(57),
-        now_title_font=font_px(px, 29, role="title", max_height=57, vertical_padding=8),
-        now_time_y=px(531),
+        now_caption_y=px(562),
+        now_caption_h=px(36),
+        now_caption_font=font_px(px, 25, role="title", max_height=36, vertical_padding=5),
+        now_title_y=px(606),
+        now_title_h=px(48),
+        now_title_font=font_px(px, 29, role="title", max_height=48, vertical_padding=7),
+        now_time_y=px(664),
         now_time_w=px(232),
-        now_time_h=px(42),
-        now_time_font=font_px(px, 21, max_height=42, vertical_padding=7),
+        now_time_h=px(36),
+        now_time_font=font_px(px, 21, max_height=36, vertical_padding=5),
         progress_label_x=left_x + left_w - px(136),
         progress_label_w=px(110),
-        progress_font=font_px(px, 20, max_height=42, vertical_padding=7),
-        detail_progress_y=px(578),
+        progress_font=font_px(px, 20, max_height=36, vertical_padding=5),
+        detail_progress_y=px(712),
         detail_progress_w=left_w - px(52),
         detail_progress_h=px(10),
-        summary_line_y=px(612),
-        summary_y=px(633),
-        summary_w=left_w - px(64),
-        summary_h=px(282),
-        summary_font=font_px(px, 23, max_height=282, vertical_padding=5),
-        summary_scroll_x=left_x + left_w - px(52),
-        summary_scroll_w=px(22),
-        summary_scroll_font=font_px(px, 14, max_height=282, vertical_padding=4),
+        summary_line_y=px(744),
+        summary_y=summary_y,
+        summary_w=summary_w,
+        summary_h=summary_h,
+        summary_font=font_px(px, 23, vertical_padding=5),
+        summary_scroll_x=pagination_x,
+        summary_scroll_y=pagination_y,
+        summary_scroll_w=pagination_w,
+        summary_scroll_h=pagination_h,
+        summary_scroll_font=font_px(px, 14, max_height=18, vertical_padding=2),
         summary_bar_x=left_x + left_w - px(20),
         summary_bar_w=px(5),
         caption_x=list_x + px(22),
@@ -2909,32 +2831,25 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
         list_scroll_x=list_x + list_w - px(9),
         list_scroll_w=px(4),
         list_scroll_h=(LIVE_STREAM_PAGE_SIZE * row_step) - px(6),
-        preview_frame_x=preview_x - px(3),
-        preview_frame_y=px(111),
-        preview_frame_w=preview_w + px(6),
-        preview_frame_h=preview_h + px(6),
+        preview_frame_x=frame_x,
+        preview_frame_y=frame_y,
+        preview_frame_w=frame_w,
+        preview_frame_h=frame_h,
+        preview_frame_art=LIVE_PREVIEW_FRAME_PATH.replace("&", "&amp;").replace('"', "&quot;"),
         preview_x=preview_x,
-        preview_y=px(114),
+        preview_y=preview_y,
         preview_w=preview_w,
         preview_h=preview_h,
-        preview_hint_y=px(114) + max(1, preview_h - px(72)),
+        preview_hint_y=preview_y + (preview_h - px(58)) // 2,
         preview_hint_h=px(58),
         preview_hint_font=font_px(px, 19, max_height=58, vertical_padding=8),
-        right_now_time_x=right_x + px(22),
-        right_now_y=px(405),
-        right_now_time_w=px(105),
-        right_now_h=px(64),
-        right_now_font=font_px(px, 23, max_height=64, vertical_padding=10),
-        right_now_title_x=right_x + px(132),
-        right_now_title_w=right_w - px(154),
         right_inner_x=right_x + px(20),
         right_inner_w=right_w - px(40),
-        right_sep_y=px(482),
-        right_title_y=px(501),
-        right_title_h=px(72),
-        right_title_font=font_px(px, 29, role="title", max_height=72, vertical_padding=12),
+        schedule_title_y=px(102),
+        schedule_title_h=px(55),
+        schedule_title_font=font_px(px, 29, role="title", max_height=55, vertical_padding=8),
         schedule_rows="".join(schedule_rows),
-        right_bottom_y=px(918),
+        right_bottom_y=footer_y - px(8),
         footer_backdrop_y=footer_y - px(5),
         footer_backdrop_h=height - footer_y + px(5),
         footer_y=footer_y,
@@ -3019,6 +2934,9 @@ def _cinematic_scroll_geometries(width, height, px):
 def _movie_browser_skin(cinematic=False):
     """Remote-first VOD library: categories, poster rail and film details."""
     width, height, px = _scale()
+    if not cinematic:
+        return poster_grid_skin("movie", width, height, px, FAVORITE_STAR_PATH,
+                                _movie_browser_skin(True))
     favorite_star = FAVORITE_STAR_PATH.replace("&", "&amp;").replace(
         '"', "&quot;"
     )
@@ -3066,9 +2984,7 @@ def _movie_browser_skin(cinematic=False):
         rail_caption_y = px(574)
         rail_y = px(616)
         gap = px(18)
-        tile_w = int((rail_w - (gap * 4)) / 5)
-        tile_image_h = px(276)
-        tile_h = px(344)
+        poster_geometry = cinematic_poster_geometry(width, height, px)
         cinematic_scrim = CINEMATIC_SCRIM_PATH.replace(
             "&", "&amp;"
         ).replace('"', "&quot;")
@@ -3106,8 +3022,10 @@ def _movie_browser_skin(cinematic=False):
             )
 
         poster_tiles = []
-        for index in range(5):
-            tile_x = rail_x + (index * (tile_w + gap))
+        for index, tile in enumerate(poster_geometry["tiles"]):
+            tile_x, tile_y, tile_w, tile_h = tile["card"]
+            image_x, image_y, image_w, image_h = tile["image"]
+            title_x, title_y, title_w, title_h = tile["title"]
             poster_tiles.append(
                 """
     <widget name="movie_tile_bg_{index}" position="{x},{y}"
@@ -3139,26 +3057,26 @@ def _movie_browser_skin(cinematic=False):
             halign="center" noWrap="0" />""".format(
                     index=index,
                     x=tile_x,
-                    y=rail_y,
+                    y=tile_y,
                     w=tile_w,
                     h=tile_h,
                     inner_x=tile_x + px(4),
-                    inner_y=rail_y + px(4),
+                    inner_y=tile_y + px(4),
                     inner_w=tile_w - px(8),
                     inner_h=tile_h - px(8),
-                    image_x=tile_x + px(10),
-                    image_y=rail_y + px(10),
-                    image_w=tile_w - px(20),
-                    image_h=tile_image_h,
+                    image_x=image_x,
+                    image_y=image_y,
+                    image_w=image_w,
+                    image_h=image_h,
                     placeholder_font=px(30),
                     favorite_x=tile_x + tile_w - px(45),
-                    favorite_y=rail_y + px(16),
+                    favorite_y=tile_y + px(16),
                     favorite_size=px(31),
                     favorite_star=favorite_star,
-                    title_x=tile_x + px(8),
-                    title_y=rail_y + tile_image_h + px(10),
-                    title_w=tile_w - px(16),
-                    title_h=tile_h - tile_image_h - px(14),
+                    title_x=title_x,
+                    title_y=title_y,
+                    title_w=title_w,
+                    title_h=title_h,
                     title_font=px(18),
                 )
             )
@@ -3847,6 +3765,9 @@ def _all_movies_search_skin():
 def _series_browser_skin(cinematic=False):
     """Series categories, eight-card grid and selected-series preview."""
     width, height, px = _scale()
+    if not cinematic:
+        return poster_grid_skin("series", width, height, px, FAVORITE_STAR_PATH,
+                                _series_browser_skin(True))
     favorite_star = FAVORITE_STAR_PATH.replace("&", "&amp;").replace(
         '"', "&quot;"
     )
@@ -3869,7 +3790,7 @@ def _series_browser_skin(cinematic=False):
             CINEMATIC_CATEGORY_PAGE_SIZE * category_row_h
         ) - px(8)
         # Keep the Series composition pixel-identical to Movies: one full
-        # bleed hero, the same category rail and the same five-card row.
+        # bleed hero, the same category rail and the same portrait row.
         hero_y = 0
         hero_w = width - hero_x
         hero_h = px(616)
@@ -3891,9 +3812,7 @@ def _series_browser_skin(cinematic=False):
         rail_caption_y = px(574)
         rail_y = px(616)
         gap = px(18)
-        tile_w = int((rail_w - (gap * 4)) / 5)
-        tile_image_h = px(276)
-        tile_h = px(344)
+        poster_geometry = cinematic_poster_geometry(width, height, px)
         cinematic_scrim = CINEMATIC_SCRIM_PATH.replace(
             "&", "&amp;"
         ).replace('"', "&quot;")
@@ -3932,7 +3851,7 @@ def _series_browser_skin(cinematic=False):
 
         series_tiles = []
         for index in range(SERIES_GRID_PAGE_SIZE):
-            if index >= 5:
+            if index >= CINEMATIC_POSTER_COLUMNS:
                 series_tiles.append(
                     """
     <widget name="series_tile_bg_{index}" position="0,0" size="1,1"
@@ -3954,7 +3873,10 @@ def _series_browser_skin(cinematic=False):
                     )
                 )
                 continue
-            tile_x = rail_x + (index * (tile_w + gap))
+            tile = poster_geometry["tiles"][index]
+            tile_x, tile_y, tile_w, tile_h = tile["card"]
+            image_x, image_y, image_w, image_h = tile["image"]
+            title_x, title_y, title_w, title_h = tile["title"]
             series_tiles.append(
                 """
     <widget name="series_tile_bg_{index}" position="{x},{y}"
@@ -3986,26 +3908,26 @@ def _series_browser_skin(cinematic=False):
             halign="center" noWrap="0" />""".format(
                     index=index,
                     x=tile_x,
-                    y=rail_y,
+                    y=tile_y,
                     w=tile_w,
                     h=tile_h,
                     inner_x=tile_x + px(4),
-                    inner_y=rail_y + px(4),
+                    inner_y=tile_y + px(4),
                     inner_w=tile_w - px(8),
                     inner_h=tile_h - px(8),
-                    image_x=tile_x + px(10),
-                    image_y=rail_y + px(10),
-                    image_w=tile_w - px(20),
-                    image_h=tile_image_h,
+                    image_x=image_x,
+                    image_y=image_y,
+                    image_w=image_w,
+                    image_h=image_h,
                     placeholder_font=px(29),
                     favorite_x=tile_x + tile_w - px(45),
-                    favorite_y=rail_y + px(16),
+                    favorite_y=tile_y + px(16),
                     favorite_size=px(31),
                     favorite_star=favorite_star,
-                    title_x=tile_x + px(8),
-                    title_y=rail_y + tile_image_h + px(10),
-                    title_w=tile_w - px(16),
-                    title_h=tile_h - tile_image_h - px(14),
+                    title_x=title_x,
+                    title_y=title_y,
+                    title_w=title_w,
+                    title_h=title_h,
                     title_font=px(18),
                 )
             )
@@ -4682,6 +4604,7 @@ class GTAsyncListScreen(Screen):
             bottom_padding=getattr(self, "_footer_bottom_padding", None),
             side_padding=getattr(self, "_footer_side_padding", None),
             content_y_offset=getattr(self, "_footer_content_y_offset", 0),
+            show_web_hint=getattr(self, "_footer_show_web_hint", True),
         )
         if not getattr(self, "_list_scroll_geometry", None):
             width, height, px = _scale()
@@ -5010,19 +4933,14 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
             px(8),
             px(626),
         )
-        self._stored_preferences = self.category_store.load(
-            self.account_scope
-        )
-        self._provider_entries = arrange_categories(
-            categories,
-            CategoryPreferences(),
-            include_hidden=True,
-        )
-        arranged = arrange_categories(
-            categories,
-            self._stored_preferences,
-            include_hidden=True,
-        )
+        self._source_categories = list(categories)
+        self._selected_category_id = selected_category_id
+        self._stored_preferences = CategoryPreferences()
+        self._provider_entries = []
+        self._hidden = set()
+        self._initial_ids = self._provider_ids = ()
+        self._initial_hidden = frozenset()
+        self._save_result = None
         self._move_mode = False
         self._marked = set()
         self._move_ids = set()
@@ -5053,33 +4971,6 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
                 self[
                     "category_focus_{}_{}".format(index, edge)
                 ] = Label("")
-        self._entries = list(arranged)
-        self._ready = True
-        self._loading = False
-        self._error = ""
-        self._hidden = set(self._stored_preferences.hidden)
-        current_ids = set(self._current_ids())
-        self._hidden.intersection_update(current_ids)
-        # Carry old Filter Search results into the editable hidden set. Once
-        # saved, only explicit hidden IDs remain and the retired rules go away.
-        if (
-            self._stored_preferences.include_terms
-            or self._stored_preferences.exclude_terms
-        ):
-            allowed, unused_excluded = category_filter_ids(
-                self._provider_entries,
-                self._stored_preferences.include_terms,
-                self._stored_preferences.exclude_terms,
-            )
-            self._hidden.update(current_ids.difference(allowed))
-        self._initial_ids = tuple(self._current_ids())
-        self._initial_hidden = frozenset(self._hidden)
-        self._provider_ids = tuple(
-            self._entry_id(entry)
-            for entry in self._provider_entries
-            if self._entry_id(entry)
-        )
-        self._select_category_id(selected_category_id)
         self["actions"] = ActionMap(
             [
                 "OkCancelActions",
@@ -5134,12 +5025,68 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self.selected_index = 0
 
     def load_items(self):
-        return list(self._entries)
+        preferences = self.category_store.load(self.account_scope)
+        return preferences, arrange_categories(self._source_categories, preferences, include_hidden=True)
+
+    def _prepare_loaded_items(self, values):
+        return values
+
+    def _commit_loaded_items(self, prepared, generation):
+        if not prepared:
+            return
+        self._stored_preferences, self._entries = prepared
+        self._provider_entries = arrange_categories(self._source_categories, CategoryPreferences(), include_hidden=True)
+        self._hidden = set(self._stored_preferences.hidden)
+        current_ids = set(self._current_ids())
+        self._hidden.intersection_update(current_ids)
+        # Carry old Filter Search results into the editable hidden set. Once
+        # saved, only explicit hidden IDs remain and the retired rules go away.
+        if (
+            self._stored_preferences.include_terms
+            or self._stored_preferences.exclude_terms
+        ):
+            allowed, unused_excluded = category_filter_ids(
+                self._provider_entries,
+                self._stored_preferences.include_terms,
+                self._stored_preferences.exclude_terms,
+            )
+            self._hidden.update(current_ids.difference(allowed))
+        self._initial_ids = tuple(self._current_ids())
+        self._initial_hidden = frozenset(self._hidden)
+        self._provider_ids = tuple(
+            self._entry_id(entry)
+            for entry in self._provider_entries
+            if self._entry_id(entry)
+        )
+        self._select_category_id(self._selected_category_id)
+
+    def _poll_result(self):
+        if self._closed:
+            return
+        result = self._save_result
+        if result is not None:
+            if not result["done"].is_set():
+                self._timer.start(100, True)
+                return
+            self._save_result = None
+            self._loading = False
+            if result.get("saved"):
+                self.close(True, result["order"], result["hidden"], (), ())
+            else:
+                self._notice = _("Settings could not be saved. Check the receiver storage.")
+                self._refresh()
+            return
+        GTAsyncListScreen._poll_result(self)
 
     def empty_message(self):
         return N_("No category found.")
 
     def _refresh(self):
+        if self._loading:
+            self._clear_category_rows()
+            self["items"].setText(_("Loading content..."))
+            self["message"].setText(_("Please wait"))
+            return
         if not self._entries:
             self._clear_category_rows()
             self["items"].setText(_(self.empty_message()))
@@ -5270,30 +5217,40 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._refresh()
 
     def move_up(self):
+        if self._loading:
+            return
         if self._move_mode:
             self._select_move_destination(-1)
             return
         GTAsyncListScreen.move_up(self)
 
     def move_down(self):
+        if self._loading:
+            return
         if self._move_mode:
             self._select_move_destination(1)
             return
         GTAsyncListScreen.move_down(self)
 
     def page_up(self):
+        if self._loading:
+            return
         if self._move_mode:
             self._select_move_destination(-self.page_size)
             return
         GTAsyncListScreen.page_up(self)
 
     def page_down(self):
+        if self._loading:
+            return
         if self._move_mode:
             self._select_move_destination(self.page_size)
             return
         GTAsyncListScreen.page_down(self)
 
     def open_selected(self):
+        if self._loading:
+            return
         if self._move_mode:
             self.finish_move()
             return
@@ -5316,6 +5273,8 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._refresh()
 
     def hide_all_categories(self):
+        if self._loading:
+            return
         if self._move_mode:
             return
         self._hidden.update(self._current_ids())
@@ -5323,6 +5282,8 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._refresh()
 
     def start_move(self):
+        if self._loading:
+            return
         if self._move_mode:
             return
         self._marked.intersection_update(self._current_ids())
@@ -5378,6 +5339,10 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._refresh()
 
     def cancel_or_close(self):
+        if self._loading:
+            if self._save_result is None:
+                self.close(False)
+            return
         if self._move_mode:
             self._entries = list(self._move_snapshot or self._entries)
             self.selected_index = min(
@@ -5397,6 +5362,8 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self.close(False)
 
     def restore_defaults(self):
+        if self._loading:
+            return
         if self._move_mode:
             return
         selected_id = self._selected_id()
@@ -5424,6 +5391,8 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         )
 
     def save_and_close(self):
+        if self._loading or not self._ready:
+            return
         if self._move_mode:
             self._notice = self._move_guidance()
             self._refresh()
@@ -5508,32 +5477,26 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
                     if category_id in missing_id_set
                 )
             )
-        if (
-            self._reset_requested
-            and tuple(ordered_ids) == self._provider_ids
-            and not hidden_ids
-        ):
-            saved = self.category_store.reset(self.account_scope)
-        else:
-            saved = self.category_store.save(
-                self.account_scope,
-                ordered_ids,
-                hidden_ids,
-                include_terms=(),
-                exclude_terms=(),
-            )
-        if not saved:
-            self._notice = _(
-                "Settings could not be saved. Check the receiver storage."
-            )
-            self._refresh()
-            return
-        self.close(
-            True, ordered_ids, hidden_ids,
-            (), (),
-        )
+        reset = (self._reset_requested and tuple(ordered_ids) == self._provider_ids and not hidden_ids)
+        result = {"done": threading.Event(), "order": list(ordered_ids), "hidden": list(hidden_ids)}
+        self._save_result = result
+        self._loading = True
+        store, scope = self.category_store, self.account_scope
+        def save():
+            try:
+                result["saved"] = (store.reset(scope) if reset else store.save(scope,
+                    result["order"], result["hidden"], include_terms=(), exclude_terms=()))
+            except Exception:
+                result["saved"] = False
+            finally:
+                result["done"].set()
+        threading.Thread(target=save, daemon=True).start()
+        self._timer.start(100, True)
+        self._refresh()
 
     def toggle_mark(self):
+        if self._loading:
+            return
         if self._move_mode:
             return
         category_id = self._selected_id()
@@ -5934,33 +5897,11 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
             return candidates
         try:
             content_type = getattr(item, "content_type", "")
-            if content_type == "movie":
-                completed = _bounded_client_call(
-                    client,
-                    token,
-                    lambda: client.complete_movie(
-                        item,
-                        info,
-                        force_cover_fallback=True,
-                    ),
-                )
-            elif content_type == "series":
-                completed = _bounded_client_call(
-                    client,
-                    token,
-                    lambda: client.complete_series(
-                        item,
-                        info,
-                        force_cover_fallback=True,
-                    ),
-                )
-            else:
+            if content_type not in ("movie", "series"):
                 return candidates
-            _attach_subtitle_detail_metadata(item, completed)
-            self._continue_candidate(
-                candidates,
-                getattr(completed, "cover", ""),
-            )
+            cover = _bounded_client_call(client, token, lambda: client.poster_cover(
+                "movie" if content_type == "movie" else "tv", item, info))
+            self._continue_candidate(candidates, cover)
         except MetadataError as error:
             _debug(
                 "continue TMDb poster fallback failed id={} error={}".format(
@@ -6040,13 +5981,12 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
             "token": token,
         }
         self._continue_poster_state = state
-        for _worker_index in range(min(CONTINUE_POSTER_WORKERS, len(jobs))):
-            worker = threading.Thread(
-                target=self._load_continue_poster_worker,
-                args=(state,),
-            )
-            worker.daemon = True
-            worker.start()
+        pool = getattr(self, "_continue_poster_workers", None)
+        if pool is None:
+            pool = self._continue_poster_workers = LatestPosterWorkers(worker_count=CONTINUE_POSTER_WORKERS)
+            self.onClose.append(pool.close)
+        pool.replace([lambda: self._load_continue_poster_worker(state)
+                      for unused in range(min(CONTINUE_POSTER_WORKERS, len(jobs)))])
         self._poster_timer.start(120, True)
 
     def _poster_job_allowed(self, item, stored_url):
@@ -6256,7 +6196,9 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
             return
         item = self._entries[self.selected_index]
         key = str(getattr(item, "resume_key", "") or "")
-        if not key or not self.resume_store.clear(key):
+        if not key:
+            return
+        if not queue_playback_clear(self.resume_store, key):
             return
         self._entries.pop(self.selected_index)
         self.selected_index = min(
@@ -6755,26 +6697,47 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
         self._continue_poster_page_key = None
         set_remote_footer(self, FAVORITES_FOOTER_ITEMS)
 
+    def _watch_favorite_operation(self, result, failure, success=""):
+        operations = getattr(self, "_favorite_operations", None)
+        if operations is None:
+            operations = self._favorite_operations = []
+            self._favorite_operation_timer = eTimer()
+            _connect_timer(self._favorite_operation_timer, self._poll_favorite_operations)
+            self.onClose.append(self._favorite_operation_timer.stop)
+        operations[:] = [entry for entry in operations if not entry[0]["done"]][-31:]
+        operations.append((result, failure, success))
+        self._favorite_operation_timer.start(80, True)
+
+    def _poll_favorite_operations(self):
+        if self._closed:
+            return
+        pending = []
+        for result, failure, success in self._favorite_operations:
+            if not result["done"]:
+                pending.append((result, failure, success))
+            elif not result["ok"]:
+                self.start_load()
+                self["favorite_info"].setText(failure)
+            elif success:
+                self["favorite_info"].setText(success)
+        self._favorite_operations = pending
+        if pending:
+            self._favorite_operation_timer.start(80, True)
+
     def save_move(self):
         if not self._move_active:
             return
         keys = [str(getattr(item, "favorite_key", "") or "") for item in self._entries]
         content_type = self._active_filter()[0]
-        if not self.favorite_store.reorder(
-            self.favorite_scope, keys, content_type=content_type
-        ):
-            snapshot = list(self._move_snapshot or ())
-            self._entries = snapshot
-            self.selected_index = min(
-                self._move_snapshot_index, max(0, len(snapshot) - 1)
-            )
-            self._leave_move_mode()
-            self._refresh()
+        result = self.favorite_store.reorder_async(self.favorite_scope, keys, content_type=content_type)
+        if result is None:
+            self.cancel_move()
             self["favorite_info"].setText(_("Could not save the favorite order."))
             return
         self._leave_move_mode()
         self._refresh()
-        self["favorite_info"].setText(_("Favorite order saved."))
+        self["favorite_info"].setText(_("Please wait"))
+        self._watch_favorite_operation(result, _("Could not save the favorite order."), _("Favorite order saved."))
 
     def cancel_move(self):
         if not self._move_active:
@@ -6809,9 +6772,11 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
             return
         item = self._entries[self.selected_index]
         key = str(getattr(item, "favorite_key", "") or "")
-        if not key or not self.favorite_store.remove(key, self.favorite_scope):
+        desired, result = self.favorite_store.toggle_async(self.favorite_scope, item, desired=False) if key else (None, None)
+        if desired is not False:
             self["message"].setText(_("Could not update favorites."))
             return
+        self._watch_favorite_operation(result, _("Could not update favorites."))
         self._entries.pop(self.selected_index)
         item_type = str(getattr(item, "content_type", "") or "")
         self._favorite_counts[""] = max(0, self._favorite_counts.get("", 0) - 1)
@@ -6935,11 +6900,21 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
 
 
 class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
-    """Search movies through the provider's bounded page API."""
+    """Search persistent metadata, or the portal's native bounded page API."""
 
     page_size = ALL_MOVIES_SEARCH_PAGE_SIZE
     provider_page_size = 14
     page_cache_limit = 5
+    content_type = "movie"
+    _search_title_message = N_("Search All Movies")
+    _query_hint_message = N_("Enter a movie name.")
+    _result_title_message = N_("All Movies")
+    _selecting_title_message = N_("Selecting movie...")
+    _summary_title_message = N_("MOVIE SUMMARY")
+    _empty_summary_message = N_("Movie summary unavailable.")
+    _load_error_message = N_("Could not load movies")
+    _no_match_message = N_("No movies matched this search.")
+    _item_noun_message = N_("Movie")
 
     def __init__(
         self,
@@ -6950,9 +6925,10 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         hidden_category_ids=None,
         initial_query=None,
     ):
+        search_footer = ALL_SERIES_SEARCH_FOOTER_ITEMS if self.content_type == "series" else ALL_MOVIES_SEARCH_FOOTER_ITEMS
         self.skin = decorate_remote_footer(
             prepared_skin(_all_movies_search_skin),
-            ALL_MOVIES_SEARCH_FOOTER_ITEMS,
+            search_footer,
             transparent_panel=True,
             show_dividers=False,
             stacked=True,
@@ -6986,6 +6962,21 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._page_cache = OrderedDict()
         self._event_lock = threading.Lock()
         self._events = deque()
+        self._catalog_mode = (
+            self.content_type == "series"
+            or str(getattr(self.client, "source_type", "")).lower() == "xtream"
+            or isinstance(self.client, XtreamContentClient)
+        )
+        self._catalog_index = None
+        self._catalog_started = False
+        self._catalog_preparing = False
+        self._catalog_state = {"complete": False, "movies": 0}
+        self._catalog_page_complete = False
+        self._catalog_token = None
+        self._catalog_generation = 0
+        self._catalog_mailbox = None
+        self._catalog_refresh_pending = False
+        self._catalog_next_refresh = 0.0
         self._provider_worker_lock = threading.Lock()
         self._provider_worker_count = 0
         self._provider_workers_idle = threading.Event()
@@ -6999,7 +6990,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
 
         attach_background(self, "app_bg", APP_BACKGROUND_PATH)
         self["top_accent"] = Label("")
-        self["header"] = Label(_("Search All Movies"))
+        self["header"] = Label(_(self._search_title_message))
         self["server"] = Label("")
         self._dynamic_search_server_text = (
             account.host or account.display_name
@@ -7008,10 +6999,10 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self["query_panel"] = Label("")
         self["query_accent"] = Label("")
         self["query_caption"] = Label(_("Search"))
-        self["query_text"] = Label(_("Enter a movie name."))
+        self["query_text"] = Label(_(self._query_hint_message))
         self["result_panel"] = Label("")
         self["result_accent"] = Label("")
-        self["result_caption"] = Label(_("All Movies"))
+        self["result_caption"] = Label(_(self._result_title_message))
         for index in range(self.page_size):
             self["catalog_result_{}".format(index)] = Label("")
             self["catalog_result_focus_{}".format(index)] = Label("")
@@ -7021,16 +7012,16 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         hide_scrollbar(self, "results_scroll")
         self["detail_panel"] = Label("")
         self["detail_accent"] = Label("")
-        self["detail_title"] = Label(_("Selecting movie..."))
+        self["detail_title"] = Label(_(self._selecting_title_message))
         self["detail_rating"] = Label("")
         self["detail_meta"] = Label("")
         self["detail_category"] = Label("")
-        self["detail_plot_caption"] = Label(_("MOVIE SUMMARY"))
-        self["detail_plot"] = Label(_("Enter a movie name."))
-        self["status"] = Label(_("Enter a movie name."))
+        self["detail_plot_caption"] = Label(_(self._summary_title_message))
+        self["detail_plot"] = Label(_(self._query_hint_message))
+        self["status"] = Label(_(self._query_hint_message))
         self["message"] = Label("")
         self["footer"] = Label("")
-        install_remote_footer(self, ALL_MOVIES_SEARCH_FOOTER_ITEMS, stacked=True)
+        install_remote_footer(self, search_footer, stacked=True)
         width, height, px = _scale()
         self._search_title_preferred_font = font_px(
             px,
@@ -7081,7 +7072,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self.onLayoutFinish.append(self._refit_search_server)
         if hasattr(self, "onClose"):
             self.onClose.append(self._stop)
-        self.setTitle(_("Search All Movies"))
+        self.setTitle(_(self._search_title_message))
         self._render()
 
     def _refit_search_server(self):
@@ -7130,7 +7121,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         opener(
             self._query_entered,
             VirtualKeyBoard,
-            title=_("Search All Movies"),
+            title=_(self._search_title_message),
             text=self._query,
         )
 
@@ -7169,7 +7160,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._query = query
         ellipsize_dynamic_text(
             self["query_text"],
-            query or _("Enter a movie name."),
+            query or _(self._query_hint_message),
             fallback_chars=90,
         )
         if changed:
@@ -7178,9 +7169,54 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self._reset_search_results()
             self._query_key = query_key
         if not query_key:
+            self._catalog_refresh_pending = False
             self._render()
             return
+        if self._catalog_mode and not self._catalog_started:
+            self._start_catalog()
         self._load_page(1, pending_index=0)
+
+    def _start_catalog(self, force=False):
+        if self._closed or self._catalog_preparing:
+            return
+        if self._catalog_index is None:
+            self._catalog_index = (SeriesCatalogIndex(self.client)
+                                   if self.content_type == "series" else MovieCatalogIndex(self.client))
+        self._catalog_started = True
+        self._catalog_preparing = True
+        self._catalog_state = dict(self._catalog_state, complete=False, reason="")
+        self._catalog_generation += 1
+        generation = self._catalog_generation
+        # This is a cooperative background budget, independent of the short
+        # query/page timeout. Every network read still has a socket timeout.
+        token = self._catalog_token = _WorkerToken(30 * 60)
+        self._provider_worker_started()
+        worker = threading.Thread(target=self._catalog_worker, args=(generation, token, force))
+        worker.daemon = True
+        try:
+            worker.start()
+        except (RuntimeError, OSError):
+            self._provider_worker_finished()
+            token.cancel()
+            self._catalog_token = None
+            self._catalog_preparing = False
+            self._catalog_state["reason"] = "storage"
+        self._poll_timer.start(60, True)
+
+    def _catalog_worker(self, generation, token, force):
+        def progress(state):
+            with self._event_lock:
+                if not self._closed and generation == self._catalog_generation:
+                    # Only the latest progress snapshot is needed, regardless
+                    # of provider speed or time spent in the keyboard/player.
+                    self._catalog_mailbox = (generation, dict(state))
+        try:
+            result = self._catalog_index.prepare(token, callback=progress, force=force)
+            progress(dict(result, preparing=False))
+        except Exception:
+            progress(dict(self._catalog_state, complete=False, preparing=False, reason="storage"))
+        finally:
+            self._provider_worker_finished()
 
     def _cache_key(self, page):
         return (self._query_key, int(page))
@@ -7227,7 +7263,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self["status"].setText(_("Please wait"))
             return False
         searcher = getattr(self.client, "search_movies", None)
-        if not callable(searcher):
+        if not self._catalog_mode and not callable(searcher):
             self._supported = False
             self._search_reason = "unsupported"
             self._results = []
@@ -7291,6 +7327,14 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         try:
             try:
                 token.check()
+                if getattr(self, "_catalog_mode", False):
+                    result = self._catalog_index.search(
+                        query, page=page, page_size=self.provider_page_size,
+                        hidden_category_ids=self._hidden_category_ids, token=token,
+                    )
+                    token.check()
+                    self._queue_search_event(("page", generation, page, result))
+                    return
                 searcher = getattr(self.client, "search_movies", None)
                 if not callable(searcher):
                     self._queue_search_event(
@@ -7333,10 +7377,20 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                 else:
                     result = search_page()
                 token.check()
-                self._queue_search_event(("page", generation, page, result))
+                fallback = (
+                    not self._page_value(result, "supported", True)
+                    and callable(getattr(self.client, "load_vod_catalog_step", None))
+                )
+                self._queue_search_event(("fallback" if fallback else "page", generation, page, result))
             except _WorkerCancelled:
                 return
+            except (CatalogStorageError, CatalogLimitError):
+                self._queue_search_event(("error", generation, page, "storage"))
             except ContentError as error:
+                if (error.reason == ContentError.UNSUPPORTED_TYPE
+                        and callable(getattr(self.client, "load_vod_catalog_step", None))):
+                    self._queue_search_event(("fallback", generation, page, None))
+                    return
                 self._queue_search_event(
                     (
                         "error",
@@ -7367,6 +7421,10 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._search_source = str(
             self._page_value(result, "source", "") or ""
         )
+        if self._search_source == "catalog":
+            self._catalog_page_complete = bool(
+                self._page_value(result, "catalog_state", {}).get("complete", False)
+            )
         try:
             result_page_size = int(
                 self._page_value(
@@ -7426,6 +7484,19 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         except (TypeError, ValueError, OverflowError):
             result_total = 0
 
+        if self._search_source == "catalog" and page > 1 and not result_items:
+            # A successful refresh can shrink the catalogue. Requery the last
+            # valid local page instead of retaining films removed by refresh.
+            self._results = []
+            self.selected_index = 0
+            self._total_items = result_total
+            self._current_page = max(1, (result_total + result_page_size - 1) // result_page_size)
+            self._known_last_page = None
+            self._catalog_refresh_pending = True
+            self._catalog_next_refresh = 0.0
+            self._render()
+            return
+
         # Some Ministra forks report the first page size as ``total_items``.
         # The client deliberately permits one lazy confirmation page in that
         # case.  If that next page is empty, or its terminal rows are all from
@@ -7451,7 +7522,10 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._result_page_size = result_page_size
         self._results = result_items
         self._total_items = result_total
-        if not result_has_more:
+        if not result_has_more and not (
+            getattr(self, "_catalog_mode", False)
+            and not self._catalog_state.get("complete", False)
+        ):
             self._known_last_page = page
         self._has_more = bool(
             result_has_more
@@ -7491,7 +7565,13 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self._loading = False
             self._search_token = None
             self._requested_page = 0
-            if event[0] == "page":
+            if event[0] == "fallback":
+                self._catalog_mode = True
+                self._page_cache.clear()
+                self._reset_search_results()
+                self._start_catalog()
+                self._catalog_refresh_pending = True
+            elif event[0] == "page":
                 pending_index = self._pending_page_index
                 self._pending_page_index = 0
                 self._apply_search_page(
@@ -7502,6 +7582,18 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             else:
                 self._pending_page_index = 0
                 self._search_reason = str(event[3] or "search_error")
+            changed = True
+
+        with self._event_lock:
+            catalogue, self._catalog_mailbox = self._catalog_mailbox, None
+        if catalogue is not None and catalogue[0] == self._catalog_generation:
+            self._catalog_state = catalogue[1]
+            self._catalog_preparing = bool(self._catalog_state.get("preparing", False))
+            if not self._catalog_preparing:
+                self._catalog_token = None
+            self._page_cache.clear()
+            self._known_last_page = None
+            self._catalog_refresh_pending = True
             changed = True
 
         # Drain a result that was already queued before declaring timeout.
@@ -7518,13 +7610,18 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                 changed = True
         if changed or (not self._loading and self._search_reason):
             self._render()
+        if (self._catalog_refresh_pending and not self._loading and self._query_key
+                and (not self._catalog_preparing or time.monotonic() >= self._catalog_next_refresh)):
+            self._catalog_refresh_pending = False
+            self._catalog_next_refresh = time.monotonic() + 2.0
+            self._load_page(self._current_page, pending_index=self.selected_index)
         with self._event_lock:
             has_events = bool(self._events)
-        if self._loading or has_events:
+        if (self._loading or has_events or self._catalog_preparing
+                or (self._catalog_refresh_pending and self._query_key)):
             self._poll_timer.start(60, True)
 
-    @staticmethod
-    def _reason_text(reason):
+    def _reason_text(self, reason):
         reason = str(reason or "")
         if reason in (ContentError.DEADLINE, "deadline"):
             return _("Request timed out")
@@ -7538,15 +7635,34 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             return _(
                 "This source does not support the selected content type."
             )
-        return _("Could not load movies")
+        return _(self._load_error_message)
 
     def _status_text(self):
         if not self._query_key:
-            return _("Enter a movie name.")
+            return _(self._query_hint_message)
         if not self._supported:
             return _(
                 "This source does not support the selected content type."
             )
+        if self._catalog_mode:
+            state = self._catalog_state
+            if self._search_reason == "storage" or state.get("reason") == "storage":
+                return _("Search cache is unavailable. Check receiver storage.")
+            if self._catalog_preparing:
+                if self.content_type == "series":
+                    return _("Preparing series catalogue: {count} series").format(count=state.get("movies", 0))
+                return _("Preparing search catalogue: {movies} movies").format(movies=state.get("movies", 0))
+            if state.get("reason") == "limit":
+                return _("Catalogue limit reached. Results may be incomplete.")
+            if not state.get("complete"):
+                if self.content_type == "series":
+                    return _("Series catalogue incomplete: {count} series. Press GREEN to continue.").format(count=state.get("movies", 0))
+                return _("Catalogue incomplete: {movies} movies. Press GREEN to continue.").format(movies=state.get("movies", 0))
+            if not self._search_reason:
+                if self.content_type == "series":
+                    return _("{} • {} SERIES").format(_("Search"), self._total_items)
+                return _("Catalogue ready: {movies} movies • {results} matches").format(
+                    movies=state.get("movies", 0), results=self._total_items)
         if self._loading:
             return _("Please wait")
         if self._search_reason:
@@ -7579,7 +7695,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                     self["catalog_result_{}".format(row)],
                     "{:05d}.  {}{}{}".format(
                         global_start + local_index + 1,
-                        str(getattr(item, "name", "") or _("Movie")),
+                        str(getattr(item, "name", "") or _(self._item_noun_message)),
                         suffix,
                         favorite,
                     ),
@@ -7620,9 +7736,14 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                     )
                 )
             elif self._search_reason:
-                self["message"].setText(_("Could not load movies"))
+                self["message"].setText(_(self._load_error_message))
             elif self._query_key and not self._loading:
-                self["message"].setText(_("No movies matched this search."))
+                self["message"].setText(
+                    _("Search incomplete.") if self._catalog_mode and not (
+                        self._catalog_state.get("complete") and self._catalog_page_complete
+                    )
+                    else _(self._no_match_message)
+                )
             else:
                 self["message"].setText("")
         self["status"].setText(self._status_text())
@@ -7632,7 +7753,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         if not self._results:
             set_static_text(
                 self["detail_title"],
-                _("Selecting movie..."),
+                _(self._selecting_title_message),
                 preferred_size=self._search_title_preferred_font,
             )
             self["detail_rating"].setText("")
@@ -7643,11 +7764,13 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                     "This source does not support the selected content type."
                 )
             elif self._search_reason:
-                text = _("Could not load movies")
+                text = _(self._load_error_message)
             elif self._query_key and not self._loading:
-                text = _("No movies matched this search.")
+                text = (_("Search incomplete.") if self._catalog_mode and not (
+                            self._catalog_state.get("complete") and self._catalog_page_complete)
+                        else _(self._no_match_message))
             else:
-                text = _("Enter a movie name.")
+                text = _(self._query_hint_message)
             self["detail_plot"].setText(text)
             return
         item = self._results[self.selected_index]
@@ -7664,7 +7787,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         else:
             set_static_text(
                 self["detail_title"],
-                _("Movie"),
+                _(self._item_noun_message),
                 preferred_size=self._search_title_preferred_font,
             )
         self["detail_rating"].setText(
@@ -7698,7 +7821,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         fit_dynamic_text(
             self["detail_plot"],
             str(getattr(item, "plot", "") or "")
-            or _("Movie summary unavailable."),
+            or _(self._empty_summary_message),
             max_lines=7,
             fallback_chars=48,
         )
@@ -7762,6 +7885,8 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self.open_keyboard()
             return
         self._cancel_search_request(invalidate_generation=True)
+        if self._catalog_mode:
+            self._start_catalog(force=True)
         self._release_xtream_search_cache()
         query_key = self._query_key
         for key in tuple(self._page_cache):
@@ -7815,6 +7940,9 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         if self._loading:
             self["status"].setText(_("Please wait"))
             return
+        if self.content_type == "series":
+            self._open_series_episodes()
+            return
         open_extplayer(
             self.session,
             self.client,
@@ -7828,6 +7956,12 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         if self._closed:
             return
         self._closed = True
+        self._catalog_generation += 1
+        _cancel_worker_token(self._catalog_token)
+        self._catalog_token = None
+        self._catalog_preparing = False
+        with self._event_lock:
+            self._catalog_mailbox = None
         self._cancel_search_request(invalidate_generation=True)
         self._page_cache.clear()
         try:
@@ -7835,6 +7969,69 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         except Exception:
             pass
         self._release_xtream_search_cache()
+
+
+class GTAllSeriesSearchScreen(GTAllMoviesSearchScreen):
+    """Paged account-wide series search using the persistent series index."""
+    content_type = "series"
+    _search_title_message = N_("Search All Series")
+    _query_hint_message = N_("Enter a series name.")
+    _result_title_message = N_("All Series")
+    _selecting_title_message = N_("Selecting series...")
+    _summary_title_message = N_("SERIES SUMMARY")
+    _empty_summary_message = N_("Series summary unavailable.")
+    _load_error_message = N_("Could not load series")
+    _no_match_message = N_("No series matched this search.")
+    _item_noun_message = N_("Series")
+
+    def _release_xtream_search_cache(self):
+        pass
+
+    def request_selected_download(self):
+        self._open_series_episodes(download_mode=True)
+
+    def _open_series_episodes(self, download_mode=False):
+        if self._closed or not self._results or self._loading:
+            return
+        if getattr(self, "_series_episode_child_open", False):
+            return
+        self._series_episode_child_open = True
+        self._catalog_generation += 1
+        _cancel_worker_token(self._catalog_token)
+        self._catalog_token = None
+        self._catalog_preparing = False
+        self._catalog_started = False
+        with self._event_lock:
+            self._catalog_mailbox = None
+        self._cancel_search_request(invalidate_generation=True)
+        try:
+            episode_client = self.client if _is_stalker_client(self.client) else content_client_for(self.account)
+            self.session.openWithCallback(
+                self._series_episode_closed,
+                GTEpisodeListScreen,
+                self.account,
+                self._results[self.selected_index],
+                episode_client,
+                favorite_store=self.favorite_store,
+                download_mode=download_mode,
+            )
+        except Exception as error:
+            log_event("series", "Could not open series search episodes", error=error)
+            self._series_episode_closed()
+            self["status"].setText(_("Could not open the content list."))
+
+    def _series_episode_closed(self, *args):
+        self._series_episode_child_open = False
+        if self._closed:
+            return
+        self._reload_favorite_keys()
+        self._page_cache.clear()
+        self._known_last_page = None
+        if self._query_key:
+            self._start_catalog()
+            self._catalog_refresh_pending = True
+            self._poll_timer.start(60, True)
+        self._render()
 
 
 class GTM3UChannelSearchScreen(_FavoriteSupport, GTAsyncListScreen):
@@ -8093,13 +8290,30 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._cinematic_enabled = bool(
             self.content_type in ("movie", "series") and cinematic_view
         )
+        self._poster_grid_enabled = bool(
+            self.content_type in ("movie", "series") and not self._cinematic_enabled
+        )
+        self._poster_page_size = (GRID_PAGE_SIZE if self._poster_grid_enabled
+                                  else CINEMATIC_POSTER_COLUMNS)
+        self._poster_slot_count = (GRID_PAGE_SIZE if self._poster_grid_enabled
+                                   else (SERIES_GRID_PAGE_SIZE if self.content_type == "series"
+                                         else CINEMATIC_POSTER_COLUMNS))
+        self._vod_poster_retries = PosterRetryQueue()
+        self._vod_poster_retry_timer = None
+        self._vod_decode_failures = {}
+        self._vod_decode_failure_lock = threading.Lock()
+        self._vod_poster_url_overrides = OrderedDict()
+        self._vod_poster_info_cache = OrderedDict()
+        self._vod_poster_info_lock = threading.Lock()
         self._cinematic_generation = 0
         self._cinematic_pending = False
         self._cinematic_result = None
         self._cinematic_token = None
+        self._cinematic_lookup_pending = False
         self._cinematic_surface_prepared = None
         self._cinematic_request_signature = None
         self._cinematic_applied_path = ""
+        self._cinematic_decode_request = None
         if metadata_client is not None:
             self._metadata_client = metadata_client
         else:
@@ -8139,14 +8353,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             )
         elif self.content_type == "movie":
             self._footer_layout_items = MOVIE_FOOTER_ITEMS
-            if self._cinematic_enabled:
-                self._screen_background_path = CINEMATIC_GLASS_BACKGROUND_PATH
+            self._screen_background_path = CINEMATIC_GLASS_BACKGROUND_PATH
             self.skin = prepared_skin(_movie_browser_skin, self._cinematic_enabled)
-            self.page_size = (
-                CINEMATIC_CATEGORY_PAGE_SIZE
-                if self._cinematic_enabled
-                else MOVIE_CATEGORY_PAGE_SIZE
-            )
+            self.page_size = CINEMATIC_CATEGORY_PAGE_SIZE
             width, height, px = _scale()
             if self._cinematic_enabled:
                 (
@@ -8158,21 +8367,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     px,
                 )
             else:
-                self._list_scroll_geometry = (
-                    px(42 + 340 - 14),
-                    px(118 + 48),
-                    px(8),
-                    (MOVIE_CATEGORY_PAGE_SIZE * px(72)) - px(8),
-                )
-                rail_x = px(430)
-                self._poster_scroll_geometry = (
-                    rail_x,
-                    height - px(82) - px(25),
-                    width - rail_x - px(42),
-                    px(6),
-                )
+                geometry = grid_geometry(width, height, px)
+                self._list_scroll_geometry = geometry["category_scroll"]
+                self._poster_scroll_geometry = geometry["poster_scroll"]
             self._movie_catalog_entries = []
             self._movie_entries = []
+            self._movie_browser_catalog = (
+                MovieBrowseCatalog(self.client) if source_type == "xtream" else None
+            )
+            self._movie_browse_cursor = 0
+            self._movie_index_reload_when_done = False
             self._movie_selected_index = 0
             self._movie_focus = "categories"
             self._movie_loading = False
@@ -8206,6 +8410,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._movie_poster_generation = 0
             self._movie_search_child_open = False
             self._movie_search_child = None
+            self._movie_search_keyboard_open = False
+            self._movie_search_query = ""
             self._movie_search_drain_event = None
             self._movie_search_resume_categories = False
             self._movie_search_resume_category_id = None
@@ -8231,14 +8437,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             )
         elif self.content_type == "series":
             self._footer_layout_items = SERIES_FOOTER_ITEMS
-            if self._cinematic_enabled:
-                self._screen_background_path = CINEMATIC_GLASS_BACKGROUND_PATH
+            self._screen_background_path = CINEMATIC_GLASS_BACKGROUND_PATH
             self.skin = prepared_skin(_series_browser_skin, self._cinematic_enabled)
-            self.page_size = (
-                CINEMATIC_CATEGORY_PAGE_SIZE
-                if self._cinematic_enabled
-                else SERIES_CATEGORY_PAGE_SIZE
-            )
+            self.page_size = CINEMATIC_CATEGORY_PAGE_SIZE
             width, height, px = _scale()
             if self._cinematic_enabled:
                 (
@@ -8250,16 +8451,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     px,
                 )
             else:
-                self._list_scroll_geometry = (
-                    px(42 + 300 - 14),
-                    px(180),
-                    px(8),
-                    px(696),
-                )
-                self._poster_scroll_geometry = (
-                    px(366), px(936), px(972), px(8)
-                )
+                geometry = grid_geometry(width, height, px)
+                self._list_scroll_geometry = geometry["category_scroll"]
+                self._poster_scroll_geometry = geometry["poster_scroll"]
             self._series_entries = []
+            self._series_browser_catalog = (
+                MovieBrowseCatalog(self.client, index=SeriesCatalogIndex(self.client))
+                if source_type == "xtream" else None
+            )
+            self._series_browse_cursor = 0
+            self._series_index_reload_when_done = False
             self._series_selected_index = 0
             self._series_focus = "categories"
             self._series_selection_by_category = {}
@@ -8296,6 +8497,13 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._series_info_stream_id = ""
             self._series_child_open = False
             self._series_search_query = ""
+            self._series_search_keyboard_open = False
+            self._series_search_child_open = False
+            self._series_search_child = None
+            self._series_search_drain_event = None
+            self._series_search_resume_categories = False
+            self._series_search_resume_timer = eTimer()
+            _connect_timer(self._series_search_resume_timer, self._resume_series_after_search)
             self._series_timer = eTimer()
             _connect_timer(self._series_timer, self._poll_series_result)
             self._series_scan_timer = eTimer()
@@ -8410,8 +8618,15 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._setup_series_widgets()
         if hasattr(self, "onShown"):
             self.onShown.append(self._favorite_browser_shown)
+        if hasattr(self, "onHide"):
+            self.onHide.append(self._pause_vod_scroll)
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._refit_content_dynamic_layout)
+        if self.content_type in ("movie", "series"):
+            self._vod_preparation = VODPreparation(self)
+            self.onClose.append(self._vod_preparation.close)
+            self.onHide.append(self._vod_preparation.pause)
+            self.onShown.append(self._vod_preparation.resume)
 
     def _refit_content_dynamic_layout(self):
         widget_name = getattr(self, "_dynamic_server_widget", "")
@@ -8430,7 +8645,30 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 fallback_chars=20,
             )
 
+    def _pause_vod_scroll(self):
+        if self.content_type in ("movie", "series"):
+            try:
+                self[self.content_type + "_plot"].stop_scroll()
+            except (KeyError, AttributeError):
+                pass
+
     def _favorite_browser_shown(self):
+        if getattr(self, "_vod_work_suspended", False):
+            self._vod_work_suspended = False
+            kind = self.content_type
+            catalog = getattr(self, "_{}_browser_catalog".format(kind), None)
+            if catalog is not None:
+                catalog.start()
+            if kind in ("movie", "series"):
+                if getattr(self, "_{}_has_more".format(kind), False):
+                    getattr(self, "_start_{}_more_load".format(kind))()
+                getattr(self, "_schedule_{}_detail".format(kind))()
+                getattr(self, "_render_movie_posters" if kind == "movie" else "_render_series_tiles")()
+        for name in ("movie_plot", "series_plot"):
+            try:
+                self[name].restart_scroll()
+            except (KeyError, AttributeError):
+                pass
         if not self._favorite_screen_shown():
             return
         if self.content_type == "movie" and self._movie_entries:
@@ -8666,6 +8904,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 ].hide()
 
     def refresh_all(self):
+        for name in ("_load_token", "_live_more_token"):
+            _cancel_worker_token(getattr(self, name, None))
+        self._loading = False
         invalidator = getattr(self.client, "invalidate_cache", None)
         if invalidator is not None:
             try:
@@ -9004,13 +9245,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 category_id = str(
                     getattr(category, "category_id", "") or ""
                 ).strip()
-                if filters_changed or category_id != str(
-                    self._movie_loaded_category_id or ""
-                ).strip():
-                    if category_id:
-                        self._start_movie_load(category)
-                    else:
-                        self._render_all_movies_prompt()
+                if filters_changed or category_id != self._movie_loaded_category_id:
+                    self._start_movie_load(category)
                 else:
                     self._refresh_movie_categories(schedule_load=False)
                     self._render_movie_posters()
@@ -9074,8 +9310,197 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._reload_favorite_keys()
         self._weather_child_closed(*args)
 
+    def _cached_grid_detail(self, kind):
+        prefix = "_" + kind + "_"
+        entries = getattr(self, prefix + "entries")
+        if not entries:
+            return None
+        item = entries[getattr(self, prefix + "selected_index")]
+        cache = getattr(self, prefix + "info_cache")
+        lock = getattr(self, prefix + "info_cache_lock", None)
+        return (_detail_cache_get(cache, lock, item.stream_id)
+                if lock is not None else cache.get(item.stream_id))
+
+    def _schedule_grid_detail(self, kind, immediate=False):
+        entries = getattr(self, "_" + kind + "_entries")
+        if not entries or self._closed:
+            return
+        prefix = "_" + kind + "_"
+        generation = getattr(self, prefix + "generation")
+        setattr(self, prefix + "pending_detail_generation", generation)
+        _cancel_worker_token(getattr(self, prefix + "detail_token"))
+        setattr(self, prefix + "detail_token", None)
+        setattr(self, prefix + "detail_result", None)
+        setattr(self, prefix + "detail_preview", None)
+        timer = getattr(self, prefix + "detail_timer")
+        timer.stop()
+        item = entries[getattr(self, prefix + "selected_index")]
+        info = self._cached_grid_detail(kind)
+        self._render_grid_detail(kind, info, loading=info is None)
+        if info is not None and getattr(info, "_grid_metadata_complete", False):
+            setattr(self, prefix + "pending_detail_generation", None)
+            setattr(self, prefix + "detail_pending", False)
+            self._apply_grid_cover(kind, "", getattr(info, "cover", ""), getattr(item, "icon", ""))
+            return
+        if immediate:
+            getattr(self, "_commit_" + kind + "_detail")()
+        else:
+            timer.start(NAVIGATION_DEBOUNCE_MS, True)
+
+    def _start_grid_detail(self, kind):
+        prefix = "_" + kind + "_"
+        entries = getattr(self, prefix + "entries")
+        if not entries or self._closed:
+            return
+        generation = getattr(self, prefix + "generation")
+        item = entries[getattr(self, prefix + "selected_index")]
+        token = _WorkerToken(WORKER_DETAIL_TIMEOUT_SECONDS)
+        _cancel_worker_token(getattr(self, prefix + "detail_token"))
+        setattr(self, prefix + "detail_token", token)
+        setattr(self, prefix + "detail_pending", True)
+        pool = getattr(self, "_grid_detail_workers", None)
+        if pool is None:
+            pool = self._grid_detail_workers = LatestPosterWorkers(worker_count=1)
+            self.onClose.append(pool.close)
+        worker = getattr(self, "_load_" + kind + "_detail_worker")
+        pool.replace([lambda: worker(generation, item, token)])
+        getattr(self, "_start_deferred_" + kind + "_posters")()
+        getattr(self, prefix + "timer").start(80, True)
+
+    def _render_grid_detail(self, kind, info, loading=False):
+        prefix = "_" + kind + "_"
+        entries = getattr(self, prefix + "entries")
+        if not entries:
+            getattr(self, "_set_static_" + kind + "_title")(
+                _("Selecting movie...") if kind == "movie" else _("Selecting series..."))
+            for field in ("rating", "meta", "people"):
+                set_text_if_changed(self[kind + "_" + field], "")
+            message = (_("Loading movie information from the server.") if kind == "movie"
+                       else _("Loading series information from the server.")) if loading else ""
+            getattr(self, "_set_" + kind + "_plot")(message)
+            return
+        item = entries[getattr(self, prefix + "selected_index")]
+        if info is not None:
+            _attach_subtitle_detail_metadata(item, info)
+        if kind == "series":
+            self._series_info = info
+            self._series_info_stream_id = str(item.stream_id)
+        title = getattr(info, "title", "") or item.name
+        getattr(self, "_set_" + kind + "_title")(title)
+        tmdb_rating = getattr(info, "tmdb_rating", "")
+        rating = tmdb_rating or getattr(info, "rating", "") or getattr(item, "rating", "")
+        label = _rating_label(rating)
+        if tmdb_rating:
+            label = "TMDb {} / 10".format(label)
+        fit_dynamic_text(self[kind + "_rating"], label, max_lines=1,
+                         preferred_size=getattr(self, "_grid_rating_font", None),
+                         min_size=getattr(self, "_grid_rating_min_font", None), fallback_chars=24)
+        meta = [str(value) for value in (
+            getattr(info, "year", "") or getattr(item, "year", ""),
+            getattr(info, "genre", ""), getattr(info, "duration", ""),
+        ) if value]
+        if kind == "series":
+            seasons = list(getattr(info, "seasons", []) or [])
+            if seasons:
+                meta.append("{}: {}".format(_("Seasons"), len(seasons)))
+        ellipsize_dynamic_text(self[kind + "_meta"], "  •  ".join(meta), fallback_chars=110)
+        plot = getattr(info, "plot", "")
+        if not plot:
+            plot = (_("Loading movie information from the server.") if kind == "movie"
+                    else _("Loading series information from the server.")) if loading else (
+                    _("Movie summary unavailable.") if kind == "movie" else _("Series summary unavailable."))
+        getattr(self, "_set_" + kind + "_plot")(plot)
+        people = []
+        if getattr(info, "director", ""):
+            people.append(_("Director: {}").format(info.director))
+        if getattr(info, "cast", ""):
+            people.append(_("Cast: {}").format(info.cast))
+        fit_dynamic_text(self[kind + "_people"], "\n".join(people), max_lines=2,
+                         preferred_size=getattr(self, "_grid_people_font", None),
+                         min_size=getattr(self, "_grid_people_min_font", None), fallback_chars=140)
+
+    def _apply_grid_cover(self, kind, path, url, catalogue_url):
+        entries = getattr(self, "_" + kind + "_entries")
+        if not entries:
+            return
+        selected = getattr(self, "_" + kind + "_selected_index")
+        item = entries[selected]
+        url, catalogue_url = _safe_picon_url(url), _safe_picon_url(catalogue_url)
+        current = _safe_picon_url(getattr(item, "icon", ""))
+        if url and current in ("", catalogue_url) and current != url:
+            item.icon = url
+            getattr(self, "_render_movie_posters" if kind == "movie" else "_render_series_tiles")()
+        # Tile decoding remains in the pair-paced poster queue, including
+        # cached cover replacements; the information panel owns no artwork.
+
+    def _release_grid_pixmaps(self, kind):
+        loaders = getattr(self, "_gt_pixmap_loaders", {})
+        for slot in range(self._poster_slot_count):
+            getattr(self, "_vod_tile_requests", {}).pop((kind, slot), None)
+            getattr(self, "_vod_tile_displayed", {}).pop((kind, slot), None)
+            loader = loaders.pop("{}-tile-{}".format(kind, slot), None)
+            if loader is not None:
+                loader.close()
+            widget = self["{}_tile_poster_{}".format(kind, slot)]
+            widget.hide()
+            try:
+                widget.instance.setPixmap(None)
+            except Exception:
+                pass
+
+    def _update_grid_position(self, kind):
+        entries = getattr(self, "_" + kind + "_entries")
+        selected = getattr(self, "_" + kind + "_selected_index")
+        more = getattr(self, "_" + kind + "_has_more")
+        base = self._vod_window_base(kind)
+        selected += base
+        count = len(entries) + base
+        self[kind + "_grid_position"].setText(page_position(selected, count, more))
+        # Work in whole pages so the thumb stays still while focus moves
+        # inside one page, and reaches the bottom on a short last page.
+        pages = max(1, (count + GRID_PAGE_SIZE - 1) // GRID_PAGE_SIZE)
+        update_scrollbar(self, "poster_scroll", pages + int(more),
+                         selected // GRID_PAGE_SIZE, 1, self._poster_scroll_geometry)
+        _set_component_visible(self["poster_scroll_more"],
+                               selected // GRID_PAGE_SIZE < pages - 1 or more)
+
+    def _move_vod_grid(self, kind, direction):
+        entries = getattr(self, "_" + kind + "_entries")
+        selected = getattr(self, "_" + kind + "_selected_index")
+        more = getattr(self, "_" + kind + "_has_more")
+        if not entries or getattr(self, "_" + kind + "_loading"):
+            return
+        target = grid_move(selected, len(entries), more, direction)
+        if direction == "up" and selected < GRID_COLUMNS and self._vod_window_base(kind):
+            target = selected - GRID_COLUMNS
+        if target is None:
+            setattr(self, "_" + kind + "_focus", "categories")
+            getattr(self, "_refresh_" + kind + "_categories")()
+            getattr(self, "_render_movie_posters" if kind == "movie" else "_render_series_tiles")()
+        elif target != selected:
+            # If provider pagination ends in a short row, clamp to its last
+            # available item once the final page arrives.
+            if kind == "series":
+                self._series_pending_clamp_to_end = direction == "down"
+            getattr(self, "_select_" + kind)(target)
+
     def _setup_movie_widgets(self):
+        if self._poster_grid_enabled:
+            self["grid_clean_guard"] = Label("")
+            width, height, unused_px = _scale()
+            attach_background_window(self, "grid_clean_background", APP_BACKGROUND_PATH,
+                                     (width, height))
+            self["movie_grid_info_panel"] = Pixmap()
+            self["hint"] = Label("")
+            self[self.content_type + "_video_guard"] = Label("")
+            self["poster_scroll_more"] = Label("⌄")
+            self["poster_scroll_more"].hide()
         unused_width, unused_height, px = _scale()
+        self._poster_image_width = (
+            grid_geometry(unused_width, unused_height, px)["tiles"][0]["image"][2]
+            if self._poster_grid_enabled else
+            cinematic_poster_geometry(unused_width, unused_height, px)["tiles"][0]["image"][2]
+        )
         del unused_width, unused_height
         self._movie_title_preferred_font = font_px(
             px,
@@ -9088,6 +9513,15 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             role="title",
             value="standard",
         )
+        if self._poster_grid_enabled:
+            self._movie_title_preferred_font = font_px(px, 34, role="title")
+            self._movie_title_min_font = font_px(px, 24, role="title", value="standard")
+            self._grid_rating_font = font_px(px, 22)
+            self._grid_rating_min_font = font_px(px, 16, value="standard")
+            self._grid_plot_font = font_px(px, 23)
+            self._grid_plot_min_font = font_px(px, 19, value="standard")
+            self._grid_people_font = font_px(px, 20)
+            self._grid_people_min_font = font_px(px, 18, value="standard")
         self["movie_server"] = Label("")
         self._dynamic_server_widget = "movie_server"
         self._dynamic_server_text = (
@@ -9144,12 +9578,18 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         )
         self["movie_people"] = Label("")
         self["movie_rail_caption"] = Label(_("MOVIES IN THE SELECTED CATEGORY"))
+        if self._poster_grid_enabled:
+            self["movie_grid_position"] = Label("")
         self["poster_scroll_track"] = Label("")
         self["poster_scroll_thumb"] = Label("")
         hide_scrollbar(self, "poster_scroll")
-        for index in range(5):
-            self["movie_tile_bg_{}".format(index)] = Label("")
-            self["movie_tile_focus_{}".format(index)] = Label("")
+        for index in range(getattr(self, "_poster_slot_count", CINEMATIC_POSTER_COLUMNS)):
+            self["movie_tile_bg_{}".format(index)] = (
+                Pixmap() if self._poster_grid_enabled else Label("")
+            )
+            self["movie_tile_focus_{}".format(index)] = (
+                Pixmap() if self._poster_grid_enabled else Label("")
+            )
             self["movie_tile_inner_{}".format(index)] = Label("")
             self["movie_tile_placeholder_{}".format(index)] = Label("GT")
             self["movie_tile_poster_{}".format(index)] = Pixmap()
@@ -9197,7 +9637,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         return fit_dynamic_text(
             self["movie_title"],
             value,
-            max_lines=2,
+            max_lines=1 if getattr(self, "_poster_grid_enabled", False) else 2,
             preferred_size=self._movie_title_preferred_font,
             min_size=self._movie_title_min_font,
             fallback_chars=42,
@@ -9211,6 +9651,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         )
 
     def _set_movie_plot(self, value):
+        if getattr(self, "_poster_grid_enabled", False):
+            self["hint"].setText(value if not self._movie_entries else "")
+            return fit_dynamic_text(self["movie_plot"], value, max_lines=2,
+                                    preferred_size=getattr(self, "_grid_plot_font", None),
+                                    min_size=getattr(self, "_grid_plot_min_font", None), fallback_chars=150)
         if getattr(self, "_cinematic_enabled", False):
             rendered = clean_dynamic_text(value)
             self["movie_plot"].setText(rendered)
@@ -9256,9 +9701,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self.selected_index %= len(self._entries)
         if self._movie_category_list_generation != self._load_generation:
             self._movie_category_list_generation = self._load_generation
-            pending_category_id = str(
-                self._movie_pending_category_id or ""
-            )
+            pending_category_id = self._movie_pending_category_id
             pending_index = (
                 next(
                     (
@@ -9269,19 +9712,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     ),
                     None,
                 )
-                if pending_category_id
+                if pending_category_id is not None
                 else None
             )
             if pending_index is not None:
                 self.selected_index = pending_index
-            elif not str(
-                getattr(self._entries[self.selected_index], "category_id", "")
-                or ""
-            ):
-                for index, entry in enumerate(self._entries):
-                    if str(getattr(entry, "category_id", "") or "").strip():
-                        self.selected_index = index
-                        break
         page_start = int(self.selected_index / self.page_size) * self.page_size
         page_items = self._entries[page_start : page_start + self.page_size]
         for row in range(self.page_size):
@@ -9318,10 +9753,6 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self, "list_scroll", len(self._entries), self.selected_index,
             self.page_size, self._list_scroll_geometry,
         )
-        if not str(getattr(category, "category_id", "") or "").strip():
-            if schedule_load:
-                self._render_all_movies_prompt()
-            return
         if (
             schedule_load
             and self._movie_loaded_category_id != category.category_id
@@ -9350,11 +9781,42 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if not callable(opener):
             self["message"].setText(_("Could not open the content list."))
             return
-        if self._movie_search_child_open:
+        if self._movie_search_child_open or self._movie_search_keyboard_open:
             self["message"].setText(_("Please wait"))
             return
         if self._movie_search_drain_event is not None:
             self["message"].setText(_("Please wait"))
+            return
+        try:
+            from Screens.VirtualKeyBoard import VirtualKeyBoard
+        except ImportError:
+            self["message"].setText(
+                _("The virtual keyboard is unavailable on this image.")
+            )
+            return
+        self._movie_search_keyboard_open = True
+        try:
+            opener(
+                self._movie_search_entered,
+                VirtualKeyBoard,
+                title=_("Search All Movies"),
+                text=self._movie_search_query,
+            )
+        except Exception:
+            self._movie_search_keyboard_open = False
+            self["message"].setText(_("Could not open the virtual keyboard."))
+
+    def _movie_search_entered(self, value):
+        self._movie_search_keyboard_open = False
+        if self._closed or value is None:
+            return
+        query = " ".join(str(value or "").split())[:120]
+        if not query:
+            return
+        self._movie_search_query = query
+        opener = getattr(self.session, "openWithCallback", None)
+        if not callable(opener):
+            self["message"].setText(_("Could not open the content list."))
             return
         try:
             search_client = content_client_for(self.account)
@@ -9377,6 +9839,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 search_client,
                 self.favorite_store,
                 self._hidden_category_ids,
+                initial_query=query,
             )
         except Exception:
             self._movie_search_closed()
@@ -9408,6 +9871,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         )
         if callable(reset_cinematic):
             reset_cinematic()
+        browse_catalog = getattr(self, "_movie_browser_catalog", None)
+        if browse_catalog is not None:
+            browse_catalog.stop()
         category_active = bool(self._loading or self._load_token is not None)
         movie_active = bool(
             self._movie_loading or self._movie_load_token is not None
@@ -9425,20 +9891,20 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             or self._movie_poster_state is not None
             or self._movie_poster_token is not None
             or self._movie_deferred_poster_jobs is not None
+            or self._vod_poster_retries.pending
         )
-        pending_category_id = str(
-            self._movie_pending_category_id or ""
-        )
-        loaded_category_id = str(
-            self._movie_loaded_category_id or ""
-        )
+        self._reset_vod_poster_retries()
+        pending_category_id = self._movie_pending_category_id
+        loaded_category_id = self._movie_loaded_category_id
 
         self._movie_search_resume_categories = category_active
         self._movie_search_resume_category_id = (
             pending_category_id
-            or (loaded_category_id if movie_active else "")
-            or None
+            if pending_category_id is not None
+            else (loaded_category_id if movie_active else None)
         )
+        if browse_catalog is not None and loaded_category_id is not None:
+            self._movie_search_resume_category_id = loaded_category_id
         self._movie_search_resume_more = more_active
         self._movie_search_resume_detail = detail_active
         self._movie_search_resume_posters = poster_active
@@ -9511,13 +9977,17 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._timer.start(150, True)
 
     def _resume_movie_category_after_search(self, category_id):
-        category_id = str(category_id or "")
-        if self._closed or not category_id or self._movie_loading:
+        if self._closed or category_id is None or self._movie_loading:
             return
+        category_id = str(category_id)
         self._movie_generation += 1
         self._movie_catalog_generation += 1
         generation = self._movie_generation
-        token = _WorkerToken(MOVIE_CATEGORY_TIMEOUT_SECONDS)
+        browse_catalog = getattr(self, "_movie_browser_catalog", None)
+        if browse_catalog is not None:
+            browse_catalog.start()
+            self._movie_browse_cursor = 0
+        token = _WorkerToken(30 * 60 if browse_catalog is not None else MOVIE_CATEGORY_TIMEOUT_SECONDS)
         self._movie_load_token = token
         self._movie_loading = True
         self._movie_ready = False
@@ -9545,13 +10015,13 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
 
         if resume_categories:
             self._resume_category_list_after_search()
-        if category_id:
+        if category_id is not None:
             self._resume_movie_category_after_search(category_id)
         elif resume_more and self._movie_has_more:
             self._start_movie_more_load()
-        if not category_id and resume_detail and self._movie_entries:
+        if category_id is None and resume_detail and self._movie_entries:
             self._schedule_movie_detail()
-        if not category_id and resume_posters and self._movie_entries:
+        if category_id is None and resume_posters and self._movie_entries:
             self._movie_poster_page_key = None
             self._render_movie_posters()
 
@@ -9586,77 +10056,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._movie_search_drain_event = None
         self._resume_movie_work_after_search()
 
-    def _render_all_movies_prompt(self):
-        active = bool(
-            self._movie_loading
-            or self._movie_entries
-            or self._movie_loaded_category_id is not None
-            or self._movie_load_token is not None
-        )
-        if active:
-            for token in (
-                self._movie_load_token,
-                self._movie_more_token,
-                self._movie_detail_token,
-                self._movie_poster_token,
-            ):
-                _cancel_worker_token(token)
-            self._movie_generation += 1
-            self._movie_catalog_generation += 1
-            self._movie_poster_generation = getattr(
-                self, "_movie_poster_generation", self._movie_generation
-            ) + 1
-        self._movie_load_token = None
-        self._movie_more_token = None
-        self._movie_detail_token = None
-        self._movie_poster_token = None
-        self._movie_loading = False
-        self._movie_ready = False
-        self._movie_more_loading = False
-        self._movie_more_result = None
-        self._movie_has_more = False
-        self._movie_pending_advance = False
-        self._movie_pending_selection_index = None
-        self._movie_detail_pending = False
-        self._movie_detail_preview = None
-        self._movie_detail_result = None
-        self._movie_pending_category_id = None
-        self._movie_pending_detail_generation = None
-        self._movie_poster_pending = False
-        self._movie_poster_state = None
-        self._movie_deferred_poster_jobs = None
-        self._movie_catalog_entries = []
-        self._movie_entries = []
-        self._movie_loaded_category_id = None
-        self._movie_selected_index = 0
-        self._movie_focus = "categories"
-        self["movie_rail_caption"].setText(localized_upper(_("All Movies")))
-        self._set_static_movie_title(_("Search All Movies"))
-        self["movie_rating"].setText("")
-        self["movie_meta"].setText("")
-        self["movie_genre"].setText("")
-        self._set_movie_plot(_("Press BLUE to search all movies."))
-        self["movie_people"].setText("")
-        self["movie_poster"].hide()
-        self["movie_poster_placeholder"].show()
-        self._clear_movie_posters()
-        for timer in (
-            self._movie_timer,
-            self._movie_category_timer,
-            self._movie_detail_timer,
-        ):
-            try:
-                timer.stop()
-            except Exception:
-                pass
-
     def _schedule_movie_load(self, category=None, immediate=False):
         if not self._entries or self._closed:
             return
         category = category or self._entries[self.selected_index]
-        if not str(getattr(category, "category_id", "") or "").strip():
-            self._render_all_movies_prompt()
-            return
         self._movie_pending_category_id = category.category_id
         try:
             self._movie_category_timer.stop()
@@ -9671,22 +10074,18 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if not self._entries or self._closed:
             return
         category = self._entries[self.selected_index]
-        if not str(getattr(category, "category_id", "") or "").strip():
-            self._movie_pending_category_id = None
-            self._render_all_movies_prompt()
-            return
         if category.category_id != self._movie_pending_category_id:
             return
         self._movie_pending_category_id = None
         self._start_movie_load(category)
 
     def _start_movie_load(self, category=None):
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.invalidate()
         if not self._entries or self._closed:
             return
         category = category or self._entries[self.selected_index]
-        if not str(getattr(category, "category_id", "") or "").strip():
-            self._render_all_movies_prompt()
-            return
         for timer in (
             self._movie_category_timer,
             self._movie_detail_timer,
@@ -9715,7 +10114,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._movie_ready = False
         self._movie_error = ""
         self._movie_catalog_entries = []
+        old_window = getattr(self, "_movie_native_window", None)
+        if old_window is not None:
+            old_window.close()
+        if _is_stalker_client(self.client) and getattr(self, "_movie_browser_catalog", None) is None:
+            self._movie_native_window = NativeBrowseWindow("movie")
+            if not getattr(self, "_native_window_close_hook", False):
+                self._native_window_close_hook = True
+                self.onClose.append(self._close_native_vod_windows)
         self._movie_entries = []
+        self._movie_browse_cursor = 0
         self._movie_selected_index = 0
         self._movie_loaded_category_id = category.category_id
         self._movie_detail_preview = None
@@ -9740,7 +10148,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         )
         self._clear_movie_posters()
         self._render_movie_waiting()
-        token = _WorkerToken(MOVIE_CATEGORY_TIMEOUT_SECONDS)
+        browse_catalog = getattr(self, "_movie_browser_catalog", None)
+        if browse_catalog is not None:
+            browse_catalog.start()
+        token = _WorkerToken(30 * 60 if browse_catalog is not None else MOVIE_CATEGORY_TIMEOUT_SECONDS)
         self._movie_load_token = token
         worker = threading.Thread(
             target=self._load_movie_worker,
@@ -9751,25 +10162,38 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._movie_timer.start(120, True)
 
     def _load_movie_worker(self, generation, category_id, token=None):
+        browse_catalog = getattr(self, "_movie_browser_catalog", None)
+        native_window = getattr(self, "_movie_native_window", None)
         try:
-            entries = list(
-                _bounded_client_call(
-                    self.client,
-                    token,
-                    lambda: self.client.load_items("movie", category_id),
+            if browse_catalog is not None:
+                page = browse_catalog.read(category_id,
+                    hidden_category_ids=self._hidden_category_ids, token=token)
+                entries = list(page.items)
+                error = "" if entries or page.catalog_state.get("complete") else N_("Search incomplete.")
+            else:
+                entries = list(
+                    _bounded_client_call(
+                        self.client,
+                        token,
+                        lambda: self.client.load_items("movie", category_id),
+                    )
+                    or []
                 )
-                or []
-            )
-            if category_filter_active(getattr(self, "_hidden_category_ids", ())):
+                error = ""
+            if not str(category_id or "").strip() or category_filter_active(
+                getattr(self, "_hidden_category_ids", ())
+            ):
                 entries = filter_hidden_category_items(
                     entries, self._hidden_category_ids, category_id
                 )
-            error = ""
         except _WorkerCancelled:
             return
         except ContentError as caught:
             entries = []
             error = str(caught)
+        except (CatalogStorageError, CatalogLimitError):
+            entries = []
+            error = N_("Search cache is unavailable. Check receiver storage.")
         except Exception:
             entries = []
             error = N_("Could not load movies")
@@ -9779,18 +10203,29 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             or (token is not None and not token.active())
         ):
             return
-        self._movie_catalog_entries = entries
-        self._movie_entries = list(entries)
+        if native_window is not None and not error:
+            try:
+                entries = native_window.append(entries, self._client_has_more_items("movie", category_id), token)[:240]
+            except Exception:
+                entries = []
+                error = N_("Search incomplete.")
+        self._movie_window_base = 0
+        self._movie_known_ids = {str(item.stream_id) for item in entries}
+        self._movie_entries = self._movie_catalog_entries = entries
         self._movie_error = error
-        self._movie_has_more = self._client_has_more_items(
-            "movie", category_id
-        )
+        if browse_catalog is not None and not error:
+            self._movie_browse_cursor = page.next_cursor
+            self._movie_has_more = page.has_more
+        else:
+            self._movie_has_more = self._client_has_more_items("movie", category_id) if browse_catalog is None else False
+        if native_window is not None and not error:
+            self._movie_has_more = native_window.has_more or native_window.count > len(entries)
         self._movie_ready = True
 
     def _start_movie_more_load(self):
         loader = getattr(self.client, "load_more_items", None)
         if (
-            not callable(loader)
+            (not callable(loader) and getattr(self, "_movie_browser_catalog", None) is None)
             or not self._movie_has_more
             or self._movie_more_loading
             or self._closed
@@ -9818,16 +10253,30 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         loader,
         token=None,
     ):
+        browse_catalog = getattr(self, "_movie_browser_catalog", None)
+        native_window = getattr(self, "_movie_native_window", None)
+        page = None
         try:
-            entries = list(
-                _bounded_client_call(
-                    self.client,
-                    token,
-                    lambda: loader("movie", category_id),
+            local_end = self._vod_window_base("movie") + len(self._movie_entries)
+            if native_window is not None and local_end < native_window.count:
+                page = native_window.read_window(category_id, offset=local_end, size=80, token=token)
+                entries = list(page.items)
+            elif browse_catalog is not None:
+                page = browse_catalog.read(category_id, after=self._movie_browse_cursor,
+                    hidden_category_ids=self._hidden_category_ids, token=token)
+                entries = list(page.items)
+            else:
+                entries = list(
+                    _bounded_client_call(
+                        self.client,
+                        token,
+                        lambda: loader("movie", category_id),
+                    )
+                    or []
                 )
-                or []
-            )
-            if category_filter_active(getattr(self, "_hidden_category_ids", ())):
+            if not str(category_id or "").strip() or category_filter_active(
+                getattr(self, "_hidden_category_ids", ())
+            ):
                 entries = filter_hidden_category_items(
                     entries, self._hidden_category_ids, category_id
                 )
@@ -9837,16 +10286,30 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         except ContentError as caught:
             entries = []
             error = str(caught)
+        except (CatalogStorageError, CatalogLimitError):
+            entries = []
+            error = N_("Search cache is unavailable. Check receiver storage.")
         except Exception:
             entries = []
             error = N_("Could not load movies")
-        has_more = self._client_has_more_items("movie", category_id)
+        has_more = page.has_more if page is not None else (
+            self._client_has_more_items("movie", category_id) if browse_catalog is None else False
+        )
+        if native_window is not None and not error and page is None:
+            try:
+                entries = native_window.append(entries, has_more, token)[:80]
+                has_more = native_window.has_more or local_end + len(entries) < native_window.count
+            except Exception:
+                entries, has_more = [], False
+                error = N_("Search incomplete.")
         if (
             self._closed
             or generation != self._movie_catalog_generation
             or (token is not None and not token.active())
         ):
             return
+        if page is not None:
+            self._movie_browse_cursor = page.next_cursor
         self._movie_more_result = (
             generation,
             category_id,
@@ -9855,11 +10318,104 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             error,
         )
 
+    def _close_native_vod_windows(self):
+        for kind in ("movie", "series"):
+            window = getattr(self, "_" + kind + "_native_window", None)
+            if window is not None:
+                window.close()
+
+    def _vod_window_base(self, kind):
+        return int(getattr(self, "_" + kind + "_window_base", 0))
+
+    def _trim_vod_window(self, kind):
+        prefix = "_" + kind + "_"
+        if (getattr(self, prefix + "browser_catalog", None) is None
+                and getattr(self, prefix + "native_window", None) is None):
+            return
+        entries = getattr(self, prefix + "entries")
+        selected = getattr(self, prefix + "selected_index")
+        # 70 is a whole number of both the 5-card and 14-card layouts.
+        excess = len(entries) - 280
+        remove = ((excess + 69) // 70) * 70 if excess > 0 else 0
+        remove = min(remove, max(0, ((selected - 14) // 70) * 70))
+        if remove:
+            del entries[:remove]
+            setattr(self, prefix + "window_base", self._vod_window_base(kind) + remove)
+            setattr(self, prefix + "selected_index", selected - remove)
+            pending = getattr(self, prefix + "pending_selection_index", None)
+            if pending is not None:
+                setattr(self, prefix + "pending_selection_index", pending - remove)
+            setattr(self, prefix + "poster_page_key", None)
+        setattr(self, prefix + "known_ids", {str(item.stream_id) for item in entries})
+        if kind == "movie":
+            self._movie_catalog_entries = entries
+
+    def _request_vod_window(self, kind, index):
+        prefix = "_" + kind + "_"
+        catalog = (getattr(self, prefix + "browser_catalog", None)
+                   or getattr(self, prefix + "native_window", None))
+        if catalog is None or getattr(self, prefix + "more_loading"):
+            return False
+        absolute = max(0, self._vod_window_base(kind) + int(index))
+        base = max(0, ((absolute - 70) // 70) * 70)
+        generation = getattr(self, prefix + "catalog_generation")
+        category = str(getattr(self, prefix + "loaded_category_id") or "")
+        token = _WorkerToken(WORKER_LIST_TIMEOUT_SECONDS)
+        setattr(self, prefix + "more_token", token)
+        setattr(self, prefix + "more_loading", True)
+        hidden = self._hidden_category_ids
+        def load():
+            try:
+                read_base, target = base, absolute
+                if getattr(catalog, "content_type", None) == kind:
+                    while absolute >= catalog.count and catalog.has_more:
+                        token.check()
+                        rows = _bounded_client_call(self.client, token,
+                            lambda: self.client.load_more_items(kind, category))
+                        rows = filter_hidden_category_items(rows, hidden, category)
+                        catalog.append(rows, self._client_has_more_items(kind, category), token)
+                    if absolute >= catalog.count and not catalog.has_more:
+                        target = max(0, catalog.count - 1)
+                        read_base = max(0, ((target - 70) // 70) * 70)
+                page = catalog.read_window(category, offset=read_base, size=240,
+                    hidden_category_ids=hidden, token=token)
+                result = (generation, category, page.items, page.has_more, "", (read_base, target))
+                cursor = page.next_cursor
+            except Exception:
+                result = (generation, category, [], False, N_("Search incomplete."), None)
+                cursor = None
+            if not self._closed and token.active() and generation == getattr(self, prefix + "catalog_generation"):
+                if cursor is not None:
+                    setattr(self, prefix + "browse_cursor", cursor)
+                setattr(self, prefix + "more_result", result)
+        worker = threading.Thread(target=load, name="GT-CatalogWindow", daemon=True)
+        try:
+            worker.start()
+        except (RuntimeError, OSError):
+            setattr(self, prefix + "more_loading", False)
+            return False
+        getattr(self, prefix + "timer").start(80, True)
+        return True
+
+    def _apply_vod_window(self, kind, entries, replacement):
+        if replacement is None:
+            return False
+        prefix = "_" + kind + "_"
+        base, absolute = replacement
+        setattr(self, prefix + "entries", list(entries))
+        setattr(self, prefix + "window_base", base)
+        setattr(self, prefix + "known_ids", {str(item.stream_id) for item in entries})
+        if kind == "movie":
+            self._movie_catalog_entries = self._movie_entries
+        if entries:
+            getattr(self, "_select_" + kind)(max(0, min(absolute - base, len(entries) - 1)))
+        return True
+
     def _maybe_load_more_movies(self):
         if not self._movie_entries or not self._movie_has_more:
             return False
         remaining = len(self._movie_entries) - self._movie_selected_index - 1
-        if remaining > 5 and not self._movie_pending_advance:
+        if remaining > getattr(self, "_poster_page_size", CINEMATIC_POSTER_COLUMNS) and not self._movie_pending_advance:
             return False
         return self._start_movie_more_load()
 
@@ -9870,7 +10426,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         ellipsize_dynamic_text(
             self["movie_rail_caption"],
             _("{} • {} MOVIES").format(
-                localized_upper(category.name), len(self._movie_entries)
+                localized_upper(category.name), self._vod_window_base("movie") + len(self._movie_entries)
             ),
             fallback_chars=90,
         )
@@ -9880,7 +10436,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if result is None:
             return
         self._movie_more_result = None
-        generation, category_id, entries, has_more, error = result
+        generation, category_id, entries, has_more, error = result[:5]
+        replacement = result[5] if len(result) > 5 else None
         if (
             generation != self._movie_catalog_generation
             or category_id != str(self._movie_loaded_category_id or "")
@@ -9890,21 +10447,29 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._movie_more_token = None
         self._movie_has_more = bool(has_more)
         if error:
-            self._movie_has_more = False
             self._movie_pending_advance = False
             self._movie_pending_selection_index = None
+            ellipsize_dynamic_text(self["message"], _(error), fallback_chars=90)
+            if not self._movie_entries:
+                self._movie_error = error
+                self._render_movie_results()
+            return
+        if self._apply_vod_window("movie", entries, replacement):
             return
         old_length = len(self._movie_entries)
-        known = {
-            str(item.stream_id) for item in self._movie_catalog_entries
-        }
+        known = getattr(self, "_movie_known_ids", None)
+        if known is None:
+            known = self._movie_known_ids = {str(item.stream_id) for item in self._movie_catalog_entries}
         for item in entries:
             stream_id = str(getattr(item, "stream_id", ""))
             if not stream_id or stream_id in known:
                 continue
             known.add(stream_id)
             self._movie_catalog_entries.append(item)
-        self._movie_entries = list(self._movie_catalog_entries)
+        self._movie_entries = self._movie_catalog_entries
+        if not old_length:
+            self._render_movie_results()
+            return
         self._update_movie_rail_caption()
         if self._movie_pending_advance:
             pending_index = getattr(
@@ -9934,11 +10499,37 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     return
         self._movie_pending_advance = False
         self._movie_pending_selection_index = None
+        self._trim_vod_window("movie")
         self._render_movie_posters()
+
+    def _update_movie_catalog_message(self):
+        catalog = getattr(self, "_movie_browser_catalog", None)
+        if catalog is None:
+            return
+        state = catalog.state
+        if state.get("preparing"):
+            text = _("Preparing search catalogue: {movies} movies").format(movies=state.get("movies", 0))
+        elif state.get("reason") == "storage":
+            text = _("Search cache is unavailable. Check receiver storage.")
+        elif state.get("reason") == "limit":
+            text = _("Catalogue limit reached. Results may be incomplete.")
+        elif not state.get("complete"):
+            text = _("Catalogue incomplete: {movies} movies. Press GREEN to continue.").format(movies=state.get("movies", 0))
+        else:
+            text = ""
+        ellipsize_dynamic_text(self["message"], text, fallback_chars=90)
 
     def _poll_movie_result(self):
         if self._closed:
             return
+        browse_catalog = getattr(self, "_movie_browser_catalog", None)
+        if browse_catalog is not None:
+            self._update_movie_catalog_message()
+            if (self._movie_index_reload_when_done
+                    and not browse_catalog.state.get("preparing")):
+                self._movie_index_reload_when_done = False
+                self._start_movie_load()
+                return
         if self._movie_loading:
             if not self._movie_ready:
                 if (
@@ -9955,6 +10546,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._movie_loading = False
             self._movie_load_token = None
             self._render_movie_results()
+            if browse_catalog is not None and browse_catalog.state.get("preparing"):
+                self._movie_timer.start(120, True)
             return
         if (
             self._movie_more_loading
@@ -9978,8 +10571,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if detail is not None:
             self._movie_detail_preview = None
             self._movie_detail_result = None
-            self._movie_detail_pending = False
-            self._movie_detail_token = None
+            if (not getattr(self, "_poster_grid_enabled", False)
+                    or detail[0] == self._movie_generation):
+                self._movie_detail_pending = False
+                self._movie_detail_token = None
             (
                 generation,
                 info,
@@ -10005,6 +10600,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             _cancel_worker_token(self._movie_detail_token)
             self._movie_detail_token = None
             self._movie_detail_pending = False
+            if getattr(self, "_poster_grid_enabled", False):
+                self._render_grid_detail("movie", self._cached_grid_detail("movie"))
             self._start_deferred_movie_posters()
         state = self._movie_poster_state
         if state is not None:
@@ -10015,11 +10612,15 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             if state_expired:
                 _cancel_worker_token(state_token)
             with state["lock"]:
-                results = list(state["results"])
-                del state["results"][:]
+                limit = 2 if getattr(self, "_poster_grid_enabled", False) else len(state["results"])
+                results = state["results"][:limit]
+                del state["results"][:limit]
                 complete = (
-                    state_expired or state["pending_workers"] <= 0
+                    (state_expired or state["pending_workers"] <= 0)
+                    and not state["results"]
                 )
+                if complete and "queued_jobs" in state:
+                    state["queued_jobs"].clear()
             generation = state["generation"]
             page_is_current = (
                 state.get("page_key") == self._movie_poster_page_key
@@ -10050,11 +10651,13 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                         result_is_current = False
                     if not result_is_current:
                         continue
-                    current_url = _safe_picon_url(
+                    if path and resolved_url:
+                        self._remember_vod_card_size(resolved_url)
+                    current_url = self._vod_card_url(
                         getattr(page_item, "icon", "")
                     )
-                    requested_url = _safe_picon_url(requested_url)
-                    resolved_url = _safe_picon_url(resolved_url)
+                    requested_url = self._vod_card_url(requested_url)
+                    resolved_url = self._vod_card_url(resolved_url)
                     if path and current_url not in (
                         "",
                         requested_url,
@@ -10066,14 +10669,17 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                         requested_url,
                     ):
                         page_item.icon = resolved_url
+                    if path:
+                        poster_urls = getattr(self, "_movie_poster_urls", None)
+                        if poster_urls is not None:
+                            poster_urls[slot] = resolved_url or current_url
                     if fallback_deferred and not path:
-                        retry_url = _safe_picon_url(
+                        retry_url = self._vod_card_url(
                             getattr(page_item, "icon", "")
                         )
-                        self._movie_deferred_poster_jobs = (
-                            self._movie_poster_page_key,
-                            [(slot, page_item, retry_url)],
-                            True,
+                        self._defer_vod_poster_jobs(
+                            "movie", self._movie_poster_page_key,
+                            [(slot, page_item, retry_url)], True,
                         )
                     self._apply_movie_tile_poster(
                         slot,
@@ -10103,6 +10709,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     self._movie_poster_token = None
                 if page_is_current:
                     self._start_deferred_movie_posters()
+                    if complete:
+                        self._schedule_missing_vod_posters("movie")
         poll_cinematic = getattr(self, "_poll_cinematic_backdrop", None)
         cinematic_pending = bool(
             poll_cinematic() if callable(poll_cinematic) else False
@@ -10112,10 +10720,13 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             or self._movie_poster_pending
             or self._movie_more_loading
             or cinematic_pending
+            or (browse_catalog is not None and browse_catalog.state.get("preparing"))
         ):
             self._movie_timer.start(80, True)
 
     def _apply_detail_poster(self, kind, item, path=""):
+        if getattr(self, "_poster_grid_enabled", False):
+            return False
         if kind == "movie":
             entries = self._movie_entries
             generation = self._movie_generation
@@ -10265,8 +10876,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             except Exception:
                 pass
 
-    def _reset_cinematic_backdrop(self):
-        """Cancel stale hero work and remove artwork while focus is moving."""
+    def _reset_cinematic_backdrop(self, keep_visible=False):
+        """Cancel stale work; preserve displayed art only within one selection."""
         if not getattr(self, "_cinematic_enabled", False):
             return
         self._cinematic_generation = getattr(
@@ -10277,10 +10888,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         _cancel_worker_token(getattr(self, "_cinematic_token", None))
         self._cinematic_token = None
         self._cinematic_pending = False
+        self._cinematic_lookup_pending = False
         self._cinematic_result = None
         self._cinematic_surface_prepared = None
         self._cinematic_request_signature = None
-        self._cinematic_applied_path = ""
+        # Invalidate a decode before closing it: close() invokes its failure
+        # callback synchronously, including when a newer request replaces it.
+        self._cinematic_decode_request = None
+        keep_visible = keep_visible and bool(getattr(self, "_cinematic_applied_path", ""))
+        if not keep_visible:
+            self._cinematic_applied_path = ""
         loaders = getattr(self, "_gt_pixmap_loaders", {})
         loader = loaders.pop("cinematic-backdrop", None)
         if loader is not None:
@@ -10288,6 +10905,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 loader.close()
             except Exception:
                 pass
+        if keep_visible:
+            return
         backdrop_name, unused_scrim_name = self._cinematic_widget_names(
             getattr(self, "content_type", "")
         )
@@ -10360,6 +10979,21 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             candidates.append(url)
         signature = (prepared, tuple(candidates))
         previous = getattr(self, "_cinematic_request_signature", None)
+        preparation = getattr(self, "_vod_preparation", None)
+        prepared_path = preparation.hero_ready(kind, item, info) if preparation is not None else ""
+        token = getattr(self, "_cinematic_token", None)
+        same_selection = bool(previous and previous[0] == prepared)
+        if (same_selection and prepared_path
+                and prepared_path == getattr(self, "_cinematic_applied_path", "")):
+            self._cinematic_request_signature = signature
+            return True
+        if (same_selection and getattr(self, "_cinematic_lookup_pending", False)
+                and getattr(self, "_cinematic_pending", False)
+                and not verified_backdrop and token is not None and token.active()):
+            # A provider preview can add a fallback while the independent
+            # wide-art lookup is running. Keep that lookup and its deadline.
+            self._cinematic_request_signature = signature
+            return True
         same_primary = bool(
             previous and previous[0] == prepared and previous[1] and candidates
             and previous[1][0] == candidates[0]
@@ -10367,29 +11001,39 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if signature == previous or same_primary:
             token = getattr(self, "_cinematic_token", None)
             applied_path = getattr(self, "_cinematic_applied_path", "")
+            decode = getattr(self, "_cinematic_decode_request", None)
+            decoding = bool(decode and decode[:2] == (kind, stream_id)
+                            and decode[3] == getattr(self, "_cinematic_generation", -1))
             if (
                 (applied_path and (signature == previous
                                   or _cached_picon_path(candidates[0]) == applied_path))
                 or (getattr(self, "_cinematic_pending", False)
                     and getattr(self, "_cinematic_result", None) is None
                     and token is not None and token.active())
+                or decoding
             ):
                 # Provider text and localized TMDb text share the same hero.
                 # Keep its decoder/request and publish any added fallbacks.
                 self._cinematic_request_signature = signature
                 return True
-        # Selection waiting already cleared the previous surface. A changed
-        # image or selection still receives its own cancellation generation.
+        # A new selection clears the surface. Refreshing that selection can
+        # cancel obsolete work without exposing the empty theme underneath.
         if getattr(self, "_cinematic_surface_prepared", None) == prepared:
             self._cinematic_surface_prepared = None
+        elif same_selection:
+            self._reset_cinematic_backdrop(keep_visible=True)
         else:
             self._reset_cinematic_backdrop()
         self._cinematic_request_signature = signature
-        if not candidates:
-            return False
         generation = self._cinematic_generation
-        first_url = candidates[0]
-        cached = _cached_picon_path(first_url)
+        if prepared_path:
+            return self._apply_cinematic_backdrop(kind, stream_id, prepared_path, generation)
+        resolver = getattr(getattr(self, "_metadata_client", None), "cinematic_backdrop", None)
+        resolve = (callable(resolver) and getattr(self._metadata_client, "available", True)
+                   and (not candidates or (provider_item and not verified_backdrop)))
+        if not candidates and not resolve:
+            return False
+        cached = _cached_picon_path(candidates[0]) if candidates else ""
         if cached:
             if _valid_cinematic_backdrop_file(cached):
                 self._apply_cinematic_backdrop(
@@ -10402,18 +11046,13 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         token = _WorkerToken(CINEMATIC_BACKDROP_TIMEOUT_SECONDS)
         self._cinematic_token = token
         self._cinematic_pending = True
-        worker = threading.Thread(
-            target=self._load_cinematic_backdrop_worker,
-            args=(
-                kind,
-                stream_id,
-                tuple(candidates),
-                generation,
-                token,
-            ),
-        )
-        worker.daemon = True
-        worker.start()
+        self._cinematic_lookup_pending = resolve
+        pool = getattr(self, "_cinematic_workers", None)
+        if pool is None:
+            pool = self._cinematic_workers = LatestPosterWorkers(worker_count=1)
+            self.onClose.append(pool.close)
+        pool.replace([lambda: self._load_cinematic_backdrop_worker(
+            kind, stream_id, tuple(candidates), generation, token, item, info)])
         timer = getattr(
             self,
             "_movie_timer" if kind == "movie" else "_series_timer",
@@ -10433,15 +11072,36 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         candidates,
         generation,
         token,
+        item=None,
+        info=None,
     ):
-        path = ""
+        path, resolved, selected_url = "", "", ""
+        resolver = getattr(getattr(self, "_metadata_client", None), "cinematic_backdrop", None)
+        if item is not None and callable(resolver) and getattr(self, "_cinematic_lookup_pending", False):
+            try:
+                token.check()
+                resolved = _safe_picon_url(_bounded_client_call(
+                    self._metadata_client, token, lambda: resolver(kind, item, info)))
+            except _WorkerCancelled:
+                return
+            except Exception as error:
+                if not token.active():
+                    return
+                _debug("cinematic wide-art lookup failed kind={} error={}".format(
+                    kind, error.__class__.__name__))
         attempted = set()
         while True:
-            if generation != getattr(self, "_cinematic_generation", -1):
+            if not token.active() or generation != getattr(self, "_cinematic_generation", -1):
                 return
             request = getattr(self, "_cinematic_request_signature", None)
             current_candidates = request[1] if request is not None else candidates
-            url = next((value for value in current_candidates if value not in attempted), "")
+            urls = list(current_candidates)
+            if resolved:
+                if getattr(item, "portal_request_type", "") or not urls:
+                    urls = [resolved] + [url for url in urls if url != resolved]
+                elif resolved not in urls:
+                    urls.append(resolved)
+            url = next((value for value in urls if value not in attempted), "")
             if not url:
                 break
             attempted.add(url)
@@ -10456,7 +11116,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 )
                 token.check()
                 if candidate and _valid_cinematic_backdrop_file(candidate):
-                    path = candidate
+                    path, selected_url = candidate, url
                     break
             except _WorkerCancelled:
                 return
@@ -10477,6 +11137,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 stream_id,
                 path,
                 generation,
+                tuple(current_candidates),
+                selected_url,
             )
 
     def _apply_cinematic_backdrop(
@@ -10491,6 +11153,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         backdrop_name, unused_scrim_name = self._cinematic_widget_names(kind)
         if not backdrop_name:
             return False
+        request = (kind, stream_id, path, generation, object())
+        self._cinematic_decode_request = request
 
         try:
             set_visible = _set_component_visible
@@ -10515,12 +11179,15 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     getattr(self, "_cinematic_enabled", False)
                     and generation == self._cinematic_generation
                     and str(getattr(current, "stream_id", "")) == stream_id
+                    and getattr(self, "_cinematic_decode_request", None) is request
                 )
                 # An obsolete decoder callback must never clear a newer
                 # selection's already visible hero or fallback state.
                 if not valid:
                     return
+                self._cinematic_decode_request = None
                 if success:
+                    self._cinematic_applied_path = path
                     set_visible(self[backdrop_name], True)
                     set_panels = getattr(
                         self,
@@ -10530,7 +11197,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     if callable(set_panels):
                         set_panels(kind, True)
                 else:
-                    self._cinematic_applied_path = ""
+                    # A failed replacement leaves the previously decoded
+                    # bitmap and its panels on screen for this selection.
+                    if getattr(self, "_cinematic_applied_path", ""):
+                        return
                     set_visible(self[backdrop_name], False)
                     set_panels = getattr(
                         self,
@@ -10542,7 +11212,6 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             except Exception:
                 pass
 
-        self._cinematic_applied_path = path
         attach_pixmap(
             self,
             backdrop_name,
@@ -10560,10 +11229,19 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         result = getattr(self, "_cinematic_result", None)
         if result is not None:
             self._cinematic_result = None
+            if result[3] != self._cinematic_generation:
+                return bool(getattr(self, "_cinematic_pending", False))
             self._cinematic_pending = False
             self._cinematic_token = None
-            kind, stream_id, path, generation = result
+            self._cinematic_lookup_pending = False
+            kind, stream_id, path, generation = result[:4]
             if generation == self._cinematic_generation and path:
+                preparation = getattr(self, "_vod_preparation", None)
+                if preparation is not None and len(result) > 4:
+                    entries = getattr(self, "_" + kind + "_entries", ())
+                    index = getattr(self, "_" + kind + "_selected_index", 0)
+                    if index < len(entries) and str(entries[index].stream_id) == stream_id:
+                        preparation.remember_hero(kind, entries[index], result[4], path, result[5])
                 self._apply_cinematic_backdrop(
                     kind,
                     stream_id,
@@ -10576,10 +11254,14 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             _cancel_worker_token(token)
             self._cinematic_token = None
             self._cinematic_pending = False
+            self._cinematic_lookup_pending = False
             return False
         return bool(getattr(self, "_cinematic_pending", False))
 
     def _render_movie_waiting(self, item=None):
+        if getattr(self, "_poster_grid_enabled", False):
+            self._render_grid_detail("movie", None, loading=True)
+            return
         getattr(self, "_detail_poster_signatures", {}).pop("movie", None)
         try:
             set_visible = _set_component_visible
@@ -10625,12 +11307,24 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._apply_detail_poster("movie", item)
 
     def _render_movie_results(self):
+        if getattr(self, "_poster_grid_enabled", False):
+            self["hint"].setText("")
         if self._movie_error:
             self["movie_rail_caption"].setText(_("COULD NOT LOAD MOVIES"))
             self._set_movie_plot(_(self._movie_error))
             self._clear_movie_posters()
             return
         if not self._movie_entries:
+            if self._movie_has_more and (
+                self._movie_more_loading or self._start_movie_more_load()
+            ):
+                category = self._entries[self.selected_index]
+                self["movie_rail_caption"].setText(
+                    _("{} • LOADING MOVIES").format(localized_upper(category.name))
+                )
+                self._set_movie_plot(_("Please wait"))
+                self._clear_movie_posters()
+                return
             self["movie_rail_caption"].setText(_("NO MOVIES FOUND IN THIS CATEGORY"))
             self._set_movie_plot(_("Try another category."))
             self._clear_movie_posters()
@@ -10660,20 +11354,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 current = getattr(component, "message", None)
                 if current is None or str(current) != text:
                     component.setText(text)
-        page_start = int(self._movie_selected_index / 5) * 5
-        page = self._movie_entries[page_start : page_start + 5]
+        page_size = getattr(self, "_poster_page_size", CINEMATIC_POSTER_COLUMNS)
+        page_start = (self._movie_selected_index // page_size) * page_size
+        page = self._movie_entries[page_start : page_start + page_size]
         page_key = (
             page_start,
-            tuple(
-                (
-                    str(getattr(item, "stream_id", "")),
-                    _safe_picon_url(getattr(item, "icon", "")),
-                )
-                for item in page
-            ),
+            tuple(str(getattr(item, "stream_id", "")) for item in page),
         )
         page_changed = page_key != self._movie_poster_page_key
         if page_changed:
+            self._release_grid_pixmaps("movie")
             self._movie_poster_generation = getattr(
                 self, "_movie_poster_generation", self._movie_generation
             ) + 1
@@ -10683,8 +11373,13 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._movie_poster_state = None
             self._movie_deferred_poster_jobs = None
             self._movie_poster_page_key = page_key
+            self._movie_poster_urls = {}
+            self._reset_vod_poster_retries("movie")
+        poster_urls = getattr(self, "_movie_poster_urls", None)
+        if poster_urls is None:
+            poster_urls = self._movie_poster_urls = {}
         jobs = []
-        for slot in range(5):
+        for slot in range(getattr(self, "_poster_page_size", CINEMATIC_POSTER_COLUMNS)):
             selected = False
             if slot < len(page):
                 absolute = page_start + slot
@@ -10703,15 +11398,24 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     self["movie_tile_favorite_{}".format(slot)],
                     self._is_favorite(item),
                 )
-                if page_changed:
-                    set_visible(
-                        self["movie_tile_placeholder_{}".format(slot)],
-                        True,
-                    )
-                    url = _safe_picon_url(getattr(item, "icon", ""))
+                for family in ("bg", "inner", "title"):
+                    set_visible(self["movie_tile_{}_{}".format(family, slot)], True)
+                url = self._vod_card_url(getattr(item, "icon", ""))
+                cover_changed = slot not in poster_urls or poster_urls[slot] != url
+                if page_changed or cover_changed:
+                    poster_urls[slot] = url
+                    if page_changed:
+                        set_visible(
+                            self["movie_tile_placeholder_{}".format(slot)],
+                            True,
+                        )
                     if url:
                         cached = _cached_picon_path(url)
-                        if cached:
+                        preparation = getattr(self, "_vod_preparation", None)
+                        if (cached and getattr(self, "_poster_grid_enabled", False)
+                                and not (preparation is not None and preparation.card_ready("movie", slot, cached))):
+                            jobs.append((slot, item, url))
+                        elif cached:
                             self._apply_movie_tile_poster(
                                 slot,
                                 cached,
@@ -10724,9 +11428,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                             )
                         else:
                             jobs.append((slot, item, url))
-                    elif absolute == self._movie_selected_index:
+                    else:
                         jobs.append((slot, item, ""))
             else:
+                for family in ("bg", "inner", "title"):
+                    set_visible(self["movie_tile_{}_{}".format(family, slot)], False)
                 update_text(self["movie_tile_title_{}".format(slot)], "")
                 set_visible(
                     self["movie_tile_placeholder_{}".format(slot)],
@@ -10744,19 +11450,173 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 self["movie_tile_focus_{}".format(slot)],
                 selected,
             )
-        update_horizontal_scrollbar(
-            self,
-            "poster_scroll",
-            len(self._movie_entries),
-            self._movie_selected_index,
-            5,
-            self._poster_scroll_geometry,
-        )
+        if getattr(self, "_poster_grid_enabled", False):
+            self._update_grid_position("movie")
+        else:
+            update_horizontal_scrollbar(
+                self,
+                "poster_scroll",
+                self._vod_window_base("movie") + len(self._movie_entries),
+                self._vod_window_base("movie") + self._movie_selected_index,
+                page_size,
+                self._poster_scroll_geometry,
+            )
         if jobs:
-            if self._movie_pending_detail_generation is not None:
-                self._movie_deferred_poster_jobs = (page_key, jobs)
-            else:
-                self._start_movie_poster_jobs(page_key, jobs)
+            self._queue_vod_poster_jobs("movie", page_key, jobs)
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.update("movie")
+
+    def _queue_vod_poster_jobs(self, kind, page_key, jobs):
+        state = getattr(self, "_{}_poster_state".format(kind), None)
+        if state is not None and state.get("page_key") == page_key:
+            token = state.get("token")
+            with state["lock"]:
+                if (state.get("pending_workers", 0) > 0
+                        and "queued_jobs" in state
+                        and (token is None or token.active())):
+                    identities = {(int(slot), str(item.stream_id)) for slot, item, url in jobs}
+                    queue = state["queued_jobs"]
+                    retained = [job for job in queue
+                                if (int(job[0]), str(job[1].stream_id)) not in identities]
+                    queue.clear()
+                    selected = getattr(self, "_{}_selected_index".format(kind)) - int(page_key[0])
+                    priority = sorted(jobs, key=lambda job: int(job[0]) != selected)
+                    queue.extend(priority + retained)
+                    state["selected_slot"] = selected
+                    if token is not None:
+                        token.deadline = max(token.deadline, time.monotonic() + poster_batch_timeout(
+                            len(queue) + BACKGROUND_POSTER_WORKERS, BACKGROUND_POSTER_WORKERS,
+                            PICON_DOWNLOAD_TIMEOUT, WORKER_DETAIL_TIMEOUT_SECONDS,
+                        ))
+                    return
+            # A worker can finish just as the GUI adds a replacement. The
+            # current poll drains its results before starting this small job.
+            self._defer_vod_poster_jobs(kind, page_key, jobs)
+            getattr(self, "_{}_timer".format(kind)).start(50, True)
+            return
+        getattr(self, "_start_{}_poster_jobs".format(kind))(page_key, jobs)
+
+    def _defer_vod_poster_jobs(self, kind, page_key, jobs, wait_for_detail=False):
+        attribute = "_{}_deferred_poster_jobs".format(kind)
+        existing = getattr(self, attribute, None)
+        merged = {}
+        if existing is not None and existing[0] == page_key:
+            merged.update((str(job[1].stream_id), job) for job in existing[1])
+            wait_for_detail = wait_for_detail or (len(existing) > 2 and existing[2])
+        merged.update((str(job[1].stream_id), job) for job in jobs)
+        setattr(self, attribute, (page_key, list(merged.values()), bool(wait_for_detail)))
+
+    def _reset_vod_poster_retries(self, kind=None):
+        timer = self._vod_poster_retry_timer
+        if timer is not None:
+            timer.stop()
+        context = None
+        if kind is not None:
+            context = (kind, getattr(self, "_{}_poster_generation".format(kind)),
+                       getattr(self, "_{}_poster_page_key".format(kind)))
+        self._vod_poster_retries.reset(context)
+        with self._vod_decode_failure_lock:
+            self._vod_decode_failures.clear()
+
+    def _arm_vod_poster_retries(self):
+        delay = self._vod_poster_retries.next_delay(time.monotonic())
+        timer = self._vod_poster_retry_timer
+        if delay is None or self._closed:
+            if timer is not None:
+                timer.stop()
+            return
+        if timer is None:
+            timer = self._vod_poster_retry_timer = eTimer()
+            _connect_timer(timer, self._retry_visible_vod_posters)
+            self.onClose.append(self._reset_vod_poster_retries)
+        timer.start(max(100, int(math.ceil(delay * 1000.0))), True)
+
+    def _schedule_vod_poster_retry(self, kind, slot, item, delay=None):
+        if self._closed or kind != self.content_type:
+            return False
+        generation = getattr(self, "_{}_poster_generation".format(kind))
+        page_key = getattr(self, "_{}_poster_page_key".format(kind))
+        context = (kind, generation, page_key)
+        retries = self._vod_poster_retries
+        if page_key is None or retries.context != context:
+            return False
+        entries = getattr(self, "_{}_entries".format(kind))
+        index = int(page_key[0]) + slot
+        if index >= len(entries) or str(entries[index].stream_id) != str(item.stream_id):
+            return False
+        displayed = getattr(self, "_vod_tile_displayed", {}).get((kind, slot))
+        if (displayed is not None and displayed[:2] == (generation, str(item.stream_id))
+                and getattr(self["{}_tile_poster_{}".format(kind, slot)], "visible", False)):
+            return False
+        if delay is None:
+            url = self._vod_card_url(getattr(item, "icon", ""))
+            delay = min(60.0, _picon_failure_remaining(url)) if url else 2.0
+        scheduled = retries.schedule(item.stream_id, (slot, str(item.stream_id)),
+                                     time.monotonic(), delay)
+        self._arm_vod_poster_retries()
+        return scheduled
+
+    def _retry_visible_vod_posters(self):
+        if self._closed:
+            self._reset_vod_poster_retries()
+            return
+        kind = self.content_type
+        context = (kind, getattr(self, "_{}_poster_generation".format(kind)),
+                   getattr(self, "_{}_poster_page_key".format(kind)))
+        if self._vod_poster_retries.context != context or context[2] is None:
+            self._reset_vod_poster_retries()
+            return
+        # Child search/player screens and an active batch retain their work;
+        # retry only when the visible page can accept a fresh bounded batch.
+        if (getattr(self, "_{}_loading".format(kind), False)
+                or getattr(self, "_{}_search_child_open".format(kind), False)
+                or getattr(self, "_{}_child_open".format(kind), False)
+                or getattr(self, "_{}_poster_state".format(kind), None) is not None):
+            self._vod_poster_retry_timer.start(500, True)
+            return
+        entries = getattr(self, "_{}_entries".format(kind))
+        jobs = []
+        for slot, stream_id in self._vod_poster_retries.ready(time.monotonic()):
+            index = int(context[2][0]) + slot
+            if index < len(entries) and str(entries[index].stream_id) == stream_id:
+                item = entries[index]
+                jobs.append((slot, item, self._vod_card_url(getattr(item, "icon", ""))))
+        if jobs:
+            self._queue_vod_poster_jobs(kind, context[2], jobs)
+        self._arm_vod_poster_retries()
+
+    def _schedule_missing_vod_posters(self, kind):
+        page_key = getattr(self, "_{}_poster_page_key".format(kind))
+        if (page_key is None or getattr(self, "_{}_poster_state".format(kind)) is not None
+                or getattr(self, "_{}_deferred_poster_jobs".format(kind)) is not None):
+            return
+        generation = getattr(self, "_{}_poster_generation".format(kind))
+        entries = getattr(self, "_{}_entries".format(kind))
+        for slot, item in enumerate(entries[int(page_key[0]):int(page_key[0]) + self._poster_page_size]):
+            request = getattr(self, "_vod_tile_requests", {}).get((kind, slot))
+            if request is not None and request[0][:2] == (generation, str(item.stream_id)):
+                continue
+            self._schedule_vod_poster_retry(kind, slot, item)
+
+    def _rejected_vod_card_urls(self, kind, item):
+        with self._vod_decode_failure_lock:
+            return set(self._vod_decode_failures.get((kind, str(item.stream_id)), ()))
+
+    def _retry_vod_poster_after_decode(self, kind, slot, item, path):
+        if self._closed:
+            return
+        url = self._vod_card_url(getattr(item, "icon", ""))
+        if (not url or os.path.splitext(os.path.abspath(path))[0]
+                != os.path.splitext(_picon_cache_path(url))[0]):
+            return
+        with self._vod_decode_failure_lock:
+            self._vod_decode_failures.setdefault((kind, str(item.stream_id)), set()).add(url)
+        _discard_invalid_live_picon_cache(url, path)
+        _mark_picon_failure(url)
+        log_event("artwork", "stage=decode outcome=failed kind={} id={}".format(
+            kind, _debug_identifier(item.stream_id)))
+        self._schedule_vod_poster_retry(kind, slot, item, delay=2.0)
 
     def _start_movie_poster_jobs(self, page_key, jobs):
         if (
@@ -10775,7 +11635,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         generation = getattr(
             self, "_movie_poster_generation", self._movie_generation
         )
-        token = _WorkerToken(WORKER_POSTER_TIMEOUT_SECONDS)
+        timeout = max(WORKER_POSTER_TIMEOUT_SECONDS, poster_batch_timeout(
+            len(jobs), BACKGROUND_POSTER_WORKERS,
+            PICON_DOWNLOAD_TIMEOUT, WORKER_DETAIL_TIMEOUT_SECONDS,
+        ))
+        token = _WorkerToken(timeout)
         _cancel_worker_token(self._movie_poster_token)
         self._movie_poster_token = token
         self._movie_poster_pending = True
@@ -10785,41 +11649,21 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             "page_key": page_key,
             "selected_slot": selected_slot,
             "results": [],
+            "queued_jobs": deque(jobs),
             "pending_workers": worker_count,
-            "batch_workers": worker_count,
-            "metadata_cache_batch": False,
-            "metadata_cache_client": None,
             "lock": threading.Lock(),
             "token": token,
         }
-        metadata_client = getattr(self, "_metadata_client", None)
-        begin_batch = getattr(
-            metadata_client, "begin_cache_batch", None
-        )
-        if callable(begin_batch):
-            try:
-                begin_batch()
-                state["metadata_cache_batch"] = True
-                state["metadata_cache_client"] = metadata_client
-            except Exception as error:
-                _debug(
-                    "movie metadata cache batch failed error={}".format(
-                        error.__class__.__name__
-                    )
-                )
         self._movie_poster_state = state
         self._movie_deferred_poster_jobs = None
-        for worker_index in range(worker_count):
-            worker = threading.Thread(
-                target=self._load_movie_posters_worker,
-                args=(
-                    jobs[worker_index::worker_count],
-                    state,
-                    token,
-                ),
-            )
-            worker.daemon = True
-            worker.start()
+        pool = getattr(self, "_grid_poster_workers", None)
+        if pool is None:
+            pool = self._grid_poster_workers = LatestPosterWorkers()
+            self.onClose.append(pool.close)
+        target = self._load_movie_posters_worker
+        tasks = [lambda batch=jobs[i::worker_count]: target(batch, state, token)
+                 for i in range(worker_count)]
+        pool.replace(tasks)
         self._movie_timer.start(50, True)
 
     def _start_deferred_movie_posters(self):
@@ -10833,137 +11677,163 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 return
             self._start_movie_poster_jobs(deferred[0], deferred[1])
 
-    def _load_movie_posters_worker(
-        self,
-        jobs,
-        state,
-        token=None,
-    ):
+    def _vod_card_url(self, url):
+        url = tmdb_poster_url(_safe_picon_url(url), getattr(self, "_poster_image_width", 342))
+        return self._vod_poster_url_overrides.get(url, url)
+
+    def _remember_vod_card_size(self, url):
+        if not is_tmdb_artwork_url(url):
+            return
+        canonical = tmdb_poster_url(url, getattr(self, "_poster_image_width", 342))
+        if canonical != url:
+            self._vod_poster_url_overrides[canonical] = url
+            self._vod_poster_url_overrides.move_to_end(canonical)
+            while len(self._vod_poster_url_overrides) > 128:
+                self._vod_poster_url_overrides.popitem(last=False)
+
+    def _vod_poster_info(self, kind, item, token):
+        cache = getattr(self, "_{}_info_cache".format(kind), {})
+        lock = getattr(self, "_{}_info_cache_lock".format(kind), None)
+        info = _detail_cache_get(cache, lock, item.stream_id) if lock is not None else cache.get(item.stream_id)
+        if info is not None:
+            return info
+        poster_cache = getattr(self, "_vod_poster_info_cache", None)
+        poster_lock = getattr(self, "_vod_poster_info_lock", None)
+        key = (kind, str(item.stream_id))
+        if poster_cache is not None and poster_lock is not None:
+            with poster_lock:
+                info = poster_cache.get(key)
+                if info is not None:
+                    poster_cache.move_to_end(key)
+                    return info
+        # Stalker summaries do not walk seasons/episodes. Xtream summaries
+        # parse only the information section of get_series_info.
+        name = "load_vod_info" if kind == "movie" else "load_series_summary"
+        loader = getattr(self.client, name, None)
+        if not callable(loader):
+            return None
         try:
-            for slot, item, url in jobs:
-                if token is not None:
-                    token.check()
-                path = ""
-                resolved_url = url
-                fallback_deferred = False
-                is_selected = int(slot) == int(state.get("selected_slot", -1))
-                if url:
-                    try:
-                        path = _download_client_image(
-                            self.client,
-                            url,
-                            _picon_cache_path(url),
-                            timeout=_provider_picon_timeout(
-                                self._metadata_client,
-                                url,
-                            ),
-                            token=token,
-                        )
-                    except _WorkerCancelled:
-                        raise
-                    except Exception as error:
-                        _debug(
-                            "movie poster failed id={} error={}".format(
-                                _debug_identifier(item.stream_id),
-                                error.__class__.__name__,
-                            )
-                        )
-                if not path and is_selected:
-                    fallback_deferred = bool(
-                        self._movie_detail_pending
-                        or self._movie_pending_detail_generation is not None
-                    )
-                    if not fallback_deferred:
-                        if token is not None:
-                            token.check()
-                        try:
-                            completed = _bounded_client_call(
-                                self._metadata_client,
-                                token,
-                                lambda: self._metadata_client.complete_movie(
-                                    item,
-                                    _detail_cache_get(
-                                        self._movie_info_cache,
-                                        self._movie_info_cache_lock,
-                                        item.stream_id,
-                                    )
-                                    if hasattr(self, "_movie_info_cache_lock")
-                                    else self._movie_info_cache.get(item.stream_id),
-                                    force_cover_fallback=True,
-                                ),
-                            )
-                        except MetadataError as error:
-                            _debug(
-                                "TMDb movie poster fallback failed id={} error={}".format(
-                                    _debug_identifier(item.stream_id),
-                                    error.__class__.__name__,
-                                )
-                            )
-                            completed = None
-                        except _WorkerCancelled:
-                            raise
-                        except Exception as error:
-                            _debug(
-                                "movie poster fallback failed id={} error={}".format(
-                                    _debug_identifier(item.stream_id),
-                                    error.__class__.__name__,
-                                )
-                            )
-                            completed = None
-                        fallback_url = _safe_picon_url(
-                            getattr(completed, "cover", "")
-                        )
-                        if fallback_url and fallback_url != url:
-                            try:
-                                path = _download_client_image(
-                                    self.client,
-                                    fallback_url,
-                                    _picon_cache_path(fallback_url),
-                                    token=token,
-                                )
-                            except _WorkerCancelled:
-                                raise
-                            except Exception as error:
-                                _debug(
-                                    "movie fallback image failed id={} error={}".format(
-                                        _debug_identifier(item.stream_id),
-                                        error.__class__.__name__,
-                                    )
-                                )
-                            if path:
-                                resolved_url = fallback_url
+            provider_token = _poster_metadata_token(token)
+            info = _bounded_client_call(self.client, provider_token, lambda: loader(item.stream_id))
+        except _WorkerCancelled:
+            if token is not None:
+                token.check()
+            return None
+        except Exception as error:
+            log_event("artwork", "stage=provider-summary outcome=failed kind={} id={}".format(
+                kind, _debug_identifier(item.stream_id)), error)
+            return None
+        if info is not None and poster_cache is not None and poster_lock is not None:
+            with poster_lock:
+                poster_cache[key] = info
+                poster_cache.move_to_end(key)
+                while len(poster_cache) > 128:
+                    poster_cache.popitem(last=False)
+        return info
+
+    def _fetch_vod_card(self, url, token):
+        if not url:
+            return ""
+        if token is not None:
+            token.check()
+        try:
+            return _download_client_image(
+                self.client, url, _picon_cache_path(url),
+                timeout=_provider_picon_timeout(self._metadata_client, url), token=token,
+            )
+        except _WorkerCancelled:
+            raise
+        except Exception as error:
+            _debug("VOD poster failed source={} error={}".format(
+                "tmdb" if is_tmdb_artwork_url(url) else "provider", error.__class__.__name__))
+            return ""
+
+    def _recover_vod_card(self, kind, item, requested_url, token):
+        if token is not None:
+            token.check()
+        rejected = self._rejected_vod_card_urls(kind, item)
+        tried = {requested_url} | rejected
+        # A receiver may reject one cached TMDb encoding/size. Keep the exact
+        # fallback URL through GUI application rather than resizing it back.
+        if is_tmdb_artwork_url(requested_url) and requested_url in rejected:
+            for width in (185, 342, 500):
+                url = tmdb_poster_url(requested_url, width)
+                if url in tried:
+                    continue
+                tried.add(url)
+                path = self._fetch_vod_card(url, token)
+                if path:
+                    return path, url
+        info = self._vod_poster_info(kind, item, token)
+        candidates = [getattr(info, "cover", "")] + list(getattr(info, "cover_urls", ()) or ())
+        alternatives = 0
+        for candidate in candidates:
+            url = self._vod_card_url(candidate)
+            if not url or url in tried:
+                continue
+            tried.add(url)
+            alternatives += 1
+            path = self._fetch_vod_card(url, token)
+            if path:
+                return path, url
+            if alternatives >= 2:
+                break
+        try:
+            metadata_token = _poster_metadata_token(token)
+            url = _bounded_client_call(
+                self._metadata_client, metadata_token,
+                lambda: self._metadata_client.poster_cover(kind, item, info),
+            )
+        except _WorkerCancelled:
+            if token is not None:
+                token.check()
+            url = ""
+        except Exception as error:
+            log_event("artwork", "stage=poster-lookup outcome=failed kind={} id={}".format(
+                kind, _debug_identifier(item.stream_id)), error)
+            url = ""
+        url = self._vod_card_url(url)
+        if url and url not in tried:
+            path = self._fetch_vod_card(url, token)
+            if path:
+                return path, url
+        return "", ""
+
+    def _load_vod_posters_worker(self, kind, jobs, state, token=None):
+        metadata_client = getattr(self, "_metadata_client", None)
+        begun = False
+        try:
+            begin = getattr(metadata_client, "begin_cache_batch", None)
+            if callable(begin):
+                begin()
+                begun = True
+            recoveries = []
+            # Do not spend metadata time on one broken card while healthy
+            # posters are still waiting in the shared visible-page queue.
+            for slot, item, requested in _poster_jobs(jobs, state, token):
+                url = self._vod_card_url(requested)
+                path = ("" if url in self._rejected_vod_card_urls(kind, item)
+                        else self._fetch_vod_card(url, token))
+                if path:
+                    with state["lock"]:
+                        state["results"].append((slot, item.stream_id, path, url, url, False))
+                else:
+                    recoveries.append((slot, item, url))
+            for slot, item, url in recoveries:
+                path, resolved = self._recover_vod_card(kind, item, url, token)
                 with state["lock"]:
-                    state["results"].append(
-                        (
-                            slot,
-                            item.stream_id,
-                            path,
-                            url,
-                            resolved_url if path else "",
-                            fallback_deferred,
-                        )
-                    )
+                    state["results"].append((slot, item.stream_id, path, url, resolved, False))
         finally:
-            finish_batch = False
             with state["lock"]:
                 state["pending_workers"] -= 1
-                if "batch_workers" in state:
-                    state["batch_workers"] -= 1
-                    if (
-                        state["batch_workers"] <= 0
-                        and state.get("metadata_cache_batch")
-                    ):
-                        state["metadata_cache_batch"] = False
-                        finish_batch = True
-            if finish_batch:
+            if begun:
                 try:
-                    state["metadata_cache_client"].end_cache_batch()
+                    metadata_client.end_cache_batch()
                 except Exception as error:
-                    _debug(
-                        "movie metadata cache flush failed error={}".format(
-                            error.__class__.__name__
-                        )
-                    )
+                    _debug("poster cache flush failed: {}".format(error.__class__.__name__))
+
+    def _load_movie_posters_worker(self, jobs, state, token=None):
+        self._load_vod_posters_worker("movie", jobs, state, token)
 
     def _apply_movie_tile_poster(
         self,
@@ -10982,9 +11852,30 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             else generation
         )
 
+        requests = getattr(self, "_vod_tile_requests", None)
+        if requests is None:
+            requests = self._vod_tile_requests = {}
+        key = ("movie", slot)
+        signature = (generation, str(stream_id), path)
+        previous = requests.get(key)
+        if previous is not None and previous[0] == signature:
+            return
+        request = (signature, object())
+        requests[key] = request
+        displayed = getattr(self, "_vod_tile_displayed", None)
+        if displayed is None:
+            displayed = self._vod_tile_displayed = {}
+        previous_display = displayed.get(key)
+        was_visible = bool(previous_display is not None
+                           and previous_display[:2] == signature[:2]
+                           and getattr(self["movie_tile_poster_{}".format(slot)], "visible", False))
+
         def loaded(success):
+            if self._closed or requests.get(key) is not request:
+                return
             try:
-                page_start = int(self._movie_selected_index / 5) * 5
+                page_size = getattr(self, "_poster_page_size", CINEMATIC_POSTER_COLUMNS)
+                page_start = (self._movie_selected_index // page_size) * page_size
                 current = self._movie_entries[page_start + slot]
                 valid = (
                     generation
@@ -10995,23 +11886,38 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     )
                     and str(current.stream_id) == str(stream_id)
                 )
-                if success and valid:
+                if not valid:
+                    return
+                if success:
+                    displayed[key] = signature
+                    self._vod_poster_retries.succeeded(stream_id)
+                    self._arm_vod_poster_retries()
                     self["movie_tile_poster_{}".format(slot)].show()
                     self["movie_tile_placeholder_{}".format(slot)].hide()
                 else:
-                    self["movie_tile_poster_{}".format(slot)].hide()
+                    requests.pop(key, None)
+                    if not was_visible:
+                        self["movie_tile_poster_{}".format(slot)].hide()
+                    self._retry_vod_poster_after_decode("movie", slot, current, path)
             except Exception:
                 pass
 
-        attach_pixmap(
-            self,
-            "movie_tile_poster_{}".format(slot),
-            path,
-            key="movie-tile-{}".format(slot),
-            on_loaded=loaded,
-        )
+        try:
+            attach_pixmap(
+                self,
+                "movie_tile_poster_{}".format(slot),
+                path,
+                key="movie-tile-{}".format(slot),
+                on_loaded=loaded,
+            )
+        except Exception as error:
+            log_event("artwork", "stage=decode outcome=start-failed", error)
+            loaded(False)
 
     def _start_movie_detail(self):
+        if getattr(self, "_poster_grid_enabled", False):
+            self._start_grid_detail("movie")
+            return
         if not self._movie_entries:
             return
         item = self._movie_entries[self._movie_selected_index]
@@ -11019,17 +11925,25 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         _cancel_worker_token(self._movie_detail_token)
         token = _WorkerToken(WORKER_DETAIL_TIMEOUT_SECONDS)
         self._movie_detail_token = token
-        worker = threading.Thread(
-            target=self._load_movie_detail_worker,
-            args=(generation, item, token),
-        )
-        worker.daemon = True
+        if getattr(self, "_cinematic_enabled", False):
+            info = _detail_cache_get(self._movie_info_cache, self._movie_info_cache_lock, item.stream_id)
+            self._start_cinematic_backdrop("movie", item, info)
+        pool = getattr(self, "_grid_detail_workers", None)
+        if pool is None:
+            pool = self._grid_detail_workers = LatestPosterWorkers(worker_count=1)
+            self.onClose.append(pool.close)
         self._movie_detail_pending = True
-        worker.start()
+        pool.replace([lambda: self._load_movie_detail_worker(generation, item, token)])
         self._start_deferred_movie_posters()
         self._movie_timer.start(80, True)
 
     def _schedule_movie_detail(self, immediate=False):
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.selection("movie")
+        if getattr(self, "_poster_grid_enabled", False):
+            self._schedule_grid_detail("movie", immediate)
+            return
         if not self._movie_entries or self._closed:
             return
         self._movie_pending_detail_generation = self._movie_generation
@@ -11040,7 +11954,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         except Exception:
             pass
         item = self._movie_entries[self._movie_selected_index]
+        if preparation is not None and preparation.show_ready("movie"):
+            return
         self._render_movie_waiting(item)
+        if preparation is not None and getattr(self, "_cinematic_enabled", False):
+            preparation.show_hero("movie", item)
         if immediate:
             self._commit_movie_detail()
         else:
@@ -11121,6 +12039,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 token,
                 lambda: completer(item, info),
             )
+            if info is not None:
+                info._vod_metadata_complete = True
+            if info is not None and getattr(self, "_poster_grid_enabled", False):
+                info._grid_metadata_complete = True
             if hasattr(self, "_movie_info_cache_lock"):
                 _detail_cache_put(
                     self._movie_info_cache,
@@ -11168,6 +12090,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         poster_url="",
         catalogue_poster_url="",
     ):
+        if getattr(self, "_poster_grid_enabled", False):
+            self._render_grid_detail("movie", info)
+            self._apply_grid_cover("movie", poster_path, poster_url, catalogue_poster_url)
+            return
         cinematic = bool(getattr(self, "_cinematic_enabled", False))
 
         # Some long-lived integrations reuse this method independently of the
@@ -11279,7 +12205,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             )
         if self._apply_detail_poster("movie", item, poster_path):
             stream_id = item.stream_id
-            slot = self._movie_selected_index % 5
+            slot = self._movie_selected_index % getattr(self, "_poster_page_size", CINEMATIC_POSTER_COLUMNS)
             self._apply_movie_tile_poster(
                 slot,
                 poster_path,
@@ -11296,12 +12222,20 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._render_movie_posters()
 
     def _clear_movie_posters(self):
-        for slot in range(5):
+        self._reset_vod_poster_retries()
+        self._release_grid_pixmaps("movie")
+        if getattr(self, "_poster_grid_enabled", False):
+            self["movie_grid_position"].setText("")
+            self["poster_scroll_more"].hide()
+        for slot in range(getattr(self, "_poster_slot_count", CINEMATIC_POSTER_COLUMNS)):
             self["movie_tile_title_{}".format(slot)].setText("")
             self["movie_tile_poster_{}".format(slot)].hide()
             self["movie_tile_placeholder_{}".format(slot)].hide()
             self["movie_tile_favorite_{}".format(slot)].hide()
             self["movie_tile_focus_{}".format(slot)].hide()
+            if getattr(self, "_poster_grid_enabled", False):
+                for family in ("bg", "inner", "title"):
+                    self["movie_tile_{}_{}".format(family, slot)].hide()
         hide_scrollbar(self, "poster_scroll")
 
     def refresh_movies(self):
@@ -11311,6 +12245,20 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if self._movie_search_child_open:
             self["message"].setText(_("Please wait"))
             return
+        for name in ("_load_token", "_movie_load_token", "_movie_more_token",
+                     "_movie_detail_token", "_movie_poster_token"):
+            _cancel_worker_token(getattr(self, name, None))
+        self._loading = self._movie_loading = self._movie_more_loading = False
+        self._movie_generation += 1
+        self._movie_catalog_generation += 1
+        self._movie_poster_generation = getattr(self, "_movie_poster_generation", 0) + 1
+        self._movie_more_result = self._movie_detail_preview = self._movie_detail_result = None
+        self._movie_poster_state = self._movie_deferred_poster_jobs = None
+        self._movie_ready = self._movie_detail_pending = self._movie_poster_pending = False
+        browse_catalog = getattr(self, "_movie_browser_catalog", None)
+        if browse_catalog is not None:
+            browse_catalog.start(force=True)
+            self._movie_index_reload_when_done = True
         for current in self._movie_entries:
             url = _safe_picon_url(getattr(current, "icon", ""))
             if url:
@@ -11333,6 +12281,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._start_movie_load()
 
     def _select_movie_category(self, index):
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.invalidate()
         if not self._entries or self._loading:
             return
         self._movie_focus = "categories"
@@ -11350,6 +12301,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         focus_changed = self._movie_focus != "posters"
         self._movie_focus = "posters"
         index = int(index)
+        if index < 0 and self._vod_window_base("movie"):
+            self._request_vod_window("movie", index)
+            return
         if index >= len(self._movie_entries) and self._movie_has_more:
             self._movie_pending_advance = True
             self._movie_pending_selection_index = index
@@ -11357,7 +12311,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             return
         self._movie_pending_advance = False
         self._movie_pending_selection_index = None
-        self._movie_selected_index = index % len(self._movie_entries)
+        self._movie_selected_index = (max(0, min(index, len(self._movie_entries) - 1))
+                                      if getattr(self, "_poster_grid_enabled", False)
+                                      else index % len(self._movie_entries))
+        self._trim_vod_window("movie")
         _cancel_worker_token(self._movie_detail_token)
         self._movie_detail_token = None
         self._movie_generation += 1
@@ -11368,6 +12325,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._maybe_load_more_movies()
 
     def move_up(self):
+        if (getattr(self, "_poster_grid_enabled", False)
+                and self.content_type == "movie" and self._movie_focus == "posters"):
+            self._move_vod_grid("movie", "up")
+            return
         if self.content_type == "series":
             self._series_move_up()
             return
@@ -11382,6 +12343,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._select_movie_category(self.selected_index - 1)
 
     def move_down(self):
+        if (getattr(self, "_poster_grid_enabled", False)
+                and self.content_type == "movie" and self._movie_focus == "posters"):
+            self._move_vod_grid("movie", "down")
+            return
         if self.content_type == "series":
             self._series_move_down()
             return
@@ -11393,6 +12358,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._select_movie_category(self.selected_index + 1)
 
     def page_up(self):
+        if (getattr(self, "_poster_grid_enabled", False)
+                and self.content_type == "movie" and self._movie_focus == "posters"):
+            self._move_vod_grid("movie", "left")
+            return
         if self.content_type == "series":
             self._series_move_left()
             return
@@ -11400,7 +12369,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             GTAsyncListScreen.page_up(self)
             return
         if self._movie_focus == "posters":
-            if self._movie_selected_index == 0:
+            if self._movie_selected_index == 0 and not self._vod_window_base("movie"):
                 self._movie_focus = "categories"
                 self._render_movie_posters()
                 self._refresh_movie_categories()
@@ -11410,20 +12379,19 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._select_movie_category(self.selected_index - self.page_size)
 
     def page_down(self):
+        if (getattr(self, "_poster_grid_enabled", False)
+                and self.content_type == "movie" and self._movie_focus == "posters"):
+            self._move_vod_grid("movie", "right")
+            return
         if self.content_type == "series":
             self._series_move_right()
             return
         if self.content_type != "movie":
             GTAsyncListScreen.page_down(self)
             return
-        if not self._movie_entries:
-            return
         if self._movie_focus == "categories":
-            self._movie_focus = "posters"
-            self._schedule_movie_detail()
-            self._render_movie_posters()
-            self._refresh_movie_categories()
-        else:
+            self.open_selected()
+        elif self._movie_entries and not self._movie_loading:
             self._select_movie(self._movie_selected_index + 1)
 
     def channel_page_up(self):
@@ -11436,7 +12404,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if self._movie_focus == "posters":
             if not self._movie_entries:
                 return
-            target = max(0, self._movie_selected_index - MOVIE_RAIL_PAGE_SIZE)
+            target = max(-self._vod_window_base("movie"), self._movie_selected_index - getattr(self, "_poster_page_size", MOVIE_RAIL_PAGE_SIZE))
             if target != self._movie_selected_index:
                 self._select_movie(target)
             return
@@ -11456,7 +12424,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if self._movie_focus == "posters":
             if not self._movie_entries:
                 return
-            target = self._movie_selected_index + MOVIE_RAIL_PAGE_SIZE
+            target = self._movie_selected_index + getattr(self, "_poster_page_size", MOVIE_RAIL_PAGE_SIZE)
             if not self._movie_has_more:
                 target = min(target, len(self._movie_entries) - 1)
             if target != self._movie_selected_index:
@@ -11472,6 +12440,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._select_movie_category(target)
 
     def _stop_movie(self):
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.invalidate()
+        self._reset_vod_poster_retries()
+        pool = getattr(self, "_grid_detail_workers", None)
+        if pool is not None:
+            pool.close()
+        browse_catalog = getattr(self, "_movie_browser_catalog", None)
+        if browse_catalog is not None:
+            browse_catalog.stop()
         reset_cinematic = getattr(
             self,
             "_reset_cinematic_backdrop",
@@ -11493,6 +12471,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         ) + 1
         self._movie_search_child_open = False
         self._movie_search_child = None
+        self._movie_search_keyboard_open = False
         self._movie_search_drain_event = None
         self._movie_search_resume_categories = False
         self._movie_search_resume_category_id = None
@@ -11534,7 +12513,22 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 pass
 
     def _setup_series_widgets(self):
+        if self._poster_grid_enabled:
+            self["grid_clean_guard"] = Label("")
+            width, height, unused_px = _scale()
+            attach_background_window(self, "grid_clean_background", APP_BACKGROUND_PATH,
+                                     (width, height))
+            self["series_grid_info_panel"] = Pixmap()
+            self["hint"] = Label("")
+            self[self.content_type + "_video_guard"] = Label("")
+            self["poster_scroll_more"] = Label("⌄")
+            self["poster_scroll_more"].hide()
         unused_width, unused_height, px = _scale()
+        self._poster_image_width = (
+            grid_geometry(unused_width, unused_height, px)["tiles"][0]["image"][2]
+            if self._poster_grid_enabled else
+            cinematic_poster_geometry(unused_width, unused_height, px)["tiles"][0]["image"][2]
+        )
         del unused_width, unused_height
         self._series_title_preferred_font = font_px(
             px,
@@ -11547,6 +12541,15 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             role="title",
             value="standard",
         )
+        if self._poster_grid_enabled:
+            self._series_title_preferred_font = font_px(px, 34, role="title")
+            self._series_title_min_font = font_px(px, 24, role="title", value="standard")
+            self._grid_rating_font = font_px(px, 22)
+            self._grid_rating_min_font = font_px(px, 16, value="standard")
+            self._grid_plot_font = font_px(px, 23)
+            self._grid_plot_min_font = font_px(px, 19, value="standard")
+            self._grid_people_font = font_px(px, 20)
+            self._grid_people_min_font = font_px(px, 18, value="standard")
         self["series_server"] = Label("")
         self._dynamic_server_widget = "series_server"
         self._dynamic_server_text = _("{}   |   CONTENT BROWSER").format(
@@ -11590,9 +12593,13 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self["poster_scroll_track"] = Label("")
         self["poster_scroll_thumb"] = Label("")
         hide_scrollbar(self, "poster_scroll")
-        for index in range(SERIES_GRID_PAGE_SIZE):
-            self["series_tile_bg_{}".format(index)] = Label("")
-            self["series_tile_focus_{}".format(index)] = Label("")
+        for index in range(getattr(self, "_poster_slot_count", SERIES_GRID_PAGE_SIZE)):
+            self["series_tile_bg_{}".format(index)] = (
+                Pixmap() if self._poster_grid_enabled else Label("")
+            )
+            self["series_tile_focus_{}".format(index)] = (
+                Pixmap() if self._poster_grid_enabled else Label("")
+            )
             self["series_tile_inner_{}".format(index)] = Label("")
             self["series_tile_placeholder_{}".format(index)] = Label("GT")
             self["series_tile_poster_{}".format(index)] = Pixmap()
@@ -11650,7 +12657,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         return fit_dynamic_text(
             self["series_title"],
             value,
-            max_lines=2,
+            max_lines=1 if getattr(self, "_poster_grid_enabled", False) else 2,
             preferred_size=self._series_title_preferred_font,
             min_size=self._series_title_min_font,
             fallback_chars=18,
@@ -11664,6 +12671,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         )
 
     def _set_series_plot(self, value):
+        if getattr(self, "_poster_grid_enabled", False):
+            self["hint"].setText(value if not self._series_entries else "")
+            return fit_dynamic_text(self["series_plot"], value, max_lines=2,
+                                    preferred_size=getattr(self, "_grid_plot_font", None),
+                                    min_size=getattr(self, "_grid_plot_min_font", None), fallback_chars=150)
         if getattr(self, "_cinematic_enabled", False):
             rendered = clean_dynamic_text(value)
             self["series_plot"].setText(rendered)
@@ -11676,11 +12688,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         )
 
     def _series_rail_page_size(self):
-        return (
-            5
-            if getattr(self, "_cinematic_enabled", False)
-            else SERIES_GRID_PAGE_SIZE
-        )
+        return getattr(self, "_poster_page_size", (
+            CINEMATIC_POSTER_COLUMNS if getattr(self, "_cinematic_enabled", False) else SERIES_GRID_PAGE_SIZE
+        ))
 
     def _refresh_series_categories(self):
         try:
@@ -11781,15 +12791,13 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if not self._series_entries:
             return
         category_id = str(self._series_loaded_category_id or "")
-        if not category_id:
-            return
         index = max(
             0,
             min(self._series_selected_index, len(self._series_entries) - 1),
         )
         item = self._series_entries[index]
         self._series_selection_by_category[category_id] = (
-            index,
+            index + self._vod_window_base("series"),
             str(getattr(item, "stream_id", "") or ""),
         )
 
@@ -11814,6 +12822,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             saved_index = max(0, int(saved_index))
         except (TypeError, ValueError, OverflowError):
             saved_index = 0
+        base = self._vod_window_base("series")
+        if not base <= saved_index < base + len(self._series_entries) and (getattr(self, "_series_browser_catalog", None) is not None or getattr(self, "_series_native_window", None) is not None):
+            self._request_vod_window("series", saved_index - base)
+            return
+        saved_index -= base
         self._series_selected_index = min(
             saved_index,
             len(self._series_entries) - 1,
@@ -11824,7 +12837,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._series_pending_clamp_to_end = True
 
     def _schedule_series_load(self, category=None, immediate=False):
-        if not self._entries or self._closed:
+        if not self._entries or self._closed or getattr(self, "_series_search_child_open", False):
             return
         category = category or self._entries[self.selected_index]
         self._series_pending_category_id = category.category_id
@@ -11847,7 +12860,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._start_series_load(category)
 
     def _start_series_load(self, category=None):
-        if not self._entries or self._closed:
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.invalidate()
+        if not self._entries or self._closed or getattr(self, "_series_search_child_open", False):
             return
         category = category or self._entries[self.selected_index]
         self._remember_series_selection()
@@ -11879,7 +12895,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._series_loading = True
         self._series_ready = False
         self._series_error = ""
+        old_window = getattr(self, "_series_native_window", None)
+        if old_window is not None:
+            old_window.close()
+        if _is_stalker_client(self.client) and getattr(self, "_series_browser_catalog", None) is None:
+            self._series_native_window = NativeBrowseWindow("series")
+            if not getattr(self, "_native_window_close_hook", False):
+                self._native_window_close_hook = True
+                self.onClose.append(self._close_native_vod_windows)
         self._series_entries = []
+        self._series_browse_cursor = 0
         self._series_selected_index = 0
         self._series_loaded_category_id = category.category_id
         self._series_detail_preview = None
@@ -11908,7 +12933,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         )
         self._clear_series_tiles()
         self._render_series_waiting()
-        token = _WorkerToken(WORKER_LIST_TIMEOUT_SECONDS)
+        browse_catalog = getattr(self, "_series_browser_catalog", None)
+        if browse_catalog is not None:
+            browse_catalog.start()
+        token = _WorkerToken(30 * 60 if browse_catalog is not None else WORKER_LIST_TIMEOUT_SECONDS)
         self._series_load_token = token
         worker = threading.Thread(
             target=self._load_series_worker,
@@ -11919,15 +12947,24 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._series_timer.start(120, True)
 
     def _load_series_worker(self, generation, category_id, token=None):
+        browse_catalog = getattr(self, "_series_browser_catalog", None)
+        native_window = getattr(self, "_series_native_window", None)
         try:
-            entries = list(
-                _bounded_client_call(
-                    self.client,
-                    token,
-                    lambda: self.client.load_items("series", category_id),
+            if browse_catalog is not None:
+                page = browse_catalog.read(category_id,
+                    hidden_category_ids=self._hidden_category_ids, token=token)
+                entries = list(page.items)
+                error = "" if entries or page.catalog_state.get("complete") else N_("Could not load series")
+            else:
+                entries = list(
+                    _bounded_client_call(
+                        self.client,
+                        token,
+                        lambda: self.client.load_items("series", category_id),
+                    )
+                    or []
                 )
-                or []
-            )
+                error = ""
             if not str(category_id or "").strip() or category_filter_active(
                 getattr(self, "_hidden_category_ids", ())
             ):
@@ -11936,12 +12973,14 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     self._hidden_category_ids,
                     category_id,
                 )
-            error = ""
         except _WorkerCancelled:
             return
         except ContentError as caught:
             entries = []
             error = str(caught)
+        except (CatalogStorageError, CatalogLimitError):
+            entries = []
+            error = N_("Search cache is unavailable. Check receiver storage.")
         except Exception:
             entries = []
             error = N_("Could not load series")
@@ -11951,17 +12990,30 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             or (token is not None and not token.active())
         ):
             return
+        if native_window is not None and not error:
+            try:
+                entries = native_window.append(entries, self._client_has_more_items("series", category_id), token)[:240]
+            except Exception:
+                entries = []
+                error = N_("Search incomplete.")
+        self._series_window_base = 0
+        self._series_known_ids = {str(item.stream_id) for item in entries}
         self._series_entries = entries
         self._series_error = error
-        self._series_has_more = self._client_has_more_items(
-            "series", category_id
-        )
+        if browse_catalog is not None:
+            self._series_has_more = page.has_more if not error else False
+            if not error:
+                self._series_browse_cursor = page.next_cursor
+        else:
+            self._series_has_more = self._client_has_more_items("series", category_id)
+        if native_window is not None and not error:
+            self._series_has_more = native_window.has_more or native_window.count > len(entries)
         self._series_ready = True
 
     def _start_series_more_load(self):
         loader = getattr(self.client, "load_more_items", None)
         if (
-            not callable(loader)
+            (not callable(loader) and getattr(self, "_series_browser_catalog", None) is None)
             or not self._series_has_more
             or self._series_more_loading
             or self._closed
@@ -11974,7 +13026,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._series_more_loading = True
         generation = self._series_catalog_generation
         category_id = str(self._series_loaded_category_id or "")
-        token = _WorkerToken(WORKER_LIST_TIMEOUT_SECONDS)
+        token = _WorkerToken(30 * 60 if getattr(self, "_series_browser_catalog", None) is not None else WORKER_LIST_TIMEOUT_SECONDS)
         _cancel_worker_token(self._series_more_token)
         self._series_more_token = token
         worker = threading.Thread(
@@ -11993,15 +13045,27 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         loader,
         token=None,
     ):
+        browse_catalog = getattr(self, "_series_browser_catalog", None)
+        native_window = getattr(self, "_series_native_window", None)
+        page = None
         try:
-            entries = list(
-                _bounded_client_call(
-                    self.client,
-                    token,
-                    lambda: loader("series", category_id),
+            local_end = self._vod_window_base("series") + len(self._series_entries)
+            if native_window is not None and local_end < native_window.count:
+                page = native_window.read_window(category_id, offset=local_end, size=80, token=token)
+                entries = list(page.items)
+            elif browse_catalog is not None:
+                page = browse_catalog.read(category_id, after=self._series_browse_cursor,
+                    hidden_category_ids=self._hidden_category_ids, token=token)
+                entries = list(page.items)
+            else:
+                entries = list(
+                    _bounded_client_call(
+                        self.client,
+                        token,
+                        lambda: loader("series", category_id),
+                    )
+                    or []
                 )
-                or []
-            )
             if not str(category_id or "").strip() or category_filter_active(
                 getattr(self, "_hidden_category_ids", ())
             ):
@@ -12016,16 +13080,30 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         except ContentError as caught:
             entries = []
             error = str(caught)
+        except (CatalogStorageError, CatalogLimitError):
+            entries = []
+            error = N_("Search cache is unavailable. Check receiver storage.")
         except Exception:
             entries = []
             error = N_("Could not load series")
-        has_more = self._client_has_more_items("series", category_id)
+        has_more = page.has_more if page is not None else (
+            self._client_has_more_items("series", category_id) if browse_catalog is None else False
+        )
+        if native_window is not None and not error and page is None:
+            try:
+                entries = native_window.append(entries, has_more, token)[:80]
+                has_more = native_window.has_more or local_end + len(entries) < native_window.count
+            except Exception:
+                entries, has_more = [], False
+                error = N_("Search incomplete.")
         if (
             self._closed
             or generation != self._series_catalog_generation
             or (token is not None and not token.active())
         ):
             return
+        if page is not None:
+            self._series_browse_cursor = page.next_cursor
         self._series_more_result = (
             generation,
             category_id,
@@ -12037,11 +13115,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
     def _maybe_load_more_series(self):
         if not self._series_entries or not self._series_has_more:
             return False
-        page_size = (
-            5
-            if getattr(self, "_cinematic_enabled", False)
-            else SERIES_GRID_PAGE_SIZE
-        )
+        page_size = getattr(self, "_poster_page_size", (
+            CINEMATIC_POSTER_COLUMNS if getattr(self, "_cinematic_enabled", False) else SERIES_GRID_PAGE_SIZE
+        ))
         remaining = len(self._series_entries) - self._series_selected_index - 1
         if (
             remaining > page_size
@@ -12073,6 +13149,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             or self._series_loading
             or self._series_more_loading
             or not self._series_has_more
+            or (self._series_entries and not self._series_pending_advance
+                and len(self._series_entries) - self._series_selected_index - 1
+                > getattr(self, "_poster_page_size", 14))
         ):
             return False
         try:
@@ -12088,6 +13167,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             or self._series_loading
             or self._series_more_loading
             or not self._series_has_more
+            or (self._series_entries and not self._series_pending_advance
+                and len(self._series_entries) - self._series_selected_index - 1
+                > getattr(self, "_poster_page_size", 14))
         ):
             return
         # Detail requests use the same single-request slot.  Let the
@@ -12109,7 +13191,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         ellipsize_dynamic_text(
             self["series_rail_caption"],
             _("{} • {} SERIES").format(
-                localized_upper(category.name), len(self._series_entries)
+                localized_upper(category.name), self._vod_window_base("series") + len(self._series_entries)
             ),
             fallback_chars=65,
         )
@@ -12119,7 +13201,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if result is None:
             return
         self._series_more_result = None
-        generation, category_id, entries, has_more, error = result
+        generation, category_id, entries, has_more, error = result[:5]
+        replacement = result[5] if len(result) > 5 else None
         if (
             generation != self._series_catalog_generation
             or category_id != str(self._series_loaded_category_id or "")
@@ -12129,13 +13212,20 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._series_more_token = None
         self._series_has_more = bool(has_more)
         if error:
-            self._series_has_more = False
             self._series_pending_advance = False
             self._series_pending_selection_index = None
             self._series_pending_clamp_to_end = False
+            ellipsize_dynamic_text(self["message"], _(error), fallback_chars=90)
+            if not self._series_entries:
+                self._series_error = error
+                self._render_series_results()
+            return
+        if self._apply_vod_window("series", entries, replacement):
             return
         old_length = len(self._series_entries)
-        known = {str(item.stream_id) for item in self._series_entries}
+        known = getattr(self, "_series_known_ids", None)
+        if known is None:
+            known = self._series_known_ids = {str(item.stream_id) for item in self._series_entries}
         for item in entries:
             stream_id = str(getattr(item, "stream_id", ""))
             if not stream_id or stream_id in known:
@@ -12198,12 +13288,38 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._series_pending_advance = False
         self._series_pending_selection_index = None
         self._series_pending_clamp_to_end = False
+        self._trim_vod_window("series")
         self._render_series_tiles()
         self._schedule_series_scan()
 
-    def _poll_series_result(self):
-        if self._closed:
+    def _update_series_catalog_message(self):
+        catalog = getattr(self, "_series_browser_catalog", None)
+        if catalog is None:
             return
+        state = catalog.state
+        if state.get("preparing"):
+            text = _("Preparing series catalogue: {count} series").format(count=state.get("movies", 0))
+        elif state.get("reason") == "storage":
+            text = _("Search cache is unavailable. Check receiver storage.")
+        elif state.get("reason") == "limit":
+            text = _("Catalogue limit reached. Results may be incomplete.")
+        elif not state.get("complete"):
+            text = _("Series catalogue incomplete: {count} series. Press GREEN to continue.").format(count=state.get("movies", 0))
+        else:
+            text = ""
+        ellipsize_dynamic_text(self["message"], text, fallback_chars=90)
+
+    def _poll_series_result(self):
+        if self._closed or getattr(self, "_series_search_child_open", False):
+            return
+        browse_catalog = getattr(self, "_series_browser_catalog", None)
+        if browse_catalog is not None:
+            self._update_series_catalog_message()
+            if (self._series_index_reload_when_done
+                    and not browse_catalog.state.get("preparing")):
+                self._series_index_reload_when_done = False
+                self._start_series_load()
+                return
         if self._series_loading:
             if not self._series_ready:
                 if (
@@ -12220,6 +13336,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._series_loading = False
             self._series_load_token = None
             self._render_series_results()
+            if browse_catalog is not None and browse_catalog.state.get("preparing"):
+                self._series_timer.start(120, True)
             return
         if (
             self._series_more_loading
@@ -12243,8 +13361,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if detail is not None:
             self._series_detail_preview = None
             self._series_detail_result = None
-            self._series_detail_pending = False
-            self._series_detail_token = None
+            if (not getattr(self, "_poster_grid_enabled", False)
+                    or detail[0] == self._series_generation):
+                self._series_detail_pending = False
+                self._series_detail_token = None
             (
                 generation,
                 info,
@@ -12270,6 +13390,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             _cancel_worker_token(self._series_detail_token)
             self._series_detail_token = None
             self._series_detail_pending = False
+            if getattr(self, "_poster_grid_enabled", False):
+                self._render_grid_detail("series", self._cached_grid_detail("series"))
             self._start_deferred_series_posters()
         state = self._series_poster_state
         if state is not None:
@@ -12280,11 +13402,15 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             if state_expired:
                 _cancel_worker_token(state_token)
             with state["lock"]:
-                results = list(state["results"])
-                del state["results"][:]
+                limit = 2 if getattr(self, "_poster_grid_enabled", False) else len(state["results"])
+                results = state["results"][:limit]
+                del state["results"][:limit]
                 complete = (
-                    state_expired or state["pending_workers"] <= 0
+                    (state_expired or state["pending_workers"] <= 0)
+                    and not state["results"]
                 )
+                if complete and "queued_jobs" in state:
+                    state["queued_jobs"].clear()
             generation = state["generation"]
             page_is_current = (
                 state.get("page_key") == self._series_poster_page_key
@@ -12315,11 +13441,13 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                         result_is_current = False
                     if not result_is_current:
                         continue
-                    current_url = _safe_picon_url(
+                    if path and resolved_url:
+                        self._remember_vod_card_size(resolved_url)
+                    current_url = self._vod_card_url(
                         getattr(page_item, "icon", "")
                     )
-                    requested_url = _safe_picon_url(requested_url)
-                    resolved_url = _safe_picon_url(resolved_url)
+                    requested_url = self._vod_card_url(requested_url)
+                    resolved_url = self._vod_card_url(resolved_url)
                     if path and current_url not in (
                         "",
                         requested_url,
@@ -12331,14 +13459,17 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                         requested_url,
                     ):
                         page_item.icon = resolved_url
+                    if path:
+                        poster_urls = getattr(self, "_series_poster_urls", None)
+                        if poster_urls is not None:
+                            poster_urls[slot] = resolved_url or current_url
                     if fallback_deferred and not path:
-                        retry_url = _safe_picon_url(
+                        retry_url = self._vod_card_url(
                             getattr(page_item, "icon", "")
                         )
-                        self._series_deferred_poster_jobs = (
-                            self._series_poster_page_key,
-                            [(slot, page_item, retry_url)],
-                            True,
+                        self._defer_vod_poster_jobs(
+                            "series", self._series_poster_page_key,
+                            [(slot, page_item, retry_url)], True,
                         )
                     self._apply_series_tile_poster(
                         slot,
@@ -12368,6 +13499,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     self._series_poster_token = None
                 if page_is_current:
                     self._start_deferred_series_posters()
+                    if complete:
+                        self._schedule_missing_vod_posters("series")
         poll_cinematic = getattr(self, "_poll_cinematic_backdrop", None)
         cinematic_pending = bool(
             poll_cinematic() if callable(poll_cinematic) else False
@@ -12377,10 +13510,14 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             or self._series_poster_pending
             or self._series_more_loading
             or cinematic_pending
+            or (browse_catalog is not None and browse_catalog.state.get("preparing"))
         ):
             self._series_timer.start(80, True)
 
     def _render_series_waiting(self, item=None):
+        if getattr(self, "_poster_grid_enabled", False):
+            self._render_grid_detail("series", None, loading=True)
+            return
         getattr(self, "_detail_poster_signatures", {}).pop("series", None)
         try:
             set_visible = _set_component_visible
@@ -12432,6 +13569,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         return str(result.get("outcome", "") or "")
 
     def _render_series_results(self):
+        if getattr(self, "_poster_grid_enabled", False):
+            self["hint"].setText("")
         if self._series_error:
             self["series_rail_caption"].setText(_("COULD NOT LOAD SERIES"))
             self._set_series_plot(_(self._series_error))
@@ -12490,11 +13629,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 current = getattr(component, "message", None)
                 if current is None or str(current) != text:
                     component.setText(text)
-        page_size = (
-            5
-            if getattr(self, "_cinematic_enabled", False)
-            else SERIES_GRID_PAGE_SIZE
-        )
+        page_size = getattr(self, "_poster_page_size", (
+            CINEMATIC_POSTER_COLUMNS if getattr(self, "_cinematic_enabled", False) else SERIES_GRID_PAGE_SIZE
+        ))
         page_start = (
             int(self._series_selected_index / page_size)
             * page_size
@@ -12504,16 +13641,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         ]
         page_key = (
             page_start,
-            tuple(
-                (
-                    str(getattr(item, "stream_id", "")),
-                    _safe_picon_url(getattr(item, "icon", "")),
-                )
-                for item in page
-            ),
+            tuple(str(getattr(item, "stream_id", "")) for item in page),
         )
         page_changed = page_key != self._series_poster_page_key
         if page_changed:
+            self._release_grid_pixmaps("series")
             self._series_poster_generation = getattr(
                 self, "_series_poster_generation", self._series_generation
             ) + 1
@@ -12523,6 +13655,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._series_poster_state = None
             self._series_deferred_poster_jobs = None
             self._series_poster_page_key = page_key
+            self._series_poster_urls = {}
+            self._reset_vod_poster_retries("series")
+        poster_urls = getattr(self, "_series_poster_urls", None)
+        if poster_urls is None:
+            poster_urls = self._series_poster_urls = {}
         jobs = []
         for slot in range(page_size):
             selected = False
@@ -12533,11 +13670,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     self._series_focus == "series"
                     and absolute == self._series_selected_index
                 )
-                ellipsize_dynamic_text(
-                    self["series_tile_title_{}".format(slot)],
-                    item.name,
-                    fallback_chars=18,
-                )
+                fit_dynamic_text(self["series_tile_title_{}".format(slot)],
+                                 item.name, max_lines=2, fallback_chars=24)
                 set_visible(self["series_tile_bg_{}".format(slot)], True)
                 set_visible(self["series_tile_inner_{}".format(slot)], True)
                 set_visible(self["series_tile_title_{}".format(slot)], True)
@@ -12545,19 +13679,27 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     self["series_tile_favorite_{}".format(slot)],
                     self._is_favorite(item),
                 )
-                if page_changed:
-                    set_visible(
-                        self["series_tile_placeholder_{}".format(slot)],
-                        True,
-                    )
-                    set_visible(
-                        self["series_tile_poster_{}".format(slot)],
-                        False,
-                    )
-                    url = _safe_picon_url(getattr(item, "icon", ""))
+                url = self._vod_card_url(getattr(item, "icon", ""))
+                cover_changed = slot not in poster_urls or poster_urls[slot] != url
+                if page_changed or cover_changed:
+                    poster_urls[slot] = url
+                    if page_changed:
+                        set_visible(
+                            self["series_tile_placeholder_{}".format(slot)],
+                            True,
+                        )
+                    if page_changed:
+                        set_visible(
+                            self["series_tile_poster_{}".format(slot)],
+                            False,
+                        )
                     if url:
                         cached = _cached_picon_path(url)
-                        if cached:
+                        preparation = getattr(self, "_vod_preparation", None)
+                        if (cached and getattr(self, "_poster_grid_enabled", False)
+                                and not (preparation is not None and preparation.card_ready("series", slot, cached))):
+                            jobs.append((slot, item, url))
+                        elif cached:
                             self._apply_series_tile_poster(
                                 slot,
                                 cached,
@@ -12590,7 +13732,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 self["series_tile_focus_{}".format(slot)],
                 selected,
             )
-        for slot in range(page_size, SERIES_GRID_PAGE_SIZE):
+        for slot in range(page_size, getattr(self, "_poster_slot_count", SERIES_GRID_PAGE_SIZE)):
             update_text(self["series_tile_title_{}".format(slot)], "")
             for family in (
                 "bg",
@@ -12605,39 +13747,44 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     self["series_tile_{}_{}".format(family, slot)],
                     False,
                 )
-        update_horizontal_scrollbar(
-            self,
-            "poster_scroll",
-            len(self._series_entries),
-            self._series_selected_index,
-            page_size,
-            self._poster_scroll_geometry,
-        )
+        if getattr(self, "_poster_grid_enabled", False):
+            self._update_grid_position("series")
+        else:
+            update_horizontal_scrollbar(
+                self,
+                "poster_scroll",
+                self._vod_window_base("series") + len(self._series_entries),
+                self._vod_window_base("series") + self._series_selected_index,
+                page_size,
+                self._poster_scroll_geometry,
+            )
         update_text(
             self["series_grid_position"],
             self._series_grid_position_text(),
         )
         if jobs:
-            if self._series_pending_detail_generation is not None:
-                self._series_deferred_poster_jobs = (page_key, jobs)
-            else:
-                self._start_series_poster_jobs(page_key, jobs)
+            self._queue_vod_poster_jobs("series", page_key, jobs)
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.update("series")
 
     def _series_grid_position_text(self):
+        if getattr(self, "_poster_grid_enabled", False):
+            return page_position(self._vod_window_base("series") + self._series_selected_index, self._vod_window_base("series") + len(self._series_entries), self._series_has_more)
         if not self._series_entries:
             return ""
-        page_size = (
-            5
-            if getattr(self, "_cinematic_enabled", False)
-            else SERIES_GRID_PAGE_SIZE
-        )
+        page_size = getattr(self, "_poster_page_size", (
+            CINEMATIC_POSTER_COLUMNS if getattr(self, "_cinematic_enabled", False) else SERIES_GRID_PAGE_SIZE
+        ))
+        base = self._vod_window_base("series")
+        count = base + len(self._series_entries)
         page_start = (
-            int(self._series_selected_index / page_size)
+            int((base + self._series_selected_index) / page_size)
             * page_size
         )
         page_end = min(
             page_start + page_size,
-            len(self._series_entries),
+            count,
         )
         page_number = int(page_start / page_size) + 1
         page_label = localized_upper(_("Page"))
@@ -12645,21 +13792,21 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             return "{}–{} / {}+  •  {} {}".format(
                 page_start + 1,
                 page_end,
-                len(self._series_entries),
+                count,
                 page_label,
                 page_number,
             )
         page_count = max(
             1,
             int(
-                (len(self._series_entries) + page_size - 1)
+                (count + page_size - 1)
                 / page_size
             ),
         )
         return "{}–{} / {}  •  {} {}/{}".format(
             page_start + 1,
             page_end,
-            len(self._series_entries),
+            count,
             page_label,
             page_number,
             page_count,
@@ -12679,7 +13826,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         generation = getattr(
             self, "_series_poster_generation", self._series_generation
         )
-        token = _WorkerToken(WORKER_POSTER_TIMEOUT_SECONDS)
+        timeout = max(WORKER_POSTER_TIMEOUT_SECONDS, poster_batch_timeout(
+            len(jobs), BACKGROUND_POSTER_WORKERS,
+            PICON_DOWNLOAD_TIMEOUT, WORKER_DETAIL_TIMEOUT_SECONDS,
+        ))
+        token = _WorkerToken(timeout)
         _cancel_worker_token(self._series_poster_token)
         self._series_poster_token = token
         self._series_poster_pending = True
@@ -12689,41 +13840,21 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             "page_key": page_key,
             "selected_slot": selected_slot,
             "results": [],
+            "queued_jobs": deque(jobs),
             "pending_workers": worker_count,
-            "batch_workers": worker_count,
-            "metadata_cache_batch": False,
-            "metadata_cache_client": None,
             "lock": threading.Lock(),
             "token": token,
         }
-        metadata_client = getattr(self, "_metadata_client", None)
-        begin_batch = getattr(
-            metadata_client, "begin_cache_batch", None
-        )
-        if callable(begin_batch):
-            try:
-                begin_batch()
-                state["metadata_cache_batch"] = True
-                state["metadata_cache_client"] = metadata_client
-            except Exception as error:
-                _debug(
-                    "series metadata cache batch failed error={}".format(
-                        error.__class__.__name__
-                    )
-                )
         self._series_poster_state = state
         self._series_deferred_poster_jobs = None
-        for worker_index in range(worker_count):
-            worker = threading.Thread(
-                target=self._load_series_posters_worker,
-                args=(
-                    jobs[worker_index::worker_count],
-                    state,
-                    token,
-                ),
-            )
-            worker.daemon = True
-            worker.start()
+        pool = getattr(self, "_grid_poster_workers", None)
+        if pool is None:
+            pool = self._grid_poster_workers = LatestPosterWorkers()
+            self.onClose.append(pool.close)
+        target = self._load_series_posters_worker
+        tasks = [lambda batch=jobs[i::worker_count]: target(batch, state, token)
+                 for i in range(worker_count)]
+        pool.replace(tasks)
         self._series_timer.start(50, True)
 
     def _start_deferred_series_posters(self):
@@ -12737,140 +13868,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 return
             self._start_series_poster_jobs(deferred[0], deferred[1])
 
-    def _load_series_posters_worker(
-        self,
-        jobs,
-        state,
-        token=None,
-    ):
-        try:
-            for slot, item, url in jobs:
-                if token is not None:
-                    token.check()
-                path = ""
-                resolved_url = url
-                fallback_deferred = False
-                is_selected = int(slot) == int(state.get("selected_slot", -1))
-                if url:
-                    try:
-                        path = _download_client_image(
-                            self.client,
-                            url,
-                            _picon_cache_path(url),
-                            timeout=_provider_picon_timeout(
-                                self._metadata_client,
-                                url,
-                            ),
-                            token=token,
-                        )
-                    except _WorkerCancelled:
-                        raise
-                    except Exception as error:
-                        _debug(
-                            "series poster failed id={} error={}".format(
-                                _debug_identifier(item.stream_id),
-                                error.__class__.__name__,
-                            )
-                        )
-                if not path:
-                    fallback_deferred = bool(
-                        is_selected
-                        and (
-                            self._series_detail_pending
-                            or self._series_pending_detail_generation is not None
-                        )
-                    )
-                    if not fallback_deferred:
-                        if token is not None:
-                            token.check()
-                        try:
-                            completed = _bounded_client_call(
-                                self._metadata_client,
-                                token,
-                                lambda: self._metadata_client.complete_series(
-                                    item,
-                                    _detail_cache_get(
-                                        self._series_info_cache,
-                                        self._series_info_cache_lock,
-                                        item.stream_id,
-                                    )
-                                    if hasattr(self, "_series_info_cache_lock")
-                                    else self._series_info_cache.get(item.stream_id),
-                                    force_cover_fallback=True,
-                                ),
-                            )
-                        except MetadataError as error:
-                            _debug(
-                                "TMDb series poster fallback failed id={} error={}".format(
-                                    _debug_identifier(item.stream_id),
-                                    error.__class__.__name__,
-                                )
-                            )
-                            completed = None
-                        except _WorkerCancelled:
-                            raise
-                        except Exception as error:
-                            _debug(
-                                "series poster fallback failed id={} error={}".format(
-                                    _debug_identifier(item.stream_id),
-                                    error.__class__.__name__,
-                                )
-                            )
-                            completed = None
-                        fallback_url = _safe_picon_url(
-                            getattr(completed, "cover", "")
-                        )
-                        if fallback_url and fallback_url != url:
-                            try:
-                                path = _download_client_image(
-                                    self.client,
-                                    fallback_url,
-                                    _picon_cache_path(fallback_url),
-                                    token=token,
-                                )
-                            except _WorkerCancelled:
-                                raise
-                            except Exception as error:
-                                _debug(
-                                    "series fallback image failed id={} error={}".format(
-                                        _debug_identifier(item.stream_id),
-                                        error.__class__.__name__,
-                                    )
-                                )
-                            if path:
-                                resolved_url = fallback_url
-                with state["lock"]:
-                    state["results"].append(
-                        (
-                            slot,
-                            item.stream_id,
-                            path,
-                            url,
-                            resolved_url if path else "",
-                            fallback_deferred,
-                        )
-                    )
-        finally:
-            finish_batch = False
-            with state["lock"]:
-                state["pending_workers"] -= 1
-                if "batch_workers" in state:
-                    state["batch_workers"] -= 1
-                    if (
-                        state["batch_workers"] <= 0
-                        and state.get("metadata_cache_batch")
-                    ):
-                        state["metadata_cache_batch"] = False
-                        finish_batch = True
-            if finish_batch:
-                try:
-                    state["metadata_cache_client"].end_cache_batch()
-                except Exception as error:
-                    _debug(
-                        "series metadata cache flush failed error={}".format(
-                            error.__class__.__name__
-                        )
-                    )
+    def _load_series_posters_worker(self, jobs, state, token=None):
+        self._load_vod_posters_worker("series", jobs, state, token)
 
     def _apply_series_tile_poster(
         self,
@@ -12889,13 +13888,31 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             else generation
         )
 
+        requests = getattr(self, "_vod_tile_requests", None)
+        if requests is None:
+            requests = self._vod_tile_requests = {}
+        key = ("series", slot)
+        signature = (generation, str(stream_id), path)
+        previous = requests.get(key)
+        if previous is not None and previous[0] == signature:
+            return
+        request = (signature, object())
+        requests[key] = request
+        displayed = getattr(self, "_vod_tile_displayed", None)
+        if displayed is None:
+            displayed = self._vod_tile_displayed = {}
+        previous_display = displayed.get(key)
+        was_visible = bool(previous_display is not None
+                           and previous_display[:2] == signature[:2]
+                           and getattr(self["series_tile_poster_{}".format(slot)], "visible", False))
+
         def loaded(success):
+            if self._closed or requests.get(key) is not request:
+                return
             try:
-                page_size = (
-                    5
-                    if getattr(self, "_cinematic_enabled", False)
-                    else SERIES_GRID_PAGE_SIZE
-                )
+                page_size = getattr(self, "_poster_page_size", (
+                    CINEMATIC_POSTER_COLUMNS if getattr(self, "_cinematic_enabled", False) else SERIES_GRID_PAGE_SIZE
+                ))
                 page_start = (
                     int(self._series_selected_index / page_size)
                     * page_size
@@ -12910,23 +13927,38 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     )
                     and str(current.stream_id) == str(stream_id)
                 )
-                if success and valid:
+                if not valid:
+                    return
+                if success:
+                    displayed[key] = signature
+                    self._vod_poster_retries.succeeded(stream_id)
+                    self._arm_vod_poster_retries()
                     self["series_tile_poster_{}".format(slot)].show()
                     self["series_tile_placeholder_{}".format(slot)].hide()
                 else:
-                    self["series_tile_poster_{}".format(slot)].hide()
+                    requests.pop(key, None)
+                    if not was_visible:
+                        self["series_tile_poster_{}".format(slot)].hide()
+                    self._retry_vod_poster_after_decode("series", slot, current, path)
             except Exception:
                 pass
 
-        attach_pixmap(
-            self,
-            "series_tile_poster_{}".format(slot),
-            path,
-            key="series-tile-{}".format(slot),
-            on_loaded=loaded,
-        )
+        try:
+            attach_pixmap(
+                self,
+                "series_tile_poster_{}".format(slot),
+                path,
+                key="series-tile-{}".format(slot),
+                on_loaded=loaded,
+            )
+        except Exception as error:
+            log_event("artwork", "stage=decode outcome=start-failed", error)
+            loaded(False)
 
     def _start_series_detail(self):
+        if getattr(self, "_poster_grid_enabled", False):
+            self._start_grid_detail("series")
+            return
         if not self._series_entries:
             return
         item = self._series_entries[self._series_selected_index]
@@ -12934,17 +13966,25 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         _cancel_worker_token(self._series_detail_token)
         token = _WorkerToken(WORKER_DETAIL_TIMEOUT_SECONDS)
         self._series_detail_token = token
-        worker = threading.Thread(
-            target=self._load_series_detail_worker,
-            args=(generation, item, token),
-        )
-        worker.daemon = True
+        if getattr(self, "_cinematic_enabled", False):
+            info = _detail_cache_get(self._series_info_cache, self._series_info_cache_lock, item.stream_id)
+            self._start_cinematic_backdrop("series", item, info)
+        pool = getattr(self, "_grid_detail_workers", None)
+        if pool is None:
+            pool = self._grid_detail_workers = LatestPosterWorkers(worker_count=1)
+            self.onClose.append(pool.close)
         self._series_detail_pending = True
-        worker.start()
+        pool.replace([lambda: self._load_series_detail_worker(generation, item, token)])
         self._start_deferred_series_posters()
         self._series_timer.start(80, True)
 
     def _schedule_series_detail(self, immediate=False):
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.selection("series")
+        if getattr(self, "_poster_grid_enabled", False):
+            self._schedule_grid_detail("series", immediate)
+            return
         if not self._series_entries or self._closed:
             return
         self._series_pending_detail_generation = self._series_generation
@@ -12955,7 +13995,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         except Exception:
             pass
         item = self._series_entries[self._series_selected_index]
+        if preparation is not None and preparation.show_ready("series"):
+            return
         self._render_series_waiting(item)
+        if preparation is not None and getattr(self, "_cinematic_enabled", False):
+            preparation.show_hero("series", item)
         if immediate:
             self._commit_series_detail()
         else:
@@ -12984,7 +14028,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             else self._series_info_cache.get(item.stream_id)
         )
         metadata_status = ""
-        loader = getattr(self.client, "load_series_info", None)
+        loader = getattr(self.client, "load_series_summary", None)
+        if loader is None:
+            loader = getattr(self.client, "load_series_info", None)
         if info is None and loader is not None:
             try:
                 info = _bounded_client_call(
@@ -13036,6 +14082,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 token,
                 lambda: completer(item, info),
             )
+            if info is not None:
+                info._vod_metadata_complete = True
+            if info is not None and getattr(self, "_poster_grid_enabled", False):
+                info._grid_metadata_complete = True
             if hasattr(self, "_series_info_cache_lock"):
                 _detail_cache_put(
                     self._series_info_cache,
@@ -13082,6 +14132,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         catalogue_poster_url="",
     ):
         if not self._series_entries:
+            return
+        if getattr(self, "_poster_grid_enabled", False):
+            self._render_grid_detail("series", info)
+            self._apply_grid_cover("series", poster_path, poster_url, catalogue_poster_url)
             return
         cinematic = bool(getattr(self, "_cinematic_enabled", False))
 
@@ -13213,7 +14267,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             stream_id = item.stream_id
             self._apply_series_tile_poster(
                 self._series_selected_index % (
-                    5
+                    CINEMATIC_POSTER_COLUMNS
                     if cinematic
                     else SERIES_GRID_PAGE_SIZE
                 ),
@@ -13229,7 +14283,12 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._render_series_tiles()
 
     def _clear_series_tiles(self):
-        for slot in range(SERIES_GRID_PAGE_SIZE):
+        self._reset_vod_poster_retries()
+        self._release_grid_pixmaps("series")
+        if getattr(self, "_poster_grid_enabled", False):
+            self["series_grid_position"].setText("")
+            self["poster_scroll_more"].hide()
+        for slot in range(getattr(self, "_poster_slot_count", SERIES_GRID_PAGE_SIZE)):
             self["series_tile_title_{}".format(slot)].setText("")
             self["series_tile_bg_{}".format(slot)].hide()
             self["series_tile_inner_{}".format(slot)].hide()
@@ -13246,6 +14305,20 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self.start_load()
             return
         self._remember_series_selection()
+        for name in ("_load_token", "_series_load_token", "_series_more_token",
+                     "_series_detail_token", "_series_poster_token"):
+            _cancel_worker_token(getattr(self, name, None))
+        self._loading = self._series_loading = self._series_more_loading = False
+        self._series_generation += 1
+        self._series_catalog_generation += 1
+        self._series_poster_generation = getattr(self, "_series_poster_generation", 0) + 1
+        self._series_more_result = self._series_detail_preview = self._series_detail_result = None
+        self._series_poster_state = self._series_deferred_poster_jobs = None
+        self._series_ready = self._series_detail_pending = self._series_poster_pending = False
+        browse_catalog = getattr(self, "_series_browser_catalog", None)
+        if browse_catalog is not None:
+            browse_catalog.start(force=True)
+            self._series_index_reload_when_done = True
         for current in self._series_entries:
             url = _safe_picon_url(getattr(current, "icon", ""))
             if url:
@@ -13268,6 +14341,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._start_series_load()
 
     def _select_series_category(self, index):
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.invalidate()
         if not self._entries or self._loading:
             return
         self._remember_series_selection()
@@ -13286,6 +14362,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         focus_changed = self._series_focus != "series"
         self._series_focus = "series"
         index = int(index)
+        if index < 0 and self._vod_window_base("series"):
+            self._request_vod_window("series", index)
+            return
         if index < 0:
             return
         if index >= len(self._series_entries) and self._series_has_more:
@@ -13300,6 +14379,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._series_pending_selection_index = None
         self._series_pending_clamp_to_end = False
         self._series_selected_index = index
+        self._trim_vod_window("series")
         _cancel_worker_token(self._series_detail_token)
         self._series_detail_token = None
         self._series_generation += 1
@@ -13313,6 +14393,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._maybe_load_more_series()
 
     def _series_move_up(self):
+        if (getattr(self, "_poster_grid_enabled", False)
+                and self.content_type == "series" and self._series_focus == "series"):
+            self._move_vod_grid("series", "up")
+            return
         if self._series_focus == "categories":
             self._select_series_category(self.selected_index - 1)
             return
@@ -13326,6 +14410,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._select_series(target)
 
     def _series_move_down(self):
+        if (getattr(self, "_poster_grid_enabled", False)
+                and self.content_type == "series" and self._series_focus == "series"):
+            self._move_vod_grid("series", "down")
+            return
         if self._series_focus == "categories":
             self._select_series_category(self.selected_index + 1)
             return
@@ -13337,11 +14425,15 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._select_series(target)
 
     def _series_move_left(self):
+        if (getattr(self, "_poster_grid_enabled", False)
+                and self.content_type == "series" and self._series_focus == "series"):
+            self._move_vod_grid("series", "left")
+            return
         if self._series_focus == "categories":
             self._select_series_category(self.selected_index - self.page_size)
             return
         if getattr(self, "_cinematic_enabled", False):
-            if self._series_selected_index == 0:
+            if self._series_selected_index == 0 and not self._vod_window_base("series"):
                 self._series_focus = "categories"
                 self._refresh_series_categories()
                 self._render_series_tiles()
@@ -13356,6 +14448,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._select_series(self._series_selected_index - 1)
 
     def _series_move_right(self):
+        if (getattr(self, "_poster_grid_enabled", False)
+                and self.content_type == "series" and self._series_focus == "series"):
+            self._move_vod_grid("series", "right")
+            return
         if self._series_focus == "categories":
             category = self._entries[self.selected_index] if self._entries else None
             if (
@@ -13399,16 +14495,14 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             return
         if not self._series_entries:
             return
-        page_size = (
-            5
-            if getattr(self, "_cinematic_enabled", False)
-            else SERIES_RAIL_PAGE_SIZE
-        )
+        page_size = getattr(self, "_poster_page_size", (
+            CINEMATIC_POSTER_COLUMNS if getattr(self, "_cinematic_enabled", False) else SERIES_RAIL_PAGE_SIZE
+        ))
         target = self._series_selected_index + (
             step * page_size
         )
         if step < 0:
-            target = max(0, target)
+            target = max(-self._vod_window_base("series"), target)
         elif not self._series_has_more:
             target = min(target, len(self._series_entries) - 1)
         if target != self._series_selected_index:
@@ -13457,6 +14551,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if not category_is_current:
             self._clear_series_tiles()
             return
+        browse_catalog = getattr(self, "_series_browser_catalog", None)
+        if browse_catalog is not None:
+            browse_catalog.start()
+            self._series_timer.start(120, True)
         if self._series_loading:
             self._series_timer.start(120, True)
         if self._series_entries:
@@ -13487,6 +14585,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             if _is_stalker_client(self.client)
             else content_client_for(self.account)
         )
+        share = getattr(self.client, "share_series_responses", None)
+        if callable(share):
+            share(episode_client)
         self._open_series_child(
             GTEpisodeListScreen,
             self.account,
@@ -13494,6 +14595,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             episode_client,
             favorite_store=self.favorite_store,
             download_mode=download_mode,
+            series_info=(self._series_info if self._series_info_stream_id
+                         == str(series.stream_id) else None),
         )
 
     def open_series_continue(self):
@@ -13526,21 +14629,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
     def open_series_search(self):
         if self.content_type != "series" or self._closed:
             return
-        if (
-            self._series_loading
-            or self._series_more_loading
-            or self._series_has_more
-            or self._series_pending_category_id is not None
-            or (
-                self._entries
-                and not self._selected_series_category_is_loaded()
-            )
-        ):
-            self["message"].setText(_("Please wait"))
-            self._schedule_series_scan(delay_ms=1)
-            return
-        if not self._series_entries:
-            self["message"].setText(_("No content found."))
+        if (getattr(self, "_series_search_keyboard_open", False)
+                or getattr(self, "_series_search_child_open", False)
+                or self._series_child_open):
             return
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
@@ -13555,19 +14646,49 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 _("Could not open the virtual keyboard.")
             )
             return
-        opener(
-            self._series_search_entered,
-            VirtualKeyBoard,
-            title=_("Search"),
-            text=self._series_search_query,
-        )
+        self._series_search_keyboard_open = True
+        try:
+            opener(
+                self._series_search_entered,
+                VirtualKeyBoard,
+                title=_("Search All Series"),
+                text=self._series_search_query,
+            )
+        except Exception:
+            self._series_search_keyboard_open = False
+            self["message"].setText(_("Could not open the virtual keyboard."))
 
     def _series_search_entered(self, value):
+        self._series_search_keyboard_open = False
         if self._closed or value is None:
             return
         self._series_search_query = " ".join(str(value or "").split())[:120]
         query = _movie_search_text(self._series_search_query)
         if not query:
+            return
+        if callable(getattr(self.client, "iter_series_catalog_items", None)):
+            if getattr(self, "_series_search_child_open", False):
+                return
+            try:
+                search_client = self.client if _is_stalker_client(self.client) else content_client_for(self.account)
+            except Exception:
+                self["message"].setText(_("Could not open the content list."))
+                return
+            self._series_search_child_open = True
+            self._pause_series_for_search()
+            try:
+                self._series_search_child = self.session.openWithCallback(
+                    self._series_search_closed,
+                    GTAllSeriesSearchScreen,
+                    self.account,
+                    search_client,
+                    self.favorite_store,
+                    self._hidden_category_ids,
+                    initial_query=self._series_search_query,
+                )
+            except Exception:
+                self._series_search_closed()
+                self["message"].setText(_("Could not open the content list."))
             return
         terms = query.split()
         matches = []
@@ -13615,7 +14736,79 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if 0 <= index < len(self._series_entries):
             self._select_series(index)
 
+    def _pause_series_for_search(self):
+        self._reset_vod_poster_retries()
+        self._remember_series_selection()
+        catalog = getattr(self, "_series_browser_catalog", None)
+        if catalog is not None:
+            catalog.stop()
+        self._series_search_resume_categories = bool(self._loading)
+        if self._loading:
+            self._load_generation += 1
+            _cancel_worker_token(self._load_token)
+            self._load_token = None
+            self._loading = False
+        self._series_generation += 1
+        self._series_catalog_generation += 1
+        self._series_poster_generation += 1
+        for name in ("_series_load_token", "_series_more_token", "_series_detail_token", "_series_poster_token"):
+            _cancel_worker_token(getattr(self, name, None))
+            setattr(self, name, None)
+        self._series_loading = self._series_more_loading = False
+        self._series_detail_pending = self._series_poster_pending = False
+        self._series_more_result = self._series_detail_preview = self._series_detail_result = None
+        self._series_poster_state = self._series_deferred_poster_jobs = None
+        self._series_pending_category_id = self._series_pending_detail_generation = None
+        for name in ("_timer", "_series_timer", "_series_scan_timer", "_series_category_timer", "_series_detail_timer"):
+            timer = getattr(self, name, None)
+            if timer is not None:
+                try:
+                    timer.stop()
+                except Exception:
+                    pass
+
+    def _series_search_closed(self, *args):
+        if self._closed or not self._series_search_child_open:
+            return
+        child = self._series_search_child
+        self._series_search_child = None
+        self._series_search_child_open = False
+        self._series_search_drain_event = getattr(child, "_provider_workers_idle", None)
+        self._resume_series_after_search()
+
+    def _resume_series_after_search(self):
+        if self._closed:
+            self._series_search_drain_event = None
+            return
+        event = self._series_search_drain_event
+        if self._series_search_child_open or (event is not None and not event.is_set()):
+            self._series_search_resume_timer.start(100, True)
+            return
+        self._series_search_drain_event = None
+        self._reload_favorite_keys()
+        self._series_poster_page_key = None
+        if self._series_search_resume_categories:
+            self._series_search_resume_categories = False
+            self._resume_category_list_after_search()
+        elif self._entries:
+            self._start_series_load()
+
     def _stop_series(self):
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.invalidate()
+        self._reset_vod_poster_retries()
+        pool = getattr(self, "_grid_detail_workers", None)
+        if pool is not None:
+            pool.close()
+        timer = getattr(self, "_series_search_resume_timer", None)
+        if timer is not None:
+            timer.stop()
+        self._series_search_drain_event = None
+        self._series_search_keyboard_open = self._series_search_child_open = False
+        browse_catalog = getattr(self, "_series_browser_catalog", None)
+        if browse_catalog is not None:
+            browse_catalog.stop()
         reset_cinematic = getattr(
             self,
             "_reset_cinematic_backdrop",
@@ -13874,7 +15067,20 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
 
     def _suspend_for_playback(self):
         """Silence optional parent work while a VOD player owns the screen."""
+        preparation = getattr(self, "_vod_preparation", None)
+        if preparation is not None:
+            preparation.pause()
+        self._reset_vod_poster_retries()
+        self._vod_work_suspended = True
+        for name in ("movie_plot", "series_plot"):
+            try:
+                self[name].stop_scroll()
+            except (KeyError, AttributeError):
+                pass
         if self.content_type == "movie":
+            browse_catalog = getattr(self, "_movie_browser_catalog", None)
+            if browse_catalog is not None:
+                browse_catalog.stop()
             reset_cinematic = getattr(
                 self,
                 "_reset_cinematic_backdrop",
@@ -13902,6 +15108,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 except Exception:
                     pass
         elif self.content_type == "series":
+            browse_catalog = getattr(self, "_series_browser_catalog", None)
+            if browse_catalog is not None:
+                browse_catalog.stop()
             reset_cinematic = getattr(
                 self,
                 "_reset_cinematic_backdrop",
@@ -13980,18 +15189,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 return
             if self._movie_focus == "categories":
                 category = self._entries[self.selected_index]
-                if not str(
-                    getattr(category, "category_id", "") or ""
-                ).strip():
-                    self.open_movie_search()
-                    return
-                if self._movie_entries:
+                loaded = self._movie_loaded_category_id == category.category_id
+                if loaded and self._movie_entries and not self._movie_loading:
                     self._movie_focus = "posters"
                     self._schedule_movie_detail()
                     self._render_movie_posters()
                     self._refresh_movie_categories()
-                else:
-                    self._start_movie_load()
+                elif not loaded or not (
+                    self._movie_loading or self._movie_more_loading
+                ):
+                    self._start_movie_load(category)
                 return
             if self._movie_entries and not self._movie_loading:
                 open_extplayer(
@@ -14015,7 +15222,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     self._schedule_series_detail()
                     self._refresh_series_categories()
                     self._render_series_tiles()
-                else:
+                elif not loaded or not (self._series_loading or self._series_more_loading):
                     self._start_series_load(category)
                 return
             self.open_series_episode_list()
@@ -14053,6 +15260,9 @@ class _GTStreamListBase(GTAsyncListScreen):
     """Shared catalogue primitives; live browsing never owns a decoder."""
 
     def refresh_streams(self):
+        for name in ("_load_token", "_live_more_token"):
+            _cancel_worker_token(getattr(self, name, None))
+        self._loading = False
         invalidator = getattr(self.client, "invalidate_cache", None)
         if invalidator is not None:
             try:
@@ -14149,7 +15359,7 @@ class _GTStreamListBase(GTAsyncListScreen):
         self._live_more_token = None
         self._live_has_more = bool(has_more)
         if error:
-            self._live_has_more = False
+            self._live_pending_target_index = None
             if not self._entries:
                 self._error = error
             else:
@@ -14231,6 +15441,8 @@ class _GTStreamListBase(GTAsyncListScreen):
             return
         except ContentError as caught:
             error = str(caught)
+            checker = getattr(self.client, "has_more_items", None)
+            has_more = bool(checker is not None and checker("live", self.category.category_id))
         except Exception:
             error = N_("Could not load content")
         if token is not None:
@@ -14507,6 +15719,7 @@ class _LiveStartupRecoverySupport(object):
 
 
 class GTStreamListScreen(
+    LiveProgrammePosterMixin,
     _LiveStartupRecoverySupport,
     _FavoriteSupport,
     _GTStreamListBase,
@@ -14546,6 +15759,7 @@ class GTStreamListScreen(
         self._opaque_background = True
         self._screen_background_path = LIVE_GUIDE_BACKGROUND_PATH
         self._active_live_service_type = None
+        settings = None
         try:
             settings = load_player_settings()
             self._active_live_service_type = int(
@@ -14595,6 +15809,7 @@ class GTStreamListScreen(
         self._live_picon_prefetch_completed = set()
         self._live_picon_prefetch_tokens = set()
         self._live_picon_prefetch_worker_counts = {}
+        self._init_programme_poster(eTimer, _connect_timer, settings)
 
         self._preview_item = None
         self._preview_epg_events = []
@@ -14605,6 +15820,10 @@ class GTStreamListScreen(
         self._detail_page_key = None
         self._detail_generation = 0
         self._detail_deadline = 0.0
+        self._detail_selection_started_at = 0.0
+        self._detail_epg_retry_count = 0
+        self._detail_epg_retry_key = ""
+        self._detail_epg_retry_deadline = 0.0
         self._detail_results = {}
         self._detail_results_lock = threading.Lock()
         self._detail_store = {}
@@ -14654,6 +15873,7 @@ class GTStreamListScreen(
         self._fullscreen_link_snapshot = None
 
         self._detail_dwell_timer = eTimer()
+        self._detail_epg_retry_timer = eTimer()
         self._detail_poll_timer = eTimer()
         self._detail_prefetch_timer = eTimer()
         self._detail_progress_timer = eTimer()
@@ -14673,6 +15893,7 @@ class GTStreamListScreen(
         self._live_active_picon_poll_timer = eTimer()
         self._live_picon_prefetch_poll_timer = eTimer()
         _connect_timer(self._detail_dwell_timer, self._detail_dwell_fired)
+        _connect_timer(self._detail_epg_retry_timer, self._selected_epg_retry_fired)
         _connect_timer(self._detail_poll_timer, self._detail_poll)
         _connect_timer(self._detail_prefetch_timer, self._detail_prefetch_fired)
         _connect_timer(self._detail_progress_timer, self._detail_progress_tick)
@@ -14734,21 +15955,26 @@ class GTStreamListScreen(
             role="title",
             value="standard",
         )
-        self._list_scroll_geometry = (
-            px(432 + 952 - 9), px(166), px(4), px(774)
+        side_geometry = live_guide_side_geometry(width, height, px)
+        self._list_scroll_geometry = side_geometry["list_scrollbar"]
+        self._live_channel_name_font = font_px(
+            px, {"standard": 24, "large": 26, "very_large": 28}[current_text_size()],
+            value="standard", max_height=64, vertical_padding=4,
         )
-        self._summary_scrollbar_geometry = (
-            px(8 + 414 - 20), px(633), px(5), px(282)
+        self._live_channel_name_min_font = font_px(
+            px, 18, value="standard", max_height=64, vertical_padding=4,
         )
-        summary_width = px(414 - 64)
+        self._summary_scrollbar_geometry = side_geometry["summary_scrollbar"]
+        unused_x, unused_y, summary_width, summary_height = side_geometry["summary"]
         self._summary_font_size = font_px(
-            px, 23, max_height=282, vertical_padding=5
+            px, 23, vertical_padding=5
         )
+        self._summary_text_width = max(1, summary_width - px(2))
         self._summary_line_capacity = max(
-            8, int(summary_width / max(1, self._summary_font_size * 0.66))
+            8, int(self._summary_text_width / max(1, self._summary_font_size * 0.58))
         )
         self._summary_visible_lines = max(
-            1, int(px(282) / max(1, self._summary_font_size * 1.22))
+            1, int(summary_height / max(1, self._summary_font_size * 1.22))
         )
         title = CONTENT_LABELS[self.content_type][0]
         GTAsyncListScreen.__init__(
@@ -14794,6 +16020,8 @@ class GTStreamListScreen(
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._preview_layout_ready)
             self.onLayoutFinish.append(self._refresh_summary_scroll_indicator)
+            self.onLayoutFinish.append(self._refit_live_summary)
+            self.onLayoutFinish.append(self._refit_live_channel_names)
 
     def _setup_live_widgets(self, px):
         self["root_fill"] = Label("")
@@ -14806,6 +16034,8 @@ class GTStreamListScreen(
         self["clock_date"] = Label("")
         self["detail_picon"] = Pixmap()
         self["detail_picon"].hide()
+        self["detail_programme_poster"] = Pixmap()
+        self["detail_programme_poster"].hide()
         self["left_panel_art"] = Pixmap()
         self["right_panel_art"] = Pixmap()
         for panel in ("left", "right"):
@@ -14846,7 +16076,7 @@ class GTStreamListScreen(
         self["ribbon_clock"] = Label("")
         self["ribbon_next_title"] = Label("")
         self["ribbon_next_time"] = Label("")
-        self["preview_frame"] = Label("")
+        self["preview_frame"] = Pixmap()
         if VideoWindow is not None:
             self["preview_video"] = VideoWindow(
                 decoder=0,
@@ -14866,6 +16096,11 @@ class GTStreamListScreen(
             self["epg_{}_time".format(row)] = Label("")
             self["epg_{}_title".format(row)] = Label("")
             self["epg_{}_status".format(row)] = Label("")
+        # Current programme details already appear on the left. Keep these
+        # legacy components available to external skins without a second row.
+        self["epg_now_time"].hide()
+        self["epg_now_title"].hide()
+        self["epg_now_status"].hide()
         self["epg_progress_bg"] = Label("")
         self["epg_progress_fill"] = Label("")
         self["epg_progress"] = Label("")
@@ -15227,6 +16462,22 @@ class GTStreamListScreen(
                 self._ensure_live_active_picon()
             )
 
+    def _set_live_channel_name(self, row_index, value):
+        return fit_dynamic_text(
+            self["stream_name_{}".format(row_index)], value, max_lines=2,
+            preferred_size=self._live_channel_name_font,
+            min_size=self._live_channel_name_min_font,
+        )
+
+    def _refit_live_channel_names(self):
+        # A cached page may have arrived before native labels had geometry.
+        # Refit only visible names after layout, without another provider call.
+        if self._closed or not self._entries:
+            return
+        page_start = int(self.selected_index / self.page_size) * self.page_size
+        for row_index, item in enumerate(self._entries[page_start:page_start + self.page_size]):
+            self._set_live_channel_name(row_index, str(item.name or ""))
+
     def _refresh_live_streams(self):
         if self._error:
             ellipsize_dynamic_text(
@@ -15271,11 +16522,7 @@ class GTStreamListScreen(
                     self["stream_number_{}".format(row_index)].setText(
                         "{:04d}".format(absolute_index + 1)
                     )
-                    rendered_name = ellipsize_dynamic_text(
-                        self["stream_name_{}".format(row_index)],
-                        str(item.name or ""),
-                        fallback_chars=25,
-                    )
+                    rendered_name = self._set_live_channel_name(row_index, str(item.name or ""))
                     plain_lines.append(rendered_name)
                     if self._is_favorite(item):
                         self["stream_favorite_{}".format(row_index)].show()
@@ -15856,9 +17103,9 @@ class GTStreamListScreen(
         if events:
             return events
         if _is_m3u_client(self.client):
-            # M3UContentClient.load_epg() is explicitly a RAM-snapshot lookup;
-            # XML/file/network refresh belongs to the session scheduler.
-            loader = getattr(self.client, "load_epg", None)
+            # Cold index reads belong to the existing EPG workers. Immediate
+            # row rendering only peeks at already decoded channel data.
+            loader = getattr(self.client, "peek_epg", None)
             if callable(loader):
                 try:
                     return list(loader(stream_id, LIVE_EPG_FETCH_LIMIT) or [])
@@ -16064,6 +17311,8 @@ class GTStreamListScreen(
     def _show_selected_local_detail(self, item, key):
         # Selection changes remain purely local and therefore cannot slow
         # rapid UP/DOWN navigation.
+        if key != self._detail_selection_key or not self._detail_selection_started_at:
+            self._detail_selection_started_at = time.monotonic()
         ellipsize_dynamic_text(
             self["ribbon_channel"],
             localized_upper(item.name),
@@ -16109,6 +17358,8 @@ class GTStreamListScreen(
         page_key = self._visible_detail_page()[0]
         page_changed = page_key != self._detail_page_key
         selection_changed = key != self._detail_selection_key
+        if selection_changed:
+            self._detail_epg_retry_count = 0
 
         if selection_changed or page_changed:
             # Cancel stale priorities immediately. Socket calls already in
@@ -16129,6 +17380,8 @@ class GTStreamListScreen(
         preview_ready = self._selected_detail_preview_ready(key)
         if selected_complete:
             if preview_ready:
+                if not cached.get("events") and self._provider_epg_loader() is not None:
+                    self._schedule_selected_epg_retry(key)
                 self._schedule_detail_prefetch()
             return
         if not preview_ready:
@@ -16170,8 +17423,12 @@ class GTStreamListScreen(
         _cancel_worker_token(state.get("token"))
 
     def _cancel_selected_detail(self, clear_selection=False):
+        self._cancel_programme_poster()
+        self._detail_epg_retry_key = ""
+        self._detail_epg_retry_deadline = 0.0
         for timer in (
             self._detail_dwell_timer,
+            self._detail_epg_retry_timer,
             self._detail_poll_timer,
             self._detail_prefetch_timer,
             self._detail_progress_timer,
@@ -16196,6 +17453,44 @@ class GTStreamListScreen(
         if clear_selection:
             self._detail_selection_key = None
             self._detail_page_key = None
+            self._detail_epg_retry_count = 0
+            self._detail_selection_started_at = 0.0
+
+    def _schedule_selected_epg_retry(self, key):
+        """Retry a still-selected channel at most twice after its existing cooldown."""
+        if (self._closed or self._fullscreen_active
+                or getattr(self, "_live_modal_active", False)
+                or not key or key != self._detail_selection_key
+                or self._detail_epg_retry_count >= LIVE_DETAIL_EPG_RETRY_LIMIT
+                or not self._selected_detail_preview_ready(key)):
+            return
+        now = time.monotonic()
+        if self._detail_epg_retry_key == key and self._detail_epg_retry_deadline > now:
+            return
+        with self._detail_store_lock:
+            entry = self._detail_store.get(key, {})
+            retry_at = float(entry.get("epg_retry_after", 0.0) or 0.0)
+        if retry_at <= now:
+            retry_at = now + LIVE_DETAIL_EMPTY_RETRY_SECONDS
+        self._detail_epg_retry_key = key
+        self._detail_epg_retry_deadline = retry_at + 0.1
+        self._detail_epg_retry_count += 1
+        self._detail_epg_retry_timer.start(
+            max(100, int((self._detail_epg_retry_deadline - now) * 1000)), True,
+        )
+        log_event("programme_art", "stage=epg outcome=retry-scheduled attempt={} delay_ms={}".format(
+            self._detail_epg_retry_count, int((self._detail_epg_retry_deadline - now) * 1000)))
+
+    def _selected_epg_retry_fired(self):
+        key = self._detail_epg_retry_key
+        self._detail_epg_retry_key = ""
+        self._detail_epg_retry_deadline = 0.0
+        if (self._closed or self._fullscreen_active
+                or getattr(self, "_live_modal_active", False)
+                or key != self._detail_selection_key
+                or not self._selected_detail_preview_ready(key)):
+            return
+        self._schedule_selected_detail()
 
     def _detail_dwell_fired(self):
         if self._closed or self._fullscreen_active or not self._entries:
@@ -16316,6 +17611,8 @@ class GTStreamListScreen(
         store_epoch=None,
         worker_token=None,
     ):
+        started = time.monotonic()
+        outcome = "empty"
         events = []
         try:
             if worker_token is not None:
@@ -16335,6 +17632,7 @@ class GTStreamListScreen(
                 )
             if worker_token is not None:
                 worker_token.check()
+            outcome = "ready" if events else "empty"
             self._publish_detail_component(
                 generation,
                 stream_id,
@@ -16343,8 +17641,9 @@ class GTStreamListScreen(
                 store_epoch=store_epoch,
             )
         except _WorkerCancelled:
-            pass
+            outcome = "cancelled"
         except Exception:
+            outcome = "error"
             if worker_token is None or worker_token.active():
                 self._publish_detail_component(
                     generation,
@@ -16354,6 +17653,8 @@ class GTStreamListScreen(
                     store_epoch=store_epoch,
                 )
         finally:
+            log_event("programme_art", "stage=epg outcome={} elapsed_ms={} events={}".format(
+                outcome, int((time.monotonic() - started) * 1000), len(events or [])))
             worker_event.set()
 
     def _load_detail_picon_path(self, item, worker_token=None):
@@ -16617,6 +17918,7 @@ class GTStreamListScreen(
 
     def _clear_live_selected_picon(self, reset_signature=True):
         self._live_selected_picon_generation += 1
+        self._live_selected_picon_ready = False
         self._close_live_pixmap_loader(self, "live-selected-picon")
         try:
             self["detail_picon"].hide()
@@ -16624,6 +17926,7 @@ class GTStreamListScreen(
             pass
         if reset_signature:
             self._live_selected_picon_signature = None
+            self._cancel_programme_poster()
 
     def _refresh_live_visible_picons(
         self,
@@ -16697,7 +18000,7 @@ class GTStreamListScreen(
             )
 
     def _refresh_selected_picon(self, force=False):
-        """Show the selected channel logo in the large left-hand slot."""
+        """Refresh only the right poster; large channel logos were removed."""
         if (
             self._closed
             or self._fullscreen_active
@@ -16706,46 +18009,7 @@ class GTStreamListScreen(
         ):
             self._clear_live_selected_picon()
             return
-        item = self._entries[self.selected_index]
-        key = self._selection_key(item)
-        cached = self._detail_store_snapshot(key, item=item)
-        path = str(cached.get("picon_path", "") or "").strip()
-        if not path or not _valid_live_picon_file(path):
-            path = ""
-        signature = (key, path)
-        if not force and signature == self._live_selected_picon_signature:
-            return
-        self._clear_live_selected_picon(reset_signature=False)
-        self._live_selected_picon_signature = signature
-        if not path:
-            return
-        generation = self._live_selected_picon_generation
-
-        def loaded(success):
-            if (
-                generation != self._live_selected_picon_generation
-                or signature != self._live_selected_picon_signature
-                or self._closed
-                or self._fullscreen_active
-                or not self._entries
-                or self._selection_key(self._entries[self.selected_index]) != key
-            ):
-                return
-            try:
-                if success:
-                    self["detail_picon"].show()
-                else:
-                    self["detail_picon"].hide()
-            except Exception:
-                pass
-
-        attach_native_alpha_pixmap(
-            self,
-            "detail_picon",
-            path,
-            key="live-selected-picon",
-            on_loaded=loaded,
-        )
+        self._schedule_programme_poster()
 
     def _cancel_live_picon_prefetch(self, clear_render=False):
         """Cancel the bounded category queue without touching disk cache."""
@@ -17375,6 +18639,8 @@ class GTStreamListScreen(
                         LIVE_DETAIL_PROGRESS_INTERVAL_MS,
                         True,
                     )
+                else:
+                    self._schedule_selected_epg_retry(stream_id)
             elif component == "picon_path":
                 path = str(value or "").strip()
                 self._detail_picon_path = (
@@ -17431,6 +18697,7 @@ class GTStreamListScreen(
         )
 
     def _render_detail_waiting(self, item):
+        self._schedule_programme_poster()
         ellipsize_dynamic_text(
             self["ribbon_channel"],
             localized_upper(item.name),
@@ -17454,6 +18721,8 @@ class GTStreamListScreen(
         self._set_summary(_("Waiting for programme information"))
 
     def _render_selected_epg(self, events):
+        self._schedule_programme_poster()
+        unused_width, unused_height, px = _scale()
         events = self._detail_window() if events else []
         if not events:
             self["ribbon_now_time"].setText("--:--")
@@ -17520,9 +18789,12 @@ class GTStreamListScreen(
             if event is None:
                 title_label.setText("")
             else:
-                ellipsize_dynamic_text(
+                fit_dynamic_text(
                     title_label,
                     event.title,
+                    max_lines=2,
+                    preferred_size=font_px(px, 22, max_height=64, vertical_padding=8),
+                    min_size=font_px(px, 18, max_height=64, vertical_padding=8),
                     fallback_chars=54,
                 )
             status_label.setText(
@@ -17765,6 +19037,7 @@ class GTStreamListScreen(
         if self._closed or self._fullscreen_active:
             return
         self._update_epg_clock()
+        self._schedule_programme_poster()
         self._epg_clock_timer.start(1000, True)
 
     def _clear_epg_progress(self):
@@ -17790,18 +19063,27 @@ class GTStreamListScreen(
             pass
         fill.show()
 
-    def _set_summary(self, summary):
+    def _refit_live_summary(self):
+        # Provider text can arrive before native labels have their final font.
+        if not self._closed and self._summary_text:
+            self._set_summary(self._summary_text, force=True)
+
+    def _set_summary(self, summary, force=False):
         rendered = clean_dynamic_text(summary)
         selection_key = self._detail_selection_key
         text_changed = rendered != self._summary_text
         selection_changed = selection_key != self._summary_selection_key
-        if not text_changed and not selection_changed:
+        if not force and not text_changed and not selection_changed:
             return rendered
         self._summary_scroll_timer.stop()
         self._summary_text = rendered
         self._summary_selection_key = selection_key
         self._summary_lines = _wrap_live_summary(
-            rendered, self._summary_line_capacity
+            rendered, self._summary_line_capacity,
+            fits=lambda value: _line_fits(
+                self["summary"], value, self._summary_text_width,
+                self._summary_font_size, None,
+            ),
         )
         self._summary_line_offset = 0
         self._render_summary_window()
@@ -18455,127 +19737,315 @@ class GTStreamListScreen(
 
 
 class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
-    def __init__(
-        self,
-        session,
-        account,
-        series,
-        client=None,
-        favorite_store=None,
-        download_mode=False,
-    ):
+    """Account-scoped cinematic season browser with durable completion dates."""
+
+    def __init__(self, session, account, series, client=None, favorite_store=None,
+                 download_mode=False, series_info=None):
         self.download_mode = bool(download_mode)
         self.series = series
         self.client = client or content_client_for(account)
+        self._watched_store = WatchedEpisodeStore()
+        self._resume_store = PlaybackResumeStore()
+        self._watched_records = {}
+        self._resume_records = {}
+        self._all_episode_entries = []
+        self._season_groups = []
+        self._season_index = 0
+        self._season_selection = {}
+        self._episode_pane = "episodes"
+        self._episode_action = 0
+        self._provider_info = series_info
+        self._series_detail_info = series_info
+        self._episode_keys_bound = False
+        self._episode_key_map = None
+        self._episode_key_ids = set()
+        self._episode_ok_key_code = None
+        self._episode_metadata_started = False
+        self._episode_art_token = None
+        self._episode_art_path = ""
+        self._episode_state_generation = 0
+        self._episode_reload_selection = None
+        self._episode_resume_request = ""
+        self._episode_pending_watched = None
         self._init_favorite_support(favorite_store)
         self._footer_layout_items = (
-            EPISODE_DOWNLOAD_FOOTER_ITEMS
-            if self.download_mode else EPISODE_FOOTER_ITEMS
+            EPISODE_DOWNLOAD_FOOTER_ITEMS if self.download_mode else EPISODE_FOOTER_ITEMS
         )
         self._footer_layout_stacked = True
+        self._footer_transparent_panel = True
+        self._footer_show_dividers = False
         self.skin = prepared_skin(_episode_list_skin)
-        self.page_size = EPISODE_PAGE_SIZE
-        screen_width, screen_height, px = _scale()
-        margin = px(64)
-        self._list_scroll_geometry = (
-            margin + (screen_width - (margin * 2)) - px(50),
-            px(224),
-            px(8),
-            px(613),
-        )
-        GTAsyncListScreen.__init__(
-            self,
-            session,
-            "GTEpisodeListScreen",
-            series.name,
-            _("{}  >  Series  >  Select season and episode").format(
-                account.display_name
-            ),
-            frameless_footer=True,
-        )
-        self._dynamic_episode_header_text = series.name
-        self._episode_header_preferred_font = font_px(
-            px,
-            34,
-            role="title",
-        )
-        self._episode_header_min_font = font_px(
-            px,
-            34,
-            role="title",
-            value="standard",
-        )
-        self._refit_episode_header()
-        self["screen_label"].setText(_("EPISODES"))
-        for color in ("cyan", "magenta"):
-            self["episode_panel_accent_{}".format(color)] = Label("")
-        self["episode_caption"] = Label(_("EPISODES"))
-        self["episode_caption_accent"] = Label("")
-        for index in range(EPISODE_PAGE_SIZE):
-            self["episode_row_bg_{}".format(index)] = Label("")
-            self["episode_number_{}".format(index)] = Label("")
-            self["episode_name_{}".format(index)] = Label("")
-            for edge in ("fill", "top", "bottom", "left", "right"):
-                self[
-                    "episode_focus_{}_{}".format(index, edge)
-                ] = Label("")
-        self._clear_episode_rows()
+        self.page_size = EPISODE_ROWS
+        width, height, px = _scale()
+        self._episode_geometry = episode_geometry(width, height, px)
+        self._footer_panel_height = int(round(self._episode_geometry["footer_h"]
+            / min(width / 1920.0, height / 1080.0)))
+        self._footer_bottom_padding = 0
+        self._footer_show_web_hint = False
+        self._list_scroll_geometry = self._episode_geometry["list_scroll"]
+        self._screen_background_path = APP_BACKGROUND_PATH
+        GTAsyncListScreen.__init__(self, session, "GTEpisodeListScreen", series.name,
+                                   _("Series") + "  /  " + series.name,
+                                   frameless_footer=True)
+        for name in EPISODE_LABEL_NAMES:
+            self[name] = Label("")
+        for name in EPISODE_PIXMAP_NAMES:
+            self[name] = Pixmap()
+        self._episode_state_reader = SourceLoader(eTimer(), _connect_timer,
+                                                  self._episode_state_loaded)
+        self._episode_art_reader = SourceLoader(eTimer(), _connect_timer,
+                                                self._episode_art_loaded)
+        self._episode_ok_key = LiveZeroKey(
+            eTimer, self._episode_key_active, self.open_selected,
+            self.toggle_selected_watched, prime_native=self._prime_episode_ok)
         self["actions"] = ActionMap(
             ["OkCancelActions", "DirectionActions", "ColorActions", "MenuActions"],
-            {
-                "ok": self.open_selected,
-                "menu": self.download_selected,
-                "cancel": self.close,
-                "up": self.move_up,
-                "down": self.move_down,
-                "upRepeated": self.move_up,
-                "downRepeated": self.move_down,
-                "left": self.page_up,
-                "right": self.page_down,
-                "leftRepeated": self.page_up,
-                "rightRepeated": self.page_down,
-                "red": self.toggle_series_favorite,
-                "green": self.start_load,
-            },
-            -1,
-        )
+            {"ok": self.open_selected, "oklong": self.toggle_selected_watched,
+             "ok_long": self.toggle_selected_watched,
+             "menu": self.download_selected, "cancel": self.close,
+             "up": self.move_up, "down": self.move_down,
+             "upRepeated": self.move_up, "downRepeated": self.move_down,
+             "left": self.episode_left, "right": self.episode_right,
+             "leftRepeated": self.episode_left, "rightRepeated": self.episode_right,
+             "red": self.toggle_series_favorite, "green": self.start_load}, -1)
         self["channel_actions"] = ActionMap(
             ["MoviePlayerActions"],
-            {
-                "channelUp": self.previous_page,
-                "channelDown": self.next_page,
-            },
-            -1,
-        )
-        if hasattr(self, "onShown"):
-            self.onShown.append(self._favorite_screen_shown)
-        if hasattr(self, "onLayoutFinish"):
-            self.onLayoutFinish.append(self._refit_episode_header)
+            {"channelUp": self.previous_page, "channelDown": self.next_page}, -1)
+        self._episode_clock_timer = eTimer()
+        _connect_timer(self._episode_clock_timer, self._episode_clock_tick)
+        self.onExecBegin.append(self._bind_episode_keys)
+        self.onExecEnd.append(self._unbind_episode_keys)
+        self.onShown.append(self._episode_screen_shown)
+        self.onLayoutFinish.append(self._episode_layout_ready)
+        self.onClose.append(self._stop_episode_screen)
+        self["episode_backdrop"].hide()
+        self["episode_scrim"].hide()
+        self["season_tabs_focus"].hide()
+        self._clear_episode_rows()
+        self._render_episode_details()
 
-    def _refit_episode_header(self):
-        fit_dynamic_text(
-            self["header"],
-            self._dynamic_episode_header_text,
-            max_lines=1,
-            preferred_size=self._episode_header_preferred_font,
-            min_size=self._episode_header_min_font,
-            fallback_chars=65,
-        )
+    def _episode_layout_ready(self):
+        from .channel_highlight import saved_selection_palette
+        fill, border = saved_selection_palette()
+        fill_path, border_path = episode_focus_assets(fill, border)
+        for i in range(self.page_size):
+            for suffix, path in (("", border_path), ("_fill", fill_path)):
+                name = ("episode_focus_fill_{}" if suffix else "episode_focus_{}").format(i)
+                attach_native_alpha_pixmap(self, name, path, key=name)
+        for i in range(3):
+            name = "episode_action_focus_{}".format(i)
+            attach_native_alpha_pixmap(self, name, border_path, key=name)
+        attach_native_alpha_pixmap(self, "season_tabs_focus", border_path,
+                                   key="episode-season-focus")
+        self._render_episode_details()
+        self._refresh()
+
+    def _episode_screen_shown(self):
+        self._favorite_screen_shown()
+        self._episode_clock_tick()
+
+    def _episode_clock_tick(self):
+        if self._closed:
+            return
+        self["episode_clock"].setText(time.strftime("%H:%M"))
+        if bool(getattr(self, "execing", True)):
+            self._episode_clock_timer.start(30000, True)
+
+    def _episode_key_active(self):
+        return bool(not self._closed and not self._loading
+                    and getattr(self, "execing", True) and self._entries)
+
+    def _bind_episode_keys(self):
+        if self._closed or self._episode_keys_bound:
+            return
+        try:
+            from enigma import eActionMap
+            from keyids import KEYIDS
+            self._episode_key_ids = set(KEYIDS[name] for name in ("KEY_OK", "KEY_ENTER")
+                                        if name in KEYIDS)
+            self._episode_key_map = eActionMap.getInstance()
+            self._episode_key_map.bindAction("", -110, self._episode_key_event)
+            self._episode_keys_bound = True
+        except (ImportError, AttributeError, RuntimeError, TypeError) as error:
+            log_event("episodes", "remote-bind-failed", error)
+        self._episode_clock_tick()
+
+    def _prime_episode_ok(self):
+        if (self._episode_key_map is not None
+                and self._episode_ok_key_code in self._episode_key_ids):
+            self._episode_key_map.keyPressed("", self._episode_ok_key_code, 0)
+
+    def _episode_key_event(self, key, flag):
+        if key not in self._episode_key_ids:
+            return 0
+        self._episode_ok_key_code = key
+        return self._episode_ok_key.handle(flag)
+
+    def _unbind_episode_keys(self):
+        self._episode_ok_key.cancel()
+        self._episode_clock_timer.stop()
+        if self._episode_keys_bound and self._episode_key_map is not None:
+            try:
+                self._episode_key_map.unbindAction("", self._episode_key_event)
+            except (AttributeError, RuntimeError, TypeError):
+                pass
+        self._episode_keys_bound = False
+        self._episode_ok_key_code = None
+
+    def _stop_episode_screen(self):
+        self._unbind_episode_keys()
+        self._episode_ok_key.close()
+        _cancel_worker_token(self._episode_art_token)
+        self._episode_art_token = None
+        self._episode_state_generation += 1
+        self._episode_resume_request = ""
+        self._episode_pending_watched = None
+        self._episode_state_reader.close()
+        self._episode_art_reader.close()
+
+    def start_load(self):
+        if self._loading or self._closed:
+            return
+        if self._entries:
+            self._episode_reload_selection = (
+                self._season_groups[self._season_index][0],
+                episode_watch_key(self.client, self._entries[self.selected_index]))
+        self._clear_episode_rows()
+        GTAsyncListScreen.start_load(self)
+        self["items"].setText("")
+
+    def load_items(self):
+        restore = getattr(self.client, "restore_series_catalog_item", None)
+        if callable(restore) and getattr(self.series, "portal_catalog_page", None) is not None:
+            restore(self.series)
+        info = self._provider_info
+        loader = getattr(self.client, "load_series_info", None)
+        if callable(loader):
+            loaded = loader(self.series.stream_id)
+            if loaded is not None:
+                info = loaded
+        entries = getattr(info, "episodes", None) if info is not None else None
+        if entries is None or not entries:
+            entries = self.client.load_episodes(self.series.stream_id)
+        entries = list(entries or [])
+        for episode in entries:
+            episode.parent_id = str(self.series.stream_id)
+            episode.favorite_parent = self.series
+            if not getattr(episode, "icon", ""):
+                episode.icon = getattr(self.series, "icon", "")
+        return entries, info
+
+    def _prepare_loaded_items(self, value):
+        entries, info = value
+        watched = self._watched_store.records(refresh=True)
+        bookmarks = self._resume_store.get_many(resume_key(self.client, item) for item in entries)
+        return entries, info, watched, bookmarks
+
+    def _commit_loaded_items(self, value, generation):
+        if self._closed or generation != self._load_generation:
+            return
+        if not isinstance(value, tuple) or len(value) != 4:
+            value = ([], self._provider_info, {}, {})
+        entries, info, watched, bookmarks = value
+        self._all_episode_entries = entries
+        self._provider_info = info
+        self._series_detail_info = info or self._series_detail_info
+        self._watched_records, self._resume_records = watched, bookmarks
+        self._season_groups = group_episode_seasons(entries)
+        self._season_index = 0
+        target = preferred_resume_index(entries, bookmarks, set(watched), self.client)
+        selection = self._episode_reload_selection
+        if selection:
+            target = next((i for i, item in enumerate(entries)
+                           if episode_watch_key(self.client, item) == selection[1]), target)
+        target_item = entries[target] if target is not None and target < len(entries) else None
+        self._entries = []
+        for i, (season, items) in enumerate(self._season_groups):
+            if target_item is not None and target_item in items:
+                self._season_index = i
+                self._entries = items
+                self.selected_index = items.index(target_item)
+                break
+        if not self._entries and self._season_groups:
+            self._entries = self._season_groups[0][1]
+            self.selected_index = 0
+        self._episode_reload_selection = None
+
+    def _poll_result(self):
+        GTAsyncListScreen._poll_result(self)
+        if not self._closed and not self._loading and self._ready:
+            self._render_episode_details()
+            if self._entries and not self._episode_metadata_started:
+                self._episode_metadata_started = True
+                self._start_episode_artwork()
+
+    def empty_message(self):
+        return N_("No episodes were found for this series.")
+
+    def _change_season(self, step):
+        if self._loading or not self._season_groups:
+            return
+        old = self._season_groups[self._season_index][0]
+        self._season_selection[old] = self.selected_index
+        self._season_index = (self._season_index + step) % len(self._season_groups)
+        season, self._entries = self._season_groups[self._season_index]
+        self.selected_index = min(self._season_selection.get(season, 0), len(self._entries) - 1)
+        self._refresh()
+
+    def move_up(self):
+        if self._episode_pane == "actions":
+            self._episode_action = (self._episode_action - 1) % 3
+        elif self._episode_pane == "seasons":
+            self._episode_pane, self._episode_action = "actions", 0
+        elif self.selected_index == 0:
+            self._episode_pane = "seasons"
+        else:
+            self._select(self.selected_index - 1)
+            return
+        self._refresh()
+
+    def move_down(self):
+        if self._episode_pane == "actions":
+            self._episode_action = (self._episode_action + 1) % 3
+        elif self._episode_pane == "seasons":
+            self._episode_pane = "episodes"
+        else:
+            self._select(self.selected_index + 1)
+            return
+        self._refresh()
+
+    def episode_left(self):
+        if self._episode_pane == "seasons":
+            self._change_season(-1)
+        elif self._episode_pane == "actions" and self._episode_action == 2:
+            self._episode_action = 1
+            self._refresh()
+        else:
+            self._episode_pane, self._episode_action = "actions", 0
+            self._refresh()
+
+    def episode_right(self):
+        if self._episode_pane == "seasons":
+            self._change_season(1)
+        elif self._episode_pane == "actions":
+            if self._episode_action == 1:
+                self._episode_action = 2
+            else:
+                self._episode_pane = "episodes"
+            self._refresh()
+        else:
+            self._episode_pane = "seasons"
+            self._refresh()
 
     def _change_episode_page(self, direction):
         if not self._entries or self._loading:
             return
-        current_start = int(self.selected_index / self.page_size) * self.page_size
-        last_start = int((len(self._entries) - 1) / self.page_size) * self.page_size
-        target_start = max(
-            0,
-            min(current_start + (int(direction) * self.page_size), last_start),
-        )
-        if target_start == current_start:
-            return
-        row = self.selected_index - current_start
-        target_count = min(self.page_size, len(self._entries) - target_start)
-        self.selected_index = target_start + min(row, target_count - 1)
+        self._episode_pane = "episodes"
+        start = self.selected_index // self.page_size * self.page_size
+        last = (len(self._entries) - 1) // self.page_size * self.page_size
+        target = max(0, min(start + direction * self.page_size, last))
+        self.selected_index = target + min(self.selected_index - start,
+                                           len(self._entries) - target - 1)
         self._refresh()
 
     def previous_page(self):
@@ -18584,107 +20054,272 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
     def next_page(self):
         self._change_episode_page(1)
 
-    def start_load(self):
-        if self._loading or self._closed:
-            return
-        self._clear_episode_rows()
-        GTAsyncListScreen.start_load(self)
-        self["items"].setText("")
+    def _episode_fit(self, name, value, lines=1):
+        fonts = self._episode_geometry.get("fonts", {})
+        font_key = {"series_title": "title", "series_meta": "meta", "series_genre": "genre",
+                    "series_plot": "plot", "series_cast": "cast", "episode_resume_text": "resume",
+                    "episode_resume_detail": "resume_detail", "episode_favorite_text": "favorite",
+                    "episode_download_text": "download", "season_progress_text": "progress_text"}.get(name, name)
+        if name.startswith("season_tab_"):
+            font_key = "season"
+        preferred = fonts.get(font_key)
+        kwargs = {"max_lines": lines, "fallback_chars": 90 if lines > 1 else 55}
+        if isinstance(preferred, (int, float)):
+            kwargs.update(preferred_size=int(preferred), min_size=max(9, int(preferred * 0.70)))
+        fit_dynamic_text(self[name], str(value or ""), **kwargs)
 
-    def load_items(self):
-        entries = list(self.client.load_episodes(self.series.stream_id) or [])
-        for episode in entries:
-            episode.parent_id = str(self.series.stream_id)
-            episode.favorite_parent = self.series
-            if not getattr(episode, "icon", ""):
-                episode.icon = getattr(self.series, "icon", "")
-        return entries
+    @staticmethod
+    def _episode_show(widget, shown):
+        if shown:
+            widget.show()
+        else:
+            widget.hide()
 
-    def empty_message(self):
-        return N_("No episodes were found for this series.")
+    def _episode_progress(self, name, rect, percent):
+        width = max(1, int(rect[2] * max(0, min(100, percent)) / 100.0))
+        instance = getattr(self[name], "instance", None)
+        if instance is not None:
+            instance.resize(eSize(width, max(1, rect[3])))
+        self._episode_show(self[name], percent > 0)
+
+    def _resume_target(self):
+        index = preferred_resume_index(self._entries, self._resume_records,
+                                       set(self._watched_records), self.client)
+        return index if index is not None else (self.selected_index if self._entries else None)
+
+    def _render_episode_details(self):
+        info = self._series_detail_info
+        title = getattr(info, "title", "") or self.series.name
+        self._episode_fit("series_title", title, 2)
+        year = getattr(info, "year", "") or getattr(self.series, "year", "")
+        meta = [str(year)] if year else []
+        if self._season_groups:
+            season_count = len(self._season_groups)
+            meta.append(ngettext("{} season", "{} seasons", season_count).format(season_count))
+        rating = getattr(info, "rating", "") or getattr(self.series, "rating", "")
+        if rating:
+            meta.append(_rating_label(rating))
+        self._episode_fit("series_meta", "  /  ".join(meta), 2)
+        self._episode_fit("series_genre", getattr(info, "genre", ""), 1)
+        self._episode_fit("series_plot", getattr(info, "plot", "")
+                          or _("No information available."), 5)
+        cast = getattr(info, "cast", "") or ""
+        self["series_cast_label"].setText(_("CAST") if cast else "")
+        self._episode_fit("series_cast", str(cast), 2)
+        self._episode_fit("episode_favorite_text", _("Remove from favorites")
+                          if self._is_series_favorite() else _("Add to favorites"))
+        self._episode_fit("episode_download_text", _("Download episode"))
+        self["episode_download_key"].setText("MENU")
+        self["season_progress_label"].setText(_("SEASON PROGRESS"))
+        self._set_dynamic_breadcrumb(_("Series") + "  /  " + title)
+        self._render_episode_resume()
+
+    def _is_series_favorite(self):
+        return self._is_favorite(self.series)
+
+    def _render_episode_resume(self):
+        target = self._resume_target()
+        label = _("Play")
+        detail = ""
+        if target is not None and self._entries:
+            item = self._entries[target]
+            bookmark = self._resume_records.get(resume_key(self.client, item))
+            number = episode_number(item, target + 1)
+            if bookmark and episode_watch_key(self.client, item) not in self._watched_records:
+                label = _("Resume episode {}").format(number)
+                detail = _("Season {season} · Episode {episode} · Resume at {time}").format(
+                    season=getattr(item, "season", "") or "—", episode=number,
+                    time=format_episode_time(bookmark["position"]))
+            else:
+                label = _("Episode {}").format(number) + "  ·  " + _("Play")
+        if self.download_mode:
+            label = _("Download episode")
+        self._episode_fit("episode_resume_text", "▶  " + label)
+        self._episode_fit("episode_resume_detail", detail)
 
     def _refresh(self):
-        self["items"].setText("")
-        if self._error:
-            self._clear_episode_rows()
-            ellipsize_dynamic_text(
-                self["message"],
-                _(self._error),
-                fallback_chars=80,
-            )
-            hide_scrollbar(self, "list_scroll")
+        if not hasattr(self, "_episode_geometry"):
             return
-        if not self._entries:
-            self._clear_episode_rows()
-            self["message"].setText(_(self.empty_message()))
+        self["items"].setText("")
+        self._episode_fit("episode_favorite_text", _("Remove from favorites")
+                          if self._is_series_favorite() else _("Add to favorites"))
+        self._clear_episode_rows()
+        if self._error or not self._entries:
+            self["message"].setText(_(self._error or self.empty_message()))
             hide_scrollbar(self, "list_scroll")
             return
         self.selected_index %= len(self._entries)
-        page_start = int(self.selected_index / self.page_size) * self.page_size
-        page_items = self._entries[page_start : page_start + self.page_size]
-        plain_lines = []
-        for row_index in range(self.page_size):
-            row_bg = self["episode_row_bg_{}".format(row_index)]
-            number = self["episode_number_{}".format(row_index)]
-            name = self["episode_name_{}".format(row_index)]
-            if row_index < len(page_items):
-                item = page_items[row_index]
-                absolute_index = page_start + row_index
-                item_name = str(self.item_text(item) or "")
-                number.setText("{:04d}.".format(absolute_index + 1))
-                rendered_name = ellipsize_dynamic_text(
-                    name,
-                    item_name,
-                    fallback_chars=80,
-                )
-                plain_lines.append(rendered_name)
-                row_bg.show()
-                number.show()
-                name.show()
-                selected = absolute_index == self.selected_index
+        start = self.selected_index // self.page_size * self.page_size
+        current_watched = self._watched_store.records(refresh=False)
+        self._watched_records = current_watched
+        for row, item in enumerate(self._entries[start:start + self.page_size]):
+            number = episode_number(item, start + row + 1)
+            self["episode_number_{}".format(row)].setText(str(number).zfill(2))
+            title = episode_title(item, _("Episode {}").format(number))
+            title = re.sub(r"^S\s*\d+\s+E\s*\d+\s+", "", title, flags=re.I)
+            ellipsize_dynamic_text(self["episode_name_{}".format(row)], title,
+                                   fallback_chars=55)
+            key = episode_watch_key(self.client, item)
+            watched = current_watched.get(key)
+            bookmark = self._resume_records.get(resume_key(self.client, item))
+            percent = 0
+            if watched is not None:
+                status = _("Watched")
+                timestamp = watched.get("finished_at", 0)
+                if timestamp:
+                    try:
+                        status += " · " + datetime.datetime.fromtimestamp(timestamp).strftime("%d.%m.%Y")
+                    except (OSError, ValueError, OverflowError):
+                        pass
+            elif bookmark:
+                status = _("Resume at {}").format(format_episode_time(bookmark["position"]))
+                percent = progress_percent(bookmark["position"], bookmark["length"])
             else:
-                number.setText("")
-                name.setText("")
-                row_bg.hide()
-                number.hide()
-                name.hide()
-                selected = False
-            for edge in ("fill", "top", "bottom", "left", "right"):
-                focus = self[
-                    "episode_focus_{}_{}".format(row_index, edge)
-                ]
-                if selected:
-                    focus.show()
-                else:
-                    focus.hide()
-        self["items"].setText("\n".join(plain_lines))
-        self["message"].setText(
-            "{}  |  {}/{}".format(
-                len(self._entries), self.selected_index + 1, len(self._entries)
-            )
-        )
-        update_scrollbar(
-            self,
-            "list_scroll",
-            len(self._entries),
-            self.selected_index,
-            self.page_size,
-            self._list_scroll_geometry,
-        )
+                status = _("Not played")
+            ellipsize_dynamic_text(self["episode_status_{}".format(row)], status,
+                                   fallback_chars=65)
+            for part in ("row_bg", "number", "name", "status"):
+                self["episode_{}_{}".format(part, row)].show()
+            self._episode_show(self["episode_watched_{}".format(row)], watched is not None)
+            self._episode_show(self["episode_progress_track_{}".format(row)], percent > 0)
+            self._episode_progress("episode_progress_fill_{}".format(row),
+                                   self._episode_geometry["rows"][row]["progress"], percent)
+            focused = start + row == self.selected_index and self._episode_pane == "episodes"
+            self._episode_show(self["episode_focus_{}".format(row)], focused)
+            self._episode_show(self["episode_focus_fill_{}".format(row)], focused)
+        first_tab = min(max(0, self._season_index - 1), max(0, len(self._season_groups) - 3))
+        for slot in range(3):
+            index = first_tab + slot
+            exists = index < len(self._season_groups)
+            label = ""
+            if exists:
+                season = self._season_groups[index][0]
+                label = _("Season {}").format(season) if season else _("Unknown season")
+                if self._episode_pane == "seasons" and index == self._season_index:
+                    label = "▸ " + label
+            self._episode_fit("season_tab_{}".format(slot), label)
+            self._episode_show(self["season_tab_line_{}".format(slot)],
+                               exists and index == self._season_index)
+        self._episode_show(self["season_tabs_focus"], self._episode_pane == "seasons")
+        episode_count = len(self._entries)
+        self["season_count"].setText(ngettext(
+            "{} episode", "{} episodes", episode_count).format(episode_count))
+        completed = sum(episode_watch_key(self.client, item) in current_watched for item in self._entries)
+        percent = int(completed * 100 / episode_count)
+        self._episode_fit("season_progress_text", ngettext(
+            "{} / {} episode completed", "{} / {} episodes completed", episode_count).format(
+                completed, episode_count))
+        self["season_progress_percent"].setText("{}%".format(percent))
+        self._episode_progress("season_progress_fill", self._episode_geometry["season_progress"], percent)
+        self["episode_position"].setText("{}–{} / {}".format(
+            start + 1, min(start + self.page_size, len(self._entries)), len(self._entries)))
+        for i in range(3):
+            self._episode_show(self["episode_action_focus_{}".format(i)],
+                               self._episode_pane == "actions" and self._episode_action == i)
+        self["message"].setText("")
+        self._render_episode_resume()
+        update_scrollbar(self, "list_scroll", len(self._entries), self.selected_index,
+                         self.page_size, self._list_scroll_geometry)
 
     def _clear_episode_rows(self):
-        for row_index in range(EPISODE_PAGE_SIZE):
-            for name in ("row_bg", "number", "name"):
-                widget = self[
-                    "episode_{}_{}".format(name, row_index)
-                ]
-                if name != "row_bg":
-                    widget.setText("")
-                widget.hide()
-            for edge in ("fill", "top", "bottom", "left", "right"):
-                self[
-                    "episode_focus_{}_{}".format(row_index, edge)
-                ].hide()
+        for i in range(self.page_size):
+            for part in ("row_bg", "number", "name", "status", "watched",
+                         "progress_track", "progress_fill"):
+                self["episode_{}_{}".format(part, i)].hide()
+            self["episode_focus_{}".format(i)].hide()
+            self["episode_focus_fill_{}".format(i)].hide()
+        for i in range(3):
+            self["episode_action_focus_{}".format(i)].hide()
+
+    def toggle_selected_watched(self):
+        if self._loading or not self._entries:
+            return
+        self._episode_pane = "episodes"
+        item = self._entries[self.selected_index]
+        key = episode_watch_key(self.client, item)
+        watched = key in self._watched_store.records(refresh=False)
+        if not key or not self._watched_store.set_watched_async(key, not watched):
+            self["message"].setText(_("Could not save watched status."))
+            return
+        self._episode_pending_watched = (key, not watched)
+        self._refresh()
+        self["message"].setText(_("Please wait"))
+        self._request_episode_state()
+
+    def _request_episode_state(self):
+        if self._closed:
+            return
+        self._episode_state_generation += 1
+        generation = self._episode_state_generation
+        entries = list(self._all_episode_entries)
+        mutation = self._episode_pending_watched
+        def read():
+            confirmed = (self._watched_store.confirm_watched(*mutation)
+                         if mutation is not None else None)
+            return (generation, self._watched_store.records(refresh=True),
+                    self._resume_store.get_many(resume_key(self.client, item) for item in entries),
+                    mutation, confirmed)
+        self._episode_state_reader.request(read)
+
+    def _episode_state_loaded(self, value, error):
+        if self._closed:
+            return
+        if error is not None or not value:
+            if self._episode_pending_watched is not None:
+                self._episode_pending_watched = None
+                self["message"].setText(_("Could not save watched status."))
+            return
+        generation, watched, bookmarks, mutation, confirmed = value
+        if generation != self._episode_state_generation:
+            return
+        self._watched_records, self._resume_records = watched, bookmarks
+        self._refresh()
+        if mutation is not None and mutation == self._episode_pending_watched:
+            if confirmed is None:
+                self["message"].setText(_("Please wait"))
+                self._request_episode_state()
+                return
+            self._episode_pending_watched = None
+            self["message"].setText(
+                (_("Marked as watched") if mutation[1] else _("Marked as not watched"))
+                if confirmed else _("Could not save watched status."))
+
+    def _episode_playback_closed(self, *args):
+        if not self._closed:
+            self._request_episode_state()
+
+    def open_selected(self):
+        self._episode_resume_request = ""
+        if self._loading or not self._entries:
+            return
+        if self._episode_pane == "seasons":
+            self._episode_pane = "episodes"
+            self._refresh()
+            return
+        if self._episode_pane == "actions":
+            if self._episode_action == 1:
+                self.toggle_series_favorite()
+                return
+            if self._episode_action == 2:
+                self.download_selected()
+                return
+            target = self._resume_target()
+            if target is not None:
+                self.selected_index = target
+                if not self.download_mode:
+                    self._episode_resume_request = resume_key(self.client, self._entries[target])
+        if self.download_mode:
+            self.download_selected()
+            return
+        open_extplayer(self.session, self.client, self._entries[self.selected_index],
+                       self._entries, self.selected_index, owner=self)
+
+    def _consume_episode_resume_request(self, key):
+        requested, self._episode_resume_request = self._episode_resume_request, ""
+        return bool(requested and requested == key)
+
+    def _resume_after_playback_resolution_failure(self):
+        self._episode_resume_request = ""
 
     def download_selected(self):
         if not self._entries or self._loading:
@@ -18692,28 +20327,68 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
         from .downloads_ui import request_download
         request_download(self.session, self.client, self._entries[self.selected_index])
 
-    def open_selected(self):
-        if self.download_mode:
-            self.download_selected()
-            return
-        if not self._entries or self._loading:
-            return
-        open_extplayer(
-            self.session,
-            self.client,
-            self._entries[self.selected_index],
-            self._entries,
-            self.selected_index,
-            owner=self,
-        )
-
     def toggle_series_favorite(self):
         added = self._toggle_favorite_item(self.series)
-        ellipsize_dynamic_text(
-            self["message"],
-            self._favorite_message(self.series, added),
-            fallback_chars=80,
-        )
+        self._render_episode_details()
+        self["message"].setText(self._favorite_message(self.series, added))
+
+    def _start_episode_artwork(self):
+        token = _WorkerToken(40)
+        self._episode_art_token = token
+        seed = self._provider_info
+        def load():
+            settings = load_player_settings()
+            metadata = TMDbMetadataClient(api_key=getattr(settings, "tmdb_api_key", ""),
+                enabled=getattr(settings, "metadata_enabled", True), language=metadata_language())
+            info = seed
+            try:
+                info = _bounded_client_call(metadata, token,
+                    lambda: metadata.complete_series_cinematic(self.series, seed)) or seed
+            except _WorkerCancelled:
+                raise
+            except Exception as error:
+                log_event("episodes", "metadata-fallback", error)
+            candidates = []
+            for value in (getattr(info, "fallback_backdrop", ""),
+                          getattr(info, "backdrop", ""), getattr(self.series, "backdrop", ""),
+                          getattr(info, "cover", ""), getattr(self.series, "icon", "")):
+                url = _safe_picon_url(value)
+                if url and url not in candidates:
+                    candidates.append(url)
+            path = ""
+            for url in candidates[:4]:
+                token.check()
+                try:
+                    candidate = _cached_picon_path(url) or _download_client_image(
+                        self.client, url, _picon_cache_path(url),
+                        timeout=CINEMATIC_CANDIDATE_TIMEOUT_SECONDS, token=token)
+                    if candidate and _valid_cinematic_fallback_file(candidate):
+                        path = candidate
+                        break
+                except _WorkerCancelled:
+                    raise
+                except Exception as error:
+                    log_event("episodes", "artwork-fallback", error)
+            token.check()
+            return info, path
+        self._episode_art_reader.request(load)
+
+    def _episode_art_loaded(self, value, error):
+        if self._closed or error is not None or not value:
+            return
+        self._series_detail_info, path = value
+        self._render_episode_details()
+        if not path or path == self._episode_art_path:
+            return
+        self._episode_art_path = path
+        def loaded(success):
+            if not self._closed and path == self._episode_art_path:
+                self._episode_show(self["episode_backdrop"], success)
+                self._episode_show(self["episode_scrim"], success)
+        attach_pixmap(self, "episode_backdrop", path, key="episode-series-art",
+                      on_loaded=loaded, cover_ratio=_cinematic_cover_ratio(path),
+                      cover_alignment="center")
+
 
 
 def build_extplayer_reference(
@@ -19773,7 +21448,7 @@ def _launch_extplayer(
     key = resume_key(client, item)
     bookmark = store.get(key)
     if bookmark:
-        remember = getattr(store, "remember", None)
+        remember = getattr(store, "remember_async", None)
         if remember is not None:
             try:
                 remember(key, item, resume_account_scope(client))
@@ -19783,7 +21458,11 @@ def _launch_extplayer(
     def launch(start_position=0):
         if not _allow_account_playback(session, client):
             return
-        session.open(
+        callback = getattr(owner, "_episode_playback_closed", None)
+        opener = session.open
+        if callable(callback) and hasattr(session, "openWithCallback"):
+            opener = lambda *args, **kwargs: session.openWithCallback(callback, *args, **kwargs)
+        opener(
             GTExternalPlayerScreen,
             reference,
             item,
@@ -19803,6 +21482,11 @@ def _launch_extplayer(
             archive_initial_playback=archive_initial_playback,
         )
 
+    consume_resume = getattr(owner, "_consume_episode_resume_request", None)
+    if callable(consume_resume) and consume_resume(key) and bookmark:
+        launch(bookmark["position"])
+        return
+
     if not bookmark or not hasattr(session, "openWithCallback"):
         launch(0)
         return
@@ -19811,7 +21495,7 @@ def _launch_extplayer(
         if answer:
             launch(bookmark["position"])
         else:
-            store.clear(key)
+            queue_playback_clear(store, key)
             launch(0)
 
     session.openWithCallback(
@@ -20054,7 +21738,7 @@ class _AsyncPlaybackResolver(object):
             if preparation is None or preparation.restore():
                 self._detach()
             log_event("playback", "Asynchronous stream link resolution failed", error)
-            self._resolution_failed()
+            self._resolution_failed(error)
             return
         self._set_message("")
         try:
@@ -20079,9 +21763,9 @@ class _AsyncPlaybackResolver(object):
             if preparation is None or preparation.restore():
                 self._detach()
             log_event("playback", "Resolved player launch failed", launch_error)
-            self._resolution_failed()
+            self._resolution_failed(launch_error)
 
-    def _resolution_failed(self):
+    def _resolution_failed(self, error=None):
         _cancel_download_pending(self.client)
         resume = getattr(self.owner, "_resume_after_playback_resolution_failure", None)
         if callable(resume) and not getattr(self.owner, "_closed", False):
@@ -20092,6 +21776,8 @@ class _AsyncPlaybackResolver(object):
         message = (_("Could not open the archived programme.")
                    if getattr(self.item, "content_type", "") == "catchup"
                    else _("Could not open the stream."))
+        if isinstance(error, _DownloadError):
+            message = _(str(error))
         if not self._set_message(message):
             try:
                 self.session.open(MessageBox, message, MessageBox.TYPE_ERROR)
@@ -20296,17 +21982,7 @@ def _load_live_picon_path(client, item, worker_token=None):
 
 
 def _provider_picon_timeout(metadata_client, url):
-    try:
-        hostname = str(urlsplit(url).hostname or "").lower()
-    except Exception:
-        hostname = ""
-    is_tmdb = hostname == "image.tmdb.org" or hostname.endswith(
-        ".image.tmdb.org"
-    )
-    if bool(getattr(metadata_client, "available", False)) and not is_tmdb:
-        # When TMDb fallback is ready, do not let a dead provider image hold
-        # the selected title for the full general image timeout.
-        return PICON_FAST_FALLBACK_TIMEOUT
+    # A working slow provider must receive the same allowance as TMDb.
     return PICON_DOWNLOAD_TIMEOUT
 
 
@@ -20359,6 +22035,29 @@ def _discard_invalid_live_picon_cache(url, path):
     return True
 
 
+def _compatible_cached_picon(url, path):
+    if not is_tmdb_artwork_url(url):
+        return True
+    try:
+        with open(path, "rb") as handle:
+            return _image_suffix(handle.read(16)) in (".jpg", ".png")
+    except OSError:
+        return False
+
+
+def _remember_picon_path(url, path):
+    now = time.monotonic()
+    with _PICON_PATH_CACHE_GUARD:
+        for key, (expiry, unused_path) in list(_PICON_PATH_CACHE.items()):
+            if expiry <= now:
+                _PICON_PATH_CACHE.pop(key, None)
+        _PICON_PATH_CACHE.pop(url, None)
+        _PICON_PATH_CACHE[url] = (now + PICON_PATH_CACHE_TTL_SECONDS, path)
+        while len(_PICON_PATH_CACHE) > PICON_PATH_CACHE_MAX_ENTRIES:
+            oldest = min(_PICON_PATH_CACHE, key=lambda key: _PICON_PATH_CACHE[key][0])
+            _PICON_PATH_CACHE.pop(oldest, None)
+
+
 def _cached_picon_path(url):
     now_mono = time.monotonic()
     with _PICON_PATH_CACHE_GUARD:
@@ -20371,7 +22070,11 @@ def _cached_picon_path(url):
             and status is not None
             and 0 < status.st_size <= MAX_PICON_BYTES
         ):
-            return remembered_path
+            if _compatible_cached_picon(url, remembered_path):
+                _PICON_CACHE_BUDGET.touch(remembered_path)
+                return remembered_path
+            _discard_invalid_live_picon_cache(url, remembered_path)
+            _clear_picon_failure(url)
         with _PICON_PATH_CACHE_GUARD:
             _PICON_PATH_CACHE.pop(url, None)
     preferred = _picon_cache_path(url)
@@ -20398,6 +22101,13 @@ def _cached_picon_path(url):
                 # Remove cached HTTP/error payloads masquerading as images.
                 os.unlink(candidate)
                 continue
+            if is_tmdb_artwork_url(url) and suffix == ".webp":
+                # r23 could cache negotiated WebP from a TMDb .jpg URL.
+                # Refetch it with the receiver-compatible request profile.
+                _discard_invalid_live_picon_cache(url, candidate)
+                _clear_picon_failure(url)
+                log_event("artwork", "stage=cache source=tmdb outcome=discarded-webp")
+                continue
             corrected = base + suffix
             if corrected != candidate:
                 if os.path.isfile(corrected):
@@ -20405,17 +22115,8 @@ def _cached_picon_path(url):
                 else:
                     os.rename(candidate, corrected)
                 candidate = corrected
-            with _PICON_PATH_CACHE_GUARD:
-                _PICON_PATH_CACHE[url] = (
-                    now_mono + PICON_PATH_CACHE_TTL_SECONDS,
-                    candidate,
-                )
-                if len(_PICON_PATH_CACHE) > PICON_PATH_CACHE_MAX_ENTRIES:
-                    oldest = min(
-                        _PICON_PATH_CACHE,
-                        key=lambda key: _PICON_PATH_CACHE[key][0],
-                    )
-                    _PICON_PATH_CACHE.pop(oldest, None)
+            _remember_picon_path(url, candidate)
+            _PICON_CACHE_BUDGET.touch(candidate)
             return candidate
         except (IOError, OSError):
             continue
@@ -20425,10 +22126,10 @@ def _cached_picon_path(url):
 def _picon_failure_remaining(url, now=None):
     now = time.time() if now is None else float(now)
     with _PICON_FAILURES_GUARD:
-        failed_at = _PICON_FAILURES.get(url)
-        if failed_at is None:
+        expires_at = _PICON_FAILURES.get(url)
+        if expires_at is None:
             return 0.0
-        remaining = PICON_FAILURE_TTL_SECONDS - (now - failed_at)
+        remaining = expires_at - now
         if remaining <= 0.0:
             _PICON_FAILURES.pop(url, None)
             return 0.0
@@ -20439,23 +22140,16 @@ def _picon_failure_active(url, now=None):
     return _picon_failure_remaining(url, now=now) > 0.0
 
 
-def _mark_picon_failure(url):
+def _mark_picon_failure(url, error=None):
     now = time.time()
     with _PICON_FAILURES_GUARD:
-        expired = [
-            failed_url
-            for failed_url, failed_at in _PICON_FAILURES.items()
-            if now - failed_at >= PICON_FAILURE_TTL_SECONDS
-        ]
-        for failed_url in expired:
-            _PICON_FAILURES.pop(failed_url, None)
-        if (
-            url not in _PICON_FAILURES
-            and len(_PICON_FAILURES) >= PICON_FAILURE_MAX_ENTRIES
-        ):
+        expired = [key for key, expiry in _PICON_FAILURES.items() if expiry <= now]
+        for key in expired:
+            _PICON_FAILURES.pop(key, None)
+        if url not in _PICON_FAILURES and len(_PICON_FAILURES) >= PICON_FAILURE_MAX_ENTRIES:
             oldest = min(_PICON_FAILURES, key=_PICON_FAILURES.get)
             _PICON_FAILURES.pop(oldest, None)
-        _PICON_FAILURES[url] = now
+        _PICON_FAILURES[url] = now + artwork_failure_ttl(error)
 
 
 def _clear_picon_failure(url):
@@ -20464,71 +22158,20 @@ def _clear_picon_failure(url):
 
 
 def _prune_picon_cache(force=False, now=None):
-    """Keep the temporary image cache bounded on small receiver flash/RAM."""
-    now = time.time() if now is None else float(now)
-    if not force and now - _PICON_LAST_CLEANUP[0] < PICON_CLEANUP_INTERVAL_SECONDS:
+    """Periodic reconciliation; every cache write already enforces the budget."""
+    before = _PICON_CACHE_BUDGET.scanned_at
+    _PICON_CACHE_BUDGET.maintain(force=force, now=now)
+    if before == _PICON_CACHE_BUDGET.scanned_at and not force:
         return
-    if not _PICON_CLEANUP_GUARD.acquire(False):
-        return
-    try:
-        if not force and now - _PICON_LAST_CLEANUP[0] < PICON_CLEANUP_INTERVAL_SECONDS:
-            return
-        _PICON_LAST_CLEANUP[0] = now
-        if not _ensure_picon_cache_directory(create=False):
-            return
-        files = []
-        total = 0
-        try:
-            names = os.listdir(PICON_CACHE_DIR)
-        except OSError:
-            return
-        for name in names:
-            path = os.path.join(PICON_CACHE_DIR, name)
-            try:
-                stat_result = os.lstat(path)
-            except OSError:
-                continue
-            current_uid = getattr(os, "geteuid", lambda: stat_result.st_uid)()
-            if (
-                not stat.S_ISREG(stat_result.st_mode)
-                or stat_result.st_uid != current_uid
-                or stat_result.st_nlink != 1
-            ):
-                try:
-                    os.unlink(path)
-                except OSError:
-                    pass
-                continue
-            age = max(0.0, now - float(stat_result.st_mtime))
-            stale_temporary = name.endswith(".tmp") and age >= 3600
-            if (
-                stat_result.st_size <= 0
-                or age >= PICON_CACHE_MAX_AGE_SECONDS
-                or stale_temporary
-            ):
-                try:
-                    os.unlink(path)
-                except OSError:
-                    pass
-                continue
-            files.append((float(stat_result.st_mtime), path, stat_result.st_size))
-            total += stat_result.st_size
-        files.sort()
-        while (
-            files
-            and (
-                len(files) > PICON_CACHE_MAX_FILES
-                or total > PICON_CACHE_MAX_BYTES
-            )
-        ):
-            path, size = files.pop(0)[1:]
-            try:
-                os.unlink(path)
-                total -= size
-            except OSError:
-                pass
-    finally:
-        _PICON_CLEANUP_GUARD.release()
+    with _PICON_PATH_CACHE_GUARD:
+        remembered = list(_PICON_PATH_CACHE.items())
+    now_mono = time.monotonic()
+    stale = [(url, value) for url, value in remembered
+             if value[0] <= now_mono or _safe_cache_file_status(value[1]) is None]
+    with _PICON_PATH_CACHE_GUARD:
+        for url, value in stale:
+            if _PICON_PATH_CACHE.get(url) == value:
+                _PICON_PATH_CACHE.pop(url, None)
 
 
 def _image_suffix(body, content_type=""):
@@ -20554,6 +22197,8 @@ def _image_suffix(body, content_type=""):
 def _image_dimensions(body, suffix):
     """Read dimensions without decoding attacker-controlled image pixels."""
     try:
+        if suffix == ".webp":
+            return webp_dimensions(body)
         if suffix == ".png" and len(body) >= 24:
             return struct.unpack(">II", body[16:24])
         if suffix == ".gif" and len(body) >= 10:
@@ -20601,64 +22246,60 @@ def _valid_image_dimensions(body, suffix):
     )
 
 
-def _valid_cinematic_backdrop_file(path):
-    """Accept only bounded landscape artwork for the wide cinematic hero."""
+def _cinematic_image_header(path):
     status = _safe_cache_file_status(path)
-    if status is None or status.st_size <= 0 or status.st_size > MAX_PICON_BYTES:
-        return False
+    if status is None or not 0 < status.st_size <= MAX_PICON_BYTES:
+        return "", 0, 0
+    identity = (os.path.abspath(path), status.st_dev, status.st_ino, status.st_size,
+                status.st_mtime_ns, status.st_ctime_ns)
+    with _PICON_VALIDATION_CACHE_GUARD:
+        cached = _CINEMATIC_PICON_HEADER_CACHE.get(identity)
+        if cached is not None:
+            _CINEMATIC_PICON_HEADER_CACHE.move_to_end(identity)
+            return cached
     try:
-        with open(path, "rb") as handle:
+        flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+        with os.fdopen(os.open(path, flags), "rb") as handle:
+            opened = os.fstat(handle.fileno())
+            if (opened.st_dev, opened.st_ino, opened.st_size, opened.st_mtime_ns, opened.st_ctime_ns) != identity[1:]:
+                return "", 0, 0
             body = handle.read(min(status.st_size, LIVE_PICON_HEADER_BYTES))
+            current = os.fstat(handle.fileno())
+            if (current.st_size, current.st_mtime_ns, current.st_ctime_ns) != identity[3:]:
+                return "", 0, 0
     except (IOError, OSError):
-        return False
+        return "", 0, 0
     suffix = _image_suffix(body)
     width, height = _image_dimensions(body, suffix)
-    return (
-        bool(suffix)
-        and width * 3 >= height * 4
-        and width >= CINEMATIC_MIN_HERO_WIDTH
-        and height >= CINEMATIC_MIN_HERO_HEIGHT
-        and width <= MAX_PICON_DIMENSION
-        and height <= MAX_PICON_DIMENSION
-        and width * height <= MAX_PICON_PIXELS
-    )
+    value = (suffix, width, height)
+    with _PICON_VALIDATION_CACHE_GUARD:
+        _CINEMATIC_PICON_HEADER_CACHE[identity] = value
+        _CINEMATIC_PICON_HEADER_CACHE.move_to_end(identity)
+        while len(_CINEMATIC_PICON_HEADER_CACHE) > LIVE_PICON_VALIDATION_CACHE_MAX_ENTRIES:
+            _CINEMATIC_PICON_HEADER_CACHE.popitem(last=False)
+    return value
+
+
+def _valid_cinematic_backdrop_file(path):
+    """Accept only bounded landscape artwork for the wide cinematic hero."""
+    suffix, width, height = _cinematic_image_header(path)
+    return (bool(suffix) and width * 3 >= height * 4
+            and width >= CINEMATIC_MIN_HERO_WIDTH and height >= CINEMATIC_MIN_HERO_HEIGHT
+            and width <= MAX_PICON_DIMENSION and height <= MAX_PICON_DIMENSION
+            and width * height <= MAX_PICON_PIXELS)
 
 
 def _valid_cinematic_fallback_file(path):
-    """Accept a bounded poster when no usable wide hero is available."""
-    status = _safe_cache_file_status(path)
-    if status is None or status.st_size <= 0 or status.st_size > MAX_PICON_BYTES:
-        return False
-    try:
-        with open(path, "rb") as handle:
-            body = handle.read(min(status.st_size, LIVE_PICON_HEADER_BYTES))
-    except (IOError, OSError):
-        return False
-    suffix = _image_suffix(body)
-    width, height = _image_dimensions(body, suffix)
-    return (
-        bool(suffix)
-        and width > 0
-        and height > 0
-        and width <= MAX_PICON_DIMENSION
-        and height <= MAX_PICON_DIMENSION
-        and width * height <= MAX_PICON_PIXELS
-    )
+    suffix, width, height = _cinematic_image_header(path)
+    return (bool(suffix) and 0 < width <= MAX_PICON_DIMENSION
+            and 0 < height <= MAX_PICON_DIMENSION and width * height <= MAX_PICON_PIXELS)
 
 
 def _cinematic_cover_ratio(path):
-    """Return a verified source ratio for centre-cropped, full-bleed heroes."""
     if not _valid_cinematic_fallback_file(path):
         return None
-    status = _safe_cache_file_status(path)
-    try:
-        with open(path, "rb") as handle:
-            body = handle.read(min(status.st_size, LIVE_PICON_HEADER_BYTES))
-    except (AttributeError, IOError, OSError):
-        return None
-    suffix = _image_suffix(body)
-    width, height = _image_dimensions(body, suffix)
-    return (width, height) if width > 0 and height > 0 else None
+    unused_suffix, width, height = _cinematic_image_header(path)
+    return width, height
 
 
 def _valid_live_picon_file(path):
@@ -20782,33 +22423,44 @@ def _download_picon(
                 return cached
             if _picon_failure_active(url):
                 return ""
-            try:
-                downloaded = _download_picon_unlocked(
-                    url,
-                    destination,
-                    timeout,
-                    token=token,
-                    request_headers=request_headers,
-                    user_agent=user_agent,
-                )
-            except _WorkerCancelled:
-                raise
-            except Exception:
-                _mark_picon_failure(url)
-                raise
+            for attempt in range(2):
+                try:
+                    downloaded = _download_picon_unlocked(
+                        url, destination, timeout, token=token,
+                        request_headers=request_headers, user_agent=user_agent,
+                    )
+                    break
+                except _WorkerCancelled:
+                    raise
+                except Exception as error:
+                    if attempt == 0 and retryable_artwork_error(error):
+                        _debug("artwork retry error={} status={}".format(
+                            error.__class__.__name__, getattr(error, "status", "")))
+                        if token is not None:
+                            if token.cancel_event.wait(RETRY_DELAY_SECONDS):
+                                token.check()
+                            token.check()
+                        else:
+                            threading.Event().wait(RETRY_DELAY_SECONDS)
+                        continue
+                    _mark_picon_failure(url, error)
+                    log_event("artwork",
+                              "stage=download outcome=error source={} status={} cooldown={} reason={}".format(
+                                  "tmdb" if is_tmdb_artwork_url(url) else "provider",
+                                  getattr(error, "status", ""), artwork_failure_ttl(error),
+                                  str(error)[:180]), error)
+                    raise
             if not downloaded:
                 _mark_picon_failure(url)
+                log_event("artwork", "stage=download outcome=rejected source={}".format(
+                    "tmdb" if is_tmdb_artwork_url(url) else "provider"))
                 return ""
             _clear_picon_failure(url)
             # The cache lives under /tmp. Scanning hundreds of files after
             # every logo download causes needless I/O while video is starting;
             # the existing bounded periodic cleanup is sufficient here.
             _prune_picon_cache()
-            with _PICON_PATH_CACHE_GUARD:
-                _PICON_PATH_CACHE[url] = (
-                    time.monotonic() + PICON_PATH_CACHE_TTL_SECONDS,
-                    downloaded,
-                )
+            _remember_picon_path(url, downloaded)
             return downloaded
         finally:
             state["lock"].release()
@@ -20841,23 +22493,26 @@ def _download_picon_unlocked(
     try:
         if token is not None:
             token.check()
+            timeout = min(timeout, max(0.25, token.deadline - time.monotonic()))
+        accept, selected_user_agent = artwork_request_profile(url, PLUGIN_VERSION, user_agent)
         fetch_arguments = (
             url,
             MAX_PICON_BYTES,
             timeout,
-            "image/jpeg,image/png;q=0.9,*/*;q=0.5",
-            str(
-                user_agent
-                or "Mozilla/5.0 GT-IPTV-Player-Pro/{}".format(PLUGIN_VERSION)
-            ),
+            accept,
+            selected_user_agent,
         )
+        fetch_options = {}
         if request_headers:
-            response = fetch_public_url(
-                *fetch_arguments,
-                request_headers=request_headers
-            )
-        else:
-            response = fetch_public_url(*fetch_arguments)
+            fetch_options["request_headers"] = request_headers
+        if token is not None:
+            fetch_options["cancel_event"] = token.cancel_event
+        try:
+            response = fetch_public_url(*fetch_arguments, **fetch_options)
+        except Exception:
+            if token is not None:
+                token.check()
+            raise
         body, headers = response[:2]
         content_type = headers.get("content-type", "")
     finally:
@@ -20871,51 +22526,16 @@ def _download_picon_unlocked(
         return ""
     if not _valid_image_dimensions(body, suffix):
         return ""
-    if not _ensure_picon_cache_directory():
-        return ""
+    if suffix == ".webp":
+        body, suffix = prepare_webp(body, MAX_PICON_BYTES)
+        if token is not None:
+            token.check()
+        _debug("artwork WebP prepared format={}".format(suffix))
     expected_base = os.path.splitext(_picon_cache_path(url))[0]
     if os.path.splitext(os.path.abspath(destination))[0] != expected_base:
         return ""
     destination = expected_base + suffix
-    temporary = os.path.join(
-        PICON_CACHE_DIR,
-        ".{}.tmp".format(uuid.uuid4().hex),
-    )
-    descriptor = None
-    try:
-        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
-        flags |= getattr(os, "O_CLOEXEC", 0)
-        flags |= getattr(os, "O_NOFOLLOW", 0)
-        descriptor = os.open(temporary, flags, 0o600)
-        status = os.fstat(descriptor)
-        if not stat.S_ISREG(status.st_mode) or status.st_nlink != 1:
-            raise OSError("unsafe picon cache target")
-        payload = body
-        while payload:
-            written = os.write(descriptor, payload)
-            if written <= 0:
-                raise OSError("picon cache write failed")
-            payload = payload[written:]
-        # A picon is a disposable /tmp cache entry, not durable user data.
-        # Avoid forcing receiver storage to flush while a live stream starts.
-        os.close(descriptor)
-        descriptor = None
-        if not _ensure_picon_cache_directory(create=False):
-            raise OSError("unsafe picon cache directory")
-        os.replace(temporary, destination)
-        os.chmod(destination, 0o600)
-    finally:
-        if descriptor is not None:
-            try:
-                os.close(descriptor)
-            except OSError:
-                pass
-        try:
-            if os.path.lexists(temporary):
-                os.unlink(temporary)
-        except OSError:
-            pass
-    return destination
+    return _PICON_CACHE_BUDGET.store(destination, body, check=token.check if token is not None else None)
 
 
 class GTPlayerInfoOverlay(Screen):
@@ -20923,34 +22543,43 @@ class GTPlayerInfoOverlay(Screen):
 
     def __init__(self, session, live=True):
         self._infobar_live = bool(live)
+        self._youtube_mode = False
         self.skin = scale_skin_fonts(prepared_skin(_player_info_skin, self._infobar_live))
         Screen.__init__(self, session)
         self["info_background"] = Pixmap()
         self["top_line"] = Label("")
         self["bottom_line"] = Label("")
         # Keep the established component names for older Enigma2 skins, but
-        # render their 1x1 compatibility widgets fully transparent.  Only a
-        # successfully decoded provider picon is allowed to occupy this area.
+        # render their 1x1 compatibility widgets fully transparent.
         self["picon_frame"] = Label("")
         self["picon_inner"] = Label("")
         self["picon_placeholder"] = Label("")
         self["picon_placeholder"].hide()
         self["picon"] = Pixmap()
         self["picon"].hide()
+        self["youtube_logo"] = Pixmap()
+        self["youtube_logo"].hide()
+        self["youtube_number_mask"] = Label("")
+        self["youtube_number_mask"].hide()
         self["number_badge_frame"] = Label("")
         self["number_badge_inner"] = Label("")
         self["channel_number"] = Label("")
         self["number_divider"] = Label("")
         self["channel_name"] = Label("")
         self["engine"] = Label(_("Player"))
-        self["web_shortcut_hint"] = Label(_("Web interface"))
-        for name in ("account_source", "stream_bitrate", "audio_language", "subtitle_status",
+        self["web_shortcut_hint"] = Label("")
+        self["web_shortcut_hint"].hide()
+        self["web_shortcut_background"] = Label("")
+        for name in ("account_source", "info_chip_background", "stream_bitrate_frame", "stream_bitrate", "audio_language", "subtitle_status",
                      "epg_now_time", "epg_next_time", "player_progress_start", "player_progress_end",
                      "shortcut_separator", "shortcut_epg_key", "shortcut_epg", "shortcut_audio_dot",
                      "shortcut_audio", "shortcut_aspect_dot", "shortcut_aspect", "shortcut_web_key"):
             self[name] = Label("")
-        self.onLayoutFinish.append(self._fit_web_shortcut_hint)
-        self.onShown.append(self._fit_web_shortcut_hint)
+        self["shortcut_web_key"].hide()
+        self.onLayoutFinish.append(self._fit_shortcut_captions)
+        self.onShown.append(self._fit_shortcut_captions)
+        self.onLayoutFinish.append(self._apply_youtube_layout)
+        self.onShown.append(self._apply_youtube_layout)
         self["resolution"] = Label(_("Reading resolution"))
         self["fps"] = Label("-- FPS")
         self["video_codec"] = Label(_("VIDEO: --"))
@@ -20974,6 +22603,7 @@ class GTPlayerInfoOverlay(Screen):
         self["weather_desc"] = Label(_("Loading weather data"))
         self["clock_divider"] = Label("")
         self["clock"] = Label("--:--")
+        self["clock_seconds"] = Label(":--")
         self["date"] = Label("")
         self["seek_panel"] = Label("")
         self["seek_state"] = Label("")
@@ -20991,15 +22621,65 @@ class GTPlayerInfoOverlay(Screen):
         ):
             self[name].hide()
 
-    def _fit_web_shortcut_hint(self):
+        self._device_usage_sampler = DeviceUsageSampler()
+        for prefix, kind in (("cpu", "CPU"), ("ram", "RAM")):
+            self[prefix + "_gauge"] = DeviceUsageGauge()
+            self[prefix + "_usage"] = Label(usage_text(kind, None))
+        self["audio_language"].hide()
+        self["subtitle_status"].hide()
+        self.onShow.append(self.refresh_device_usage)
+        self.onHide.append(self.reset_device_usage)
+        self.onClose.append(self.reset_device_usage)
+
+    def reset_device_usage(self):
+        self._device_usage_sampler.reset()
+
+    def refresh_device_usage(self):
+        if (not self.shown or self.instance is None
+                or getattr(self["seek_panel"], "visible", False)):
+            self.reset_device_usage()
+            return
+        cpu, ram = self._device_usage_sampler.sample()
+        unused_width, unused_height, px = _scale()
+        for prefix, kind, value in (("cpu", "CPU", cpu), ("ram", "RAM", ram)):
+            self[prefix + "_gauge"].set_value(value)
+            fit_dynamic_text(self[prefix + "_usage"], usage_text(kind, value), max_lines=1,
+                preferred_size=font_px(px, 19), min_size=max(6, px(12)))
+
+    def set_youtube_mode(self, enabled):
+        self._youtube_mode = bool(enabled)
+        self._apply_youtube_layout()
+
+    def _apply_youtube_layout(self):
+        # The number border is painted into the shared panel PNG. Hiding its
+        # label alone leaves an empty box, so mask the border too. Apply again
+        # after layout when native instances become available.
+        youtube = self._youtube_mode
+        if youtube:
+            self["youtube_number_mask"].show()
+            self["channel_number"].hide()
+        else:
+            self["youtube_number_mask"].hide()
+            self["channel_number"].show()
+        unused_width, unused_height, px = _scale()
+        title_x = 250 if youtube else 345
+        title_right = 880 if self._infobar_live else 1185
+        for name, x, y, w, h in (
+            ("channel_name", title_x, 13, title_right - title_x, 49),
+            ("picon", 30, 74 if youtube else 53, 170, 128 if youtube else 170),
+        ):
+            instance = getattr(self[name], "instance", None)
+            if instance is not None:
+                instance.move(ePoint(px(x), px(y)))
+                instance.resize(eSize(px(w), px(h)))
+
+    def _fit_shortcut_captions(self):
         unused_width, unused_height, px = _scale()
         captions = {
             "shortcut_epg_key": "EPG",
             "shortcut_epg": _("Programme guide"),
             "shortcut_audio": _("Audio / Subtitles"),
             "shortcut_aspect": _("Aspect ratio"),
-            "shortcut_web_key": _("MENU 3s"),
-            "web_shortcut_hint": _("Web interface"),
         }
         for name, text in captions.items():
             fit_dynamic_text(
@@ -21379,6 +23059,8 @@ class GTExternalPlayerScreen(
         del live_startup_recovery
         self._live_startup_recovery = None
         self._playback_owner = playback_owner
+        self._catalog_player_base = int(getattr(playback_owner, "_movie_window_base", 0))
+        self._catalog_player_request = None
         self._archive_initial_playback = archive_initial_playback
         self._archive_startup_watchdog = None
         self._archive_failure_reported = False
@@ -21411,6 +23093,12 @@ class GTExternalPlayerScreen(
         self.old_reference = None
         self._started = False
         self._closed = False
+        try:
+            self._infobar_timeout = normalize_infobar_timeout(
+                load_player_settings().infobar_timeout
+            )
+        except Exception:
+            self._infobar_timeout = DEFAULT_INFOBAR_TIMEOUT
         self._youtube_end_watcher = None
         self._fullscreen_close_result = None
         self._front_panel_summary = None
@@ -21507,6 +23195,12 @@ class GTExternalPlayerScreen(
         self._player_keys_bound = False
         self._player_key_map = None
         self._player_key_ids = {}
+        self._subtitle_sync_overlay = None
+        self._subtitle_sync_keys = SubtitleSyncKeys(
+            self._subtitle_sync_context,
+            self._adjust_subtitle_sync,
+            finished=self._persist_subtitle_sync,
+        )
         self._live_zero_key = LiveZeroKey(
             eTimer,
             self._live_zero_is_active,
@@ -21542,6 +23236,9 @@ class GTExternalPlayerScreen(
         self._resume_last_length = -1
         self._resume_stable_length_samples = 0
         self._resume_saved = False
+        self._episode_watcher = EpisodeCompletionWatcher(
+            self, eof_event=getattr(_PlayableServiceEvents, "evEOF", None),
+        )
         self._active_live_service_type = reference_service_type(
             self.reference,
             4097,
@@ -21689,6 +23386,9 @@ class GTExternalPlayerScreen(
                 # live guide. OK still opens the ordinary player infobar.
                 "0": self.recall_previous_live_channel,
                 "1": self.cycle_player_service_type,
+                "4": self.subtitle_sync_minus,
+                "5": self.subtitle_sync_reset,
+                "6": self.subtitle_sync_plus,
                 "info": self.open_epg_guide,
                 "tv": self.toggle_info,
                 "showEventInfo": self.open_epg_guide,
@@ -22121,17 +23821,51 @@ class GTExternalPlayerScreen(
             preferred_size=font_px(px, 19), min_size=max(6, px(12)),
         )
 
+    def _refresh_resolution_info(self, service=None):
+        tracker = getattr(self, "_resolution_tracker", None)
+        if tracker is None:
+            tracker = self._resolution_tracker = ResolutionTracker()
+        navigation = getattr(self.session, "nav", None)
+        active = bool(self._started and not self._closed
+                      and getattr(self, "_web_suspended", None) is None
+                      and getattr(self, "_pending_engine_reference", None) is None
+                      and not self._live_transition_in_progress())
+        try:
+            active = active and GTStreamListScreen._same_service_reference(
+                navigation.getCurrentlyPlayingServiceReference(), self.reference)
+        except Exception:
+            active = False
+        if not active:
+            tracker.reset()
+            self._set_info_chip("resolution", "--")
+            return None
+        try:
+            if service is None:
+                service = navigation.getCurrentService()
+            reference = self.reference.toString()
+        except Exception:
+            service, reference = None, ""
+        snapshot = tracker.sample(service, iServiceInformation,
+            (self._generation, reference), item=self.current_item)
+        self._set_info_chip("resolution", resolution_text(snapshot, compact=_scale()[0] <= 720))
+        return snapshot
+
     def _refresh_infobar_telemetry(self):
         """Sample receiver RX and local metadata only while the banner is visible."""
         timer = getattr(self, "_infobar_telemetry_timer", None)
+        dialog = getattr(self, "_info_dialog", None)
+        seek_panel = dialog.get("seek_panel") if dialog is not None else None
         if (self._closed or not self._info_visible or not self._started
                 or getattr(self, "_web_suspended", None) is not None
-                or self._info_dialog is None):
+                or dialog is None or getattr(seek_panel, "visible", False)):
             if timer is not None:
                 timer.stop()
             sampler = getattr(self, "_network_rate_sampler", None)
             if sampler is not None:
                 sampler.reset()
+            resetter = getattr(dialog, "reset_device_usage", None)
+            if callable(resetter):
+                resetter()
             return
         service = None
         transitioning = self._live_transition_in_progress()
@@ -22149,21 +23883,21 @@ class GTExternalPlayerScreen(
                 except Exception:
                     pass
         rate = self._network_rate_sampler.sample()
+        self._refresh_resolution_info(service)
         screen_width, unused_height, px = _scale()
         values = {
             "stream_bitrate": network_rate_text(rate, compact=screen_width <= 720),
-            "audio_language": audio_language_text(service),
-            "subtitle_status": subtitle_status_text(
-                None if transitioning else getattr(self, "_subtitle_controller", None)
-            ),
         }
         for name, value in values.items():
             fit_dynamic_text(
                 self._info_dialog[name], value, max_lines=1,
                 preferred_size=font_px(px, 20), min_size=max(6, px(12)),
             )
+        updater = getattr(dialog, "refresh_device_usage", None)
+        if callable(updater):
+            updater()
+        self._clock_tick()
         if self._is_live_item() and not transitioning:
-            self._clock_tick()
             self._render_live_snapshot_epg(now=time.time())
         if timer is not None:
             timer.start(1000, True)
@@ -22670,7 +24404,7 @@ class GTExternalPlayerScreen(
                 if self._info_visible:
                     # Leave enough time to read a reply that arrived near
                     # the end of the banner timeout. Respect a hidden banner.
-                    self._hide_timer.start(INFO_TIMEOUT_MS, True)
+                    self._start_info_hide_timer()
             else:
                 self._live_info_epg_retry_after[stream_id] = (
                     time.monotonic() + LIVE_DETAIL_EMPTY_RETRY_SECONDS
@@ -23085,7 +24819,7 @@ class GTExternalPlayerScreen(
         # reopening the decoder must not launch another online search.
         self._subtitle_auto_generation = -1
         self._subtitle_auto_timer.stop()
-        self._clock_timer.start(1000, False)
+        self._clock_tick()
         if self._resume_start_position <= 0:
             self._finish_web_resume()
         return True
@@ -23155,6 +24889,8 @@ class GTExternalPlayerScreen(
         return True
 
     def _after_zap(self, refresh_epg=False):
+        self._episode_watcher.arm()
+        self._arm_resume_bookmark_guard()
         if self._started and self._is_live_item():
             # Adopting the same preview service is idempotent. A newly opened
             # fullscreen screen must retain the list's previous channel.
@@ -23309,6 +25045,85 @@ class GTExternalPlayerScreen(
             self._reconnect_queued = False
         _cancel_worker_token(token)
 
+    def _subtitle_sync_context(self, require_focus=True):
+        if (self._closed or not self._started
+                or getattr(self, "_web_suspended", None) is not None
+                or getattr(self, "_pending_engine_reference", None) is not None):
+            return None
+        controller = getattr(self, "_subtitle_controller", None)
+        online = getattr(controller, "online", None)
+        if (controller is None or getattr(controller, "_closed", False)
+                or online is None or getattr(online, "_closed", False)
+                or not online.is_loaded):
+            return None
+        if require_focus and (
+                getattr(self.session, "current_dialog", None) is not self
+                or not getattr(self.session, "in_exec", True)
+                or getattr(controller, "_menu_open", False)
+                or getattr(self, "_subtitle_menu_open", False)
+                or getattr(self, "_subtitle_message_tokens", None)
+                or getattr(self, "_audio_menu_open", False)
+                or getattr(self, "_media_menu_open", False)
+                or getattr(self, "_aspect_menu_open", False)
+                or getattr(self, "_minute_seek_open", False)):
+            return None
+        renderer = online.renderer
+        return (self._generation, renderer.content_revision, renderer.loaded_path)
+
+    def _adjust_subtitle_sync(self, delta_ms, reset=False):
+        if self._subtitle_sync_context() is None:
+            return False
+        try:
+            offset = self._subtitle_controller.adjust_online_timing(delta_ms, reset=reset)
+        except Exception as error:
+            log_event("subtitles", "timing-shortcut-failed", error)
+            return False
+        if offset is None:
+            return False
+        self._show_subtitle_sync_offset(offset)
+        return True
+
+    def _show_subtitle_sync_offset(self, offset_ms):
+        try:
+            dialog = self._subtitle_sync_overlay
+            if dialog is None:
+                dialog = self.session.instantiateDialog(GTSubtitleSyncOverlay)
+                self._subtitle_sync_overlay = dialog
+            dialog.show_offset(offset_ms)
+            return
+        except Exception as error:
+            log_event("subtitles", "timing-notice-failed", error)
+        # Retain feedback on images which cannot create another OSD dialog.
+        text = _("Subtitle timing offset: {:+.1f} seconds").format(offset_ms / 1000.0)
+        self._set_static_info_epg("epg_now", text)
+        self._set_static_info_epg("epg_next", "")
+        self.show_info()
+
+    def _dismiss_subtitle_sync_offset(self):
+        dialog = getattr(self, "_subtitle_sync_overlay", None)
+        if dialog is not None:
+            dialog.dismiss()
+
+    def _persist_subtitle_sync(self, context):
+        # Native repeats update the screen immediately; only the completed
+        # gesture queues its final per-film offset for resume persistence.
+        if context == self._subtitle_sync_context(require_focus=False):
+            self._remember_resume_subtitle()
+
+    def _subtitle_sync_shortcut(self, command):
+        result = self._subtitle_sync_keys.handle(command, 0)
+        self._subtitle_sync_keys.handle(command, 1)
+        return result
+
+    def subtitle_sync_minus(self):
+        return self._subtitle_sync_shortcut("minus")
+
+    def subtitle_sync_reset(self):
+        return self._subtitle_sync_shortcut("reset")
+
+    def subtitle_sync_plus(self):
+        return self._subtitle_sync_shortcut("plus")
+
     def _bind_player_key_handler(self):
         """Receive remote events independently of image-specific keymaps."""
         if (self._player_keys_bound or self._closed
@@ -23319,7 +25134,8 @@ class GTExternalPlayerScreen(
             from keyids import KEYIDS
             self._player_key_ids = {
                 name: KEYIDS[name]
-                for name in ("KEY_0", "KEY_1", "KEY_YELLOW", "KEY_GREEN", "KEY_LEFT", "KEY_RIGHT", "KEY_EPG", "KEY_INFO")
+                for name in ("KEY_0", "KEY_1", "KEY_4", "KEY_5", "KEY_6",
+                             "KEY_YELLOW", "KEY_GREEN", "KEY_LEFT", "KEY_RIGHT", "KEY_EPG", "KEY_INFO")
                 if name in KEYIDS
             }
             # VOD short directions always seek. Image keymaps use different
@@ -23340,6 +25156,8 @@ class GTExternalPlayerScreen(
             ))
 
     def _unbind_player_key_handler(self):
+        self._subtitle_sync_keys.cancel()
+        self._dismiss_subtitle_sync_offset()
         zero_key = getattr(self, "_live_zero_key", None)
         if zero_key is not None:
             zero_key.cancel()
@@ -23368,6 +25186,14 @@ class GTExternalPlayerScreen(
         ):
             return 0
         kind = getattr(self.current_item, "content_type", "")
+        for name, command in (("KEY_4", "minus"), ("KEY_5", "reset"), ("KEY_6", "plus")):
+            key_id = key_ids.get(name)
+            if key_id is not None and key == key_id:
+                if flag == 0:
+                    self._live_zero_key.cancel()
+                return self._subtitle_sync_keys.handle(command, flag)
+        if flag == 0:
+            self._subtitle_sync_keys.cancel()
         if kind == "live" and key == key_ids.get("KEY_0"):
             return self._live_zero_key.handle(flag)
         if flag == 0:
@@ -24258,15 +26084,18 @@ class GTExternalPlayerScreen(
 
     def _render_channel(self):
         screen_width, unused_height, px = _scale()
+        youtube = bool(getattr(self.current_item, "youtube_native", False))
+        self._info_dialog.set_youtube_mode(youtube)
         self._set_info_chip("stream_bitrate", network_rate_text(None, compact=screen_width <= 720))
-        self._set_info_chip("audio_language", audio_language_text(None))
-        self._set_info_chip("subtitle_status", subtitle_status_text(None))
+        # The former audio/subtitle status labels are empty compatibility
+        # widgets; the shared banner now shows local CPU/RAM usage instead.
         unused_width, unused_height, px = _scale()
         fit_dynamic_text(
-            self._info_dialog["account_source"], source_account_text(self.client),
+            self._info_dialog["account_source"],
+            _("Source: {}").format(_("YouTube")) if youtube else source_account_text(self.client),
             max_lines=1, preferred_size=font_px(px, 19), min_size=max(6, px(12)),
         )
-        if live_channel_key(self.current_item) in self._live_recall_extra_keys:
+        if youtube or live_channel_key(self.current_item) in self._live_recall_extra_keys:
             self._info_dialog["channel_number"].setText("")
         elif self._entries:
             number = self.current_index + 1
@@ -24286,14 +26115,10 @@ class GTExternalPlayerScreen(
                 reference_service_type(self.reference, fallback_type)
             )
         )
-        self._set_info_chip("resolution", "--")
-        youtube_quality = getattr(self.current_item, "youtube_selected_quality", 0)
-        if youtube_quality:
-            requested = getattr(self.current_item, "youtube_requested_quality", "")
-            label = "{}P".format(youtube_quality)
-            if requested and str(requested) != str(youtube_quality):
-                label = "{}P → {}".format(requested, label)
-            self._set_info_chip("resolution", label)
+        tracker = getattr(self, "_resolution_tracker", None)
+        if tracker is not None:
+            tracker.reset()
+        self._set_info_chip("resolution", resolution_text(youtube_resolution_hint(self.current_item)))
         self._set_info_chip("fps", "-- FPS")
         self._set_info_chip("video_codec", "--")
         self._set_info_chip("audio_codec", "--")
@@ -24751,6 +26576,127 @@ class GTExternalPlayerScreen(
         _debug("live recall requested target_index={}".format(index))
         self._switch_channel(0, target_index=index)
 
+    def _request_catalog_player_window(self, direction):
+        owner = getattr(self, "_playback_owner", None)
+        native = getattr(owner, "_movie_native_window", None)
+        catalog = getattr(owner, "_movie_browser_catalog", None) or native
+        if catalog is None or getattr(self.item, "content_type", "") != "movie":
+            return False
+        if getattr(self, "_catalog_player_request", None) is not None:
+            return True
+        target = self._catalog_player_base + self.current_index + direction
+        if 0 <= self.current_index + direction < len(self._entries):
+            return False
+        # Catalogue reads and URL resolution remain in workers even at an
+        # evicted-window boundary. Preserve the currently playing service.
+        request = {"done": False, "page": None, "target": target}
+        self._catalog_player_request = request
+        timer = getattr(self, "_catalog_player_timer", None)
+        if timer is None:
+            timer = self._catalog_player_timer = eTimer()
+            _connect_timer(timer, self._poll_catalog_player_window)
+            self.onClose.append(timer.stop)
+        category = str(getattr(owner, "_movie_loaded_category_id", "") or "")
+        hidden = getattr(owner, "_hidden_category_ids", ())
+        token = _WorkerToken(WORKER_LIST_TIMEOUT_SECONDS)
+        previous = getattr(self, "_catalog_player_token", None)
+        _cancel_worker_token(previous)
+        self._catalog_player_token = token
+        if not getattr(self, "_catalog_player_close_hook", False):
+            self._catalog_player_close_hook = True
+            self.onClose.append(lambda: _cancel_worker_token(getattr(self, "_catalog_player_token", None)))
+        base = max(0, ((target - 70) // 70) * 70)
+        def load():
+            try:
+                if native is not None:
+                    while target >= native.count and native.has_more:
+                        rows = _bounded_client_call(self.client, token,
+                            lambda: self.client.load_more_items("movie", category))
+                        rows = filter_hidden_category_items(rows, hidden, category)
+                        native.append(rows, owner._client_has_more_items("movie", category), token)
+                    if target < 0:
+                        target_index = native.count - 1
+                    elif target >= native.count and not native.has_more:
+                        target_index = 0
+                    else:
+                        target_index = target
+                    native_base = max(0, ((target_index - 70) // 70) * 70)
+                    page = native.read_window(category, offset=native_base, size=240, token=token)
+                    request.update(page=page, base=native_base, target=target_index)
+                elif target < 0:
+                    # Match native wraparound at the real catalogue boundary,
+                    # rather than at the edge of the bounded UI list.
+                    cursor, count, tail = 0, 0, []
+                    while True:
+                        token.check()
+                        page = catalog.index.browse(category, after=cursor, page_size=80,
+                            hidden_category_ids=hidden, token=token, include_total=False)
+                        tail.extend(page.items)
+                        count += len(page.items)
+                        tail = tail[-240:]
+                        if not page.has_more or not page.items:
+                            break
+                        cursor = page.next_cursor
+                    tail_base = max(0, ((count - 240) // 70) * 70)
+                    page = catalog.read_window(category, offset=tail_base, size=240,
+                        hidden_category_ids=hidden, token=token)
+                    # Align the return view and include the actual final item.
+                    if tail_base + len(page.items) < count:
+                        tail_base += 70
+                        page = catalog.read_window(category, offset=tail_base, size=240,
+                            hidden_category_ids=hidden, token=token)
+                    request.update(page=page, base=tail_base, target=count - 1)
+                else:
+                    page = catalog.read_window(category, offset=base, size=240,
+                        hidden_category_ids=hidden, token=token)
+                    if target >= base + len(page.items) and not page.has_more:
+                        page = catalog.read_window(category, offset=0, size=240,
+                            hidden_category_ids=hidden, token=token)
+                        request.update(base=0, target=0)
+                    else:
+                        request["base"] = base
+                    request["page"] = page
+            except Exception as error:
+                _debug("catalogue playback window failed {}".format(error.__class__.__name__))
+            finally:
+                request["done"] = True
+        try:
+            threading.Thread(target=load, name="GT-PlayerCatalogue", daemon=True).start()
+        except (OSError, RuntimeError):
+            self._catalog_player_request = None
+            return True
+        timer.start(50, True)
+        return True
+
+    def _poll_catalog_player_window(self):
+        request = getattr(self, "_catalog_player_request", None)
+        if self._closed or request is None:
+            return
+        if not request["done"]:
+            self._catalog_player_timer.start(50, True)
+            return
+        self._catalog_player_request = None
+        page = request["page"]
+        if page is None or not page.items:
+            return
+        old_id = str(self.item.stream_id)
+        self._entries = list(page.items)
+        self._catalog_player_base = request["base"]
+        target = max(0, min(request["target"] - request["base"], len(self._entries) - 1))
+        self.current_index = next((i for i, item in enumerate(self._entries)
+                                   if str(item.stream_id) == old_id), -1)
+        self._pending_channel_index = None
+        owner = getattr(self, "_playback_owner", None)
+        if owner is not None and not getattr(owner, "_closed", False):
+            owner._movie_entries = owner._movie_catalog_entries = list(page.items)
+            owner._movie_window_base = request["base"]
+            owner._movie_selected_index = target
+            owner._movie_known_ids = {str(item.stream_id) for item in page.items}
+            owner._movie_browse_cursor = page.next_cursor
+            owner._movie_has_more = page.has_more
+            owner._movie_poster_page_key = None
+        self._switch_channel(0, target_index=target)
+
     def _switch_channel(self, step, target_index=None):
         if (
             not self._entries
@@ -24769,6 +26715,9 @@ class GTExternalPlayerScreen(
             return
         if self._pending_engine_reference is not None:
             self.show_info()
+            return
+        request_window = getattr(self, "_request_catalog_player_window", None)
+        if target_index is None and callable(request_window) and request_window(1 if step > 0 else -1):
             return
         direction = (1 if step > 0 else -1) if target_index is None else 0
         now = time.monotonic()
@@ -25196,6 +27145,15 @@ class GTExternalPlayerScreen(
                 self._channel_key_accepted_at = 0.0
                 self._channel_link_ready_at = 0.0
 
+    def _start_info_hide_timer(self):
+        """Apply the appearance timeout to every automatic banner-hide path."""
+        self._hide_timer.stop()
+        if self._closed or self._seeking or self._paused:
+            return
+        timeout = self._infobar_timeout
+        if timeout:
+            self._hide_timer.start(timeout * 1000, True)
+
     def show_info(self):
         if (
             getattr(self, "_subtitle_menu_open", False)
@@ -25229,19 +27187,8 @@ class GTExternalPlayerScreen(
         # Native pixmap instances now exist. Also completes missing weather
         # when the category screen was left before its first response arrived.
         self._start_player_weather()
-        try:
-            if self._picon_visible:
-                self._info_dialog["picon"].show()
-            else:
-                self._info_dialog["picon"].hide()
-            self._info_dialog["picon_placeholder"].hide()
-        except Exception:
-            pass
-        try:
-            self._hide_timer.stop()
-        except Exception:
-            pass
-        self._hide_timer.start(INFO_TIMEOUT_MS, True)
+        self._sync_picon_visibility()
+        self._start_info_hide_timer()
 
     def hide_info(self):
         if self._closed or self._seeking or self._paused:
@@ -25284,7 +27231,7 @@ class GTExternalPlayerScreen(
                 MessageBox,
                 text,
                 MessageBox.TYPE_INFO,
-                timeout=INFO_TIMEOUT_MS // 1000,
+                timeout=SUBTITLE_MESSAGE_TIMEOUT_SECONDS,
             )
             return
         except Exception:
@@ -25298,6 +27245,8 @@ class GTExternalPlayerScreen(
 
     def _subtitle_changed(self, selected_track):
         """Keep the player banner from covering newly enabled subtitles."""
+        self._subtitle_sync_keys.cancel()
+        self._dismiss_subtitle_sync_offset()
         if selected_track is not None:
             self.hide_info()
         controller = getattr(self, "_subtitle_controller", None)
@@ -25306,6 +27255,8 @@ class GTExternalPlayerScreen(
         ):
             return
         self._resume_subtitle_pending_key = ""
+        self._resume_subtitle_read_job = None
+        self._resume_subtitle_read_state = None
         self._resume_subtitle_restore_attempts = 0
         self._remember_resume_subtitle(mark_disabled=True)
 
@@ -25322,25 +27273,77 @@ class GTExternalPlayerScreen(
             state = controller.snapshot_resume_state()
             if state is None and mark_disabled:
                 state = {"kind": "disabled"}
-            if state is not None and not store.remember(self._resume_key, state):
+            if state is not None and not store.remember_async(self._resume_key, state):
                 _debug("resume subtitle save failed")
         except Exception:
             _debug("resume subtitle save failed")
+
+    def _resume_subtitle_context(self):
+        controller = getattr(self, "_subtitle_controller", None)
+        return (self._generation, self._resume_key, id(controller),
+                getattr(controller, "_service_generation", None),
+                getattr(getattr(controller, "online", None), "_generation", None))
 
     def _restore_resume_subtitle(self):
         key = getattr(self, "_resume_subtitle_pending_key", "")
         if not key:
             return False
-        if key != self._resume_key:
-            self._resume_subtitle_pending_key = ""
-            return False
         controller = getattr(self, "_subtitle_controller", None)
         store = getattr(self, "_subtitle_resume_store", None)
-        if controller is None or store is None:
+        if key != self._resume_key or controller is None or store is None:
             self._resume_subtitle_pending_key = ""
             return False
+        if getattr(self, "_subtitle_menu_open", False):
+            return True
+        context = self._resume_subtitle_context()
+        cached = getattr(self, "_resume_subtitle_read_state", None)
+        if cached is not None and cached[0] == context:
+            return self._apply_resume_subtitle_state(cached[1])
+        if getattr(self, "_resume_subtitle_read_job", None) == context:
+            return True
+        reader = getattr(self, "_resume_subtitle_reader", None)
+        if reader is None:
+            reader = self._resume_subtitle_reader = SourceLoader(
+                eTimer(), _connect_timer, self._resume_subtitle_read_done)
+            self.onClose.append(reader.close)
+        self._resume_subtitle_read_job = context
+        def load():
+            state = store.get(key, nonblocking=True)
+            prepare = getattr(controller, "prepare_resume_state", None)
+            if callable(prepare) and state is not None:
+                state = prepare(state)
+            return context, state
+        reader.request(load)
+        return True
+
+    def _resume_subtitle_read_done(self, value, error):
+        context = getattr(self, "_resume_subtitle_read_job", None)
+        self._resume_subtitle_read_job = None
+        current = self._resume_subtitle_context()
+        if (self._closed or context is None or context != current
+                or not getattr(self, "_resume_subtitle_pending_key", "")
+                or getattr(self, "_web_suspended", None) is not None):
+            if context is not None and context[:4] == current[:4] and context != current:
+                # A manual native/web subtitle operation now owns this film.
+                self._resume_subtitle_pending_key = ""
+                self._resume_subtitle_read_state = None
+            return
+        if error is not None or value is None or value[0] != context:
+            value = (context, None)
+        self._resume_subtitle_read_state = value
+        self._apply_resume_subtitle_state(value[1])
+        if not getattr(self, "_resume_subtitle_pending_key", ""):
+            self._start_automatic_subtitle_search()
+
+    def _apply_resume_subtitle_state(self, state):
+        if getattr(self, "_subtitle_menu_open", False):
+            return True
+        controller = getattr(self, "_subtitle_controller", None)
         try:
-            state = store.get(key)
+            if state is not None and state.get("kind") == "pending":
+                self._resume_subtitle_read_state = None
+                self._subtitle_auto_timer.start(200, True)
+                return True
             if state is not None and state.get("kind") in ("embedded", "external"):
                 ready = (bool(controller.embedded.available_tracks())
                          if state["kind"] == "embedded"
@@ -25351,6 +27354,7 @@ class GTExternalPlayerScreen(
                     self._subtitle_auto_timer.start(500, True)
                     return True
             self._resume_subtitle_pending_key = ""
+            self._resume_subtitle_read_state = None
             self._resume_subtitle_restore_attempts = 0
             if state is not None and controller.restore_resume_state(state):
                 _debug("resume subtitle restored kind={}".format(state["kind"]))
@@ -25358,6 +27362,7 @@ class GTExternalPlayerScreen(
         except Exception:
             pass
         self._resume_subtitle_pending_key = ""
+        self._resume_subtitle_read_state = None
         self._resume_subtitle_restore_attempts = 0
         _debug("resume subtitle unavailable; using configured search mode")
         return False
@@ -25398,6 +27403,8 @@ class GTExternalPlayerScreen(
         self._subtitle_menu_generation = None
         if was_open:
             self._restore_subtitle_overlay(generation)
+            if not self._closed and getattr(self, "_resume_subtitle_pending_key", ""):
+                self._subtitle_auto_timer.start(50, True)
 
     def _restore_subtitle_overlay(self, generation):
         if (
@@ -25888,7 +27895,7 @@ class GTExternalPlayerScreen(
             self._cancel_seek_verification()
             self._seeking = False
             self._show_seek_overlay(N_("Loading..."), N_("Please wait"))
-            self._hide_timer.start(INFO_TIMEOUT_MS, True)
+            self._start_info_hide_timer()
             return
         self._seek_unavailable()
 
@@ -25899,7 +27906,7 @@ class GTExternalPlayerScreen(
             N_("THIS STREAM CANNOT BE SEEKED"),
             N_("The server or playback format does not support seeking"),
         )
-        self._hide_timer.start(INFO_TIMEOUT_MS, True)
+        self._start_info_hide_timer()
 
     def _begin_or_adjust_seek(self, delta_seconds):
         if getattr(self.current_item, "content_type", "") == "live":
@@ -25962,6 +27969,9 @@ class GTExternalPlayerScreen(
         return int(target) - 5 <= int(position) <= int(origin) - required
 
     def _prepare_subtitle_seek(self, target, origin=None):
+        watcher = getattr(self, "_youtube_end_watcher", None)
+        if watcher is not None:
+            watcher.reset_position()
         controller = getattr(self, "_subtitle_controller", None)
         preparer = getattr(controller, "prepare_seek", None)
         if callable(preparer):
@@ -25997,11 +28007,12 @@ class GTExternalPlayerScreen(
                 except Exception as error:
                     log_event("subtitles", "seek-cancel-resync-failed", error)
 
-    def _schedule_seek_verification(self, origin, target, method):
+    def _schedule_seek_verification(self, origin, target, method, startup_resume=False):
         self._pending_seek_verification = {
             "origin": int(origin),
             "target": int(target),
             "method": str(method),
+            "startup_resume": bool(startup_resume),
             "checks": 0,
             "async_deadline": (
                 time.monotonic() + SEEK_ASYNC_VERIFY_TIMEOUT_SECONDS
@@ -26012,10 +28023,19 @@ class GTExternalPlayerScreen(
                 getattr(self.current_item, "stream_id", "") or ""
             ),
         }
+        if not startup_resume:
+            if (self._resume_start_position > 0
+                    and getattr(self, "_resume_bookmark_guard", None) is None):
+                self._arm_resume_bookmark_guard()
+            self._resume_start_position = 0
+            self._resume_timer.stop()
+            guard = getattr(self, "_resume_bookmark_guard", None)
+            if guard is not None:
+                guard["manual_seek"] = {"origin": int(origin), "target": int(target)}
         self._seek_verify_timer.start(SEEK_VERIFY_DELAY_MS, True)
 
 
-    def _request_seek(self, seeker, origin, target):
+    def _request_seek(self, seeker, origin, target, startup_resume=False):
         """Seek absolutely first, falling back immediately on explicit failure."""
         origin = int(origin)
         target = int(target)
@@ -26026,7 +28046,7 @@ class GTExternalPlayerScreen(
             try:
                 result = absolute(target * 90000)
                 if not self._seek_call_failed(result):
-                    self._schedule_seek_verification(origin, target, "absolute")
+                    self._schedule_seek_verification(origin, target, "absolute", startup_resume)
                     self._prepare_subtitle_seek(target, origin=origin)
                     return True
             except Exception as error:
@@ -26038,6 +28058,10 @@ class GTExternalPlayerScreen(
         relative = getattr(seeker, "seekRelative", None)
         delta = target - origin
         if relative is None or delta == 0:
+            if delta == 0 and not startup_resume:
+                self._resume_start_position = 0
+                self._resume_bookmark_guard = None
+                self._resume_timer.stop()
             return delta == 0
         try:
             result = relative(-1 if delta < 0 else 1, abs(delta) * 90000)
@@ -26050,7 +28074,7 @@ class GTExternalPlayerScreen(
                 )
             )
             return False
-        self._schedule_seek_verification(origin, target, "relative")
+        self._schedule_seek_verification(origin, target, "relative", startup_resume)
         self._prepare_subtitle_seek(target, origin=origin)
         return True
 
@@ -26067,6 +28091,7 @@ class GTExternalPlayerScreen(
         seeker = self._seek_interface()
         position = self._seek_position(seeker)[0]
         if self._seek_reached(position, state["origin"], state["target"]):
+            self._resume_bookmark_position_ready(position)
             self._cancel_seek_verification(resync_subtitles=False)
             self._playback_tick()
             observed = self._subtitle_position()
@@ -26379,7 +28404,7 @@ class GTExternalPlayerScreen(
                 N_("PAUSE IS NOT AVAILABLE"),
                 N_("This server or playback format does not support pausing"),
             )
-            self._hide_timer.start(INFO_TIMEOUT_MS, True)
+            self._start_info_hide_timer()
             return
         try:
             result = pauseable.pause()
@@ -26434,14 +28459,17 @@ class GTExternalPlayerScreen(
         if self._closed:
             return
         current = now or datetime.datetime.now()
-        self._info_dialog["clock"].setText(current.strftime("%H:%M"))
         unused_width, unused_height, px = _scale()
+        fit_dynamic_text(self._info_dialog["clock"], current.strftime("%H:%M"), max_lines=1,
+            preferred_size=font_px(px, 52), min_size=max(6, px(30)))
+        fit_dynamic_text(self._info_dialog["clock_seconds"], current.strftime(":%S"), max_lines=1,
+            preferred_size=font_px(px, 30), min_size=max(6, px(18)))
         fit_dynamic_text(
             self._info_dialog["date"], localized_date_text(current), max_lines=1,
             preferred_size=font_px(px, 18), min_size=max(6, px(10)),
         )
-        if not self._live_network_silent():
-            self._clock_timer.start(30000, True)
+        # The visible-banner telemetry already refreshes every second for all
+        # playback types. Do not run a second clock loop while it is hidden.
 
     def _render_player_weather_waiting(self, settings=None):
         if settings is None:
@@ -26678,7 +28706,12 @@ class GTExternalPlayerScreen(
             return
         if getattr(self.current_item, "content_type", "") == "live":
             return
-        position, length = self._seek_position()
+        position, length = self._seek_position(
+            self._raw_seek_interface() if self._episode_watcher.key else None,
+        )
+        if self._episode_watcher.sample(position, length):
+            if self._resume_store is not None and self._resume_key:
+                queue_playback_clear(self._resume_store, self._resume_key)
         if self._youtube_end_watcher is not None:
             self._youtube_end_watcher.sample(position, length)
         if position >= 0 and length > 0:
@@ -26696,6 +28729,54 @@ class GTExternalPlayerScreen(
         # Keep retrying while ExtEplayer3 is opening the stream; getLength()
         # can legitimately be unavailable during the first few callbacks.
         self._playback_timer.start(1000, True)
+
+    def _arm_resume_bookmark_guard(self):
+        """Retain a bookmark until the decoder confirms its resumed position."""
+        target = self._resume_start_position
+        previous = getattr(self, "_resume_bookmark_guard", None)
+        same_item = previous is not None and previous["key"] == self._resume_key
+        changed_service = same_item and (
+            previous["reference"] is not self.reference
+            or previous["generation"] != self._generation)
+        manual = previous.get("manual_seek") if same_item else None
+        if changed_service and manual is not None:
+            # An engine change carries the user's newer seek intent. Use its
+            # observed landing if available, otherwise request that target.
+            if not self._seek_reached(target, manual["origin"], manual["target"]):
+                target = manual["target"]
+            self._resume_start_position = target
+        elif same_item and target < previous["target"]:
+            # A same-item engine handoff must not discard protection merely
+            # because its queued seek was accepted before the handoff.
+            target = previous["target"]
+            if (previous["reference"] is not self.reference
+                    or previous["generation"] != self._generation):
+                self._resume_start_position = target
+        self._resume_bookmark_guard = (
+            {"key": self._resume_key, "target": target,
+             "reference": self.reference, "generation": self._generation}
+            if target > 0 else None
+        )
+
+    def _resume_bookmark_position_ready(self, position):
+        guard = getattr(self, "_resume_bookmark_guard", None)
+        if guard is None:
+            return True
+        if guard["key"] != self._resume_key:
+            self._resume_bookmark_guard = None
+            return True
+        if (guard["reference"] is not self.reference
+                or guard["generation"] != self._generation):
+            return False
+        manual = guard.get("manual_seek")
+        if manual is not None:
+            ready = self._seek_reached(position, manual["origin"], manual["target"])
+        else:
+            ready = position >= max(0, guard["target"] - 2)
+        if not ready:
+            return False
+        self._resume_bookmark_guard = None
+        return True
 
     def _resume_retry(self, reason, observed_length=-1):
         """Retry a bounded resume probe, then keep playback at the beginning."""
@@ -26754,6 +28835,7 @@ class GTExternalPlayerScreen(
         """Seek only after the decoder exposes a plausible, stable VOD length."""
         if self._closed or self._resume_start_position <= 0:
             return
+        self._arm_resume_bookmark_guard()
         seeker = self._seek_interface()
         if seeker is None:
             self._reset_resume_length_probe()
@@ -26769,7 +28851,7 @@ class GTExternalPlayerScreen(
             return
         target = int(self._resume_start_position)
         self._cancel_seek_verification()
-        if not self._request_seek(seeker, position, target):
+        if not self._request_seek(seeker, position, target, startup_resume=True):
             self._resume_retry("seek-rejected", length)
             return
         _debug(
@@ -26790,6 +28872,20 @@ class GTExternalPlayerScreen(
     def _save_resume_position(self):
         if getattr(self, "_web_suspended", None) is not None:
             return
+        # A successful seekTo() can mean only that ServiceApp queued it.
+        # Preserve the prior bookmark through startup, retries and queued
+        # seeks until a real decoder sample reaches the saved position.
+        if self._resume_start_position > 0:
+            return
+        sampled_position = None
+        if getattr(self, "_resume_bookmark_guard", None) is not None:
+            sampled_position = self._seek_position()
+            position, length = sampled_position
+            if length <= 0 or not self._resume_bookmark_position_ready(position):
+                return
+        if self._episode_watcher.sample_current():
+            if self._resume_store is not None and self._resume_key:
+                queue_playback_clear(self._resume_store, self._resume_key)
         if self._resume_saved or self._resume_store is None or not self._resume_key:
             return
         if getattr(self.current_item, "content_type", "") not in (
@@ -26797,31 +28893,27 @@ class GTExternalPlayerScreen(
         ):
             return
         if bool(getattr(self.current_item, "youtube_native", False)):
-            # EXIT while the decoder is still opening must retain the bookmark.
-            if self._resume_start_position > 0:
-                return
-            position, length = self._seek_position()
+            position, length = sampled_position or self._seek_position()
             watcher = getattr(self, "_youtube_end_watcher", None)
             if getattr(watcher, "ended", False):
                 position = length
             try:
-                self._resume_saved = bool(self._resume_store.save(
+                self._resume_saved = bool(queue_playback_save(self._resume_store,
                     self._resume_key, position, length
                 ))
             except OSError as exc:
                 log_event("youtube", "playback-history-write-failed error_type={}".format(type(exc).__name__))
             return
-        position, length = self._seek_position()
+        position, length = sampled_position or self._seek_position()
         if position >= 0 and length > 0:
             self._remember_resume_subtitle()
-            self._resume_store.save(
+            self._resume_saved = bool(queue_playback_save(self._resume_store,
                 self._resume_key,
                 position,
                 length,
                 item=self.current_item,
                 account_scope=resume_account_scope(self.client),
-            )
-            self._resume_saved = True
+            ))
 
     def _set_player_progress(self, event, now=None):
         start = int(getattr(event, "start_timestamp", 0) or 0)
@@ -26919,30 +29011,16 @@ class GTExternalPlayerScreen(
             except Exception:
                 info = None
 
-        width = self._service_info_value(info, "sVideoWidth")
-        height = self._service_info_value(info, "sVideoHeight")
+        snapshot = self._refresh_resolution_info(service)
+        width = snapshot.get("width", 0) if snapshot else 0
+        height = snapshot.get("height", 0) if snapshot else 0
         frame_rate = self._service_info_value(info, "sFrameRate")
         video_type = self._service_info_value(info, "sVideoType")
-        if width <= 0:
-            width = _read_proc_number("/proc/stb/vmpeg/0/xres", 16)
-        if height <= 0:
-            height = _read_proc_number("/proc/stb/vmpeg/0/yres", 16)
         if frame_rate <= 0:
             frame_rate = _read_proc_number("/proc/stb/vmpeg/0/framerate", 10)
 
-        if width > 0 and height > 0:
-            quality = "SD"
-            if width >= 3800 or height >= 2100:
-                quality = "UHD"
-            elif width >= 1900 or height >= 1050:
-                quality = "FHD"
-            elif width >= 1200 or height >= 700:
-                quality = "HD"
-            self._set_info_chip("resolution", quality)
-            if live_local_once:
-                self._live_metadata_ready["resolution"] = True
-        elif not live_local_once or not self._live_metadata_ready.get("resolution"):
-            self._set_info_chip("resolution", "--")
+        if width > 0 and height > 0 and live_local_once:
+            self._live_metadata_ready["resolution"] = True
 
         if frame_rate > 0:
             fps = int((frame_rate + 500) / 1000) if frame_rate > 1000 else frame_rate
@@ -27079,8 +29157,19 @@ class GTExternalPlayerScreen(
         _cancel_worker_token(self._picon_worker_token)
         self._picon_worker_token = None
         self._picon_results = {}
+        self._sync_picon_visibility()
+
+    def _sync_picon_visibility(self):
+        """Keep a local YouTube logo visible until current artwork decodes."""
         try:
-            self._info_dialog["picon"].hide()
+            show_picon = self._picon_visible and self._info_visible
+            show_logo = (self._info_visible and not self._picon_visible
+                         and bool(getattr(self.current_item, "youtube_native", False)))
+            for name, visible in (("picon", show_picon), ("youtube_logo", show_logo)):
+                if visible:
+                    self._info_dialog[name].show()
+                else:
+                    self._info_dialog[name].hide()
             self._info_dialog["picon_placeholder"].hide()
         except Exception:
             pass
@@ -27213,18 +29302,14 @@ class GTExternalPlayerScreen(
         if self._is_live_item() and not _valid_live_picon_file(path):
             return
 
+        request_token = self._picon_request_token
+
         def loaded(success):
-            if generation != self._generation:
+            if (self._closed or generation != self._generation
+                    or request_token != self._picon_request_token):
                 return
             self._picon_visible = bool(success)
-            try:
-                self._info_dialog["picon_placeholder"].hide()
-                if success and self._info_visible:
-                    self._info_dialog["picon"].show()
-                else:
-                    self._info_dialog["picon"].hide()
-            except Exception:
-                self._picon_visible = False
+            self._sync_picon_visibility()
 
         loader = (
             attach_native_alpha_pixmap
@@ -27457,9 +29542,17 @@ class GTExternalPlayerScreen(
         self._stop_player_stream_diag()
         self._unbind_player_key_handler()
         self._live_zero_key.close()
+        self._subtitle_sync_keys.close()
+        sync_overlay, self._subtitle_sync_overlay = self._subtitle_sync_overlay, None
+        if sync_overlay is not None:
+            try:
+                self.session.deleteDialog(sync_overlay)
+            except Exception:
+                sync_overlay.dismiss()
         self._held_direction = None
         self._held_direction_long = False
         self._save_resume_position()
+        self._episode_watcher.close()
         stop_archive_keepalive = getattr(
             self,
             "_stop_archive_portal_keepalive",

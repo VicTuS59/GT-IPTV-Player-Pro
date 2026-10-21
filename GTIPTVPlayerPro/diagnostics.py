@@ -95,6 +95,9 @@ def log_event(area, message, error=None, path=DEFAULT_LOG_PATH):
             flags = os.O_WRONLY | os.O_APPEND | os.O_CREAT
             flags |= getattr(os, "O_CLOEXEC", 0)
             flags |= getattr(os, "O_NOFOLLOW", 0)
+            # Validate the opened descriptor without first waiting for a
+            # reader when an unexpected FIFO occupies this /tmp pathname.
+            flags |= getattr(os, "O_NONBLOCK", 0)
             descriptor = os.open(path, flags, 0o600)
             status = os.fstat(descriptor)
             current_uid = getattr(os, "geteuid", lambda: status.st_uid)()

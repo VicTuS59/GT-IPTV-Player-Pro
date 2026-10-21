@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Tamil\nLanguage: ta\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1); \n"
+
+msgid "Choose a subtitle file"
+msgstr "வசன வரிக் கோப்பைத் தேர்ந்தெடுக்கவும்"
+
+msgid "Download folder"
+msgstr "பதிவிறக்கக் கோப்புறை"
+
+msgid "Use this folder"
+msgstr "இந்தக் கோப்புறையைப் பயன்படுத்தவும்"
+
+msgid "Local subtitles"
+msgstr "உள்ளூர் வசன வரிகள்"
+
+msgid "GT subtitle downloads"
+msgstr "GT வசன வரிப் பதிவிறக்கங்கள்"
+
+msgid "Search subtitle files"
+msgstr "வசன வரிக் கோப்புகளைத் தேடவும்"
+
+msgid "No subtitle files found."
+msgstr "வசன வரிக் கோப்புகள் எதுவும் கிடைக்கவில்லை."
+
+msgid "Could not read this folder."
+msgstr "இந்தக் கோப்புறையைப் படிக்க முடியவில்லை."
+
+msgid "Could not load this subtitle file."
+msgstr "இந்த வசன வரிக் கோப்பை ஏற்ற முடியவில்லை."
+
+msgid "Could not save the download folder."
+msgstr "பதிவிறக்கக் கோப்புறையைச் சேமிக்க முடியவில்லை."
+
+msgid "Download folder saved."
+msgstr "பதிவிறக்கக் கோப்புறை சேமிக்கப்பட்டது."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "வசன வரிப் பதிவிறக்கக் கோப்புறை கிடைக்கவில்லை. வேறொரு கோப்புறையைத் தேர்ந்தெடுக்கவும்."
+
+msgid "Subtitle file is too large."
+msgstr "வசன வரிக் கோப்பு மிகவும் பெரியது."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "SRT மற்றும் VTT வசன வரிக் கோப்புகள் மட்டுமே ஆதரிக்கப்படுகின்றன."
+
+msgid "Searching subtitle files..."
+msgstr "வசன வரிக் கோப்புகள் தேடப்படுகின்றன..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "தேடல் வரம்பை எட்டிவிட்டது. தேடலைக் குறுக்கவும்."
+
+msgid "Temporary folder"
+msgstr "தற்காலிகக் கோப்புறை"
+
+msgid "Device storage"
+msgstr "சாதனச் சேமிப்பகம்"
+
+msgid "Up one folder"
+msgstr "ஒரு நிலை மேலே"
+
+msgid "Subtitle language"
+msgstr "வசன வரிகளின் மொழி"
+
+msgid "Search this folder"
+msgstr "இந்தக் கோப்புறையில் தேடவும்"
+
+msgid "Local subtitle loaded."
+msgstr "உள்ளூர் வசன வரிகள் ஏற்றப்பட்டன."
+
+msgid "Automatic detection"
+msgstr "தானாகக் கண்டறிதல்"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "HDD, USB அல்லது இணைக்கப்பட்ட NAS சாதனத்தில் ஒரு கோப்புறையைத் தேர்ந்தெடுக்கவும்."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "ரிசீவர் மறுதொடக்கம் செய்யப்படும்போது தற்காலிகக் கோப்புறை காலியாக்கப்படும்."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "பதிவிறக்கக் கோப்புறை: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "வசன வரிகளின் மொழி: {}"
+
+msgid "Folder is not available."
+msgstr "கோப்புறை கிடைக்கவில்லை."
+
+msgid "Use temporary folder"
+msgstr "தற்காலிகக் கோப்புறையைப் பயன்படுத்தவும்"
+
+msgid "Device folders"
+msgstr "சாதனக் கோப்புறைகள்"
+
+msgid "Downloaded subtitles"
+msgstr "பதிவிறக்கப்பட்ட வசன வரிகள்"
+
+msgid "Search results"
+msgstr "தேடல் முடிவுகள்"

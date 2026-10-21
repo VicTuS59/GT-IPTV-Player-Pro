@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: da\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Serie"
+
+msgid "Season"
+msgstr "Sæson"
+
+msgid "Navigate"
+msgstr "Naviger"
+
+msgid "Page"
+msgstr "Side"
+
+msgid "Play"
+msgstr "Afspil"
+
+msgid "Favorite"
+msgstr "Favorit"
+
+msgid "Refresh"
+msgstr "Opdater"
+
+msgid "Download"
+msgstr "Hent"
+
+msgid "Back"
+msgstr "Tilbage"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Sæson {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} sæsoner"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} afsnit"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Afsnit {}"
+
+msgid "Watched"
+msgstr "Set"
+
+msgid "Not played"
+msgstr "Ikke afspillet"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Genoptag fra {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Genoptag afsnit {}"
+
+msgid "Continue watching"
+msgstr "Fortsæt med at se"
+
+msgid "Add to favorites"
+msgstr "Føj til favoritter"
+
+msgid "Remove from favorites"
+msgstr "Fjern fra favoritter"
+
+msgid "Download episode"
+msgstr "Download afsnit"
+
+msgid "SEASON PROGRESS"
+msgstr "SÆSONFREMSKRIDT"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} afsnit set færdig"
+
+msgid "CAST"
+msgstr "MEDVIRKENDE"
+
+msgid "GENRE"
+msgstr "GENRE"
+
+msgid "Unknown season"
+msgstr "Ukendt sæson"
+
+msgid "No episodes in this season."
+msgstr "Ingen afsnit i denne sæson."
+
+msgid "Marked as watched"
+msgstr "Markeret som set"
+
+msgid "Marked as not watched"
+msgstr "Markeret som ikke set"
+
+msgid "Could not save watched status."
+msgstr "Kunne ikke gemme visningsstatus."
+
+msgid "Mark watched"
+msgstr "Markér som set"
+
+msgid "Hold OK"
+msgstr "Hold OK nede"
+
+msgid "Episodes"
+msgstr "Afsnit"
+
+msgid "No information available."
+msgstr "Ingen oplysninger tilgængelige."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Sæson {season} · Afsnit {episode} · Genoptag fra {time}"

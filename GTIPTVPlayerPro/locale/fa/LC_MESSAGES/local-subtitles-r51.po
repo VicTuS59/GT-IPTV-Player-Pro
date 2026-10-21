@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Persian\nLanguage: fa\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1); \n"
+
+msgid "Choose a subtitle file"
+msgstr "یک فایل زیرنویس انتخاب کنید"
+
+msgid "Download folder"
+msgstr "پوشهٔ دانلود"
+
+msgid "Use this folder"
+msgstr "استفاده از این پوشه"
+
+msgid "Local subtitles"
+msgstr "زیرنویس‌های محلی"
+
+msgid "GT subtitle downloads"
+msgstr "دانلودهای زیرنویس GT"
+
+msgid "Search subtitle files"
+msgstr "جستجوی فایل‌های زیرنویس"
+
+msgid "No subtitle files found."
+msgstr "هیچ فایل زیرنویسی یافت نشد."
+
+msgid "Could not read this folder."
+msgstr "خواندن این پوشه ممکن نشد."
+
+msgid "Could not load this subtitle file."
+msgstr "بارگذاری این فایل زیرنویس ممکن نشد."
+
+msgid "Could not save the download folder."
+msgstr "ذخیرهٔ پوشهٔ دانلود ممکن نشد."
+
+msgid "Download folder saved."
+msgstr "پوشهٔ دانلود ذخیره شد."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "پوشهٔ دانلود زیرنویس در دسترس نیست. پوشهٔ دیگری انتخاب کنید."
+
+msgid "Subtitle file is too large."
+msgstr "فایل زیرنویس بیش از حد بزرگ است."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "فقط فایل‌های زیرنویس SRT و VTT پشتیبانی می‌شوند."
+
+msgid "Searching subtitle files..."
+msgstr "در حال جستجوی فایل‌های زیرنویس..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "به حد جستجو رسیدید. دامنهٔ جستجو را محدودتر کنید."
+
+msgid "Temporary folder"
+msgstr "پوشهٔ موقت"
+
+msgid "Device storage"
+msgstr "حافظهٔ دستگاه"
+
+msgid "Up one folder"
+msgstr "یک پوشه بالاتر"
+
+msgid "Subtitle language"
+msgstr "زبان زیرنویس"
+
+msgid "Search this folder"
+msgstr "جستجو در این پوشه"
+
+msgid "Local subtitle loaded."
+msgstr "زیرنویس محلی بارگذاری شد."
+
+msgid "Automatic detection"
+msgstr "تشخیص خودکار"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "پوشه‌ای روی هارددیسک، حافظهٔ USB یا NAS متصل انتخاب کنید."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "با راه‌اندازی دوبارهٔ گیرنده، پوشهٔ موقت پاک می‌شود."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "پوشهٔ دانلود: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "زبان زیرنویس: {}"
+
+msgid "Folder is not available."
+msgstr "پوشه در دسترس نیست."
+
+msgid "Use temporary folder"
+msgstr "استفاده از پوشهٔ موقت"
+
+msgid "Device folders"
+msgstr "پوشه‌های دستگاه"
+
+msgid "Downloaded subtitles"
+msgstr "زیرنویس‌های دانلودشده"
+
+msgid "Search results"
+msgstr "نتایج جستجو"

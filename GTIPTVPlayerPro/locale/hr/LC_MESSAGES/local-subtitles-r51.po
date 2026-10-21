@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro\nLanguage-Team: Croatian\nLanguage: hr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11) ? 0 : (n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20)) ? 1 : 2;\n"
+
+msgid "Choose a subtitle file"
+msgstr "Odaberite datoteku titlova"
+
+msgid "Download folder"
+msgstr "Mapa za preuzimanje"
+
+msgid "Use this folder"
+msgstr "Koristi ovu mapu"
+
+msgid "Local subtitles"
+msgstr "Lokalni titlovi"
+
+msgid "GT subtitle downloads"
+msgstr "GT preuzeti titlovi"
+
+msgid "Search subtitle files"
+msgstr "Traži datoteke titlova"
+
+msgid "No subtitle files found."
+msgstr "Nisu pronađene datoteke titlova."
+
+msgid "Could not read this folder."
+msgstr "Nije moguće pročitati ovu mapu."
+
+msgid "Could not load this subtitle file."
+msgstr "Nije moguće učitati ovu datoteku titlova."
+
+msgid "Could not save the download folder."
+msgstr "Nije moguće spremiti mapu za preuzimanje."
+
+msgid "Download folder saved."
+msgstr "Mapa za preuzimanje spremljena."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Mapa za preuzimanje titlova nije dostupna. Odaberite drugu mapu."
+
+msgid "Subtitle file is too large."
+msgstr "Datoteka titlova je prevelika."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Podržane su samo datoteke titlova SRT i VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Traženje datoteka titlova..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Dosegnuto je ograničenje pretraživanja. Suzite pretragu."
+
+msgid "Temporary folder"
+msgstr "Privremena mapa"
+
+msgid "Device storage"
+msgstr "Pohrana uređaja"
+
+msgid "Up one folder"
+msgstr "Jednu mapu gore"
+
+msgid "Subtitle language"
+msgstr "Jezik titlova"
+
+msgid "Search this folder"
+msgstr "Pretraži ovu mapu"
+
+msgid "Local subtitle loaded."
+msgstr "Lokalni titlovi učitani."
+
+msgid "Automatic detection"
+msgstr "Automatsko prepoznavanje"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Odaberite mapu na HDD-u, USB-u ili povezanom NAS-u."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Privremena mapa briše se pri ponovnom pokretanju prijamnika."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Mapa za preuzimanje: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Jezik titlova: {}"
+
+msgid "Folder is not available."
+msgstr "Mapa nije dostupna."
+
+msgid "Use temporary folder"
+msgstr "Koristi privremenu mapu"
+
+msgid "Device folders"
+msgstr "Mape uređaja"
+
+msgid "Downloaded subtitles"
+msgstr "Preuzeti titlovi"
+
+msgid "Search results"
+msgstr "Rezultati pretraživanja"

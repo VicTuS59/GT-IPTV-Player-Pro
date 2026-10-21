@@ -747,7 +747,10 @@ class WebYouTube(object):
                     from enigma import eServiceReference
                     from .browser import GTExternalPlayerScreen
                     from .content import ContentItem
-                    item = ContentItem("movie", video_id, title)
+                    item = ContentItem(
+                        "movie", video_id, title,
+                        icon="https://i.ytimg.com/vi/{}/hqdefault.jpg".format(video_id),
+                    )
                     item.youtube_requested_quality = str(player.youtube_resolution)
                     item.youtube_selected_quality = selected_quality
                     item.youtube_duration_seconds = duration_seconds

@@ -11,7 +11,7 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 PROJECT_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd -P)
 PLUGIN_ROOT="$PROJECT_ROOT/GTIPTVPlayerPro"
 CONTROL_ROOT="$PROJECT_ROOT/CONTROL"
-DEFAULT_OUTPUT="$PROJECT_ROOT/dist/enigma2-plugin-extensions-gtiptvplayerpro_1.4.0-r0_all.ipk"
+DEFAULT_OUTPUT="$PROJECT_ROOT/dist/enigma2-plugin-extensions-gtiptvplayerpro_1.5.0-r0_all.ipk"
 
 if [ "$#" -gt 1 ]; then
     die 'usage: build-ipk.sh [output.ipk]'
@@ -116,7 +116,7 @@ find "$DATA_STAGE" -type f -exec chmod 0644 {} \;
 
 (
     cd "$CONTROL_STAGE"
-    find . -print0 > "$BUILD_DIR/control.unsorted"
+    find . -mindepth 1 -print0 > "$BUILD_DIR/control.unsorted"
 )
 LC_ALL=C sort -z "$BUILD_DIR/control.unsorted" > "$BUILD_DIR/control.members"
 (
@@ -129,7 +129,7 @@ gzip -9 -n -c "$BUILD_DIR/control.tar" > "$BUILD_DIR/control.tar.gz"
 
 (
     cd "$DATA_STAGE"
-    find . -print0 > "$BUILD_DIR/data.unsorted"
+    find . -mindepth 1 -print0 > "$BUILD_DIR/data.unsorted"
 )
 LC_ALL=C sort -z "$BUILD_DIR/data.unsorted" > "$BUILD_DIR/data.members"
 (
@@ -147,3 +147,4 @@ chmod 0644 "$BUILD_DIR/package.ipk"
 mv -f "$BUILD_DIR/package.ipk" "$OUTPUT"
 
 printf '%s\n' "$OUTPUT"
+

@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: lt\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Serialai"
+
+msgid "Season"
+msgstr "Sezonas"
+
+msgid "Navigate"
+msgstr "Naršyti"
+
+msgid "Page"
+msgstr "Puslapis"
+
+msgid "Play"
+msgstr "Leisti"
+
+msgid "Favorite"
+msgstr "Mėgstamiausias"
+
+msgid "Refresh"
+msgstr "Atnaujinti"
+
+msgid "Download"
+msgstr "Atsisiųsti"
+
+msgid "Back"
+msgstr "Atgal"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "{} sezonas"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "Sezonai: {}"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "Epizodai: {}"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "{} epizodas"
+
+msgid "Watched"
+msgstr "Peržiūrėta"
+
+msgid "Not played"
+msgstr "Neleista"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Tęsti nuo {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Tęsti {} epizodą"
+
+msgid "Continue watching"
+msgstr "Tęsti žiūrėjimą"
+
+msgid "Add to favorites"
+msgstr "Pridėti prie mėgstamiausių"
+
+msgid "Remove from favorites"
+msgstr "Pašalinti iš mėgstamiausių"
+
+msgid "Download episode"
+msgstr "Atsisiųsti epizodą"
+
+msgid "SEASON PROGRESS"
+msgstr "SEZONO PAŽANGA"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "Baigti epizodai: {} / {}"
+
+msgid "CAST"
+msgstr "VAIDINA"
+
+msgid "GENRE"
+msgstr "ŽANRAS"
+
+msgid "Unknown season"
+msgstr "Nežinomas sezonas"
+
+msgid "No episodes in this season."
+msgstr "Šiame sezone nėra epizodų."
+
+msgid "Marked as watched"
+msgstr "Pažymėta kaip peržiūrėta"
+
+msgid "Marked as not watched"
+msgstr "Pažymėta kaip neperžiūrėta"
+
+msgid "Could not save watched status."
+msgstr "Nepavyko išsaugoti peržiūros būsenos."
+
+msgid "Mark watched"
+msgstr "Pažymėti kaip peržiūrėtą"
+
+msgid "Hold OK"
+msgstr "Palaikyti OK"
+
+msgid "Episodes"
+msgstr "Epizodai"
+
+msgid "No information available."
+msgstr "Informacijos nėra."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "{season} sezonas · {episode} epizodas · Tęsti nuo {time}"

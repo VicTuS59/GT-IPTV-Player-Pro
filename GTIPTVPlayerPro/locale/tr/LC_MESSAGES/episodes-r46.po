@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: tr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Diziler"
+
+msgid "Season"
+msgstr "Sezon"
+
+msgid "Navigate"
+msgstr "Gezin"
+
+msgid "Page"
+msgstr "Sayfa"
+
+msgid "Play"
+msgstr "Oynat"
+
+msgid "Favorite"
+msgstr "Favori"
+
+msgid "Refresh"
+msgstr "Yenile"
+
+msgid "Download"
+msgstr "İndir"
+
+msgid "Back"
+msgstr "Geri"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "{}. Sezon"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} sezon"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} bölüm"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Bölüm {}"
+
+msgid "Watched"
+msgstr "İzlendi"
+
+msgid "Not played"
+msgstr "Oynatılmadı"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "{} konumundan devam"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "{}. bölüme devam et"
+
+msgid "Continue watching"
+msgstr "İzlemeye devam et"
+
+msgid "Add to favorites"
+msgstr "Favorilere ekle"
+
+msgid "Remove from favorites"
+msgstr "Favorilerden çıkar"
+
+msgid "Download episode"
+msgstr "Bölümü indir"
+
+msgid "SEASON PROGRESS"
+msgstr "SEZON İLERLEMESİ"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} bölüm tamamlandı"
+
+msgid "CAST"
+msgstr "OYUNCULAR"
+
+msgid "GENRE"
+msgstr "TÜR"
+
+msgid "Unknown season"
+msgstr "Bilinmeyen sezon"
+
+msgid "No episodes in this season."
+msgstr "Bu sezonda bölüm bulunamadı."
+
+msgid "Marked as watched"
+msgstr "İzlendi olarak işaretlendi"
+
+msgid "Marked as not watched"
+msgstr "İzlenmedi olarak işaretlendi"
+
+msgid "Could not save watched status."
+msgstr "İzlenme durumu kaydedilemedi."
+
+msgid "Mark watched"
+msgstr "İzlendi işaretle"
+
+msgid "Hold OK"
+msgstr "OK basılı"
+
+msgid "Episodes"
+msgstr "Bölümler"
+
+msgid "No information available."
+msgstr "Bilgi bulunamadı."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "{season}. Sezon · Bölüm {episode} · {time} konumundan devam"

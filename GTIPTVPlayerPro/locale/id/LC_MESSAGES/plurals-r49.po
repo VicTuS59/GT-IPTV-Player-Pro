@@ -1,0 +1,35 @@
+# GT IPTV Player Pro — r49 count-aware templates
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Indonesian\nLanguage: id\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
+
+#, python-brace-format
+msgid "{} minute"
+msgid_plural "{} minutes"
+msgstr[0] "{} menit"
+
+#, python-brace-format
+msgid "{} hour"
+msgid_plural "{} hours"
+msgstr[0] "{} jam"
+
+#, python-brace-format
+msgid "{} day"
+msgid_plural "{} days"
+msgstr[0] "{} hari"
+
+#, python-brace-format
+msgid "{} episode"
+msgid_plural "{} episodes"
+msgstr[0] "{} episode"
+
+#, python-brace-format
+msgid "{} season"
+msgid_plural "{} seasons"
+msgstr[0] "{} musim"
+
+#, python-brace-format
+msgid "{} / {} episode completed"
+msgid_plural "{} / {} episodes completed"
+msgstr[0] "{} / {} episode selesai"

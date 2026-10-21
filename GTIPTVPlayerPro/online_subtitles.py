@@ -18,7 +18,9 @@ from .subtitle_settings import MAX_OFFSET_MS
 from .subtitle_language import (
     LANGUAGE_ALIASES as _LANGUAGE_ALIASES, normalize_subtitle_language,
     text_matches_language, subtitle_episode_numbers, subtitle_episode_matches,
+    subtitle_episode_markers,
 )
+from .subtitle_identity import matching_metadata
 from .subtitle_decode import decode_subtitle_content
 from .polish_subtitles import POLISH_PROVIDERS, polish_search_providers
 from .web_subtitles import SubtitleError, _download, _request
@@ -524,20 +526,20 @@ def _release_profile(value):
 
 
 def _release_identity_evidence(meta, target, candidate, verified_identity=False):
-    expected_title = _title_identity(meta.get("search_title"))
+    expected_titles = _metadata_title_keys(meta)
     pairs = []
     title_conflict = False
     for left in target["variants"]:
         for right in candidate["variants"]:
             left_title = _title_identity(left["title"])
             right_title = _title_identity(right["title"])
-            if right_title and expected_title and right_title != expected_title:
+            if right_title and expected_titles and right_title not in expected_titles:
                 title_conflict = True
             # Returned catalogue IDs can verify a decorated/localized IPTV
             # title. The two actual release titles must still agree before
             # granting full-release or group evidence.
             semantic_match = bool(
-                expected_title and left_title == expected_title and right_title == expected_title
+                expected_titles and left_title in expected_titles and right_title in expected_titles
                 or verified_identity and left_title and left_title == right_title
             )
             same_full = bool(semantic_match and left["identity"] and left["identity"] == right["identity"])
@@ -746,7 +748,7 @@ def annotate_subtitle_compatibility(metadata, result):
     """Rank known release evidence without calling missing hints a match."""
     item = dict(result) if isinstance(result, dict) else {}
     language = item.get("language") or "en"
-    meta = normalized_metadata(metadata, language)
+    meta = normalized_metadata(matching_metadata(metadata, item), language)
     target = _release_profile(meta.get("release_hint"))
     filename = _safe_text(item.get("file_name"), limit=240)
     candidate = _release_profile(
@@ -763,14 +765,21 @@ def annotate_subtitle_compatibility(metadata, result):
         )
     identity_mismatch = item.get("identity_match") is False
     identifier_matches = []
-    if meta["content_type"] != "series":
+    if meta["content_type"] == "series":
+        for field, imdb in (("parent_imdb_id", True), ("parent_tmdb_id", False),
+                            ("episode_imdb_id", True), ("episode_tmdb_id", False)):
+            expected = _numeric_identifier(meta.get(field), imdb=imdb)
+            found = _numeric_identifier(item.get(field), imdb=imdb)
+            if expected and found:
+                identifier_matches.append(expected == found)
+    else:
         for field, imdb in (("imdb_id", True), ("tmdb_id", False)):
             expected = _numeric_identifier(meta.get(field), imdb=imdb)
             found = _numeric_identifier(item.get(field), imdb=imdb)
             if expected and found:
                 identifier_matches.append(expected == found)
-        if identifier_matches and not all(identifier_matches):
-            identity_mismatch = True
+    if identifier_matches and not all(identifier_matches):
+        identity_mismatch = True
     reliable_same_id = bool(identifier_matches and all(identifier_matches))
     same_full, same_group, release_title_conflict = _release_identity_evidence(
         meta, target, candidate, verified_identity=reliable_same_id,
@@ -785,29 +794,41 @@ def annotate_subtitle_compatibility(metadata, result):
             identity_mismatch = True
     expected_season, expected_episode = _number(meta.get("season")), _number(meta.get("episode"))
     found_season, found_episode = _number(item.get("season")), _number(item.get("episode"))
+    # A bare Show.S01E02.srt is still authoritative episode evidence even
+    # when a richer parent description advertises S01E01.
     parsed_episodes = {variant["episode"] for variant in candidate["variants"] if variant["episode"]}
-    if expected_season and expected_episode:
+    for value in (filename, item.get("release"), item.get("release_parent")):
+        parsed_episodes.update(subtitle_episode_markers(value))
+    if meta["season_known"] and expected_episode:
         expected_pair = (expected_season, expected_episode)
-        if found_season and found_episode and (found_season, found_episode) != expected_pair:
+        if item.get("season") is not None and found_episode and (found_season, found_episode) != expected_pair:
             identity_mismatch = True
-        if parsed_episodes and expected_pair not in parsed_episodes:
+        if parsed_episodes and parsed_episodes != {expected_pair}:
             identity_mismatch = True
-    expected_title = _title_identity(meta.get("search_title"))
+    expected_titles = _metadata_title_keys(meta)
     declared_title = _safe_text(item.get("title"))
-    declared_title_conflict = bool(declared_title and expected_title and
-        _title_identity(_subtitle_search_title(declared_title, found_year or expected_year)) != expected_title)
+    declared_title_conflict = bool(declared_title and expected_titles and
+        _title_identity(_subtitle_search_title(declared_title, found_year or expected_year)) not in expected_titles)
     title_uncertain = (release_title_conflict or declared_title_conflict) and not reliable_same_id
+    if meta["content_type"] == "series":
+        parent_year = _year_number(item.get("parent_year"))
+        if expected_year and parent_year and not _catalog_year_matches(expected_year, parent_year) and not reliable_same_id:
+            identity_mismatch = True
+        if expected_year and release_years and not reliable_same_id and not any(
+                _catalog_year_matches(expected_year, year) for year in release_years):
+            title_uncertain = True
 
     # Adapters may copy the query title/episode into the result. Strong
     # identity support must come from returned IDs or the actual release.
-    release_title_matches = bool(expected_title and any(
-        _title_identity(variant["title"]) == expected_title
+    release_title_matches = bool(expected_titles and any(
+        _title_identity(variant["title"]) in expected_titles
         for variant in candidate["variants"]
     ))
     if meta["content_type"] == "series":
         identity_supported = bool(
-            release_title_matches and expected_season and expected_episode
-            and parsed_episodes == {(expected_season, expected_episode)}
+            meta["season_known"] and expected_episode and (
+                reliable_same_id or release_title_matches
+                and parsed_episodes == {(expected_season, expected_episode)})
         )
     else:
         known_years = release_years | ({found_year} if found_year else set())
@@ -883,12 +904,11 @@ def annotate_subtitle_compatibility(metadata, result):
     # release evidence must not be discarded because of that hint alone.
     supported_group = bool(same_group and source_state == "match" and
                            (resolution_state == "match" or codec_state == "match" or edition_state == "match"))
-    version_matches = sum(state == "match" for state in (
-        source_state, resolution_state, codec_state,
-    ))
     supported_profile = bool(
         identity_supported and not title_uncertain
-        and (fps_state == "match" or version_matches >= 2)
+        and source_state == "match" and fps_state == "match"
+        and (edition_state == "match" or revision_state == "match"
+             or target.get("platforms") and target.get("platforms") == candidate.get("platforms"))
         and all(state != "mismatch" for state in (
             source_state, resolution_state, codec_state,
         ))
@@ -933,8 +953,8 @@ def annotate_subtitle_compatibility(metadata, result):
         status = "fps_convert"
     elif same_full or supported_group or supported_profile:
         # Exact releases and supported groups take priority over FPS hints.
-        # Without those, require verified identity and either matching FPS
-        # with another hint, or two agreeing technical release details.
+        # Without those, require programme identity, matching source/FPS
+        # and a distinguishing platform, cut or revision detail.
         status = "high"
     elif evidence:
         status = "possible"
@@ -1090,6 +1110,8 @@ def normalized_metadata(metadata, language):
         "search_title": search_title,
         "year": year,
         "season": _number(metadata.get("season")),
+        "season_known": bool(metadata.get("season_known", metadata.get("season") is not None
+                                          and str(metadata.get("season")).strip() != "")),
         "episode": _number(metadata.get("episode")),
         "content_type": (
             "series"
@@ -1100,6 +1122,13 @@ def normalized_metadata(metadata, language):
         "tmdb_id": tmdb_id if tmdb_id.isdigit() else "",
         "imdb_id": imdb_id if re.fullmatch(r"tt\d{5,12}", imdb_id) else "",
         "sd_id": sd_id if re.fullmatch(r"[A-Za-z0-9_-]{1,120}", sd_id) else "",
+        "parent_tmdb_id": str(metadata.get("parent_tmdb_id") or (tmdb_id if str(metadata.get("content_type")).lower() == "series" else "")),
+        "parent_imdb_id": str(metadata.get("parent_imdb_id") or (imdb_id if str(metadata.get("content_type")).lower() == "series" else "")),
+        "episode_tmdb_id": str(metadata.get("episode_tmdb_id") or ""),
+        "episode_imdb_id": str(metadata.get("episode_imdb_id") or ""),
+        "_tmdb_verified": metadata.get("_tmdb_verified") is True,
+        "_title_aliases": [str(value)[:160] for value in metadata.get("_title_aliases", ())[:32]
+                           if isinstance(value, str)] if isinstance(metadata.get("_title_aliases"), (list, tuple)) else [],
         # These hints are used only to rank the returned provider entries. They
         # are never included in the provider query or request headers.
         "release_hint": hint,
@@ -1163,6 +1192,12 @@ def _title_identity(value):
     return re.sub(r"[^\w]+", "", str(value or "").casefold())
 
 
+def _metadata_title_keys(meta):
+    return {_title_identity(value) for value in
+            [meta.get("search_title")] + list(meta.get("_title_aliases") or ())
+            if value}
+
+
 def _resolved_sd_id(meta, api_key):
     """Resolve a title/year through SubDL's documented movie-search route."""
     if not meta["year"]:
@@ -1180,7 +1215,7 @@ def _resolved_sd_id(meta, api_key):
     items = data.get("results", [])
     if not isinstance(items, list):
         raise SubtitleError("provider_invalid_reply", 502)
-    expected_title = _title_identity(meta["search_title"])
+    expected_titles = _metadata_title_keys(meta)
     matches = []
     for index, item in enumerate(items[:30]):
         if not isinstance(item, dict):
@@ -1190,7 +1225,7 @@ def _resolved_sd_id(meta, api_key):
         if not re.fullmatch(r"[A-Za-z0-9_-]{1,120}", sd_id):
             continue
         names = (item.get("name"), item.get("original_name"))
-        exact = any(_title_identity(name) == expected_title for name in names)
+        exact = any(_title_identity(name) in expected_titles for name in names)
         if exact and _catalog_year_matches(meta["year"], candidate_year):
             matches.append((abs(candidate_year - meta["year"]), index, sd_id))
     matches.sort()
@@ -1295,7 +1330,7 @@ def _subdl_response_matches(meta, data):
         # Older/lean replies omit the catalogue block. The provider already
         # applied the requested identifier in that response shape.
         return True
-    expected_title = _title_identity(meta.get("search_title"))
+    expected_titles = _metadata_title_keys(meta)
     expected_year = _year_number(meta.get("year"))
     expected_sd = str(meta.get("sd_id") or "").strip()
     expected_imdb = _numeric_identifier(meta.get("imdb_id"), imdb=True)
@@ -1322,29 +1357,18 @@ def _subdl_response_matches(meta, data):
         names = (
             item.get("name"), item.get("original_name"), item.get("title")
         )
-        has_candidate_title = any(_safe_text(name) for name in names)
         title_matches = any(
             _title_identity(_subtitle_search_title(
                 name, candidate_year or expected_year
-            )) == expected_title
+            )) in expected_titles
             for name in names
             if _safe_text(name)
         )
         if identifier_checks:
             if not all(identifier_checks):
                 continue
-            # A translated title needs supporting year/ID evidence. Keep
-            # rejecting conflicting catalogue IDs or an unverified name.
-            if (has_candidate_title and not title_matches
-                    and not (len(identifier_checks) >= 2
-                             or (expected_year and candidate_year == expected_year))):
-                continue
-            if (
-                meta.get("content_type") != "series"
-                and expected_year
-                and not _catalog_year_matches(expected_year, candidate_year)
-            ):
-                continue
+            # A returned matching catalogue ID is stronger than a missing
+            # release year or a translated title. Conflicting IDs still fail.
             return True
         if not title_matches:
             continue
@@ -1364,7 +1388,7 @@ def _opensubtitles_identity_matches(meta, attributes, details):
     exact normalized title/year pair. Episodes additionally use their exact
     season/episode check in ``search`` below.
     """
-    expected_title = _title_identity(meta.get("search_title"))
+    expected_titles = _metadata_title_keys(meta)
     candidate_year = _year_number(
         details.get("year")
         or details.get("release_year")
@@ -1377,11 +1401,10 @@ def _opensubtitles_identity_matches(meta, attributes, details):
         attributes.get("movie_name"),
         attributes.get("title"),
     )
-    has_candidate_title = any(_safe_text(candidate) for candidate in candidate_titles)
     title_matches = any(
         _title_identity(_subtitle_search_title(
             candidate, candidate_year or meta.get("year", 0)
-        )) == expected_title
+        )) in expected_titles
         for candidate in candidate_titles
         if _safe_text(candidate)
     )
@@ -1396,14 +1419,23 @@ def _opensubtitles_identity_matches(meta, attributes, details):
     )
 
     if meta.get("content_type") == "series":
-        # Episode IMDb/TMDb identifiers are not necessarily the parent show's
-        # identifiers. The returned programme title plus S/E is authoritative;
-        # matching IDs remain a safe fallback when a title is omitted.
-        return bool(
-            title_matches
-            or (expected_imdb and candidate_imdb == expected_imdb)
-            or (expected_tmdb and candidate_tmdb == expected_tmdb)
-        )
+        checks = []
+        for field, imdb in (("parent_imdb_id", True), ("parent_tmdb_id", False)):
+            expected = _numeric_identifier(meta.get(field), imdb=imdb)
+            found = _numeric_identifier(details.get(field) or attributes.get(field), imdb=imdb)
+            if expected and found:
+                checks.append(expected == found)
+        for field, found in (("episode_imdb_id", candidate_imdb), ("episode_tmdb_id", candidate_tmdb)):
+            expected = _numeric_identifier(meta.get(field), imdb=field.endswith("imdb_id"))
+            if expected and found:
+                checks.append(expected == found)
+        if checks:
+            return all(checks)
+        parent_year = _year_number(details.get("parent_year"))
+        if parent_year and meta.get("year") and not _catalog_year_matches(meta["year"], parent_year):
+            return False
+        # Episode IDs must never be compared to the parent programme's IDs.
+        return title_matches
 
     identifier_checks = []
     if expected_imdb and candidate_imdb:
@@ -1412,15 +1444,6 @@ def _opensubtitles_identity_matches(meta, attributes, details):
         identifier_checks.append(expected_tmdb == candidate_tmdb)
     if identifier_checks:
         if not all(identifier_checks):
-            return False
-        expected_year = _year_number(meta.get("year"))
-        if (has_candidate_title and not title_matches
-                and not (len(identifier_checks) >= 2
-                         or (expected_year and candidate_year == expected_year))):
-            return False
-        if expected_year and not _catalog_year_matches(
-            expected_year, candidate_year
-        ):
             return False
         return True
 
@@ -1548,7 +1571,7 @@ class SubDLClient(object):
             "releases": 1,
         }
         if meta["content_type"] == "series":
-            if meta["season"]:
+            if meta["season_known"]:
                 base_params["season"] = meta["season"]
             if meta["episode"]:
                 base_params["episode"] = meta["episode"]
@@ -1583,6 +1606,9 @@ class SubDLClient(object):
                         "identity_match": True,
                         "imdb_id": _numeric_identifier(owner.get("imdb_id"), imdb=True),
                         "tmdb_id": _numeric_identifier(owner.get("tmdb_id")),
+                        "parent_imdb_id": _numeric_identifier(owner.get("imdb_id"), imdb=True) if meta["content_type"] == "series" else "",
+                        "parent_tmdb_id": _numeric_identifier(owner.get("tmdb_id")) if meta["content_type"] == "series" else "",
+                        "parent_year": _year_number(owner.get("year") or owner.get("release_year")) if meta["content_type"] == "series" else 0,
                         "year": _year_number(owner.get("year") or owner.get("release_year")),
                         "season": meta["season"],
                         "episode": meta["episode"],
@@ -1606,11 +1632,11 @@ class SubDLClient(object):
                     for release in _subdl_release_names(candidate, parent):
                         episode_data = dict(candidate, release_name=release)
                         if not _episode_matches(
-                            episode_data, meta["season"], meta["episode"]
+                            episode_data, meta["season"] if meta["season_known"] else None, meta["episode"]
                         ):
                             continue
                         parsed_episode = subtitle_episode_numbers(release)
-                        if (meta["season"] and meta["episode"] and parsed_episode
+                        if (meta["season_known"] and meta["episode"] and parsed_episode
                                 and parsed_episode != (meta["season"], meta["episode"])):
                             continue
                         option = dict(result, release=release, fps=_subtitle_fps(
@@ -1678,9 +1704,10 @@ class SubDLClient(object):
             return []
 
         title_meta = dict(meta)
-        title_meta["sd_id"] = ""
-        title_meta["imdb_id"] = ""
-        title_meta["tmdb_id"] = ""
+        if not meta.get("_tmdb_verified"):
+            title_meta["sd_id"] = ""
+            title_meta["imdb_id"] = ""
+            title_meta["tmdb_id"] = ""
         _provider_search_log("subdl", "title-resolve", meta, requested)
         resolved = _resolved_sd_id(meta, self.api_key)
         _provider_search_log(
@@ -1835,7 +1862,7 @@ class OpenSubtitlesClient(object):
             "order_direction": "desc",
         }
         if meta["content_type"] == "series":
-            if meta["season"]:
+            if meta["season_known"]:
                 base_params["season_number"] = meta["season"]
             if meta["episode"]:
                 base_params["episode_number"] = meta["episode"]
@@ -1868,7 +1895,7 @@ class OpenSubtitlesClient(object):
                     "release_name": attributes.get("release"),
                 }
                 if not _episode_matches(
-                    episode_data, meta["season"], meta["episode"]
+                    episode_data, meta["season"] if meta["season_known"] else None, meta["episode"]
                 ):
                     continue
                 if not _opensubtitles_identity_matches(
@@ -1900,9 +1927,13 @@ class OpenSubtitlesClient(object):
                         continue
                     if file_id <= 0 or file_id in seen:
                         continue
-                    seen.add(file_id)
                     filename = _safe_text(subtitle_file.get("file_name"), limit=240)
                     filename = filename.replace("\\", "/").rsplit("/", 1)[-1]
+                    if not _episode_matches(dict(episode_data, file_name=filename),
+                                            meta["season"] if meta["season_known"] else None,
+                                            meta["episode"]):
+                        continue
+                    seen.add(file_id)
                     parent_release = _safe_text(attributes.get("release"), limit=240)
                     release = (
                         filename if _informative_subtitle_filename(filename, parent_release)
@@ -1914,6 +1945,11 @@ class OpenSubtitlesClient(object):
                         "identity_match": True,
                         "imdb_id": _numeric_identifier(details.get("imdb_id") or attributes.get("imdb_id"), imdb=True),
                         "tmdb_id": _numeric_identifier(details.get("tmdb_id") or attributes.get("tmdb_id")),
+                        "parent_imdb_id": _numeric_identifier(details.get("parent_imdb_id") or attributes.get("parent_imdb_id"), imdb=True),
+                        "parent_tmdb_id": _numeric_identifier(details.get("parent_tmdb_id") or attributes.get("parent_tmdb_id")),
+                        "episode_imdb_id": _numeric_identifier(details.get("imdb_id") or attributes.get("imdb_id"), imdb=True) if meta["content_type"] == "series" else "",
+                        "episode_tmdb_id": _numeric_identifier(details.get("tmdb_id") or attributes.get("tmdb_id")) if meta["content_type"] == "series" else "",
+                        "parent_year": _year_number(details.get("parent_year")),
                         "year": _year_number(details.get("year") or details.get("release_year") or attributes.get("year")),
                         "season": meta["season"],
                         "episode": meta["episode"],
@@ -1960,6 +1996,9 @@ class OpenSubtitlesClient(object):
                     break
                 params = dict(base_params)
                 params.update(extra)
+                if stage == "episode-id":
+                    params.pop("season_number", None)
+                    params.pop("episode_number", None)
                 if page > 1:
                     params["page"] = page
                 _provider_search_log("opensubtitles", stage, meta, requested)
@@ -1995,7 +2034,15 @@ class OpenSubtitlesClient(object):
             return ranked(results)
 
         identifier = None
-        if meta["imdb_id"]:
+        if meta["content_type"] == "series":
+            if meta["parent_imdb_id"]:
+                identifier = ({"parent_imdb_id": _numeric_identifier(meta["parent_imdb_id"], imdb=True)}, "parent-imdb-id")
+            elif meta["parent_tmdb_id"]:
+                identifier = ({"parent_tmdb_id": _numeric_identifier(meta["parent_tmdb_id"])}, "parent-tmdb-id")
+            elif meta["episode_imdb_id"] or meta["episode_tmdb_id"]:
+                field = "imdb_id" if meta["episode_imdb_id"] else "tmdb_id"
+                identifier = ({field: _numeric_identifier(meta["episode_" + field], imdb=field == "imdb_id")}, "episode-id")
+        elif meta["imdb_id"]:
             # OpenSubtitles accepts IMDb identifiers without the public tt
             # prefix used by TMDb and IPTV metadata.
             identifier = ({"imdb_id": meta["imdb_id"][2:]}, "imdb-id")
@@ -2015,8 +2062,11 @@ class OpenSubtitlesClient(object):
         title_meta = dict(meta)
         # A stale provider identifier is exactly why this fallback exists.
         # Match the fallback response strictly by title/year instead.
-        title_meta["imdb_id"] = ""
-        title_meta["tmdb_id"] = ""
+        if not meta.get("_tmdb_verified"):
+            title_meta["imdb_id"] = ""
+            title_meta["tmdb_id"] = ""
+            for field in ("parent_imdb_id", "parent_tmdb_id", "episode_imdb_id", "episode_tmdb_id"):
+                title_meta[field] = ""
         results = request_results(title_params, "title", title_meta)
         if results or not meta["year"]:
             return results
@@ -2136,12 +2186,8 @@ class SubSourceClient(object):
             imdb=True,
         )
         if expected_imdb and found_imdb:
-            if expected_imdb != found_imdb:
-                return False
-            return meta["content_type"] == "series" or _catalog_year_matches(
-                meta["year"], movie.get("releaseYear") or movie.get("year")
-            )
-        expected_title = _title_identity(meta["search_title"])
+            return expected_imdb == found_imdb
+        expected_titles = _metadata_title_keys(meta)
         year = _year_number(movie.get("releaseYear") or movie.get("year"))
         for value in (movie.get("title"), movie.get("alternateTitle"), movie.get("name")):
             title = _safe_text(value)
@@ -2150,7 +2196,7 @@ class SubSourceClient(object):
                 title = re.sub(
                     r"(?i)\s*[-:([ ]*\bseason\s+\d{1,2}\s*[)\]]?\s*$", "", title
                 ).strip()
-            if _title_identity(_subtitle_search_title(title, year)) == expected_title:
+            if _title_identity(_subtitle_search_title(title, year)) in expected_titles:
                 return meta["content_type"] == "series" or _catalog_year_matches(
                     meta["year"], year
                 )
@@ -2165,15 +2211,15 @@ class SubSourceClient(object):
 
     @staticmethod
     def _episode_release(item, releases, meta):
-        if not meta["season"] or not meta["episode"]:
+        if not meta["season_known"] or not meta["episode"]:
             return releases[0], False
         explicit = {
             "season": item.get("seasonNumber", item.get("season_number", item.get("season"))),
             "episode": item.get("episodeNumber", item.get("episode_number", item.get("episode"))),
         }
-        if explicit["season"] and explicit["episode"]:
+        if explicit["season"] is not None and explicit["episode"]:
             return (releases[0], False) if _episode_matches(
-                explicit, meta["season"], meta["episode"]
+                dict(explicit, release_name=releases[0]), meta["season"], meta["episode"]
             ) else ("", False)
         for release in releases:
             if _episode_matches({"release_name": release}, meta["season"], meta["episode"]):
@@ -2182,7 +2228,7 @@ class SubSourceClient(object):
         # from its ZIP at download time. Never load the first file blindly.
         for release in releases:
             season = re.search(r"(?i)(?<![a-z0-9])(?:S|season[ ._-]*)(\d{1,2})(?![a-z0-9])", release)
-            has_episode = bool(subtitle_episode_numbers(release))
+            has_episode = bool(subtitle_episode_markers(release))
             if season and int(season.group(1)) == meta["season"] and not has_episode:
                 return release, True
         return "", False
@@ -2211,7 +2257,7 @@ class SubSourceClient(object):
             raise SubtitleError("invalid_search", 400)
 
         def movies_for(params, match_meta, stage):
-            if meta["content_type"] == "series" and meta["season"]:
+            if meta["content_type"] == "series" and meta["season_known"]:
                 params["season"] = meta["season"]
             rows = self._get("/movies/search", params)
             movies = [movie for movie in rows[:20] if isinstance(movie, dict)
@@ -2225,7 +2271,8 @@ class SubSourceClient(object):
             movies = movies_for({"searchType": "imdb", "imdb": meta["imdb_id"]}, meta, "imdb-id")
         if not movies and len(meta["search_title"]) >= 2:
             title_meta = dict(meta)
-            title_meta["imdb_id"] = ""
+            if not meta.get("_tmdb_verified"):
+                title_meta["imdb_id"] = ""
             movies = movies_for({"searchType": "text", "q": meta["search_title"]}, title_meta, "title")
 
         results, seen = [], set()
@@ -2235,7 +2282,7 @@ class SubSourceClient(object):
             for language in requested:
                 params = {"movieId": movie_id, "language": self.LANGUAGES[language], "limit": 100}
                 if meta["content_type"] == "series":
-                    if meta["season"]:
+                    if meta["season_known"]:
                         params["seasonNumber"] = meta["season"]
                     if meta["episode"]:
                         params["episodeNumber"] = meta["episode"]
@@ -2283,6 +2330,8 @@ class SubSourceClient(object):
                         "identity_match": True, "season": meta["season"],
                         "episode": meta["episode"], "release": release,
                         "imdb_id": _numeric_identifier(movie.get("imdbId") or movie.get("imdb_id") or movie.get("imdb"), imdb=True),
+                        "parent_imdb_id": _numeric_identifier(movie.get("imdbId") or movie.get("imdb_id") or movie.get("imdb"), imdb=True) if meta["content_type"] == "series" else "",
+                        "parent_year": _year_number(movie.get("releaseYear") or movie.get("year")) if meta["content_type"] == "series" else 0,
                         "year": _year_number(movie.get("releaseYear") or movie.get("year")),
                         "language": language, "subtitle_id": subtitle_id,
                         "is_pack": is_pack, "hearing_impaired": self._hearing_impaired(item),
@@ -2348,43 +2397,17 @@ def subtitle_client(settings, provider=None):
     )
 
 
-def save_subtitle_file(content, metadata, result, root="/tmp/gtiptvplayerpro-subtitles"):
-    """Keep one downloaded subtitle in a private bounded cache directory."""
-    if not isinstance(content, bytes) or len(content) > 2 * 1024 * 1024:
-        raise SubtitleError("subtitle_too_large", 422)
-    identity = "|".join(
-        str(value or "")
-        for value in (
-            (metadata or {}).get("title"),
-            (metadata or {}).get("season"),
-            (metadata or {}).get("episode"),
-            (result or {}).get("language"),
-            (result or {}).get("release"),
-            sha256(content).hexdigest(),
-        )
-    )
-    filename = sha256(identity.encode("utf-8", "ignore")).hexdigest() + ".srt"
+def save_subtitle_file(content, metadata, result, root=None):
+    """Publish a readable subtitle name in the receiver-selected directory."""
+    from .local_subtitles import LocalSubtitleError, save_downloaded_subtitle
     try:
-        if os.path.islink(root):
-            raise OSError("unsafe subtitle cache")
-        os.makedirs(root, mode=0o700, exist_ok=True)
-        if not os.path.isdir(root) or os.path.islink(root):
-            raise OSError("unsafe subtitle cache")
-        os.chmod(root, 0o700)
-        path = os.path.join(root, filename)
-        fd, temporary = tempfile.mkstemp(prefix=".download-", dir=root)
-        try:
-            with os.fdopen(fd, "wb") as handle:
-                handle.write(content)
-                handle.flush()
-                os.fsync(handle.fileno())
-            os.chmod(temporary, 0o600)
-            os.replace(temporary, path)
-        finally:
-            if os.path.exists(temporary):
-                os.unlink(temporary)
-        _prune_subtitle_cache(root, path)
-        return path
+        return save_downloaded_subtitle(content, metadata, result, root=root)
+    except LocalSubtitleError as error:
+        if error.code == "local_too_large":
+            raise SubtitleError("subtitle_too_large", 422)
+        if error.code == "download_folder_unavailable":
+            raise SubtitleError("subtitle_download_folder_unavailable", 500)
+        raise SubtitleError("subtitle_cache_unavailable", 500)
     except OSError:
         raise SubtitleError("subtitle_cache_unavailable", 500)
 

@@ -336,6 +336,17 @@ def _(value):
     return _catalog(_ui_language_code()).gettext(text) if text else text
 
 
+def ngettext(singular, plural, n):
+    """Select a count-aware template in the receiver's active language.
+
+    Keep the count separate from formatting so each catalog can apply its
+    own plural rules before callers fill the template's brace fields.
+    """
+    singular = "" if singular is None else str(singular)
+    plural = "" if plural is None else str(plural)
+    return _catalog(_ui_language_code()).ngettext(singular, plural, n)
+
+
 def normalize_language(value, fallback="en"):
     """Return one public, browser-safe language code.
 
@@ -355,6 +366,14 @@ def translate_for_language(value, language_code):
         return text
     code = _normalise_language(language_code)
     return _catalog(code).gettext(text)
+
+
+def translate_plural_for_language(singular, plural, n, language_code):
+    """Select a plural template without changing the active language."""
+    singular = "" if singular is None else str(singular)
+    plural = "" if plural is None else str(plural)
+    code = _normalise_language(language_code)
+    return _catalog(code).ngettext(singular, plural, n)
 
 
 def supported_language_names():

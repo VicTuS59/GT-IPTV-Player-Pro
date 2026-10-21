@@ -31,7 +31,7 @@ from .subtitle_settings import (
 )
 from .subtitle_language import (
     filename_languages, normalize_subtitle_language,
-    subtitle_episode_matches, subtitle_episode_numbers,
+    subtitle_episode_matches, subtitle_episode_numbers, subtitle_episode_markers,
 )
 from .subtitle_search_cache import subtitle_search_context
 from .subtitle_decode import decode_subtitle_content
@@ -155,7 +155,9 @@ def _search_independent(provider, metadata, settings):
     # The native and web pages use the same adapters and private credentials.
     # Import lazily because those adapters reuse this module's HTTP helpers.
     from .online_subtitles import annotate_subtitle_results, subtitle_client
+    from .subtitle_identity import resolve_subtitle_metadata
 
+    metadata = resolve_subtitle_metadata(metadata)
     selected = settings.copy()
     selected.provider = provider
     if provider in POLISH_PROVIDERS:
@@ -166,12 +168,19 @@ def _search_independent(provider, metadata, settings):
                and result.get("provider") == provider
                and normalize_subtitle_language(result.get("language")) == metadata["language"]
                and (settings.hearing_impaired or not result.get("hearing_impaired"))]
+    if metadata.get("_tmdb_identity"):
+        results = [dict(result, _tmdb_identity=metadata["_tmdb_identity"]) for result in results]
     annotated = annotate_subtitle_results(metadata, results)
     annotated.sort(key=_result_compatibility_sort)
     return annotated
 
 
 def _download(provider, result, extensions=(".srt",)):
+    if result.get("identity_match") is False or result.get("compatibility_status") == "different":
+        raise SubtitleError("subtitle_not_found", 404)
+    if (result.get("season") is not None and str(result.get("season")).strip() != ""
+            and result.get("episode") and not _episode_matches(result, result["season"], result["episode"])):
+        raise SubtitleError("subtitle_not_found", 404)
     if provider == "opensubtitles_file":
         # The independent OpenSubtitles client has already exchanged its
         # authenticated file_id for this short-lived link.  API credentials
@@ -204,7 +213,7 @@ def _download(provider, result, extensions=(".srt",)):
                 ]
                 if not candidates:
                     raise SubtitleError("subtitle_format_unsupported", 422)
-                if result.get("season") and result.get("episode"):
+                if result.get("season") is not None and str(result.get("season")).strip() != "" and result.get("episode"):
                     season, episode = _number(result["season"]), _number(result["episode"])
                     matching = [entry for entry in candidates if _episode_matches(
                         {"name": os.path.basename(entry.filename)}, season, episode
@@ -212,7 +221,7 @@ def _download(provider, result, extensions=(".srt",)):
                     if matching:
                         candidates = matching
                     elif result.get("is_pack") or len(candidates) > 1 or any(
-                        subtitle_episode_numbers(entry.filename) for entry in candidates
+                        subtitle_episode_markers(entry.filename) for entry in candidates
                     ):
                         raise SubtitleError("subtitle_not_found", 404)
                 language = normalize_subtitle_language(result.get("language"))
@@ -747,7 +756,8 @@ class WebSubtitles(object):
             result, search_metadata=query_metadata,
         ))
         cues, unused_factor, timeline_state = retime_subtitle_cues(original_cues, fresh_result)
-        if not cues or fresh_result.get("identity_match") is False or timeline_state == "mismatch":
+        if (not cues or fresh_result.get("identity_match") is False
+                or fresh_result.get("compatibility_status") == "different" or timeline_state == "mismatch"):
             raise SubtitleError("subtitle_load_failed", 409)
         if not continuing():
             raise SubtitleError("subtitle_operation_cancelled", 409)
@@ -780,7 +790,8 @@ class WebSubtitles(object):
             # conversion. Decoder FPS/duration can arrive while saving a file.
             latest_result = online.revalidate_result(result, search_metadata=query_metadata)
             ready_cues, unused_factor, timeline_state = retime_subtitle_cues(original_cues, latest_result)
-            if not ready_cues or latest_result.get("identity_match") is False or timeline_state == "mismatch":
+            if (not ready_cues or latest_result.get("identity_match") is False
+                    or latest_result.get("compatibility_status") == "different" or timeline_state == "mismatch"):
                 raise SubtitleError("subtitle_load_failed", 409)
             # Explicit web selection wins over a pending receiver auto-search.
             # The existing coordinator disables other subtitle overlays and

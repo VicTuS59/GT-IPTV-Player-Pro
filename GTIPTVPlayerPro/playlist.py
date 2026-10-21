@@ -14,8 +14,9 @@ from urllib.request import Request
 
 from . import PLUGIN_VERSION
 from .diagnostics import log_event
+from .persistence import guarded_mutation
 from .http_transport import build_credential_urlopen
-from .i18n import N_, _
+from .i18n import N_, _, ngettext
 
 
 GT_PLAYLIST_PATH = "/etc/enigma2/gtiptvplayer/playlists.txt"
@@ -581,6 +582,7 @@ def _atomic_write_playlist(path, payload, expected_status):
         _discard_playlist_stage(stage)
 
 
+@guarded_mutation(busy_error=True)
 def ensure_playlist_file(path=GT_PLAYLIST_PATH):
     """Create the private GT playlist file without replacing existing data."""
     unused_directory, directory_descriptor = _open_playlist_directory(path, True)
@@ -708,6 +710,7 @@ def _playlist_url(account):
     return urlunsplit((account.scheme, account.netloc, path, query, ""))
 
 
+@guarded_mutation(busy_error=True)
 def save_account(url, name="", path=None):
     """Validate and atomically save an Xtream account on the receiver."""
     register_path = path is None
@@ -784,6 +787,7 @@ def _save_account_locked(url, name, path):
     return account
 
 
+@guarded_mutation(busy_error=True)
 def save_account_credentials(
     server_url,
     username,
@@ -837,6 +841,7 @@ def save_account_credentials(
     return save_account(playlist_url, name, path)
 
 
+@guarded_mutation(busy_error=True)
 def delete_account(account, paths=None):
     """Atomically remove one account identity from the GT playlist file."""
     with _PLAYLIST_TRANSACTION_LOCK:
@@ -856,6 +861,7 @@ def _check_playlist_mutation_limits(cancel_event=None, deadline=None):
         raise OSError(N_("Request timed out"))
 
 
+@guarded_mutation(busy_error=True)
 def delete_accounts(
     accounts,
     paths=None,
@@ -1122,6 +1128,7 @@ def load_sources(paths=None, m3u_path=None, portal_path=None):
     return PlaylistLoadResult(sources, source_files, error)
 
 
+@guarded_mutation(busy_error=True)
 def delete_source(
     source,
     paths=None,
@@ -1457,8 +1464,10 @@ def _m3u_cache_age_text(cached_at, now=None):
     if seconds < 60:
         return N_("Less than one minute")
     if seconds < 60 * 60:
-        return _(N_("{} minutes")).format(max(1, int(seconds / 60)))
-    return _(N_("{} hours")).format(max(1, int(seconds / (60 * 60))))
+        minutes = max(1, int(seconds / 60))
+        return ngettext("{} minute", "{} minutes", minutes).format(minutes)
+    hours = max(1, int(seconds / (60 * 60)))
+    return ngettext("{} hour", "{} hours", hours).format(hours)
 
 
 def check_source_health(
@@ -1572,6 +1581,7 @@ def check_source_health(
     )
 
 
+@guarded_mutation(busy_error=True)
 def delete_sources(
     sources,
     paths=None,

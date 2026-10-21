@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: id\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Serial"
+
+msgid "Season"
+msgstr "Musim"
+
+msgid "Navigate"
+msgstr "Navigasi"
+
+msgid "Page"
+msgstr "Halaman"
+
+msgid "Play"
+msgstr "Putar"
+
+msgid "Favorite"
+msgstr "Favorit"
+
+msgid "Refresh"
+msgstr "Segarkan"
+
+msgid "Download"
+msgstr "Unduh"
+
+msgid "Back"
+msgstr "Kembali"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Musim {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} musim"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} episode"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Episode {}"
+
+msgid "Watched"
+msgstr "Sudah ditonton"
+
+msgid "Not played"
+msgstr "Belum diputar"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Lanjutkan dari {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Lanjutkan episode {}"
+
+msgid "Continue watching"
+msgstr "Lanjutkan menonton"
+
+msgid "Add to favorites"
+msgstr "Tambahkan ke favorit"
+
+msgid "Remove from favorites"
+msgstr "Hapus dari favorit"
+
+msgid "Download episode"
+msgstr "Unduh episode"
+
+msgid "SEASON PROGRESS"
+msgstr "PROGRES MUSIM"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} episode selesai"
+
+msgid "CAST"
+msgstr "PEMERAN"
+
+msgid "GENRE"
+msgstr "GENRE"
+
+msgid "Unknown season"
+msgstr "Musim tidak diketahui"
+
+msgid "No episodes in this season."
+msgstr "Tidak ada episode di musim ini."
+
+msgid "Marked as watched"
+msgstr "Ditandai sebagai sudah ditonton"
+
+msgid "Marked as not watched"
+msgstr "Ditandai sebagai belum ditonton"
+
+msgid "Could not save watched status."
+msgstr "Tidak dapat menyimpan status tontonan."
+
+msgid "Mark watched"
+msgstr "Tandai sudah ditonton"
+
+msgid "Hold OK"
+msgstr "Tahan OK"
+
+msgid "Episodes"
+msgstr "Episode"
+
+msgid "No information available."
+msgstr "Tidak ada informasi yang tersedia."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Musim {season} · Episode {episode} · Lanjutkan dari {time}"

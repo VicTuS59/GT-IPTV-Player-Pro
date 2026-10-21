@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro\nLanguage-Team: Macedonian\nLanguage: mk\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n%10==1 && n%100!=11 ? 0 : 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Изберете датотека со преводи"
+
+msgid "Download folder"
+msgstr "Папка за преземање"
+
+msgid "Use this folder"
+msgstr "Користи ја оваа папка"
+
+msgid "Local subtitles"
+msgstr "Локални преводи"
+
+msgid "GT subtitle downloads"
+msgstr "Преземања на преводи GT"
+
+msgid "Search subtitle files"
+msgstr "Пребарај датотеки со преводи"
+
+msgid "No subtitle files found."
+msgstr "Не се пронајдени датотеки со преводи."
+
+msgid "Could not read this folder."
+msgstr "Не може да се прочита оваа папка."
+
+msgid "Could not load this subtitle file."
+msgstr "Не може да се вчита оваа датотека со преводи."
+
+msgid "Could not save the download folder."
+msgstr "Не може да се зачува папката за преземање."
+
+msgid "Download folder saved."
+msgstr "Папката за преземање е зачувана."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Папката за преземање преводи не е достапна. Изберете друга папка."
+
+msgid "Subtitle file is too large."
+msgstr "Датотеката со преводи е преголема."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Поддржани се само датотеки со преводи SRT и VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Пребарување датотеки со преводи..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Достигнато е ограничувањето за пребарување. Стеснете го пребарувањето."
+
+msgid "Temporary folder"
+msgstr "Привремена папка"
+
+msgid "Device storage"
+msgstr "Складиште на уредот"
+
+msgid "Up one folder"
+msgstr "Една папка нагоре"
+
+msgid "Subtitle language"
+msgstr "Јазик на преводите"
+
+msgid "Search this folder"
+msgstr "Пребарај во оваа папка"
+
+msgid "Local subtitle loaded."
+msgstr "Локалниот превод е вчитан."
+
+msgid "Automatic detection"
+msgstr "Автоматско препознавање"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Изберете папка на HDD, USB или поврзан NAS."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Привремената папка се празни кога приемникот се рестартира."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Папка за преземање: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Јазик на преводите: {}"
+
+msgid "Folder is not available."
+msgstr "Папката не е достапна."
+
+msgid "Use temporary folder"
+msgstr "Користи привремена папка"
+
+msgid "Device folders"
+msgstr "Папки на уредот"
+
+msgid "Downloaded subtitles"
+msgstr "Преземени преводи"
+
+msgid "Search results"
+msgstr "Резултати од пребарувањето"

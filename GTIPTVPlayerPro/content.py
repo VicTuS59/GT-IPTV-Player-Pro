@@ -32,6 +32,7 @@ CONTENT_CACHE_SECONDS = 180
 CONTENT_CACHE_MAX_ENTRIES = 3
 CONTENT_CACHE_MAX_ITEMS = 5000
 MAX_ACCOUNT_API_REQUESTS = 2
+_SERIES_RESPONSE_INIT_LOCK = threading.Lock()
 API_READ_CHUNK_BYTES = 64 * 1024
 MAX_PROVIDER_INTEGER_DIGITS = 128
 MAX_PROVIDER_JSON_NESTING = 128
@@ -229,6 +230,7 @@ class MovieInfo(object):
         backdrop="",
         tmdb_id="",
         imdb_id="",
+        cover_urls=None,
     ):
         self.title = _clean_text(title, _("Movie"))
         self.plot = _decode_epg_description(plot)
@@ -239,6 +241,7 @@ class MovieInfo(object):
         self.director = _clean_text(director)
         self.cast = _decode_epg_description(cast)[:500]
         self.cover = str(cover or "").strip()
+        self.cover_urls = list(dict.fromkeys([self.cover] + list(cover_urls or [])))
         self.backdrop = str(backdrop or "").strip()
         self.tmdb_id = str(tmdb_id or "").strip()[:32]
         self.imdb_id = _imdb_id(imdb_id)
@@ -261,6 +264,8 @@ class SeriesInfo(object):
         backdrop="",
         tmdb_id="",
         imdb_id="",
+        cover_urls=None,
+        season_ids=None,
     ):
         self.title = _clean_text(title)
         self.plot = _decode_epg_description(plot)
@@ -270,7 +275,9 @@ class SeriesInfo(object):
         self.director = _clean_text(director)
         self.cast = _decode_epg_description(cast)[:500]
         self.cover = str(cover or "").strip()
+        self.cover_urls = list(dict.fromkeys([self.cover] + list(cover_urls or [])))
         self.episodes = list(episodes or [])
+        self.season_ids = list(dict.fromkeys(str(value) for value in (season_ids or ())))
         self.backdrop = str(backdrop or "").strip()
         self.tmdb_id = str(tmdb_id or "").strip()[:32]
         self.imdb_id = _imdb_id(imdb_id)
@@ -283,7 +290,7 @@ class SeriesInfo(object):
             season = str(getattr(episode, "season", "") or "").strip()
             if season and season not in values:
                 values.append(season)
-        return values
+        return values or list(self.season_ids)
 
 
 class EPGEvent(object):
@@ -387,6 +394,30 @@ def _normalise_media_url(value, account=None):
     return urlunsplit(
         (parsed.scheme.lower(), parsed.netloc, path, query, parsed.fragment)
     )
+
+
+def _media_cover_urls(records, keys, account=None):
+    """Retain working alternatives instead of discarding all but one field."""
+    result = []
+    def add(value):
+        if isinstance(value, (list, tuple)):
+            for entry in value:
+                add(entry)
+        elif isinstance(value, dict):
+            for key in ("url", "path", "src", "image"):
+                if key in value:
+                    add(value[key])
+        else:
+            if str(value or "").strip().lower() in ("", "-", "0", "n/a", "none", "null", "undefined"):
+                return
+            url = _normalise_media_url(value, account)
+            if url and url not in result and len(result) < 8:
+                result.append(url)
+    for key in keys:
+        for record in records:
+            if isinstance(record, dict):
+                add(record.get(key))
+    return result
 
 
 def _numeric_id(value):
@@ -1403,6 +1434,63 @@ class XtreamContentClient(object):
         self._check_request_limits()
         return results
 
+    def iter_movie_catalog_items(self, category_id=""):
+        """Stream VOD rows without the normal response-size or UI item slice."""
+        return self._iter_catalog_items("movie", category_id)
+
+    def iter_series_catalog_items(self, category_id=""):
+        """Stream series headers; seasons and episodes are requested on demand."""
+        return self._iter_catalog_items("series", category_id)
+
+    def _iter_catalog_items(self, content_type, category_id):
+        from .streaming_json import iter_json_array
+
+        category_id = str(category_id or "").strip()
+        parameters = {"category_id": category_id} if category_id else None
+        request = Request(self.account.api_url(ITEM_ACTIONS[content_type], parameters), headers={
+            "Accept": "application/json",
+            "User-Agent": "GT-IPTV-Player-Pro/{}".format(PLUGIN_VERSION),
+        })
+        acquired = False
+        response = None
+        try:
+            self._check_request_limits()
+            self._acquire_request_slot()
+            acquired = True
+            response = self.opener(request, timeout=self._request_timeout())
+            reader = getattr(response, "read1", None)
+            if not callable(reader):
+                reader = response.read
+
+            def read(size):
+                self._check_request_limits()
+                self._set_response_timeout(response, self._request_timeout())
+                return reader(size)
+
+            for entry in iter_json_array(read, self._check_request_limits):
+                item = self._content_item(content_type, entry, category_id)
+                if item is not None:
+                    yield item
+        except HTTPError as error:
+            try:
+                error.close()
+            except Exception:
+                pass
+            reason = (ContentError.ACCESS_DENIED if error.code in (401, 403) else
+                      ContentError.RATE_LIMITED if error.code == 429 else ContentError.HTTP_ERROR)
+            raise ContentError(N_("Could not connect to the content server"), reason, error.code)
+        except (URLError, socket.timeout, OSError):
+            raise ContentError(N_("Could not connect to the content server"), ContentError.CONNECTION)
+        finally:
+            try:
+                if response is not None:
+                    response.close()
+            except Exception:
+                pass
+            finally:
+                if acquired:
+                    self._request_slots.release()
+
     def load_more_items(self, content_type, category_id=""):
         content_type = self._validate_type(content_type)
         category_id = str(category_id or "")
@@ -1488,16 +1576,64 @@ class XtreamContentClient(object):
             ),
             tmdb_id=first("tmdb_id", "tmdb"),
             imdb_id=first("imdb_id", "imdbId", "imdb"),
+            cover_urls=_media_cover_urls(
+                (info, movie), ("cover_big", "movie_image", "cover", "stream_icon", "poster"), self.account,
+            ),
         )
 
-    def load_series_info(self, series_id):
+    def _series_response_state(self):
+        with _SERIES_RESPONSE_INIT_LOCK:
+            state = getattr(self, "_shared_series_response", None)
+            if state is None:
+                state = {"condition": threading.Condition(), "cached": None, "inflight": set()}
+                self._shared_series_response = state
+            return state
+
+    def share_series_responses(self, other):
+        if isinstance(other, XtreamContentClient) and other.account == self.account:
+            other._shared_series_response = self._series_response_state()
+
+    def _series_payload(self, series_id):
+        # Keep just one bounded API response, not an episode tree for every
+        # highlighted card. A child client may reuse it while owning its own
+        # cancellation scope and provider slots.
+        state = self._series_response_state()
+        condition = state["condition"]
+        while True:
+            if hasattr(self, "_request_context"):
+                self._check_request_limits()
+            with condition:
+                cached = state["cached"]
+                if cached and cached[0] == series_id and time.monotonic() - cached[1] < CONTENT_CACHE_SECONDS:
+                    return cached[2]
+                if series_id not in state["inflight"]:
+                    state["inflight"].add(series_id)
+                    break
+                condition.wait(0.05)
+        try:
+            payload = self._request_json("get_series_info", {"series_id": series_id})
+            if hasattr(self, "_request_context"):
+                self._check_request_limits()
+            if isinstance(payload, dict):
+                with condition:
+                    state["cached"] = (series_id, time.monotonic(), payload)
+            return payload
+        finally:
+            with condition:
+                state["inflight"].discard(series_id)
+                condition.notify_all()
+
+    def load_series_summary(self, series_id):
+        return self.load_series_info(series_id, _poster_only=True)
+
+    def load_series_info(self, series_id, _poster_only=False):
         series_id = _numeric_id(series_id)
         if not series_id:
             raise ContentError(
                 N_("Invalid series ID"),
                 ContentError.INVALID_SERIES_ID,
             )
-        payload = self._request_json("get_series_info", {"series_id": series_id})
+        payload = self._series_payload(series_id)
         if not isinstance(payload, dict):
             raise ContentError(
                 N_("Could not load series information"),
@@ -1506,7 +1642,7 @@ class XtreamContentClient(object):
         info = payload.get("info") or {}
         if not isinstance(info, dict):
             info = {}
-        episodes = payload.get("episodes") or {}
+        episodes = {} if _poster_only else (payload.get("episodes") or {})
         if not isinstance(episodes, dict):
             raise ContentError(
                 N_("Could not load series episodes"),
@@ -1594,6 +1730,8 @@ class XtreamContentClient(object):
                 self.account,
             ),
             episodes=results,
+            season_ids=(list((payload.get("episodes") or {}).keys())
+                        if isinstance(payload.get("episodes"), dict) else []),
             backdrop=_normalise_media_url(
                 first(
                     "backdrop_path",
@@ -1606,6 +1744,9 @@ class XtreamContentClient(object):
             ),
             tmdb_id=first("tmdb_id", "tmdb"),
             imdb_id=first("imdb_id", "imdbId", "imdb"),
+            cover_urls=_media_cover_urls(
+                (info, payload), ("cover", "cover_big", "movie_image", "stream_icon", "poster"), self.account,
+            ),
         )
 
     def load_episodes(self, series_id):

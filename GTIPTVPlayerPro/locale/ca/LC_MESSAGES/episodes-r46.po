@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: ca\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Sèrie"
+
+msgid "Season"
+msgstr "Temporada"
+
+msgid "Navigate"
+msgstr "Navega"
+
+msgid "Page"
+msgstr "Pàgina"
+
+msgid "Play"
+msgstr "Reprodueix"
+
+msgid "Favorite"
+msgstr "Preferit"
+
+msgid "Refresh"
+msgstr "Actualitza"
+
+msgid "Download"
+msgstr "Baixa"
+
+msgid "Back"
+msgstr "Enrere"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Temporada {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} temporades"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} episodis"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Episodi {}"
+
+msgid "Watched"
+msgstr "Vist"
+
+msgid "Not played"
+msgstr "Sense reproduir"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Reprèn a {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Reprèn l'episodi {}"
+
+msgid "Continue watching"
+msgstr "Continua mirant"
+
+msgid "Add to favorites"
+msgstr "Afegeix als preferits"
+
+msgid "Remove from favorites"
+msgstr "Elimina dels preferits"
+
+msgid "Download episode"
+msgstr "Descarrega l'episodi"
+
+msgid "SEASON PROGRESS"
+msgstr "PROGRÉS DE LA TEMPORADA"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} episodis completats"
+
+msgid "CAST"
+msgstr "REPARTIMENT"
+
+msgid "GENRE"
+msgstr "GÈNERE"
+
+msgid "Unknown season"
+msgstr "Temporada desconeguda"
+
+msgid "No episodes in this season."
+msgstr "No hi ha episodis en aquesta temporada."
+
+msgid "Marked as watched"
+msgstr "Marcat com a vist"
+
+msgid "Marked as not watched"
+msgstr "Marcat com a no vist"
+
+msgid "Could not save watched status."
+msgstr "No s'ha pogut desar l'estat de visualització."
+
+msgid "Mark watched"
+msgstr "Marca com a vist"
+
+msgid "Hold OK"
+msgstr "Mantén premut OK"
+
+msgid "Episodes"
+msgstr "Episodis"
+
+msgid "No information available."
+msgstr "No hi ha informació disponible."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Temporada {season} · Episodi {episode} · Reprèn a {time}"

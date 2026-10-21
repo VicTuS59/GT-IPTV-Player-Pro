@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: sk\nLanguage: sk\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n == 1) ? 0 : (n >= 2 && n <= 4) ? 1 : 2;\n"
+
+msgid "Choose a subtitle file"
+msgstr "Vyberte súbor s titulkami"
+
+msgid "Download folder"
+msgstr "Priečinok na sťahovanie"
+
+msgid "Use this folder"
+msgstr "Použiť tento priečinok"
+
+msgid "Local subtitles"
+msgstr "Miestne titulky"
+
+msgid "GT subtitle downloads"
+msgstr "Titulky stiahnuté cez GT"
+
+msgid "Search subtitle files"
+msgstr "Hľadať súbory s titulkami"
+
+msgid "No subtitle files found."
+msgstr "Nenašli sa žiadne súbory s titulkami."
+
+msgid "Could not read this folder."
+msgstr "Tento priečinok sa nepodarilo načítať."
+
+msgid "Could not load this subtitle file."
+msgstr "Tento súbor s titulkami sa nepodarilo načítať."
+
+msgid "Could not save the download folder."
+msgstr "Priečinok na sťahovanie sa nepodarilo uložiť."
+
+msgid "Download folder saved."
+msgstr "Priečinok na sťahovanie bol uložený."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Priečinok na sťahovanie titulkov nie je dostupný. Vyberte iný priečinok."
+
+msgid "Subtitle file is too large."
+msgstr "Súbor s titulkami je príliš veľký."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Podporované sú iba súbory s titulkami SRT a VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Hľadanie súborov s titulkami..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Bol dosiahnutý limit vyhľadávania. Spresnite vyhľadávanie."
+
+msgid "Temporary folder"
+msgstr "Dočasný priečinok"
+
+msgid "Device storage"
+msgstr "Úložisko zariadenia"
+
+msgid "Up one folder"
+msgstr "O priečinok vyššie"
+
+msgid "Subtitle language"
+msgstr "Jazyk titulkov"
+
+msgid "Search this folder"
+msgstr "Prehľadať tento priečinok"
+
+msgid "Local subtitle loaded."
+msgstr "Miestne titulky boli načítané."
+
+msgid "Automatic detection"
+msgstr "Automatické rozpoznanie"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Vyberte priečinok na HDD, USB alebo pripojenom NAS."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Dočasný priečinok sa pri reštarte prijímača vymaže."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Priečinok na sťahovanie: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Jazyk titulkov: {}"
+
+msgid "Folder is not available."
+msgstr "Priečinok nie je dostupný."
+
+msgid "Use temporary folder"
+msgstr "Použiť dočasný priečinok"
+
+msgid "Device folders"
+msgstr "Priečinky zariadenia"
+
+msgid "Downloaded subtitles"
+msgstr "Stiahnuté titulky"
+
+msgid "Search results"
+msgstr "Výsledky vyhľadávania"

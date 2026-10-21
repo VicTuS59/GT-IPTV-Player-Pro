@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: fi\nLanguage: fi\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Valitse tekstitystiedosto"
+
+msgid "Download folder"
+msgstr "Latauskansio"
+
+msgid "Use this folder"
+msgstr "Käytä tätä kansiota"
+
+msgid "Local subtitles"
+msgstr "Paikalliset tekstitykset"
+
+msgid "GT subtitle downloads"
+msgstr "GT:n tekstityslataukset"
+
+msgid "Search subtitle files"
+msgstr "Etsi tekstitystiedostoja"
+
+msgid "No subtitle files found."
+msgstr "Tekstitystiedostoja ei löytynyt."
+
+msgid "Could not read this folder."
+msgstr "Tätä kansiota ei voitu lukea."
+
+msgid "Could not load this subtitle file."
+msgstr "Tätä tekstitystiedostoa ei voitu ladata."
+
+msgid "Could not save the download folder."
+msgstr "Latauskansiota ei voitu tallentaa."
+
+msgid "Download folder saved."
+msgstr "Latauskansio tallennettu."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Tekstitysten latauskansio ei ole käytettävissä. Valitse toinen kansio."
+
+msgid "Subtitle file is too large."
+msgstr "Tekstitystiedosto on liian suuri."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Vain SRT- ja VTT-tekstitystiedostoja tuetaan."
+
+msgid "Searching subtitle files..."
+msgstr "Etsitään tekstitystiedostoja..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Hakuraja saavutettu. Rajaa hakuasi."
+
+msgid "Temporary folder"
+msgstr "Tilapäinen kansio"
+
+msgid "Device storage"
+msgstr "Laitteen tallennustila"
+
+msgid "Up one folder"
+msgstr "Yksi kansio ylöspäin"
+
+msgid "Subtitle language"
+msgstr "Tekstityksen kieli"
+
+msgid "Search this folder"
+msgstr "Etsi tästä kansiosta"
+
+msgid "Local subtitle loaded."
+msgstr "Paikallinen tekstitys ladattu."
+
+msgid "Automatic detection"
+msgstr "Automaattinen tunnistus"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Valitse kansio HDD-levyltä, USB-laitteelta tai yhdistetystä NAS-laitteesta."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Tilapäinen kansio tyhjennetään vastaanottimen käynnistyessä uudelleen."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Latauskansio: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Tekstityksen kieli: {}"
+
+msgid "Folder is not available."
+msgstr "Kansio ei ole käytettävissä."
+
+msgid "Use temporary folder"
+msgstr "Käytä tilapäistä kansiota"
+
+msgid "Device folders"
+msgstr "Laitteen kansiot"
+
+msgid "Downloaded subtitles"
+msgstr "Ladatut tekstitykset"
+
+msgid "Search results"
+msgstr "Hakutulokset"

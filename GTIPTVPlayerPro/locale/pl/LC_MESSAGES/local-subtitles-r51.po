@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: pl\nLanguage: pl\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n == 1) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2;\n"
+
+msgid "Choose a subtitle file"
+msgstr "Wybierz plik napisów"
+
+msgid "Download folder"
+msgstr "Folder pobierania"
+
+msgid "Use this folder"
+msgstr "Użyj tego folderu"
+
+msgid "Local subtitles"
+msgstr "Lokalne napisy"
+
+msgid "GT subtitle downloads"
+msgstr "Napisy pobrane przez GT"
+
+msgid "Search subtitle files"
+msgstr "Szukaj plików napisów"
+
+msgid "No subtitle files found."
+msgstr "Nie znaleziono plików napisów."
+
+msgid "Could not read this folder."
+msgstr "Nie można odczytać tego folderu."
+
+msgid "Could not load this subtitle file."
+msgstr "Nie można wczytać tego pliku napisów."
+
+msgid "Could not save the download folder."
+msgstr "Nie można zapisać folderu pobierania."
+
+msgid "Download folder saved."
+msgstr "Folder pobierania zapisany."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Folder pobierania napisów jest niedostępny. Wybierz inny folder."
+
+msgid "Subtitle file is too large."
+msgstr "Plik napisów jest zbyt duży."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Obsługiwane są tylko pliki napisów SRT i VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Wyszukiwanie plików napisów..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Osiągnięto limit wyszukiwania. Zawęź wyszukiwanie."
+
+msgid "Temporary folder"
+msgstr "Folder tymczasowy"
+
+msgid "Device storage"
+msgstr "Pamięć urządzenia"
+
+msgid "Up one folder"
+msgstr "Folder wyżej"
+
+msgid "Subtitle language"
+msgstr "Język napisów"
+
+msgid "Search this folder"
+msgstr "Przeszukaj ten folder"
+
+msgid "Local subtitle loaded."
+msgstr "Wczytano lokalne napisy."
+
+msgid "Automatic detection"
+msgstr "Automatyczne wykrywanie"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Wybierz folder na dysku HDD, nośniku USB lub podłączonym serwerze NAS."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Folder tymczasowy jest czyszczony po ponownym uruchomieniu odbiornika."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Folder pobierania: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Język napisów: {}"
+
+msgid "Folder is not available."
+msgstr "Folder jest niedostępny."
+
+msgid "Use temporary folder"
+msgstr "Użyj folderu tymczasowego"
+
+msgid "Device folders"
+msgstr "Foldery urządzenia"
+
+msgid "Downloaded subtitles"
+msgstr "Pobrane napisy"
+
+msgid "Search results"
+msgstr "Wyniki wyszukiwania"

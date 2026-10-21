@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: hu\nLanguage: hu\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Feliratfájl kiválasztása"
+
+msgid "Download folder"
+msgstr "Letöltési mappa"
+
+msgid "Use this folder"
+msgstr "Mappa használata"
+
+msgid "Local subtitles"
+msgstr "Helyi feliratok"
+
+msgid "GT subtitle downloads"
+msgstr "GT-feliratletöltések"
+
+msgid "Search subtitle files"
+msgstr "Feliratfájlok keresése"
+
+msgid "No subtitle files found."
+msgstr "Nem találhatók feliratfájlok."
+
+msgid "Could not read this folder."
+msgstr "A mappa nem olvasható."
+
+msgid "Could not load this subtitle file."
+msgstr "A feliratfájl nem tölthető be."
+
+msgid "Could not save the download folder."
+msgstr "A letöltési mappa nem menthető."
+
+msgid "Download folder saved."
+msgstr "A letöltési mappa mentve."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "A feliratok letöltési mappája nem érhető el. Válasszon másik mappát."
+
+msgid "Subtitle file is too large."
+msgstr "A feliratfájl túl nagy."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Csak SRT- és VTT-feliratfájlok támogatottak."
+
+msgid "Searching subtitle files..."
+msgstr "Feliratfájlok keresése..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Elérte a keresési korlátot. Szűkítse a keresést."
+
+msgid "Temporary folder"
+msgstr "Ideiglenes mappa"
+
+msgid "Device storage"
+msgstr "Eszköz tárhelye"
+
+msgid "Up one folder"
+msgstr "Egy mappával feljebb"
+
+msgid "Subtitle language"
+msgstr "Felirat nyelve"
+
+msgid "Search this folder"
+msgstr "Keresés ebben a mappában"
+
+msgid "Local subtitle loaded."
+msgstr "Helyi felirat betöltve."
+
+msgid "Automatic detection"
+msgstr "Automatikus felismerés"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Válasszon mappát a HDD-n, USB-n vagy a csatlakoztatott NAS-on."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Az ideiglenes mappa a vevőegység újraindításakor kiürül."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Letöltési mappa: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Felirat nyelve: {}"
+
+msgid "Folder is not available."
+msgstr "A mappa nem érhető el."
+
+msgid "Use temporary folder"
+msgstr "Ideiglenes mappa használata"
+
+msgid "Device folders"
+msgstr "Eszköz mappái"
+
+msgid "Downloaded subtitles"
+msgstr "Letöltött feliratok"
+
+msgid "Search results"
+msgstr "Keresési eredmények"

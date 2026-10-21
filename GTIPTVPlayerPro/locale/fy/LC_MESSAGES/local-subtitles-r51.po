@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: fy\nLanguage: fy\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Kies in ûndertitelbestân"
+
+msgid "Download folder"
+msgstr "Map foar ynladen"
+
+msgid "Use this folder"
+msgstr "Dizze map brûke"
+
+msgid "Local subtitles"
+msgstr "Lokale ûndertitels"
+
+msgid "GT subtitle downloads"
+msgstr "Mei GT ynladen ûndertitels"
+
+msgid "Search subtitle files"
+msgstr "Sykje nei ûndertitelbestannen"
+
+msgid "No subtitle files found."
+msgstr "Gjin ûndertitelbestannen fûn."
+
+msgid "Could not read this folder."
+msgstr "Dizze map koe net lêzen wurde."
+
+msgid "Could not load this subtitle file."
+msgstr "Dit ûndertitelbestân koe net laden wurde."
+
+msgid "Could not save the download folder."
+msgstr "De map foar ynladen koe net bewarre wurde."
+
+msgid "Download folder saved."
+msgstr "Map foar ynladen bewarre."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "De map foar it ynladen fan ûndertitels is net beskikber. Kies in oare map."
+
+msgid "Subtitle file is too large."
+msgstr "It ûndertitelbestân is te grut."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Allinnich SRT- en VTT-ûndertitelbestannen wurde stipe."
+
+msgid "Searching subtitle files..."
+msgstr "Sykje nei ûndertitelbestannen..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "De sykgrins is berikt. Meitsje jo sykopdracht spesifiker."
+
+msgid "Temporary folder"
+msgstr "Tydlike map"
+
+msgid "Device storage"
+msgstr "Opslach fan it apparaat"
+
+msgid "Up one folder"
+msgstr "Ien map omheech"
+
+msgid "Subtitle language"
+msgstr "Taal fan ûndertitels"
+
+msgid "Search this folder"
+msgstr "Dizze map trochsykje"
+
+msgid "Local subtitle loaded."
+msgstr "Lokale ûndertitel laden."
+
+msgid "Automatic detection"
+msgstr "Automatyske deteksje"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Kies in map op HDD, USB of in ferbûne NAS."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "De tydlike map wurdt leechmakke as de ûntfanger opnij start."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Map foar ynladen: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Taal fan ûndertitels: {}"
+
+msgid "Folder is not available."
+msgstr "De map is net beskikber."
+
+msgid "Use temporary folder"
+msgstr "Tydlike map brûke"
+
+msgid "Device folders"
+msgstr "Mappen fan it apparaat"
+
+msgid "Downloaded subtitles"
+msgstr "Ynladen ûndertitels"
+
+msgid "Search results"
+msgstr "Sykresultaten"

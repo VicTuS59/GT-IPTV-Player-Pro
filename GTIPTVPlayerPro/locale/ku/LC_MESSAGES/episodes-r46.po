@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: ku\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Rêzefîlm"
+
+msgid "Season"
+msgstr "Sezon"
+
+msgid "Navigate"
+msgstr "Navîgasyon"
+
+msgid "Page"
+msgstr "Rûpel"
+
+msgid "Play"
+msgstr "Lê bide"
+
+msgid "Favorite"
+msgstr "Bijare"
+
+msgid "Refresh"
+msgstr "Nûkirin"
+
+msgid "Download"
+msgstr "Daxîne"
+
+msgid "Back"
+msgstr "Paşve"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Sezona {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} sezon"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} beş"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Beşa {}"
+
+msgid "Watched"
+msgstr "Hatiye temaşekirin"
+
+msgid "Not played"
+msgstr "Nehatiye lîstin"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Ji {} bidomîne"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Beşa {} bidomîne"
+
+msgid "Continue watching"
+msgstr "Temaşekirinê bidomîne"
+
+msgid "Add to favorites"
+msgstr "Li bijareyan zêde bike"
+
+msgid "Remove from favorites"
+msgstr "Ji bijareyan rake"
+
+msgid "Download episode"
+msgstr "Beşê daxîne"
+
+msgid "SEASON PROGRESS"
+msgstr "PÊŞKETINA SEZONÊ"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} beş hatine qedandin"
+
+msgid "CAST"
+msgstr "LÎSTIKVAN"
+
+msgid "GENRE"
+msgstr "CURE"
+
+msgid "Unknown season"
+msgstr "Sezona nenas"
+
+msgid "No episodes in this season."
+msgstr "Di vê sezonê de beş tune ne."
+
+msgid "Marked as watched"
+msgstr "Wek temaşekirî hate nîşankirin"
+
+msgid "Marked as not watched"
+msgstr "Wek netemaşekirî hate nîşankirin"
+
+msgid "Could not save watched status."
+msgstr "Rewşa temaşekirinê nehat tomarkirin."
+
+msgid "Mark watched"
+msgstr "Wek temaşekirî nîşan bike"
+
+msgid "Hold OK"
+msgstr "OK dirêj bigire"
+
+msgid "Episodes"
+msgstr "Beş"
+
+msgid "No information available."
+msgstr "Agahî tune ye."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Sezona {season} · Beşa {episode} · Ji {time} bidomîne"

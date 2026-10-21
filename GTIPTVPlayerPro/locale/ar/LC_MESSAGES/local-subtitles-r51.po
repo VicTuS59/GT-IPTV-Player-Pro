@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: ar\nLanguage: ar\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=6; plural=(n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5);\n"
+
+msgid "Choose a subtitle file"
+msgstr "اختر ملف ترجمة"
+
+msgid "Download folder"
+msgstr "مجلد التنزيل"
+
+msgid "Use this folder"
+msgstr "استخدام هذا المجلد"
+
+msgid "Local subtitles"
+msgstr "ترجمات محلية"
+
+msgid "GT subtitle downloads"
+msgstr "تنزيلات ترجمة GT"
+
+msgid "Search subtitle files"
+msgstr "البحث عن ملفات الترجمة"
+
+msgid "No subtitle files found."
+msgstr "لم يُعثر على ملفات ترجمة."
+
+msgid "Could not read this folder."
+msgstr "تعذّرت قراءة هذا المجلد."
+
+msgid "Could not load this subtitle file."
+msgstr "تعذّر تحميل ملف الترجمة هذا."
+
+msgid "Could not save the download folder."
+msgstr "تعذّر حفظ مجلد التنزيل."
+
+msgid "Download folder saved."
+msgstr "تم حفظ مجلد التنزيل."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "مجلد تنزيل الترجمة غير متاح. اختر مجلدًا آخر."
+
+msgid "Subtitle file is too large."
+msgstr "حجم ملف الترجمة كبير جدًا."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "تُدعم ملفات الترجمة بصيغتي SRT وVTT فقط."
+
+msgid "Searching subtitle files..."
+msgstr "جارٍ البحث عن ملفات الترجمة..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "تم بلوغ حد البحث. ضيّق نطاق البحث."
+
+msgid "Temporary folder"
+msgstr "مجلد مؤقت"
+
+msgid "Device storage"
+msgstr "مساحة تخزين الجهاز"
+
+msgid "Up one folder"
+msgstr "الانتقال إلى المجلد الأب"
+
+msgid "Subtitle language"
+msgstr "لغة الترجمة"
+
+msgid "Search this folder"
+msgstr "البحث في هذا المجلد"
+
+msgid "Local subtitle loaded."
+msgstr "تم تحميل الترجمة المحلية."
+
+msgid "Automatic detection"
+msgstr "اكتشاف تلقائي"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "اختر مجلدًا على القرص الصلب أو ذاكرة USB أو وحدة تخزين شبكية NAS متصلة."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "يُفرَّغ المجلد المؤقت عند إعادة تشغيل جهاز الاستقبال."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "مجلد التنزيل: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "لغة الترجمة: {}"
+
+msgid "Folder is not available."
+msgstr "المجلد غير متاح."
+
+msgid "Use temporary folder"
+msgstr "استخدام المجلد المؤقت"
+
+msgid "Device folders"
+msgstr "مجلدات الجهاز"
+
+msgid "Downloaded subtitles"
+msgstr "الترجمات المنزَّلة"
+
+msgid "Search results"
+msgstr "نتائج البحث"

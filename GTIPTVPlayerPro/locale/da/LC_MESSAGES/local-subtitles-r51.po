@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: da\nLanguage: da\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Vælg en undertekstfil"
+
+msgid "Download folder"
+msgstr "Downloadmappe"
+
+msgid "Use this folder"
+msgstr "Brug denne mappe"
+
+msgid "Local subtitles"
+msgstr "Lokale undertekster"
+
+msgid "GT subtitle downloads"
+msgstr "Undertekster hentet med GT"
+
+msgid "Search subtitle files"
+msgstr "Søg efter undertekstfiler"
+
+msgid "No subtitle files found."
+msgstr "Ingen undertekstfiler fundet."
+
+msgid "Could not read this folder."
+msgstr "Kunne ikke læse denne mappe."
+
+msgid "Could not load this subtitle file."
+msgstr "Kunne ikke indlæse denne undertekstfil."
+
+msgid "Could not save the download folder."
+msgstr "Kunne ikke gemme downloadmappen."
+
+msgid "Download folder saved."
+msgstr "Downloadmappe gemt."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Downloadmappen til undertekster er ikke tilgængelig. Vælg en anden mappe."
+
+msgid "Subtitle file is too large."
+msgstr "Undertekstfilen er for stor."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Kun undertekstfiler i SRT- og VTT-format understøttes."
+
+msgid "Searching subtitle files..."
+msgstr "Søger efter undertekstfiler..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Søgegrænsen er nået. Begræns din søgning."
+
+msgid "Temporary folder"
+msgstr "Midlertidig mappe"
+
+msgid "Device storage"
+msgstr "Enhedens lager"
+
+msgid "Up one folder"
+msgstr "En mappe op"
+
+msgid "Subtitle language"
+msgstr "Undertekstsprog"
+
+msgid "Search this folder"
+msgstr "Søg i denne mappe"
+
+msgid "Local subtitle loaded."
+msgstr "Lokal undertekst indlæst."
+
+msgid "Automatic detection"
+msgstr "Automatisk registrering"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Vælg en mappe på HDD, USB eller en tilsluttet NAS."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Den midlertidige mappe tømmes, når modtageren genstarter."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Downloadmappe: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Undertekstsprog: {}"
+
+msgid "Folder is not available."
+msgstr "Mappen er ikke tilgængelig."
+
+msgid "Use temporary folder"
+msgstr "Brug midlertidig mappe"
+
+msgid "Device folders"
+msgstr "Mapper på enheden"
+
+msgid "Downloaded subtitles"
+msgstr "Hentede undertekster"
+
+msgid "Search results"
+msgstr "Søgeresultater"

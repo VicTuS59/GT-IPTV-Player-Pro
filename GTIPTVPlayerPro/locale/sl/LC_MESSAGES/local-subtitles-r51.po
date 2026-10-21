@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro\nLanguage-Team: Slovenian\nLanguage: sl\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=4; plural=(n%100==1) ? 1 : (n%100==2) ? 2 : (n%100==3 || n%100==4) ? 3 : 0;\n"
+
+msgid "Choose a subtitle file"
+msgstr "Izberite datoteko s podnapisi"
+
+msgid "Download folder"
+msgstr "Mapa za prenose"
+
+msgid "Use this folder"
+msgstr "Uporabi to mapo"
+
+msgid "Local subtitles"
+msgstr "Lokalni podnapisi"
+
+msgid "GT subtitle downloads"
+msgstr "Prenosi podnapisov GT"
+
+msgid "Search subtitle files"
+msgstr "Poišči datoteke s podnapisi"
+
+msgid "No subtitle files found."
+msgstr "Ni najdenih datotek s podnapisi."
+
+msgid "Could not read this folder."
+msgstr "Te mape ni bilo mogoče prebrati."
+
+msgid "Could not load this subtitle file."
+msgstr "Te datoteke s podnapisi ni bilo mogoče naložiti."
+
+msgid "Could not save the download folder."
+msgstr "Mape za prenose ni bilo mogoče shraniti."
+
+msgid "Download folder saved."
+msgstr "Mapa za prenose je shranjena."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Mapa za prenos podnapisov ni na voljo. Izberite drugo mapo."
+
+msgid "Subtitle file is too large."
+msgstr "Datoteka s podnapisi je prevelika."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Podprte so samo datoteke s podnapisi SRT in VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Iskanje datotek s podnapisi..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Dosežena je omejitev iskanja. Zožite iskanje."
+
+msgid "Temporary folder"
+msgstr "Začasna mapa"
+
+msgid "Device storage"
+msgstr "Shramba naprave"
+
+msgid "Up one folder"
+msgstr "Eno mapo višje"
+
+msgid "Subtitle language"
+msgstr "Jezik podnapisov"
+
+msgid "Search this folder"
+msgstr "Preišči to mapo"
+
+msgid "Local subtitle loaded."
+msgstr "Lokalni podnapisi so naloženi."
+
+msgid "Automatic detection"
+msgstr "Samodejno zaznavanje"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Izberite mapo na HDD, USB ali povezanem NAS-u."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Začasna mapa se izbriše ob ponovnem zagonu sprejemnika."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Mapa za prenose: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Jezik podnapisov: {}"
+
+msgid "Folder is not available."
+msgstr "Mapa ni na voljo."
+
+msgid "Use temporary folder"
+msgstr "Uporabi začasno mapo"
+
+msgid "Device folders"
+msgstr "Mape naprave"
+
+msgid "Downloaded subtitles"
+msgstr "Preneseni podnapisi"
+
+msgid "Search results"
+msgstr "Rezultati iskanja"

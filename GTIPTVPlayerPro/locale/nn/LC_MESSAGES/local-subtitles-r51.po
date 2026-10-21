@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: nn\nLanguage: nn\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Vel ei undertekstfil"
+
+msgid "Download folder"
+msgstr "Nedlastingsmappe"
+
+msgid "Use this folder"
+msgstr "Bruk denne mappa"
+
+msgid "Local subtitles"
+msgstr "Lokale undertekstar"
+
+msgid "GT subtitle downloads"
+msgstr "Undertekstar lasta ned med GT"
+
+msgid "Search subtitle files"
+msgstr "Søk etter undertekstfiler"
+
+msgid "No subtitle files found."
+msgstr "Fann ingen undertekstfiler."
+
+msgid "Could not read this folder."
+msgstr "Klarte ikkje å lese denne mappa."
+
+msgid "Could not load this subtitle file."
+msgstr "Klarte ikkje å laste inn denne undertekstfila."
+
+msgid "Could not save the download folder."
+msgstr "Klarte ikkje å lagre nedlastingsmappa."
+
+msgid "Download folder saved."
+msgstr "Nedlastingsmappe lagra."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Nedlastingsmappa for undertekstar er ikkje tilgjengeleg. Vel ei anna mappe."
+
+msgid "Subtitle file is too large."
+msgstr "Undertekstfila er for stor."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Berre SRT- og VTT-undertekstfiler er støtta."
+
+msgid "Searching subtitle files..."
+msgstr "Søkjer etter undertekstfiler..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Søkjegrensa er nådd. Avgrens søket."
+
+msgid "Temporary folder"
+msgstr "Mellombels mappe"
+
+msgid "Device storage"
+msgstr "Lagring på eininga"
+
+msgid "Up one folder"
+msgstr "Opp éi mappe"
+
+msgid "Subtitle language"
+msgstr "Undertekstspråk"
+
+msgid "Search this folder"
+msgstr "Søk i denne mappa"
+
+msgid "Local subtitle loaded."
+msgstr "Lokal undertekst lasta inn."
+
+msgid "Automatic detection"
+msgstr "Automatisk attkjenning"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Vel ei mappe på HDD, USB eller ein tilkopla NAS."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Den mellombelse mappa vert tømd når mottakaren startar på nytt."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Nedlastingsmappe: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Undertekstspråk: {}"
+
+msgid "Folder is not available."
+msgstr "Mappa er ikkje tilgjengeleg."
+
+msgid "Use temporary folder"
+msgstr "Bruk mellombels mappe"
+
+msgid "Device folders"
+msgstr "Mapper på eininga"
+
+msgid "Downloaded subtitles"
+msgstr "Nedlasta undertekstar"
+
+msgid "Search results"
+msgstr "Søkjeresultat"

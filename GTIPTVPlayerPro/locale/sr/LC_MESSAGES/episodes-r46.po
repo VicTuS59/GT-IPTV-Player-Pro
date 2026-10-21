@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: sr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Серија"
+
+msgid "Season"
+msgstr "Сезона"
+
+msgid "Navigate"
+msgstr "Навигација"
+
+msgid "Page"
+msgstr "Страница"
+
+msgid "Play"
+msgstr "Репродукуј"
+
+msgid "Favorite"
+msgstr "Омиљено"
+
+msgid "Refresh"
+msgstr "Освежи"
+
+msgid "Download"
+msgstr "Преузми"
+
+msgid "Back"
+msgstr "Назад"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Сезона {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "Сезоне: {}"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "Епизоде: {}"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Епизода {}"
+
+msgid "Watched"
+msgstr "Одгледано"
+
+msgid "Not played"
+msgstr "Није пуштано"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Настави од {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Настави епизоду {}"
+
+msgid "Continue watching"
+msgstr "Настави гледање"
+
+msgid "Add to favorites"
+msgstr "Додај у омиљене"
+
+msgid "Remove from favorites"
+msgstr "Уклони из омиљених"
+
+msgid "Download episode"
+msgstr "Преузми епизоду"
+
+msgid "SEASON PROGRESS"
+msgstr "НАПРЕДАК СЕЗОНЕ"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "Завршене епизоде: {} / {}"
+
+msgid "CAST"
+msgstr "УЛОГЕ"
+
+msgid "GENRE"
+msgstr "ЖАНР"
+
+msgid "Unknown season"
+msgstr "Непозната сезона"
+
+msgid "No episodes in this season."
+msgstr "У овој сезони нема епизода."
+
+msgid "Marked as watched"
+msgstr "Означено као одгледано"
+
+msgid "Marked as not watched"
+msgstr "Означено као неодгледано"
+
+msgid "Could not save watched status."
+msgstr "Није могуће сачувати статус гледања."
+
+msgid "Mark watched"
+msgstr "Означи као одгледано"
+
+msgid "Hold OK"
+msgstr "Држи OK"
+
+msgid "Episodes"
+msgstr "Епизоде"
+
+msgid "No information available."
+msgstr "Информације нису доступне."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Сезона {season} · Епизода {episode} · Настави од {time}"

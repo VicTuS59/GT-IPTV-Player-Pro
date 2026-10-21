@@ -3,10 +3,10 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Bounded external XMLTV support for M3U live channels.
 
-Refresh work in this module is synchronous and belongs on a worker thread.
-The television-facing lookup path is deliberately different: once a snapshot
-has been published, :class:`M3UEPGStore` only reads immutable in-memory data.
-It never opens a file, resolves a host, or parses XML while changing channels.
+Refresh work and cold lookups belong on the existing EPG worker threads.
+Published snapshots use compact local indexes and a shared decoded-channel
+cache. GUI rendering requests cache-only lookups, which never open a file,
+resolve a host, or parse XML while changing channels.
 
 Channel association is intentionally conservative.  A playlist ``tvg-id`` is
 matched to an XMLTV channel ID first by an exact comparison and then, only if
@@ -36,6 +36,7 @@ from . import PLUGIN_VERSION
 from . import dvb_epg
 from . import m3u
 from .content import ContentError, EPGEvent
+from .epg_runtime import DECODED_CHANNEL_BYTES, DecodedChannelCache, EPGChannelIndex
 
 
 M3U_EPG_CACHE_DIRECTORY = "/etc/enigma2/gtiptvplayer/m3u-epg-cache"
@@ -102,7 +103,7 @@ class M3UEPGCancelled(M3UEPGError):
 
 
 def get_default_store():
-    """Return the process-wide RAM snapshot store."""
+    """Return the process-wide compact snapshot store."""
     global _DEFAULT_STORE
     if _DEFAULT_STORE is None:
         with _DEFAULT_STORE_LOCK:
@@ -171,13 +172,43 @@ def delete_snapshot(source_id, cache_dir=M3U_EPG_CACHE_DIRECTORY, store=None):
 
 
 class M3UEPGStore(object):
-    """Thread-safe collection of immutable, RAM-only runtime indexes."""
+    """Compact local indexes with a shared, bounded RAM cache of channel rows."""
 
-    def __init__(self, cache_dir=M3U_EPG_CACHE_DIRECTORY):
+    def __init__(self, cache_dir=M3U_EPG_CACHE_DIRECTORY,
+                 max_decoded_bytes=DECODED_CHANNEL_BYTES,
+                 max_index_bytes=MAX_SNAPSHOT_CACHE_BYTES):
         self.cache_dir = _validated_absolute_directory(cache_dir)
         self._lock = threading.RLock()
-        self._snapshots = {}
+        self._snapshots = OrderedDict()
         self._generations = {}
+        self._decoded = DecodedChannelCache(maximum=max_decoded_bytes)
+        self._index_bytes = 0
+        self._index_limit = max(1, int(max_index_bytes))
+
+    def _drop_runtime_locked(self, source_id):
+        runtime = self._snapshots.pop(source_id, None)
+        index = runtime.get("index") if runtime is not None else None
+        if index is not None:
+            self._index_bytes -= index.size_bytes
+            self._decoded.drop(index.ticket)
+        return runtime
+
+    def _remember_runtime_locked(self, source_id, runtime):
+        self._drop_runtime_locked(source_id)
+        self._snapshots[source_id] = runtime
+        index = runtime["index"]
+        self._index_bytes += index.size_bytes
+        # Normally 64 MiB, matching the existing snapshot-file budget. At
+        # least the newest single index stays usable even in tiny test budgets.
+        limit = max(self._index_limit, index.size_bytes)
+        for other_id, other in self._snapshots.items():
+            if self._index_bytes <= limit:
+                break
+            cold = other.get("index")
+            if other_id != source_id and cold is not None:
+                self._index_bytes -= cold.size_bytes
+                self._decoded.drop(cold.ticket)
+                other["index"] = None
 
     def publish(
         self,
@@ -219,10 +250,13 @@ class M3UEPGStore(object):
         serialized = _serialize_snapshot(validated)
         if _deadline is not None:
             _check_limits(_cancel_event, _deadline)
+        target_dir = self.cache_dir if cache_dir is None else cache_dir
         runtime = _runtime_snapshot(
             validated,
             cancel_event=_cancel_event,
             deadline=_deadline,
+            cache=self._decoded,
+            cache_dir=target_dir,
         )
         with _CACHE_LOCK:
             with self._lock:
@@ -233,7 +267,6 @@ class M3UEPGStore(object):
             ):
                 raise M3UEPGCancelled("external XMLTV publication was superseded")
             if persist:
-                target_dir = self.cache_dir if cache_dir is None else cache_dir
                 _install_snapshot(
                     source_id,
                     serialized,
@@ -250,10 +283,10 @@ class M3UEPGStore(object):
                     raise M3UEPGCancelled(
                         "external XMLTV publication was superseded"
                     )
-                self._snapshots[source_id] = runtime
+                self._remember_runtime_locked(source_id, runtime)
         return _snapshot_summary(validated, len(serialized))
 
-    def load_from_disk(self, source_id, binding=None, cache_dir=None):
+    def load_from_disk(self, source_id, binding=None, cache_dir=None, _expected_runtime=None):
         """Preload one snapshot on a scheduler/startup worker.
 
         Missing, malformed, oversized, or stale-binding files are reported as
@@ -269,6 +302,12 @@ class M3UEPGStore(object):
         if binding is not None:
             expected = binding_fingerprint(binding, source_id)
         with _CACHE_LOCK:
+            if _expected_runtime is not None:
+                with self._lock:
+                    current = self._snapshots.get(source_id)
+                    if current is not _expected_runtime:
+                        return bool(current is not None and current.get("index") is not None)
+                expected = _expected_runtime["binding_fingerprint"]
             directory_descriptor = None
             try:
                 directory_descriptor = _open_private_cache_directory(
@@ -280,7 +319,9 @@ class M3UEPGStore(object):
                     directory_descriptor=directory_descriptor,
                 )
                 payload = json.loads(body.decode("utf-8"))
+                del body
                 validated = _validate_snapshot(payload)
+                del payload
                 if validated["source_id"] != source_id:
                     raise M3UEPGSnapshotError("snapshot source ID does not match")
                 if (
@@ -289,7 +330,8 @@ class M3UEPGStore(object):
                 ):
                     self.forget(source_id)
                     return False
-                runtime = _runtime_snapshot(validated)
+                runtime = _runtime_snapshot(validated, cache=self._decoded,
+                    cache_dir=target_dir, directory_descriptor=directory_descriptor)
             except (
                 OSError,
                 UnicodeError,
@@ -304,11 +346,11 @@ class M3UEPGStore(object):
                 if directory_descriptor is not None:
                     os.close(directory_descriptor)
             with self._lock:
-                self._snapshots[source_id] = runtime
+                self._remember_runtime_locked(source_id, runtime)
             return True
 
-    def lookup(self, source_id, tvg_id, now=None):
-        """Return ``(current, next)`` :class:`EPGEvent` objects from RAM only."""
+    def lookup(self, source_id, tvg_id, now=None, cache_only=False):
+        """Read current/next on existing EPG workers; hot channels stay in RAM."""
         try:
             source_id = _validated_source_id(source_id)
             tvg_id = _validated_tvg_id(tvg_id)
@@ -319,14 +361,22 @@ class M3UEPGStore(object):
             return (None, None)
         with self._lock:
             runtime = self._snapshots.get(source_id)
+            if runtime is not None:
+                self._snapshots.move_to_end(source_id)
         if runtime is None:
             return (None, None)
-        xmltv_id = runtime["exact"].get(tvg_id)
-        if xmltv_id is None:
-            xmltv_id = runtime["normalised"].get(normalise_tvg_id(tvg_id))
-        if xmltv_id is None:
-            return (None, None)
-        events = runtime["events"].get(xmltv_id, ())
+        index = runtime.get("index")
+        if index is None:
+            if cache_only:
+                return (None, None)
+            if not self.load_from_disk(source_id, cache_dir=runtime["cache_dir"], _expected_runtime=runtime):
+                return (None, None)
+            with self._lock:
+                runtime = self._snapshots.get(source_id)
+                index = runtime.get("index") if runtime is not None else None
+            if index is None:
+                return (None, None)
+        events = index.get(tvg_id, normalise_tvg_id(tvg_id), cache_only=cache_only)
         current_index = None
         upcoming_index = None
         for index, event in enumerate(events):
@@ -358,7 +408,7 @@ class M3UEPGStore(object):
             return False
         with _CACHE_LOCK:
             with self._lock:
-                removed = self._snapshots.pop(source_id, None) is not None
+                removed = self._drop_runtime_locked(source_id) is not None
                 self._generations[source_id] = (
                     int(self._generations.get(source_id, 0) or 0) + 1
                 )
@@ -377,7 +427,7 @@ class M3UEPGStore(object):
                     current is not None
                     and current.get("binding_fingerprint") != fingerprint
                 ):
-                    self._snapshots.pop(source_id, None)
+                    self._drop_runtime_locked(source_id)
                     self._generations[source_id] = (
                         int(self._generations.get(source_id, 0) or 0) + 1
                     )
@@ -1444,9 +1494,10 @@ def _build_snapshot(
 
 
 def _clean_snapshot_text(value, maximum):
+    original = value
     value = unicodedata.normalize("NFC", str(value or ""))
-    value = " ".join(value.replace("\r", " ").replace("\n", " ").split())
-    return value[: int(maximum)]
+    value = " ".join(value.replace("\r", " ").replace("\n", " ").split())[: int(maximum)]
+    return original if isinstance(original, str) and value == original else value
 
 
 def _snapshot_encoded_size(payload, cancel_event=None, deadline=None):
@@ -1937,35 +1988,33 @@ def _serialize_snapshot(payload):
     return body
 
 
-def _runtime_snapshot(payload, cancel_event=None, deadline=None):
-    exact = {}
-    normalised_candidates = defaultdict(set)
-    events = {}
-    for channel_index, (xmltv_id, rows) in enumerate(payload["channels"]):
-        if deadline is not None and channel_index % 128 == 0:
-            _check_limits(cancel_event, deadline)
-        events[xmltv_id] = tuple(tuple(row) for row in rows)
-    for alias_index, (wanted_id, xmltv_id) in enumerate(payload["aliases"]):
-        if deadline is not None and alias_index % 128 == 0:
-            _check_limits(cancel_event, deadline)
-        exact[wanted_id] = xmltv_id
-        normalised_candidates[normalise_tvg_id(wanted_id)].add(xmltv_id)
-    ambiguous = frozenset(payload.get("ambiguous", ()))
-    normalised = {
-        key: next(iter(values))
-        for key, values in normalised_candidates.items()
-        if key and key not in ambiguous and len(values) == 1
-    }
-    if deadline is not None:
-        _check_limits(cancel_event, deadline)
-    return {
-        "source_id": payload["source_id"],
-        "binding_fingerprint": payload["binding_fingerprint"],
-        "cached_at": payload["cached_at"],
-        "exact": exact,
-        "normalised": normalised,
-        "events": events,
-    }
+def _runtime_snapshot(payload, cancel_event=None, deadline=None, cache=None,
+                      cache_dir=None, directory_descriptor=None):
+    own_descriptor = None
+    if cache is None:
+        cache = DecodedChannelCache()
+    if directory_descriptor is None and cache_dir is not None:
+        try:
+            own_descriptor = _open_private_cache_directory(cache_dir, create=True)
+            directory_descriptor = own_descriptor
+        except (OSError, M3UEPGSnapshotError):
+            pass
+    def check():
+        if deadline is not None or cancel_event is not None:
+            _check_limits(cancel_event, float("inf") if deadline is None else deadline)
+    try:
+        index = EPGChannelIndex(payload, normalise_tvg_id, cache,
+            directory_descriptor=directory_descriptor, check=check)
+        return {
+            "source_id": payload["source_id"],
+            "binding_fingerprint": payload["binding_fingerprint"],
+            "cached_at": payload["cached_at"],
+            "cache_dir": cache_dir,
+            "index": index,
+        }
+    finally:
+        if own_descriptor is not None:
+            os.close(own_descriptor)
 
 
 def _content_event(row, now_playing):

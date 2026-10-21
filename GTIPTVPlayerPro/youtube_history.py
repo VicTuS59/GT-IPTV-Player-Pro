@@ -7,6 +7,8 @@ import tempfile
 import threading
 import unicodedata
 
+from .persistence import guarded_mutation
+
 HISTORY_PATH = "/etc/enigma2/gtiptvplayer/youtube-history.json"
 HISTORY_LIMIT = 50
 PLAYBACK_HISTORY_PATH = "/etc/enigma2/gtiptvplayer/youtube-playback-history.json"
@@ -84,6 +86,7 @@ class YouTubeHistory(object):
         with self._lock:
             return self._read()
 
+    @guarded_mutation(busy_error=True)
     def add(self, query):
         query = normalize_query(query)
         if not query:
@@ -92,6 +95,7 @@ class YouTubeHistory(object):
             queries = [query] + [value for value in self._read() if _key(value) != _key(query)]
             self._write(queries[:HISTORY_LIMIT])
 
+    @guarded_mutation(busy_error=True)
     def delete(self, query=None):
         with self._lock:
             values = self._read()
@@ -162,10 +166,14 @@ class YouTubePlaybackHistory(object):
             return self._read()
 
     def get(self, video_id):
-        with self._lock:
-            return next((dict(value) for value in self._read()
-                         if value["id"] == video_id and value.get("position")), None)
+        from .persistence import WRITER, resume_write_key
+        pending, value = WRITER.peek(resume_write_key(self, video_id))
+        if pending:
+            return value if youtube_resume_position(value["position"], value["length"]) else None
+        return next((dict(value) for value in self._read()
+                     if value["id"] == video_id and value.get("position")), None)
 
+    @guarded_mutation(busy_error=True)
     def add(self, video_id, title, quality, duration=0):
         entry = self._entry({"id": video_id, "title": title, "quality": quality, "duration": duration})
         if entry is None:
@@ -179,6 +187,7 @@ class YouTubePlaybackHistory(object):
             values = [entry] + [value for value in values if value["id"] != video_id]
             _atomic_write(self.path, {"videos": values[:HISTORY_LIMIT]}, ".youtube-playback-history-")
 
+    @guarded_mutation
     def save(self, video_id, position, length, **unused_metadata):
         """Update an existing card without recreating a deleted history entry."""
         try:
@@ -202,6 +211,7 @@ class YouTubePlaybackHistory(object):
                 _atomic_write(self.path, {"videos": values}, ".youtube-playback-history-")
             return True
 
+    @guarded_mutation
     def finish(self, video_id):
         with self._lock:
             values = self._read()
@@ -212,6 +222,7 @@ class YouTubePlaybackHistory(object):
                 _atomic_write(self.path, {"videos": values}, ".youtube-playback-history-")
             return True
 
+    @guarded_mutation(busy_error=True)
     def delete(self, video_id=None):
         if video_id is not None and (not isinstance(video_id, str) or not _VIDEO_ID.fullmatch(video_id)):
             raise ValueError("invalid video selection")

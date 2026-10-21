@@ -166,6 +166,7 @@ _KEY_WIDTH_FACTORS = {
     "channel_page": 3.6,
     "right": FOOTER_KEY_WIDTH_FACTOR,
     "ok": FOOTER_KEY_WIDTH_FACTOR,
+    "ok_long": 2.8,
     "menu": FOOTER_KEY_WIDTH_FACTOR,
     "exit": FOOTER_KEY_WIDTH_FACTOR,
     "red": FOOTER_KEY_WIDTH_FACTOR,
@@ -178,6 +179,7 @@ _ACTION_TEXT = {
     "account_select": N_("Account"),
     "source_select": N_("Source"),
     "action_select": N_("Action"),
+    "auto_login": N_("Auto login"),
     "confirm": N_("Select"),
     "settings": N_("Settings"),
     "exit": N_("Exit"),
@@ -372,6 +374,7 @@ def decorate_remote_footer(
     design_size=None,
     side_padding=None,
     content_y_offset=0,
+    show_web_hint=True,
 ):
     """Replace every legacy footer with the same bottom-aligned guide."""
     if font_profile is None:
@@ -570,7 +573,7 @@ def decorate_remote_footer(
     # Keep the shortcut in its own narrow line so every existing key retains
     # its slot and caption area. At SD this is more readable than squeezing a
     # new key into the guide or using its very small upper padding.
-    if not re.search(r'<screen\b[^>]*\bname="GTWebInterfaceScreen"', skin):
+    if show_web_hint and not re.search(r'<screen\b[^>]*\bname="GTWebInterfaceScreen"', skin):
         hint_font = _web_hint_fonts(scale, font_profile)[0]
         hint_h = max(hint_font + _scaled(4, scale), _scaled(24, scale))
         hint_w = min(max(1, w - 2 * padding), _scaled(640, scale))
@@ -707,6 +710,8 @@ def _key_text(key):
         return "CH±"
     if key == "channel_page":
         return "CH+/CH−"
+    if key == "ok_long":
+        return localized_upper(_("Hold OK"))
     if key == "ok":
         return "OK"
     if key == "menu":
@@ -740,6 +745,18 @@ def _set_action_caption(screen, widget, action):
         )
 
 
+def _set_key_caption(screen, widget, key):
+    text = _key_text(key)
+    if key != "ok_long" or getattr(widget, "instance", None) is None:
+        widget.setText(text)
+        return
+    preferred, minimum = getattr(screen, "_remote_footer_hold_key_fonts", (20, 8))
+    fit_dynamic_text(
+        widget, text, max_lines=1,
+        preferred_size=preferred, min_size=minimum,
+    )
+
+
 def _refresh_stacked_captions(screen):
     if not (getattr(screen, "_remote_footer_stacked", False)
             or getattr(screen, "_remote_footer_fit_horizontal", False)):
@@ -749,6 +766,8 @@ def _refresh_stacked_captions(screen):
     for index, item in enumerate(items[:slots]):
         key, action = _item_parts(item)[:2]
         if key:
+            if key == "ok_long":
+                _set_key_caption(screen, screen["remote_key_{}".format(index)], key)
             _set_action_caption(
                 screen,
                 screen["remote_action_{}".format(index)],
@@ -806,7 +825,7 @@ def set_remote_footer(screen, items):
             action_widget.hide()
             continue
         visible.append(True)
-        key_widget.setText(_key_text(key))
+        _set_key_caption(screen, key_widget, key)
         _set_action_caption(screen, action_widget, action)
         key_background.show()
         key_widget.show()
@@ -839,6 +858,17 @@ def install_remote_footer(screen, items, slot_count=None, stacked=False, design_
     screen._remote_footer_slot_count = slots
     screen._remote_footer_stacked = bool(stacked)
     screen._remote_footer_fit_horizontal = bool(fit_horizontal)
+    hold_index = next((index for index, item in enumerate(items)
+                       if _item_parts(item)[0] == "ok_long"), None)
+    if hold_index is not None:
+        key_widget = re.search(
+            r'<widget\b[^>]*\bname="remote_key_{}"[^>]*/>'.format(hold_index),
+            screen.skin,
+        )
+        key_font = re.search(r'\bfont="[^";]+;(\d+)"', key_widget.group(0)) if key_widget else None
+        preferred = int(key_font.group(1)) if key_font else 20
+        scale = _footer_geometry(screen.skin, design_size=design_size)[4]
+        screen._remote_footer_hold_key_fonts = (preferred, max(8, _scaled(12, scale)))
     if stacked:
         scale = _footer_geometry(screen.skin, design_size=design_size)[4]
         screen._remote_footer_action_fonts = _stacked_action_fonts(scale)

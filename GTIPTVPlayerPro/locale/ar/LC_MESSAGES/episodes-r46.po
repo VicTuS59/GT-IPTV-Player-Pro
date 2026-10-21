@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: ar\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "المسلسلات"
+
+msgid "Season"
+msgstr "الموسم"
+
+msgid "Navigate"
+msgstr "تنقل"
+
+msgid "Page"
+msgstr "الصفحة"
+
+msgid "Play"
+msgstr "تشغيل"
+
+msgid "Favorite"
+msgstr "مفضلة"
+
+msgid "Refresh"
+msgstr "تحديث"
+
+msgid "Download"
+msgstr "تنزيل"
+
+msgid "Back"
+msgstr "رجوع"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "الموسم {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} مواسم"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} حلقات"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "الحلقة {}"
+
+msgid "Watched"
+msgstr "تمت المشاهدة"
+
+msgid "Not played"
+msgstr "لم تُشغّل"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "استئناف من {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "استئناف الحلقة {}"
+
+msgid "Continue watching"
+msgstr "متابعة المشاهدة"
+
+msgid "Add to favorites"
+msgstr "إضافة إلى المفضلة"
+
+msgid "Remove from favorites"
+msgstr "إزالة من المفضلة"
+
+msgid "Download episode"
+msgstr "تنزيل الحلقة"
+
+msgid "SEASON PROGRESS"
+msgstr "تقدم الموسم"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} حلقات مكتملة"
+
+msgid "CAST"
+msgstr "طاقم التمثيل"
+
+msgid "GENRE"
+msgstr "النوع"
+
+msgid "Unknown season"
+msgstr "موسم غير معروف"
+
+msgid "No episodes in this season."
+msgstr "لا توجد حلقات في هذا الموسم."
+
+msgid "Marked as watched"
+msgstr "تم وضع علامة «تمت المشاهدة»"
+
+msgid "Marked as not watched"
+msgstr "تم وضع علامة «لم تتم المشاهدة»"
+
+msgid "Could not save watched status."
+msgstr "تعذر حفظ حالة المشاهدة."
+
+msgid "Mark watched"
+msgstr "وضع علامة تمت المشاهدة"
+
+msgid "Hold OK"
+msgstr "اضغط مطولاً على OK"
+
+msgid "Episodes"
+msgstr "الحلقات"
+
+msgid "No information available."
+msgstr "لا توجد معلومات متاحة."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "الموسم {season} · الحلقة {episode} · استئناف من {time}"

@@ -8,6 +8,7 @@ import json
 import os
 import re
 import socket
+import tempfile
 import threading
 import time
 import unicodedata
@@ -28,17 +29,53 @@ TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p"
 DEFAULT_METADATA_CACHE_PATH = "/etc/enigma2/gtiptvplayerpro-metadata.json"
 METADATA_CACHE_SECONDS = 30 * 24 * 60 * 60
 NEGATIVE_CACHE_SECONDS = 24 * 60 * 60
+POSTER_NEGATIVE_CACHE_SECONDS = 5 * 60
 MAX_CACHE_ENTRIES = 1000
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 RESPONSE_READ_CHUNK_BYTES = 64 * 1024
 DEFAULT_TIMEOUT = 6
 CACHE_FILE_VERSION = 2
 CACHE_MATCH_VERSION = 4
-CACHE_PAYLOAD_VERSION = 4
+CACHE_PAYLOAD_VERSION = 5
+_CACHE_PATH_LOCKS = {}
+_CACHE_PATH_LOCKS_GUARD = threading.Lock()
+
+
+@contextmanager
+def _cache_path_guard(path):
+    """Serialize commits by path across independent metadata clients."""
+    key = os.path.abspath(path)
+    with _CACHE_PATH_LOCKS_GUARD:
+        state = _CACHE_PATH_LOCKS.get(key)
+        if state is None:
+            state = {"lock": threading.Lock(), "users": 0}
+            _CACHE_PATH_LOCKS[key] = state
+        state["users"] += 1
+    try:
+        with state["lock"]:
+            yield
+    finally:
+        with _CACHE_PATH_LOCKS_GUARD:
+            state["users"] -= 1
+            if state["users"] == 0:
+                _CACHE_PATH_LOCKS.pop(key, None)
+
+
+def _read_cache_entries(path):
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except (IOError, OSError, TypeError, ValueError):
+        return {}
+    entries = (payload.get("entries") if isinstance(payload, dict)
+               and payload.get("version") == CACHE_FILE_VERSION else {})
+    return entries if isinstance(entries, dict) else {}
 
 
 class MetadataError(Exception):
-    pass
+    def __init__(self, message="", http_status=None):
+        super().__init__(message)
+        self.http_status = http_status
 
 
 def _text(value):
@@ -55,6 +92,18 @@ def clean_media_title(value):
     title = _text(value)
     if not title:
         return ""
+    # Numeric film names such as "1917" must survive year cleanup.
+    if title.isdigit():
+        return title
+    languages = r"TR|TUR|TÜRK|TURK|EN|ENG|DE|GER|FR|FRA|AR|NL|IT|ES|PT|PL|RU|UK|GR|EL|RO|BG|HU|CZ|CS|SK|SR|HR|BS|AL|SQ|DK|DA|NO|SE|SV|FI|HE|FA|UR|HI|ID|TH|KO|JP|JA|CN|ZH"
+    title = re.sub(
+        r"^\s*(?:\|[^|]{1,24}\||┃[^┃]{1,24}┃)\s*", "", title,
+    )
+    title = re.sub(
+        r"^\s*(?:(?:[\[({]\s*(?:" + languages + r")\s*[\])}]|(?:"
+        + languages + r")(?:\s*[|:┃-]|\s*\|\s*(?:" + languages + r")\s*[|:┃-]))\s*)+",
+        "", title, flags=re.I,
+    )
     title = re.sub(
         r"^\s*[\[({]\s*(?:TR|TUR|TÜRK|TURK|EN|DE|FR|AR|NL|"
         r"YERLİ\s+DİZİ|YERLI\s+DIZI)\s*[\])}]\s*[|:\-]*\s*",
@@ -123,7 +172,8 @@ def clean_media_title(value):
         flags=re.I,
     )
     title = re.sub(r"[\[({]\s*[\])}]", " ", title)
-    title = re.sub(r"\b(?:19|20)\d{2}\b", " ", title)
+    if not title.strip().isdigit():
+        title = re.sub(r"\b(?:19|20)\d{2}\b", " ", title)
     title = re.sub(r"\s*[|:_]+\s*", " ", title)
     title = re.sub(r"\s+-\s*$", "", title)
     return " ".join(title.split()).strip(" -._")
@@ -131,13 +181,16 @@ def clean_media_title(value):
 
 def clear_metadata_cache(path=DEFAULT_METADATA_CACHE_PATH):
     removed = False
-    for candidate in (path, path + ".tmp"):
-        try:
-            if os.path.exists(candidate):
-                os.unlink(candidate)
-                removed = True
-        except OSError:
-            pass
+    with _cache_path_guard(path):
+        # Keep the exact legacy temporary path cleanup; never glob a live
+        # writer's unique temporary file or any unrelated user file.
+        for candidate in (path, path + ".tmp"):
+            try:
+                if os.path.exists(candidate):
+                    os.unlink(candidate)
+                    removed = True
+            except OSError:
+                pass
     return removed
 
 
@@ -395,12 +448,13 @@ class TMDbMetadataClient(object):
                     close()
                 except (AttributeError, OSError, ValueError):
                     pass
-            log_event("metadata", N_("TMDb HTTP error path={}").format(path), error)
+            log_event("metadata", N_("TMDb HTTP error path={}").format(path)
+                      + " status={}".format(error.code), error)
             if error.code in (401, 403):
-                raise MetadataError(N_("TMDb API key is invalid"))
+                raise MetadataError(N_("TMDb API key is invalid"), error.code)
             if error.code == 429:
-                raise MetadataError(N_("TMDb request limit reached"))
-            raise MetadataError(_(N_("TMDb returned HTTP {}")).format(error.code))
+                raise MetadataError(N_("TMDb request limit reached"), error.code)
+            raise MetadataError(_(N_("TMDb returned HTTP {}")).format(error.code), error.code)
         except (URLError, socket.timeout, OSError) as error:
             log_event("metadata", N_("TMDb connection error path={}").format(path), error)
             raise MetadataError(N_("Could not connect to the TMDb service"))
@@ -425,18 +479,7 @@ class TMDbMetadataClient(object):
     def _load_cache(self):
         if self._cache is not None:
             return self._cache
-        try:
-            with open(self.cache_path, "r", encoding="utf-8") as handle:
-                payload = json.load(handle)
-        except (IOError, OSError, TypeError, ValueError):
-            payload = {}
-        entries = (
-            payload.get("entries")
-            if isinstance(payload, dict)
-            and payload.get("version") == CACHE_FILE_VERSION
-            else {}
-        )
-        self._cache = entries if isinstance(entries, dict) else {}
+        self._cache = _read_cache_entries(self.cache_path)
         return self._cache
 
     @contextmanager
@@ -450,8 +493,15 @@ class TMDbMetadataClient(object):
             state["users"] += 1
             lookup_lock = state["lock"]
         try:
-            with lookup_lock:
+            acquired = False
+            try:
+                while not acquired:
+                    self._check_request_limits()
+                    acquired = lookup_lock.acquire(timeout=0.1)
                 yield
+            finally:
+                if acquired:
+                    lookup_lock.release()
         finally:
             with self._lock:
                 current = self._lookup_locks.get(key)
@@ -492,60 +542,68 @@ class TMDbMetadataClient(object):
             self._cache_dirty = False
 
     def _save_cache(self):
-        directory = os.path.dirname(self.cache_path)
-        temporary = self.cache_path + ".tmp"
-        try:
-            if directory and not os.path.isdir(directory):
-                os.makedirs(directory)
-            entries = self._load_cache()
-            valid_entries = {}
-            for key, entry in entries.items():
-                if not isinstance(entry, dict):
-                    continue
-                try:
-                    float(entry.get("cached_at", 0))
-                except (TypeError, ValueError, OverflowError):
-                    continue
-                valid_entries[key] = entry
-            if len(valid_entries) != len(entries):
-                entries.clear()
-                entries.update(valid_entries)
-            if len(entries) > MAX_CACHE_ENTRIES:
-                newest = sorted(
-                    entries.items(),
-                    key=lambda pair: float(pair[1].get("cached_at", 0)),
-                    reverse=True,
-                )[:MAX_CACHE_ENTRIES]
-                entries.clear()
-                entries.update(newest)
-            # TMDb summaries are stored as UTF-8 regardless of the process
-            # locale used by the receiver image.
-            with open(temporary, "w", encoding="utf-8") as handle:
-                json.dump(
-                    {"version": CACHE_FILE_VERSION, "entries": entries},
-                    handle,
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                    sort_keys=True,
-                )
-                handle.flush()
-                try:
-                    os.fsync(handle.fileno())
-                except (AttributeError, OSError):
-                    pass
+        temporary = None
+        descriptor = None
+        with self._lock:
             try:
-                os.chmod(temporary, 0o600)
-            except OSError:
-                pass
-            getattr(os, "replace", os.rename)(temporary, self.cache_path)
-            return True
-        except (IOError, OSError, TypeError, ValueError):
-            try:
-                if os.path.exists(temporary):
-                    os.unlink(temporary)
-            except OSError:
-                pass
-            return False
+                with _cache_path_guard(self.cache_path):
+                    directory = os.path.dirname(self.cache_path)
+                    if directory:
+                        os.makedirs(directory, exist_ok=True)
+                    entries = self._load_cache()
+                    merged = {}
+                    # A stale client must retain another client's committed
+                    # entries and must not overwrite a fresher copy of a key.
+                    for source in (_read_cache_entries(self.cache_path), entries):
+                        for key, entry in source.items():
+                            if not isinstance(entry, dict):
+                                continue
+                            try:
+                                stamp = float(entry.get("cached_at", 0))
+                            except (TypeError, ValueError, OverflowError):
+                                continue
+                            previous = merged.get(key)
+                            if previous is None or stamp >= float(previous.get("cached_at", 0)):
+                                merged[key] = entry
+                    if len(merged) > MAX_CACHE_ENTRIES:
+                        merged = dict(sorted(merged.items(),
+                            key=lambda pair: float(pair[1].get("cached_at", 0)),
+                            reverse=True)[:MAX_CACHE_ENTRIES])
+                    entries.clear()
+                    entries.update(merged)
+                    # mkstemp creates a private, exclusive inode for this
+                    # writer. No other client's descriptor can modify it.
+                    descriptor, temporary = tempfile.mkstemp(
+                        prefix=".{}-".format(os.path.basename(self.cache_path)),
+                        suffix=".tmp", dir=directory or ".")
+                    with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+                        descriptor = None
+                        json.dump(
+                            {"version": CACHE_FILE_VERSION, "entries": entries},
+                            handle, ensure_ascii=False, separators=(",", ":"),
+                            sort_keys=True,
+                        )
+                        handle.flush()
+                        try:
+                            os.fsync(handle.fileno())
+                        except (AttributeError, OSError):
+                            pass
+                    getattr(os, "replace", os.rename)(temporary, self.cache_path)
+                    temporary = None
+                    return True
+            except (IOError, OSError, TypeError, ValueError):
+                return False
+            finally:
+                if descriptor is not None:
+                    try:
+                        os.close(descriptor)
+                    except OSError:
+                        pass
+                if temporary is not None:
+                    try:
+                        os.unlink(temporary)
+                    except OSError:
+                        pass
 
     def _cache_key(self, media_type, title, year):
         # Both exact-ID and title searches contain translated text. Old
@@ -563,7 +621,9 @@ class TMDbMetadataClient(object):
         entry = self._load_cache().get(key)
         if not isinstance(entry, dict):
             return False, None
-        ttl = METADATA_CACHE_SECONDS if entry.get("found") else NEGATIVE_CACHE_SECONDS
+        ttl = METADATA_CACHE_SECONDS if entry.get("found") else (
+            POSTER_NEGATIVE_CACHE_SECONDS if entry.get("poster_lookup") else NEGATIVE_CACHE_SECONDS
+        )
         try:
             fresh = self.clock() - float(entry.get("cached_at", 0)) < ttl
         except (TypeError, ValueError, OverflowError):
@@ -595,7 +655,7 @@ class TMDbMetadataClient(object):
             score += 18 if requested_year == candidate_year else -22
         return score
 
-    def _search(self, media_type, title, requested_year):
+    def _search(self, media_type, title, requested_year, require_poster=False):
         path = "/search/movie" if media_type == "movie" else "/search/tv"
         params = {"query": title, "page": 1, "include_adult": "false"}
         year_key = "primary_release_year" if media_type == "movie" else "first_air_date_year"
@@ -625,11 +685,200 @@ class TMDbMetadataClient(object):
                     )
                     for item in results[:20]
                     if isinstance(item, dict)
+                    and (not require_poster or item.get("poster_path"))
                 ]
                 ranked.sort(key=lambda pair: pair[0], reverse=True)
                 if ranked and ranked[0][0] >= 68:
                     return ranked[0][1]
         return None
+
+    @staticmethod
+    def _poster_identity(payload, media_type):
+        tv = media_type == "series"
+        return {
+            "tmdb_id": str(payload.get("id") or ""),
+            "title": _text(payload.get("name" if tv else "title")),
+            "original_title": _text(payload.get("original_name" if tv else "original_title")),
+            "year": _year(payload.get("first_air_date" if tv else "release_date")),
+            "cover": _image_url(payload.get("poster_path"), "w500"),
+        }
+
+    def _poster_record(self, media_type, payload):
+        result = self._poster_identity(payload, media_type)
+        if not result["cover"] and result["tmdb_id"].isdigit():
+            root = "/tv" if media_type == "series" else "/movie"
+            images = self._request_json(root + "/" + result["tmdb_id"] + "/images")
+            posters = [p for p in (images.get("posters") or []) if isinstance(p, dict) and p.get("file_path")]
+            language = self.language.replace("_", "-").split("-")[0]
+            posters.sort(key=lambda p: (p.get("iso_639_1") != language, p.get("iso_639_1") not in ("en", None)))
+            if posters:
+                result["cover"] = _image_url(posters[0]["file_path"], "w500")
+        return result if result["cover"] else None
+
+    def poster_cover(self, media_type, item, info=None):
+        """Resolve artwork without downloading plot translations or credits."""
+        if not self.available:
+            return ""
+        media_type = "series" if media_type == "series" else "movie"
+        raw_title = getattr(info, "title", "") or getattr(item, "name", "")
+        if raw_title == N_("Movie"):
+            raw_title = getattr(item, "name", "")
+        title = clean_media_title(raw_title)
+        year = _year(getattr(info, "year", "") or getattr(item, "year", ""))
+        if not year and not str(raw_title).strip().isdigit():
+            year = _year(raw_title)
+        tmdb_id = self._valid_tmdb_id(getattr(info, "tmdb_id", "") or getattr(item, "tmdb_id", ""))
+        imdb_id = str(getattr(info, "imdb_id", "") or getattr(item, "imdb_id", ""))
+        if not re.fullmatch(r"tt\d{5,12}", imdb_id):
+            imdb_id = ""
+        if not (title or tmdb_id or imdb_id):
+            return ""
+        key = self._cache_key(media_type, "poster-v1:{}:{}:{}".format(tmdb_id, imdb_id, title), year)
+        with self._lookup_guard(key):
+            self._check_request_limits()
+            with self._lock:
+                cached, value = self._cached(key)
+                if cached:
+                    return (value or {}).get("cover", "")
+                # Full selected-item metadata may already contain this image.
+                full_keys = [self._cache_key(media_type, title, year)]
+                if tmdb_id:
+                    full_keys.insert(0, self._cache_key(media_type, "tmdb-id:" + tmdb_id, ""))
+                for full_key in full_keys:
+                    found, value = self._cached(full_key)
+                    if found and value and value.get("cover"):
+                        if (getattr(item, "portal_request_type", "")
+                                and not self._provider_identity_matches(media_type, title, year, value)):
+                            continue
+                        return value["cover"]
+            root = "/tv" if media_type == "series" else "/movie"
+            result = None
+            if tmdb_id:
+                try:
+                    payload = self._request_json(root + "/" + tmdb_id, language=self.language)
+                except MetadataError as error:
+                    if error.http_status != 404:
+                        raise
+                    payload = {}
+                identity = self._poster_identity(payload, media_type)
+                if (payload.get("id") and (not getattr(item, "portal_request_type", "")
+                        or self._provider_identity_matches(media_type, title, year, identity))):
+                    result = self._poster_record(media_type, payload)
+            if result is None and imdb_id:
+                payload = self._request_json("/find/" + imdb_id, {"external_source": "imdb_id"}, self.language)
+                matches = payload.get("tv_results" if media_type == "series" else "movie_results") or []
+                if matches and isinstance(matches[0], dict):
+                    result = self._poster_record(media_type, matches[0])
+            if result is None and title:
+                selected = self._search(media_type, title, year, require_poster=True)
+                if selected:
+                    result = self._poster_record(media_type, selected)
+            self._check_request_limits()
+            with self._lock:
+                self._load_cache()[key] = {
+                    "cached_at": self.clock(), "found": bool(result), "data": result or {},
+                    "poster_lookup": True, "payload_version": CACHE_PAYLOAD_VERSION,
+                }
+                self._cache_changed()
+            return (result or {}).get("cover", "")
+
+    def _backdrop_record(self, media_type, payload):
+        result = self._poster_identity(payload, media_type)
+        result["backdrop"] = _image_url(payload.get("backdrop_path"), "w780")
+        if not result["backdrop"] and result["tmdb_id"].isdigit():
+            root = "/tv" if media_type == "series" else "/movie"
+            images = self._request_json(root + "/" + result["tmdb_id"] + "/images")
+            backdrops = images.get("backdrops") or []
+            if not isinstance(backdrops, list):
+                backdrops = []
+            backdrops = [entry for entry in backdrops if isinstance(entry, dict)
+                         and entry.get("file_path")]
+            # Wide art without lettering is suitable in every UI language.
+            backdrops.sort(key=lambda entry: (entry.get("iso_639_1") is not None,
+                                              entry.get("iso_639_1") != "en"))
+            if backdrops:
+                result["backdrop"] = _image_url(backdrops[0]["file_path"], "w780")
+        return result if result["backdrop"] else None
+
+    def cinematic_backdrop(self, media_type, item, info=None):
+        """Resolve verified wide art without credits or plot translations.
+
+        This has its own bounded cache key: an artwork-only response must
+        never masquerade as completed provider/TMDb detail information.
+        """
+        if not self.available:
+            return ""
+        media_type = "series" if media_type == "series" else "movie"
+        raw_title = getattr(info, "title", "") or getattr(item, "name", "")
+        if raw_title == N_("Movie"):
+            raw_title = getattr(item, "name", "")
+        title = clean_media_title(raw_title)
+        year = _year(getattr(info, "year", "") or getattr(item, "year", ""))
+        if not year and not str(raw_title).strip().isdigit():
+            year = _year(raw_title)
+        tmdb_id = self._valid_tmdb_id(getattr(info, "tmdb_id", "") or getattr(item, "tmdb_id", ""))
+        imdb_id = str(getattr(info, "imdb_id", "") or getattr(item, "imdb_id", ""))
+        if not re.fullmatch(r"tt\d{5,12}", imdb_id):
+            imdb_id = ""
+        if not (title or tmdb_id or imdb_id):
+            return ""
+        provider_item = bool(getattr(item, "portal_request_type", ""))
+        key = self._cache_key(media_type, "backdrop-v1:{}:{}:{}".format(tmdb_id, imdb_id, title), year)
+        with self._lookup_guard(key):
+            self._check_request_limits()
+            with self._lock:
+                cached, value = self._cached(key)
+                if cached and (not value or not provider_item
+                        or self._provider_identity_matches(media_type, title, year, value)):
+                    return (value or {}).get("backdrop", "")
+                full_keys = [self._cache_key(media_type, title, year)]
+                if tmdb_id:
+                    full_keys.insert(0, self._cache_key(media_type, "tmdb-id:" + tmdb_id, ""))
+                for full_key in full_keys:
+                    found, value = self._cached(full_key)
+                    if found and value and value.get("backdrop"):
+                        if provider_item and not self._provider_identity_matches(media_type, title, year, value):
+                            continue
+                        return value["backdrop"]
+            root = "/tv" if media_type == "series" else "/movie"
+            result = None
+            if tmdb_id:
+                try:
+                    payload = self._request_json(root + "/" + tmdb_id, language=self.language)
+                except MetadataError as error:
+                    if error.http_status != 404:
+                        raise
+                    payload = {}
+                identity = self._poster_identity(payload, media_type)
+                if payload.get("id") and (not provider_item
+                        or self._provider_identity_matches(media_type, title, year, identity)):
+                    result = self._backdrop_record(media_type, payload)
+            if result is None and imdb_id:
+                payload = self._request_json("/find/" + imdb_id, {"external_source": "imdb_id"}, self.language)
+                matches = payload.get("tv_results" if media_type == "series" else "movie_results") or []
+                if isinstance(matches, list):
+                    for match in matches[:20]:
+                        if not isinstance(match, dict):
+                            continue
+                        identity = self._poster_identity(match, media_type)
+                        if provider_item and not self._provider_identity_matches(media_type, title, year, identity):
+                            continue
+                        result = self._backdrop_record(media_type, match)
+                        if result:
+                            break
+            if result is None and title:
+                selected = self._search(media_type, title, year)
+                if selected and (not provider_item or self._provider_identity_matches(
+                        media_type, title, year, self._poster_identity(selected, media_type))):
+                    result = self._backdrop_record(media_type, selected)
+            self._check_request_limits()
+            with self._lock:
+                self._load_cache()[key] = {
+                    "cached_at": self.clock(), "found": bool(result), "data": result or {},
+                    "poster_lookup": True, "payload_version": CACHE_PAYLOAD_VERSION,
+                }
+                self._cache_changed()
+            return (result or {}).get("backdrop", "")
 
     @staticmethod
     def _merge_payload(primary, fallback):
@@ -692,7 +941,7 @@ class TMDbMetadataClient(object):
             "movie" if media_type == "movie" else "tv",
             tmdb_id,
         )
-        detail = self._request_json(path, {}, self.language)
+        detail = self._request_json(path, {"append_to_response": "credits"}, self.language)
         # A search result may have come from the English search fallback.
         # Only the requested-language detail can establish a localized plot.
         localized_plot = _text(detail.get("overview"))[:2000]
@@ -717,7 +966,26 @@ class TMDbMetadataClient(object):
             except (TypeError, ValueError, OverflowError):
                 minutes = 0
             if minutes > 0:
-                runtime = "{} dk".format(minutes)
+                runtime = _("{} min").format(minutes)
+        else:
+            for value in detail.get("episode_run_time") or []:
+                try:
+                    minutes = int(value)
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                if minutes > 0:
+                    runtime = _("{} min").format(minutes)
+                    break
+        credits = detail.get("credits") or {}
+        credits = credits if isinstance(credits, dict) else {}
+        directors = []
+        for person in credits.get("crew") or []:
+            if isinstance(person, dict) and person.get("job") == "Director":
+                name = _text(person.get("name"))
+                if name and name not in directors:
+                    directors.append(name)
+        cast = [_text(person.get("name")) for person in (credits.get("cast") or [])[:8]
+                if isinstance(person, dict) and _text(person.get("name"))]
         return {
             "tmdb_id": str(detail.get("id") or tmdb_id),
             "title": _text(detail.get(title_key)),
@@ -734,6 +1002,8 @@ class TMDbMetadataClient(object):
             "year": _year(detail.get(date_key)),
             "duration": runtime,
             "genre": genre[:180],
+            "director": ", ".join(directors)[:180],
+            "cast": ", ".join(cast)[:500],
             "cover": _image_url(detail.get("poster_path"), "w500"),
             "backdrop": _image_url(detail.get("backdrop_path"), "w780"),
         }
@@ -971,14 +1241,16 @@ class TMDbMetadataClient(object):
             year=year or external.get("year"),
             duration=getattr(info, "duration", "") or external.get("duration"),
             genre=getattr(info, "genre", "") or external.get("genre"),
-            director=getattr(info, "director", ""),
-            cast=getattr(info, "cast", ""),
+            director=getattr(info, "director", "") or external.get("director"),
+            cast=getattr(info, "cast", "") or external.get("cast"),
             cover=completed_cover,
             backdrop=backdrop or external.get("backdrop"),
             tmdb_id=tmdb_id or external.get("tmdb_id"),
             imdb_id=imdb_id or external.get("imdb_id"),
+            cover_urls=getattr(info, "cover_urls", ()),
         )
         completed._provider_plot = plot
+        completed.tmdb_rating = external.get("rating") or getattr(info, "tmdb_rating", "")
         external_backdrop = str(external.get("backdrop") or "").strip()
         completed.fallback_backdrop = (
             external_backdrop
@@ -1046,15 +1318,19 @@ class TMDbMetadataClient(object):
             rating=rating if _has_rating(rating) else external.get("rating"),
             year=year or external.get("year"),
             genre=getattr(info, "genre", "") or external.get("genre"),
-            director=getattr(info, "director", ""),
-            cast=getattr(info, "cast", ""),
+            director=getattr(info, "director", "") or external.get("director"),
+            cast=getattr(info, "cast", "") or external.get("cast"),
             cover=completed_cover,
             episodes=getattr(info, "episodes", []) or [],
+            season_ids=getattr(info, "seasons", []) or [],
             backdrop=backdrop or external.get("backdrop"),
             tmdb_id=tmdb_id or external.get("tmdb_id"),
             imdb_id=imdb_id or external.get("imdb_id"),
+            cover_urls=getattr(info, "cover_urls", ()),
         )
         completed._provider_plot = plot
+        completed.tmdb_rating = external.get("rating") or getattr(info, "tmdb_rating", "")
+        completed.duration = getattr(info, "duration", "") or external.get("duration", "")
         external_backdrop = str(external.get("backdrop") or "").strip()
         completed.fallback_backdrop = (
             external_backdrop

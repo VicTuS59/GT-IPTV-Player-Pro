@@ -4,7 +4,9 @@
 """Receiver-native, account-independent YouTube search and playback."""
 
 import threading
-from collections import deque
+from collections import OrderedDict, deque
+
+from .vod_grid import LatestPosterWorkers
 
 from Components.ActionMap import ActionMap
 from Components.Label import Label
@@ -27,6 +29,7 @@ from .web_youtube import WEB_YOUTUBE
 from .youtube_options import YOUTUBE_QUALITIES, DEFAULT_YOUTUBE_QUALITY, quality_label
 from .youtube_preview import YouTubePreviewMixin
 from .youtube_skin import youtube_search_skin, youtube_art
+from .stream_resolution import resolution_text
 
 
 ROWS = 5
@@ -228,7 +231,10 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         self._closed = False
         self._query = ""
         self._quality = str(load_player_settings().youtube_resolution)
-        self._pages = {}
+        self._pages = OrderedDict()
+        self._page_cursors = OrderedDict([(1, "")])
+        self._highest_page = 0
+        self._page_expired = False
         self._page = 1
         self._selected = 0
         self._top = 0
@@ -249,6 +255,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         self._search_signature = None
         self._prefetch = None
         self._thumb_cancel = None
+        self._thumb_workers = None
         self._thumb_key = ()
         self._thumb_active = False
         self._keyboard_open = False
@@ -262,7 +269,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         attach_background(self, "app_bg", APP_BACKGROUND)
         for name in ("video_guard", "header", "header_divider", "youtube_brand", "quality", "search_text", "section",
                      "pages", "status", "footer", "preview_mask", "preview_badge",
-                     "preview_title", "preview_detail", "preview_action", "preview_live"):
+                     "preview_title", "preview_detail", "preview_action", "preview_live", "preview_resolution"):
             self[name] = Label("")
         for name in ("quality_frame", "search_frame", "search_icon", "preview_panel", "preview_art", "preview_live_bg", "youtube_logo", "footer_frame"):
             self[name] = Pixmap()
@@ -345,12 +352,18 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         self._cancel_search()
         if self._thumb_cancel is not None:
             self._thumb_cancel.set()
+        if self._thumb_workers is not None:
+            self._thumb_workers.close()
         if self._play_token:
             self._service.cancel_play(self._play_token)
         self._poll_timer.stop()
         self._keyboard_timer.stop()
         with self._event_lock:
             self._events.clear()
+        self._pages.clear()
+        self._page_cursors.clear()
+        self._preview_records.clear()
+        self._thumbnail_paths.clear()
 
     def _open_initial_search(self):
         self.open_history()
@@ -421,9 +434,39 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
             self._service.cancel_play(self._play_token)
             self._play_token = ""
         self._pages.clear()
+        self._page_cursors = OrderedDict([(1, "")])
+        self._highest_page = 0
+        self._page_expired = False
+        protected = getattr(getattr(self, "current_item", None), "stream_id", "")
+        self._preview_records = {key: value for key, value in self._preview_records.items() if key == protected}
+        self._thumbnail_paths = {key: value for key, value in self._thumbnail_paths.items() if key == protected}
         self._page, self._selected, self._top = 1, 0, 0
         self._request_page(1)
         self._render()
+
+    def _cache_page(self, page, response):
+        self._pages[page] = response
+        self._highest_page = max(self._highest_page, page)
+        if response.get("has_more") and response.get("cursor"):
+            self._page_cursors[page + 1] = response["cursor"]
+            self._page_cursors.move_to_end(page + 1)
+        while len(self._pages) > 12:
+            victim = max((key for key in self._pages if key != page), key=lambda key: abs(key - page))
+            self._pages.pop(victim, None)
+        while len(self._page_cursors) > 240:
+            victim = next(key for key in self._page_cursors if key != 1)
+            self._page_cursors.pop(victim, None)
+
+    def _trim_preview_records(self):
+        protected = {entry.get("id") for entry in self._visible()}
+        protected.add(getattr(getattr(self, "current_item", None), "stream_id", ""))
+        protected.add(self._pending_play_id)
+        for values in (self._preview_records, self._thumbnail_paths):
+            for key in list(values):
+                if len(values) <= 240:
+                    break
+                if key not in protected:
+                    values.pop(key, None)
 
     def _request_page(self, page):
         if self._closed or self._busy or not self._query:
@@ -435,14 +478,20 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
             self._render()
             self._prepare_next_page()
             return
-        if page != len(self._pages) + 1:
+        if page < 1 or page > self._highest_page + 1:
             return
         previous = self._pages.get(page - 1) if page > 1 else None
-        if previous is not None and not previous.get("has_more"):
+        cursor = self._page_cursors.get(page)
+        if cursor is None and previous is not None and previous.get("has_more"):
+            cursor = previous.get("cursor")
+        if cursor is None or (page > 1 and not cursor):
+            if page <= self._highest_page:
+                self._page_expired = True
+                self["status"].setText(_("Request timed out") + " · MENU · " + _("Retry"))
             return
-        cursor = previous.get("cursor", "") if previous is not None else ""
-        if previous is not None and not cursor:
-            return
+        self._page_expired = False
+        if page in self._page_cursors:
+            self._page_cursors.move_to_end(page)
         prepared = self._prefetch
         if prepared and prepared["page"] == page:
             self._prefetch = None
@@ -551,7 +600,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         previous = (self._pages.get(self._search_page) or {}).get("results") or []
         selected_id = previous[self._selected].get("id") if self._selected < len(previous) else ""
         self._busy = pending
-        self._pages[self._search_page] = response
+        self._cache_page(self._search_page, response)
         self._page = self._search_page
         self._selected = next((index for index, entry in enumerate(entries)
                                if entry.get("id") == selected_id), 0)
@@ -598,7 +647,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                 if error or not isinstance(response, dict):
                     self["status"].setText(_("Could not load content") + " · MENU · " + _("Retry"))
                     continue
-                self._pages[page] = response
+                self._cache_page(page, response)
                 self._page, self._selected, self._top = page, 0, 0
                 self["status"].setText("")
                 self._render()
@@ -606,7 +655,9 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                 unused_kind, key, index, video_id, path = event
                 if key == self._thumb_key and index < len(self._visible()) and path:
                     if self._visible()[index].get("id") == video_id:
+                        self._thumbnail_paths.pop(video_id, None)
                         self._thumbnail_paths[video_id] = path
+                        self._trim_preview_records()
                         attach_pixmap(self, "thumb_{}".format(index), path, cover_ratio=(16, 9))
                         self._render_preview()
             elif event[0] == "thumb_done":
@@ -664,7 +715,9 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         if not key or not any(item.get("thumbnail") for item in visible):
             self._thumb_active = False
             return
-        cancel = threading.Event()
+        from .browser import _WorkerToken
+        token = _WorkerToken(max(12, len(visible) * 5))
+        cancel = token.cancel_event
         self._thumb_cancel = cancel
         records = [(index, item.get("id", ""), item.get("thumbnail", ""))
                    for index, item in enumerate(visible)]
@@ -682,7 +735,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                         continue
                     try:
                         path = _cached_picon_path(url) or _download_picon(
-                            url, _picon_cache_path(url), timeout=4)
+                            url, _picon_cache_path(url), timeout=4, token=token)
                     except Exception:
                         path = ""
                     if path and not cancel.is_set():
@@ -692,9 +745,9 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                 with mailbox_lock:
                     mailbox.append(("thumb_done", key))
 
-        thread = threading.Thread(target=work, name="GT-YouTube-Thumbs")
-        thread.daemon = True
-        thread.start()
+        if self._thumb_workers is None:
+            self._thumb_workers = LatestPosterWorkers(worker_count=1)
+        self._thumb_workers.replace([work])
         self._poll_timer.start(100, True)
 
     def _render(self):
@@ -708,7 +761,11 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         response = self._pages.get(self._page) or {}
         entries = response.get("results") or []
         visible = self._visible()
-        self._preview_records.update({item["id"]: item for item in entries if item.get("id")})
+        for item in entries:
+            if item.get("id"):
+                self._preview_records.pop(item["id"], None)
+                self._preview_records[item["id"]] = item
+        self._trim_preview_records()
         self._refresh_youtube_border()
         for index in range(ROWS):
             focused = bool(index < len(visible) and self._top + index == self._selected)
@@ -736,7 +793,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         if not self._query:
             self["pages"].setText("")
             return
-        last = max(self._pages) if self._pages else 0
+        last = self._highest_page
         first = max(1, min(self._page - 2, max(1, last - 3)))
         numbers = []
         for page in range(first, min(last + 2, first + 5)):
@@ -774,16 +831,16 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
             self._request_page(self._page + 1)
 
     def jump_page(self, page):
-        if not self._busy and 1 <= page <= len(self._pages) + 1:
+        if not self._busy and 1 <= page <= self._highest_page + 1:
             self._request_page(page)
 
     def retry(self):
         if not self._busy and self._query:
             current = self._pages.get(self._page) or {}
-            if current.get("error") or current.get("pending"):
+            if current.get("error") or current.get("pending") or self._page_expired:
                 self._query_entered(self._query)
             else:
-                self._request_page(len(self._pages) + 1)
+                self._request_page(self._highest_page + 1)
 
     def play_selected(self):
         if self._closed or self._keyboard_open or self._history_fullscreen_id:
@@ -860,14 +917,14 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         fit_dynamic_text(self["preview_detail"],
                          " · ".join(str(video.get(field, "")) for field in ("channel", "published") if video.get(field)),
                          max_lines=2, fallback_chars=54)
-        badge = (_("Live") if video.get("live") else
-                 quality_label(str(self.current_item.youtube_selected_quality)) if playing else _("Preview"))
+        badge = (_("Live") if video.get("live") else _("Playing") if playing else _("Preview"))
         self._fit_youtube_caption("preview_badge", badge if video else _("YouTube"), 22)
         live = bool(video.get("live"))
         self._fit_youtube_caption("preview_live", _("Live"), 22, max_lines=2)
         for name in ("preview_live_bg", "preview_live"):
             self[name].show() if live else self[name].hide()
         self["preview_badge"].hide() if live else self["preview_badge"].show()
+        self._refresh_youtube_resolution()
         fullscreen = bool(playing and (not selected or selected.get("id") == self.current_item.stream_id)
                           and str(self.current_item.youtube_requested_quality) == self._quality)
         self._fit_youtube_caption("preview_action", "OK · " + (_("Full screen") if fullscreen else _("Play")), 26)
@@ -890,6 +947,16 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                               on_loaded=self._preview_art_loaded)
         elif key[1] and self._preview_art_loaded_key == key:
             self["preview_art"].show()
+
+    def _refresh_youtube_resolution(self):
+        if self._closed or self._fullscreen_active or not self._preview_owns_service():
+            self["preview_resolution"].setText("")
+            self["preview_resolution"].hide()
+            return
+        snapshot = self._youtube_resolution_snapshot()
+        text = resolution_text(snapshot)
+        self._fit_youtube_caption("preview_resolution", text if text != "--" else _("Resolution: --"), 22)
+        self["preview_resolution"].show()
 
     def _preview_art_loaded(self, loaded):
         if loaded:

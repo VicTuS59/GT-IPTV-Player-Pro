@@ -1,0 +1,13 @@
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Turkish\nLanguage: tr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Infobar auto-hide timeout"
+msgstr "Bilgi çubuğu kapanma süresi"
+
+#, python-brace-format
+msgid "{} s"
+msgstr "{} sn"
+
+msgid "Off: keep the infobar visible until you press OK."
+msgstr "Kapalı: Bilgi çubuğu OK tuşuna basana kadar açık kalır."
+

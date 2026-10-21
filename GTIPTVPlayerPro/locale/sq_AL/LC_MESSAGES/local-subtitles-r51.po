@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: sq_AL\nLanguage: sq_AL\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Zgjidhni një skedar titrash"
+
+msgid "Download folder"
+msgstr "Dosja e shkarkimeve"
+
+msgid "Use this folder"
+msgstr "Përdor këtë dosje"
+
+msgid "Local subtitles"
+msgstr "Titra lokalë"
+
+msgid "GT subtitle downloads"
+msgstr "Shkarkimet e titrave GT"
+
+msgid "Search subtitle files"
+msgstr "Kërko skedarë titrash"
+
+msgid "No subtitle files found."
+msgstr "Nuk u gjetën skedarë titrash."
+
+msgid "Could not read this folder."
+msgstr "Kjo dosje nuk mund të lexohej."
+
+msgid "Could not load this subtitle file."
+msgstr "Ky skedar titrash nuk mund të ngarkohej."
+
+msgid "Could not save the download folder."
+msgstr "Dosja e shkarkimeve nuk mund të ruhej."
+
+msgid "Download folder saved."
+msgstr "Dosja e shkarkimeve u ruajt."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Dosja e shkarkimit të titrave nuk është e disponueshme. Zgjidhni një dosje tjetër."
+
+msgid "Subtitle file is too large."
+msgstr "Skedari i titrave është tepër i madh."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Mbështeten vetëm skedarët e titrave SRT dhe VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Po kërkohen skedarë titrash..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "U arrit kufiri i kërkimit. Ngushtoni kërkimin."
+
+msgid "Temporary folder"
+msgstr "Dosje e përkohshme"
+
+msgid "Device storage"
+msgstr "Hapësira ruajtëse e pajisjes"
+
+msgid "Up one folder"
+msgstr "Një dosje më lart"
+
+msgid "Subtitle language"
+msgstr "Gjuha e titrave"
+
+msgid "Search this folder"
+msgstr "Kërko në këtë dosje"
+
+msgid "Local subtitle loaded."
+msgstr "Titrat lokalë u ngarkuan."
+
+msgid "Automatic detection"
+msgstr "Zbulim automatik"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Zgjidhni një dosje në HDD, USB ose NAS të lidhur."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Dosja e përkohshme pastrohet kur marrësi riniset."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Dosja e shkarkimeve: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Gjuha e titrave: {}"
+
+msgid "Folder is not available."
+msgstr "Dosja nuk është e disponueshme."
+
+msgid "Use temporary folder"
+msgstr "Përdor dosjen e përkohshme"
+
+msgid "Device folders"
+msgstr "Dosjet e pajisjes"
+
+msgid "Downloaded subtitles"
+msgstr "Titrat e shkarkuar"
+
+msgid "Search results"
+msgstr "Rezultatet e kërkimit"

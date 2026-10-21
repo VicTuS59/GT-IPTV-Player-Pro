@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro\nLanguage-Team: Romanian\nLanguage: ro\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
+
+msgid "Choose a subtitle file"
+msgstr "Alegeți un fișier de subtitrare"
+
+msgid "Download folder"
+msgstr "Dosar de descărcare"
+
+msgid "Use this folder"
+msgstr "Folosește acest dosar"
+
+msgid "Local subtitles"
+msgstr "Subtitrări locale"
+
+msgid "GT subtitle downloads"
+msgstr "Subtitrări descărcate prin GT"
+
+msgid "Search subtitle files"
+msgstr "Caută fișiere de subtitrare"
+
+msgid "No subtitle files found."
+msgstr "Nu s-au găsit fișiere de subtitrare."
+
+msgid "Could not read this folder."
+msgstr "Acest dosar nu a putut fi citit."
+
+msgid "Could not load this subtitle file."
+msgstr "Acest fișier de subtitrare nu a putut fi încărcat."
+
+msgid "Could not save the download folder."
+msgstr "Dosarul de descărcare nu a putut fi salvat."
+
+msgid "Download folder saved."
+msgstr "Dosarul de descărcare a fost salvat."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Dosarul de descărcare a subtitrărilor nu este disponibil. Alegeți alt dosar."
+
+msgid "Subtitle file is too large."
+msgstr "Fișierul de subtitrare este prea mare."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Sunt acceptate doar fișierele de subtitrare SRT și VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Se caută fișiere de subtitrare..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "S-a atins limita de căutare. Restrângeți căutarea."
+
+msgid "Temporary folder"
+msgstr "Dosar temporar"
+
+msgid "Device storage"
+msgstr "Stocarea dispozitivului"
+
+msgid "Up one folder"
+msgstr "Un dosar mai sus"
+
+msgid "Subtitle language"
+msgstr "Limba subtitrării"
+
+msgid "Search this folder"
+msgstr "Caută în acest dosar"
+
+msgid "Local subtitle loaded."
+msgstr "Subtitrarea locală a fost încărcată."
+
+msgid "Automatic detection"
+msgstr "Detectare automată"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Alegeți un dosar de pe HDD, USB sau un NAS conectat."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Dosarul temporar este golit la repornirea receptorului."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Dosar de descărcare: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Limba subtitrării: {}"
+
+msgid "Folder is not available."
+msgstr "Dosarul nu este disponibil."
+
+msgid "Use temporary folder"
+msgstr "Folosește dosarul temporar"
+
+msgid "Device folders"
+msgstr "Dosarele dispozitivului"
+
+msgid "Downloaded subtitles"
+msgstr "Subtitrări descărcate"
+
+msgid "Search results"
+msgstr "Rezultatele căutării"

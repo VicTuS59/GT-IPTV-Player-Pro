@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: ta\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "தொடர்கள்"
+
+msgid "Season"
+msgstr "பருவம்"
+
+msgid "Navigate"
+msgstr "வழிசெலுத்து"
+
+msgid "Page"
+msgstr "பக்கம்"
+
+msgid "Play"
+msgstr "இயக்கு"
+
+msgid "Favorite"
+msgstr "விருப்பமானவை"
+
+msgid "Refresh"
+msgstr "புதுப்பிக்கவும்"
+
+msgid "Download"
+msgstr "பதிவிறக்கு"
+
+msgid "Back"
+msgstr "பின்செல்க"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "பருவம் {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} பருவங்கள்"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} அத்தியாயங்கள்"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "அத்தியாயம் {}"
+
+msgid "Watched"
+msgstr "பார்க்கப்பட்டது"
+
+msgid "Not played"
+msgstr "இயக்கப்படவில்லை"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "{} இலிருந்து தொடரவும்"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "அத்தியாயம் {}ஐத் தொடரவும்"
+
+msgid "Continue watching"
+msgstr "பார்ப்பதைத் தொடரவும்"
+
+msgid "Add to favorites"
+msgstr "விருப்பங்களில் சேர்க்கவும்"
+
+msgid "Remove from favorites"
+msgstr "விருப்பங்களிலிருந்து அகற்றவும்"
+
+msgid "Download episode"
+msgstr "அத்தியாயத்தைப் பதிவிறக்கவும்"
+
+msgid "SEASON PROGRESS"
+msgstr "பருவ முன்னேற்றம்"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} அத்தியாயங்கள் முடிக்கப்பட்டன"
+
+msgid "CAST"
+msgstr "நடிகர்கள்"
+
+msgid "GENRE"
+msgstr "வகை"
+
+msgid "Unknown season"
+msgstr "தெரியாத பருவம்"
+
+msgid "No episodes in this season."
+msgstr "இந்தப் பருவத்தில் அத்தியாயங்கள் இல்லை."
+
+msgid "Marked as watched"
+msgstr "பார்த்ததாகக் குறிக்கப்பட்டது"
+
+msgid "Marked as not watched"
+msgstr "பார்க்காததாகக் குறிக்கப்பட்டது"
+
+msgid "Could not save watched status."
+msgstr "பார்த்த நிலையைச் சேமிக்க முடியவில்லை."
+
+msgid "Mark watched"
+msgstr "பார்த்ததாகக் குறிக்கவும்"
+
+msgid "Hold OK"
+msgstr "OKஐ அழுத்திப் பிடிக்கவும்"
+
+msgid "Episodes"
+msgstr "அத்தியாயங்கள்"
+
+msgid "No information available."
+msgstr "தகவல் எதுவும் இல்லை."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "பருவம் {season} · அத்தியாயம் {episode} · {time} இலிருந்து தொடரவும்"

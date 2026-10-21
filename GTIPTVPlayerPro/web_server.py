@@ -10,6 +10,7 @@ except ImportError:  # An image may provide OpenWebif without python3-netserver.
     BaseHTTPRequestHandler = object
     ThreadingHTTPServer = None
 import fcntl
+import io
 import json
 import os
 import re
@@ -35,6 +36,8 @@ from .web_youtube import WEB_YOUTUBE
 
 WEB_PORT = 9999
 MAX_REQUEST_BODY = 64 * 1024
+STANDALONE_REQUEST_TIMEOUT_SECONDS = 10.0
+MAX_STANDALONE_REQUESTS = 8
 SESSION_COOKIE = "gt_session"
 STATIC_FILES = {
     "/": ("index.html", "text/html; charset=utf-8"),
@@ -415,7 +418,8 @@ class GTWebApplication(object):
                                         (query.get("q") or [""])[0],
                                         (query.get("kind") or ["movie"])[0])
             elif path == "/api/v1/media/episodes" and method == "GET":
-                data = WEB_MEDIA.episodes((query.get("token") or [""])[0])
+                data = WEB_MEDIA.episodes((query.get("token") or [""])[0],
+                                          (query.get("page") or ["1"])[0])
             elif path == "/api/v1/media/play" and method == "POST":
                 data = WEB_MEDIA.play(_parse_json(body).get("token"))
             elif path == "/api/v1/media/download" and method == "POST":
@@ -502,35 +506,89 @@ def _lan_ipv4_addresses():
     return addresses
 
 
+class _DeadlineSocketReader(io.RawIOBase):
+    """Apply one request deadline to every underlying socket read."""
+
+    def __init__(self, connection, deadline):
+        io.RawIOBase.__init__(self)
+        self.connection = connection
+        self.deadline = deadline
+
+    def readable(self):
+        return True
+
+    def readinto(self, buffer):
+        remaining = self.deadline() - time.monotonic()
+        if remaining <= 0:
+            raise socket.timeout("request deadline expired")
+        self.connection.settimeout(remaining)
+        return self.connection.recv_into(buffer)
+
+
 class _StandaloneHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     server_version = "GTWeb"
     sys_version = ""
 
+    def setup(self):
+        BaseHTTPRequestHandler.setup(self)
+        self.rfile.close()
+        self._read_deadline = time.monotonic() + STANDALONE_REQUEST_TIMEOUT_SECONDS
+        self.rfile = io.BufferedReader(_DeadlineSocketReader(
+            self.connection, lambda: self._read_deadline))
+
+    def handle_one_request(self):
+        # Re-arm for each HTTP keep-alive request, without allowing slow input
+        # to extend the same request's header/body budget indefinitely.
+        self._read_deadline = time.monotonic() + STANDALONE_REQUEST_TIMEOUT_SECONDS
+        return BaseHTTPRequestHandler.handle_one_request(self)
+
     def log_message(self, unused_format, *unused_args):
         del unused_format, unused_args
 
     def _dispatch(self):
-        length = _safe_content_length(self.headers.get("Content-Length", "0"))
-        if length > MAX_REQUEST_BODY:
-            response = _json_response({"ok": False, "error": "request_too_large"}, 413)
+        lengths = self.headers.get_all("Content-Length", [])
+        raw_length = lengths[0].strip() if lengths else "0"
+        invalid_length = (len(lengths) > 1 or len(raw_length) > 12
+                          or re.fullmatch(r"[0-9]+", raw_length) is None)
+        # Chunked transfer is not part of this small JSON bridge. Reject it
+        # before reading, rather than interpreting unread bytes as a request.
+        invalid_length = invalid_length or bool(self.headers.get("Transfer-Encoding"))
+        length = _safe_content_length(raw_length)
+        if invalid_length or length > MAX_REQUEST_BODY:
+            self.close_connection = True
+            response = _json_response(
+                {"ok": False, "error": "invalid_json" if invalid_length else "request_too_large"},
+                400 if invalid_length else 413,
+            )
             response = self.server.runtime.application._security_headers(response)
         else:
             body = self.rfile.read(length) if length else b""
-            response = self.server.runtime.application.handle(
-                self.command,
-                self.path,
-                dict(self.headers.items()),
-                body,
-                self.client_address[0],
-                secure=False,
-            )
-        self.send_response(response.status)
-        for key, value in response.headers:
-            self.send_header(key, value)
-        self.end_headers()
-        if self.command != "HEAD":
-            self.wfile.write(response.body)
+            if len(body) != length:
+                self.close_connection = True
+                response = self.server.runtime.application._security_headers(
+                    _json_response({"ok": False, "error": "invalid_json"}, 400))
+            else:
+                response = self.server.runtime.application.handle(
+                    self.command,
+                    self.path,
+                    dict(self.headers.items()),
+                    body,
+                    self.client_address[0],
+                    secure=False,
+                )
+        try:
+            self.connection.settimeout(STANDALONE_REQUEST_TIMEOUT_SECONDS)
+            self.send_response(response.status)
+            for key, value in response.headers:
+                self.send_header(key, value)
+            if self.close_connection:
+                self.send_header("Connection", "close")
+            self.end_headers()
+            if self.command != "HEAD":
+                self.wfile.write(response.body)
+        except OSError:
+            self.close_connection = True
 
     do_GET = _dispatch
     do_POST = _dispatch
@@ -551,6 +609,55 @@ def _safe_content_length(value):
 class _GTHTTPServer(ThreadingHTTPServer if ThreadingHTTPServer is not None else object):
     daemon_threads = True
     allow_reuse_address = True
+
+    def __init__(self, *args, **kwargs):
+        self._request_slots = threading.BoundedSemaphore(MAX_STANDALONE_REQUESTS)
+        self._request_lock = threading.Lock()
+        self._active_requests = set()
+        ThreadingHTTPServer.__init__(self, *args, **kwargs)
+
+    def process_request(self, request, client_address):
+        if not self._request_slots.acquire(False):
+            # The acceptor must never wait for a worker or a slow reader.
+            body = b'{"ok":false,"error":"request_failed"}'
+            response = (b"HTTP/1.1 503 Service Unavailable\r\nConnection: close\r\n"
+                        b"Content-Type: application/json\r\nCache-Control: no-store\r\n"
+                        b"Content-Length: " + str(len(body)).encode("ascii") + b"\r\n\r\n" + body)
+            try:
+                request.setblocking(False)
+                request.send(response)
+            except OSError:
+                pass
+            finally:
+                self.shutdown_request(request)
+            return
+        with self._request_lock:
+            self._active_requests.add(request)
+        try:
+            ThreadingHTTPServer.process_request(self, request, client_address)
+        except BaseException:
+            with self._request_lock:
+                self._active_requests.discard(request)
+            self._request_slots.release()
+            raise
+
+    def process_request_thread(self, request, client_address):
+        try:
+            return ThreadingHTTPServer.process_request_thread(self, request, client_address)
+        finally:
+            with self._request_lock:
+                self._active_requests.discard(request)
+            self._request_slots.release()
+
+    def server_close(self):
+        with self._request_lock:
+            pending = tuple(self._active_requests)
+        for request in pending:
+            try:
+                request.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+        return ThreadingHTTPServer.server_close(self)
 
 
 def _probe_openwebif(scheme, port):

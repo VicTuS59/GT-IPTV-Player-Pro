@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: sq_AL\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Seriali"
+
+msgid "Season"
+msgstr "Sezoni"
+
+msgid "Navigate"
+msgstr "Lëviz"
+
+msgid "Page"
+msgstr "Faqja"
+
+msgid "Play"
+msgstr "Luaj"
+
+msgid "Favorite"
+msgstr "E preferuar"
+
+msgid "Refresh"
+msgstr "Rifresko"
+
+msgid "Download"
+msgstr "Shkarko"
+
+msgid "Back"
+msgstr "Prapa"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Sezoni {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "Sezone: {}"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "Episode: {}"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Episodi {}"
+
+msgid "Watched"
+msgstr "I parë"
+
+msgid "Not played"
+msgstr "Nuk është luajtur"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Vazhdo nga {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Vazhdo episodin {}"
+
+msgid "Continue watching"
+msgstr "Vazhdo shikimin"
+
+msgid "Add to favorites"
+msgstr "Shto te të preferuarat"
+
+msgid "Remove from favorites"
+msgstr "Hiq nga të preferuarat"
+
+msgid "Download episode"
+msgstr "Shkarko episodin"
+
+msgid "SEASON PROGRESS"
+msgstr "ECURIA E SEZONIT"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "Episode të përfunduara: {} / {}"
+
+msgid "CAST"
+msgstr "AKTORËT"
+
+msgid "GENRE"
+msgstr "ZHANRI"
+
+msgid "Unknown season"
+msgstr "Sezon i panjohur"
+
+msgid "No episodes in this season."
+msgstr "Nuk ka episode në këtë sezon."
+
+msgid "Marked as watched"
+msgstr "U shënua si i parë"
+
+msgid "Marked as not watched"
+msgstr "U shënua si i paparë"
+
+msgid "Could not save watched status."
+msgstr "Nuk u ruajt gjendja e shikimit."
+
+msgid "Mark watched"
+msgstr "Shëno si të parë"
+
+msgid "Hold OK"
+msgstr "Mbaj shtypur OK"
+
+msgid "Episodes"
+msgstr "Episodet"
+
+msgid "No information available."
+msgstr "Nuk ka informacion të disponueshëm."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Sezoni {season} · Episodi {episode} · Vazhdo nga {time}"

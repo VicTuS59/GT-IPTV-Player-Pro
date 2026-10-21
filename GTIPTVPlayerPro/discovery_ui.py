@@ -7,6 +7,8 @@ import threading
 import time
 from collections import deque
 
+from .vod_grid import LatestPosterWorkers
+
 from Components.ActionMap import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
@@ -17,10 +19,12 @@ from enigma import eServiceReference, eTimer
 
 from .background import attach_background, attach_pixmap
 from .browser import (
-    GTAllMoviesSearchScreen, GTExternalPlayerScreen, _WorkerToken,
+    GTAllMoviesSearchScreen, GTExternalPlayerScreen, _WorkerToken, _WorkerCancelled,
+    PICON_DOWNLOAD_TIMEOUT,
     _cached_picon_path, _cinematic_cover_ratio, _client_supports,
     _download_picon, _picon_cache_path, _valid_cinematic_backdrop_file, content_client_for,
 )
+from .artwork import RETRY_DELAY_SECONDS
 from .category_preferences import LiveCategoryPreferenceStore, category_preferences_path
 from .category_visibility import category_visibility_ids
 from .content import ContentError, ContentItem
@@ -144,6 +148,7 @@ class GTMovieDiscoveryScreen(Screen):
         self._events = deque()
         self._event_lock = threading.Lock()
         self._worker_slots = threading.BoundedSemaphore(3)
+        self._channel_workers = {}
         self._visible_ids = ()
         self._hero_identity = None
         self._hero_request = None
@@ -310,6 +315,10 @@ class GTMovieDiscoveryScreen(Screen):
                 with client.request_scope(cancel_event=token.cancel_event, deadline=token.deadline):
                     result = work(token)
                 token.check()
+            except _WorkerCancelled:
+                if not token.cancel_event.is_set():
+                    log_event("discovery", "channel={} outcome=timeout".format(channel))
+                return
             except (MetadataError, ContentError) as exc:
                 error = str(exc)
             except Exception as exc:
@@ -320,12 +329,10 @@ class GTMovieDiscoveryScreen(Screen):
                     self._worker_slots.release()
             self._queue(("done", channel, token, result, error))
 
-        worker = threading.Thread(target=run)
-        worker.daemon = True
-        try:
-            worker.start()
-        except (RuntimeError, OSError):
-            self._queue(("done", channel, token, None, self._channel_error(channel)))
+        pool = self._channel_workers.get(channel)
+        if pool is None:
+            pool = self._channel_workers[channel] = LatestPosterWorkers(worker_count=1)
+        pool.replace([run])
         self._poll_timer.start(80, True)
         return token
 
@@ -341,8 +348,15 @@ class GTMovieDiscoveryScreen(Screen):
             self._poll_timer.start(150, True)
             return
         with self._event_lock:
-            events = list(self._events)
-            self._events.clear()
+            events = []
+            images = 0
+            while self._events:
+                event = self._events[0]
+                if event[0] == "image":
+                    if images >= 2:
+                        break
+                    images += 1
+                events.append(self._events.popleft())
         for kind, channel, token, result, error in events:
             job = self._jobs.get(channel)
             if not job or job[0] is not token or not token.active():
@@ -361,18 +375,20 @@ class GTMovieDiscoveryScreen(Screen):
                         self._failed(channel, self._channel_error(channel))
         for channel, job in list(self._jobs.items()):
             if job[0].expired():
+                if not job[0].cancel_event.is_set():
+                    log_event("discovery", "channel={} outcome=timeout".format(channel))
                 self._cancel(channel)
                 self._failed(channel, N_("The trailer could not be played.") if channel == "trailer"
                              else N_("Could not connect to the TMDb service")
                              if channel in ("list", "genres", "detail") else N_("Request timed out"))
         self["busy"].setText("•" * (1 + int(time.monotonic() * 2) % 3) if self._busy else "")
-        if self._jobs:
+        if self._jobs or self._events:
             self._poll_timer.start(100, True)
 
     def _failed(self, channel, error):
         if channel == "hero":
             self._hero_request = None
-        if channel in ("detail", "posters", "hero"):
+        if channel in ("detail", "posters", "posters2", "hero"):
             return
         self._busy = False
         self["busy"].setText("")
@@ -519,25 +535,36 @@ class GTMovieDiscoveryScreen(Screen):
 
     def _image_path(self, url, token):
         token.check()
-        return _cached_picon_path(url) or _download_picon(url, _picon_cache_path(url), timeout=5, token=token)
+        return _cached_picon_path(url) or _download_picon(
+            url, _picon_cache_path(url), timeout=PICON_DOWNLOAD_TIMEOUT, token=token)
 
     def _load_posters(self, visible):
-        records = [dict(movie) for movie in visible]
-
-        def work(token):
-            for index, movie in enumerate(records):
-                token.check()
-                if not movie.get("poster"):
-                    continue
-                try:
-                    path = self._image_path(movie["poster"], token)
-                    if path:
-                        self._queue(("image", "posters", token,
-                                     ("poster_{}".format(index), path, movie["id"]), ""))
-                except Exception:
+        self._cancel("posters")
+        self._cancel("posters2")
+        selected = self._selected()
+        selected_id = selected.get("id") if selected else None
+        records = [(index, dict(movie)) for index, movie in enumerate(visible)]
+        records.sort(key=lambda pair: pair[1].get("id") != selected_id)
+        def submit(channel, batch):
+            def work(token):
+                for index, movie in batch:
                     token.check()
-
-        self._submit("posters", work, lambda result: None, timeout=45)
+                    if not movie.get("poster"):
+                        continue
+                    try:
+                        path = self._image_path(movie["poster"], token)
+                        if path:
+                            self._queue(("image", channel, token,
+                                         ("poster_{}".format(index), path, movie["id"]), ""))
+                    except _WorkerCancelled:
+                        raise
+                    except Exception as error:
+                        log_event("discovery", "stage=poster outcome=error movie_id={}".format(movie["id"]), error)
+                        token.check()
+            timeout = len(batch) * (2 * PICON_DOWNLOAD_TIMEOUT + RETRY_DELAY_SECONDS) + 8
+            self._submit(channel, work, lambda result: None, timeout=max(30, timeout))
+        submit("posters", records[::2])
+        submit("posters2", records[1::2])
 
     def _load_hero(self, movie):
         # Discovery always includes its own hero, independently of the classic
@@ -555,7 +582,8 @@ class GTMovieDiscoveryScreen(Screen):
             else:
                 self._hero_request = None
 
-        self._submit("hero", lambda token: self._image_path(url, token), ready, timeout=12)
+        self._submit("hero", lambda token: self._image_path(url, token), ready,
+                     timeout=2 * PICON_DOWNLOAD_TIMEOUT + RETRY_DELAY_SECONDS + 8)
         self._hero_request = identity
 
     def _apply_image(self, name, path, movie_id):
@@ -577,6 +605,7 @@ class GTMovieDiscoveryScreen(Screen):
                     self._hero_identity = movie_id
                     self["scrim"].show()
                 else:
+                    log_event("discovery", "stage=decode kind=backdrop outcome=failed movie_id={}".format(movie_id))
                     self._hero_identity = None
                     self["backdrop"].hide()
                     self["scrim"].hide()
@@ -586,7 +615,14 @@ class GTMovieDiscoveryScreen(Screen):
         else:
             index = int(name.rsplit("_", 1)[1])
             if index < len(self._visible_ids) and self._visible_ids[index] == movie_id:
-                attach_pixmap(self, name, path)
+                def decoded(loaded):
+                    if (self._closed or index >= len(self._visible_ids)
+                            or self._visible_ids[index] != movie_id):
+                        return
+                    if not loaded:
+                        self[name].hide()
+                        log_event("discovery", "stage=decode kind=poster outcome=failed movie_id={}".format(movie_id))
+                attach_pixmap(self, name, path, on_loaded=decoded)
 
     def move(self, step):
         if self._closed or self._child_open or self._busy or not step:
@@ -802,6 +838,9 @@ class GTMovieDiscoveryScreen(Screen):
 
     def _stop(self):
         self._closed = True
+        for pool in self._channel_workers.values():
+            pool.close()
+        self._channel_workers.clear()
         for timer in (self._poll_timer, self._start_timer, self._detail_timer):
             timer.stop()
         for channel in tuple(self._jobs):

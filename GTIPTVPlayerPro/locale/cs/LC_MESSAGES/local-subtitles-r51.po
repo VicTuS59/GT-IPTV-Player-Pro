@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: cs\nLanguage: cs\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n == 1) ? 0 : (n >= 2 && n <= 4) ? 1 : 2;\n"
+
+msgid "Choose a subtitle file"
+msgstr "Vyberte soubor s titulky"
+
+msgid "Download folder"
+msgstr "Složka pro stahování"
+
+msgid "Use this folder"
+msgstr "Použít tuto složku"
+
+msgid "Local subtitles"
+msgstr "Místní titulky"
+
+msgid "GT subtitle downloads"
+msgstr "Titulky stažené v GT"
+
+msgid "Search subtitle files"
+msgstr "Hledat soubory s titulky"
+
+msgid "No subtitle files found."
+msgstr "Nenalezeny žádné soubory s titulky."
+
+msgid "Could not read this folder."
+msgstr "Tuto složku se nepodařilo načíst."
+
+msgid "Could not load this subtitle file."
+msgstr "Tento soubor s titulky se nepodařilo načíst."
+
+msgid "Could not save the download folder."
+msgstr "Složku pro stahování se nepodařilo uložit."
+
+msgid "Download folder saved."
+msgstr "Složka pro stahování byla uložena."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Složka pro stahování titulků není dostupná. Vyberte jinou složku."
+
+msgid "Subtitle file is too large."
+msgstr "Soubor s titulky je příliš velký."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Podporovány jsou pouze soubory s titulky SRT a VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Hledání souborů s titulky..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Byl dosažen limit hledání. Upřesněte hledání."
+
+msgid "Temporary folder"
+msgstr "Dočasná složka"
+
+msgid "Device storage"
+msgstr "Úložiště zařízení"
+
+msgid "Up one folder"
+msgstr "O složku výše"
+
+msgid "Subtitle language"
+msgstr "Jazyk titulků"
+
+msgid "Search this folder"
+msgstr "Prohledat tuto složku"
+
+msgid "Local subtitle loaded."
+msgstr "Místní titulky byly načteny."
+
+msgid "Automatic detection"
+msgstr "Automatické rozpoznání"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Vyberte složku na HDD, USB nebo připojeném NAS."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Dočasná složka se při restartu přijímače vymaže."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Složka pro stahování: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Jazyk titulků: {}"
+
+msgid "Folder is not available."
+msgstr "Složka není dostupná."
+
+msgid "Use temporary folder"
+msgstr "Použít dočasnou složku"
+
+msgid "Device folders"
+msgstr "Složky zařízení"
+
+msgid "Downloaded subtitles"
+msgstr "Stažené titulky"
+
+msgid "Search results"
+msgstr "Výsledky hledání"

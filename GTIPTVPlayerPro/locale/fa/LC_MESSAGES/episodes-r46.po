@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: fa\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "سریال‌ها"
+
+msgid "Season"
+msgstr "فصل"
+
+msgid "Navigate"
+msgstr "پیمایش"
+
+msgid "Page"
+msgstr "صفحه"
+
+msgid "Play"
+msgstr "پخش"
+
+msgid "Favorite"
+msgstr "مورد علاقه"
+
+msgid "Refresh"
+msgstr "به‌روزرسانی"
+
+msgid "Download"
+msgstr "دانلود"
+
+msgid "Back"
+msgstr "بازگشت"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "فصل {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} فصل"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} قسمت"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "قسمت {}"
+
+msgid "Watched"
+msgstr "تماشا شده"
+
+msgid "Not played"
+msgstr "پخش نشده"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "ادامه از {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "ادامه قسمت {}"
+
+msgid "Continue watching"
+msgstr "ادامه تماشا"
+
+msgid "Add to favorites"
+msgstr "افزودن به علاقه‌مندی‌ها"
+
+msgid "Remove from favorites"
+msgstr "حذف از علاقه‌مندی‌ها"
+
+msgid "Download episode"
+msgstr "دانلود قسمت"
+
+msgid "SEASON PROGRESS"
+msgstr "پیشرفت فصل"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} قسمت تکمیل شده"
+
+msgid "CAST"
+msgstr "بازیگران"
+
+msgid "GENRE"
+msgstr "ژانر"
+
+msgid "Unknown season"
+msgstr "فصل نامشخص"
+
+msgid "No episodes in this season."
+msgstr "در این فصل قسمتی وجود ندارد."
+
+msgid "Marked as watched"
+msgstr "به‌عنوان تماشا شده علامت‌گذاری شد"
+
+msgid "Marked as not watched"
+msgstr "به‌عنوان تماشا نشده علامت‌گذاری شد"
+
+msgid "Could not save watched status."
+msgstr "ذخیره وضعیت تماشا ممکن نشد."
+
+msgid "Mark watched"
+msgstr "علامت‌گذاری به‌عنوان تماشا شده"
+
+msgid "Hold OK"
+msgstr "OK را نگه دارید"
+
+msgid "Episodes"
+msgstr "قسمت‌ها"
+
+msgid "No information available."
+msgstr "اطلاعاتی موجود نیست."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "فصل {season} · قسمت {episode} · ادامه از {time}"

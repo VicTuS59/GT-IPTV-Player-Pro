@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Turkish\nLanguage: tr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Bir altyazı dosyası seçin"
+
+msgid "Download folder"
+msgstr "İndirme klasörü"
+
+msgid "Use this folder"
+msgstr "Bu klasörü kullan"
+
+msgid "Local subtitles"
+msgstr "Yerel altyazılar"
+
+msgid "GT subtitle downloads"
+msgstr "GT altyazı indirmeleri"
+
+msgid "Search subtitle files"
+msgstr "Altyazı dosyalarını ara"
+
+msgid "No subtitle files found."
+msgstr "Altyazı dosyası bulunamadı."
+
+msgid "Could not read this folder."
+msgstr "Bu klasör okunamadı."
+
+msgid "Could not load this subtitle file."
+msgstr "Bu altyazı dosyası yüklenemedi."
+
+msgid "Could not save the download folder."
+msgstr "İndirme klasörü kaydedilemedi."
+
+msgid "Download folder saved."
+msgstr "İndirme klasörü kaydedildi."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Altyazı indirme klasörü kullanılamıyor. Başka bir klasör seçin."
+
+msgid "Subtitle file is too large."
+msgstr "Altyazı dosyası çok büyük."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Yalnızca SRT ve VTT altyazı dosyaları desteklenir."
+
+msgid "Searching subtitle files..."
+msgstr "Altyazı dosyaları aranıyor..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Arama sınırına ulaşıldı. Aramanızı daraltın."
+
+msgid "Temporary folder"
+msgstr "Geçici klasör"
+
+msgid "Device storage"
+msgstr "Cihaz depolaması"
+
+msgid "Up one folder"
+msgstr "Bir üst klasör"
+
+msgid "Subtitle language"
+msgstr "Altyazı dili"
+
+msgid "Search this folder"
+msgstr "Bu klasörde ara"
+
+msgid "Local subtitle loaded."
+msgstr "Yerel altyazı yüklendi."
+
+msgid "Automatic detection"
+msgstr "Otomatik algılama"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "HDD, USB veya bağlı bir NAS üzerinde bir klasör seçin."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Geçici klasör, alıcı yeniden başlatıldığında temizlenir."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "İndirme klasörü: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Altyazı dili: {}"
+
+msgid "Folder is not available."
+msgstr "Klasör kullanılamıyor."
+
+msgid "Use temporary folder"
+msgstr "Geçici klasörü kullan"
+
+msgid "Device folders"
+msgstr "Cihaz klasörleri"
+
+msgid "Downloaded subtitles"
+msgstr "İndirilen altyazılar"
+
+msgid "Search results"
+msgstr "Arama sonuçları"

@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: cs\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Seriál"
+
+msgid "Season"
+msgstr "Řada"
+
+msgid "Navigate"
+msgstr "Navigace"
+
+msgid "Page"
+msgstr "Stránka"
+
+msgid "Play"
+msgstr "Přehrát"
+
+msgid "Favorite"
+msgstr "Oblíbené"
+
+msgid "Refresh"
+msgstr "Obnovit"
+
+msgid "Download"
+msgstr "Stáhnout"
+
+msgid "Back"
+msgstr "Zpět"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Řada {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "Řady: {}"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "Epizody: {}"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Epizoda {}"
+
+msgid "Watched"
+msgstr "Zhlédnuto"
+
+msgid "Not played"
+msgstr "Nepřehráno"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Pokračovat od {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Pokračovat v epizodě {}"
+
+msgid "Continue watching"
+msgstr "Pokračovat ve sledování"
+
+msgid "Add to favorites"
+msgstr "Přidat do oblíbených"
+
+msgid "Remove from favorites"
+msgstr "Odebrat z oblíbených"
+
+msgid "Download episode"
+msgstr "Stáhnout epizodu"
+
+msgid "SEASON PROGRESS"
+msgstr "PRŮBĚH ŘADY"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "Dokončené epizody: {} / {}"
+
+msgid "CAST"
+msgstr "OBSAZENÍ"
+
+msgid "GENRE"
+msgstr "ŽÁNR"
+
+msgid "Unknown season"
+msgstr "Neznámá řada"
+
+msgid "No episodes in this season."
+msgstr "V této řadě nejsou žádné epizody."
+
+msgid "Marked as watched"
+msgstr "Označeno jako zhlédnuté"
+
+msgid "Marked as not watched"
+msgstr "Označeno jako nezhlédnuté"
+
+msgid "Could not save watched status."
+msgstr "Stav zhlédnutí se nepodařilo uložit."
+
+msgid "Mark watched"
+msgstr "Označit jako zhlédnuté"
+
+msgid "Hold OK"
+msgstr "Podržet OK"
+
+msgid "Episodes"
+msgstr "Epizody"
+
+msgid "No information available."
+msgstr "Informace nejsou k dispozici."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Řada {season} · Epizoda {episode} · Pokračovat od {time}"

@@ -112,6 +112,10 @@ def session_start(reason, session=None, **kwargs):
         except Exception:
             pass
     elif reason != 0:
+        from .download_guard import uninstall as uninstall_download_guard
+        uninstall_download_guard()
+        from .persistence import WRITER
+        WRITER.flush(timeout=2)
         from .web_shortcut import uninstall as uninstall_web_shortcut
         uninstall_web_shortcut()
         from .web_remote import WEB_REMOTE

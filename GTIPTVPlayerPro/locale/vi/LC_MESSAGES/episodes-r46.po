@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: vi\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Phim bộ"
+
+msgid "Season"
+msgstr "Mùa"
+
+msgid "Navigate"
+msgstr "Điều hướng"
+
+msgid "Page"
+msgstr "Trang"
+
+msgid "Play"
+msgstr "Phát"
+
+msgid "Favorite"
+msgstr "Yêu thích"
+
+msgid "Refresh"
+msgstr "Làm mới"
+
+msgid "Download"
+msgstr "Tải xuống"
+
+msgid "Back"
+msgstr "Quay lại"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Mùa {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} mùa"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} tập"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Tập {}"
+
+msgid "Watched"
+msgstr "Đã xem"
+
+msgid "Not played"
+msgstr "Chưa phát"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Tiếp tục từ {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Tiếp tục tập {}"
+
+msgid "Continue watching"
+msgstr "Xem tiếp"
+
+msgid "Add to favorites"
+msgstr "Thêm vào yêu thích"
+
+msgid "Remove from favorites"
+msgstr "Xóa khỏi yêu thích"
+
+msgid "Download episode"
+msgstr "Tải tập xuống"
+
+msgid "SEASON PROGRESS"
+msgstr "TIẾN ĐỘ MÙA"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "Đã hoàn thành {} / {} tập"
+
+msgid "CAST"
+msgstr "DIỄN VIÊN"
+
+msgid "GENRE"
+msgstr "THỂ LOẠI"
+
+msgid "Unknown season"
+msgstr "Không rõ mùa"
+
+msgid "No episodes in this season."
+msgstr "Không có tập nào trong mùa này."
+
+msgid "Marked as watched"
+msgstr "Đã đánh dấu đã xem"
+
+msgid "Marked as not watched"
+msgstr "Đã đánh dấu chưa xem"
+
+msgid "Could not save watched status."
+msgstr "Không thể lưu trạng thái xem."
+
+msgid "Mark watched"
+msgstr "Đánh dấu đã xem"
+
+msgid "Hold OK"
+msgstr "Nhấn giữ OK"
+
+msgid "Episodes"
+msgstr "Các tập"
+
+msgid "No information available."
+msgstr "Không có thông tin."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Mùa {season} · Tập {episode} · Tiếp tục từ {time}"

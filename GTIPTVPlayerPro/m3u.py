@@ -25,6 +25,7 @@ from urllib.parse import urljoin, urlsplit, urlunsplit
 from . import PLUGIN_VERSION
 from .content import ContentCategory, ContentError, ContentItem
 from .i18n import N_, _
+from .persistence import guarded_mutation
 from .category_visibility import category_ids_visible, hidden_category_match_ids
 
 
@@ -233,6 +234,7 @@ def load_m3u_sources(path=M3U_SOURCE_PATH):
     return sources
 
 
+@guarded_mutation(busy_error=True)
 def save_m3u_source(
     source,
     path=M3U_SOURCE_PATH,
@@ -285,6 +287,7 @@ def save_m3u_source(
     return saved_source
 
 
+@guarded_mutation(busy_error=True)
 def delete_m3u_source(
     source_id,
     path=M3U_SOURCE_PATH,
@@ -843,13 +846,16 @@ class M3UContentClient(object):
         values.discard("")
         return tuple(sorted(values))
 
-    def load_epg(self, stream_id, limit=2):
-        """Read current/next XMLTV events from the published RAM snapshot.
+    def peek_epg(self, stream_id, limit=2):
+        """Return already decoded current/next for immediate GUI rendering."""
+        return self.load_epg(stream_id, limit=limit, cache_only=True)
 
-        This method is used by both the channel-list detail worker and the
-        full-screen completion path.  It must therefore remain free of file,
-        XML and network access.  Snapshot loading and refresh are owned by the
-        session scheduler, never by navigation or zapping.
+    def load_epg(self, stream_id, limit=2, cache_only=False):
+        """Read current/next on the existing list/player EPG workers.
+
+        The small shared cache serves hot channels from RAM. Cold channels
+        need only a bounded local index read, without parsing XML or contacting
+        a provider. Full snapshot preparation remains scheduler-owned.
         """
         stream_id = str(stream_id or "")
         try:
@@ -868,6 +874,7 @@ class M3UContentClient(object):
                 self.account.source_id,
                 tvg_id,
                 now=self.wall_clock(),
+                cache_only=cache_only,
             )
         except Exception:
             return []
@@ -2848,6 +2855,9 @@ def _read_http_response_body(
             raise
         check_limits(deadline)
         if not chunk:
+            remaining_length = getattr(response, "length", None)
+            if remaining_length not in (None, 0):
+                raise http.client.IncompleteRead(bytes(body), remaining_length)
             break
         total += len(chunk)
         if total > maximum:

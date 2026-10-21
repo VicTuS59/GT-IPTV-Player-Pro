@@ -88,7 +88,7 @@ class SubtitleResumeStore(object):
             return {"kind": kind, "track": track} if track is not None else None
         name = value.get("file")
         if (
-            kind not in ("online", "external")
+            kind not in ("online", "local", "external")
             or not isinstance(name, str)
             or not _FILE.fullmatch(name)
             or not name.startswith(key + "-")
@@ -98,10 +98,16 @@ class SubtitleResumeStore(object):
         return {"kind": kind, "file": name, "offset_ms": offset,
                 "external_sync": normalize_external_subtitle_sync(value.get("external_sync"))}
 
-    def get(self, key):
+    def get(self, key, nonblocking=False):
         if not isinstance(key, str) or not _KEY.fullmatch(key):
             return None
-        with _LOCK:
+        if nonblocking:
+            from .persistence import WRITER
+            if WRITER.peek(("subtitle", self.root, key))[0]:
+                return {"kind": "pending"}
+        if not _LOCK.acquire(blocking=not nonblocking):
+            return {"kind": "pending"}
+        try:
             try:
                 self._directory()
                 value = self._metadata(key, _read_file(
@@ -118,6 +124,39 @@ class SubtitleResumeStore(object):
                         "external_sync": value["external_sync"]}
             except (OSError, TypeError, ValueError, OverflowError):
                 return None
+        finally:
+            _LOCK.release()
+
+    @staticmethod
+    def capture(state):
+        """Retain an open file across controller cleanup, without reading it."""
+        state = dict(state)
+        if state.get("kind") not in ("online", "local", "external"):
+            return state, None
+        descriptor = os.open(state["path"], os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
+        try:
+            info = os.fstat(descriptor)
+            if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_SUBTITLE_BYTES:
+                raise OSError("subtitle file is not a bounded regular file")
+        except Exception:
+            os.close(descriptor)
+            raise
+        state["_resume_fd"] = descriptor
+        return state, lambda: os.close(descriptor)
+
+    def remember_async(self, key, state):
+        from .persistence import WRITER
+        state, cleanup = self.capture(state)
+        return WRITER.submit(("subtitle", self.root, key), lambda: self.remember(key, state), cleanup=cleanup, value=True)
+
+    def _write_changed(self, name, content):
+        try:
+            if _read_file(os.path.join(self.root, name), max(MAX_SUBTITLE_BYTES, MAX_METADATA_BYTES)) == content:
+                return False
+        except OSError:
+            pass
+        self._write(name, content)
+        return True
 
     def remember(self, key, state):
         """Commit the selected file before its small, credential-free index."""
@@ -137,16 +176,23 @@ class SubtitleResumeStore(object):
                         return False
                     value = {"version": 1, "kind": kind, "track": track}
                     content = None
-                elif kind in ("online", "external"):
+                elif kind in ("online", "local", "external"):
                     path = state.get("path")
                     if not isinstance(path, str) or not path:
                         return False
-                    content = _read_file(path, MAX_SUBTITLE_BYTES)
+                    descriptor = state.get("_resume_fd")
+                    if descriptor is None:
+                        content = _read_file(path, MAX_SUBTITLE_BYTES)
+                    else:
+                        with os.fdopen(os.dup(descriptor), "rb") as handle:
+                            content = handle.read(MAX_SUBTITLE_BYTES + 1)
+                        if len(content) > MAX_SUBTITLE_BYTES:
+                            return False
                     if not content:
                         return False
                     digest = hashlib.sha256(content).hexdigest()
                     extension = os.path.splitext(path)[1].lower().lstrip(".")
-                    if kind == "online":
+                    if kind in ("online", "local"):
                         extension = "srt"
                     if extension not in ("srt", "ass", "ssa", "sub", "vtt", "txt"):
                         return False
@@ -163,12 +209,14 @@ class SubtitleResumeStore(object):
                 else:
                     return False
                 self._directory(create=True)
+                changed = False
                 if content is not None:
-                    self._write(value["file"], content)
-                self._write(key + ".json", json.dumps(
+                    changed = self._write_changed(value["file"], content)
+                changed = self._write_changed(key + ".json", json.dumps(
                     value, separators=(",", ":"), sort_keys=True
-                ).encode("utf-8"))
-                self._prune(key)
+                ).encode("utf-8")) or changed
+                if changed:
+                    self._prune(key)
                 return True
             except (OSError, TypeError, ValueError, OverflowError):
                 return False

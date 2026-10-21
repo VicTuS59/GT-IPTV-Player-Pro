@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: et\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Sari"
+
+msgid "Season"
+msgstr "Hooaeg"
+
+msgid "Navigate"
+msgstr "Liigu"
+
+msgid "Page"
+msgstr "Lehekülg"
+
+msgid "Play"
+msgstr "Esita"
+
+msgid "Favorite"
+msgstr "Lemmik"
+
+msgid "Refresh"
+msgstr "Värskenda"
+
+msgid "Download"
+msgstr "Laadi alla"
+
+msgid "Back"
+msgstr "Tagasi"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Hooaeg {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "Hooaegu: {}"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "Episoode: {}"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Episood {}"
+
+msgid "Watched"
+msgstr "Vaadatud"
+
+msgid "Not played"
+msgstr "Esitamata"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Jätka kohast {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Jätka episoodi {}"
+
+msgid "Continue watching"
+msgstr "Jätka vaatamist"
+
+msgid "Add to favorites"
+msgstr "Lisa lemmikutesse"
+
+msgid "Remove from favorites"
+msgstr "Eemalda lemmikutest"
+
+msgid "Download episode"
+msgstr "Laadi episood alla"
+
+msgid "SEASON PROGRESS"
+msgstr "HOOAJA EDENEMINE"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "Lõpetatud episoodid: {} / {}"
+
+msgid "CAST"
+msgstr "OSATÄITJAD"
+
+msgid "GENRE"
+msgstr "ŽANR"
+
+msgid "Unknown season"
+msgstr "Tundmatu hooaeg"
+
+msgid "No episodes in this season."
+msgstr "Sellel hooajal pole episoode."
+
+msgid "Marked as watched"
+msgstr "Märgitud vaadatuks"
+
+msgid "Marked as not watched"
+msgstr "Märgitud vaatamata episoodiks"
+
+msgid "Could not save watched status."
+msgstr "Vaatamise olekut ei saanud salvestada."
+
+msgid "Mark watched"
+msgstr "Märgi vaadatuks"
+
+msgid "Hold OK"
+msgstr "Hoia OK all"
+
+msgid "Episodes"
+msgstr "Episoodid"
+
+msgid "No information available."
+msgstr "Teave pole saadaval."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Hooaeg {season} · Episood {episode} · Jätka kohast {time}"

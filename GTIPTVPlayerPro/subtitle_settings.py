@@ -5,10 +5,12 @@
 
 import json
 import os
+import stat
 import tempfile
 import threading
 
 from .i18n import device_language, normalize_language
+from .persistence import guarded_mutation
 
 
 SUBTITLE_SETTINGS_PATH = "/etc/enigma2/gtiptvplayerpro-subtitles.json"
@@ -123,9 +125,10 @@ def read_subtitle_document(path=SUBTITLE_SETTINGS_PATH):
         try:
             if os.path.islink(path):
                 return {}
-            flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+            flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
             descriptor = os.open(path, flags)
-            if os.fstat(descriptor).st_size > MAX_SETTINGS_BYTES:
+            details = os.fstat(descriptor)
+            if not stat.S_ISREG(details.st_mode) or details.st_size > MAX_SETTINGS_BYTES:
                 return {}
             with os.fdopen(descriptor, "r", encoding="utf-8") as handle:
                 descriptor = -1
@@ -141,9 +144,15 @@ def read_subtitle_document(path=SUBTITLE_SETTINGS_PATH):
                     pass
 
 
-def write_subtitle_document(document, path=SUBTITLE_SETTINGS_PATH):
+def _write_cancelled(cancel):
+    return bool(cancel() if callable(cancel) else
+                getattr(cancel, "is_set", lambda: False)())
+
+
+@guarded_mutation()
+def write_subtitle_document(document, path=SUBTITLE_SETTINGS_PATH, cancel=None):
     """Atomically replace the subtitle document with receiver-only permissions."""
-    if not isinstance(document, dict):
+    if not isinstance(document, dict) or _write_cancelled(cancel):
         return False
     with _DOCUMENT_LOCK:
         directory = os.path.dirname(path) or "."
@@ -158,6 +167,8 @@ def write_subtitle_document(document, path=SUBTITLE_SETTINGS_PATH):
                     handle.flush()
                     os.fsync(handle.fileno())
                 os.chmod(temporary, 0o600)
+                if _write_cancelled(cancel):
+                    return False
                 os.replace(temporary, path)
             finally:
                 if os.path.exists(temporary):
@@ -167,9 +178,10 @@ def write_subtitle_document(document, path=SUBTITLE_SETTINGS_PATH):
             return False
 
 
-def update_subtitle_document(updater, path=SUBTITLE_SETTINGS_PATH):
+@guarded_mutation()
+def update_subtitle_document(updater, path=SUBTITLE_SETTINGS_PATH, cancel=None):
     """Apply one read/modify/write operation under the process-wide lock."""
-    if not callable(updater):
+    if not callable(updater) or _write_cancelled(cancel):
         return False
     with _DOCUMENT_LOCK:
         document = read_subtitle_document(path)
@@ -177,7 +189,9 @@ def update_subtitle_document(updater, path=SUBTITLE_SETTINGS_PATH):
             updated = updater(dict(document))
         except Exception:
             return False
-        return write_subtitle_document(updated, path)
+        if cancel is None:
+            return write_subtitle_document(updated, path)
+        return write_subtitle_document(updated, path, cancel=cancel)
 
 
 class SubtitleSettings(object):

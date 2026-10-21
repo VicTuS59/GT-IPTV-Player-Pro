@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: he\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "סדרות"
+
+msgid "Season"
+msgstr "עונה"
+
+msgid "Navigate"
+msgstr "ניווט"
+
+msgid "Page"
+msgstr "עמוד"
+
+msgid "Play"
+msgstr "הפעלה"
+
+msgid "Favorite"
+msgstr "מועדפים"
+
+msgid "Refresh"
+msgstr "רענן"
+
+msgid "Download"
+msgstr "הורד"
+
+msgid "Back"
+msgstr "חזרה"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "עונה {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} עונות"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} פרקים"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "פרק {}"
+
+msgid "Watched"
+msgstr "נצפה"
+
+msgid "Not played"
+msgstr "לא נוגן"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "המשך מ־{}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "המשך פרק {}"
+
+msgid "Continue watching"
+msgstr "המשך צפייה"
+
+msgid "Add to favorites"
+msgstr "הוסף למועדפים"
+
+msgid "Remove from favorites"
+msgstr "הסר מהמועדפים"
+
+msgid "Download episode"
+msgstr "הורד פרק"
+
+msgid "SEASON PROGRESS"
+msgstr "התקדמות העונה"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} פרקים הושלמו"
+
+msgid "CAST"
+msgstr "שחקנים"
+
+msgid "GENRE"
+msgstr "סוגה"
+
+msgid "Unknown season"
+msgstr "עונה לא ידועה"
+
+msgid "No episodes in this season."
+msgstr "אין פרקים בעונה זו."
+
+msgid "Marked as watched"
+msgstr "סומן כנצפה"
+
+msgid "Marked as not watched"
+msgstr "סומן כלא נצפה"
+
+msgid "Could not save watched status."
+msgstr "לא ניתן לשמור את מצב הצפייה."
+
+msgid "Mark watched"
+msgstr "סמן כנצפה"
+
+msgid "Hold OK"
+msgstr "החזק את OK"
+
+msgid "Episodes"
+msgstr "פרקים"
+
+msgid "No information available."
+msgstr "אין מידע זמין."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "עונה {season} · פרק {episode} · המשך מ־{time}"

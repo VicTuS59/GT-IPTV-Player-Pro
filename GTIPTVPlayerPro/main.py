@@ -6,6 +6,7 @@ import datetime
 import os
 import platform
 import threading
+from .source_loader import SourceLoader
 import textwrap
 import time
 
@@ -30,7 +31,18 @@ from . import (
     PLUGIN_VERSION,
 )
 from .background import attach_background, attach_pixmap
+from .appearance_skin import (
+    appearance_pixmap, fit_appearance_text, glass_appearance_skin,
+    refresh_appearance_palette, set_appearance_pixmap,
+)
 from .account_test_cache import account_test_fingerprint
+from .auto_login import automatic_account, source_identity_key, toggle_auto_login as toggle_auto_login_selection
+from .auto_login_ui import (
+    auto_login_overlay_skin,
+    install_auto_login_overlay,
+    show_auto_login_overlay,
+    advance_auto_login_spinner,
+)
 from .channel_highlight import (
     CHANNEL_HIGHLIGHT_KEYS,
     DEFAULT_CHANNEL_HIGHLIGHT,
@@ -52,6 +64,7 @@ from .content import ContentError
 from .i18n import (
     N_,
     _,
+    device_language,
     device_language_label,
     localized_upper,
     metadata_language,
@@ -81,10 +94,13 @@ from .remote_footer import (
 )
 from .scrollbar import hide_scrollbar, update_scrollbar
 from .settings import (
+    DEFAULT_INFOBAR_TIMEOUT,
+    INFOBAR_TIMEOUT_CHOICES,
     PlayerSettings,
     configurable_service_types,
     load_dashboard_order,
     load_player_settings,
+    normalize_infobar_timeout,
     normalize_text_size,
     save_dashboard_order,
     save_player_settings,
@@ -536,7 +552,10 @@ PROVIDER_CREDITS = (
     "https://creativecommons.org/licenses/by/4.0/\n"
     "Forecast data is reformatted for television display.\n"
     "This product uses the TMDB API but is not endorsed or certified by TMDB.\n"
-    "https://www.themoviedb.org"
+    "https://www.themoviedb.org\n"
+    "TVmaze — CC BY-SA 4.0\n"
+    "https://www.tvmaze.com/\n"
+    "https://creativecommons.org/licenses/by-sa/4.0/"
 )
 
 
@@ -556,8 +575,8 @@ def _about_text():
             PLUGIN_LICENSE_URL,
         ),
     )
-    sections = [notice, "\n".join(links)]
-    # Provider attribution text is kept verbatim to satisfy both providers'
+    sections = [notice, _("For live TV posters, programme titles may also be sent to TVmaze."), "\n".join(links)]
+    # Provider attribution text is kept verbatim to satisfy the providers'
     # public attribution requirements in every UI language.
     sections.append(PROVIDER_CREDITS)
     return "\n\n".join(sections)
@@ -790,6 +809,7 @@ WELCOME_FOOTER_ITEMS = (
     footer_item("up_down", "source_select", 1.1),
     footer_item("left_right", "action_select", 1.05),
     footer_item("ok", "confirm", 0.82),
+    footer_item("blue", "auto_login", 1.05),
     footer_item("menu", "settings", 0.9),
     footer_item("exit", "exit", 0.72),
 )
@@ -1083,6 +1103,7 @@ def _welcome_skin():
             font="Regular;{footer_font}" foregroundColor="#C8D2E3"
             transparent="1" zPosition="2"
             valign="center" halign="center" />
+    {auto_login_overlay}
 </screen>
 """.format(
         width=width,
@@ -1162,6 +1183,7 @@ def _welcome_skin():
         footer_w=px(1790),
         footer_h=py(110),
         footer_font=px(20),
+        auto_login_overlay=auto_login_overlay_skin(width, height),
     )
 
 
@@ -1812,148 +1834,10 @@ def _player_settings_skin():
     )
 
 
-def _appearance_settings_skin():
-    """List-themed appearance page with the shared selection color preview."""
-    width, height, px = _scale()
-    footer_y = height - px(86)
-    rows = []
-    for index in range(len(GTAppearanceSettingsScreen.LABELS)):
-        row_y = px(290 + (index * 92))
-        rows.append(
-            """
-    <widget name="row_bg_{index}" position="{row_x},{row_y}"
-            size="{row_w},{row_h}" font="Regular;1"
-            backgroundColor="#101B30" transparent="0" zPosition="2" />
-    <widget name="row_focus_{index}" position="{row_x},{row_y}"
-            size="{row_w},{row_h}" font="Regular;1"
-            backgroundColor="#17536A" transparent="0" zPosition="3" />
-    <widget name="row_marker_{index}" position="{row_x},{row_y}"
-            size="{marker_w},{row_h}" font="Regular;1"
-            backgroundColor="#16C9F4" transparent="0" zPosition="4" />
-    <widget name="row_label_{index}" position="{label_x},{row_y}"
-            size="{label_w},{row_h}" font="Regular;{row_font}"
-            foregroundColor="#FFFFFF" transparent="1" zPosition="5"
-            valign="center" halign="left" noWrap="1" />
-    <widget name="value_bg_{index}" position="{value_x},{value_y}"
-            size="{value_w},{value_h}" font="Regular;1"
-            backgroundColor="#091426" transparent="0" zPosition="4" />
-    <widget name="row_value_{index}" position="{text_x},{value_y}"
-            size="{text_w},{value_h}" font="Regular;{value_font}"
-            foregroundColor="#FFFFFF" transparent="1" zPosition="5"
-            valign="center" halign="center" noWrap="1" />""".format(
-                index=index,
-                row_x=px(105),
-                row_y=row_y,
-                row_w=px(1710),
-                row_h=px(72),
-                marker_w=px(8),
-                label_x=px(145),
-                label_w=px(880),
-                row_font=font_px(
-                    px, 25, max_height=72, vertical_padding=12
-                ),
-                value_x=px(1115),
-                value_y=row_y + px(8),
-                value_w=px(660),
-                value_h=px(56),
-                text_x=px(1260 if index >= 3 else 1115),
-                text_w=px(515 if index >= 3 else 660),
-                value_font=font_px(
-                    px, 24, max_height=56, vertical_padding=10
-                ),
-            )
-        )
-    return """
-<screen name="GTAppearanceSettingsScreen" position="0,0"
-        size="{width},{height}" flags="wfNoBorder"
-        backgroundColor="#050914">
-    <widget name="app_bg" position="0,0" size="{width},{height}"
-            zPosition="0" />
-    <widget name="top_accent" position="{border},{border}"
-            size="{accent_w},{accent_h}" font="Regular;1"
-            backgroundColor="#8638FF" transparent="0" zPosition="1" />
-    <widget name="header" position="{header_x},{header_y}"
-            size="{header_w},{header_h}" font="Regular;{title_font}"
-            foregroundColor="#FFFFFF" transparent="1" zPosition="2"
-            valign="center" halign="left" noWrap="1" />
-    <widget name="brand" position="{brand_x},{header_y}"
-            size="{brand_w},{header_h}" font="Regular;{brand_font}"
-            foregroundColor="#16C9F4" transparent="1" zPosition="2"
-            valign="center" halign="right" noWrap="1" />
-    <widget name="panel" position="{panel_x},{panel_y}"
-            size="{panel_w},{panel_h}" font="Regular;1"
-            backgroundColor="#07101F" transparent="0" zPosition="1" />
-    <widget name="section" position="{section_x},{section_y}"
-            size="{section_w},{section_h}" font="Regular;{section_font}"
-            foregroundColor="#FFFFFF" backgroundColor="#16AEE0"
-            transparent="0" zPosition="2" valign="center"
-            halign="center" noWrap="1" />
-    {rows}
-    <widget name="channel_color_swatch" position="{swatch_x},{swatch_y}"
-            size="{swatch_w},{swatch_h}" pixmap="{swatch_art}"
-            alphatest="blend" scale="1" zPosition="6" />
-    <widget name="selection_border_swatch"
-            position="{swatch_x},{border_swatch_y}"
-            size="{swatch_w},{swatch_h}" pixmap="{border_swatch_art}"
-            alphatest="blend" scale="1" zPosition="6" />
-    <widget name="message" position="{message_x},{message_y}"
-            size="{message_w},{message_h}" font="Regular;{message_font}"
-            foregroundColor="#16C9F4" transparent="1" zPosition="3"
-            valign="center" halign="left" noWrap="1" />
-    <widget name="footer" position="0,{footer_y}"
-            size="{width},{footer_h}" font="Regular;{footer_font}"
-            foregroundColor="#C8D2E3" backgroundColor="#080E1A"
-            transparent="0" zPosition="4" valign="center"
-            halign="center" />
-</screen>
-""".format(
-        width=width,
-        height=height,
-        border=px(14),
-        accent_w=width - px(28),
-        accent_h=px(3),
-        header_x=px(72),
-        header_y=px(35),
-        header_w=px(900),
-        header_h=px(75),
-        title_font=font_px(
-            px, 38, role="title", max_height=75, vertical_padding=10
-        ),
-        brand_x=px(1350),
-        brand_w=px(500),
-        brand_font=font_px(
-            px, 22, role="title", max_height=75, vertical_padding=10
-        ),
-        panel_x=px(70),
-        panel_y=px(120),
-        panel_w=px(1780),
-        panel_h=px(800),
-        section_x=px(100),
-        section_y=px(155),
-        section_w=px(1720),
-        section_h=px(78),
-        section_font=font_px(
-            px, 29, role="title", max_height=78, vertical_padding=14
-        ),
-        rows="".join(rows),
-        swatch_x=px(1130),
-        swatch_y=px(290 + 3 * 92 + 16),
-        border_swatch_y=px(290 + 4 * 92 + 16),
-        swatch_w=px(112),
-        swatch_h=px(40),
-        swatch_art=channel_highlight_art(DEFAULT_CHANNEL_HIGHLIGHT, "swatch"),
-        border_swatch_art=selection_border_art(DEFAULT_CHANNEL_HIGHLIGHT),
-        message_x=px(110),
-        message_y=px(835),
-        message_w=px(1690),
-        message_h=px(70),
-        message_font=font_px(
-            px, 21, max_height=70, vertical_padding=12
-        ),
-        footer_y=footer_y,
-        footer_h=height - footer_y,
-        footer_font=px(20),
-    )
+def _appearance_settings_skin(fill=DEFAULT_CHANNEL_HIGHLIGHT, border=None):
+    """Draw the approved glass page; words and values stay native and translated."""
+    width, height = _desktop_size()
+    return glass_appearance_skin(width, height, fill, border)
 
 
 def _accounts_skin():
@@ -4453,10 +4337,11 @@ class GTAppearanceSettingsScreen(Screen):
     }
     LABELS = (
         N_("Text size"),
-        N_("Cinematic view"),
+        N_("Movies and Series Cinematic View"),
         N_("Show in device main menu"),
         N_("Selection color"),
         N_("Selection border color"),
+        N_("Infobar auto-hide timeout"),
     )
 
     def __init__(
@@ -4467,9 +4352,15 @@ class GTAppearanceSettingsScreen(Screen):
         show_in_main_menu=True,
         channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT,
         selection_border=None,
+        infobar_timeout=DEFAULT_INFOBAR_TIMEOUT,
     ):
+        self._appearance_desktop = _desktop_size()
         self.skin = decorate_remote_footer(
-            prepared_skin(_appearance_settings_skin),
+            prepared_skin(
+                _appearance_settings_skin,
+                normalize_channel_highlight(channel_highlight),
+                normalize_selection_border(selection_border, channel_highlight),
+            ),
             APPEARANCE_FOOTER_ITEMS,
             skin_fonts_scaled=True,
         )
@@ -4477,6 +4368,7 @@ class GTAppearanceSettingsScreen(Screen):
         self.value = normalize_text_size(value)
         self.cinematic_view = bool(cinematic_view)
         self.show_in_main_menu = bool(show_in_main_menu)
+        self.infobar_timeout = normalize_infobar_timeout(infobar_timeout)
         self.channel_highlight = normalize_channel_highlight(channel_highlight)
         self.selection_border = normalize_selection_border(
             selection_border, self.channel_highlight
@@ -4487,17 +4379,18 @@ class GTAppearanceSettingsScreen(Screen):
         self["top_accent"] = Label("")
         self["header"] = Label(_("Appearance"))
         self["brand"] = Label("GT IPTV PLAYER PRO")
-        self["panel"] = Label("")
+        self["panel"] = appearance_pixmap(self, Pixmap)
+        self["section_glass"] = appearance_pixmap(self, Pixmap)
         self["section"] = Label(_("Appearance"))
         for index, label in enumerate(self.LABELS):
-            self["row_bg_{}".format(index)] = Label("")
-            self["row_focus_{}".format(index)] = Label("")
-            self["row_marker_{}".format(index)] = Label("")
+            self["row_bg_{}".format(index)] = appearance_pixmap(self, Pixmap)
+            self["row_focus_{}".format(index)] = appearance_pixmap(self, Pixmap)
+            self["row_marker_{}".format(index)] = appearance_pixmap(self, Pixmap)
             self["row_label_{}".format(index)] = Label(_(label))
-            self["value_bg_{}".format(index)] = Label("")
+            self["value_bg_{}".format(index)] = appearance_pixmap(self, Pixmap)
             self["row_value_{}".format(index)] = Label("")
-        self["channel_color_swatch"] = Pixmap()
-        self["selection_border_swatch"] = Pixmap()
+        self["channel_color_swatch"] = appearance_pixmap(self, Pixmap)
+        self["selection_border_swatch"] = appearance_pixmap(self, Pixmap)
         self["message"] = Label(_("Select"))
         self["footer"] = Label("")
         install_remote_footer(self, APPEARANCE_FOOTER_ITEMS)
@@ -4523,6 +4416,7 @@ class GTAppearanceSettingsScreen(Screen):
         self._refresh()
         self.onLayoutFinish.append(self._refresh_swatches)
         self.onLayoutFinish.append(self._preview_selection_palette)
+        self.onLayoutFinish.append(self._fit_appearance_labels)
         self.setTitle("{} - {}".format(_("Settings"), _("Appearance")))
 
     def _refresh_swatches(self):
@@ -4536,17 +4430,16 @@ class GTAppearanceSettingsScreen(Screen):
                 selection_border_art(self.selection_border),
             ),
         ):
-            instance = getattr(self[name], "instance", None)
-            if instance is not None:
-                try:
-                    instance.setPixmapFromFile(path)
-                except (AttributeError, IOError, OSError):
-                    pass
+            set_appearance_pixmap(self, self[name], path)
 
     def _preview_selection_palette(self):
-        refresh_screen_selection(
-            self, self.channel_highlight, self.selection_border
+        width, height = self._appearance_desktop
+        refresh_appearance_palette(
+            self, width, height, self.channel_highlight, self.selection_border
         )
+
+    def _fit_appearance_labels(self):
+        fit_appearance_text(self, *self._appearance_desktop)
 
     def _refresh(self):
         self["row_value_0"].setText(_(self.VALUE_LABELS[self.value]))
@@ -4568,6 +4461,14 @@ class GTAppearanceSettingsScreen(Screen):
                 len(CHANNEL_HIGHLIGHT_KEYS),
             )
         )
+        self["row_value_5"].setText(
+            _("{} s").format(self.infobar_timeout)
+            if self.infobar_timeout else _("Off")
+        )
+        self["message"].setText(
+            _("Off: keep the infobar visible until you press OK.")
+            if self.selected_index == 5 else _("Select")
+        )
         self._refresh_swatches()
         self._preview_selection_palette()
         for index in range(len(self.LABELS)):
@@ -4577,6 +4478,7 @@ class GTAppearanceSettingsScreen(Screen):
                     self[name.format(index)].show()
                 else:
                     self[name.format(index)].hide()
+        self._fit_appearance_labels()
 
     def move_up(self):
         self.selected_index = (
@@ -4605,6 +4507,11 @@ class GTAppearanceSettingsScreen(Screen):
             self.selection_border = CHANNEL_HIGHLIGHT_KEYS[
                 (index + int(step)) % len(CHANNEL_HIGHLIGHT_KEYS)
             ]
+        elif self.selected_index == 5:
+            index = INFOBAR_TIMEOUT_CHOICES.index(self.infobar_timeout)
+            self.infobar_timeout = INFOBAR_TIMEOUT_CHOICES[
+                (index + int(step)) % len(INFOBAR_TIMEOUT_CHOICES)
+            ]
         else:
             try:
                 index = self.VALUES.index(self.value)
@@ -4629,6 +4536,7 @@ class GTAppearanceSettingsScreen(Screen):
                 "show_in_main_menu": self.show_in_main_menu,
                 "channel_highlight": self.channel_highlight,
                 "selection_border": self.selection_border,
+                "infobar_timeout": self.infobar_timeout,
             }
         )
 
@@ -4698,6 +4606,7 @@ class GTPlayerSettingsScreen(Screen):
             self.settings = PlayerSettings.from_dict(loaded)
         else:
             self.settings = PlayerSettings()
+        self._settings_baseline = self.settings.copy()
         # Always expose every supported Enigma2/ServiceApp ID.  Older builds
         # may already have rewritten all three stored values to 4097, so using
         # those values or executable discovery to build this list would leave
@@ -4775,11 +4684,20 @@ class GTPlayerSettingsScreen(Screen):
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._refresh)
         self._refresh()
-        self.setTitle(_("Settings - Player / Codec"))
 
     def _refresh_device_language(self):
-        self["language_soon"].setText(device_language_label())
         self._refresh()
+
+    def _refresh_settings_language(self):
+        language = device_language()
+        if language == getattr(self, "_settings_language_code", None):
+            return
+        self["header"].setText(_("Settings"))
+        self["player_tab"].setText(_("Player / Codec"))
+        self["language_tab"].setText(_("LANGUAGE"))
+        self["language_soon"].setText(device_language_label())
+        self.setTitle(_("Settings - Player / Codec"))
+        self._settings_language_code = language
 
     def _metadata_signature(self):
         return (
@@ -4834,6 +4752,7 @@ class GTPlayerSettingsScreen(Screen):
         return str(value)
 
     def _refresh(self):
+        self._refresh_settings_language()
         if self.selected_index < self._settings_window:
             self._settings_window = self.selected_index
         elif self.selected_index >= self._settings_window + 9:
@@ -4961,7 +4880,7 @@ class GTPlayerSettingsScreen(Screen):
         # Capture edits visible on this page before creating either a full
         # backup or the automatic safety backup used by restoration.
         try:
-            saved = self.settings_saver(self.settings)
+            saved = self._save_settings_draft()
         except Exception:
             saved = False
         if not saved:
@@ -4974,6 +4893,7 @@ class GTPlayerSettingsScreen(Screen):
         try:
             loaded = self.settings_loader()
             self.settings = loaded.copy() if isinstance(loaded, PlayerSettings) else PlayerSettings.from_dict(loaded)
+            self._settings_baseline = self.settings.copy()
             self._category_lock_status = self.category_lock_store.status()
         except Exception:
             pass
@@ -5002,6 +4922,26 @@ class GTPlayerSettingsScreen(Screen):
                 setattr(self.settings, field, getattr(shared, field))
         except Exception:
             return
+
+    def _save_settings_draft(self):
+        """Merge explicit edits into current settings; edited fields win."""
+        self._refresh_youtube_settings()
+        current = self.settings_loader()
+        if isinstance(current, dict):
+            current = PlayerSettings.from_dict(current)
+        if not isinstance(current, PlayerSettings):
+            return False
+        baseline = getattr(self, "_settings_baseline", None)
+        original = baseline.as_dict() if isinstance(baseline, PlayerSettings) else {}
+        merged = current.copy()
+        for field, value in self.settings.as_dict().items():
+            if field not in original or value != original[field]:
+                setattr(merged, field, value)
+        result = self.settings_saver(merged)
+        if result is not False:
+            self.settings = merged
+            self._settings_baseline = merged.copy()
+        return result
 
     def _open_category_code(
         self,
@@ -5244,6 +5184,9 @@ class GTPlayerSettingsScreen(Screen):
         selection_border = normalize_selection_border(
             getattr(self.settings, "selection_border", None), channel_highlight
         )
+        infobar_timeout = normalize_infobar_timeout(
+            getattr(self.settings, "infobar_timeout", DEFAULT_INFOBAR_TIMEOUT)
+        )
         opener = getattr(self.session, "openWithCallback", None)
         if callable(opener):
             opener(
@@ -5254,6 +5197,7 @@ class GTPlayerSettingsScreen(Screen):
                 show_in_main_menu,
                 channel_highlight,
                 selection_border,
+                infobar_timeout,
             )
         else:
             self.session.open(
@@ -5263,6 +5207,7 @@ class GTPlayerSettingsScreen(Screen):
                 show_in_main_menu,
                 channel_highlight,
                 selection_border,
+                infobar_timeout,
             )
 
     def open_playlist_files(self):
@@ -5289,6 +5234,9 @@ class GTPlayerSettingsScreen(Screen):
         selection_border = getattr(
             self.settings, "selection_border", channel_highlight
         )
+        infobar_timeout = getattr(
+            self.settings, "infobar_timeout", DEFAULT_INFOBAR_TIMEOUT
+        )
         if isinstance(value, dict):
             text_size = value.get("ui_text_size", self.settings.ui_text_size)
             cinematic_view = value.get(
@@ -5304,6 +5252,7 @@ class GTPlayerSettingsScreen(Screen):
             selection_border = value.get(
                 "selection_border", selection_border
             )
+            infobar_timeout = value.get("infobar_timeout", infobar_timeout)
         elif isinstance(value, (tuple, list)) and len(value) >= 2:
             text_size, cinematic_view = value[:2]
         else:
@@ -5317,6 +5266,7 @@ class GTPlayerSettingsScreen(Screen):
         self.settings.ui_text_size = normalize_text_size(text_size)
         self.settings.cinematic_view = bool(cinematic_view)
         self.settings.show_in_main_menu = bool(show_in_main_menu)
+        self.settings.infobar_timeout = normalize_infobar_timeout(infobar_timeout)
         self.settings.channel_highlight = normalize_channel_highlight(
             channel_highlight
         )
@@ -5461,8 +5411,7 @@ class GTPlayerSettingsScreen(Screen):
 
     def save(self):
         try:
-            self._refresh_youtube_settings()
-            result = self.settings_saver(self.settings)
+            result = self._save_settings_draft()
         except Exception:
             result = False
         if result is False:
@@ -5493,6 +5442,7 @@ class _DirectAccountConnection(object):
         on_success=None,
         on_failure=None,
         on_return=None,
+        automatic=False,
     ):
         self.session = session
         self.account = account
@@ -5501,6 +5451,7 @@ class _DirectAccountConnection(object):
         self.on_success = on_success
         self.on_failure = on_failure
         self.on_return = on_return
+        self.automatic = bool(automatic)
         self._checking = False
         self._closed = False
         self._result = None
@@ -5537,7 +5488,12 @@ class _DirectAccountConnection(object):
         try:
             if job is not None:
                 job.check()
-            result = self.checker(self.account)
+            if self.checker is check_source_health and job is not None:
+                result = self.checker(
+                    self.account, cancel_event=job.cancel_event,
+                )
+            else:
+                result = self.checker(self.account)
         except Exception:
             result = ServerHealth(
                 "ERROR",
@@ -5554,6 +5510,7 @@ class _DirectAccountConnection(object):
         if not self._result_ready:
             if self._job is not None and self._job.expired():
                 self._checking = False
+                _cancel_ui_job(self._job)
                 self._job = None
                 result = ServerHealth(
                     "ERROR",
@@ -5567,10 +5524,17 @@ class _DirectAccountConnection(object):
         self._checking = False
         self._job = None
         result = self._result
-        if result.status in ("ONLINE", "BUSY", "STALE"):
+        accepted = ("ONLINE",) if self.automatic else ("ONLINE", "BUSY", "STALE")
+        if result.status in accepted:
             if self.on_success is not None:
                 self.on_success(self.account, result)
-            self._open_dashboard(result)
+            try:
+                self._open_dashboard(result)
+            except Exception:
+                if self.on_failure is not None:
+                    self.on_failure(self.account, ServerHealth(
+                        "ERROR", detail=N_("Could not open the content list."),
+                    ))
             return
         if self.on_failure is not None:
             self.on_failure(self.account, result)
@@ -6343,11 +6307,23 @@ class GTAccountsScreen(Screen):
             return []
         return self.load_result.accounts
 
-    def reload_accounts(self):
-        try:
-            self.load_result = self.account_loader()
-        except Exception as error:
-            self.load_result = PlaylistLoadResult([], [], str(error))
+    def reload_accounts(self, *args):
+        self._sources_loading = True
+        reader = getattr(self, "_sources_reader", None)
+        if reader is None:
+            reader = self._sources_reader = SourceLoader(eTimer(), _connect_timer, self._apply_accounts_reload)
+            self.onClose.append(reader.close)
+        self._refresh()
+        reader.request(self.account_loader)
+
+    def _apply_accounts_reload(self, result, error=None):
+        self._sources_loading = False
+        if error is not None:
+            if self.load_result is None:
+                self.load_result = PlaylistLoadResult([], [], str(error))
+            self._refresh()
+            return
+        self.load_result = result
         if self.selected_index >= len(self.accounts):
             self.selected_index = max(0, len(self.accounts) - 1)
         fingerprints = {
@@ -6391,6 +6367,9 @@ class GTAccountsScreen(Screen):
         return removed
 
     def _arm_automatic_test(self):
+        if getattr(self, "_sources_loading", False):
+            self._account_screen_shown = True
+            return
         """Defer the child dialog until this account screen is fully modal."""
         self._account_screen_shown = True
         if (
@@ -6551,7 +6530,9 @@ class GTAccountsScreen(Screen):
             )
         )
         if not count:
-            empty_text = _(
+            loading = bool(getattr(self, "_sources_loading", False))
+            source_error = getattr(self.load_result, "error", "") or ""
+            empty_text = _("Please wait") if loading else _(
                 "No source was found.\n\n"
                 "Create one from the ADD SOURCE panel on the home screen."
             )
@@ -6582,7 +6563,7 @@ class GTAccountsScreen(Screen):
             _set_signal_label(
                 self,
                 "selected_status",
-                localized_upper(_("Add Source")),
+                localized_upper(_("Please wait") if loading else _("Add Source")),
                 HEALTH_SIGNAL_NEUTRAL,
                 fallback_chars=25,
             )
@@ -6601,12 +6582,12 @@ class GTAccountsScreen(Screen):
                 fallback_chars=30,
             )
             self["detail_action"].setText(
-                localized_upper(_("Add Source"))
+                localized_upper(_("Please wait") if loading else _("Add Source"))
             )
             ellipsize_dynamic_text(
                 self["message"],
-                clean_dynamic_text(_(self.load_result.error))
-                if self.load_result.error else empty_text.splitlines()[0],
+                clean_dynamic_text(_(source_error))
+                if source_error and not loading else empty_text.splitlines()[0],
                 fallback_chars=90,
             )
             hide_scrollbar(self, "account_scroll")
@@ -7055,7 +7036,10 @@ class GTAccountsScreen(Screen):
 
     def connect_selected(self):
         if not self.accounts:
-            self["message"].setText(_("No source is available to connect."))
+            self["message"].setText(
+                _("Please wait") if getattr(self, "_sources_loading", False)
+                else _("No source is available to connect.")
+            )
             return
         if self._direct_connector is not None and self._direct_connector.active:
             self["message"].setText(_("A source connection is already in progress."))
@@ -10030,6 +10014,13 @@ class GTIPTVPlayerProScreen(Screen):
         self.selected_action = 0
         self._direct_connector = None
         self._child_screen_open = False
+        self._auto_login_source = ""
+        self._auto_login_attempted = False
+        self._auto_login_connecting = False
+        self._auto_login_timer = eTimer()
+        _connect_timer(self._auto_login_timer, self._begin_auto_login)
+        self._auto_login_spinner_timer = eTimer()
+        _connect_timer(self._auto_login_spinner_timer, self._animate_auto_login)
         self._account_preview_closed = False
         self._account_preview_generation = 0
         self._account_preview_job = None
@@ -10089,6 +10080,7 @@ class GTIPTVPlayerProScreen(Screen):
             self["focus_{}".format(index)] = Pixmap()
         self["hint"] = Label("")
         self["footer"] = Label("")
+        install_auto_login_overlay(self, desktop_width, desktop_height)
         install_remote_footer(self, WELCOME_FOOTER_ITEMS)
         self["actions"] = ActionMap(
             [
@@ -10107,22 +10099,120 @@ class GTIPTVPlayerProScreen(Screen):
                 "up": self.previous_account,
                 "down": self.next_account,
                 "green": self.open_accounts,
-                "blue": self.connect_selected,
+                "blue": self.toggle_auto_login,
                 "menu": self.open_settings,
                 "red": self.close,
             },
             -1,
         )
+        self["auto_login_actions"] = ActionMap(
+            ["OkCancelActions", "WizardActions"],
+            {"cancel": self.cancel_auto_login, "back": self.cancel_auto_login},
+            -2,
+        )
+        self["auto_login_actions"].setEnabled(False)
         self.reload_accounts()
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._cover_live_video)
             self.onLayoutFinish.append(self._refresh)
             self.onLayoutFinish.append(self._prefetch_weather)
+            self.onLayoutFinish.append(self._prepare_auto_login_overlay)
+        if hasattr(self, "onShown"):
+            self.onShown.append(self._schedule_auto_login)
         if hasattr(self, "onClose"):
+            self.onClose.append(self._stop_auto_login)
             self.onClose.append(self._stop_direct_connection)
             self.onClose.append(self._stop_account_preview)
             self.onClose.append(self._dvb_background_guard.restore)
         self.setTitle("{} v{}".format(PLUGIN_NAME, PLUGIN_VERSION))
+
+    def _prepare_auto_login_overlay(self):
+        # Labels stay native/gettext widgets at every OSD resolution.
+        account = automatic_account(self.accounts, self._auto_login_source)
+        name = _source_list_labels(account)[0] if account is not None else ""
+        show_auto_login_overlay(self, self._auto_login_connecting, name)
+
+    def _schedule_auto_login(self):
+        self._sources_shown = True
+        if getattr(self, "_sources_loading", False):
+            return
+        if self._account_preview_closed or self._auto_login_attempted:
+            return
+        self._auto_login_attempted = True
+        if self._auto_login_source:
+            self._cancel_account_preview()
+            # Defer until the welcome screen and its artwork have been drawn.
+            self._auto_login_timer.start(80, True)
+
+    def _begin_auto_login(self):
+        if self._account_preview_closed or self._child_screen_open:
+            return
+        if self._direct_connector is not None and self._direct_connector.active:
+            return
+        account = automatic_account(self.accounts, self._auto_login_source)
+        if account is None:
+            self._schedule_account_preview_check()
+            return
+        self.selected_account_index = self.accounts.index(account)
+        self.selected_action = 0
+        self._refresh()
+        self._start_connection(account, automatic=True)
+
+    def _set_auto_login_connecting(self, visible, account=None):
+        self._auto_login_connecting = bool(visible)
+        name = _source_list_labels(account)[0] if account is not None else ""
+        show_auto_login_overlay(self, visible, name)
+        self._set_remote_actions_enabled(not visible)
+        self["auto_login_actions"].setEnabled(bool(visible))
+        self._auto_login_spinner_timer.stop()
+        if visible:
+            self._auto_login_spinner_timer.start(90, True)
+
+    def _animate_auto_login(self):
+        if not self._auto_login_connecting or self._account_preview_closed:
+            return
+        advance_auto_login_spinner(self)
+        self._auto_login_spinner_timer.start(90, True)
+
+    def cancel_auto_login(self):
+        if not self._auto_login_connecting:
+            return
+        self._stop_direct_connection()
+        self._set_auto_login_connecting(False)
+        self._refresh()
+        self._schedule_account_preview_check()
+
+    def _stop_auto_login(self):
+        self._auto_login_timer.stop()
+        self._auto_login_spinner_timer.stop()
+        self._auto_login_connecting = False
+
+    def toggle_auto_login(self):
+        if not self.accounts or self._child_screen_open or self._auto_login_connecting:
+            return
+        if self._direct_connector is not None and self._direct_connector.active:
+            self["hint"].setText(_("A source connection is already in progress."))
+            return
+        self._auto_login_timer.stop()
+        self._auto_login_attempted = True
+        account = self.accounts[self.selected_account_index]
+        status, key, owner = toggle_auto_login_selection(account, self.accounts)
+        if status == "conflict":
+            message = _(
+                "Automatic login is already enabled for {}. Disable it for that account first."
+            ).format(_source_list_labels(owner)[0])
+            self._open_child_screen(MessageBox, None, message, MessageBox.TYPE_INFO)
+            return
+        if status == "error":
+            self["hint"].setText(_("Settings could not be saved. Check the receiver storage."))
+            return
+        self._auto_login_source = key
+        self._refresh()
+        message = (
+            _("Automatic login enabled for {}.") if status == "enabled"
+            else _("Automatic login disabled for {}.")
+        ).format(_source_list_labels(account)[0])
+        ellipsize_dynamic_text(self["hint"], message, fallback_chars=94)
 
     def _prefetch_weather(self):
         # OpenPLi dispatches bound methods here; plain functions are passed
@@ -10140,10 +10230,25 @@ class GTIPTVPlayerProScreen(Screen):
         return self.load_result.accounts
 
     def reload_accounts(self, *args):
+        self._sources_loading = True
+        reader = getattr(self, "_sources_reader", None)
+        if reader is None:
+            reader = self._sources_reader = SourceLoader(eTimer(), _connect_timer, self._apply_accounts_reload)
+            self.onClose.append(reader.close)
         self._cancel_account_preview()
         self._account_preview_cache.clear()
-        self.load_result = self.account_loader()
-        settings = load_player_settings()
+        self._refresh()
+        reader.request(lambda: (self.account_loader(), load_player_settings()))
+
+    def _apply_accounts_reload(self, result, error=None):
+        self._sources_loading = False
+        if error is not None:
+            if self.load_result is None:
+                self.load_result = PlaylistLoadResult([], [], str(error))
+            self._refresh()
+            return
+        self.load_result, settings = result
+        self._auto_login_source = settings.auto_login_source
         refresh_screen_selection(
             self, settings.channel_highlight,
             getattr(settings, "selection_border", None),
@@ -10152,6 +10257,10 @@ class GTIPTVPlayerProScreen(Screen):
             self.selected_account_index = max(0, len(self.accounts) - 1)
         self._refresh()
         self._schedule_account_preview_check()
+
+        self._prepare_auto_login_overlay()
+        if getattr(self, "_sources_shown", False):
+            self._schedule_auto_login()
 
     def _refresh(self):
         count = len(self.accounts)
@@ -10174,7 +10283,10 @@ class GTIPTVPlayerProScreen(Screen):
                 )
                 account_label = "{}\n{}".format(account_label, endpoint)
             account_widget.setText(account_label)
-            self["account_status"].setText(_("Ready to connect"))
+            automatic = bool(self._auto_login_source) and source_identity_key(account) == self._auto_login_source
+            self["account_status"].setText(
+                _("Automatic login: On") if automatic else _("Ready to connect")
+            )
             cached = self._account_preview_cache.get(id(account))
             if cached is not None:
                 self._show_account_preview(cached)
@@ -10492,6 +10604,8 @@ class GTIPTVPlayerProScreen(Screen):
         self.open_add_source()
 
     def connect_selected(self):
+        self._auto_login_timer.stop()
+        self._auto_login_attempted = True
         if not self.accounts:
             self.open_accounts()
             return
@@ -10501,19 +10615,28 @@ class GTIPTVPlayerProScreen(Screen):
         account = self.accounts[self.selected_account_index]
         self._start_connection(account)
 
-    def _start_connection(self, account):
+    def _start_connection(self, account, automatic=False):
         self._cancel_account_preview()
         self._stop_direct_connection()
-        self._direct_connector = _DirectAccountConnection(
-            self.session,
-            account,
-            checker=self.account_checker,
-            on_started=self._connection_started,
-            on_success=self._connection_succeeded,
-            on_failure=self._connection_failed,
-            on_return=self.reload_accounts,
-        )
-        self._direct_connector.start()
+        if automatic:
+            self._set_auto_login_connecting(True, account)
+        try:
+            self._direct_connector = _DirectAccountConnection(
+                self.session,
+                account,
+                checker=self.account_checker,
+                on_started=self._connection_started,
+                on_success=self._connection_succeeded,
+                on_failure=self._connection_failed,
+                on_return=self.reload_accounts,
+                automatic=automatic,
+            )
+            self._direct_connector.start()
+        except Exception:
+            self._stop_direct_connection()
+            self._connection_failed(account, ServerHealth(
+                "ERROR", detail=N_("The health check could not be completed."),
+            ))
 
     def _connection_started(self, account):
         self["account_status"].setText(_("CONNECTING..."))
@@ -10527,6 +10650,8 @@ class GTIPTVPlayerProScreen(Screen):
 
     def _connection_succeeded(self, account, result):
         del result
+        if self._auto_login_connecting:
+            self._set_auto_login_connecting(False)
         self["account_status"].setText(_("CONNECTED"))
         ellipsize_dynamic_text(
             self["hint"],
@@ -10537,6 +10662,8 @@ class GTIPTVPlayerProScreen(Screen):
         )
 
     def _connection_failed(self, account, result):
+        if self._auto_login_connecting:
+            self._set_auto_login_connecting(False)
         ellipsize_dynamic_text(
             self["account_status"],
             _localized_runtime_text(result.status),
@@ -10559,12 +10686,14 @@ class GTIPTVPlayerProScreen(Screen):
         action_map = self["actions"]
         set_enabled = getattr(action_map, "setEnabled", None)
         if set_enabled is not None:
-            set_enabled(enabled)
+            set_enabled(bool(enabled) and not self._auto_login_connecting)
 
     def _begin_child_screen(self):
         if self._child_screen_open:
             self["hint"].setText(_("Close the open screen before opening another one."))
             return False
+        self._auto_login_timer.stop()
+        self._auto_login_attempted = True
         self._child_screen_open = True
         self._set_remote_actions_enabled(False)
         return True

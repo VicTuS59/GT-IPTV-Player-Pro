@@ -285,6 +285,7 @@ WEB_MESSAGES = {
     "subssupport_required": "Install SubsSupport or SubsSupport Pro to load external subtitles.",
     "subtitle_load_failed": "The receiver could not load this subtitle.",
     "subtitle_cache_unavailable": "The receiver could not load this subtitle.",
+    "subtitle_download_folder_unavailable": "Subtitle download folder is unavailable. Choose another folder.",
     "provider_login_required": "Enter the username / Enter the password",
     "independent_subtitles_disabled": "Independent subtitles are turned off in settings.",
     "subtitle_not_found": "Search again; this result has expired.",
@@ -406,7 +407,6 @@ OVERRIDES = {
         "source_saved": "Kaynak kaydedildi",
         "source_deleted": "Kaynak silindi",
         "request_failed": "İşlem başarısız oldu",
-        "confirm_delete": "Bu kaynak silinsin mi?",
         "menu": "Menü",
         "subtitle_search": "Altyazı Bul",
         "audio_languages": "Ses dilleri",
@@ -530,7 +530,6 @@ OVERRIDES = {
         "source_saved": "Quelle gespeichert",
         "source_deleted": "Quelle gelöscht",
         "request_failed": "Vorgang fehlgeschlagen",
-        "confirm_delete": "Diese Quelle löschen?",
         "menu": "Menü",
         "subtitle_search": "Untertitel finden",
         "subtitle_providers": "Untertitelquellen",
@@ -714,19 +713,126 @@ INDEPENDENT_SUBTITLES_DISABLED_LABELS = {
     "ta": "அமைப்புகளில் தனித்த வசன வரிகள் முடக்கப்பட்டுள்ளன.",
 }
 
+# First-party errors reachable from M3U/portal health checks and their expiry
+# fallback labels. Keep this allowlist separate from provider and user data.
+HEALTH_DETAIL_MESSAGES = (
+    "An HTTPS M3U request cannot be redirected to HTTP.",
+    "Compressed M3U responses are not accepted.",
+    "Content type unavailable",
+    "Could not load the M3U source.",
+    "Invalid Stalker / MAC account",
+    "Invalid portal response",
+    "M3U file changed while it was being read.",
+    "M3U file could not be opened.",
+    "M3U file is outside the allowed directories.",
+    "M3U file path is invalid.",
+    "M3U file path traversal is not allowed.",
+    "M3U host address is invalid.",
+    "M3U host address is not allowed.",
+    "M3U host name could not be resolved.",
+    "M3U host name resolution is busy.",
+    "M3U host resolved to an unsafe address set.",
+    "M3U redirect URL is invalid.",
+    "M3U redirect URL is missing.",
+    "M3U redirect changed the network scope.",
+    "M3U redirection could not be completed.",
+    "M3U request was redirected too many times.",
+    "M3U response has conflicting size information.",
+    "M3U response headers are invalid.",
+    "M3U response size is invalid.",
+    "M3U server returned HTTP {}.",
+    "M3U source contains a line that is too long.",
+    "M3U source contains invalid data.",
+    "M3U source contains too many categories.",
+    "M3U source contains too many channels.",
+    "M3U source does not contain playable channels.",
+    "M3U source exceeds the safe size limit.",
+    "M3U source header is missing.",
+    "M3U source must be a regular file.",
+    "M3U source returned an invalid response.",
+    "Portal HTTP request failed",
+    "Portal access denied",
+    "Portal authentication failed",
+    "Portal is unavailable",
+    "Portal request cancelled",
+    "Portal request failed",
+    "Portal request limit reached",
+    "Portal request timed out",
+    "Portal response is too large",
+    "Request cancelled",
+    "Request timed out",
+    "Symbolic links cannot be used as M3U sources.",
+    "The selected file is an HLS stream manifest, not a channel list.",
+    "Server does not report expiry",
+    "Unlimited",
+)
+
 # Source status details can arrive as source text or in the receiver's language.
 # Browser choices must localize those details without changing the TV language.
 RUNTIME_MESSAGES = (
-    "API response is invalid", "Server did not validate the account",
-    "Connection limit reached", "API connection successful",
-    "API response is too large", "Server denied access",
-    "Server request limit reached", "Could not connect to the server",
-    "Request cancelled", "M3U catalogue loaded from cache.",
-    "M3U source is accessible.", "The source is unavailable; a stale cache is in use.",
-    "The M3U source could not be checked.", "Portal connection successful",
-    "The health check could not be completed.", "Account status: {}",
-    "Server returned HTTP {}", "Unknown", "Never / unknown",
-    "Active", "Invalid", "Disabled", "Expired",
+    "API response is invalid",
+    "Server did not validate the account",
+    "Connection limit reached",
+    "API connection successful",
+    "API response is too large",
+    "Server denied access",
+    "Server request limit reached",
+    "Could not connect to the server",
+    "M3U catalogue loaded from cache.",
+    "M3U source is accessible.",
+    "The source is unavailable; a stale cache is in use.",
+    "The M3U source could not be checked.",
+    "Portal connection successful",
+    "The health check could not be completed.",
+    "Account status: {}",
+    "Server returned HTTP {}",
+    "Unknown",
+    "Never / unknown",
+    "Active",
+    "Invalid",
+    "Disabled",
+    "Expired",
+) + HEALTH_DETAIL_MESSAGES
+
+# The API carries only exact, first-party validation messages through this
+# bridge. Never render arbitrary backend/provider text from an error response.
+SOURCE_VALIDATION_MESSAGES = (
+    "Enter a valid Xtream URL",
+    "The Xtream account limit was reached",
+    "Playlist file is too large",
+    "Server URL, username and password are required",
+    "Output format must be TS or M3U8",
+    "Server URL must start with http:// or https://",
+    "The account selected for deletion is invalid",
+    "The selected account was not found in the account files",
+    "The selected M3U source was not found",
+    "Enter a valid server URL",
+    "Do not include a username or password in the server URL",
+    "Server URL port is invalid",
+    "M3U source file version is not supported.",
+    "M3U source file is invalid.",
+    "M3U source is invalid.",
+    "M3U source file is too large.",
+    "M3U URL is invalid.",
+    "M3U URL is not safe.",
+    "M3U URL port is invalid.",
+    "M3U source ID is invalid.",
+    "M3U source location is invalid.",
+    "M3U host name is invalid.",
+    "M3U source type is invalid.",
+    "M3U file path is invalid.",
+    "Too many M3U sources are configured.",
+    "Enter a valid MAC address",
+    "Enter a valid portal URL",
+    "Portal URL must start with http:// or https://",
+    "Portal URL port is invalid",
+    "Do not include a query or fragment in the portal URL",
+    "The Stalker account file is too large",
+    "This Stalker / MAC account already exists",
+    "The Stalker / MAC account limit was reached",
+    "Invalid Stalker / MAC account",
+    "The Stalker account file was not found",
+    "The Stalker / MAC account was not found",
 )
 
 
@@ -753,11 +859,17 @@ def web_catalog(requested_language):
         runtime_texts[message] = translated
         runtime_texts[translate_for_language(message, receiver_language)] = translated
     runtime_texts["The source could not be checked."] = strings["request_failed"]
+    validation_texts = {}
+    for message in SOURCE_VALIDATION_MESSAGES:
+        translated = translate_for_language(message, code)
+        validation_texts[message] = translated
+        validation_texts[translate_for_language(message, receiver_language)] = translated
     return {
         "language": code,
         "direction": "rtl" if code in RTL_LANGUAGES else "ltr",
         "strings": strings,
         "runtime_texts": runtime_texts,
+        "validation_texts": validation_texts,
         "languages": [
             {"code": item_code, "name": name}
             for item_code, name in supported_language_names()

@@ -5,6 +5,9 @@
 import json
 import os
 import shutil
+from copy import deepcopy
+
+from .persistence import guarded_mutation
 
 from .youtube_options import YOUTUBE_QUALITIES, DEFAULT_YOUTUBE_QUALITY
 
@@ -35,6 +38,8 @@ except ImportError:  # Allow settings migration outside a running Enigma2 GUI.
 
 DEFAULT_SETTINGS_PATH = "/etc/enigma2/gtiptvplayerpro-settings.json"
 TEXT_SIZE_CHOICES = ("standard", "large", "very_large")
+DEFAULT_INFOBAR_TIMEOUT = 4
+INFOBAR_TIMEOUT_CHOICES = tuple(range(11))  # Zero disables automatic hiding.
 SUPPORTED_SERVICE_TYPES = (1, 4097, 5001, 5002)
 SERVICE_ENGINE_EXECUTABLES = {
     5001: ("/usr/bin/gstplayer2", "/usr/bin/gstplayer", "/usr/bin/gstplayer_gst-1.0"),
@@ -42,6 +47,17 @@ SERVICE_ENGINE_EXECUTABLES = {
 }
 SERVICEAPP_REPLACE_MARKER = "/etc/enigma2/serviceapp_replaceservicemp3"
 _CONFIG_SECTION = [None]
+_NATIVE_RESTORE_PENDING = False
+
+
+def defer_native_restore():
+    global _NATIVE_RESTORE_PENDING
+    _NATIVE_RESTORE_PENDING = True
+
+
+def complete_native_restore():
+    global _NATIVE_RESTORE_PENDING
+    _NATIVE_RESTORE_PENDING = False
 
 
 def _player_config():
@@ -104,6 +120,8 @@ def _player_config():
         section.show_in_main_menu = ConfigYesNo(default=True)
     if not hasattr(section, "dashboard_order"):
         section.dashboard_order = ConfigText(default="", fixed_size=False)
+    if not hasattr(section, "auto_login_source"):
+        section.auto_login_source = ConfigText(default="", fixed_size=False)
     if not hasattr(section, "backup_folder"):
         section.backup_folder = ConfigText(default="/media/hdd", fixed_size=False)
     if not hasattr(section, "restore_folder"):
@@ -123,6 +141,11 @@ def _player_config():
         section.ui_text_size = ConfigSelection(
             default="standard",
             choices=list(TEXT_SIZE_CHOICES),
+        )
+    if not hasattr(section, "infobar_timeout"):
+        section.infobar_timeout = ConfigSelection(
+            default=str(DEFAULT_INFOBAR_TIMEOUT),
+            choices=[str(value) for value in INFOBAR_TIMEOUT_CHOICES],
         )
     if not hasattr(section, "channel_highlight"):
         section.channel_highlight = ConfigSelection(
@@ -188,8 +211,11 @@ def load_dashboard_order(default_order):
     return normalize_dashboard_order(value, default_order)
 
 
+@guarded_mutation
 def save_dashboard_order(order, default_order):
     """Save only the menu order, retaining the previous value on failure."""
+    if _NATIVE_RESTORE_PENDING:
+        return False
     try:
         section = _player_config()
         if section is None:
@@ -220,14 +246,20 @@ def set_config_value(element, value):
     _set_config_value(element, value)
 
 
+@guarded_mutation
 def save_plugin_config(section):
     """Persist a plugin subsection and the global Enigma2 config file."""
+    if _NATIVE_RESTORE_PENDING:
+        return False
+    snapshot = _native_snapshot(section)
     try:
+        if configfile is None:
+            return False
         section.save()
-        if configfile is not None:
-            configfile.save()
+        configfile.save()
         return True
     except (AttributeError, IOError, OSError, TypeError, ValueError):
+        _restore_native_snapshot(snapshot)
         return False
 
 
@@ -351,6 +383,17 @@ def normalize_text_size(value):
     return value if value in TEXT_SIZE_CHOICES else "standard"
 
 
+def normalize_infobar_timeout(value):
+    """Return whole seconds; preserve zero as the explicit always-visible choice."""
+    return _choice(value, INFOBAR_TIMEOUT_CHOICES, DEFAULT_INFOBAR_TIMEOUT)
+
+
+def normalize_auto_login_source(value):
+    """Accept only an account identity digest, never account credentials."""
+    value = str(value or "").strip().lower()
+    return value if len(value) == 64 and all(c in "0123456789abcdef" for c in value) else ""
+
+
 class PlayerSettings(object):
     """Persistent player preferences with conservative receiver defaults."""
 
@@ -372,6 +415,8 @@ class PlayerSettings(object):
         channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT,
         selection_border=None,
         youtube_autoplay=False,
+        auto_login_source="",
+        infobar_timeout=DEFAULT_INFOBAR_TIMEOUT,
     ):
         self.live_service_type = supported_service_type(
             live_service_type, 4097
@@ -386,6 +431,7 @@ class PlayerSettings(object):
         self.tmdb_api_key = str(tmdb_api_key or "").strip()[:512]
         self.youtube_resolution = str(youtube_resolution) if str(youtube_resolution) in YOUTUBE_QUALITIES else DEFAULT_YOUTUBE_QUALITY
         self.youtube_autoplay = bool(youtube_autoplay)
+        self.auto_login_source = normalize_auto_login_source(auto_login_source)
         # Legacy mode/audio values remain readable for upgrades, but YouTube
         # now uses automatic native playback and prefers the original audio.
         self.youtube_stream_mode = "auto"
@@ -393,6 +439,7 @@ class PlayerSettings(object):
         self.youtube_audio_preference = "original"
         self.youtube_search_language = str(youtube_search_language) if str(youtube_search_language) in ("tr", "en", "de", "fr", "es", "ar") else "tr"
         self.ui_text_size = normalize_text_size(ui_text_size)
+        self.infobar_timeout = normalize_infobar_timeout(infobar_timeout)
         self.cinematic_view = bool(cinematic_view)
         self.show_in_main_menu = bool(show_in_main_menu)
         self.channel_highlight = normalize_channel_highlight(channel_highlight)
@@ -411,6 +458,8 @@ class PlayerSettings(object):
             tmdb_api_key=payload.get("tmdb_api_key", ""),
             youtube_resolution=payload.get("youtube_resolution", DEFAULT_YOUTUBE_QUALITY),
             youtube_autoplay=payload.get("youtube_autoplay", False),
+            auto_login_source=payload.get("auto_login_source", ""),
+            infobar_timeout=payload.get("infobar_timeout", DEFAULT_INFOBAR_TIMEOUT),
             youtube_dash=payload.get("youtube_dash", True),
             youtube_search_language=payload.get("youtube_search_language", "tr"),
             youtube_stream_mode=payload.get("youtube_stream_mode"),
@@ -441,11 +490,13 @@ class PlayerSettings(object):
             "tmdb_api_key": self.tmdb_api_key,
             "youtube_resolution": self.youtube_resolution,
             "youtube_autoplay": self.youtube_autoplay,
+            "auto_login_source": self.auto_login_source,
             "youtube_dash": self.youtube_dash,
             "youtube_search_language": self.youtube_search_language,
             "youtube_stream_mode": self.youtube_stream_mode,
             "youtube_audio_preference": self.youtube_audio_preference,
             "ui_text_size": self.ui_text_size,
+            "infobar_timeout": self.infobar_timeout,
             "cinematic_view": self.cinematic_view,
             "show_in_main_menu": self.show_in_main_menu,
             "channel_highlight": self.channel_highlight,
@@ -472,6 +523,7 @@ def _read_json_settings(path):
     return payload if isinstance(payload, dict) else {}
 
 
+@guarded_mutation
 def _write_json_settings(settings, path):
     if not isinstance(settings, PlayerSettings):
         settings = PlayerSettings.from_dict(settings)
@@ -493,7 +545,7 @@ def _write_json_settings(settings, path):
             handle.flush()
             try:
                 os.fsync(handle.fileno())
-            except (AttributeError, OSError):
+            except AttributeError:
                 pass
         try:
             os.chmod(temporary, 0o600)
@@ -537,6 +589,7 @@ def _settings_from_config(section):
         tmdb_api_key=section.tmdb_api_key.value,
         youtube_resolution=section.youtube_resolution.value,
         youtube_autoplay=section.youtube_autoplay.value,
+        auto_login_source=getattr(getattr(section, "auto_login_source", None), "value", ""),
         youtube_dash=section.youtube_dash.value,
         youtube_search_language=section.youtube_search_language.value,
         youtube_stream_mode=(
@@ -545,6 +598,9 @@ def _settings_from_config(section):
         ),
         youtube_audio_preference=section.youtube_audio_preference.value,
         ui_text_size=section.ui_text_size.value,
+        infobar_timeout=getattr(
+            getattr(section, "infobar_timeout", None), "value", DEFAULT_INFOBAR_TIMEOUT,
+        ),
         cinematic_view=section.cinematic_view.value,
         show_in_main_menu=section.show_in_main_menu.value,
         channel_highlight=channel_highlight,
@@ -552,10 +608,41 @@ def _settings_from_config(section):
     )
 
 
+def _native_snapshot(section):
+    elements = getattr(section, "dict", None)
+    try:
+        elements = elements() if callable(elements) else vars(section)
+    except (AttributeError, TypeError):
+        elements = {}
+    result = []
+    for element in elements.values():
+        if hasattr(element, "value"):
+            result.append((element, deepcopy(element.value),
+                           hasattr(element, "saved_value"),
+                           deepcopy(getattr(element, "saved_value", None))))
+    return result
+
+
+def _restore_native_snapshot(snapshot):
+    for element, value, has_saved, saved in snapshot:
+        try:
+            _set_config_value(element, value)
+            if has_saved:
+                element.saved_value = saved
+        except (AttributeError, IOError, OSError, TypeError, ValueError):
+            pass
+
+
+@guarded_mutation
 def _store_config_settings(section, settings, migrated=True):
+    if _NATIVE_RESTORE_PENDING:
+        return False
     if not isinstance(settings, PlayerSettings):
         settings = PlayerSettings.from_dict(settings)
+    snapshot = _native_snapshot(section)
     try:
+        if configfile is None:
+            return False
         _set_config_value(
             section.live_service_type,
             str(settings.live_service_type),
@@ -575,12 +662,16 @@ def _store_config_settings(section, settings, migrated=True):
         _set_config_value(section.tmdb_api_key, settings.tmdb_api_key)
         _set_config_value(section.youtube_resolution, settings.youtube_resolution)
         _set_config_value(section.youtube_autoplay, settings.youtube_autoplay)
+        if hasattr(section, "auto_login_source"):
+            _set_config_value(section.auto_login_source, settings.auto_login_source)
         _set_config_value(section.youtube_dash, settings.youtube_dash)
         _set_config_value(section.youtube_stream_mode, settings.youtube_stream_mode)
         _set_config_value(section.youtube_mode_migrated, True)
         _set_config_value(section.youtube_audio_preference, settings.youtube_audio_preference)
         _set_config_value(section.youtube_search_language, settings.youtube_search_language)
         _set_config_value(section.ui_text_size, settings.ui_text_size)
+        if hasattr(section, "infobar_timeout"):
+            _set_config_value(section.infobar_timeout, str(settings.infobar_timeout))
         _set_config_value(
             section.cinematic_view,
             bool(settings.cinematic_view),
@@ -598,10 +689,10 @@ def _store_config_settings(section, settings, migrated=True):
         if migrated:
             _set_config_value(section.legacy_json_migrated, True)
         section.save()
-        if configfile is not None:
-            configfile.save()
+        configfile.save()
         return True
     except (AttributeError, IOError, OSError, TypeError, ValueError):
+        _restore_native_snapshot(snapshot)
         return False
 
 
@@ -622,15 +713,47 @@ def load_player_settings(path=DEFAULT_SETTINGS_PATH):
     return _settings_from_config(section)
 
 
+@guarded_mutation
 def save_player_settings(settings, path=DEFAULT_SETTINGS_PATH):
     """Save preferences through Enigma2's standard ``config.plugins`` tree."""
+    if _NATIVE_RESTORE_PENDING and path == DEFAULT_SETTINGS_PATH:
+        return False
     if not isinstance(settings, PlayerSettings):
         settings = PlayerSettings.from_dict(settings)
     section = _player_config() if path == DEFAULT_SETTINGS_PATH else None
     if section is not None:
-        if _store_config_settings(section, settings, migrated=True):
+        # Native configuration remains authoritative on the next GUI boot.
+        # A JSON fallback would report success but be ignored after migration.
+        return _store_config_settings(section, settings, migrated=True)
+    return _write_json_settings(settings, path)
+
+
+@guarded_mutation
+def save_auto_login_source(value, path=DEFAULT_SETTINGS_PATH):
+    """Persist only the auto-login preference and undo a failed native save."""
+    if _NATIVE_RESTORE_PENDING and path == DEFAULT_SETTINGS_PATH:
+        return False
+    value = normalize_auto_login_source(value)
+    settings = load_player_settings(path)
+    section = _player_config() if path == DEFAULT_SETTINGS_PATH else None
+    if section is not None:
+        element = section.auto_login_source
+        previous = element.value
+        try:
+            _set_config_value(element, value)
+            element.save()
+            if configfile is None:
+                raise OSError("configuration writer unavailable")
+            configfile.save()
             return True
-        # Preserve settings on an unusual image where configfile.save fails.
+        except (AttributeError, IOError, OSError, TypeError, ValueError):
+            try:
+                _set_config_value(element, previous)
+                element.save()
+            except (AttributeError, IOError, OSError, TypeError, ValueError):
+                pass
+            return False
+    settings.auto_login_source = value
     return _write_json_settings(settings, path)
 
 
@@ -656,19 +779,25 @@ def load_text_size(path=DEFAULT_SETTINGS_PATH):
     )
 
 
+@guarded_mutation
 def save_text_size(value, path=DEFAULT_SETTINGS_PATH):
     """Persist only the appearance profile without overwriting other fields."""
+    if _NATIVE_RESTORE_PENDING and path == DEFAULT_SETTINGS_PATH:
+        return False
     value = normalize_text_size(value)
     section = _player_config() if path == DEFAULT_SETTINGS_PATH else None
     if section is not None:
+        snapshot = _native_snapshot(section)
         try:
+            if configfile is None:
+                return False
             _set_config_value(section.ui_text_size, value)
             section.ui_text_size.save()
-            if configfile is not None:
-                configfile.save()
+            configfile.save()
             return True
         except (AttributeError, IOError, OSError, TypeError, ValueError):
-            pass
+            _restore_native_snapshot(snapshot)
+            return False
 
     payload = _read_json_settings(path)
     payload["ui_text_size"] = value
@@ -690,7 +819,7 @@ def save_text_size(value, path=DEFAULT_SETTINGS_PATH):
             handle.flush()
             try:
                 os.fsync(handle.fileno())
-            except (AttributeError, OSError):
+            except AttributeError:
                 pass
         try:
             os.chmod(temporary, 0o600)

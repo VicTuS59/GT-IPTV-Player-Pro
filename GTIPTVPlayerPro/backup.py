@@ -21,13 +21,15 @@ import tempfile
 import threading
 import uuid
 import zipfile
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 
 from .backup_scope import (GROUPS, SHARED_JSON, file_group, merge_document,
                            native_group, normalize_groups, project_document)
+from .persistence import RESTORE_COORDINATOR, PersistenceBusy
+from . import PLUGIN_VERSION
 
 
-PACKAGE_VERSION = "1.4.0-r0"
+PACKAGE_VERSION = PLUGIN_VERSION
 PLUGIN_DIR = "/usr/lib/enigma2/python/Plugins/Extensions/GTIPTVPlayerPro"
 DATA_DIR = "/etc/enigma2/gtiptvplayer"
 SUBTITLE_DIR = "/etc/enigma2/gtiptvplayerpro-subtitle-cache"
@@ -47,6 +49,7 @@ DATA_FILES = (
     "/etc/enigma2/gtiptvplayerpro-settings.json",
     "/etc/enigma2/gtiptvplayerpro-favorites.json",
     "/etc/enigma2/gtiptvplayerpro-resume.json",
+    "/etc/enigma2/gtiptvplayerpro-episode-history.json",
     "/etc/enigma2/gtiptvplayerpro-subtitles.json",
     "/etc/enigma2/gtiptvplayerpro-weather.json",
     "/etc/enigma2/gtiptvplayerpro-weather-cache.json",
@@ -218,20 +221,49 @@ class BackupManager(object):
             raise BackupError("busy")
 
     @contextmanager
-    def _operation(self):
+    def _operation(self, quiesce=False, restoring=False):
         if not _LOCK.acquire(False):
             raise BackupError("busy")
         try:
             self._check_idle()
-            yield
+            with ExitStack() as stack:
+                publish_downloads = None
+                if quiesce:
+                    stack.enter_context(RESTORE_COORDINATOR.freeze())
+                    if restoring and self.root == "/":
+                        # The detached download worker is a separate process;
+                        # its state flock must span replacement and recovery.
+                        from .downloads import restore_guard
+                        publish_downloads = stack.enter_context(restore_guard())
+                try:
+                    yield publish_downloads
+                finally:
+                    if restoring:
+                        self._refresh_store_caches()
         except BackupError:
             raise
+        except PersistenceBusy:
+            raise BackupError("busy")
         except zipfile.BadZipFile:
             raise BackupError("invalid")
-        except (OSError, ValueError, UnicodeError, RuntimeError):
+        except (OSError, ValueError, UnicodeError, RuntimeError) as error:
+            if getattr(error, "code", None) == "busy":
+                raise BackupError("busy")
             raise BackupError("failed")
+        except Exception as error:
+            if getattr(error, "code", None) == "busy":
+                raise BackupError("busy")
+            raise
         finally:
             _LOCK.release()
+
+    def _refresh_store_caches(self):
+        from . import episode_history, favorites
+        with favorites._STORE_LOCK:
+            with favorites._READ_CACHE_LOCK:
+                favorites._READ_CACHE.clear()
+        episode_history.refresh_after_restore(
+            (self.host(episode_history.DEFAULT_WATCHED_PATH),))
 
     def inventory(self, safety=False, targets=(), groups=None):
         """Snapshot user choices and sources, without executable or video files."""
@@ -554,7 +586,7 @@ class BackupManager(object):
             raise error
 
     def create(self, folder, progress=None, cancel=None, label="settings", groups=None):
-        with self._operation():
+        with self._operation(quiesce=True):
             return self._create(folder, progress, cancel, label, groups=groups)
 
     def _create(self, folder, progress=None, cancel=None, label="settings", records=None, groups=None):
@@ -846,7 +878,7 @@ class BackupManager(object):
                 os.unlink(temporary)
 
     def restore(self, path, progress=None, cancel=None, approved_manifest=None, safety_folder=None, groups=None):
-        with self._operation():
+        with self._operation(quiesce=True, restoring=True) as publish_downloads:
             if os.path.lexists(self.host(JOURNAL_PATH)):
                 self._recover()
             with self._open_archive(path) as handle, zipfile.ZipFile(handle, "r") as archive:
@@ -923,6 +955,13 @@ class BackupManager(object):
                         existed=True, delete=True))
                 self._atomic_json(JOURNAL_PATH, journal)
                 done = 0
+                def recovery_error():
+                    if self.root == "/" and any(entry["kind"] == "native" for entry, unused_target in targets):
+                        from .settings import defer_native_restore
+                        defer_native_restore()
+                    error = BackupError("recovery", safety["path"])
+                    error.restart_required = True
+                    return error
                 try:
                     for (entry, target), row in zip(targets, journal["entries"]):
                         self._cancel(cancel)
@@ -947,7 +986,8 @@ class BackupManager(object):
                                 done += len(payload)
                             elif replacements and target in (
                                     DATA_DIR + "/playlist-files.json", DATA_DIR + "/m3u-sources.json",
-                                    DATA_DIR + "/m3u-xmltv.json", DATA_DIR + "/downloads.json"):
+                                    DATA_DIR + "/m3u-xmltv.json", DATA_DIR + "/downloads.json",
+                                    DATA_DIR + "/downloads-removed.json"):
                                 payload = source.read(MAX_DOCUMENT_BYTES + 1)
                                 if len(payload) > MAX_DOCUMENT_BYTES:
                                     raise BackupError("invalid")
@@ -992,6 +1032,8 @@ class BackupManager(object):
                             os.replace(stage, host)
                     for directory in {os.path.dirname(self.host(row["target"])) for row in journal["entries"]}:
                         _sync_directory(directory)
+                    if publish_downloads is not None:
+                        publish_downloads()
                     journal["phase"] = "committed"
                     self._atomic_json(JOURNAL_PATH, journal)
                     # A completed transaction must never be rolled back because
@@ -1001,12 +1043,31 @@ class BackupManager(object):
                         self._cleanup_journal(journal)
                     except OSError:
                         pass
-                    return dict(safety=safety["path"], manifest=manifest)
+                    if self.root == "/" and any(entry["kind"] == "native" for entry, unused_target in targets):
+                        # GUI ConfigElements are reloaded on the GUI poll.
+                        # Reject native settings saves during that short gap.
+                        from .settings import defer_native_restore
+                        defer_native_restore()
+                    return dict(safety=safety["path"], manifest=manifest,
+                                downloads_published=publish_downloads is not None)
                 except Exception:
+                    if journal["phase"] == "committed":
+                        # Publishing the marker can succeed before directory
+                        # fsync raises. Never roll targets back while recovery
+                        # could still observe a committed cleanup-only marker.
+                        rollback_intent = dict(journal, phase="committing")
+                        try:
+                            self._atomic_json(JOURNAL_PATH, rollback_intent)
+                        except Exception:
+                            # Keep every promoted file and its prior copy.
+                            # Startup can safely choose the durable old/new
+                            # journal phase without finding a partial rollback.
+                            raise recovery_error()
+                        journal = rollback_intent
                     try:
                         self._rollback(journal)
                     except Exception:
-                        raise BackupError("recovery", safety["path"])
+                        raise recovery_error()
                     raise
 
     def _journal(self):
@@ -1060,12 +1121,21 @@ class BackupManager(object):
     def recover(self):
         if not os.path.lexists(self.host(JOURNAL_PATH)):
             return False
-        if not _LOCK.acquire(False):
-            raise BackupError("busy")
-        try:
-            return self._recover()
-        finally:
-            _LOCK.release()
+        with self._operation(quiesce=True):
+            journal = self._journal()
+            if journal["phase"] == "committed":
+                # Cleanup-only recovery must not discard later paused download
+                # payloads: the archive and runtime were already committed.
+                self._cleanup_journal(journal)
+                return True
+            with ExitStack() as stack:
+                if self.root == "/":
+                    from .downloads import restore_guard
+                    stack.enter_context(restore_guard())
+                try:
+                    return self._recover()
+                finally:
+                    self._refresh_store_caches()
 
     def _recover(self):
         journal = self._journal()

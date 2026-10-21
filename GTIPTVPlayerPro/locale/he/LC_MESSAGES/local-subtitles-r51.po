@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Hebrew\nLanguage: he\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=4; plural=(n == 1 ? 0 : n == 2 ? 1 : (n > 10 && n % 10 == 0) ? 2 : 3); \n"
+
+msgid "Choose a subtitle file"
+msgstr "בחרו קובץ כתוביות"
+
+msgid "Download folder"
+msgstr "תיקיית הורדות"
+
+msgid "Use this folder"
+msgstr "שימוש בתיקייה זו"
+
+msgid "Local subtitles"
+msgstr "כתוביות מקומיות"
+
+msgid "GT subtitle downloads"
+msgstr "הורדות כתוביות של GT"
+
+msgid "Search subtitle files"
+msgstr "חיפוש קובצי כתוביות"
+
+msgid "No subtitle files found."
+msgstr "לא נמצאו קובצי כתוביות."
+
+msgid "Could not read this folder."
+msgstr "לא ניתן לקרוא תיקייה זו."
+
+msgid "Could not load this subtitle file."
+msgstr "לא ניתן לטעון קובץ כתוביות זה."
+
+msgid "Could not save the download folder."
+msgstr "לא ניתן לשמור את תיקיית ההורדות."
+
+msgid "Download folder saved."
+msgstr "תיקיית ההורדות נשמרה."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "תיקיית הורדת הכתוביות אינה זמינה. בחרו תיקייה אחרת."
+
+msgid "Subtitle file is too large."
+msgstr "קובץ הכתוביות גדול מדי."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "נתמכים רק קובצי כתוביות מסוג SRT ו־VTT."
+
+msgid "Searching subtitle files..."
+msgstr "מתבצע חיפוש קובצי כתוביות..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "הגעתם למגבלת החיפוש. צמצמו את החיפוש."
+
+msgid "Temporary folder"
+msgstr "תיקייה זמנית"
+
+msgid "Device storage"
+msgstr "אחסון המכשיר"
+
+msgid "Up one folder"
+msgstr "לתיקיית האב"
+
+msgid "Subtitle language"
+msgstr "שפת הכתוביות"
+
+msgid "Search this folder"
+msgstr "חיפוש בתיקייה זו"
+
+msgid "Local subtitle loaded."
+msgstr "הכתוביות המקומיות נטענו."
+
+msgid "Automatic detection"
+msgstr "זיהוי אוטומטי"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "בחרו תיקייה בכונן קשיח, בכונן USB או ב־NAS מחובר."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "התיקייה הזמנית מתרוקנת בעת הפעלה מחדש של הממיר."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "תיקיית הורדות: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "שפת הכתוביות: {}"
+
+msgid "Folder is not available."
+msgstr "התיקייה אינה זמינה."
+
+msgid "Use temporary folder"
+msgstr "שימוש בתיקייה הזמנית"
+
+msgid "Device folders"
+msgstr "תיקיות המכשיר"
+
+msgid "Downloaded subtitles"
+msgstr "כתוביות שהורדו"
+
+msgid "Search results"
+msgstr "תוצאות חיפוש"

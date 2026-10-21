@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Indonesian\nLanguage: id\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Choose a subtitle file"
+msgstr "Pilih berkas subtitel"
+
+msgid "Download folder"
+msgstr "Folder unduhan"
+
+msgid "Use this folder"
+msgstr "Gunakan folder ini"
+
+msgid "Local subtitles"
+msgstr "Subtitel lokal"
+
+msgid "GT subtitle downloads"
+msgstr "Unduhan subtitel GT"
+
+msgid "Search subtitle files"
+msgstr "Cari berkas subtitel"
+
+msgid "No subtitle files found."
+msgstr "Tidak ditemukan berkas subtitel."
+
+msgid "Could not read this folder."
+msgstr "Folder ini tidak dapat dibaca."
+
+msgid "Could not load this subtitle file."
+msgstr "Berkas subtitel ini tidak dapat dimuat."
+
+msgid "Could not save the download folder."
+msgstr "Folder unduhan tidak dapat disimpan."
+
+msgid "Download folder saved."
+msgstr "Folder unduhan disimpan."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Folder unduhan subtitel tidak tersedia. Pilih folder lain."
+
+msgid "Subtitle file is too large."
+msgstr "Berkas subtitel terlalu besar."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Hanya berkas subtitel SRT dan VTT yang didukung."
+
+msgid "Searching subtitle files..."
+msgstr "Mencari berkas subtitel..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Batas pencarian tercapai. Persempit pencarian Anda."
+
+msgid "Temporary folder"
+msgstr "Folder sementara"
+
+msgid "Device storage"
+msgstr "Penyimpanan perangkat"
+
+msgid "Up one folder"
+msgstr "Naik satu folder"
+
+msgid "Subtitle language"
+msgstr "Bahasa subtitel"
+
+msgid "Search this folder"
+msgstr "Cari di folder ini"
+
+msgid "Local subtitle loaded."
+msgstr "Subtitel lokal dimuat."
+
+msgid "Automatic detection"
+msgstr "Deteksi otomatis"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Pilih folder di HDD, USB, atau NAS yang terhubung."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Folder sementara dikosongkan saat perangkat penerima dimulai ulang."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Folder unduhan: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Bahasa subtitel: {}"
+
+msgid "Folder is not available."
+msgstr "Folder tidak tersedia."
+
+msgid "Use temporary folder"
+msgstr "Gunakan folder sementara"
+
+msgid "Device folders"
+msgstr "Folder perangkat"
+
+msgid "Downloaded subtitles"
+msgstr "Subtitel yang diunduh"
+
+msgid "Search results"
+msgstr "Hasil pencarian"

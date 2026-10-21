@@ -16,6 +16,8 @@ import stat
 import threading
 import time
 
+from .persistence import guarded_mutation
+
 
 PLAYLIST_FILE_TYPES = ("xtream", "stalker")
 MAX_PLAYLIST_FILES_PER_TYPE = 100
@@ -210,6 +212,7 @@ class PlaylistFileRegistry(object):
             raise PlaylistFileRegistryError("The playlist registry is invalid")
         return _normalise_document(value)
 
+    @guarded_mutation(busy_error=True)
     def _write(self, document):
         document = _normalise_document(document)
         directory = self._ensure_directory()
@@ -344,6 +347,7 @@ class PlaylistFileRegistry(object):
     def paths(self, source_type):
         return [path for path in self.slots(source_type) if path]
 
+    @guarded_mutation(busy_error=True)
     def set_slot(self, source_type, index, path):
         source_type = _source_type(source_type)
         index = _slot_index(index)
@@ -380,6 +384,7 @@ class PlaylistFileRegistry(object):
             self._write(document)
         return path
 
+    @guarded_mutation(busy_error=True)
     def activate(self, source_type, index):
         source_type = _source_type(source_type)
         index = _slot_index(index)
@@ -393,6 +398,7 @@ class PlaylistFileRegistry(object):
             self._write(document)
         return path
 
+    @guarded_mutation(busy_error=True)
     def register_written_path(self, source_type, path):
         source_type = _source_type(source_type)
         path = _normalise_txt_path(path)
@@ -423,6 +429,7 @@ class PlaylistFileRegistry(object):
             self._write(document)
         return match
 
+    @guarded_mutation(busy_error=True)
     def clear_slot(self, source_type, index):
         source_type = _source_type(source_type)
         index = _slot_index(index)
@@ -438,6 +445,7 @@ class PlaylistFileRegistry(object):
             self._write(document)
         return path
 
+    @guarded_mutation(busy_error=True)
     def rename_slot(self, source_type, index, new_name):
         source_type = _source_type(source_type)
         index = _slot_index(index)
@@ -480,6 +488,7 @@ class PlaylistFileRegistry(object):
                 raise
         return new_path
 
+    @guarded_mutation(busy_error=True)
     def delete_slot_file(self, source_type, index):
         source_type = _source_type(source_type)
         index = _slot_index(index)
@@ -550,6 +559,7 @@ def playlist_write_path(source_type, legacy_path):
     return legacy_path
 
 
+@guarded_mutation(busy_error=True)
 def register_written_playlist(source_type, path):
     return default_registry().register_written_path(source_type, path)
 

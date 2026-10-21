@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import http.client
+import errno
 import ipaddress
 import socket
 import ssl
@@ -36,6 +37,100 @@ _SSL_CONTEXT_LOCK = threading.Lock()
 
 class NetworkSecurityError(RuntimeError):
     pass
+
+
+def _check_cancel(cancel_event):
+    if cancel_event is not None and cancel_event.is_set():
+        raise InterruptedError("Artwork request cancelled")
+
+
+class _TransferCancellation:
+    """One process watcher interrupts blocked header/body/TLS socket reads."""
+    def __init__(self):
+        self.condition = threading.Condition()
+        self.transfers = {}
+        self.thread = None
+
+    def add(self, connection, cancel_event, deadline):
+        ticket = object()
+        with self.condition:
+            self.transfers[ticket] = [connection, None, cancel_event, deadline]
+            if self.thread is None:
+                self.thread = threading.Thread(target=self._run, name="GT-ImageCancel", daemon=True)
+                try:
+                    self.thread.start()
+                except Exception:
+                    self.thread = None
+                    self.transfers.pop(ticket, None)
+                    raise
+            self.condition.notify_all()
+        return ticket
+
+    def response(self, ticket, response):
+        with self.condition:
+            if ticket in self.transfers:
+                self.transfers[ticket][1] = response
+
+    def remove(self, ticket):
+        with self.condition:
+            self.transfers.pop(ticket, None)
+
+    def _run(self):
+        while True:
+            with self.condition:
+                while not self.transfers:
+                    self.condition.wait()
+                # Hold the memory lock while shutting down so a completed
+                # transfer cannot hand a closed/reused descriptor to us.
+                for connection, response, event, deadline in self.transfers.values():
+                    if not event.is_set() and time.monotonic() < deadline:
+                        continue
+                    sock = getattr(connection, "sock", None)
+                    if sock is None and response is not None:
+                        raw = getattr(getattr(response, "fp", None), "raw", None)
+                        sock = getattr(raw, "_sock", None)
+                    if sock is not None:
+                        try:
+                            sock.shutdown(socket.SHUT_RDWR)
+                        except (OSError, ValueError):
+                            pass
+                self.condition.wait(0.02)
+
+
+_TRANSFER_CANCELLATION = _TransferCancellation()
+
+
+def _cancellable_connect(address, port, timeout, cancel_event):
+    # Address has already passed public-IP validation. Never resolve it again.
+    family = socket.AF_INET6 if ":" in address else socket.AF_INET
+    sock = socket.socket(family, socket.SOCK_STREAM)
+    deadline = time.monotonic() + timeout
+    try:
+        sock.setblocking(False)
+        result = sock.connect_ex((address, port))
+        if result not in (0, errno.EINPROGRESS, errno.EWOULDBLOCK, errno.EALREADY):
+            raise OSError(result, "Image connection failed")
+        while result:
+            _check_cancel(cancel_event)
+            remaining = _remaining_timeout(deadline, timeout)
+            error = sock.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
+            if error:
+                raise OSError(error, "Image connection failed")
+            try:
+                sock.getpeername()
+                break
+            except OSError as pending:
+                if pending.errno not in (errno.ENOTCONN, errno.EINVAL):
+                    raise
+            # Polling the pinned nonblocking socket avoids adding a receiver
+            # package dependency solely for select/selectors.
+            cancel_event.wait(min(0.02, remaining))
+        _check_cancel(cancel_event)
+        sock.settimeout(_remaining_timeout(deadline, timeout))
+        return sock
+    except Exception:
+        sock.close()
+        raise
 
 
 def _provider_image_headers(value):
@@ -129,11 +224,14 @@ def _remaining_timeout(deadline, fallback):
         return float(fallback)
     remaining = float(deadline) - time.monotonic()
     if remaining <= 0:
-        raise NetworkSecurityError(N_("Image download timed out."))
+        error = NetworkSecurityError(N_("Image download timed out."))
+        error.retryable = True
+        raise error
     return max(0.05, min(float(fallback), remaining))
 
 
-def resolve_public_addresses(hostname, port, resolver=None, deadline=None):
+def resolve_public_addresses(hostname, port, resolver=None, deadline=None, cancel_event=None):
+    _check_cancel(cancel_event)
     use_cache = resolver is None
     cache_key = (str(hostname).lower(), int(port))
     now = time.monotonic()
@@ -157,9 +255,9 @@ def resolve_public_addresses(hostname, port, resolver=None, deadline=None):
     try:
         if use_cache and deadline is not None:
             if not _DNS_LOOKUP_SLOTS.acquire(blocking=False):
-                raise NetworkSecurityError(
-                    N_("Image host name resolution timed out.")
-                )
+                error = NetworkSecurityError(N_("Image host name resolution timed out."))
+                error.retryable = True
+                raise error
             completed = threading.Event()
             result = {"answers": None, "error": None}
 
@@ -179,10 +277,8 @@ def resolve_public_addresses(hostname, port, resolver=None, deadline=None):
             except Exception:
                 _DNS_LOOKUP_SLOTS.release()
                 raise
-            if not completed.wait(_remaining_timeout(deadline, 60.0)):
-                raise NetworkSecurityError(
-                    N_("Image host name resolution timed out.")
-                )
+            while not completed.wait(min(0.02, _remaining_timeout(deadline, 60.0))):
+                _check_cancel(cancel_event)
             if result["error"] is not None:
                 raise result["error"]
             answers = result["answers"]
@@ -243,6 +339,18 @@ class _PinnedHTTPSConnection(http.client.HTTPSConnection):
         self._verified_hostname = hostname
 
     def connect(self):
+        cancel_event = getattr(self, "_cancel_event", None)
+        if cancel_event is not None:
+            self.sock = _cancellable_connect(self._pinned_address, self.port, self.timeout, cancel_event)
+            try:
+                self.sock = self._context.wrap_socket(self.sock,
+                    server_hostname=self._verified_hostname, do_handshake_on_connect=False)
+                self.sock.do_handshake()
+                _check_cancel(cancel_event)
+            except Exception:
+                self.sock.close()
+                raise
+            return
         sock = socket.create_connection(
             (self._pinned_address, self.port),
             self.timeout,
@@ -292,10 +400,13 @@ def _request_once(
     user_agent,
     deadline=None,
     request_headers=None,
+    cancel_event=None,
 ):
     connection = None
     response = None
+    cancellation_ticket = None
     try:
+        _check_cancel(cancel_event)
         if url_info["scheme"] == "https":
             connection = _PinnedHTTPSConnection(
                 url_info["hostname"],
@@ -309,6 +420,13 @@ def _request_once(
                 port=url_info["port"],
                 timeout=_remaining_timeout(deadline, timeout),
             )
+        if cancel_event is not None:
+            connection._cancel_event = cancel_event
+            if url_info["scheme"] == "http":
+                connection._create_connection = lambda address, timeout, source_address=None: _cancellable_connect(
+                    address[0], address[1], timeout, cancel_event)
+            cancellation_ticket = _TRANSFER_CANCELLATION.add(connection, cancel_event,
+                deadline or time.monotonic() + timeout)
         headers = {
             "Accept": accept,
             "Accept-Encoding": "identity",
@@ -327,14 +445,19 @@ def _request_once(
             headers=headers,
         )
         response = connection.getresponse()
+        if cancellation_ticket is not None:
+            _TRANSFER_CANCELLATION.response(cancellation_ticket, response)
+        _check_cancel(cancel_event)
         status = int(response.status)
         headers = _response_headers(response)
         if status in REDIRECT_STATUSES:
             return status, headers, b""
         if status != 200:
-            raise NetworkSecurityError(
+            error = NetworkSecurityError(
                 _(N_("Image server returned HTTP {}.")).format(status)
             )
+            error.status = status
+            raise error
         content_encoding = headers.get("content-encoding", "").lower()
         if content_encoding not in ("", "identity"):
             raise NetworkSecurityError(
@@ -355,6 +478,7 @@ def _request_once(
         chunks = []
         total = 0
         while True:
+            _check_cancel(cancel_event)
             remaining = _remaining_timeout(deadline, timeout)
             sock = getattr(connection, "sock", None)
             if sock is not None:
@@ -363,6 +487,7 @@ def _request_once(
                 except Exception:
                     pass
             chunk = response.read(min(65536, maximum + 1 - total))
+            _check_cancel(cancel_event)
             if not chunk:
                 break
             total += len(chunk)
@@ -373,6 +498,8 @@ def _request_once(
             chunks.append(chunk)
         return status, headers, b"".join(chunks)
     finally:
+        if cancellation_ticket is not None:
+            _TRANSFER_CANCELLATION.remove(cancellation_ticket)
         if response is not None:
             try:
                 response.close()
@@ -394,6 +521,7 @@ def fetch_public_url(
     resolver=None,
     max_redirects=MAX_REDIRECTS,
     request_headers=None,
+    cancel_event=None,
 ):
     try:
         maximum = int(maximum)
@@ -413,6 +541,7 @@ def fetch_public_url(
     deadline = time.monotonic() + timeout
     previous_scheme = ""
     for redirect_count in range(max_redirects + 1):
+        _check_cancel(cancel_event)
         info = validate_public_url_syntax(current)
         if previous_scheme == "https" and info["scheme"] != "https":
             raise NetworkSecurityError(
@@ -424,16 +553,22 @@ def fetch_public_url(
             if provider_headers_allowed and current_origin == provider_origin
             else {}
         )
+        resolve_options = {"resolver": resolver, "deadline": deadline}
+        if cancel_event is not None:
+            resolve_options["cancel_event"] = cancel_event
         addresses = resolve_public_addresses(
             info["hostname"],
             info["port"],
-            resolver=resolver,
-            deadline=deadline,
+            **resolve_options,
         )
         last_error = None
         result = None
         for address in addresses:
+            _check_cancel(cancel_event)
             try:
+                request_options = {"deadline": deadline, "request_headers": selected_headers}
+                if cancel_event is not None:
+                    request_options["cancel_event"] = cancel_event
                 result = _request_once(
                     info,
                     address,
@@ -441,11 +576,11 @@ def fetch_public_url(
                     timeout,
                     str(accept),
                     str(user_agent),
-                    deadline=deadline,
-                    request_headers=selected_headers,
+                    **request_options,
                 )
                 break
             except (OSError, socket.error, http.client.HTTPException) as exc:
+                _check_cancel(cancel_event)
                 last_error = exc
         if result is None:
             raise NetworkSecurityError(

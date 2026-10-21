@@ -45,7 +45,7 @@ from .dvb_epg_settings import (
     load_dvb_epg_settings,
     save_dvb_epg_settings,
 )
-from .i18n import N_, _
+from .i18n import N_, _, ngettext
 from .paths import plugin_path
 from .playlist import load_sources
 from .remote_footer import (
@@ -668,9 +668,10 @@ class GTDVBEPGAutomationScreen(Screen):
 
     def _values(self):
         automatic = self._automatic()
+        interval_hours = _update_interval(self.settings)
         return (
             _("Automatic") if automatic else _("Manual"),
-            _("{} hours").format(_update_interval(self.settings)) if automatic else "-",
+            ngettext("{} hour", "{} hours", interval_hours).format(interval_hours) if automatic else "-",
             (_("On") if bool(getattr(self.settings, "update_on_startup", True)) else _("Off"))
             if automatic
             else "-",
@@ -971,10 +972,11 @@ class GTDVBEPGSettingsScreen(Screen):
 
     def _values(self):
         update_mode = _update_mode(self.settings)
+        interval_hours = _update_interval(self.settings)
         automatic_value = (
             _("Automatic")
             + "  •  "
-            + _("{} hours").format(_update_interval(self.settings))
+            + ngettext("{} hour", "{} hours", interval_hours).format(interval_hours)
             if update_mode == "automatic"
             else _("Manual")
         )
@@ -982,7 +984,7 @@ class GTDVBEPGSettingsScreen(Screen):
             _("On") if self.settings.enabled else _("Off"),
             self._source_value(),
             self._bouquet_value(),
-            _("{} days").format(self.settings.epg_days),
+            ngettext("{} day", "{} days", self.settings.epg_days).format(self.settings.epg_days),
             _("Open ({} mapped)").format(self.settings.last_mapping_count),
             automatic_value,
         )

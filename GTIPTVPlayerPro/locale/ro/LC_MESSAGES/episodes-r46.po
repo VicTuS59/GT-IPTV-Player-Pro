@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: ro\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Serial"
+
+msgid "Season"
+msgstr "Sezon"
+
+msgid "Navigate"
+msgstr "Navigare"
+
+msgid "Page"
+msgstr "Pagină"
+
+msgid "Play"
+msgstr "Redare"
+
+msgid "Favorite"
+msgstr "Favorit"
+
+msgid "Refresh"
+msgstr "Reîmprospătare"
+
+msgid "Download"
+msgstr "Descarcă"
+
+msgid "Back"
+msgstr "Înapoi"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Sezonul {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "Sezoane: {}"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "Episoade: {}"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Episodul {}"
+
+msgid "Watched"
+msgstr "Vizionat"
+
+msgid "Not played"
+msgstr "Neredat"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Reia de la {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Reia episodul {}"
+
+msgid "Continue watching"
+msgstr "Continuă vizionarea"
+
+msgid "Add to favorites"
+msgstr "Adaugă la favorite"
+
+msgid "Remove from favorites"
+msgstr "Elimină din favorite"
+
+msgid "Download episode"
+msgstr "Descarcă episodul"
+
+msgid "SEASON PROGRESS"
+msgstr "PROGRESUL SEZONULUI"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "Episoade finalizate: {} / {}"
+
+msgid "CAST"
+msgstr "DISTRIBUȚIE"
+
+msgid "GENRE"
+msgstr "GEN"
+
+msgid "Unknown season"
+msgstr "Sezon necunoscut"
+
+msgid "No episodes in this season."
+msgstr "Nu există episoade în acest sezon."
+
+msgid "Marked as watched"
+msgstr "Marcat ca vizionat"
+
+msgid "Marked as not watched"
+msgstr "Marcat ca nevizionat"
+
+msgid "Could not save watched status."
+msgstr "Starea vizionării nu a putut fi salvată."
+
+msgid "Mark watched"
+msgstr "Marchează ca vizionat"
+
+msgid "Hold OK"
+msgstr "Ține apăsat OK"
+
+msgid "Episodes"
+msgstr "Episoade"
+
+msgid "No information available."
+msgstr "Nu sunt disponibile informații."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Sezonul {season} · Episodul {episode} · Reia de la {time}"

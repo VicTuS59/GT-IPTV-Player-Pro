@@ -165,20 +165,52 @@ def infobar_skin(width, height, px, live=True):
         width, bar_h, infobar_panel_path(width, live=live)))
     for name in ("top_line", "bottom_line", "picon_frame", "picon_inner", "picon_placeholder",
                  "number_badge_frame", "number_badge_inner", "number_divider", "epg_separator",
-                 "epg_bottom_separator", "weather_card", "shortcut_audio_dot", "shortcut_aspect_dot"):
+                 "epg_bottom_separator", "weather_card", "shortcut_audio_dot", "shortcut_aspect_dot",
+                 "shortcut_web_key", "web_shortcut_hint"):
         label(name, 0, 0, 1, 1, font=1, z=1)
     pixmap("picon", 30, 53, 170, 170)
+    # The common overlay also hosts YouTube videos. These widgets remain
+    # hidden for provider content; the local logo covers missing thumbnails.
+    pixmap("youtube_logo", 43, 88, 144, 100,
+           plugin_path("skin", "images", "yt-logo-r44-2160.png"))
+    label("youtube_number_mask", 240, 12, 90, 54, font=1, z=2,
+          background=INFOBAR_BACKGROUND)
     label("channel_number", 247, 16, 76, 46, font=34, color="#FFFFFF", align="center", z=4)
-    label("channel_name", 345, 13, 275 if live else 840, 49, font=32, color="#FFFFFF")
-    label("account_source", 635 if live else 250, 19 if live else 72, 245 if live else 420, 36, font=19)
+    label("channel_name", 345, 13, 535 if live else 840, 49, font=32, color="#FFFFFF")
+    # Keep source details with the technical group so live names can use the
+    # full header space before the resolution badge.
+    label("account_source", 900 if live else 250, 55 if live else 72,
+          500 if live else 420, 24 if live else 36, font=19)
     chip_y = 21 if live else 74
-    chip_x = (900, 981, 1079, 1177) if live else (690, 791, 909, 1027)
-    chip_w = (72, 90, 90, 90) if live else (92, 110, 110, 140)
+    # Cover the old painted badges/frame before drawing the wider audio
+    # caption and the relocated network field as native labels.
+    if live:
+        label("info_chip_background", 900, 18, 714, 40, font=1, z=2,
+              background=INFOBAR_BACKGROUND)
+    else:
+        label("info_chip_background", 1280, 18, 334, 40, font=1, z=2,
+              background=INFOBAR_BACKGROUND)
+    chip_x = (900, 1036, 1114, 1196) if live else (690, 791, 909, 1027)
+    chip_w = (128, 70, 74, 204) if live else (92, 110, 110, 204)
     for name, x, w in zip(("resolution", "fps", "video_codec", "audio_codec"), chip_x, chip_w):
-        label(name, x, chip_y, w, 34, font=19, align="center")
-    label("stream_bitrate", 1280, 19, 200, 38, font=20, color="#22D3EE", align="center")
-    label("audio_language", 1492, 19, 180, 38, font=20)
-    label("subtitle_status", 1684, 19, 210, 38, font=20)
+        label(name, x, chip_y, w, 34, font=19, align="center",
+              background="#132B3D" if live or name == "audio_codec" else None)
+    frame_border = px(1)
+    widgets.append('<widget name="stream_bitrate_frame" position="{},{}" size="{},{}" '
+                   'font="Regular;1" backgroundColor="#22D3EE" transparent="0" zPosition="3" />'.format(
+                       px(1412) - frame_border, px(19) - frame_border,
+                       px(200) + frame_border * 2, px(38) + frame_border * 2))
+    label("stream_bitrate", 1412, 19, 200, 38, font=20, color="#22D3EE", align="center",
+          z=4, background=INFOBAR_BACKGROUND)
+    # Preserve old skin component names without showing status captions.
+    label("audio_language", 0, 0, 1, 1, font=1, z=1)
+    label("subtitle_status", 0, 0, 1, 1, font=1, z=1)
+    for prefix, x, w in (("cpu", 1624, 126), ("ram", 1762, 132)):
+        widgets.append('<widget name="{}_gauge" position="{},{}" size="{},{}" zPosition="4" />'.format(
+            prefix, px(x), px(19), px(w), px(38)))
+        # A smaller SD icon leaves room for the full CPU/RAM 100% caption.
+        inset = 24 if width <= 720 else 36
+        label(prefix + "_usage", x + inset, 19, w - inset - 6, 38, font=19, z=5)
     label("epg_now_label", 250, 83 if live else 120, 188, 29, font=22, color="#22D3EE")
     label("epg_now_time", 250, 112, 188, 27, font=19)
     label("epg_now", 465, 80 if live else 110, 850, 53, font=36, color="#FFFFFF")
@@ -199,7 +231,8 @@ def infobar_skin(width, height, px, live=True):
     label("weather_temp", 1455, 116, 170, 67, font=46, color="#FFFFFF")
     label("weather_desc", 1370, 195, 260, 33, font=20, align="center")
     label("clock_divider", 1650, 80, 1, 168, font=1, background="#22D3EE")
-    label("clock", 1665, 88, 233, 73, font=56, color="#FFFFFF", align="center")
+    label("clock", 1669, 88, 161, 73, font=52, color="#FFFFFF", align="right")
+    label("clock_seconds", 1832, 108, 62, 50, font=30, color="#FFFFFF")
     label("date", 1665, 163, 233, 35, font=18, align="center")
     label("engine", 1665, 207, 233, 29, font=17, align="center")
     label("shortcut_separator", 15, 260, 1890, 1, font=1, z=2, background="#0E7490")
@@ -207,8 +240,10 @@ def infobar_skin(width, height, px, live=True):
     label("shortcut_epg", 132, 266, 365, 29, font=20)
     label("shortcut_audio", 607, 266, 377, 29, font=20)
     label("shortcut_aspect", 1042, 266, 380, 29, font=20)
-    label("shortcut_web_key", 1480, 266, 159, 29, font=19, color="#FFFFFF", align="center")
-    label("web_shortcut_hint", 1655, 266, 240, 29, font=20)
+    # Cover the unused MENU badge painted into the existing panel artwork.
+    # Keep the old text components as empty compatibility widgets above.
+    label("web_shortcut_background", 1478, 264, 164, 34, font=1, z=2,
+          background=INFOBAR_BACKGROUND)
     # Seeking remains an independent high-z overlay over every normal field.
     full_width = max(1, width - px(160))
     widgets.append('<widget name="seek_panel" position="0,0" size="{},{}" font="Regular;1" backgroundColor="{}" transparent="0" zPosition="20" />'.format(width, bar_h, INFOBAR_BACKGROUND))

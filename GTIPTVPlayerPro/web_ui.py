@@ -158,8 +158,7 @@ def open_web_interface(session):
                     if callable(setter):
                         setter(True)
                     if state["timer_active"] and timer is not None:
-                        from .browser import INFO_TIMEOUT_MS
-                        timer.start(INFO_TIMEOUT_MS, True)
+                        player._start_info_hide_timer()
                 except Exception:
                     pass
 

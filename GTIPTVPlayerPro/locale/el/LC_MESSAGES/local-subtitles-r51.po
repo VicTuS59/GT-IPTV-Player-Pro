@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: el\nLanguage: el\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Choose a subtitle file"
+msgstr "Επιλέξτε αρχείο υποτίτλων"
+
+msgid "Download folder"
+msgstr "Φάκελος λήψεων"
+
+msgid "Use this folder"
+msgstr "Χρήση αυτού του φακέλου"
+
+msgid "Local subtitles"
+msgstr "Τοπικοί υπότιτλοι"
+
+msgid "GT subtitle downloads"
+msgstr "Λήψεις υποτίτλων GT"
+
+msgid "Search subtitle files"
+msgstr "Αναζήτηση αρχείων υποτίτλων"
+
+msgid "No subtitle files found."
+msgstr "Δεν βρέθηκαν αρχεία υποτίτλων."
+
+msgid "Could not read this folder."
+msgstr "Δεν ήταν δυνατή η ανάγνωση αυτού του φακέλου."
+
+msgid "Could not load this subtitle file."
+msgstr "Δεν ήταν δυνατή η φόρτωση αυτού του αρχείου υποτίτλων."
+
+msgid "Could not save the download folder."
+msgstr "Δεν ήταν δυνατή η αποθήκευση του φακέλου λήψεων."
+
+msgid "Download folder saved."
+msgstr "Ο φάκελος λήψεων αποθηκεύτηκε."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Ο φάκελος λήψης υποτίτλων δεν είναι διαθέσιμος. Επιλέξτε άλλον φάκελο."
+
+msgid "Subtitle file is too large."
+msgstr "Το αρχείο υποτίτλων είναι πολύ μεγάλο."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Υποστηρίζονται μόνο αρχεία υποτίτλων SRT και VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Αναζήτηση αρχείων υποτίτλων..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Συμπληρώθηκε το όριο αναζήτησης. Περιορίστε την αναζήτησή σας."
+
+msgid "Temporary folder"
+msgstr "Προσωρινός φάκελος"
+
+msgid "Device storage"
+msgstr "Αποθηκευτικός χώρος συσκευής"
+
+msgid "Up one folder"
+msgstr "Ένας φάκελος επάνω"
+
+msgid "Subtitle language"
+msgstr "Γλώσσα υποτίτλων"
+
+msgid "Search this folder"
+msgstr "Αναζήτηση σε αυτόν τον φάκελο"
+
+msgid "Local subtitle loaded."
+msgstr "Οι τοπικοί υπότιτλοι φορτώθηκαν."
+
+msgid "Automatic detection"
+msgstr "Αυτόματη ανίχνευση"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Επιλέξτε φάκελο σε HDD, USB ή συνδεδεμένο NAS."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Ο προσωρινός φάκελος αδειάζει κατά την επανεκκίνηση του δέκτη."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Φάκελος λήψεων: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Γλώσσα υποτίτλων: {}"
+
+msgid "Folder is not available."
+msgstr "Ο φάκελος δεν είναι διαθέσιμος."
+
+msgid "Use temporary folder"
+msgstr "Χρήση προσωρινού φακέλου"
+
+msgid "Device folders"
+msgstr "Φάκελοι συσκευής"
+
+msgid "Downloaded subtitles"
+msgstr "Ληφθέντες υπότιτλοι"
+
+msgid "Search results"
+msgstr "Αποτελέσματα αναζήτησης"

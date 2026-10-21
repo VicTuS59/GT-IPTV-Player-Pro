@@ -1,0 +1,118 @@
+# GT IPTV Player Pro — episode browser r46
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0-r46\nLanguage: nl\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\n"
+
+msgid "Series"
+msgstr "Serie"
+
+msgid "Season"
+msgstr "Seizoen"
+
+msgid "Navigate"
+msgstr "Navigeren"
+
+msgid "Page"
+msgstr "Pagina"
+
+msgid "Play"
+msgstr "Afspelen"
+
+msgid "Favorite"
+msgstr "Favoriet"
+
+msgid "Refresh"
+msgstr "Vernieuwen"
+
+msgid "Download"
+msgstr "Downloaden"
+
+msgid "Back"
+msgstr "Terug"
+
+#, python-brace-format
+msgid "Season {}"
+msgstr "Seizoen {}"
+
+#, python-brace-format
+msgid "{} seasons"
+msgstr "{} seizoenen"
+
+#, python-brace-format
+msgid "{} episodes"
+msgstr "{} afleveringen"
+
+#, python-brace-format
+msgid "Episode {}"
+msgstr "Aflevering {}"
+
+msgid "Watched"
+msgstr "Bekeken"
+
+msgid "Not played"
+msgstr "Niet afgespeeld"
+
+#, python-brace-format
+msgid "Resume at {}"
+msgstr "Hervatten vanaf {}"
+
+#, python-brace-format
+msgid "Resume episode {}"
+msgstr "Aflevering {} hervatten"
+
+msgid "Continue watching"
+msgstr "Verder kijken"
+
+msgid "Add to favorites"
+msgstr "Toevoegen aan favorieten"
+
+msgid "Remove from favorites"
+msgstr "Verwijderen uit favorieten"
+
+msgid "Download episode"
+msgstr "Aflevering downloaden"
+
+msgid "SEASON PROGRESS"
+msgstr "SEIZOENSVOORTGANG"
+
+#, python-brace-format
+msgid "{} / {} episodes completed"
+msgstr "{} / {} afleveringen voltooid"
+
+msgid "CAST"
+msgstr "ROLVERDELING"
+
+msgid "GENRE"
+msgstr "GENRE"
+
+msgid "Unknown season"
+msgstr "Onbekend seizoen"
+
+msgid "No episodes in this season."
+msgstr "Geen afleveringen in dit seizoen."
+
+msgid "Marked as watched"
+msgstr "Gemarkeerd als bekeken"
+
+msgid "Marked as not watched"
+msgstr "Gemarkeerd als niet bekeken"
+
+msgid "Could not save watched status."
+msgstr "De kijkstatus kon niet worden opgeslagen."
+
+msgid "Mark watched"
+msgstr "Markeren als bekeken"
+
+msgid "Hold OK"
+msgstr "OK ingedrukt houden"
+
+msgid "Episodes"
+msgstr "Afleveringen"
+
+msgid "No information available."
+msgstr "Geen informatie beschikbaar."
+
+#, python-brace-format
+msgid "Season {season} · Episode {episode} · Resume at {time}"
+msgstr "Seizoen {season} · Aflevering {episode} · Hervatten vanaf {time}"

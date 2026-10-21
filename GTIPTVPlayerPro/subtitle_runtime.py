@@ -32,6 +32,8 @@ from .subtitle_settings import PROVIDERS, load_subtitle_settings
 from .subtitle_language import normalize_subtitle_language
 from .subtitle_search_cache import subtitle_search_context
 from .subtitle_jobs import check_subtitle_job, subtitle_request_scope
+from .subtitle_identity import resolve_subtitle_metadata
+from .subtitle_sync import subtitle_sync_offset
 
 SEARCH_PROVIDERS = PROVIDERS + POLISH_PROVIDERS
 
@@ -76,6 +78,7 @@ _ERROR_MESSAGES = {
     "subtitle_too_large": N_("The selected subtitle file is too large."),
     "subtitle_format_unsupported": N_("The selected subtitle format is not supported."),
     "subtitle_cache_unavailable": N_("The downloaded subtitle could not be saved."),
+    "subtitle_download_folder_unavailable": N_("Subtitle download folder is unavailable. Choose another folder."),
     "subtitle_no_results": N_("No matching subtitles were found on SubDL."),
 }
 
@@ -258,6 +261,13 @@ class GTIndependentSubtitleOverlay(Screen):
             self.deactivate()
 
 
+class _PreparedSubtitleData(object):
+    __slots__ = ("cues", "starts", "ends", "fingerprint")
+
+    def __init__(self, cues, starts, ends, fingerprint):
+        self.cues, self.starts, self.ends, self.fingerprint = cues, starts, ends, fingerprint
+
+
 class IndependentSubtitleRenderer(object):
     """Render parsed cues without SubsSupport or decoder subtitle tracks."""
 
@@ -279,6 +289,7 @@ class IndependentSubtitleRenderer(object):
         self.starts = ()
         self.end_prefix = ()
         self.loaded_path = None
+        self.local_file = False
         self.settings = None
         self.offset_ms = 0
         self.paused = False
@@ -362,7 +373,17 @@ class IndependentSubtitleRenderer(object):
         return sha256(json.dumps(value, ensure_ascii=False, separators=(",", ":"))
                       .encode("utf-8")).hexdigest()
 
-    def load(self, cues, path, settings, preserve_offset=True):
+    @staticmethod
+    def prepare(cues):
+        cues = tuple(cues)
+        latest, ends = 0, []
+        for cue in cues:
+            latest = max(latest, cue.end_ms)
+            ends.append(latest)
+        return _PreparedSubtitleData(cues, tuple(cue.start_ms for cue in cues),
+            tuple(ends), IndependentSubtitleRenderer._content_fingerprint(cues))
+
+    def load(self, cues, path, settings, preserve_offset=True, prepared=None, local=False):
         if self.closed or not cues or not path:
             return False
         cues = tuple(cues)
@@ -371,7 +392,9 @@ class IndependentSubtitleRenderer(object):
         overlay = self._ensure_overlay(settings)
         if overlay is None:
             return False
-        fingerprint = self._content_fingerprint(cues)
+        if not isinstance(prepared, _PreparedSubtitleData) or prepared.cues is not cues:
+            prepared = self.prepare(cues)
+        fingerprint = prepared.fingerprint
         offset = self.offset_ms if (preserve_offset and self.is_loaded
                                    and fingerprint == self.content_fingerprint) else int(settings.offset_ms)
         try:
@@ -395,15 +418,11 @@ class IndependentSubtitleRenderer(object):
             previous = self.overlay
             self.overlay = overlay
             self._dispose_overlay(previous)
-        self.cues = tuple(cues)
-        self.starts = tuple(cue.start_ms for cue in self.cues)
-        latest_end = 0
-        ends = []
-        for cue in self.cues:
-            latest_end = max(latest_end, cue.end_ms)
-            ends.append(latest_end)
-        self.end_prefix = tuple(ends)
+        self.cues = cues
+        self.starts = prepared.starts
+        self.end_prefix = prepared.ends
         self.loaded_path = str(path)
+        self.local_file = bool(local)
         self.settings = settings.copy()
         self.offset_ms = offset
         self.content_fingerprint = fingerprint
@@ -662,6 +681,7 @@ class IndependentSubtitleRenderer(object):
         self.starts = ()
         self.end_prefix = ()
         self.loaded_path = None
+        self.local_file = False
         self.content_fingerprint = ""
         if had_subtitle:
             self.content_revision += 1
@@ -699,6 +719,7 @@ class IndependentSubtitleRenderer(object):
             "settings": self.settings.copy(),
             "offset_ms": self.offset_ms,
             "content_fingerprint": self.content_fingerprint,
+            "local": self.local_file,
         }
 
     def restore(self, state):
@@ -709,7 +730,8 @@ class IndependentSubtitleRenderer(object):
             return False
         settings = settings.copy()
         settings.offset_ms = int(state.get("offset_ms", settings.offset_ms))
-        return self.load(state.get("cues"), state.get("path"), settings, preserve_offset=False)
+        return self.load(state.get("cues"), state.get("path"), settings, preserve_offset=False,
+                         prepared=state.get("prepared"), local=state.get("local", False))
 
     def close(self):
         if self.closed:
@@ -771,6 +793,7 @@ class OnlineSubtitleController(object):
         self._browser_generation = 0
         self._operation_context = None
         self._download_provider = None
+        self._local_operation = False
         # Reopening a player must not create another set of network workers
         # while the previous player's bounded HTTP calls are still finishing.
         self._source_executor = _NATIVE_SOURCE_EXECUTOR
@@ -862,7 +885,7 @@ class OnlineSubtitleController(object):
         # Always use the original playback metadata. A corrected search title
         # must not become the identity of the film currently on the decoder.
         return subtitle_search_context(
-            self._metadata_value(), self._settings_value(),
+            self._metadata_value(), None if self._local_operation else self._settings_value(),
             (id(self), self._browser_generation),
         )
 
@@ -974,6 +997,8 @@ class OnlineSubtitleController(object):
             item = dict(result)
             item["provider"] = provider
             item["language"] = language
+            if metadata.get("_tmdb_identity"):
+                item["_tmdb_identity"] = deepcopy(metadata["_tmdb_identity"])
             results.append(item)
         return results
 
@@ -982,6 +1007,9 @@ class OnlineSubtitleController(object):
         combined, failures = [], []
         if not configured:
             return combined, failures
+        with subtitle_request_scope(lambda: self._job_is_current(generation)):
+            metadata = resolve_subtitle_metadata(metadata)
+            check_subtitle_job()
         jobs = []
         for provider, settings in configured:
             future = self._submit_source_job(generation, self._provider_search,
@@ -1314,6 +1342,115 @@ class OnlineSubtitleController(object):
         settings = self._settings or self._settings_value()
         return self._error_text_for(error, settings, self._download_provider)
 
+    def load_local_file(self, path, language="", on_finished=None):
+        """Import one explicit local choice off the GUI, without provider gates."""
+        if self._closed or (self._busy and self._local_operation):
+            return False
+        generation = self.begin_external_operation()
+        if not self.operation_is_current(generation):
+            return False
+        self._local_operation = True
+        self._operation_context = self._current_context()
+        self._metadata = self._metadata_value()
+        self._settings = self._settings_value().copy()
+        self._busy, self._automatic = True, False
+        self._finish_callback = on_finished
+        self._browser_results_callback = None
+        self._last_download_succeeded = False
+        self._last_download_status = ""
+        metadata, settings = dict(self._metadata), self._settings.copy()
+        old_path = self.renderer.loaded_path
+        preserve_paths = (old_path,) if old_path else ()
+        language = normalize_subtitle_language(language)
+
+        def worker():
+            try:
+                from .local_subtitles import import_local_subtitle
+                content, private_path = import_local_subtitle(
+                    path, metadata, language=language,
+                    cancel=lambda: not self._job_is_current(generation),
+                    preserve_paths=preserve_paths)
+                if not self._job_is_current(generation):
+                    return
+                cues = parse_subtitle(content, hearing_impaired=settings.hearing_impaired,
+                                      language=language)
+                prepared = IndependentSubtitleRenderer.prepare(cues)
+                self._queue(generation, "local_file", (cues, private_path, settings, prepared))
+            except Exception as error:
+                self._queue(generation, "local_error", error)
+
+        try:
+            submitted = self._submit_source_job(generation, worker)
+        except RuntimeError:
+            submitted = None
+        if submitted is None:
+            if self.operation_is_current(generation):
+                self._last_download_status = "error"
+                self._notify(N_("Could not load this subtitle file."))
+                self._finish(generation)
+            return False
+        self._arm_poll()
+        return True
+
+    def _local_file_ready(self, generation, payload):
+        cues, path, settings, prepared = payload
+        current = self._settings_value()
+        settings = settings.copy()
+        for name in ("font_size", "font_color", "background", "vertical_position", "offset_ms"):
+            if hasattr(current, name):
+                setattr(settings, name, getattr(current, name))
+        rollback = None
+        try:
+            if callable(self.before_activate):
+                rollback = self.before_activate()
+                if rollback is False:
+                    raise RuntimeError("Local subtitle activation was superseded")
+            if not self._context_is_current(generation):
+                if callable(rollback):
+                    rollback()
+                if generation == self._generation:
+                    self._last_download_status = "cancelled"
+                    self._finish(generation)
+                return
+            loaded = bool(self.renderer.load(cues, path, settings, prepared=prepared, local=True))
+        except Exception:
+            loaded = False
+        if generation != self._generation:
+            return
+        if loaded:
+            self._last_download_succeeded = True
+            self._last_download_status = "loaded"
+            if callable(self.is_paused):
+                try:
+                    if self.is_paused():
+                        self.renderer.pause()
+                except Exception:
+                    pass
+            self._changed(("local", path))
+        else:
+            if callable(rollback):
+                try:
+                    rollback()
+                except Exception:
+                    pass
+            self._last_download_status = "error"
+            self._notify(N_("Could not load this subtitle file."))
+        self._finish(generation)
+
+    def _local_file_error(self, generation, error):
+        code = getattr(error, "code", "local_read_failed")
+        self._last_download_status = "cancelled" if code == "local_cancelled" else "error"
+        messages = {
+            "local_too_large": N_("Subtitle file is too large."),
+            "subtitle_too_large": N_("Subtitle file is too large."),
+            "local_format_unsupported": N_("Only SRT and VTT subtitle files are supported."),
+            "subtitle_format_unsupported": N_("Only SRT and VTT subtitle files are supported."),
+            "download_folder_unavailable": N_("Subtitle download folder is unavailable. Choose another folder."),
+        }
+        if code != "local_cancelled":
+            self._notify(messages.get(code, N_("Could not load this subtitle file.")))
+        self._finish(generation)
+
     def _poll(self):
         if self._closed:
             return
@@ -1339,6 +1476,10 @@ class OnlineSubtitleController(object):
                 self._browser_results_ready(generation, payload)
             elif name == "download":
                 self._download_ready(generation, payload)
+            elif name == "local_file":
+                self._local_file_ready(generation, payload)
+            elif name == "local_error":
+                self._local_file_error(generation, payload)
             elif name == "error":
                 if self._automatic:
                     self._browser_results_ready(generation, (
@@ -1454,7 +1595,7 @@ class OnlineSubtitleController(object):
             self._finish(generation)
             return
         result = self.revalidate_result(result)
-        if result.get("identity_match") is False:
+        if result.get("identity_match") is False or result.get("compatibility_status") == "different":
             self._last_download_status = "different"
             if not self._automatic:
                 self._notify(_("Different version"))
@@ -1532,7 +1673,7 @@ class OnlineSubtitleController(object):
             if len(payload) == 5:
                 cues, path, settings, timeline_state, result = payload
                 result = self.revalidate_result(result)
-                if result.get("identity_match") is False:
+                if result.get("identity_match") is False or result.get("compatibility_status") == "different":
                     timeline_state = "mismatch"
                 else:
                     cues, unused_factor, timeline_state = retime_subtitle_cues(cues, result)
@@ -1577,7 +1718,7 @@ class OnlineSubtitleController(object):
             return
         if len(payload) == 5:
             latest = self.revalidate_result(payload[4])
-            if latest.get("identity_match") is False:
+            if latest.get("identity_match") is False or latest.get("compatibility_status") == "different":
                 state = "mismatch"
             else:
                 cues, unused_factor, state = retime_subtitle_cues(payload[0], latest)
@@ -1625,6 +1766,7 @@ class OnlineSubtitleController(object):
         self._browser_results_callback = None
         self._busy = False
         self._automatic = False
+        self._local_operation = False
         if callable(callback):
             try:
                 callback()
@@ -1640,6 +1782,7 @@ class OnlineSubtitleController(object):
         self._cancel_source_jobs()
         self._busy = False
         self._automatic = False
+        self._local_operation = False
         self._operation_context = None
         self._last_download_succeeded = False
         self._last_download_status = "cancelled"
@@ -1660,6 +1803,13 @@ class OnlineSubtitleController(object):
             except Exception:
                 pass
         return True
+
+    def adjust_timing(self, delta_ms=0, reset=False):
+        """Adjust only this active independent track, without opening a dialog."""
+        if self._closed or not self.is_loaded:
+            return None
+        offset = subtitle_sync_offset(self.renderer.offset_ms, delta_ms, reset)
+        return self.renderer.adjust_offset(absolute_ms=offset)
 
     def open_sync(self, on_finished=None):
         if not self.is_loaded:
@@ -1695,7 +1845,7 @@ class OnlineSubtitleController(object):
                     offset = None
                 if offset is not None:
                     self._notify(
-                        N_("Subtitle timing offset: {:+.1f} seconds").format(
+                        _("Subtitle timing offset: {:+.1f} seconds").format(
                             offset / 1000.0
                         )
                     )
@@ -1775,6 +1925,7 @@ class OnlineSubtitleController(object):
         self._browser_results_callback = None
         self._last_download_succeeded = False
         self._automatic = False
+        self._local_operation = False
         self._operation_context = None
         self._auto_started = False
         self._auto_context = None
@@ -1794,6 +1945,7 @@ class OnlineSubtitleController(object):
         self._generation += 1
         self._cancel_source_jobs()
         self._busy = False
+        self._local_operation = False
         self._operation_context = None
         self._finish_callback = None
         self._browser_results_callback = None

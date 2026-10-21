@@ -12,6 +12,7 @@ from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Components.ProgressBar import ProgressBar
 from Screens.MessageBox import MessageBox
+from Screens.ChoiceBox import ChoiceBox
 from Screens.Screen import Screen
 from enigma import eTimer, getDesktop
 
@@ -167,7 +168,7 @@ def _folder_skin():
 
 
 class GTDownloadsScreen(Screen):
-    def __init__(self, session, selected_id=""):
+    def __init__(self, session, selected_id="", pending_download=None):
         self.skin = _skin()
         Screen.__init__(self, session)
         self._closed = False
@@ -177,6 +178,10 @@ class GTDownloadsScreen(Screen):
         self._scan_result = None
         self._scan_generation = 0
         self._operation = None
+        self._snapshot_result = None
+        self._state = {}
+        self._state_epoch = 0
+        self._pending_download = pending_download
         self._scanning = False
         self._scan_at = 0
         self._scan_folder = ""
@@ -235,6 +240,10 @@ class GTDownloadsScreen(Screen):
 
     def _shown(self):
         self._visible = True
+        pending = self._pending_download
+        self._pending_download = None
+        if pending is not None:
+            self._begin_operation("enqueue", {"client": pending[0], "item": pending[1]})
         self._raise_detail_layers()
         self.refresh()
         if self._visible and not getattr(self, "_closed", True):
@@ -281,7 +290,24 @@ class GTDownloadsScreen(Screen):
                 return
             if getattr(self, "_closed", True):
                 return
-            state = manager.snapshot()
+            mailbox = getattr(self, "_snapshot_result", None)
+            if mailbox is not None and mailbox["done"].is_set():
+                if "state" in mailbox and mailbox.get("epoch", 0) == getattr(self, "_state_epoch", 0):
+                    self._state = mailbox["state"]
+                self._snapshot_result = None
+            state = getattr(self, "_state", {})
+            if self._snapshot_result is None:
+                mailbox = {"done": threading.Event(), "epoch": getattr(self, "_state_epoch", 0)}
+                self._snapshot_result = mailbox
+                def read_state():
+                    try:
+                        mailbox["state"] = manager.snapshot()
+                    except Exception as error:
+                        log_event("downloads", "snapshot-deferred", error)
+                    finally:
+                        mailbox["done"].set()
+                worker = threading.Thread(target=read_state, daemon=True)
+                worker.start()
             self._queue_held = bool(state.get("hold"))
             folder = state.get("folder") or ""
             if self._scan_result is not None and self._scan_result["done"].is_set():
@@ -300,7 +326,10 @@ class GTDownloadsScreen(Screen):
             selected = self.selected().get("id") or self._initial_id
             jobs = list(state.get("jobs") or [])
             known = {j.get("path") for j in jobs if j.get("status") == "completed"}
-            self._entries = jobs + [entry for entry in self._locals if entry["path"] not in known]
+            self._entries = manager.visible_entries(
+                jobs + [entry for entry in self._locals if entry["path"] not in known],
+                state.get("removed_paths") or (),
+            )
             if selected:
                 self.index = next((i for i, j in enumerate(self._entries) if j["id"] == selected), self.index)
                 self._initial_id = ""
@@ -404,11 +433,7 @@ class GTDownloadsScreen(Screen):
         identity = identity or self.selected().get("id")
         if not identity or identity.startswith("local:"):
             return
-        try:
-            manager.command(identity, action, restart=restart)
-        except Exception as error:
-            self._error(error)
-        self.refresh()
+        self._begin_operation("command", {"callback": lambda: manager.command(identity, action, restart=restart)})
 
     def cancel_selected(self):
         job = self.selected()
@@ -439,28 +464,65 @@ class GTDownloadsScreen(Screen):
         if job.get("status") in manager.ACTIVE + ("deleting",):
             self._error(manager.DownloadError("delete_active"))
             return
-        self.session.openWithCallback(lambda answer: self._begin_operation("delete", job) if answer else None,
-            MessageBox, _("Delete this video and its download entry?") + "\n\n" + job["name"] + "\n\n" + job["path"],
-            MessageBox.TYPE_YESNO, default=False)
+        self.session.openWithCallback(lambda choice: self._delete_choice(job, choice), ChoiceBox,
+            title=_("Remove this entry permanently from the download list, or delete the file too?") + "\n\n" + clean_dynamic_text(job["name"]),
+            list=[(_("Cancel"), "cancel"),
+                  (_("Remove from download list (keep file)"), "remove"),
+                  (_("Delete file and download entry"), "delete")])
+
+    def _delete_choice(self, job, choice):
+        if getattr(self, "_closed", True) or self._operation:
+            return
+        if not isinstance(choice, (tuple, list)) or len(choice) < 2:
+            return
+        if choice[1] == "remove":
+            self._begin_operation("remove", job)
+        elif choice[1] == "delete":
+            self.session.openWithCallback(lambda answer: self._begin_operation("delete", job) if answer else None,
+                MessageBox, _("Delete this video and its download entry?") + "\n\n" + job["name"] + "\n\n" + job["path"],
+                MessageBox.TYPE_YESNO, default=False)
 
     def _begin_operation(self, kind, entry):
         if getattr(self, "_closed", True) or self._operation:
             return
         mailbox = {"done": threading.Event(), "kind": kind, "entry": dict(entry)}
         self._operation = mailbox
+        self._state_epoch = getattr(self, "_state_epoch", 0) + 1
         def work():
             try:
                 if kind == "delete":
                     manager.delete_entry(entry)
+                elif kind == "remove":
+                    manager.remove_entry(entry)
+                elif kind == "command":
+                    entry["callback"]()
+                elif kind == "enqueue":
+                    folder = entry.get("folder") or manager.snapshot().get("folder")
+                    try:
+                        manager.folder_ready(folder)
+                    except Exception:
+                        raise manager.DownloadError("folder")
+                    if entry.get("folder"):
+                        manager.set_folder(folder)
+                    from .browser import _cached_picon_path
+                    poster = _cached_picon_path(getattr(entry["item"], "icon", ""))
+                    mailbox["identity"] = manager.enqueue(entry["client"], entry["item"], poster=poster or "")
                 else:
                     mailbox["media"] = inspect_media(entry["path"], expected_size=entry.get("total") or 0)
+                if kind != "play":
+                    try:
+                        mailbox["state"] = manager.snapshot()
+                    except Exception as error:
+                        log_event("downloads", "post-operation-snapshot-deferred", error)
             except MediaFileError as error:
                 mailbox["error"] = "media"
                 log_event("local_playback", "validation={}".format(str(error)))
             except FileNotFoundError:
-                mailbox["error"] = "missing"
+                mailbox["error"] = ("remove_failed" if kind == "remove"
+                                    else "delete_failed" if kind == "delete" else "missing")
             except Exception as error:
-                mailbox["error"] = getattr(error, "code", "delete_failed" if kind == "delete" else "media")
+                mailbox["error"] = getattr(error, "code", "remove_failed" if kind == "remove"
+                    else "delete_failed" if kind == "delete" else "media" if kind == "play" else "failed")
                 log_event("downloads", "operation={} failed".format(kind), error)
             finally:
                 mailbox["done"].set()
@@ -474,14 +536,33 @@ class GTDownloadsScreen(Screen):
         if mailbox is None or not mailbox["done"].is_set():
             return False
         self._operation = None
+        if "state" in mailbox:
+            self._state = mailbox["state"]
         if mailbox.get("error"):
+            if mailbox["kind"] == "enqueue" and mailbox["error"] == "folder":
+                entry = mailbox["entry"]
+                self.session.openWithCallback(
+                    lambda path: self._begin_operation("enqueue", dict(entry, folder=path)) if path and not self._closed else None,
+                    GTDownloadFolderScreen)
+                return False
             if mailbox["error"] == "missing":
                 self.session.open(MessageBox, _("File not found."), MessageBox.TYPE_ERROR)
             else:
                 self._error(manager.DownloadError(mailbox["error"]))
-            return True
-        if mailbox["kind"] == "delete":
-            # Discard scans that began before the deletion completed.
+            return False
+        if mailbox["kind"] == "enqueue":
+            self._initial_id = mailbox.get("identity", "")
+            return False
+        if mailbox["kind"] == "command":
+            self._scan_at = 0
+            return False
+        if mailbox["kind"] in ("delete", "remove"):
+            state = dict(getattr(self, "_state", {}))
+            entry = mailbox["entry"]
+            state["jobs"] = [job for job in state.get("jobs", ())
+                             if job.get("id") != entry.get("id") and job.get("path") != entry.get("path")]
+            self._state = state
+            # Discard scans that began before deletion/removal completed.
             self._scan_generation += 1
             self._locals = []
             self._scan_at = 0
@@ -500,30 +581,21 @@ class GTDownloadsScreen(Screen):
     def choose_folder(self):
         if self._operation:
             return
-        self.session.openWithCallback(self._folder_chosen, GTDownloadFolderScreen, manager.snapshot().get("folder") or "")
+        self.session.openWithCallback(self._folder_chosen, GTDownloadFolderScreen, self._state.get("folder") or "")
 
     def _folder_chosen(self, path):
         if path:
-            try:
-                manager.set_folder(path)
-                self._scan_at = 0
-            except Exception as error:
-                self._error(error)
-        self.refresh()
+            self._begin_operation("command", {"callback": lambda: manager.set_folder(path)})
 
     def choose_speed(self):
         if self._operation:
             return
         self.session.openWithCallback(lambda value: self._speed_chosen(value), GTSpeedLimitScreen,
-                                      manager.snapshot().get("limit") or manager.DEFAULT_SPEED)
+                                      self._state.get("limit") or manager.DEFAULT_SPEED)
 
     def _speed_chosen(self, value):
         if value is not None:
-            try:
-                manager.set_limit(value)
-            except Exception as error:
-                self._error(error)
-        self.refresh()
+            self._begin_operation("command", {"callback": lambda: manager.set_limit(value)})
 
     def open_selected(self):
         job = self.selected()
@@ -647,28 +719,9 @@ def request_download(session, client, item):
     from .download_guard import install
     install(session)
 
-    def add(folder=None):
-        try:
-            if folder:
-                manager.set_folder(folder)
-            from .browser import _cached_picon_path
-            poster = _cached_picon_path(getattr(item, "icon", "")) if getattr(item, "icon", "") else ""
-            identity = manager.enqueue(client, item, poster=poster or "")
-        except Exception as error:
-            session.open(MessageBox, _(manager.MESSAGES.get(getattr(error, "code", "failed"), manager.MESSAGES["failed"])), MessageBox.TYPE_INFO)
-            return
-        session.open(GTDownloadsScreen, identity)
-
     def accepted(answer):
-        if not answer:
-            return
-        try:
-            folder = manager.snapshot().get("folder")
-            manager.folder_ready(folder)
-        except Exception:
-            session.openWithCallback(lambda path: add(path) if path else None, GTDownloadFolderScreen)
-            return
-        add()
+        if answer:
+            session.open(GTDownloadsScreen, pending_download=(client, item))
 
     session.openWithCallback(accepted, MessageBox, _("Download this item?") + "\n\n" + item.name,
                              MessageBox.TYPE_YESNO, default=False)

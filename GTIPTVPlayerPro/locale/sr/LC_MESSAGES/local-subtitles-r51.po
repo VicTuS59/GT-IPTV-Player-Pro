@@ -1,0 +1,103 @@
+# GT IPTV Player Pro — local subtitle files and folders, r51
+# SPDX-FileCopyrightText: 2026 VicTuS59
+# SPDX-License-Identifier: GPL-2.0-or-later
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: sr\nLanguage: sr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2;\n"
+
+msgid "Choose a subtitle file"
+msgstr "Изаберите датотеку титлова"
+
+msgid "Download folder"
+msgstr "Фасцикла за преузимање"
+
+msgid "Use this folder"
+msgstr "Користи ову фасциклу"
+
+msgid "Local subtitles"
+msgstr "Локални титлови"
+
+msgid "GT subtitle downloads"
+msgstr "Преузимања титлова GT"
+
+msgid "Search subtitle files"
+msgstr "Претражи датотеке титлова"
+
+msgid "No subtitle files found."
+msgstr "Нису пронађене датотеке титлова."
+
+msgid "Could not read this folder."
+msgstr "Није могуће прочитати ову фасциклу."
+
+msgid "Could not load this subtitle file."
+msgstr "Није могуће учитати ову датотеку титлова."
+
+msgid "Could not save the download folder."
+msgstr "Није могуће сачувати фасциклу за преузимање."
+
+msgid "Download folder saved."
+msgstr "Фасцикла за преузимање је сачувана."
+
+msgid "Subtitle download folder is unavailable. Choose another folder."
+msgstr "Фасцикла за преузимање титлова није доступна. Изаберите другу фасциклу."
+
+msgid "Subtitle file is too large."
+msgstr "Датотека титлова је превелика."
+
+msgid "Only SRT and VTT subtitle files are supported."
+msgstr "Подржане су само датотеке титлова SRT и VTT."
+
+msgid "Searching subtitle files..."
+msgstr "Претраживање датотека титлова..."
+
+msgid "Search limit reached. Narrow your search."
+msgstr "Достигнуто је ограничење претраге. Сузите претрагу."
+
+msgid "Temporary folder"
+msgstr "Привремена фасцикла"
+
+msgid "Device storage"
+msgstr "Складиште уређаја"
+
+msgid "Up one folder"
+msgstr "Једну фасциклу навише"
+
+msgid "Subtitle language"
+msgstr "Језик титлова"
+
+msgid "Search this folder"
+msgstr "Претражи ову фасциклу"
+
+msgid "Local subtitle loaded."
+msgstr "Локални титлови су учитани."
+
+msgid "Automatic detection"
+msgstr "Аутоматско препознавање"
+
+msgid "Choose a folder on HDD, USB or connected NAS."
+msgstr "Изаберите фасциклу на HDD-у, USB-у или повезаном NAS-у."
+
+msgid "The temporary folder is cleared when the receiver restarts."
+msgstr "Привремена фасцикла се празни када се пријемник поново покрене."
+
+#, python-brace-format
+msgid "Download folder: {}"
+msgstr "Фасцикла за преузимање: {}"
+
+#, python-brace-format
+msgid "Subtitle language: {}"
+msgstr "Језик титлова: {}"
+
+msgid "Folder is not available."
+msgstr "Фасцикла није доступна."
+
+msgid "Use temporary folder"
+msgstr "Користи привремену фасциклу"
+
+msgid "Device folders"
+msgstr "Фасцикле уређаја"
+
+msgid "Downloaded subtitles"
+msgstr "Преузети титлови"
+
+msgid "Search results"
+msgstr "Резултати претраге"
