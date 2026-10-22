@@ -99,7 +99,7 @@ from .category_lock_ui import (
 from .metadata import MetadataError, TMDbMetadataClient
 from .live_programme_art_ui import LiveProgrammePosterMixin, live_guide_side_geometry
 from .movie_catalog import MovieCatalogIndex, SeriesCatalogIndex, CatalogStorageError, CatalogLimitError
-from .movie_browse import MovieBrowseCatalog
+from .category_browse import CategoryBrowseCatalog
 from .vod_grid import (CINEMATIC_POSTER_COLUMNS, GRID_COLUMNS, GRID_PAGE_SIZE,
                        LatestPosterWorkers, PosterRetryQueue, cinematic_poster_geometry,
                        grid_geometry, grid_move, page_position, poster_grid_skin)
@@ -6964,7 +6964,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._events = deque()
         self._catalog_mode = (
             self.content_type == "series"
-            or str(getattr(self.client, "source_type", "")).lower() == "xtream"
+            or str(getattr(self.client, "source_type", "")).lower() in ("xtream", "stalker")
             or isinstance(self.client, XtreamContentClient)
         )
         self._catalog_index = None
@@ -7334,6 +7334,22 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                     )
                     token.check()
                     self._queue_search_event(("page", generation, page, result))
+                    # Publish RAM results first. During a cold first load an
+                    # unfiltered Stalker movie query may also use its verified
+                    # provider search, without waiting for the full catalogue.
+                    if (not result.items and not result.catalog_state.get("complete")
+                            and self.content_type == "movie" and page == 1
+                            and str(getattr(self.client, "source_type", "")) == "stalker"
+                            and not self._hidden_category_ids):
+                        try:
+                            deadline = min(token.deadline, time.monotonic() + 5.0)
+                            with self.client.request_scope(cancel_event=token.cancel_event, deadline=deadline):
+                                portal = self.client.search_movies(query, page=page, page_size=self.provider_page_size)
+                            token.check()
+                            if portal.supported and portal.items:
+                                self._queue_search_event(("preview", generation, page, portal))
+                        except (ContentError, _WorkerCancelled):
+                            pass
                     return
                 searcher = getattr(self.client, "search_movies", None)
                 if not callable(searcher):
@@ -7560,7 +7576,8 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         for event in events:
             if event[1] != self._search_generation:
                 continue
-            if event[2] != self._requested_page:
+            if event[2] != self._requested_page and not (
+                    event[0] == "preview" and not self._loading and event[2] == self._current_page):
                 continue
             self._loading = False
             self._search_token = None
@@ -7571,7 +7588,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                 self._reset_search_results()
                 self._start_catalog()
                 self._catalog_refresh_pending = True
-            elif event[0] == "page":
+            elif event[0] in ("page", "preview"):
                 pending_index = self._pending_page_index
                 self._pending_page_index = 0
                 self._apply_search_page(
@@ -7963,6 +7980,9 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         with self._event_lock:
             self._catalog_mailbox = None
         self._cancel_search_request(invalidate_generation=True)
+        if self._catalog_index is not None:
+            self._catalog_index.close()
+        self._results = []
         self._page_cache.clear()
         try:
             self._keyboard_timer.stop()
@@ -7972,7 +7992,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
 
 
 class GTAllSeriesSearchScreen(GTAllMoviesSearchScreen):
-    """Paged account-wide series search using the persistent series index."""
+    """Paged account-wide series search using the session RAM catalogue."""
     content_type = "series"
     _search_title_message = N_("Search All Series")
     _query_hint_message = N_("Enter a series name.")
@@ -8373,7 +8393,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._movie_catalog_entries = []
             self._movie_entries = []
             self._movie_browser_catalog = (
-                MovieBrowseCatalog(self.client) if source_type == "xtream" else None
+                CategoryBrowseCatalog(self.client) if source_type in ("xtream", "stalker") else None
             )
             self._movie_browse_cursor = 0
             self._movie_index_reload_when_done = False
@@ -8456,8 +8476,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 self._poster_scroll_geometry = geometry["poster_scroll"]
             self._series_entries = []
             self._series_browser_catalog = (
-                MovieBrowseCatalog(self.client, index=SeriesCatalogIndex(self.client))
-                if source_type == "xtream" else None
+                CategoryBrowseCatalog(self.client, content_type="series")
+                if source_type in ("xtream", "stalker") else None
             )
             self._series_browse_cursor = 0
             self._series_index_reload_when_done = False
@@ -9871,6 +9891,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         )
         if callable(reset_cinematic):
             reset_cinematic()
+        # Account search is explicit and owns a separate catalogue. Pause the
+        # selected-category producer while its parent screen is hidden.
         browse_catalog = getattr(self, "_movie_browser_catalog", None)
         if browse_catalog is not None:
             browse_catalog.stop()
@@ -9987,7 +10009,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if browse_catalog is not None:
             browse_catalog.start()
             self._movie_browse_cursor = 0
-        token = _WorkerToken(30 * 60 if browse_catalog is not None else MOVIE_CATEGORY_TIMEOUT_SECONDS)
+        token = _WorkerToken(MOVIE_CATEGORY_TIMEOUT_SECONDS)
         self._movie_load_token = token
         self._movie_loading = True
         self._movie_ready = False
@@ -10150,8 +10172,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._render_movie_waiting()
         browse_catalog = getattr(self, "_movie_browser_catalog", None)
         if browse_catalog is not None:
-            browse_catalog.start()
-        token = _WorkerToken(30 * 60 if browse_catalog is not None else MOVIE_CATEGORY_TIMEOUT_SECONDS)
+            browse_catalog.start(preferred_category=category.category_id)
+        token = _WorkerToken(MOVIE_CATEGORY_TIMEOUT_SECONDS)
         self._movie_load_token = token
         worker = threading.Thread(
             target=self._load_movie_worker,
@@ -10508,7 +10530,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             return
         state = catalog.state
         if state.get("preparing"):
-            text = _("Preparing search catalogue: {movies} movies").format(movies=state.get("movies", 0))
+            text = ""
         elif state.get("reason") == "storage":
             text = _("Search cache is unavailable. Check receiver storage.")
         elif state.get("reason") == "limit":
@@ -10537,6 +10559,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     and self._movie_load_token.expired()
                 ):
                     _cancel_worker_token(self._movie_load_token)
+                    if browse_catalog is not None:
+                        browse_catalog.stop()
                     self._movie_loading = False
                     self._movie_error = N_("Movie request timed out")
                     self._render_movie_results()
@@ -12257,8 +12281,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._movie_ready = self._movie_detail_pending = self._movie_poster_pending = False
         browse_catalog = getattr(self, "_movie_browser_catalog", None)
         if browse_catalog is not None:
-            browse_catalog.start(force=True)
-            self._movie_index_reload_when_done = True
+            browse_catalog.invalidate()
+            self._movie_index_reload_when_done = False
         for current in self._movie_entries:
             url = _safe_picon_url(getattr(current, "icon", ""))
             if url:
@@ -12449,7 +12473,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             pool.close()
         browse_catalog = getattr(self, "_movie_browser_catalog", None)
         if browse_catalog is not None:
-            browse_catalog.stop()
+            browse_catalog.close()
         reset_cinematic = getattr(
             self,
             "_reset_cinematic_backdrop",
@@ -12935,8 +12959,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._render_series_waiting()
         browse_catalog = getattr(self, "_series_browser_catalog", None)
         if browse_catalog is not None:
-            browse_catalog.start()
-        token = _WorkerToken(30 * 60 if browse_catalog is not None else WORKER_LIST_TIMEOUT_SECONDS)
+            browse_catalog.start(preferred_category=category.category_id)
+        token = _WorkerToken(WORKER_LIST_TIMEOUT_SECONDS)
         self._series_load_token = token
         worker = threading.Thread(
             target=self._load_series_worker,
@@ -13026,7 +13050,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._series_more_loading = True
         generation = self._series_catalog_generation
         category_id = str(self._series_loaded_category_id or "")
-        token = _WorkerToken(30 * 60 if getattr(self, "_series_browser_catalog", None) is not None else WORKER_LIST_TIMEOUT_SECONDS)
+        token = _WorkerToken(WORKER_LIST_TIMEOUT_SECONDS)
         _cancel_worker_token(self._series_more_token)
         self._series_more_token = token
         worker = threading.Thread(
@@ -13298,7 +13322,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             return
         state = catalog.state
         if state.get("preparing"):
-            text = _("Preparing series catalogue: {count} series").format(count=state.get("movies", 0))
+            text = ""
         elif state.get("reason") == "storage":
             text = _("Search cache is unavailable. Check receiver storage.")
         elif state.get("reason") == "limit":
@@ -13327,6 +13351,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     and self._series_load_token.expired()
                 ):
                     _cancel_worker_token(self._series_load_token)
+                    if browse_catalog is not None:
+                        browse_catalog.stop()
                     self._series_loading = False
                     self._series_error = N_("Series request timed out")
                     self._render_series_results()
@@ -14317,8 +14343,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._series_ready = self._series_detail_pending = self._series_poster_pending = False
         browse_catalog = getattr(self, "_series_browser_catalog", None)
         if browse_catalog is not None:
-            browse_catalog.start(force=True)
-            self._series_index_reload_when_done = True
+            browse_catalog.invalidate()
+            self._series_index_reload_when_done = False
         for current in self._series_entries:
             url = _safe_picon_url(getattr(current, "icon", ""))
             if url:
@@ -14515,7 +14541,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             return None
         self._remember_series_selection()
         self._series_child_open = True
-        self._suspend_for_playback()
+        self._suspend_for_playback(keep_catalog=screen is GTAllSeriesSearchScreen)
         try:
             opener = getattr(self.session, "openWithCallback", None)
             if callable(opener):
@@ -14808,7 +14834,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._series_search_keyboard_open = self._series_search_child_open = False
         browse_catalog = getattr(self, "_series_browser_catalog", None)
         if browse_catalog is not None:
-            browse_catalog.stop()
+            browse_catalog.close()
         reset_cinematic = getattr(
             self,
             "_reset_cinematic_backdrop",
@@ -15065,8 +15091,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         else:
             self.session.open(GTWeatherSettingsScreen)
 
-    def _suspend_for_playback(self):
-        """Silence optional parent work while a VOD player owns the screen."""
+    def _suspend_for_playback(self, keep_catalog=False):
+        """Silence optional parent work; search keeps the shared producer."""
         preparation = getattr(self, "_vod_preparation", None)
         if preparation is not None:
             preparation.pause()
@@ -15079,7 +15105,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 pass
         if self.content_type == "movie":
             browse_catalog = getattr(self, "_movie_browser_catalog", None)
-            if browse_catalog is not None:
+            if browse_catalog is not None and not keep_catalog:
                 browse_catalog.stop()
             reset_cinematic = getattr(
                 self,
@@ -15109,7 +15135,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     pass
         elif self.content_type == "series":
             browse_catalog = getattr(self, "_series_browser_catalog", None)
-            if browse_catalog is not None:
+            if browse_catalog is not None and not keep_catalog:
                 browse_catalog.stop()
             reset_cinematic = getattr(
                 self,

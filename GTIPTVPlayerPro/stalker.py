@@ -132,6 +132,7 @@ REQUEST_ABORT_REASONS = frozenset(
 PORTAL_CATALOG_PACE_SECONDS = 0.12
 PORTAL_CATALOG_STEP_ITEMS = 250
 MAX_PORTAL_PAGES = 250
+PORTAL_CATALOG_MAX_PAGES = 250001
 PORTAL_VOD_INITIAL_TARGET = 12
 PORTAL_VOD_MORE_TARGET = 20
 PORTAL_VOD_REQUEST_BUDGET = 6
@@ -147,6 +148,7 @@ PORTAL_LIVE_MORE_REQUEST_BUDGET = 6
 PORTAL_PROVIDER = "stalker"
 VOD_CATALOG_STATE_LIMIT = 5
 VOD_ENTRY_CACHE_LIMIT = 2000
+VOD_PAGE_HINT_LIMIT = 512
 VOD_RAW_CACHE_LIMIT = 3
 SERIES_INFO_CACHE_LIMIT = 32
 EPISODE_COMMAND_CACHE_LIMIT = 512
@@ -1942,6 +1944,7 @@ class StalkerPortalClient(object):
         self._vod_raw_cache = OrderedDict()
         self._vod_entry_cache = OrderedDict()
         self._vod_entry_sources = {}
+        self._catalog_item_hints = OrderedDict()
         self._vod_catalog_states = OrderedDict()
         self._vod_catalog_lock = threading.RLock()
         self._movie_search_state_lock = threading.RLock()
@@ -3814,6 +3817,7 @@ class StalkerPortalClient(object):
                     self._vod_raw_cache.clear()
                     self._vod_entry_cache.clear()
                     self._vod_entry_sources.clear()
+                    self._catalog_item_hints.clear()
                     self._series_info_cache.clear()
                     self._episode_command_cache.clear()
                 with self._session.category_cache_lock:
@@ -4534,7 +4538,7 @@ class StalkerPortalClient(object):
             return []
 
         if state.get("streaming_catalog"):
-            # The disk index owns global deduplication. Keep only bounded
+            # The shared RAM index owns global deduplication. Keep only bounded
             # recent page fingerprints here, rather than every provider row.
             digest = hashlib.sha256()
             for entry in batch:
@@ -4586,7 +4590,7 @@ class StalkerPortalClient(object):
             # following empty page.  A false total therefore cannot truncate
             # either the movie or the series catalogue.
             source["page"] = page + 1
-            if source["page"] > (20000 if state.get("streaming_catalog") else MAX_PORTAL_PAGES):
+            if source["page"] > (PORTAL_CATALOG_MAX_PAGES if state.get("streaming_catalog") else MAX_PORTAL_PAGES):
                 source["done"] = True
                 source["stop_reason"] = "page-limit"
         return unique
@@ -5784,10 +5788,10 @@ class StalkerPortalClient(object):
                     self._vod_entry_sources.pop(key, None)
 
     def iter_movie_catalog_items(self, category_id=""):
-        """Stream portal pages into the disk index without a resident catalogue.
+        """Stream portal pages into the shared bounded RAM catalogue.
 
         Normal browsing keeps its small existing limits. The explicit search
-        index has its own disk/item budget and only retains recent page hashes
+        index has its own RAM/item budget; this adapter retains recent page hashes
         plus the bounded playback-entry LRU. Empty EOF confirms completion;
         repeated pages are an incomplete result, regardless of portal totals.
         """
@@ -5796,7 +5800,7 @@ class StalkerPortalClient(object):
         for request_type in self._catalog_request_types("movie"):
             page, useful, zero_probe = 1, False, False
             fingerprints = OrderedDict()
-            for request_number in range(20000):
+            for request_number in range(PORTAL_CATALOG_MAX_PAGES):
                 self._check_request_limits()
                 if request_number:
                     self._paced_catalog_wait()
@@ -5877,7 +5881,7 @@ class StalkerPortalClient(object):
                 yield item
             state["results"].clear()
             state["result_ids"].clear()
-            if state["request_count"] >= 20000:
+            if state["request_count"] >= PORTAL_CATALOG_MAX_PAGES and not state["complete"]:
                 raise ContentError(reason=ContentError.CATALOG_ITEM_LIMIT)
         if state.get("stop_reason") not in ("empty-page", "zero-page-complete"):
             error = state.get("last_error")
@@ -5889,7 +5893,7 @@ class StalkerPortalClient(object):
         """Recover one cached series parent from its original authenticated page."""
         identity = safe_series_id(getattr(item, "stream_id", ""))
         page = getattr(item, "portal_catalog_page", None)
-        if not identity or not isinstance(page, int) or not 0 <= page <= 20000:
+        if not identity or not isinstance(page, int) or not 0 <= page <= 250000:
             return False
         key = ("series", identity)
         with self._vod_catalog_critical():
@@ -5915,6 +5919,40 @@ class StalkerPortalClient(object):
                     self._vod_entry_sources[key] = request_type
                 return True
         return False
+
+    def remember_catalog_item(self, item):
+        """Keep only bounded page references for currently displayed rows."""
+        kind = getattr(item, "content_type", "")
+        page = getattr(item, "portal_catalog_page", None)
+        if kind not in ("movie", "series") or not isinstance(page, int) or not 0 <= page <= 250000:
+            return
+        key = (kind, str(item.stream_id))
+        hint = (str(getattr(item, "category_id", "") or ""), page,
+                getattr(item, "portal_request_type", "vod"),
+                getattr(item, "portal_catalog_category_parameter", "category"),
+                getattr(item, "portal_catalog_series_flag", ""))
+        with self._cache_state_lock:
+            self._lru_store(self._catalog_item_hints, key, hint, VOD_PAGE_HINT_LIMIT)
+
+    def _restore_catalog_hint(self, key, hint):
+        kind, identity = key
+        category, page, request_type, parameter, flag = hint
+        request_type = request_type if request_type in ("vod", "movie", "series") else "vod"
+        parameter = parameter if parameter in ("category", "genre") else "category"
+        parameters = [(parameter, category or "*"), ("fav", "0"), ("sortby", "name"),
+                      ("not_ended", "0"), ("hd", "0"), ("p", str(page))]
+        if flag in ("series", "is_series"):
+            parameters.append((flag, "1"))
+        value = self._request(request_type, "get_ordered_list", tuple(parameters))
+        for entry in self._data_list(value):
+            if self._media_identity(entry, kind, allow_series_composite=True) == identity:
+                with self._cache_state_lock:
+                    evicted = self._lru_store(self._vod_entry_cache, key, dict(entry), VOD_ENTRY_CACHE_LIMIT)
+                    for old in evicted:
+                        self._vod_entry_sources.pop(old, None)
+                    self._vod_entry_sources[key] = request_type
+                return dict(entry)
+        return {}
 
     def load_vod_catalog_step(
         self,
@@ -6139,24 +6177,34 @@ class StalkerPortalClient(object):
         else:
             stream_id = str(stream_id or "").strip()
         cache_key = (content_type, stream_id)
-        entry = self._vod_entry_cache.get(cache_key)
-        if entry is not None:
-            self._vod_entry_cache.move_to_end(cache_key)
-            return dict(entry)
+        with self._cache_state_lock:
+            entry = self._vod_entry_cache.get(cache_key)
+            if entry is not None:
+                self._vod_entry_cache.move_to_end(cache_key)
+                return dict(entry)
+            hint = self._catalog_item_hints.get(cache_key)
+        if hint is not None:
+            try:
+                restored = self._restore_catalog_hint(cache_key, hint)
+                if restored:
+                    return restored
+            except ContentError as error:
+                self._raise_terminal_series_error(error)
         try:
             self.load_items(content_type, "")
         except ContentError as error:
             self._raise_terminal_series_error(error)
             return {}
-        entry = self._vod_entry_cache.get(cache_key)
-        if entry is not None:
-            self._vod_entry_cache.move_to_end(cache_key)
-        else:
-            state = self._vod_catalog_states.get((content_type, ""))
-            error = state.get("last_error") if state else None
-            if isinstance(error, ContentError):
-                self._raise_terminal_series_error(error)
-        return dict(entry or {})
+        with self._cache_state_lock:
+            entry = self._vod_entry_cache.get(cache_key)
+            if entry is not None:
+                self._vod_entry_cache.move_to_end(cache_key)
+            else:
+                state = self._vod_catalog_states.get((content_type, ""))
+                error = state.get("last_error") if state else None
+                if isinstance(error, ContentError):
+                    self._raise_terminal_series_error(error)
+            return dict(entry or {})
 
     def load_vod_info(self, stream_id):
         stream_id = str(stream_id or "").strip()
@@ -7799,14 +7847,14 @@ class StalkerPortalClient(object):
             return self._media_item(entry, "movie", request_type)
 
         category_id = str(getattr(item, "category_id", "") or "")
-        # The disk search index remembers the listing page instead of an
+        # The RAM search index remembers the listing page instead of an
         # unsafe signed command. Resolve that one page before the legacy
         # bounded category walk, including films beyond its usual UI limits.
         try:
             indexed_page = int(getattr(item, "portal_catalog_page", -1))
         except (TypeError, ValueError, OverflowError):
             indexed_page = -1
-        if 0 <= indexed_page < 20001:
+        if 0 <= indexed_page <= 250000:
             request_type = str(getattr(item, "portal_request_type", "vod"))
             if request_type not in ("vod", "movie"):
                 request_type = "vod"

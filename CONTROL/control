@@ -1,11 +1,11 @@
 Package: enigma2-plugin-extensions-gtiptvplayerpro
-Version: 1.6.0-r1
+Version: 1.7.0-r0
 Section: extra
 Priority: optional
 Architecture: all
 Maintainer: VicTuS59
 Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-math, python3-netclient, python3-netserver, python3-stringold, python3-threading, python3-xml
-Installed-Size: 50624
+Installed-Size: 50605
 Homepage: https://github.com/VicTuS59/GT-IPTV-Player-Pro
 License: GPL-2.0-or-later
 Description: GT IPTV Player Pro for Enigma2
@@ -13,13 +13,15 @@ Description: GT IPTV Player Pro for Enigma2
  Selectable user-data backup and restore with section sizes and safety copies.
  Multi-day EPG guide, previous-channel recall and redesigned information bar.
  All Movies browsing and account-wide movie search for Xtream and Stalker.
- Persistent, progressive movie search with resumable category checkpoints.
- Paged normal movie browsing through the same streaming catalogue on Xtream.
- Streamed All Series and category browsing with an independent series cache.
+ Progressive movie search with bounded process-memory catalogues.
+ On-demand movie and series categories with cancellable bounded RAM windows.
+ Account-wide search starts only when requested, independently of browsing.
  Persistent watched-episode ticks across playback, resume, seeking and receiver restarts.
  Immediate BLUE-key account-wide series search with season/episode selection.
  Optional 14-poster movie/series grid with details and vertical page navigation.
- Writable cache selection and a portable backend for images without SQLite.
+ Movie/series catalogues kept only in RAM, with no SQLite or temporary cache files.
+ Shared Stalker/Xtream browsing and fast RAM title search for 200,000 films or series.
+ Packed metadata blocks, bounded display windows and immediate cached searches.
  Optional single-account automatic login with a translated connection overlay.
  Shared weather and receiver incoming network rate in Mbps.
  Actual video resolution in information bars and YouTube previews.

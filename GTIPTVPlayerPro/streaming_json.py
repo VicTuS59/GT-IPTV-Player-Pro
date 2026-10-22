@@ -10,7 +10,7 @@ from .content import ContentError, _bounded_provider_integer, _validate_provider
 from .i18n import N_
 
 
-STREAM_RESPONSE_BYTES = 256 * 1024 * 1024
+STREAM_RESPONSE_BYTES = 1024 * 1024 * 1024
 STREAM_OBJECT_BYTES = 2 * 1024 * 1024
 STREAM_CHUNK_BYTES = 64 * 1024
 
