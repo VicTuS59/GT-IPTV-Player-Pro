@@ -1,0 +1,142 @@
+name: Publish GT IPTV Player Pro 1.6.0
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-1.6.0.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-gtiptvplayerpro-1.6.0
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.repository == 'VicTuS59/GT-IPTV-Player-Pro' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event.head_commit.message == 'Release 1.6.0 stable')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      IPK: dist/enigma2-plugin-extensions-gtiptvplayerpro_1.6.0-r0_all.ipk
+      EXPECTED_SHA256: 5ae693a234419199be2d1345d17180f44d31dbafc830a6ff8c00896ba5472e9f
+      BASE_IPK: dist/enigma2-plugin-extensions-gtiptvplayerpro_1.5.0-r0_all.ipk
+      BASE_SHA256: e8979990db67ebd880e9366364eccf83894f2ee20e4bf9ea2d126fc3d92c9f57
+    steps:
+      - name: Check out approved stable sources and package
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Package the approved r2 sources with the new version
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import copy, gzip, hashlib, io, os, subprocess, tarfile, tempfile
+          from pathlib import Path
+
+          base = Path(os.environ['BASE_IPK'])
+          output = Path(os.environ['IPK']).resolve()
+          assert hashlib.sha256(base.read_bytes()).hexdigest() == os.environ['BASE_SHA256']
+          prefix = 'usr/lib/enigma2/python/Plugins/Extensions/GTIPTVPlayerPro/'
+          with tempfile.TemporaryDirectory(prefix='gtiptv-release-') as temporary:
+              staging = Path(temporary)
+              (staging / 'debian-binary').write_bytes(subprocess.check_output(['ar', 'p', str(base), 'debian-binary']))
+              for part in ('control.tar.gz', 'data.tar.gz'):
+                  raw = subprocess.check_output(['ar', 'p', str(base), part])
+                  with tarfile.open(fileobj=io.BytesIO(raw), mode='r:gz') as archive:
+                      entries = [(copy.copy(m), archive.extractfile(m).read() if m.isfile() else None)
+                                 for m in archive.getmembers()]
+                  with (staging / part).open('wb') as stream:
+                      with gzip.GzipFile(filename='', mode='wb', fileobj=stream, compresslevel=9, mtime=0) as zipped:
+                          with tarfile.open(mode='w', fileobj=zipped, format=tarfile.USTAR_FORMAT) as archive:
+                              for member, body in entries:
+                                  assert member.isfile() or member.isdir(), member.name
+                                  if member.isfile():
+                                      name = member.name.removeprefix('./')
+                                      if part == 'data.tar.gz':
+                                          assert name.startswith(prefix), name
+                                          source = Path('GTIPTVPlayerPro') / name[len(prefix):]
+                                      else:
+                                          assert name in ('control', 'postinst', 'postrm', 'prerm'), name
+                                          source = Path('CONTROL') / name
+                                      assert source.is_file() and not source.is_symlink(), str(source)
+                                      body = source.read_bytes()
+                                      member.size = len(body)
+                                  archive.addfile(member, io.BytesIO(body) if body is not None else None)
+              output.unlink(missing_ok=True)
+              subprocess.run(['ar', 'crD', str(output), 'debian-binary', 'control.tar.gz', 'data.tar.gz'], cwd=staging, check=True)
+          digest = hashlib.sha256(output.read_bytes()).hexdigest()
+          assert digest == os.environ['EXPECTED_SHA256'], 'Release package checksum mismatch'
+          output.chmod(0o644)
+          Path(str(output) + '.sha256').write_text(digest + '  ' + output.name + '\n')
+          PY
+
+      - name: Verify the approved package and matching sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s  %s\n' "$EXPECTED_SHA256" "$IPK" | sha256sum --check --strict -
+          (cd dist && sha256sum --check --strict "$(basename "$IPK").sha256")
+          python3 - <<'PY'
+          import io, os, subprocess, tarfile
+          from pathlib import Path
+
+          package = os.environ['IPK']
+          prefix = 'usr/lib/enigma2/python/Plugins/Extensions/GTIPTVPlayerPro/'
+          assert subprocess.check_output(['ar', 't', package], text=True).splitlines() == [
+              'debian-binary', 'control.tar.gz', 'data.tar.gz']
+          assert subprocess.check_output(['ar', 'p', package, 'debian-binary']) == b'2.0\n'
+          runtime = set()
+          for part in ('data.tar.gz', 'control.tar.gz'):
+              raw = subprocess.check_output(['ar', 'p', package, part])
+              with tarfile.open(fileobj=io.BytesIO(raw), mode='r:gz') as archive:
+                  for member in archive:
+                      assert member.isfile() or member.isdir(), member.name
+                      if not member.isfile():
+                          continue
+                      name = member.name.removeprefix('./')
+                      if part == 'data.tar.gz':
+                          assert name.startswith(prefix), name
+                          target = Path('GTIPTVPlayerPro') / name[len(prefix):]
+                          runtime.add(target.as_posix())
+                      else:
+                          assert name in ('control', 'postinst', 'postrm', 'prerm'), name
+                          target = Path('CONTROL') / name
+                      assert target.is_file() and not target.is_symlink(), str(target)
+                      assert target.read_bytes() == archive.extractfile(member).read(), str(target)
+          assert runtime == {p.as_posix() for p in Path('GTIPTVPlayerPro').rglob('*') if p.is_file()}
+          assert 'PLUGIN_VERSION = "1.6.0-r0"' in Path('GTIPTVPlayerPro/__init__.py').read_text()
+          assert 'Version: 1.6.0-r0\n' in Path('CONTROL/control').read_text()
+          PY
+
+      - name: Add the verified package to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'VicTuS59'
+          git config user.email 'guner.taylan59@icloud.com'
+          git add -f -- "$IPK" "$IPK.sha256"
+          if ! git diff --cached --quiet; then
+            git commit -m 'Add verified 1.6.0 release package'
+          fi
+          git push origin HEAD:main
+          printf 'RELEASE_COMMIT=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Publish v1.6.0 and its download assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v1.6.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v1.6.0 "$IPK" "$IPK.sha256" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit v1.6.0 --repo "$GITHUB_REPOSITORY" --title 'GT IPTV Player Pro v1.6.0' --notes-file .github/release-notes-1.6.0.md --latest
+          else
+            gh release create v1.6.0 "$IPK" "$IPK.sha256" --repo "$GITHUB_REPOSITORY" --target "$RELEASE_COMMIT" --title 'GT IPTV Player Pro v1.6.0' --notes-file .github/release-notes-1.6.0.md --latest
+          fi

@@ -581,6 +581,7 @@ def _select_current_epg_window(events, limit=2, now=None):
 
 
 class XtreamContentClient(object):
+    source_type = "xtream"
     def __init__(self, account, timeout=DEFAULT_TIMEOUT, opener=None, clock=None):
         self.account = account
         self.timeout = timeout
@@ -1180,7 +1181,26 @@ class XtreamContentClient(object):
         cached = self._cached_value(self._category_cache, content_type)
         if cached is not None:
             return cached
-        payload = self._request_json(CATEGORY_ACTIONS[content_type])
+        # GT_VOD_CATEGORY_TIMEOUT_FIX_V1
+        if content_type == "movie":
+            started = time.monotonic()
+            outcome = "failed"
+            try:
+                with self.request_scope(deadline=started + 28.0, timeout=25.0):
+                    payload = self._request_json("get_vod_categories")
+                outcome = "received"
+            except ContentError as error:
+                outcome = str(getattr(error, "reason", "") or "failed")
+                raise
+            finally:
+                log_event(
+                    "content",
+                    "Category API action=get_vod_categories outcome={} elapsed_ms={}".format(
+                        outcome, int((time.monotonic() - started) * 1000)
+                    ),
+                )
+        else:
+            payload = self._request_json(CATEGORY_ACTIONS[content_type])
         if not isinstance(payload, list):
             raise ContentError(
                 N_("Could not load the category list"),

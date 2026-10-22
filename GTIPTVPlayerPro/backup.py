@@ -37,8 +37,10 @@ SETTINGS_PATH = "/etc/enigma2/settings"
 CONFIG_PREFIX = "config.plugins.gtiptvplayerpro."
 JOURNAL_PATH = "/etc/enigma2/gtiptvplayerpro-restore-journal.json"
 EXTENSION = ".gtbackup"
+# Archive schema version, independent of the plugin/package release number.
 FORMAT_VERSION = 3
 BACKUP_SCOPE = "settings"
+# Only these historical builds wrote the legacy full-plugin archive layout.
 LEGACY_VERSIONS = frozenset(("1.3.0-r2", "1.3.0-r3"))
 MAX_FILES = 40000
 MAX_MANIFEST_BYTES = 16 * 1024 * 1024
@@ -706,9 +708,12 @@ class BackupManager(object):
             raise BackupError("invalid")
         legacy = manifest["format_version"] == 1
         package_version = manifest.get("package_version")
+        # The format check above determines compatibility. Keep the producing
+        # release as bounded display metadata; new releases using a supported
+        # schema must not need an entry in a package-version allowlist.
         if (not isinstance(package_version, str)
-                or (legacy and package_version not in LEGACY_VERSIONS)
-                or (not legacy and not re.fullmatch(r"1\.(?:3|4)\.0(?:-r[0-9]+)?", package_version))):
+                or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.+_-]{0,63}", package_version)
+                or (legacy and package_version not in LEGACY_VERSIONS)):
             raise BackupError("version")
         if not legacy and manifest.get("scope") != BACKUP_SCOPE:
             raise BackupError("invalid")
