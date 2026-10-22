@@ -1,0 +1,104 @@
+name: Publish GT IPTV Player Pro 1.6.0-r1
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-1.6.0-r1.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-gtiptvplayerpro-1.6.0-r1
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.repository == 'VicTuS59/GT-IPTV-Player-Pro' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event.head_commit.message == 'Release 1.6.0-r1 stable')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      IPK: dist/enigma2-plugin-extensions-gtiptvplayerpro_1.6.0-r1_all.ipk
+      EXPECTED_SHA256: 9776890e3046f353a78ce30225ebb71b8ea0a986c782a5ee48dc3cdb5eb922fc
+    steps:
+      - name: Check out approved stable sources and package
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Build the approved release package
+        shell: bash
+        run: |
+          set -euo pipefail
+          sh scripts/build-ipk.sh "$IPK"
+          printf '%s  %s\n' "$EXPECTED_SHA256" "$IPK" | sha256sum --check --strict -
+          printf '%s  %s\n' "$EXPECTED_SHA256" "$(basename "$IPK")" > "$IPK.sha256"
+
+      - name: Verify the approved package and matching sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s  %s\n' "$EXPECTED_SHA256" "$IPK" | sha256sum --check --strict -
+          (cd dist && sha256sum --check --strict "$(basename "$IPK").sha256")
+          python3 - <<'PY'
+          import io, os, subprocess, tarfile
+          from pathlib import Path
+
+          package = os.environ['IPK']
+          prefix = 'usr/lib/enigma2/python/Plugins/Extensions/GTIPTVPlayerPro/'
+          assert subprocess.check_output(['ar', 't', package], text=True).splitlines() == [
+              'debian-binary', 'control.tar.gz', 'data.tar.gz']
+          assert subprocess.check_output(['ar', 'p', package, 'debian-binary']) == b'2.0\n'
+          runtime = set()
+          for part in ('data.tar.gz', 'control.tar.gz'):
+              raw = subprocess.check_output(['ar', 'p', package, part])
+              with tarfile.open(fileobj=io.BytesIO(raw), mode='r:gz') as archive:
+                  for member in archive:
+                      assert member.isfile() or member.isdir(), member.name
+                      if not member.isfile():
+                          continue
+                      name = member.name.removeprefix('./')
+                      if part == 'data.tar.gz':
+                          assert name.startswith(prefix), name
+                          target = Path('GTIPTVPlayerPro') / name[len(prefix):]
+                          runtime.add(target.as_posix())
+                      else:
+                          assert name in ('control', 'postinst', 'postrm', 'prerm'), name
+                          target = Path('CONTROL') / name
+                      assert target.is_file() and not target.is_symlink(), str(target)
+                      assert target.read_bytes() == archive.extractfile(member).read(), str(target)
+          assert runtime == {p.as_posix() for p in Path('GTIPTVPlayerPro').rglob('*') if p.is_file()}
+          assert 'PLUGIN_VERSION = "1.6.0-r1"' in Path('GTIPTVPlayerPro/__init__.py').read_text()
+          assert 'Version: 1.6.0-r1\n' in Path('CONTROL/control').read_text()
+          assert 'python3-sqlite3' not in Path('CONTROL/control').read_text().split('Depends: ', 1)[1].splitlines()[0]
+          PY
+
+      - name: Add the verified package to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'VicTuS59'
+          git config user.email 'guner.taylan59@icloud.com'
+          git add -f -- "$IPK" "$IPK.sha256"
+          if ! git diff --cached --quiet; then
+            git commit -m 'Add verified 1.6.0-r1 release package'
+          fi
+          git push origin HEAD:main
+          printf 'RELEASE_COMMIT=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Publish v1.6.0-r1 and its download assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v1.6.0-r1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v1.6.0-r1 "$IPK" "$IPK.sha256" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit v1.6.0-r1 --repo "$GITHUB_REPOSITORY" --title 'GT IPTV Player Pro v1.6.0-r1' --notes-file .github/release-notes-1.6.0-r1.md --latest
+          else
+            gh release create v1.6.0-r1 "$IPK" "$IPK.sha256" --repo "$GITHUB_REPOSITORY" --target "$RELEASE_COMMIT" --title 'GT IPTV Player Pro v1.6.0-r1' --notes-file .github/release-notes-1.6.0-r1.md --latest
+          fi

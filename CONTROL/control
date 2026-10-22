@@ -1,10 +1,10 @@
 Package: enigma2-plugin-extensions-gtiptvplayerpro
-Version: 1.6.0-r0
+Version: 1.6.0-r1
 Section: extra
 Priority: optional
 Architecture: all
 Maintainer: VicTuS59
-Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-math, python3-netclient, python3-netserver, python3-sqlite3, python3-stringold, python3-threading, python3-xml
+Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-math, python3-netclient, python3-netserver, python3-stringold, python3-threading, python3-xml
 Installed-Size: 50624
 Homepage: https://github.com/VicTuS59/GT-IPTV-Player-Pro
 License: GPL-2.0-or-later
