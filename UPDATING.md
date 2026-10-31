@@ -7,7 +7,7 @@ with installed receivers. Store the matching private PEM key only in the
 Never commit a private key or include one in release assets.
 
 1. Prepare a higher version, for example:
-   `python3 -B scripts/prepare-release.py --version 1.7.0-r111 --notes-file RELEASE-DESCRIPTION.txt`.
+   `python3 -B scripts/prepare-release.py --version 1.8.0-r1 --notes-file RELEASE-DESCRIPTION.txt`.
 2. Review and commit the source/version/description changes to `main`.
 3. Run **Actions > Publish signed IPTV update > Run workflow**, using `main`.
 4. The workflow runs the offline updater checks, builds an IPK, signs its metadata,
