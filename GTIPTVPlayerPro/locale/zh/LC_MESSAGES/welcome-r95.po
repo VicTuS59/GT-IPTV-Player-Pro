@@ -1,0 +1,3 @@
+# Welcome heading
+msgid "Ready to watch?"
+msgstr "准备好观看了吗？"

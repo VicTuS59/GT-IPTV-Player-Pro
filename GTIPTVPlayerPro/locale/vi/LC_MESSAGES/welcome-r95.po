@@ -1,0 +1,3 @@
+# Welcome heading
+msgid "Ready to watch?"
+msgstr "Sẵn sàng xem chưa?"

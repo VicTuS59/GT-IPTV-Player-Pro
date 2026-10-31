@@ -1,0 +1,30 @@
+name: Rebuild deleted 1.8.0-r0 localization release
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: gtiptv-signed-update-publisher
+  cancel-in-progress: false
+jobs:
+  republish:
+    if: github.repository == 'VicTuS59/GT-IPTV-Player-Pro' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Offline updater and localization checks
+        run: |
+          python3 -B tests/test-updater.py
+          python3 -B tests/test-update-backup.py
+          python3 -B tests/test-update-feedback.py
+          python3 -B tests/test-welcome-localization.py
+          python3 -B tests/test-localization-republish.py
+      - name: Build and sign the localization correction with unchanged notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GTIPTV_UPDATE_SIGNING_KEY: ${{ secrets.GTIPTV_UPDATE_SIGNING_KEY }}
+          SOURCE_DATE_EPOCH: '1700000000'
+        run: python3 -B scripts/republish-localization.py

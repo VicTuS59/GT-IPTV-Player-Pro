@@ -1,0 +1,3 @@
+# Welcome heading
+msgid "Ready to watch?"
+msgstr "Kas oled vaatamiseks valmis?"
