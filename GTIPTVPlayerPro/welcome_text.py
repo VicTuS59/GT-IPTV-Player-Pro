@@ -1,11 +1,68 @@
 # -*- coding: utf-8 -*-
 # SPDX-FileCopyrightText: 2026 VicTuS59
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Word-preserving two-line captions for the welcome action cards only."""
+"""Word-preserving two-line text for the welcome screen."""
 from .typography import (
     _apply_font, _component_geometry, _measure_text, _skin_font,
-    clean_dynamic_text, fit_dynamic_text,
+    _text_units, clean_dynamic_text, fit_dynamic_text,
 )
+
+
+# These catalogues have no spaces at the natural phrase boundary. Keep their
+# approved translation intact, inserting only a line break between phrases.
+_TITLE_PHRASES = {
+    '准备好观看了吗？': ('准备好', '观看了吗？'),
+    '準備好觀看了嗎？': ('準備好', '觀看了嗎？'),
+    'พร้อมรับชมหรือยัง?': ('พร้อมรับชม', 'หรือยัง?'),
+}
+
+
+def fit_welcome_title(component, value, preferred_size, min_size):
+    """Show the whole localized heading on two lines, never splitting a word.
+
+    Unlike provider titles, this short interface heading must not be truncated
+    or cut in the middle of a word to fill a row. Prefer balanced, explicit
+    phrase/word breaks and reduce the font only when the full block needs it.
+    The skin disables automatic wrapping, so even a minimal image without
+    native measurements cannot reintroduce an in-word break.
+    """
+    text = ' '.join(clean_dynamic_text(value).split())
+    words = text.split(' ')
+    if text in _TITLE_PHRASES:
+        choices = [_TITLE_PHRASES[text]]
+    else:
+        choices = [(' '.join(words[:i]), ' '.join(words[i:]))
+                   for i in range(1, len(words))]
+    if not choices:
+        choices = [(text,)]
+
+    instance, width, height = _component_geometry(component)
+    family, skin_size = _skin_font(component)
+    preferred = max(1, int(preferred_size))
+    minimum = min(preferred, max(1, int(min_size)))
+    can_resize = _apply_font(component, family, preferred)
+    sizes = range(preferred, minimum - 1, -1) if can_resize else [skin_size or preferred]
+    rendered = text
+    for size in sizes:
+        if can_resize:
+            _apply_font(component, family, size)
+        ranked = []
+        for lines in choices:
+            measurements = [_measure_text(component, line, size, nowrap=True)
+                            for line in lines]
+            widths = [item[0] if item else _text_units(line) * size * 0.58
+                      for line, item in zip(lines, measurements)]
+            block = _measure_text(component, '\n'.join(lines), size, nowrap=True)
+            block_height = block[1] if block else size * 1.18 * len(lines)
+            fits = (width <= 0 or max(widths) <= width) and (
+                height <= 0 or block_height <= height)
+            ranked.append((not fits, max(widths), abs(widths[0] - widths[-1]), lines))
+        best = min(ranked)
+        rendered = '\n'.join(best[-1])
+        if not best[0]:
+            break
+    component.setText(rendered)
+    return rendered
 
 
 def fit_action_caption(component, value, preferred_size, min_size):

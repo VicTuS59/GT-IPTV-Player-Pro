@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Explicit one-time rebuild of the deleted 1.8.0-r0 localization release.
+"""Explicit one-time rebuild of the 1.8.0-r0 welcome heading layout.
 
 The normal publisher's immutable-version policy remains unchanged. Only the
 known superseded package may be replaced, after validating all new assets.
@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('_localization_publisher',ROOT/'scripts/publish-update.py')
 pub=importlib.util.module_from_spec(spec);spec.loader.exec_module(pub)
 TARGET='1.8.0-r0'
-PREVIOUS_SHA256='55ea47d6bd1fd751ca56e61854f3e34c0ee0abed8672ffb38ee02b1e5eff708b'
+PREVIOUS_SHA256='8a71c17d610257db000fd37cca4ef49ea6566d29ad040e63498f90270b5a3a92'
 NOTES_SHA256='123caa61fd08a718de254eda1268ca80bf7a4dcc3c1170cacf5c6dcfd64ec617'
 normal_advance=pub.advance_pointer
 
@@ -31,7 +31,7 @@ def advance_rebuilt_pointer(body,api=None):
             verified=pub.released_assets('v'+TARGET,api)
             if pub.json_document(verified)!=pub.json_document(body):raise pub.PublishError('Rebuilt release metadata mismatch')
             if not isinstance(old.get('sha'),str) or not old['sha']:raise pub.PublishError('Missing pointer revision')
-            api(endpoint,method='PUT',data=dict(message='Republish 1.8.0-r0 welcome translations',branch='main',sha=old['sha'],content=base64.b64encode(body).decode()))
+            api(endpoint,method='PUT',data=dict(message='Republish 1.8.0-r0 welcome heading layout',branch='main',sha=old['sha'],content=base64.b64encode(body).decode()))
             return True
     return normal_advance(body,api)
 

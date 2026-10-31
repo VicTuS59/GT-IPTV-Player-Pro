@@ -1,4 +1,4 @@
-name: Rebuild deleted 1.8.0-r0 localization release
+name: Rebuild 1.8.0-r0 welcome layout
 on:
   workflow_dispatch:
 permissions:
@@ -21,6 +21,7 @@ jobs:
           python3 -B tests/test-update-backup.py
           python3 -B tests/test-update-feedback.py
           python3 -B tests/test-welcome-localization.py
+          python3 -B tests/test-welcome-heading.py
           python3 -B tests/test-localization-republish.py
       - name: Build and sign the localization correction with unchanged notes
         env:

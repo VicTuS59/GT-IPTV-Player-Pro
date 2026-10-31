@@ -13,7 +13,7 @@ from .paths import plugin_path
 from .remote_footer import remote_action_text
 from .typography import fit_dynamic_text,font_px
 from .vod_discovery import style_footer,refresh_plain_footer
-from .welcome_text import fit_action_caption
+from .welcome_text import fit_action_caption,fit_welcome_title
 
 BUTTONS=('connect_button','accounts_button','add_button','youtube_button','matches_button')
 ICONS=('connect','manage','add','youtube','matches')
@@ -66,7 +66,7 @@ def welcome_skin(width,height,px):
     widget('welcome_header_line',(line_left,int(round(height*104/1080.)),line_width,1),background='#34536F')
     widget('welcome_column_line',(int(round(width*590/1920.)),int(round(height*156/1080.)),1,max(1,int(round(height*770/1080.)))),background='#34536F')
     widget('eyebrow',g['eyebrow'],g['caption_font'],color='#20D5ED')
-    widget('welcome_title',g['title'],g['title_font'],color='#FFFFFF',wrap=True)
+    widget('welcome_title',g['title'],g['title_font'],color='#FFFFFF')
     widget('subtitle',g['subtitle'],g['subtitle_font'],color='#B7C9E0',wrap=True)
     widget('welcome_shield',g['shield'],pixmap=art('shield'))
     widget('welcome_device_line',(g['device'][0],g['device'][1]-max(3,int(px(16))),g['device'][2],1),background='#34536F')
@@ -114,14 +114,14 @@ class WelcomePresentation(object):
         self['welcome_brand_gt'].setText('GT');self['header'].setText('IPTV PLAYER PRO')
         self['welcome_version'].setText('v'+str(version))
         self['eyebrow'].setText(localized_upper(_('Welcome')))
-        self['welcome_title'].setText(_('Ready to watch?'))
+        fit_welcome_title(self['welcome_title'],_('Ready to watch?'),preferred_size=font_px(px,60,role='title'),min_size=max(12,int(px(36))))
         self['welcome_status_dot'].setText('●')
         self.skin=style_footer(self.skin,'movie',px,items,tuple(remote_action_text(item[1]) for item in items))
         self.onShown.append(self._refresh_welcome_chrome)
 
     def _refresh_welcome_chrome(self):
         px=self._welcome_px
-        fit_dynamic_text(self['welcome_title'],_('Ready to watch?'),max_lines=2,preferred_size=font_px(px,60,role='title'),min_size=max(22,int(px(44))))
+        fit_welcome_title(self['welcome_title'],_('Ready to watch?'),preferred_size=font_px(px,60,role='title'),min_size=max(12,int(px(36))))
         fit_dynamic_text(self['subtitle'],self['subtitle'].getText(),max_lines=3,preferred_size=font_px(px,33),min_size=max(12,int(px(25))))
         palette=saved_selection_palette();changed=palette!=self._welcome_palette
         if changed:self._welcome_palette=palette
