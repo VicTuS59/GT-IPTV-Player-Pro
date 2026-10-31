@@ -1,0 +1,18 @@
+# Sorting menus r53
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: th\n"
+
+msgid "A–Z"
+msgstr "A–Z"
+
+msgid "Z–A"
+msgstr "Z–A"
+
+msgid "Last added"
+msgstr "เพิ่มล่าสุด"
+
+msgid "Original"
+msgstr "ลำดับเดิม"
+
+msgid "Year"
+msgstr "ปี"

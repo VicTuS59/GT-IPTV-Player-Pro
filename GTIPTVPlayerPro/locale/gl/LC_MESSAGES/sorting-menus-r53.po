@@ -1,0 +1,18 @@
+# Sorting menus r53
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: gl\n"
+
+msgid "A–Z"
+msgstr "A–Z"
+
+msgid "Z–A"
+msgstr "Z–A"
+
+msgid "Last added"
+msgstr "Engadidos recentemente"
+
+msgid "Original"
+msgstr "Orde orixinal"
+
+msgid "Year"
+msgstr "Ano"

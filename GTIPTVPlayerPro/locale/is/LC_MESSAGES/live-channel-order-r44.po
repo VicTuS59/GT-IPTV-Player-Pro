@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: is\n"
+
+msgid "Move channel"
+msgstr "Færa rás"
+
+msgid "Channel moved."
+msgstr "Rás færð."
+
+msgid "Could not save channel order."
+msgstr "Ekki tókst að vista röð rása."

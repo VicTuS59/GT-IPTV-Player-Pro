@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Adicionar fonte M3U"
+
+msgid "Application"
+msgstr "Aplicação"
+
+msgid "Application information"
+msgstr "Informações da aplicação"
+
+msgid "Category Management"
+msgstr "Gestão de categorias"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "As alterações são aplicadas ao premir VERDE."
+
+msgid "Choose the source name and location."
+msgstr "Escolha o nome e a localização da fonte."
+
+msgid "Compatibility"
+msgstr "Compatibilidade"
+
+msgid "Country"
+msgstr "País"
+
+msgid "Developer"
+msgstr "Programador"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Endereço HTTP(S) direto da lista M3U."
+
+msgid "District"
+msgstr "Distrito"
+
+msgid "Frame rate"
+msgstr "Taxa de fotogramas"
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Platform"
+msgstr "Plataforma"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Prima AZUL para introduzir outro nome de canal."
+
+msgid "Press GREEN to save the source."
+msgstr "Prima VERDE para guardar a fonte."
+
+msgid "Press GREEN to use this folder."
+msgstr "Prima VERDE para utilizar esta pasta."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Prima OK para transferir a legenda selecionada."
+
+msgid "Press OK to load this subtitle."
+msgstr "Prima OK para carregar esta legenda."
+
+msgid "Press OK to play the selected video."
+msgstr "Prima OK para reproduzir o vídeo selecionado."
+
+msgid "Press OK to search again."
+msgstr "Prima OK para pesquisar novamente."
+
+msgid "Press OK to select this location."
+msgstr "Prima OK para selecionar esta localização."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Prima OK para mostrar ou ocultar a categoria. Marque categorias com VERMELHO para as mover em conjunto."
+
+msgid "Province"
+msgstr "Província"
+
+msgid "Release"
+msgstr "Versão"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Pesquise legendas ou altere o filtro."
+
+msgid "Select a folder or subtitle file."
+msgstr "Selecione uma pasta ou um ficheiro de legendas."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Selecione uma lista do recetor, USB ou armazenamento de rede montado."
+
+msgid "Selected category"
+msgstr "Categoria selecionada"
+
+msgid "Selected folder"
+msgstr "Pasta selecionada"
+
+msgid "Selected location"
+msgstr "Localização selecionada"
+
+msgid "Selected search"
+msgstr "Pesquisa selecionada"
+
+msgid "Selected subtitle"
+msgstr "Legenda selecionada"
+
+msgid "Selected video"
+msgstr "Vídeo selecionado"
+
+msgid "Source code"
+msgstr "Código-fonte"
+
+msgid "Source location"
+msgstr "Localização da fonte"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Ficheiros de legendas: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Formato suportado"
+

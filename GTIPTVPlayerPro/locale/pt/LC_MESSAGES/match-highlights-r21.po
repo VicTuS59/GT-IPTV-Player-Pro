@@ -1,0 +1,13 @@
+# Completed-match highlights. Existing catalogue entries preserved.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.7.0-r21\nLanguage: pt\nContent-Type: text/plain; charset=UTF-8\n"
+
+#: match_highlights.py match_highlights_ui.py matches_ui.py
+msgctxt "Football scores"
+msgid "Match highlights"
+msgstr "Resumo do jogo"
+
+#: match_highlights.py match_highlights_ui.py matches_ui.py
+msgctxt "Football scores"
+msgid "OK: Match highlights"
+msgstr "OK: Resumo do jogo"

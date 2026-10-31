@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Programinės įrangos naujinimas"
+
+msgid "Automatic update check"
+msgstr "Automatinis naujinimų tikrinimas"
+
+msgid "Check for updates"
+msgstr "Tikrinti naujinimus"
+
+msgid "Download and verify"
+msgstr "Atsisiųsti ir patikrinti"
+
+msgid "Install update"
+msgstr "Įdiegti naujinimą"
+
+msgid "Update available"
+msgstr "Yra naujinimas"
+
+msgid "Up to date"
+msgstr "Atnaujinta"
+
+msgid "Update verified"
+msgstr "Naujinimas patikrintas"
+
+msgid "Restart interface"
+msgstr "Paleisti sąsają iš naujo"
+
+msgid "Update source is not ready"
+msgstr "Naujinimo šaltinis dar neparuoštas"
+
+msgid "Update signature is invalid"
+msgstr "Naujinimo parašas netinkamas"
+
+msgid "Invalid update information"
+msgstr "Netinkama naujinimo informacija"
+
+msgid "Update package is invalid"
+msgstr "Naujinimo paketas netinkamas"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Naujinimas nesuderinamas su šiuo imtuvu"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Prieš naujindami sustabdykite įrašymą ir atsisiuntimus"
+
+msgid "Update failed"
+msgstr "Naujinimas nepavyko"
+
+msgid "Update installed. Restart the interface."
+msgstr "Naujinimas įdiegtas. Paleiskite sąsają iš naujo."
+
+msgid "Install the verified update?"
+msgstr "Įdiegti patikrintą naujinimą?"
+
+msgid "Update available. Open updater?"
+msgstr "Yra naujinimas. Atverti naujinimo įrankį?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Automatinė patikra kas 6 valandas."
+
+msgid "New version"
+msgstr "Nauja versija"
+

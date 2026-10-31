@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sk\n"
+
+msgid "Provider order"
+msgstr "Poradie poskytovateľa"
+
+msgid "Newest added"
+msgstr "Najnovšie pridané"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Abecedne (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Dátum vydania (najnovšie prvé)"
+
+msgid "Saved manual order"
+msgstr "Uložené ručné poradie"
+
+msgid "Sorting"
+msgstr "Zoradenie"
+
+msgid "Sort content"
+msgstr "Zoradiť obsah"
+
+msgid "Sort channels"
+msgstr "Zoradiť kanály"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Tento zdroj neposkytuje dátumy pre tento spôsob zoradenia."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Zoradenie vyžaduje celú kategóriu. Počkajte alebo skúste znova."
+
+msgid "Could not save sorting preference."
+msgstr "Predvoľbu zoradenia sa nepodarilo uložiť."

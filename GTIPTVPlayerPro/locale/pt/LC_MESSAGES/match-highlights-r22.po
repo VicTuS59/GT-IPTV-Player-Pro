@@ -1,0 +1,8 @@
+# Date-verified match highlights; old catalogue entries retained.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.7.0-r22\nLanguage: pt\nContent-Type: text/plain; charset=UTF-8\n"
+
+#: match_highlights_ui.py
+msgctxt "Football scores"
+msgid "No date-verified highlights found for this match."
+msgstr "Não foram encontrados resumos com data verificada deste jogo."

@@ -1,0 +1,158 @@
+# Independent ESPN match information. All previous entries preserved.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.7.0-r18\nLanguage: ca\nContent-Type: text/plain; charset=UTF-8\n"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Matches"
+msgstr "Partits"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "League"
+msgstr "Lliga"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Match"
+msgstr "Enfrontament"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Score"
+msgstr "Marcador"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Match information"
+msgstr "Informació del partit"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "All leagues"
+msgstr "Totes les lligues"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "League filter"
+msgstr "Filtre de lliga"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Date"
+msgstr "Data"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "First half"
+msgstr "Primera part"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Second half"
+msgstr "Segona part"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Half-time"
+msgstr "Descans"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Extra time"
+msgstr "Pròrroga"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Penalties"
+msgstr "Penals"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Full time"
+msgstr "Final del partit"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Postponed"
+msgstr "Ajornat"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Suspended"
+msgstr "Suspès"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Abandoned"
+msgstr "Interromput definitivament"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Scheduled"
+msgstr "Programat"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "No matches found."
+msgstr "No s'ha trobat cap partit."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Loading matches..."
+msgstr "S'estan carregant els partits..."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Scores could not be updated."
+msgstr "No s'han pogut actualitzar els marcadors."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Some leagues could not be updated."
+msgstr "No s'han pogut actualitzar algunes lligues."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Showing saved scores."
+msgstr "Es mostren els marcadors desats."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Last update: {time}"
+msgstr "Darrera actualització: {time}"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "No update yet"
+msgstr "Encara no s'ha actualitzat"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "{count} matches"
+msgstr "Partits: {count}"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Previous day"
+msgstr "Dia anterior"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Next day"
+msgstr "Dia següent"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Yesterday"
+msgstr "Ahir"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Select date"
+msgstr "Tria la data"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Source: ESPN"
+msgstr "Font: ESPN"

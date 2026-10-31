@@ -1,0 +1,12 @@
+# Category sorting r51
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ku\n"
+
+msgid "Edit categories"
+msgstr "Kategoriyan biguherîne"
+
+msgid "Sort categories"
+msgstr "Kategoriyan rêz bike"
+
+msgid "Alphabetical (Z–A)"
+msgstr "Alfabetîk (Z–A)"

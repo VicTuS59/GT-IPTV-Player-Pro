@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: hr\n"
+
+msgid "Trailer"
+msgstr "Najava"
+
+msgid "Searching for the next episode trailer..."
+msgstr "Traženje najave sljedeće epizode..."
+
+msgid "No trailer found for the next episode."
+msgstr "Najava sljedeće epizode nije pronađena."
+
+msgid "Next episode information is unavailable."
+msgstr "Informacije o sljedećoj epizodi nisu dostupne."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "Pretraživanje najave nije uspjelo. Pokušajte ponovno."

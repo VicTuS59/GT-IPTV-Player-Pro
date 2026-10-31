@@ -1,0 +1,158 @@
+# Independent ESPN match information. All previous entries preserved.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.7.0-r18\nLanguage: vi\nContent-Type: text/plain; charset=UTF-8\n"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Matches"
+msgstr "Trận đấu"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "League"
+msgstr "Giải đấu"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Match"
+msgstr "Cặp đấu"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Score"
+msgstr "Tỷ số"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Match information"
+msgstr "Thông tin trận đấu"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "All leagues"
+msgstr "Tất cả giải đấu"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "League filter"
+msgstr "Lọc giải đấu"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Date"
+msgstr "Ngày"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "First half"
+msgstr "Hiệp một"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Second half"
+msgstr "Hiệp hai"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Half-time"
+msgstr "Nghỉ giữa hiệp"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Extra time"
+msgstr "Hiệp phụ"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Penalties"
+msgstr "Luân lưu"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Full time"
+msgstr "Hết trận"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Postponed"
+msgstr "Hoãn"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Suspended"
+msgstr "Tạm dừng"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Abandoned"
+msgstr "Hủy giữa chừng"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Scheduled"
+msgstr "Theo lịch"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "No matches found."
+msgstr "Không tìm thấy trận đấu."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Loading matches..."
+msgstr "Đang tải trận đấu..."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Scores could not be updated."
+msgstr "Không thể cập nhật tỷ số."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Some leagues could not be updated."
+msgstr "Không thể cập nhật một số giải đấu."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Showing saved scores."
+msgstr "Đang hiển thị tỷ số đã lưu."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Last update: {time}"
+msgstr "Cập nhật lần cuối: {time}"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "No update yet"
+msgstr "Chưa cập nhật"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "{count} matches"
+msgstr "Số trận: {count}"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Previous day"
+msgstr "Ngày trước"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Next day"
+msgstr "Ngày tiếp theo"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Yesterday"
+msgstr "Hôm qua"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Select date"
+msgstr "Chọn ngày"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Source: ESPN"
+msgstr "Nguồn: ESPN"

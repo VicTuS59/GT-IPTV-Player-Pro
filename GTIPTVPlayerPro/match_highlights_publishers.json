@@ -1,0 +1,52 @@
+[
+  {
+    "name": "beIN SPORTS Turkiye",
+    "channel_ids": [
+      "UCPe9vNjHF1kEExT5kHwc7aw"
+    ],
+    "handles": [
+      "@beinsportsturkiye"
+    ],
+    "source": "https://www.youtube.com/watch?v=PPrdZnEYm88"
+  },
+  {
+    "name": "Bundesliga",
+    "channel_ids": [
+      "UC6UL29enLNe4mqwTfAyeNuw"
+    ],
+    "handles": [
+      "@bundesliga"
+    ],
+    "source": "https://www.bundesliga.com/en/bundesliga"
+  },
+  {
+    "name": "LALIGA",
+    "channel_ids": [
+      "UCTv-XvfzLX3i4IGWAm4sbmA"
+    ],
+    "handles": [
+      "@laliga"
+    ],
+    "source": "https://www.laliga.com/en-GB"
+  },
+  {
+    "name": "Premier League",
+    "channel_ids": [
+      "UCG5qGWdu8nIRZqJ_GgDwQ-w"
+    ],
+    "handles": [
+      "@premierleague"
+    ],
+    "source": "https://www.premierleague.com/en/news/2168405"
+  },
+  {
+    "name": "Serie A",
+    "channel_ids": [
+      "UCBJeMCIeLQos7wacox4hmLQ"
+    ],
+    "handles": [
+      "@seriea"
+    ],
+    "source": "https://www.youtube.com/@seriea"
+  }
+]

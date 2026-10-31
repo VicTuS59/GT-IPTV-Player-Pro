@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Çavkaniya M3U lê zêde bike"
+
+msgid "Application"
+msgstr "Sepan"
+
+msgid "Application information"
+msgstr "Agahiyên sepanê"
+
+msgid "Category Management"
+msgstr "Rêveberiya kategoriyan"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Guhertin bi pêlkirina bişkoka KESK têne sepandin."
+
+msgid "Choose the source name and location."
+msgstr "Nav û cihê çavkaniyê hilbijêre."
+
+msgid "Compatibility"
+msgstr "Lihevhatin"
+
+msgid "Country"
+msgstr "Welat"
+
+msgid "Developer"
+msgstr "Pêşdebir"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Navnîşana rasterast a HTTP(S) ya lîsteya M3U."
+
+msgid "District"
+msgstr "Navçe"
+
+msgid "Frame rate"
+msgstr "Rêjeya çarçoveyan"
+
+msgid "Language"
+msgstr "Ziman"
+
+msgid "Platform"
+msgstr "Platform"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Ji bo nivîsandina navekî din ê kanalê, bişkoka ŞÎN pêl bike."
+
+msgid "Press GREEN to save the source."
+msgstr "Ji bo tomarkirina çavkaniyê, bişkoka KESK pêl bike."
+
+msgid "Press GREEN to use this folder."
+msgstr "Ji bo bikaranîna vê peldankê, bişkoka KESK pêl bike."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Ji bo daxistina binnivîsa hilbijartî, OK pêl bike."
+
+msgid "Press OK to load this subtitle."
+msgstr "Ji bo barkirina vê binnivîsê, OK pêl bike."
+
+msgid "Press OK to play the selected video."
+msgstr "Ji bo lîstina vîdyoya hilbijartî, OK pêl bike."
+
+msgid "Press OK to search again."
+msgstr "Ji bo lêgerîna ji nû ve, OK pêl bike."
+
+msgid "Press OK to select this location."
+msgstr "Ji bo hilbijartina vî cihî, OK pêl bike."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Ji bo nîşandan an veşartina kategoriyê, OK pêl bike. Kategoriyan bi bişkoka SOR nîşan bike da ku wan bi hev re veguhezînî."
+
+msgid "Province"
+msgstr "Parêzgeh"
+
+msgid "Release"
+msgstr "Weşan"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Li binnivîsan bigere an parzûnê biguherîne."
+
+msgid "Select a folder or subtitle file."
+msgstr "Peldankek an dosyeya binnivîsê hilbijêre."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Lîsteyekê ji wergir, USB an depoya torê ya girêdayî hilbijêre."
+
+msgid "Selected category"
+msgstr "Kategoriya hilbijartî"
+
+msgid "Selected folder"
+msgstr "Peldanka hilbijartî"
+
+msgid "Selected location"
+msgstr "Cihê hilbijartî"
+
+msgid "Selected search"
+msgstr "Lêgerîna hilbijartî"
+
+msgid "Selected subtitle"
+msgstr "Binnivîsa hilbijartî"
+
+msgid "Selected video"
+msgstr "Vîdyoya hilbijartî"
+
+msgid "Source code"
+msgstr "Koda çavkaniyê"
+
+msgid "Source location"
+msgstr "Cihê çavkaniyê"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Dosyeyên binnivîsê: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Formata piştgirîkirî"
+

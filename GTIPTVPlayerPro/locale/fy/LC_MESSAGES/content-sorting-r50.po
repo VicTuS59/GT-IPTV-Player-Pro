@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: fy\n"
+
+msgid "Provider order"
+msgstr "Folchoarder fan de oanbieder"
+
+msgid "Newest added"
+msgstr "Nij tafoege"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Alfabetysk (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Publikaasjedatum (nijste earst)"
+
+msgid "Saved manual order"
+msgstr "Bewarre hânmjittige folchoarder"
+
+msgid "Sorting"
+msgstr "Sortearring"
+
+msgid "Sort content"
+msgstr "Ynhâld sortearje"
+
+msgid "Sort channels"
+msgstr "Kanalen sortearje"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Dizze boarne jout gjin datums foar dizze sortearring."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Sortearjen freget de hiele kategory. Wachtsje of besykje it opnij."
+
+msgid "Could not save sorting preference."
+msgstr "De sortearfoarkar koe net bewarre wurde."

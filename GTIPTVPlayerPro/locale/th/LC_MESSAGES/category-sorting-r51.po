@@ -1,0 +1,12 @@
+# Category sorting r51
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: th\n"
+
+msgid "Edit categories"
+msgstr "แก้ไขหมวดหมู่"
+
+msgid "Sort categories"
+msgstr "เรียงหมวดหมู่"
+
+msgid "Alphabetical (Z–A)"
+msgstr "ตามตัวอักษร (Z–A)"

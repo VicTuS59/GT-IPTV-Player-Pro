@@ -16,6 +16,7 @@ from Screens.ChoiceBox import ChoiceBox
 from Screens.Screen import Screen
 from enigma import eTimer, getDesktop
 
+from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from . import downloads as manager
 from .background import attach_background, attach_pixmap
 from .channel_highlight import apply_selection_color
@@ -33,7 +34,7 @@ DOWNLOAD_FOOTER = (
     footer_item("green", N_("Pause / Resume")),
     footer_item("yellow", N_("Delete")),
     footer_item("blue", N_("Save folder")),
-    footer_item("menu", N_("Speed limit")),
+    footer_item("menu", N_("Menu")),
     footer_item("ok", "play"),
     footer_item("exit", "back"),
 )
@@ -104,6 +105,7 @@ def _scroll_label(name, x, y, w, h, px, size, color="#FFFFFF"):
                 name, px(x), px(y), px(w), px(h), font_px(px, size), color)
 
 
+@skin_after('downloads')
 def _skin():
     width, height, px = _scale()
     parts = ['<screen name="GTDownloadsScreen" position="0,0" size="{},{}" '
@@ -168,7 +170,7 @@ def _folder_skin():
 
 
 class GTDownloadsScreen(Screen):
-    def __init__(self, session, selected_id="", pending_download=None):
+    def __init__(self, session, selected_id="", pending_download=None, history_mode=False):
         self.skin = _skin()
         Screen.__init__(self, session)
         self._closed = False
@@ -181,6 +183,8 @@ class GTDownloadsScreen(Screen):
         self._snapshot_result = None
         self._state = {}
         self._state_epoch = 0
+        self._history_mode = bool(history_mode)
+        self._history_offset = 0
         self._pending_download = pending_download
         self._scanning = False
         self._scan_at = 0
@@ -191,7 +195,6 @@ class GTDownloadsScreen(Screen):
         self._start = 0
         self._initial_id = selected_id
         self._queue_held = True
-        attach_background(self, "app_bg", plugin_path("skin", "images", "global-neon-v0912.png"))
         for name in ("brand", "crumb", "title", "summary", "free", "detail_bg", "detail_heading",
                      "poster_placeholder", "folder_bg", "folder", "message",
                      "footer", "arrow_up", "arrow_down", "page"):
@@ -202,6 +205,7 @@ class GTDownloadsScreen(Screen):
         self["brand"].setText("GT IPTV PLAYER PRO")
         self["crumb"].setText(_("Settings") + "  ›  " + _("Downloads"))
         self["title"].setText(_("Downloads"))
+        if self._history_mode: self['title'].setText(_('Download history'))
         self["detail_heading"].setText(_("Download details"))
         self["poster_placeholder"].setText("GT")
         install_remote_footer(self, DOWNLOAD_FOOTER, stacked=True)
@@ -217,7 +221,7 @@ class GTDownloadsScreen(Screen):
             "down": lambda: self.move(1), "upRepeated": lambda: self.move(-1),
             "downRepeated": lambda: self.move(1), "left": lambda: self.move(-5), "right": lambda: self.move(5),
             "red": self.cancel_selected, "green": self.toggle_pause, "yellow": self.delete_selected,
-            "blue": self.choose_folder, "menu": self.choose_speed}, -1)
+            "blue": self.choose_folder, "menu": self.choose_menu}, -1)
         self.timer = eTimer()
         self._timer_connection = _timer(self.timer, self.refresh)
         self.onShown.append(self._shown)
@@ -227,6 +231,7 @@ class GTDownloadsScreen(Screen):
         self.onLayoutFinish.append(self._raise_detail_layers)
         self.onClose.append(self._close)
         self.setTitle(_("Downloads"))
+        setup_utility_pages(self, 'downloads', DOWNLOAD_FOOTER)
 
     def _close(self):
         self._closed = True
@@ -294,6 +299,14 @@ class GTDownloadsScreen(Screen):
             if mailbox is not None and mailbox["done"].is_set():
                 if "state" in mailbox and mailbox.get("epoch", 0) == getattr(self, "_state_epoch", 0):
                     self._state = mailbox["state"]
+                    total = int(self._state.get('history_total') or 0)
+                    if self._history_mode and self._history_offset and self._history_offset >= total:
+                        # Deleting the last row, or changing folders, can make
+                        # the current page disappear while it is open.
+                        self._history_offset = max(0, (total - 1) // 100 * 100)
+                        self._state_epoch += 1
+                        self._state = dict(self._state, jobs=[], history_more=False)
+                        self.index = 0
                 self._snapshot_result = None
             state = getattr(self, "_state", {})
             if self._snapshot_result is None:
@@ -301,7 +314,7 @@ class GTDownloadsScreen(Screen):
                 self._snapshot_result = mailbox
                 def read_state():
                     try:
-                        mailbox["state"] = manager.snapshot()
+                        mailbox["state"] = manager.snapshot(getattr(self, '_history_offset', 0))
                     except Exception as error:
                         log_event("downloads", "snapshot-deferred", error)
                     finally:
@@ -320,16 +333,15 @@ class GTDownloadsScreen(Screen):
                     self._scan_folder = scanned
             if folder != self._scan_folder:
                 self._locals, self._free = [], None
-            if not self._scanning and (time.monotonic() >= self._scan_at or folder != self._scan_folder):
+            if not self._history_mode and not self._scanning and (time.monotonic() >= self._scan_at or folder != self._scan_folder):
                 self._scan_at = time.monotonic() + 8
                 self._scan(folder)
             selected = self.selected().get("id") or self._initial_id
-            jobs = list(state.get("jobs") or [])
-            known = {j.get("path") for j in jobs if j.get("status") == "completed"}
-            self._entries = manager.visible_entries(
-                jobs + [entry for entry in self._locals if entry["path"] not in known],
-                state.get("removed_paths") or (),
-            )
+            values = state.get('jobs') or []
+            if self._history_mode: values = [row for row in values if row.get('status') in manager.TERMINAL]
+            self._entries = manager.folder_entries(
+                values, folder, () if self._history_mode else self._locals, state.get("removed_paths") or (), include_missing=self._history_mode)
+            jobs = [entry for entry in self._entries if entry.get("status") != "local"]
             if selected:
                 self.index = next((i for i, j in enumerate(self._entries) if j["id"] == selected), self.index)
                 self._initial_id = ""
@@ -356,9 +368,28 @@ class GTDownloadsScreen(Screen):
         return self._entries[self.index] if self._entries and self.index < len(self._entries) else {}
 
     def move(self, delta):
+        if self._history_mode and not self._entries and self._history_offset and delta < 0:
+            self._change_history_page(-100); return
         if self._entries:
+            if self._history_mode:
+                target = self.index + delta
+                if target >= len(self._entries) and self._state.get('history_more'):
+                    self._change_history_page(100); return
+                if target < 0 and self._history_offset:
+                    self._change_history_page(-100); return
             self.index = (self.index + delta) % len(self._entries)
             self._draw()
+
+    def _change_history_page(self, delta):
+        self._history_offset = max(0, self._history_offset + delta)
+        self._state_epoch += 1
+        self._snapshot_result = None
+        self._state = dict(self._state, jobs=[], history_more=False)
+        self._entries = []
+        self.index = 0 if delta > 0 else 99
+        self._initial_id = ''
+        self['message'].setText(_('Loading...'))
+        self.refresh()
 
     def _poster(self, name, path):
         path = path if path and os.path.isfile(path) else ""
@@ -373,15 +404,18 @@ class GTDownloadsScreen(Screen):
             if loader is not None:
                 loader.close()
 
+    @refresh_after
     def _draw(self):
         if self.index < self._start:
             self._start = self.index
         if self.index >= self._start + 5:
             self._start = self.index - 4
         self._start = min(self._start, max(0, len(self._entries)-5))
-        self["arrow_up"].show() if self._start else self["arrow_up"].hide()
-        self["arrow_down"].show() if self._start + 5 < len(self._entries) else self["arrow_down"].hide()
-        self["page"].setText("{} / {}".format(self.index+1 if self._entries else 0, len(self._entries)))
+        self["arrow_up"].show() if self._start or self._history_mode and self._history_offset else self["arrow_up"].hide()
+        self["arrow_down"].show() if self._start + 5 < len(self._entries) or self._history_mode and self._state.get('history_more') else self["arrow_down"].hide()
+        offset = self._history_offset if self._history_mode else 0
+        total = self._state.get('history_total', 0) if self._history_mode else len(self._entries)
+        self["page"].setText("{} / {}".format(offset+self.index+1 if self._entries else 0, total))
         for row in range(5):
             absolute = self._start + row
             job = self._entries[absolute] if absolute < len(self._entries) else None
@@ -508,10 +542,14 @@ class GTDownloadsScreen(Screen):
                     poster = _cached_picon_path(getattr(entry["item"], "icon", ""))
                     mailbox["identity"] = manager.enqueue(entry["client"], entry["item"], poster=poster or "")
                 else:
-                    mailbox["media"] = inspect_media(entry["path"], expected_size=entry.get("total") or 0)
+                    if entry.get('bundle'):
+                        from .recording_bundle import inspect_entry
+                        mailbox['media'] = inspect_entry(entry)
+                    else:
+                        mailbox["media"] = inspect_media(entry["path"], expected_size=entry.get("total") or 0)
                 if kind != "play":
                     try:
-                        mailbox["state"] = manager.snapshot()
+                        mailbox["state"] = manager.snapshot(getattr(self, '_history_offset', 0))
                     except Exception as error:
                         log_event("downloads", "post-operation-snapshot-deferred", error)
             except MediaFileError as error:
@@ -592,6 +630,16 @@ class GTDownloadsScreen(Screen):
             return
         self.session.openWithCallback(lambda value: self._speed_chosen(value), GTSpeedLimitScreen,
                                       self._state.get("limit") or manager.DEFAULT_SPEED)
+
+    def choose_menu(self):
+        if self._operation: return
+        choices = [(_('Speed limit'), 'speed')]
+        if not self._history_mode: choices.append((_('Download history'), 'history'))
+        def chosen(value):
+            if not value or self._closed: return
+            if value[1] == 'speed': self.choose_speed()
+            elif value[1] == 'history': self.session.open(GTDownloadsScreen, history_mode=True)
+        self.session.openWithCallback(chosen, ChoiceBox, title=_('Menu'), list=choices)
 
     def _speed_chosen(self, value):
         if value is not None:

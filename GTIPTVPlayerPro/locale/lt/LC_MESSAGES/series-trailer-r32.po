@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: lt\n"
+
+msgid "General trailer"
+msgstr "Bendras anonsas"
+
+msgid "Searching for a trailer..."
+msgstr "Ieškoma anonso..."
+
+msgid "No official trailer found."
+msgstr "Oficialus anonsas nerastas."

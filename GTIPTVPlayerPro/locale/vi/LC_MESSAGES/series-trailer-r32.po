@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: vi\n"
+
+msgid "General trailer"
+msgstr "Đoạn giới thiệu chung"
+
+msgid "Searching for a trailer..."
+msgstr "Đang tìm đoạn giới thiệu..."
+
+msgid "No official trailer found."
+msgstr "Không tìm thấy đoạn giới thiệu chính thức."

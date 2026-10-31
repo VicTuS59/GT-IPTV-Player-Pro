@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: et\n"
+
+msgid "Trailer"
+msgstr "Treiler"
+
+msgid "Searching for the next episode trailer..."
+msgstr "Järgmise osa treileri otsimine..."
+
+msgid "No trailer found for the next episode."
+msgstr "Järgmise osa treilerit ei leitud."
+
+msgid "Next episode information is unavailable."
+msgstr "Järgmise osa teave pole saadaval."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "Treileri otsimine ebaõnnestus. Proovi uuesti."

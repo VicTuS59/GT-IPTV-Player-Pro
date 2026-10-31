@@ -1,0 +1,158 @@
+# Independent ESPN match information. All previous entries preserved.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.7.0-r18\nLanguage: zh\nContent-Type: text/plain; charset=UTF-8\n"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Matches"
+msgstr "比赛"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "League"
+msgstr "联赛"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Match"
+msgstr "对阵"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Score"
+msgstr "比分"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Match information"
+msgstr "比赛信息"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "All leagues"
+msgstr "所有联赛"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "League filter"
+msgstr "联赛筛选"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Date"
+msgstr "日期"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "First half"
+msgstr "上半场"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Second half"
+msgstr "下半场"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Half-time"
+msgstr "中场休息"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Extra time"
+msgstr "加时赛"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Penalties"
+msgstr "点球大战"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Full time"
+msgstr "全场结束"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Postponed"
+msgstr "延期"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Suspended"
+msgstr "暂停"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Abandoned"
+msgstr "中止"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Scheduled"
+msgstr "未开赛"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "No matches found."
+msgstr "未找到比赛。"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Loading matches..."
+msgstr "正在加载比赛…"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Scores could not be updated."
+msgstr "无法更新比分。"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Some leagues could not be updated."
+msgstr "部分联赛无法更新。"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Showing saved scores."
+msgstr "正在显示已保存的比分。"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Last update: {time}"
+msgstr "最后更新：{time}"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "No update yet"
+msgstr "尚未更新"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "{count} matches"
+msgstr "比赛场次：{count}"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Previous day"
+msgstr "前一天"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Next day"
+msgstr "后一天"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Yesterday"
+msgstr "昨天"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Select date"
+msgstr "选择日期"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Source: ESPN"
+msgstr "来源：ESPN"

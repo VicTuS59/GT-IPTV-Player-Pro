@@ -56,6 +56,35 @@ def episode_title(item, fallback):
     return value or str(fallback)
 
 
+def episode_code(item, fallback):
+    season=str(getattr(item, 'season', '') or '').strip()
+    number=episode_number(item, fallback)
+    if (season.isdecimal() and number.isdecimal() and len(season)<=4 and len(number)<=5):
+        return 'S{:02d}E{:02d}'.format(int(season),int(number))
+    return ''
+
+
+def episode_display_title(item, series_name, fallback, number):
+    """Remove matching provider boilerplate, retaining actual episode titles."""
+    title=episode_title(item, fallback)
+    code=episode_code(item, number)
+    if code:
+        season=int(str(getattr(item,'season')))
+        episode=int(episode_number(item,number))
+        prefix=re.match(r'^S\s*(\d{1,4})\s*[EB]\s*(\d{1,5})(?:\s+|\s*[-:|]\s*)',title,re.I)
+        if prefix and (int(prefix[1]),int(prefix[2]))==(season,episode):title=title[prefix.end():]
+        suffix=re.search(r'(?:\s*[-:|]\s*|\s+)S(\d{1,4})E(\d{1,5})\s*$',title,re.I)
+        if suffix and (int(suffix[1]),int(suffix[2]))==(season,episode):title=title[:suffix.start()]
+        if title.casefold()==code.casefold():title=''
+    clean=lambda value:re.sub(r'\s*\(\d{4}\)\s*$','',' '.join(str(value or '').split())).strip()
+    series=clean(series_name)
+    if series and clean(title).casefold()==series.casefold():return str(fallback)
+    if series:
+        match=re.match(re.escape(series)+r'\s*[-:|]\s*(.+)$',title,re.I)
+        if match:title=match[1]
+    return title.strip() or str(fallback)
+
+
 def _finite_number(value):
     try:
         number = float(value)

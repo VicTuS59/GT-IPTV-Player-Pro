@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: is\n"
+
+msgid "Provider order"
+msgstr "Röð þjónustuveitanda"
+
+msgid "Newest added"
+msgstr "Nýlega bætt við"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Stafrófsröð (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Útgáfudagur (nýjast fyrst)"
+
+msgid "Saved manual order"
+msgstr "Vistuð handvirk röð"
+
+msgid "Sorting"
+msgstr "Röðun"
+
+msgid "Sort content"
+msgstr "Raða efni"
+
+msgid "Sort channels"
+msgstr "Raða rásum"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Þessi veita gefur ekki upp dagsetningar fyrir þessa röðun."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Röðun krefst alls flokksins. Bíddu eða reyndu aftur."
+
+msgid "Could not save sorting preference."
+msgstr "Ekki tókst að vista röðunarstillingu."

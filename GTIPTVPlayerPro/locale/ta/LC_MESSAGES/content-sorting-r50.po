@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ta\n"
+
+msgid "Provider order"
+msgstr "வழங்குநர் வரிசை"
+
+msgid "Newest added"
+msgstr "புதிதாகச் சேர்க்கப்பட்டவை"
+
+msgid "Alphabetical (A–Z)"
+msgstr "அகரவரிசை (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "வெளியீட்டுத் தேதி (புதியவை முதலில்)"
+
+msgid "Saved manual order"
+msgstr "சேமித்த கைமுறை வரிசை"
+
+msgid "Sorting"
+msgstr "வரிசைப்படுத்தல்"
+
+msgid "Sort content"
+msgstr "உள்ளடக்கத்தை வரிசைப்படுத்து"
+
+msgid "Sort channels"
+msgstr "சேனல்களை வரிசைப்படுத்து"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "இந்த வரிசைக்கு தேவையான தேதிகளை இந்த மூலம் வழங்கவில்லை."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "வரிசைப்படுத்த முழுப் பிரிவும் தேவை. காத்திருக்கவும் அல்லது மீண்டும் முயலவும்."
+
+msgid "Could not save sorting preference."
+msgstr "வரிசை விருப்பத்தைச் சேமிக்க முடியவில்லை."

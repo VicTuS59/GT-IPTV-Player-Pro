@@ -10,11 +10,13 @@ import os
 import tempfile
 import threading
 import time
+import weakref
 from collections import OrderedDict
 
 from .diagnostics import log_event
 from .persistence import WRITER, guarded_mutation
 from .playback import resume_account_scope
+from .history_index import HistoryIndex, document as history_document, rewrite as rewrite_history
 
 
 DEFAULT_WATCHED_PATH = "/etc/enigma2/gtiptvplayerpro-episode-history.json"
@@ -22,11 +24,12 @@ _STORE_LOCK = threading.RLock()
 _READ_CACHE_LOCK = threading.Lock()
 _READ_CACHE = OrderedDict()
 _QUEUE_LOCK = threading.Lock()
+_STORES = weakref.WeakSet()
 
 
 def _remember_records(path, signature, records):
     with _READ_CACHE_LOCK:
-        _READ_CACHE[path] = (signature, dict(records))
+        _READ_CACHE[path] = (signature, dict(list(records.items())[-256:]))
         _READ_CACHE.move_to_end(path)
         while len(_READ_CACHE) > 4:
             _READ_CACHE.popitem(last=False)
@@ -75,16 +78,12 @@ def _history_signature(path):
 
 
 def refresh_after_restore(paths=()):
-    """Publish restored snapshots on the restore worker, including rollback."""
-    with _STORE_LOCK:
-        with _READ_CACHE_LOCK:
-            known_paths = set(_READ_CACHE)
-            _READ_CACHE.clear()
-        known_paths.update(os.path.abspath(path) for path in paths)
-        for path in known_paths:
-            store = WatchedEpisodeStore(path)
-            items, unused_mutable = store._read()
-            store._publish(items)
+    """Drop only working snapshots; authoritative JSON and history are retained."""
+    with _STORE_LOCK, _READ_CACHE_LOCK:
+        _READ_CACHE.clear()
+        for store in tuple(_STORES):
+            store._records.clear(); store._keys = frozenset()
+
 
 
 def episode_watch_key(client, item):
@@ -122,6 +121,7 @@ class WatchedEpisodeStore(object):
         self._records = {}
         self._keys = frozenset()
         self._write_outcomes = OrderedDict()
+        with _READ_CACHE_LOCK: _STORES.add(self)
 
     def _read(self):
         try:
@@ -146,100 +146,84 @@ class WatchedEpisodeStore(object):
         _remember_records(self.path, self._signature, self._records)
 
     def records(self, refresh=True):
-        """Read on the loader; direction-key rendering uses the cached snapshot.
-
-        Cache publication and pending snapshots share the short cache lock.
-        Thus an older pending mark cannot resurrect a newer committed removal,
-        and a pending removal hides a disk completion before its writer runs.
-        """
-        with _READ_CACHE_LOCK:
-            cached = _READ_CACHE.get(self.path)
-        if refresh:
-            signature = _history_signature(self.path)
-            if cached is None or signature != cached[0]:
-                with _STORE_LOCK:
-                    items, unused_mutable = self._read()
-                    self._publish(items)
-        with _READ_CACHE_LOCK:
-            cached = _READ_CACHE.get(self.path)
-            if cached is not None:
-                self._signature, snapshot = cached
-                self._records = dict(snapshot)
-                self._keys = frozenset(snapshot)
-            records = dict(self._records)
-            pending = WRITER.snapshot(self._write_key("")[:-1])
-        for key, value in pending.items():
-            if not _valid_key(key):
-                continue
+        # Compatibility API for explicit full-history readers. Ordinary screens
+        # use get_many() and never retain the account-wide history.
+        if not refresh:
+            return self.get_many(tuple(self._records), refresh=False)
+        index = HistoryIndex(self.path, 'items', mapping=True)
+        result = {}
+        for key, value in index.items():
             record = _item_record(value)
-            if record is None:
-                # False is the explicit asynchronous unmark tombstone.
-                if value is False or (isinstance(value, dict)
-                                      and value.get("watched") is False):
-                    records.pop(key, None)
-            elif key not in records or (isinstance(value, dict)
-                                        and value.get("replace_finished_at")):
-                records[key] = record["finished_at"]
-        # Return fresh dictionaries so callers cannot mutate the shared cache.
-        return {key: {"finished_at": value} for key, value in records.items()}
+            if _valid_key(key) and record is not None: result[key] = record
+        for key, value in WRITER.snapshot(self._write_key('')[:-1]).items():
+            record = _item_record(value)
+            if record is not None: result[key] = record
+            elif value is False or isinstance(value, dict) and value.get('watched') is False: result.pop(key, None)
+        return result
+
+    def get_many(self, keys, refresh=True):
+        keys = tuple(dict.fromkeys(key for key in keys if _valid_key(key)))
+        if refresh:
+            with _STORE_LOCK:
+                raw = HistoryIndex(self.path, 'items', mapping=True).get_many(keys)
+                records = {key: record for key, value in raw.items() for record in (_item_record(value),) if record is not None}
+                self._records = {key: value['finished_at'] for key, value in records.items()}
+                _remember_records(self.path, _history_signature(self.path), self._records)
+        else:
+            with _READ_CACHE_LOCK:
+                cached = _READ_CACHE.get(self.path, (None, {}))[1]
+                values = dict(self._records)
+                values.update(cached)
+            records = {key: {'finished_at': values[key]} for key in keys if key in values}
+        pending = WRITER.snapshot(self._write_key('')[:-1])
+        for key in keys:
+            value = pending.get(key)
+            if value is False or isinstance(value, dict) and value.get('watched') is False:
+                records.pop(key, None)
+            elif value is not None:
+                record = _item_record(value)
+                if record is not None and (key not in records or value.get('replace_finished_at')): records[key] = record
+        return records
+
 
     def keys(self, refresh=True):
         return frozenset(self.records(refresh=refresh))
 
     @guarded_mutation
     def _set_watched(self, key, watched, finished_at=None, replace_finished_at=False):
-        if not _valid_key(key):
-            return False
+        if not _valid_key(key): return False
         if watched:
             finished_at = _completion_time(time.time() if finished_at is None else finished_at)
-            if not finished_at:
-                return False
+            if not finished_at: return False
         with _STORE_LOCK:
-            items, mutable = self._read()
-            if not mutable:
-                return False
-            previous = _item_record(items.get(key))
-            if watched:
-                if previous is not None and not replace_finished_at:
-                    self._publish(items)
-                    return True
-                items[key] = {"watched": True, "finished_at": finished_at}
-            elif key in items:
-                del items[key]
-            else:
-                self._publish(items)
-                return True
-            directory = os.path.dirname(self.path)
-            temporary = None
             try:
-                os.makedirs(directory, exist_ok=True)
-                descriptor, temporary = tempfile.mkstemp(
-                    prefix=".gtiptv-episode-history-", suffix=".tmp", dir=directory,
-                )
-                with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
-                    json.dump({"version": 2, "items": items}, handle,
-                              separators=(",", ":"), sort_keys=True, allow_nan=False)
-                    handle.flush()
-                    os.fsync(handle.fileno())
-                os.replace(temporary, self.path)
-                directory_fd = os.open(directory, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-                try:
-                    try:
-                        os.fsync(directory_fd)
-                    except OSError:
-                        pass
-                finally:
-                    os.close(directory_fd)
-                self._publish(items)
+                # Complete validation happens during index construction before
+                # a source document is ever replaced.
+                previous = HistoryIndex(self.path, 'items', mapping=True).get_many((key,)).get(key)
+                old = _item_record(previous)
+                if watched and old is not None and not replace_finished_at:
+                    return True
+                if not watched and previous is None: return True
+                def items():
+                    for name, value in history_document(self.path, 'items', mapping=True):
+                        if name is None and value[0] != key: yield value
+                    if watched: yield key, {'watched': True, 'finished_at': finished_at}
+                rewrite_history(self.path, 'items', items(), {'version': 2})
+                if watched: self._records[key] = finished_at
+                else: self._records.pop(key, None)
+                with _READ_CACHE_LOCK:
+                    for reader in tuple(_STORES):
+                        if reader.path == self.path and key in reader._records:
+                            if watched: reader._records[key] = finished_at
+                            else: reader._records.pop(key, None)
+                    cached = dict(_READ_CACHE.get(self.path, (None, {}))[1])
+                    if watched: cached[key] = finished_at
+                    else: cached.pop(key, None)
+                _remember_records(self.path, _history_signature(self.path), cached)
                 return True
-            except (OSError, TypeError, ValueError):
+            except (OSError, ValueError, TypeError):
                 return False
-            finally:
-                if temporary is not None:
-                    try:
-                        os.unlink(temporary)
-                    except OSError:
-                        pass
+
 
     def mark(self, key, finished_at=None):
         return self._set_watched(key, True, finished_at=finished_at)
@@ -263,7 +247,7 @@ class WatchedEpisodeStore(object):
                 replace_finished_at = present and (pending is False or (
                     isinstance(pending, dict) and (pending.get("watched") is False
                                                   or pending.get("replace_finished_at") is True)))
-                existing = self.records(refresh=False).get(key)
+                existing = self.get_many((key,), refresh=False).get(key)
                 if existing is not None:
                     captured_time = existing["finished_at"]
                 else:
@@ -367,8 +351,8 @@ class WatchedEpisodeStore(object):
         if outcome["ok"] is None:
             return None
         with _STORE_LOCK:
-            items, mutable = self._read()
-            self._publish(items)
+            items = HistoryIndex(self.path, 'items', mapping=True).get_many((key,))
+            mutable = True
         with _QUEUE_LOCK:
             if self._write_outcomes.get(key) is not outcome:
                 return None

@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "إضافة مصدر M3U"
+
+msgid "Application"
+msgstr "التطبيق"
+
+msgid "Application information"
+msgstr "معلومات التطبيق"
+
+msgid "Category Management"
+msgstr "إدارة الفئات"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "تُطبّق التغييرات عند الضغط على الزر الأخضر."
+
+msgid "Choose the source name and location."
+msgstr "اختر اسم المصدر وموقعه."
+
+msgid "Compatibility"
+msgstr "التوافق"
+
+msgid "Country"
+msgstr "البلد"
+
+msgid "Developer"
+msgstr "المطوّر"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "عنوان HTTP(S) مباشر لقائمة تشغيل M3U."
+
+msgid "District"
+msgstr "المنطقة"
+
+msgid "Frame rate"
+msgstr "معدل الإطارات"
+
+msgid "Language"
+msgstr "اللغة"
+
+msgid "Platform"
+msgstr "المنصة"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "اضغط على الزر الأزرق لإدخال اسم قناة آخر."
+
+msgid "Press GREEN to save the source."
+msgstr "اضغط على الزر الأخضر لحفظ المصدر."
+
+msgid "Press GREEN to use this folder."
+msgstr "اضغط على الزر الأخضر لاستخدام هذا المجلد."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "اضغط على OK لتنزيل الترجمة المحددة."
+
+msgid "Press OK to load this subtitle."
+msgstr "اضغط على OK لتحميل هذه الترجمة."
+
+msgid "Press OK to play the selected video."
+msgstr "اضغط على OK لتشغيل الفيديو المحدد."
+
+msgid "Press OK to search again."
+msgstr "اضغط على OK للبحث مجددًا."
+
+msgid "Press OK to select this location."
+msgstr "اضغط على OK لاختيار هذا الموقع."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "اضغط على OK لإظهار الفئة أو إخفائها. علّم الفئات بالزر الأحمر لنقلها معًا."
+
+msgid "Province"
+msgstr "المحافظة"
+
+msgid "Release"
+msgstr "الإصدار"
+
+msgid "Search for subtitles or change the filter."
+msgstr "ابحث عن ترجمات أو غيّر المرشح."
+
+msgid "Select a folder or subtitle file."
+msgstr "اختر مجلدًا أو ملف ترجمة."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "اختر قائمة تشغيل من جهاز الاستقبال أو USB أو وحدة تخزين شبكية موصولة."
+
+msgid "Selected category"
+msgstr "الفئة المحددة"
+
+msgid "Selected folder"
+msgstr "المجلد المحدد"
+
+msgid "Selected location"
+msgstr "الموقع المحدد"
+
+msgid "Selected search"
+msgstr "البحث المحدد"
+
+msgid "Selected subtitle"
+msgstr "الترجمة المحددة"
+
+msgid "Selected video"
+msgstr "الفيديو المحدد"
+
+msgid "Source code"
+msgstr "الشيفرة المصدرية"
+
+msgid "Source location"
+msgstr "موقع المصدر"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "ملفات الترجمة: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "الصيغة المدعومة"
+

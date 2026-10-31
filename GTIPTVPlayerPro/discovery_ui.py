@@ -17,7 +17,8 @@ from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from enigma import eServiceReference, eTimer
 
-from .background import attach_background, attach_pixmap
+from .background import attach_pixmap
+from .discovery_layout import skin as discovery_skin
 from .browser import (
     GTAllMoviesSearchScreen, GTExternalPlayerScreen, _WorkerToken, _WorkerCancelled,
     PICON_DOWNLOAD_TIMEOUT,
@@ -33,11 +34,11 @@ from .discovery import (
     TMDbDiscoveryClient, DiscoverySearchClient, prepare_youtube_trailer, resolve_youtube_trailer,
 )
 from .i18n import N_, _, localized_upper, metadata_language
-from .main import APP_BACKGROUND, TMDB_LOGO_PATH, _connect_timer, _scale
+from .main import _connect_timer, _scale
 from .metadata import MetadataError
 from .paths import plugin_path
 from .playback import resume_account_scope
-from .remote_footer import decorate_remote_footer, footer_item, install_remote_footer
+from .remote_footer import footer_item, remote_action_text, web_shortcut_hint_text
 from .settings import load_player_settings
 from .typography import ellipsize_dynamic_text, fit_dynamic_text, font_px
 
@@ -46,7 +47,7 @@ SECTIONS = (("popular", N_("Popular")), ("top", N_("Top Rated")),
             ("new", N_("New Releases")), ("genres", N_("Genres")))
 LOADING = N_("Loading data... Please wait.")
 KEY_REQUIRED = N_("Please enter your TMDB API key to use Discover Movies.")
-HERO_SCRIM_PATH = plugin_path("skin", "images", "discovery-hero-scrim.png")
+SHORT_HINT = N_("Choose a movie, then search in IPTV.")
 FOOTER = (
     footer_item("ok", N_("Movie information")),
     footer_item("green", N_("Search in IPTV"), 1.15),
@@ -58,67 +59,15 @@ FOOTER = (
 )
 
 
+def _asset(name):
+    return plugin_path("skin", "images", "discovery-r48", name)
+
+
 def _skin():
     width, height, px = _scale()
-    parts = ['<screen name="GTMovieDiscoveryScreen" position="0,0" size="{},{}" '
-             'flags="wfNoBorder" backgroundColor="#020617">'.format(width, height)]
-
-    def pixmap(name, x, y, w, h, z=1, extra=""):
-        parts.append('<widget name="{}" position="{},{}" size="{},{}" '
-                     'zPosition="{}" {} />'.format(
-                         name, px(x) if x else 0, px(y) if y else 0,
-                         px(w), px(h), z, extra))
-
-    def label(name, x, y, w, h, size=28, color="#F8FAFC", background=None, z=4, align="left", lines=False):
-        parts.append('<widget name="{}" position="{},{}" size="{},{}" '
-                     'font="Regular;{}" foregroundColor="{}" zPosition="{}" '
-                     'halign="{}" valign="center" {} {}/>'.format(
-                         name, px(x) if x else 0, px(y) if y else 0,
-                         px(w), px(h), font_px(px, size), color, z, align,
-                         'backgroundColor="{}" transparent="0"'.format(background) if background else 'transparent="1"',
-                         '' if lines else 'noWrap="1"'))
-
-    # Transparent native children must composite over a real opaque widget,
-    # not the active DVB video plane. Keep artwork out of the card/footer area.
-    parts.append('<widget name="video_guard" position="0,0" size="{},{}" '
-                 'font="Regular;1" backgroundColor="#020617" transparent="0" '
-                 'zPosition="-30" />'.format(width, height))
-    parts.append('<widget name="app_bg" position="0,0" size="{},{}" '
-                 'zPosition="-20" />'.format(width, height))
-    pixmap("backdrop", 730, 165, 1190, 425, -10, 'alphatest="blend" scale="1"')
-    # Load the RGBA mask through the native skin/LoadPixmap path. ePicLoad
-    # strips its alpha and turns the entire hero overlay into a black rectangle.
-    pixmap("scrim", 730, 165, 1190, 425, -9,
-           'pixmap="{}" alphatest="blend" scale="1"'.format(HERO_SCRIM_PATH))
-    # Header and remote guide share the application artwork beneath them.
-    label("header", 38, 17, 1550, 48, 34)
-    pixmap("tmdb_logo", 1756, 10, 100, 65, 5, 'alphatest="blend"')
-    for index in range(4):
-        x = 38 + index * 462
-        label("tab_{}".format(index), x, 96, 446, 56, 28, background="#181A35", align="center")
-        label("tab_focus_{}".format(index), x, 150, 446, 4, 1, background="#22D3EE", z=5)
-    label("section", 50, 173, 1600, 40, 25, "#22D3EE")
-    label("title", 50, 218, 1190, 82, 56, lines=True)
-    label("original", 54, 306, 1080, 36, 27, "#BBC5D8")
-    label("meta", 54, 353, 1100, 40, 28)
-    label("director", 54, 398, 1100, 35, 26)
-    label("plot", 54, 443, 1120, 104, 29, "#F6D76A", lines=True)
-    label("status", 54, 554, 1750, 36, 24, "#BFD1E9")
-    label("busy", 1810, 550, 80, 36, 26, "#22D3EE", align="center")
-    for index in range(6):
-        x = 70 + index * 308
-        label("frame_{}".format(index), x - 7, 600, 254, 358, 1, background="#445273", z=3)
-        label("focus_{}".format(index), x - 7, 600, 254, 358, 1, background="#22D3EE", z=4)
-        label("body_{}".format(index), x - 3, 604, 246, 350, 1, background="#0B1024", z=5)
-        label("empty_{}".format(index), x, 607, 240, 307, 30, background="#0B1024", z=6, align="center")
-        pixmap("poster_{}".format(index), x, 607, 240, 307, 7, 'alphatest="blend"')
-        label("name_{}".format(index), x, 921, 240, 33, 25, z=6, align="center")
-    label("counter", 1490, 175, 370, 37, 25, "#CBD5E1", align="right")
-    label("footer", 0, 982, 1920, 98, 25)
-    parts.append("</screen>")
-    return decorate_remote_footer("\n".join(parts), FOOTER, transparent_panel=True,
-                                  show_dividers=False, stacked=True, skin_fonts_scaled=True,
-                                  panel_height=92, bottom_padding=0)
+    return discovery_skin(width, height, px,
+                          [remote_action_text(item[1]) for item in FOOTER],
+                          [item[0] for item in FOOTER], font_px, _asset)
 
 
 class GTMovieDiscoveryScreen(Screen):
@@ -161,25 +110,31 @@ class GTMovieDiscoveryScreen(Screen):
         _connect_timer(self._start_timer, self._begin)
         _connect_timer(self._detail_timer, self._load_selected_detail)
 
-        attach_background(self, "app_bg", APP_BACKGROUND)
-        for name in ("backdrop", "scrim", "tmdb_logo"):
+        for name in ("backdrop", "scrim", "hero_bottom", "hero_top", "tmdb_logo"):
             self[name] = Pixmap()
-        self["backdrop"].hide()
-        self["scrim"].hide()
-        attach_pixmap(self, "tmdb_logo", TMDB_LOGO_PATH)
-        for name in ("video_guard", "header", "section", "title", "original", "meta", "director",
-                     "plot", "status", "busy", "counter", "footer"):
+        # Alpha masks are loaded by the skin, never by ePicLoad.
+        for name in ("backdrop", "scrim", "hero_bottom", "hero_top"):
+            self[name].hide()
+        for name in ("video_guard", "app_bg", "header", "header_divider", "page_title",
+                     "tmdb_wordmark", "section", "title", "original", "rating_star", "rating",
+                     "meta", "genres", "director", "plot", "status", "busy", "counter",
+                     "footer", "footer_line", "guide_divider", "web_hint"):
             self[name] = Label("")
         for index in range(4):
-            self["tab_{}".format(index)] = Label(_(SECTIONS[index][1]))
-            self["tab_focus_{}".format(index)] = Label("")
+            for prefix in ("tab", "tab_selected", "tab_focus"):
+                self["{}_{}".format(prefix, index)] = Label("")
         for index in range(6):
-            for prefix in ("frame", "focus", "body", "empty", "name"):
+            for prefix in ("focus", "empty", "name", "marker"):
                 self["{}_{}".format(prefix, index)] = Label("")
             self["poster_{}".format(index)] = Pixmap()
-        self["header"].setText("GT IPTV PLAYER PRO  |  " + localized_upper(_("Discover Movies")))
+        for index, (key, action, weight) in enumerate(FOOTER):
+            if key in ("green", "yellow", "blue"):
+                self["guide_dot_{}".format(index)] = Label("●")
+            else:
+                self["guide_bg_{}".format(index)] = Pixmap()
+                self["guide_key_{}".format(index)] = Label(key.upper())
+            self["guide_action_{}".format(index)] = Label("")
         self["title"].setText(_("Discover Movies"))
-        install_remote_footer(self, FOOTER, stacked=True)
         self["actions"] = ActionMap(
             ["OkCancelActions", "DirectionActions", "ColorActions", "MenuActions",
              "ChannelSelectBaseActions", "InfobarChannelSelection"],
@@ -211,9 +166,24 @@ class GTMovieDiscoveryScreen(Screen):
         self["video_guard"].show()
         self["backdrop"].hide()
         self["scrim"].hide()
+        self["hero_bottom"].hide()
+        self["hero_top"].hide()
+        self._refresh_chrome()
         self._render()
 
+    def _refresh_chrome(self):
+        unused_width, unused_height, px = _scale()
+        fit_dynamic_text(self["header"], "GT IPTV PLAYER PRO", preferred_size=font_px(px, 30), min_size=px(20))
+        fit_dynamic_text(self["page_title"], localized_upper(_("Discover Movies")), preferred_size=font_px(px, 30), min_size=px(20))
+        self["tmdb_wordmark"].setText("TMDB")
+        for index, item in enumerate(FOOTER):
+            fit_dynamic_text(self["guide_action_{}".format(index)], remote_action_text(item[1]),
+                             preferred_size=font_px(px, 23), min_size=px(13))
+        fit_dynamic_text(self["web_hint"], web_shortcut_hint_text(),
+                         preferred_size=font_px(px, 17), min_size=px(11))
+
     def _shown(self):
+        self._refresh_chrome()
         self._child_open = False
         if not self._started:
             self._started = True
@@ -418,7 +388,7 @@ class GTMovieDiscoveryScreen(Screen):
         self._selected_index = (len(self._entries) - 1 if self._pending_index < 0
                                 else min(self._pending_index, max(0, len(self._entries) - 1)))
         self._visible_ids = ()
-        self["status"].setText(_("Search the selected movie in your active IPTV account.")
+        self["status"].setText(_(SHORT_HINT)
                                if self._entries else _("No movies found."))
         self._render()
         self._selection_changed()
@@ -434,16 +404,17 @@ class GTMovieDiscoveryScreen(Screen):
 
     def _render(self):
         unused_width, unused_height, px = _scale()
+        active = self._tab_index if self._tabs_focused else self._active_tab_index()
         for index, (key, label) in enumerate(SECTIONS):
-            fit_dynamic_text(self["tab_{}".format(index)], _(label), preferred_size=font_px(px, 28), min_size=px(20))
-            focus = self["tab_focus_{}".format(index)]
-            if self._tabs_focused and index == self._tab_index:
-                focus.show()
-            else:
-                focus.hide()
+            for prefix in ("tab", "tab_selected"):
+                fit_dynamic_text(self["{}_{}".format(prefix, index)], _(label),
+                                 preferred_size=font_px(px, 28), min_size=px(20))
+            for prefix in ("tab_selected", "tab_focus"):
+                widget = self["{}_{}".format(prefix, index)]
+                widget.show() if index == active else widget.hide()
         section = dict(SECTIONS).get(self._section, N_("Similar Movies"))
         suffix = self._genre_name if self._section == "genres" else self._similar_title if self._section == "similar" else ""
-        self["section"].setText(_(section) + ("  •  " + suffix if suffix else ""))
+        ellipsize_dynamic_text(self["section"], localized_upper(_(section)) + ("  •  " + suffix if suffix else ""), fallback_chars=65)
         self["counter"].setText("{}/{}  ·  {}/{}".format(self._page, self._pages,
                                   self._selected_index + 1 if self._entries else 0, len(self._entries)))
         start = self._selected_index // 6 * 6
@@ -452,14 +423,16 @@ class GTMovieDiscoveryScreen(Screen):
         changed = identities != self._visible_ids
         for index in range(6):
             present = index < len(visible)
-            for prefix in ("frame", "body", "empty", "name"):
+            for prefix in ("empty", "name"):
                 widget = self["{}_{}".format(prefix, index)]
                 widget.show() if present else widget.hide()
             focus = self["focus_{}".format(index)]
             if present and start + index == self._selected_index and not self._tabs_focused:
                 focus.show()
+                self["marker_{}".format(index)].show()
             else:
                 focus.hide()
+                self["marker_{}".format(index)].hide()
             if changed or not present:
                 self._hide_art("poster_{}".format(index))
             if present:
@@ -482,7 +455,7 @@ class GTMovieDiscoveryScreen(Screen):
         if movie is None:
             self._reset_hero()
             self["title"].setText(_("Discover Movies"))
-            for name in ("original", "meta", "director", "plot"):
+            for name in ("original", "rating", "rating_star", "meta", "genres", "director", "plot"):
                 self[name].setText("")
             return
         current = self._details.get(movie["id"], movie)
@@ -496,24 +469,26 @@ class GTMovieDiscoveryScreen(Screen):
         self._cancel("hero")
         self._hero_identity = None
         self._hide_art("backdrop")
-        self._hide_art("scrim")
+        for name in ("scrim", "hero_bottom", "hero_top"):
+            self[name].hide()
 
     def _show_detail(self, movie):
         unused_width, unused_height, px = _scale()
         fit_dynamic_text(self["title"], movie["title"], max_lines=2,
-                         preferred_size=font_px(px, 56, role="title"), min_size=px(30))
+                         preferred_size=font_px(px, 72, role="title"), min_size=px(30))
         ellipsize_dynamic_text(self["original"], movie.get("original_title", "")
                               if movie.get("original_title") != movie["title"] else "", fallback_chars=70)
-        meta = [movie.get("year", ""), "TMDB {:.1f}/10".format(movie["rating"])]
+        self["rating_star"].setText("★" if movie.get("rating") else "")
+        self["rating"].setText("{:.1f}".format(movie["rating"]) if movie.get("rating") else "")
+        meta = [str(movie.get("year") or "")]
         if movie.get("runtime"):
-            meta.append("{} min".format(movie["runtime"]))
-        if movie.get("genres"):
-            meta.append(movie["genres"])
-        ellipsize_dynamic_text(self["meta"], "  •  ".join(x for x in meta if x), fallback_chars=75)
+            meta.append(_("{} min").format(movie["runtime"]))
+        ellipsize_dynamic_text(self["meta"], "  •  ".join(x for x in meta if x), fallback_chars=50)
+        ellipsize_dynamic_text(self["genres"], movie.get("genres") or "", fallback_chars=60)
         ellipsize_dynamic_text(self["director"], _("Director: {}").format(movie["director"])
                               if movie.get("director") else "", fallback_chars=70)
         fit_dynamic_text(self["plot"], movie.get("overview") or _("Movie summary unavailable."),
-                         max_lines=3, preferred_size=font_px(px, 29), min_size=px(23), fallback_chars=78)
+                         max_lines=3, preferred_size=font_px(px, 26), min_size=px(22), fallback_chars=78)
 
     def _load_selected_detail(self):
         if self._closed or self._busy or self._child_open or not self._selected():
@@ -603,12 +578,14 @@ class GTMovieDiscoveryScreen(Screen):
                 self._hero_request = None
                 if loaded:
                     self._hero_identity = movie_id
-                    self["scrim"].show()
+                    for mask in ("scrim", "hero_bottom", "hero_top"):
+                        self[mask].show()
                 else:
                     log_event("discovery", "stage=decode kind=backdrop outcome=failed movie_id={}".format(movie_id))
                     self._hero_identity = None
                     self["backdrop"].hide()
-                    self["scrim"].hide()
+                    for mask in ("scrim", "hero_bottom", "hero_top"):
+                        self[mask].hide()
 
             attach_pixmap(self, name, path, cover_ratio=_cinematic_cover_ratio(path),
                           cover_alignment="top_right", on_loaded=decoded)
@@ -745,7 +722,7 @@ class GTMovieDiscoveryScreen(Screen):
         def ready(hidden):
             self._busy = False
             adapter = DiscoverySearchClient(provider, movie, hidden)
-            self["status"].setText(_("Search the selected movie in your active IPTV account."))
+            self["status"].setText(_(SHORT_HINT))
             self._open_child(None, GTAllMoviesSearchScreen, self.account, adapter,
                              hidden_category_ids=hidden, initial_query=movie["title"])
 
@@ -792,7 +769,7 @@ class GTMovieDiscoveryScreen(Screen):
             item.youtube_duration_seconds = getattr(resolver, "duration_seconds", 0)
             reference = eServiceReference(native_type, 0, url)
             reference.setName(title)
-            self["status"].setText(_("Search the selected movie in your active IPTV account."))
+            self["status"].setText(_(SHORT_HINT))
             self._open_child(None, GTExternalPlayerScreen, reference, item)
 
         self._submit("trailer", work, ready, timeout=35)
@@ -830,7 +807,7 @@ class GTMovieDiscoveryScreen(Screen):
              self._page, self._pages, self._selected_index, self._entries, self._tab_index) = self._history.pop()
             self._tabs_focused = False
             self._visible_ids = ()
-            self["status"].setText(_("Search the selected movie in your active IPTV account."))
+            self["status"].setText(_(SHORT_HINT))
             self._render()
             self._selection_changed()
         else:

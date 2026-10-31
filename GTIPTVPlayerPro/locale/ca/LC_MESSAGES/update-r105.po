@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Actualització del programari"
+
+msgid "Automatic update check"
+msgstr "Comprovació automàtica d’actualitzacions"
+
+msgid "Check for updates"
+msgstr "Cerca actualitzacions"
+
+msgid "Download and verify"
+msgstr "Baixa i verifica"
+
+msgid "Install update"
+msgstr "Instal·la l’actualització"
+
+msgid "Update available"
+msgstr "Actualització disponible"
+
+msgid "Up to date"
+msgstr "Actualitzat"
+
+msgid "Update verified"
+msgstr "Actualització verificada"
+
+msgid "Restart interface"
+msgstr "Reinicia la interfície"
+
+msgid "Update source is not ready"
+msgstr "La font d’actualitzacions encara no està preparada"
+
+msgid "Update signature is invalid"
+msgstr "La signatura de l’actualització no és vàlida"
+
+msgid "Invalid update information"
+msgstr "Informació d’actualització no vàlida"
+
+msgid "Update package is invalid"
+msgstr "El paquet d’actualització no és vàlid"
+
+msgid "Update is not compatible with this receiver"
+msgstr "L’actualització no és compatible amb aquest receptor"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Atureu les gravacions i les baixades abans d’actualitzar"
+
+msgid "Update failed"
+msgstr "L’actualització ha fallat"
+
+msgid "Update installed. Restart the interface."
+msgstr "Actualització instal·lada. Reinicieu la interfície."
+
+msgid "Install the verified update?"
+msgstr "Voleu instal·lar l’actualització verificada?"
+
+msgid "Update available. Open updater?"
+msgstr "Actualització disponible. Voleu obrir l’actualitzador?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Comprovació automàtica cada 6 hores."
+
+msgid "New version"
+msgstr "Versió nova"
+

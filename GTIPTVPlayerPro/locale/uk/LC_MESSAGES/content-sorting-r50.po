@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: uk\n"
+
+msgid "Provider order"
+msgstr "Порядок провайдера"
+
+msgid "Newest added"
+msgstr "Нещодавно додані"
+
+msgid "Alphabetical (A–Z)"
+msgstr "За алфавітом (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Дата виходу (спочатку нові)"
+
+msgid "Saved manual order"
+msgstr "Збережений ручний порядок"
+
+msgid "Sorting"
+msgstr "Сортування"
+
+msgid "Sort content"
+msgstr "Сортувати вміст"
+
+msgid "Sort channels"
+msgstr "Сортувати канали"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Це джерело не надає дат для цього порядку сортування."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Для сортування потрібна повна категорія. Зачекайте або повторіть спробу."
+
+msgid "Could not save sorting preference."
+msgstr "Не вдалося зберегти налаштування сортування."

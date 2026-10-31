@@ -1,0 +1,158 @@
+# Independent ESPN match information. All previous entries preserved.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.7.0-r18\nLanguage: he\nContent-Type: text/plain; charset=UTF-8\n"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Matches"
+msgstr "משחקים"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "League"
+msgstr "ליגה"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Match"
+msgstr "מפגש"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Score"
+msgstr "תוצאה"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Match information"
+msgstr "פרטי המשחק"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "All leagues"
+msgstr "כל הליגות"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "League filter"
+msgstr "סינון ליגה"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Date"
+msgstr "תאריך"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "First half"
+msgstr "מחצית ראשונה"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Second half"
+msgstr "מחצית שנייה"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Half-time"
+msgstr "הפסקת מחצית"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Extra time"
+msgstr "הארכה"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Penalties"
+msgstr "דו־קרב פנדלים"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Full time"
+msgstr "סיום המשחק"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Postponed"
+msgstr "נדחה"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Suspended"
+msgstr "הופסק זמנית"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Abandoned"
+msgstr "הופסק לצמיתות"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Scheduled"
+msgstr "מתוכנן"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "No matches found."
+msgstr "לא נמצאו משחקים."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Loading matches..."
+msgstr "טוען משחקים..."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Scores could not be updated."
+msgstr "לא ניתן לעדכן תוצאות."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Some leagues could not be updated."
+msgstr "לא ניתן לעדכן חלק מהליגות."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Showing saved scores."
+msgstr "מוצגות תוצאות שמורות."
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Last update: {time}"
+msgstr "עדכון אחרון: {time}"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "No update yet"
+msgstr "טרם עודכן"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "{count} matches"
+msgstr "משחקים: {count}"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Previous day"
+msgstr "היום הקודם"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Next day"
+msgstr "היום הבא"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Yesterday"
+msgstr "אתמול"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Select date"
+msgstr "בחירת תאריך"
+
+#: matches_ui.py matches.py matches_text.py main.py
+msgctxt "Football scores"
+msgid "Source: ESPN"
+msgstr "מקור: ESPN"

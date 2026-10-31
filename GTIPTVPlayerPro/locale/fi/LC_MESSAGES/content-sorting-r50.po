@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: fi\n"
+
+msgid "Provider order"
+msgstr "Palveluntarjoajan järjestys"
+
+msgid "Newest added"
+msgstr "Viimeksi lisätyt"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Aakkosjärjestys (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Julkaisupäivä (uusimmat ensin)"
+
+msgid "Saved manual order"
+msgstr "Tallennettu oma järjestys"
+
+msgid "Sorting"
+msgstr "Lajittelu"
+
+msgid "Sort content"
+msgstr "Lajittele sisältö"
+
+msgid "Sort channels"
+msgstr "Lajittele kanavat"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Tämä lähde ei tarjoa päivämääriä tätä lajittelua varten."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Lajittelu vaatii koko kategorian. Odota tai yritä uudelleen."
+
+msgid "Could not save sorting preference."
+msgstr "Lajitteluasetusta ei voitu tallentaa."

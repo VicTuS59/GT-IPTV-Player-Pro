@@ -906,7 +906,9 @@ class M3UContentClient(object):
                     N_("Channel is no longer present in the M3U source."),
                     ContentError.PLAYBACK_URL,
                 )
-            return record["url"]
+            value = record["url"]
+        from .live_patch import playback_result
+        return playback_result(self, item, value)
 
     def resolve_items(self, values):
         """Resolve saved M3U IDs against the current catalogue on a worker."""

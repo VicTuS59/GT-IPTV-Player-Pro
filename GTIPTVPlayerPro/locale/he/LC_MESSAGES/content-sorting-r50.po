@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: he\n"
+
+msgid "Provider order"
+msgstr "סדר הספק"
+
+msgid "Newest added"
+msgstr "נוספו לאחרונה"
+
+msgid "Alphabetical (A–Z)"
+msgstr "לפי האלפבית (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "תאריך יציאה (החדשים תחילה)"
+
+msgid "Saved manual order"
+msgstr "סדר ידני שמור"
+
+msgid "Sorting"
+msgstr "מיון"
+
+msgid "Sort content"
+msgstr "מיון תכנים"
+
+msgid "Sort channels"
+msgstr "מיון ערוצים"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "המקור אינו מספק תאריכים לשיטת מיון זו."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "המיון דורש את הקטגוריה המלאה. יש להמתין או לנסות שוב."
+
+msgid "Could not save sorting preference."
+msgstr "לא ניתן לשמור את העדפת המיון."

@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ar\n"
+
+msgid "Provider order"
+msgstr "ترتيب المزود"
+
+msgid "Newest added"
+msgstr "الأحدث إضافةً"
+
+msgid "Alphabetical (A–Z)"
+msgstr "أبجدياً (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "تاريخ الإصدار (الأحدث أولاً)"
+
+msgid "Saved manual order"
+msgstr "الترتيب اليدوي المحفوظ"
+
+msgid "Sorting"
+msgstr "الترتيب"
+
+msgid "Sort content"
+msgstr "ترتيب المحتوى"
+
+msgid "Sort channels"
+msgstr "ترتيب القنوات"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "هذا المصدر لا يوفر تواريخ لطريقة الترتيب هذه."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "يتطلب الترتيب تحميل الفئة كاملة. يرجى الانتظار أو إعادة المحاولة."
+
+msgid "Could not save sorting preference."
+msgstr "تعذر حفظ إعداد الترتيب."

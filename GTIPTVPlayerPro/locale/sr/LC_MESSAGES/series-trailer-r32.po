@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sr\n"
+
+msgid "General trailer"
+msgstr "Општи трејлер"
+
+msgid "Searching for a trailer..."
+msgstr "Тражење трејлера..."
+
+msgid "No official trailer found."
+msgstr "Званични трејлер није пронађен."

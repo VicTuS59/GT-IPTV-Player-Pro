@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sk\n"
+
+msgid "Trailer"
+msgstr "Upútavka"
+
+msgid "Searching for the next episode trailer..."
+msgstr "Hľadá sa upútavka na ďalšiu epizódu..."
+
+msgid "No trailer found for the next episode."
+msgstr "Upútavka na ďalšiu epizódu sa nenašla."
+
+msgid "Next episode information is unavailable."
+msgstr "Informácie o ďalšej epizóde nie sú dostupné."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "Upútavku sa nepodarilo vyhľadať. Skúste to znova."

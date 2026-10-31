@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: th\n"
+
+msgid "General trailer"
+msgstr "ตัวอย่างทั่วไป"
+
+msgid "Searching for a trailer..."
+msgstr "กำลังค้นหาตัวอย่าง..."
+
+msgid "No official trailer found."
+msgstr "ไม่พบตัวอย่างอย่างเป็นทางการ"

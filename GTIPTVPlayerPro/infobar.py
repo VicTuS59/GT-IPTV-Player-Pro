@@ -244,6 +244,11 @@ def infobar_skin(width, height, px, live=True):
     # Keep the old text components as empty compatibility widgets above.
     label("web_shortcut_background", 1478, 264, 164, 34, font=1, z=2,
           background=INFOBAR_BACKGROUND)
+    label("shortcut_record_dot", 1504, 266, 28, 29, font=23, color="#FF3030", align="center")
+    label("shortcut_record_frame", 1540, 266, 86, 29, font=1, background="#0E7490", z=3)
+    label("shortcut_record_key", 1542, 268, 82, 25, font=19, color="#FFFFFF", align="center",
+          background=INFOBAR_BACKGROUND, z=4)
+    label("shortcut_record", 1642, 266, 250, 29, font=20)
     # Seeking remains an independent high-z overlay over every normal field.
     full_width = max(1, width - px(160))
     widgets.append('<widget name="seek_panel" position="0,0" size="{},{}" font="Regular;1" backgroundColor="{}" transparent="0" zPosition="20" />'.format(width, bar_h, INFOBAR_BACKGROUND))

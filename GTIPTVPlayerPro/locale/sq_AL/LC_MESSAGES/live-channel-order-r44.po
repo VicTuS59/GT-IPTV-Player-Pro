@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sq_AL\n"
+
+msgid "Move channel"
+msgstr "Zhvendos kanalin"
+
+msgid "Channel moved."
+msgstr "Kanali u zhvendos."
+
+msgid "Could not save channel order."
+msgstr "Rendi i kanaleve nuk mund të ruhej."

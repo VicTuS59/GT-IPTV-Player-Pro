@@ -1,0 +1,159 @@
+# LiveOnSat guide r68. Country names: Unicode CLDR via Node Intl.DisplayNames.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: he\n"
+
+msgctxt "Football scores"
+msgid "Select country"
+msgstr "בחירת מדינה"
+
+msgctxt "Football scores"
+msgid "Live broadcasts"
+msgstr "שידורים חיים"
+
+msgctxt "Football scores"
+msgid "Broadcaster channels"
+msgstr "ערוצים משדרים"
+
+msgctxt "Football scores"
+msgid "No live broadcasts found."
+msgstr "לא נמצאו שידורים של משחקים המתקיימים כעת."
+
+msgctxt "Football scores"
+msgid "Broadcasts could not be updated."
+msgstr "לא ניתן לעדכן את פרטי השידורים."
+
+msgctxt "Football scores"
+msgid "Broadcast information may be incomplete."
+msgstr "ייתכן שמידע השידורים אינו מלא."
+
+msgctxt "Football scores"
+msgid "Country preference could not be saved."
+msgstr "לא ניתן לשמור את המדינה המועדפת."
+
+msgctxt "Football scores"
+msgid "Source: LiveOnSat"
+msgstr "מקור: LiveOnSat"
+
+msgctxt "Football scores"
+msgid "Turkey"
+msgstr "טורקיה"
+
+msgctxt "Football scores"
+msgid "Germany"
+msgstr "גרמניה"
+
+msgctxt "Football scores"
+msgid "France"
+msgstr "צרפת"
+
+msgctxt "Football scores"
+msgid "United Kingdom"
+msgstr "בריטניה"
+
+msgctxt "Football scores"
+msgid "Ireland"
+msgstr "אירלנד"
+
+msgctxt "Football scores"
+msgid "Italy"
+msgstr "איטליה"
+
+msgctxt "Football scores"
+msgid "Spain"
+msgstr "ספרד"
+
+msgctxt "Football scores"
+msgid "Portugal"
+msgstr "פורטוגל"
+
+msgctxt "Football scores"
+msgid "Netherlands"
+msgstr "הולנד"
+
+msgctxt "Football scores"
+msgid "Belgium"
+msgstr "בלגיה"
+
+msgctxt "Football scores"
+msgid "Poland"
+msgstr "פולין"
+
+msgctxt "Football scores"
+msgid "Romania"
+msgstr "רומניה"
+
+msgctxt "Football scores"
+msgid "Bulgaria"
+msgstr "בולגריה"
+
+msgctxt "Football scores"
+msgid "Greece"
+msgstr "יוון"
+
+msgctxt "Football scores"
+msgid "Hungary"
+msgstr "הונגריה"
+
+msgctxt "Football scores"
+msgid "Czechia"
+msgstr "צ׳כיה"
+
+msgctxt "Football scores"
+msgid "Slovakia"
+msgstr "סלובקיה"
+
+msgctxt "Football scores"
+msgid "Denmark"
+msgstr "דנמרק"
+
+msgctxt "Football scores"
+msgid "Sweden"
+msgstr "שוודיה"
+
+msgctxt "Football scores"
+msgid "Norway"
+msgstr "נורווגיה"
+
+msgctxt "Football scores"
+msgid "Finland"
+msgstr "פינלנד"
+
+msgctxt "Football scores"
+msgid "Croatia"
+msgstr "קרואטיה"
+
+msgctxt "Football scores"
+msgid "Serbia"
+msgstr "סרביה"
+
+msgctxt "Football scores"
+msgid "Bosnia and Herzegovina"
+msgstr "בוסניה והרצגובינה"
+
+msgctxt "Football scores"
+msgid "Slovenia"
+msgstr "סלובניה"
+
+msgctxt "Football scores"
+msgid "Albania"
+msgstr "אלבניה"
+
+msgctxt "Football scores"
+msgid "United States"
+msgstr "ארצות הברית"
+
+msgctxt "Football scores"
+msgid "Canada"
+msgstr "קנדה"
+
+msgctxt "Football scores"
+msgid "Brazil"
+msgstr "ברזיל"
+
+msgctxt "Football scores"
+msgid "Australia"
+msgstr "אוסטרליה"
+
+msgctxt "Football scores"
+msgid "Japan"
+msgstr "יפן"

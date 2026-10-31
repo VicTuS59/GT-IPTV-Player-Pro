@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Bæta við M3U-heimild"
+
+msgid "Application"
+msgstr "Forrit"
+
+msgid "Application information"
+msgstr "Upplýsingar um forrit"
+
+msgid "Category Management"
+msgstr "Flokkastjórnun"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Breytingar taka gildi þegar ýtt er á GRÆNA takkann."
+
+msgid "Choose the source name and location."
+msgstr "Veldu nafn og staðsetningu heimildarinnar."
+
+msgid "Compatibility"
+msgstr "Samhæfi"
+
+msgid "Country"
+msgstr "Land"
+
+msgid "Developer"
+msgstr "Forritari"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Bein HTTP(S)-slóð að M3U-spilunarlista."
+
+msgid "District"
+msgstr "Umdæmi"
+
+msgid "Frame rate"
+msgstr "Rammatíðni"
+
+msgid "Language"
+msgstr "Tungumál"
+
+msgid "Platform"
+msgstr "Kerfi"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Ýttu á BLÁA takkann til að slá inn annað rásarheiti."
+
+msgid "Press GREEN to save the source."
+msgstr "Ýttu á GRÆNA takkann til að vista heimildina."
+
+msgid "Press GREEN to use this folder."
+msgstr "Ýttu á GRÆNA takkann til að nota þessa möppu."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Ýttu á OK til að sækja valinn skjátexta."
+
+msgid "Press OK to load this subtitle."
+msgstr "Ýttu á OK til að hlaða þessum skjátexta."
+
+msgid "Press OK to play the selected video."
+msgstr "Ýttu á OK til að spila valið myndskeið."
+
+msgid "Press OK to search again."
+msgstr "Ýttu á OK til að leita aftur."
+
+msgid "Press OK to select this location."
+msgstr "Ýttu á OK til að velja þennan stað."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Ýttu á OK til að sýna eða fela flokkinn. Merktu flokka með RAUÐA takkanum til að færa þá saman."
+
+msgid "Province"
+msgstr "Hérað"
+
+msgid "Release"
+msgstr "Útgáfa"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Leitaðu að skjátextum eða breyttu síunni."
+
+msgid "Select a folder or subtitle file."
+msgstr "Veldu möppu eða skjátextaskrá."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Veldu spilunarlista úr móttakaranum, USB eða tengdri netgeymslu."
+
+msgid "Selected category"
+msgstr "Valinn flokkur"
+
+msgid "Selected folder"
+msgstr "Valin mappa"
+
+msgid "Selected location"
+msgstr "Valinn staður"
+
+msgid "Selected search"
+msgstr "Valin leit"
+
+msgid "Selected subtitle"
+msgstr "Valinn skjátexti"
+
+msgid "Selected video"
+msgstr "Valið myndskeið"
+
+msgid "Source code"
+msgstr "Frumkóði"
+
+msgid "Source location"
+msgstr "Staðsetning heimildar"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Skjátextaskrár: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Stutt skráarsnið"
+

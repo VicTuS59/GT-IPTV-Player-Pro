@@ -1,0 +1,12 @@
+# Category recency r52
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: is\n"
+
+msgid "Most recently added content"
+msgstr "Nýjasta viðbætta efnið"
+
+msgid "Preparing category dates: {}/{} ({} items)"
+msgstr "Undirbý dagsetningar flokka: {}/{} ({} færslur)"
+
+msgid "Category dates could not be completed. Select this option again to resume."
+msgstr "Ekki tókst að ljúka dagsetningum flokka. Veldu þennan valkost aftur til að halda áfram."

@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: he\n"
+
+msgid "General trailer"
+msgstr "קדימון כללי"
+
+msgid "Searching for a trailer..."
+msgstr "מחפש קדימון..."
+
+msgid "No official trailer found."
+msgstr "לא נמצא קדימון רשמי."

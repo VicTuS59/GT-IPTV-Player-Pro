@@ -1,0 +1,18 @@
+# Sorting menus r53
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: zh_HK\n"
+
+msgid "A–Z"
+msgstr "A–Z"
+
+msgid "Z–A"
+msgstr "Z–A"
+
+msgid "Last added"
+msgstr "最近新增"
+
+msgid "Original"
+msgstr "原始次序"
+
+msgid "Year"
+msgstr "年份"

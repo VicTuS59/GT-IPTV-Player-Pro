@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sk\n"
+
+msgid "Move channel"
+msgstr "Presunúť kanál"
+
+msgid "Channel moved."
+msgstr "Kanál bol presunutý."
+
+msgid "Could not save channel order."
+msgstr "Poradie kanálov sa nepodarilo uložiť."

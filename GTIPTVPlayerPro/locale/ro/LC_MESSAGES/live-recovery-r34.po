@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ro\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "Se restabilește conexiunea"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "Conectarea a eșuat"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "Sursa a refuzat conexiunea video (HTTP {status:d})"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "Sursa nu trimite date noi"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "Timpul pentru restabilirea conexiunii a expirat"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "Se încearcă o nouă conexiune la sursă"

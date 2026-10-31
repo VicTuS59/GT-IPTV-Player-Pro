@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: he\n"
+
+msgid "Move channel"
+msgstr "העברת ערוץ"
+
+msgid "Channel moved."
+msgstr "הערוץ הועבר."
+
+msgid "Could not save channel order."
+msgstr "לא ניתן לשמור את סדר הערוצים."

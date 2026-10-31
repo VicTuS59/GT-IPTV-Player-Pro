@@ -1,0 +1,27 @@
+# Independent DVB EPG sources. Existing catalogue entries are preserved.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.7.0-r12\nLanguage: ku\nContent-Type: text/plain; charset=UTF-8\n"
+
+msgctxt "Independent DVB EPG"
+msgid "Independent EPG source"
+msgstr "Çavkaniya EPG ya serbixwe"
+
+msgctxt "Independent DVB EPG"
+msgid "Turkey"
+msgstr "Tirkiye"
+
+msgctxt "Independent DVB EPG"
+msgid "Turkey + Hotbird"
+msgstr "Tirkiye + Hotbird"
+
+msgctxt "Independent DVB EPG"
+msgid "Select an EPG source."
+msgstr "Çavkaniyek EPG hilbijêre."
+
+msgctxt "Independent DVB EPG"
+msgid "Downloading DVB EPG sources..."
+msgstr "Çavkaniyên DVB EPG têne daxistin..."
+
+msgctxt "Independent DVB EPG"
+msgid "No EPG source is available."
+msgstr "Tu çavkaniya EPG berdest nîne."

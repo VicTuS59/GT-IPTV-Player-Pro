@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: lt\n"
+
+msgid "Provider order"
+msgstr "Teikėjo tvarka"
+
+msgid "Newest added"
+msgstr "Naujausiai pridėti"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Abėcėlės tvarka (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Išleidimo data (naujausi pirmiausia)"
+
+msgid "Saved manual order"
+msgstr "Išsaugota rankinė tvarka"
+
+msgid "Sorting"
+msgstr "Rikiavimas"
+
+msgid "Sort content"
+msgstr "Rikiuoti turinį"
+
+msgid "Sort channels"
+msgstr "Rikiuoti kanalus"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Šis šaltinis nepateikia datų šiam rikiavimo būdui."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Rikiavimui reikia visos kategorijos. Palaukite arba bandykite dar kartą."
+
+msgid "Could not save sorting preference."
+msgstr "Nepavyko išsaugoti rikiavimo nuostatos."

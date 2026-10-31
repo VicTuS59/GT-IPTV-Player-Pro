@@ -1,0 +1,21 @@
+# Utility presentation r96
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: tr\n"
+
+msgid "Setting information"
+msgstr "Ayar bilgisi"
+
+msgid "Selected value"
+msgstr "Seçili değer"
+
+msgid "Select the player used for live TV."
+msgstr "Canlı TV için kullanılacak oynatıcıyı seçin."
+
+msgid "Select the player used for movies."
+msgstr "Filmler için kullanılacak oynatıcıyı seçin."
+
+msgid "Select the player used for series."
+msgstr "Diziler için kullanılacak oynatıcıyı seçin."
+
+msgid "Enable or disable TMDb metadata enrichment."
+msgstr "TMDb bilgi tamamlamasını açın veya kapatın."

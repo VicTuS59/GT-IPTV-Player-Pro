@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: nl\n"
+
+msgid "Provider order"
+msgstr "Volgorde van aanbieder"
+
+msgid "Newest added"
+msgstr "Nieuw toegevoegd"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Alfabetisch (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Uitgavedatum (nieuwste eerst)"
+
+msgid "Saved manual order"
+msgstr "Opgeslagen handmatige volgorde"
+
+msgid "Sorting"
+msgstr "Sortering"
+
+msgid "Sort content"
+msgstr "Inhoud sorteren"
+
+msgid "Sort channels"
+msgstr "Kanalen sorteren"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Deze bron levert geen datums voor deze sortering."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Sorteren vereist de volledige categorie. Wacht of probeer opnieuw."
+
+msgid "Could not save sorting preference."
+msgstr "De sorteervoorkeur kon niet worden opgeslagen."

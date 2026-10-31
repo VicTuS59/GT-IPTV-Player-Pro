@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ku\n"
+
+msgid "Provider order"
+msgstr "Rêza pêşkêşkerê"
+
+msgid "Newest added"
+msgstr "Herî nû hatine zêdekirin"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Alfabetîk (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Dîroka weşanê (nûtirîn pêşî)"
+
+msgid "Saved manual order"
+msgstr "Rêza destan a tomarkirî"
+
+msgid "Sorting"
+msgstr "Rêzkirin"
+
+msgid "Sort content"
+msgstr "Naverokê rêz bike"
+
+msgid "Sort channels"
+msgstr "Kanalên rêz bike"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Ev çavkanî ji bo vê rêzkirinê dîrokan nade."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Ji bo rêzkirinê kategorî divê temam be. Bisekine an dîsa biceribîne."
+
+msgid "Could not save sorting preference."
+msgstr "Vebijarka rêzkirinê nehat tomarkirin."

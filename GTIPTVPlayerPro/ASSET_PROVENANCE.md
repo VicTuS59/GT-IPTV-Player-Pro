@@ -1,5 +1,19 @@
 # Asset provenance
 
+## r23 lossless packaging maintenance — 2026-10-25
+
+The tables below retain the original artwork SHA-256 values as provenance
+records. R23 recompresses only PNG IDAT data with oxipng 10.2.1, without
+transformations. All original non-IDAT chunks, image dimensions, color mode,
+bit depth, palettes, transparency and decoded pixels are unchanged. Twenty
+unreferenced obsolete PNGs are omitted from the runtime package; their original
+names and hashes remain in the source validation report. Existing dynamic
+resolution/colour/frame families and native icons are retained. Current file
+hashes, the removal list and verification details are in LOCAL-VALIDATION.json
+in the source archive. Existing playback, network and buffer modules are not
+modified by this maintenance.
+
+
 Last reviewed: 2026-09-29
 
 The project owner confirmed on 2026-08-20 that the original background images

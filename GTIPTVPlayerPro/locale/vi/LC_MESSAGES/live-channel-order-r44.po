@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: vi\n"
+
+msgid "Move channel"
+msgstr "Di chuyển kênh"
+
+msgid "Channel moved."
+msgstr "Đã di chuyển kênh."
+
+msgid "Could not save channel order."
+msgstr "Không thể lưu thứ tự kênh."

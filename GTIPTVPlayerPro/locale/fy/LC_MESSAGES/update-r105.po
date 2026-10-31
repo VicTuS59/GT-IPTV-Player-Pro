@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Softwarefernijing"
+
+msgid "Automatic update check"
+msgstr "Automatysk op fernijingen kontrolearje"
+
+msgid "Check for updates"
+msgstr "Sykje nei fernijingen"
+
+msgid "Download and verify"
+msgstr "Downloade en ferifiearje"
+
+msgid "Install update"
+msgstr "Fernijing ynstallearje"
+
+msgid "Update available"
+msgstr "Fernijing beskikber"
+
+msgid "Up to date"
+msgstr "By de tiid"
+
+msgid "Update verified"
+msgstr "Fernijing ferifiearre"
+
+msgid "Restart interface"
+msgstr "Ynterface opnij starte"
+
+msgid "Update source is not ready"
+msgstr "De fernijingsboarne is noch net klear"
+
+msgid "Update signature is invalid"
+msgstr "De hantekening fan de fernijing is ûnjildich"
+
+msgid "Invalid update information"
+msgstr "Unjildige fernijingsynformaasje"
+
+msgid "Update package is invalid"
+msgstr "It fernijingspakket is ûnjildich"
+
+msgid "Update is not compatible with this receiver"
+msgstr "De fernijing is net kompatibel mei dizze ûntfanger"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Stopje opnamen en downloads foar it fernijen"
+
+msgid "Update failed"
+msgstr "Fernijing mislearre"
+
+msgid "Update installed. Restart the interface."
+msgstr "Fernijing ynstallearre. Start de ynterface opnij."
+
+msgid "Install the verified update?"
+msgstr "De ferifiearre fernijing ynstallearje?"
+
+msgid "Update available. Open updater?"
+msgstr "Fernijing beskikber. Fernijer iepenje?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Automatyske kontrôle om de 6 oeren."
+
+msgid "New version"
+msgstr "Nije ferzje"
+

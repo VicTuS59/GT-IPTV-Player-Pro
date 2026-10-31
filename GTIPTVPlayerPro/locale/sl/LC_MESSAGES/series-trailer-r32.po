@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sl\n"
+
+msgid "General trailer"
+msgstr "Splošni napovednik"
+
+msgid "Searching for a trailer..."
+msgstr "Iskanje napovednika..."
+
+msgid "No official trailer found."
+msgstr "Uradnega napovednika ni bilo mogoče najti."

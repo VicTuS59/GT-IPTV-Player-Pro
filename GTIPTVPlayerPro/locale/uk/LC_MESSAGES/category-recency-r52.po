@@ -1,0 +1,12 @@
+# Category recency r52
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: uk\n"
+
+msgid "Most recently added content"
+msgstr "Нещодавно доданий вміст"
+
+msgid "Preparing category dates: {}/{} ({} items)"
+msgstr "Підготовка дат категорій: {}/{} ({} елементів)"
+
+msgid "Category dates could not be completed. Select this option again to resume."
+msgstr "Не вдалося завершити збір дат категорій. Виберіть цей пункт ще раз, щоб продовжити."

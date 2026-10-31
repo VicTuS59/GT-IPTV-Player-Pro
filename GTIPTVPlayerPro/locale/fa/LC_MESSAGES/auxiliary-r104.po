@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "افزودن منبع M3U"
+
+msgid "Application"
+msgstr "برنامه"
+
+msgid "Application information"
+msgstr "اطلاعات برنامه"
+
+msgid "Category Management"
+msgstr "مدیریت دسته‌ها"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "تغییرات با فشردن دکمه سبز اعمال می‌شوند."
+
+msgid "Choose the source name and location."
+msgstr "نام و محل منبع را انتخاب کنید."
+
+msgid "Compatibility"
+msgstr "سازگاری"
+
+msgid "Country"
+msgstr "کشور"
+
+msgid "Developer"
+msgstr "توسعه‌دهنده"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "نشانی مستقیم HTTP(S) فهرست پخش M3U."
+
+msgid "District"
+msgstr "شهرستان"
+
+msgid "Frame rate"
+msgstr "نرخ فریم"
+
+msgid "Language"
+msgstr "زبان"
+
+msgid "Platform"
+msgstr "بستر"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "برای وارد کردن نام کانال دیگری، دکمه آبی را فشار دهید."
+
+msgid "Press GREEN to save the source."
+msgstr "برای ذخیره منبع، دکمه سبز را فشار دهید."
+
+msgid "Press GREEN to use this folder."
+msgstr "برای استفاده از این پوشه، دکمه سبز را فشار دهید."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "برای دانلود زیرنویس انتخاب‌شده، OK را فشار دهید."
+
+msgid "Press OK to load this subtitle."
+msgstr "برای بارگذاری این زیرنویس، OK را فشار دهید."
+
+msgid "Press OK to play the selected video."
+msgstr "برای پخش ویدیوی انتخاب‌شده، OK را فشار دهید."
+
+msgid "Press OK to search again."
+msgstr "برای جستجوی دوباره، OK را فشار دهید."
+
+msgid "Press OK to select this location."
+msgstr "برای انتخاب این مکان، OK را فشار دهید."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "برای نمایش یا پنهان کردن دسته، OK را فشار دهید. دسته‌ها را با دکمه قرمز علامت بزنید تا با هم جابه‌جا شوند."
+
+msgid "Province"
+msgstr "استان"
+
+msgid "Release"
+msgstr "نسخه"
+
+msgid "Search for subtitles or change the filter."
+msgstr "زیرنویس‌ها را جستجو کنید یا فیلتر را تغییر دهید."
+
+msgid "Select a folder or subtitle file."
+msgstr "یک پوشه یا پرونده زیرنویس انتخاب کنید."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "یک فهرست پخش از گیرنده، USB یا فضای ذخیره‌سازی شبکه متصل انتخاب کنید."
+
+msgid "Selected category"
+msgstr "دسته انتخاب‌شده"
+
+msgid "Selected folder"
+msgstr "پوشه انتخاب‌شده"
+
+msgid "Selected location"
+msgstr "مکان انتخاب‌شده"
+
+msgid "Selected search"
+msgstr "جستجوی انتخاب‌شده"
+
+msgid "Selected subtitle"
+msgstr "زیرنویس انتخاب‌شده"
+
+msgid "Selected video"
+msgstr "ویدیوی انتخاب‌شده"
+
+msgid "Source code"
+msgstr "کد منبع"
+
+msgid "Source location"
+msgstr "محل منبع"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "پرونده‌های زیرنویس: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "قالب پشتیبانی‌شده"
+

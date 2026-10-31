@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: et\n"
+
+msgid "Provider order"
+msgstr "Pakkuja järjestus"
+
+msgid "Newest added"
+msgstr "Viimati lisatud"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Tähestikuliselt (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Ilmumiskuupäev (uuemad ees)"
+
+msgid "Saved manual order"
+msgstr "Salvestatud käsitsi järjestus"
+
+msgid "Sorting"
+msgstr "Järjestamine"
+
+msgid "Sort content"
+msgstr "Järjesta sisu"
+
+msgid "Sort channels"
+msgstr "Järjesta kanalid"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "See allikas ei paku selle järjestuse jaoks kuupäevi."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Järjestamiseks on vaja kogu kategooriat. Oota või proovi uuesti."
+
+msgid "Could not save sorting preference."
+msgstr "Järjestuseelistust ei saanud salvestada."

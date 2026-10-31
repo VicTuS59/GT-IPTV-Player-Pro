@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: vi\n"
+
+msgid "Trailer"
+msgstr "Đoạn giới thiệu"
+
+msgid "Searching for the next episode trailer..."
+msgstr "Đang tìm đoạn giới thiệu tập tiếp theo..."
+
+msgid "No trailer found for the next episode."
+msgstr "Không tìm thấy đoạn giới thiệu cho tập tiếp theo."
+
+msgid "Next episode information is unavailable."
+msgstr "Chưa có thông tin về tập tiếp theo."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "Không thể tìm đoạn giới thiệu. Vui lòng thử lại."

@@ -36,6 +36,7 @@ CATEGORY_PREFERENCE_PATHS = {
 MAX_CATEGORY_PREFERENCES_BYTES = 8 * 1024 * 1024
 MAX_CATEGORY_SOURCES = 500
 MAX_CATEGORIES_PER_SOURCE = 20000
+CATEGORY_SORT_MODES = ('provider', 'alpha', 'alpha_desc', 'manual', 'recent')
 _FORMAT_VERSION = 1
 _STORE_LOCK = threading.RLock()
 _WRITE_LOCK_TIMEOUT_SECONDS = 2.0
@@ -226,6 +227,23 @@ def filter_hidden_category_items(items, hidden_ids):
     ]
 
 
+def clean_recency(value):
+    """Only bounded category IDs and (addition date, checked time) pairs."""
+    result = {}
+    if not isinstance(value, dict):
+        return result
+    for raw_id, pair in value.items():
+        category_id = _clean_category_id(raw_id)
+        if (not category_id or not isinstance(pair, (list, tuple)) or len(pair) != 2
+                or any(type(v) is not int for v in pair)
+                or not 0 <= pair[0] <= 100000000000 or not 0 < pair[1] <= 7289654399):
+            continue
+        result[category_id] = (pair[0], pair[1])
+        if len(result) >= MAX_CATEGORIES_PER_SOURCE:
+            break
+    return result
+
+
 class CategoryPreferences(object):
     """Validated immutable snapshot for one IPTV source."""
 
@@ -235,8 +253,16 @@ class CategoryPreferences(object):
         hidden=None,
         include_terms=None,
         exclude_terms=None,
+        sort_mode=None,
+        recency=None,
+        recency_work=None,
     ):
+        self.recency = clean_recency(recency)
+        self.recency_work = clean_recency(recency_work)
         self.order = tuple(_clean_id_list(order or ()))
+        if sort_mode == 'recent': sort_mode = 'provider'
+        self.sort_mode = (sort_mode if sort_mode in CATEGORY_SORT_MODES
+                          else 'manual' if self.order else 'provider')
         self.hidden = frozenset(_clean_id_list(hidden or ()))
         self.include_terms = clean_filter_terms(include_terms or ())
         self.exclude_terms = clean_filter_terms(exclude_terms or ())
@@ -246,6 +272,8 @@ def arrange_live_categories(
     categories,
     preferences=None,
     include_hidden=False,
+    sort_mode=None,
+    check=None,
 ):
     """Apply stored order while keeping the synthetic All Channels row fixed."""
 
@@ -267,9 +295,10 @@ def arrange_live_categories(
         if len(provider_order) >= MAX_CATEGORIES_PER_SOURCE:
             break
 
+    mode = sort_mode if sort_mode in CATEGORY_SORT_MODES else preferences.sort_mode
     ordered_ids = []
     seen = set()
-    for category_id in preferences.order:
+    for category_id in (preferences.order if mode == 'manual' else ()):
         if category_id in category_by_id and category_id not in seen:
             seen.add(category_id)
             ordered_ids.append(category_id)
@@ -278,7 +307,7 @@ def arrange_live_categories(
             seen.add(category_id)
             ordered_ids.append(category_id)
 
-    arranged = [all_channels] if all_channels is not None else []
+    arranged = []
     hidden = preferences.hidden
     allowed = frozenset(category_by_id)
     if not include_hidden and (preferences.include_terms or preferences.exclude_terms):
@@ -294,6 +323,23 @@ def arrange_live_categories(
             category_id not in hidden and category_id in allowed
         )
     )
+    if mode == 'recent':
+        from .content_sort import heap_order, normalized_name
+        def recent_key(row):
+            date = preferences.recency.get(_category_id(row), (0, 0))[0]
+            name = row.get('name', row.get('category_name', '')) if isinstance(row, dict) else row.name
+            return (not bool(date), -date, normalized_name(name), _category_id(row))
+        heap_order(arranged, recent_key, check or (lambda: None))
+    if mode in ('alpha', 'alpha_desc'):
+        # The existing category list is reordered in place. Heap sorting keeps
+        # only a constant number of bounded keys, with no per-row key cache.
+        from .content_sort import heap_order, normalized_name
+        heap_order(arranged, lambda row: (normalized_name(row.get('name', row.get('category_name', '')) if isinstance(row, dict) else row.name), _category_id(row)),
+                   check or (lambda: None))
+        if mode == 'alpha_desc':
+            arranged.reverse()
+    if all_channels is not None:
+        arranged.insert(0, all_channels)
     return arranged
 
 
@@ -346,12 +392,18 @@ class LiveCategoryPreferenceStore(object):
                 raw_hidden,
                 raw_include,
                 raw_exclude,
+                raw_preferences.get("sort_mode"),
+                raw_preferences.get("recency"),
+                raw_preferences.get("recency_work"),
             )
             sources[scope] = {
                 "order": list(preferences.order),
                 "hidden": sorted(preferences.hidden),
                 "include_terms": list(preferences.include_terms),
                 "exclude_terms": list(preferences.exclude_terms),
+                "sort_mode": preferences.sort_mode,
+                "recency": preferences.recency,
+                "recency_work": preferences.recency_work,
             }
             if len(sources) >= MAX_CATEGORY_SOURCES:
                 break
@@ -557,6 +609,9 @@ class LiveCategoryPreferenceStore(object):
             entry.get("hidden", ()),
             entry.get("include_terms", ()),
             entry.get("exclude_terms", ()),
+            entry.get("sort_mode"),
+            entry.get("recency"),
+            entry.get("recency_work"),
         )
 
     def apply(self, account_scope, categories, include_hidden=False):
@@ -651,6 +706,7 @@ class LiveCategoryPreferenceStore(object):
         hidden_ids,
         include_terms=None,
         exclude_terms=None,
+        sort_mode=None,
     ):
         scope = _clean_scope(account_scope)
         if not scope:
@@ -682,6 +738,10 @@ class LiveCategoryPreferenceStore(object):
                 sources[scope] = {
                     "order": order,
                     "hidden": sorted(hidden),
+                    "recency": previous.get("recency", {}),
+                    "recency_work": previous.get("recency_work", {}),
+                    "sort_mode": (sort_mode if sort_mode in CATEGORY_SORT_MODES
+                                  else previous.get("sort_mode", "manual" if order else "provider")),
                     "include_terms": (
                         list(clean_filter_terms(include_terms))
                         if include_terms is not None
@@ -702,6 +762,55 @@ class LiveCategoryPreferenceStore(object):
                     directory_descriptor,
                     lock_descriptor,
                 )
+
+    def save_sort(self, account_scope, mode):
+        """Change only the category mode, preserving manual order and hiding."""
+        scope = _clean_scope(account_scope)
+        if not scope or mode not in CATEGORY_SORT_MODES:
+            return False
+        with _STORE_LOCK:
+            directory_descriptor, lock_descriptor = self._acquire_store_lock(exclusive=True)
+            if lock_descriptor is None:
+                return False
+            try:
+                sources, mutable = self._load_state(directory_descriptor)
+                if not mutable or (scope not in sources and len(sources) >= MAX_CATEGORY_SOURCES):
+                    return False
+                entry = sources.setdefault(scope, dict(order=[], hidden=[], include_terms=[], exclude_terms=[]))
+                entry['sort_mode'] = mode
+                return self._write_locked(sources, directory_descriptor=directory_descriptor)
+            finally:
+                self._release_store_lock(directory_descriptor, lock_descriptor)
+
+    def save_recency(self, account_scope, values, activate=False, check=None):
+        """Checkpoint completed categories, or atomically publish a full sort."""
+        scope, values = _clean_scope(account_scope), clean_recency(values)
+        if not scope:
+            return False
+        with _STORE_LOCK:
+            directory_descriptor, lock_descriptor = self._acquire_store_lock(exclusive=True)
+            if lock_descriptor is None:
+                return False
+            try:
+                sources, mutable = self._load_state(directory_descriptor)
+                if not mutable or (scope not in sources and len(sources) >= MAX_CATEGORY_SOURCES):
+                    return False
+                if check is not None:
+                    check()
+                entry = sources.setdefault(scope, dict(order=[], hidden=[], include_terms=[], exclude_terms=[], sort_mode='provider'))
+                if activate:
+                    entry['recency'], entry['recency_work'], entry['sort_mode'] = values, {}, 'recent'
+                else:
+                    previous = entry.get('recency_work', {})
+                    committed = entry.get('recency', {})
+                    for category, pair in values.items():
+                        if (pair[1] > committed.get(category, (0, 0))[1]
+                                and pair[1] >= previous.get(category, (0, 0))[1]):
+                            previous[category] = pair
+                    entry['recency_work'] = clean_recency(previous)
+                return self._write_locked(sources, directory_descriptor=directory_descriptor)
+            finally:
+                self._release_store_lock(directory_descriptor, lock_descriptor)
 
     def reset(self, account_scope):
         scope = _clean_scope(account_scope)

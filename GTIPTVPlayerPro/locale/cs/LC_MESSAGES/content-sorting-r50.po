@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: cs\n"
+
+msgid "Provider order"
+msgstr "Pořadí poskytovatele"
+
+msgid "Newest added"
+msgstr "Nejnověji přidané"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Abecedně (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Datum vydání (nejnovější první)"
+
+msgid "Saved manual order"
+msgstr "Uložené ruční pořadí"
+
+msgid "Sorting"
+msgstr "Řazení"
+
+msgid "Sort content"
+msgstr "Seřadit obsah"
+
+msgid "Sort channels"
+msgstr "Seřadit kanály"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Tento zdroj neposkytuje data pro tento způsob řazení."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Řazení vyžaduje celou kategorii. Počkejte nebo to zkuste znovu."
+
+msgid "Could not save sorting preference."
+msgstr "Předvolbu řazení se nepodařilo uložit."

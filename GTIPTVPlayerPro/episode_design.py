@@ -70,237 +70,170 @@ def episode_focus_assets(fill="navy", border=None):
     return (episode_art("focus-fill-" + fill), episode_art("focus-border-" + border))
 
 
-def episode_geometry(width, height, px):
-    """Fill wide and 4:3 desktops, retaining eight readable episode rows."""
-    width, height = max(1, int(width)), max(1, int(height))
-    compact = width <= 800
-    x = lambda value: int(round(value * width / 1920.0))
-    y = lambda value: int(round(value * height / 1080.0))
-    rect = lambda a, b, c, d: (x(a), y(b), max(1, x(c)), max(1, y(d)))
-    font = lambda value, minimum=1: max(minimum, int(px(value)))
-    # Leave two native caption lines beneath the 32-unit remote keycaps.
-    footer_h = max(font(100), 56 if compact else 1)
-    footer_y = height - footer_h
-    right_x, right_w = x(1178), x(660)
-    if compact:
-        # SD uses the same two-area hierarchy; redistribute the empty cinema
-        # gutter into useful text width and use real pixel font minima.
-        margin = max(17, x(54))
-        right_x = int(round(width * .555))
-        right_w = width - right_x - margin
-        left_w = right_x - margin - 15
-        sy = lambda value: int(round(value * height / 480.0))
-        cr = lambda a, b, c, d: (int(a), sy(b), max(1, int(c)), max(1, sy(d)))
-        left = {
-            "title": cr(margin, 64, left_w, 49),
-            "meta": cr(margin, 114, left_w, 19),
-            "genre": cr(margin, 135, left_w, 18),
-            "plot": cr(margin, 157, left_w, 58),
-            "cast_label": cr(margin, 219, left_w, 14),
-            "cast": cr(margin, 234, left_w, 27),
-            "resume": cr(margin, 268, left_w, 32),
-            "resume_text": cr(margin + 8, 269, left_w - 16, 30),
-            "resume_detail": cr(margin, 303, left_w, 21),
-            "favorite": cr(margin, 329, int(left_w * .53), 29),
-            "download": cr(margin + int(left_w * .56), 329, int(left_w * .44), 29),
-            "progress_label": cr(margin, 367, left_w, 14),
-            "progress_text": cr(margin, 383, left_w, 17),
-            "season_progress": cr(margin, 406, left_w - 38, 6),
-            "progress_percent": cr(margin + left_w - 34, 397, 34, 19),
-        }
-        favorite, download = left["favorite"], left["download"]
-        left["favorite_key"] = (favorite[0] + 7, favorite[1] + max(1, favorite[3] // 3), 13, max(9, favorite[3] // 3))
-        left["favorite_text"] = (favorite[0] + 25, favorite[1], favorite[2] - 29, favorite[3])
-        left["download_key"] = (download[0] + 5, download[1] + 5, 28, max(1, download[3] - 10))
-        left["download_text"] = (download[0] + 37, download[1], max(1, download[2] - 41), download[3])
-        tab_y, tab_h, list_y = sy(78), sy(26), sy(113)
-        tabs = [(right_x + i * (right_w // 3), tab_y, right_w // 3 - 4, tab_h) for i in range(3)]
-        fonts = {
-            "title": max(22, int(width * .034)), "meta": 12, "genre": 12,
-            "plot": 13 if width < 700 else 14, "cast": 12, "cast_label": 11,
-            "resume": 14, "resume_detail": 11, "favorite": 10, "download": 10,
-            "progress_label": 11, "progress_text": 12, "progress_percent": 11,
-            "name": 14, "status": 11, "number": 17, "season": 12,
-            "count": 11, "position": 11, "clock": 18, "breadcrumb": 12,
-            "brand": 23, "brand_sub": 14,
-        }
-        brand = (margin, sy(8), 150, sy(24))
-        brand_sub = (margin, sy(33), 150, sy(17))
-        breadcrumb = (margin + 157, sy(19), max(1, width - margin - 250), sy(21))
-        clock = (width - margin - 58, sy(15), 58, sy(26))
-        season_count = (0, 0, 1, 1)
-        list_bottom = footer_y - max(23, sy(23))
-    else:
-        left = {
-            "title": rect(92, 160, 1040, 142),
-            "meta": rect(92, 316, 1040, 35),
-            "genre": rect(92, 350, 990, 29),
-            "plot": rect(92, 382, 700, 113),
-            "cast_label": rect(92, 506, 800, 28),
-            "cast": rect(92, 539, 890, 52),
-            "resume": rect(92, 595, 500, 70),
-            "resume_text": rect(109, 596, 466, 68),
-            "resume_detail": rect(92, 680, 930, 38),
-            "favorite": rect(92, 735, 305, 64),
-            "download": rect(417, 735, 270, 64),
-            "favorite_key": rect(117, 753, 33, 32),
-            "favorite_text": rect(166, 735, 218, 64),
-            "download_key": rect(428, 747, 67, 39),
-            "download_text": rect(504, 735, 170, 64),
-            "progress_label": rect(92, 843, 700, 30),
-            "progress_text": rect(92, 878, 700, 30),
-            "season_progress": rect(92, 909, 500, 14),
-            "progress_percent": rect(606, 896, 75, 34),
-        }
-        tab_y, tab_h, list_y = y(138), y(43), y(196)
-        tabs = [rect(1190 + i * 163, 138, 150, 43) for i in range(3)]
-        season_count = rect(1734, 139, 104, 40)
-        fonts = {name: font(value) for name, value in {
-            "title": 64, "meta": 25, "genre": 23, "plot": 27, "cast": 25,
-            "cast_label": 22, "resume": 29, "resume_detail": 23,
-            "favorite": 22, "download": 21, "progress_label": 22,
-            "progress_text": 23, "progress_percent": 22, "name": 27,
-            "status": 22, "number": 34, "season": 24, "count": 20,
-            "position": 21, "clock": 32, "breadcrumb": 23,
-            "brand": 46, "brand_sub": 31,
-        }.items()}
-        brand, brand_sub = rect(92, 21, 260, 53), rect(92, 73, 260, 35)
-        breadcrumb, clock = rect(347, 47, 760, 39), rect(1757, 38, 100, 44)
-        list_bottom = min(y(947), footer_y - font(37))
 
-    row_step = max(1, (list_bottom - list_y) // EPISODE_ROWS)
-    rows = []
-    for i in range(EPISODE_ROWS):
-        row_y = list_y + row_step * i
-        row_h = row_step - max(1, font(3))
-        pad = max(5, x(15))
-        number_w = max(25, x(63))
-        text_x = right_x + pad + number_w + max(6, x(15))
-        text_w = right_x + right_w - text_x - max(24, x(56))
-        if compact:
-            name_y, name_h = row_y + 1, max(16, int(row_h * .49))
-            status_y, status_h = row_y + name_h, max(13, row_h - name_h - 1)
-        else:
-            name_y, name_h = row_y + y(10), y(38)
-            status_y, status_h = row_y + y(51), y(31)
-        progress_w = max(50, x(165))
-        progress_x = right_x + right_w - progress_w - max(10, x(26))
-        progress_h = max(3, y(6))
-        progress_y = status_y + max(1, (status_h - progress_h) // 2)
-        status_w = max(1, progress_x - text_x - max(8, x(18)))
-        tick_size = max(16, font(32))
-        rows.append({
-            "row": (right_x, row_y, right_w, row_h),
-            "rule": (right_x + pad, row_y + row_h, right_w - 2 * pad, 1),
-            "number": (right_x + pad, row_y + max(0, (row_h - fonts["number"] - 7) // 2), number_w, fonts["number"] + 7),
-            "name": (text_x, name_y, max(1, text_w), max(1, name_h)),
-            "status": (text_x, status_y, status_w, max(1, status_h)),
-            "watched": (right_x + right_w - tick_size - pad, row_y + max(0, (row_h - tick_size) // 2), tick_size, tick_size),
-            "progress": (progress_x, progress_y, progress_w, progress_h),
-            "progress_track": (progress_x, progress_y, progress_w, progress_h),
-            "progress_fill": (progress_x, progress_y, progress_w, progress_h),
-            "progress_width": progress_w,
+EPISODE_LABEL_NAMES += ("episode_guard", "episode_header_divider", "episode_selected_caption", "episode_list_caption", "episode_page_hint", "episode_footer_line")
+EPISODE_PIXMAP_NAMES += ("episode_bottom_scrim",)
+
+def episode_geometry(width,height,px):
+    width,height=max(1,int(width)),max(1,int(height))
+    compact=width<=800
+    x=lambda n:int(round(n*width/1920.))
+    y=lambda n:int(round(n*height/1080.))
+    rect=lambda a,b,c,d:(x(a),y(b),max(1,x(c)),max(1,y(d)))
+    footer_h=max(int(px(72)),56 if compact else 1)
+    footer_y=height-footer_h
+    margin=max(17,x(64));right_x=x(1200);right_w=width-right_x-margin
+    left_w=right_x-margin-x(64)
+    hidden=(0,0,1,1)
+    fonts={key:max(1,int(px(value))) for key,value in {
+        'title':64,'meta':27,'genre':23,'plot':27,'cast':22,'cast_label':22,
+        'resume':34,'resume_detail':23,'favorite':22,'download':21,
+        'progress_label':23,'progress_text':22,'progress_percent':22,
+        'name':30,'status':23,'number':35,'season':27,'count':22,
+        'position':22,'clock':30,'breadcrumb':28,'brand':32,'brand_sub':32,
+        'selected_caption':22,'list_caption':24,'page_hint':22}.items()}
+    left={
+        'title':rect(64,480,1080,112),'meta':rect(64,610,1080,38),
+        'genre':hidden,'plot':rect(64,665,1040,95),'cast':hidden,'cast_label':hidden,
+        'selected_caption':rect(64,782,1040,26),
+        'resume_text':rect(64,816,1040,43),'resume_detail':rect(64,866,1040,30),
+        'resume':hidden,'favorite':hidden,'download':hidden,'favorite_key':hidden,
+        'favorite_text':hidden,'download_key':hidden,'download_text':hidden,
+        'progress_label':rect(64,936,1040,25),
+        'season_progress':rect(64,967,1080,9),
+        'progress_text':rect(64,982,940,23),'progress_percent':rect(1044,982,100,23),
+    }
+    brand=rect(64,24,166,56);brand_sub=rect(230,24,220,56)
+    breadcrumb=rect(540,24,1000,56);clock=rect(1760,24,96,56)
+    header_divider=rect(505,33,1,37)
+    tab_y,tab_h,list_y=y(100),y(44),y(230)
+    list_bottom=min(y(950),footer_y-max(24,int(px(40))))
+    message=rect(64,902,1080,25)
+    if compact:
+        sy=lambda n:int(round(n*height/480.))
+        cr=lambda a,b,c,d:(a,sy(b),max(1,c),max(1,sy(d)))
+        left.update({
+            'title':cr(margin,200,left_w,46),'meta':cr(margin,251,left_w,19),
+            'plot':cr(margin,278,left_w,46),'selected_caption':cr(margin,330,left_w,15),
+            'resume_text':cr(margin,349,left_w,22),'resume_detail':cr(margin,373,left_w,14),
+            'progress_label':(margin,footer_y-34,left_w,13),
+            'season_progress':(margin,footer_y-19,left_w,4),
+            'progress_text':(margin,footer_y-13,max(1,left_w-35),11),
+            'progress_percent':(margin+left_w-33,footer_y-13,33,11),
         })
-    backdrop = (0, 0, int(round(width * .62)), footer_y)
-    result = dict(left)
-    result.update({
-        "width": width, "height": height, "compact": compact, "fonts": fonts,
-        "footer_y": footer_y, "footer_h": footer_h, "rows": rows,
-        "list_scroll": (width - max(11, x(47)), list_y, max(3, x(7)), max(1, list_bottom - list_y)),
-        "list_rect": (right_x, list_y, right_w, max(1, list_bottom - list_y)),
-        "season_tabs": tabs,
-        "season_tab": tabs,
-        "season_tabs_focus": (right_x, tab_y - max(1, y(6)), right_w, tab_h + max(4, y(12))),
-        "season_tabs_rule": (right_x + max(3, x(12)), tab_y + tab_h + max(3, y(5)), right_w - max(6, x(24)), max(1, y(2))),
-        "season_tab_lines": [(a, b + c_h + max(2, y(4)), min(c_w, max(38, x(118))), max(2, y(4))) for a, b, c_w, c_h in tabs],
-        "season_count": season_count,
-        "episode_position": (right_x + max(3, x(12)), footer_y - max(23, y(37)), right_w - max(6, x(24)), max(17, y(27))),
-        "message": (right_x + max(3, x(12)), list_y + max(1, y(40)), right_w - max(6, x(24)), max(28, y(90))),
-        "backdrop": backdrop, "scrim": backdrop, "brand": brand,
-        "brand_sub": brand_sub, "breadcrumb": breadcrumb, "clock": clock,
-        "actions": (left["resume"], left["favorite"], left["download"]),
-        "resume_font": fonts["resume"], "name_font": fonts["name"],
-        "status_font": fonts["status"], "title_font": fonts["title"],
-        "plot_font": fonts["plot"], "cast_font": fonts["cast"],
-    })
+        fonts.update(title=max(22,int(width*.033)),meta=12,plot=13 if width<700 else 14,
+            resume=15,resume_detail=11,progress_label=11,progress_text=11,progress_percent=11,
+            name=14,status=11,number=18,season=13,count=11,position=11,clock=17,
+            breadcrumb=12,brand=18,brand_sub=18,selected_caption=11,list_caption=12,page_hint=11)
+        brand=(margin,sy(16),90,sy(26));brand_sub=(margin+91,sy(16),95,sy(26))
+        breadcrumb=(margin+196,sy(16),max(1,width-margin*2-278),sy(26))
+        clock=(width-margin-55,sy(16),55,sy(26));header_divider=hidden
+        message=cr(margin,174,left_w,20)
+    tab_w=max(1,min(x(180),right_w//3))
+    tabs=[(right_x+i*(tab_w+max(2,x(16))),tab_y,tab_w,tab_h) for i in range(3)]
+    rows=[];step=max(1,(list_bottom-list_y)//EPISODE_ROWS)
+    for i in range(EPISODE_ROWS):
+        row_y=list_y+i*step;row_h=max(1,step-max(1,int(px(3))))
+        pad=max(5,x(16));number_w=max(25,x(65));text_x=right_x+pad+number_w+max(6,x(16))
+        text_w=max(1,right_x+right_w-text_x-max(10,x(20)))
+        name_y=row_y+(2 if compact else y(7));name_h=max(17,y(39))
+        status_y=row_y+(max(19,name_h) if compact else y(47));status_h=max(14,y(30))
+        progress_w=max(32,x(110));progress_h=max(3,y(5))
+        progress_x=right_x+right_w-progress_w-max(9,x(20))
+        tick=max(16,int(px(30)))
+        progress=(progress_x,status_y+max(0,(status_h-progress_h)//2),progress_w,progress_h)
+        rows.append({'row':(right_x,row_y,right_w,row_h),
+            'rule':(right_x+pad,row_y+row_h,max(1,right_w-2*pad),1),
+            'number':(right_x+pad,row_y+max(0,(row_h-fonts['number']-4)//2),number_w,fonts['number']+4),
+            'name':(text_x,name_y,text_w,name_h),
+            'status':(text_x,status_y,max(1,progress_x-text_x-max(5,x(12))),status_h),
+            'watched':(right_x+right_w-tick-pad,row_y+max(0,(row_h-tick)//2),tick,tick),
+            'progress':progress,'progress_track':progress,'progress_fill':progress,'progress_width':progress_w})
+    result=dict(left)
+    result.update(width=width,height=height,compact=compact,fonts=fonts,footer_y=footer_y,footer_h=footer_h,
+        rows=rows,list_scroll=(width-max(10,x(35)),list_y,max(3,x(6)),max(1,list_bottom-list_y)),
+        list_rect=(right_x,list_y,right_w,max(1,list_bottom-list_y)),
+        season_tabs=tabs,season_tab=tabs,season_tabs_focus=hidden,
+        season_tabs_rule=(right_x,tab_y+tab_h+max(2,y(8)),right_w,max(1,y(2))),
+        season_tab_lines=[(a,b+h+max(2,y(7)),min(w,max(35,x(130))),max(2,y(3))) for a,b,w,h in tabs],
+        season_count=(right_x+right_w//2,list_y-max(24,y(50)),right_w//2,max(18,y(32))),
+        list_caption=(right_x,list_y-max(24,y(50)),right_w//2,max(18,y(32))),
+        episode_position=(right_x,footer_y-max(22,y(40)),right_w//2,max(17,y(28))),
+        page_hint=(right_x+right_w//2,footer_y-max(22,y(40)),right_w//2,max(17,y(28))),
+        message=message,backdrop=rect(0,72,1180,790),scrim=rect(0,340,1180,522),
+        bottom_scrim=rect(0,620,1180,250),brand=brand,brand_sub=brand_sub,
+        breadcrumb=breadcrumb,clock=clock,header_divider=header_divider,
+        actions=(hidden,hidden,hidden),resume_font=fonts['resume'],name_font=fonts['name'],
+        status_font=fonts['status'],title_font=fonts['title'],plot_font=fonts['plot'],cast_font=fonts['cast'])
     return result
 
 
-def episode_skin(width, height, px, watched_icon):
-    """Return plain native skin XML; all provider and translated text is live."""
-    g = episode_geometry(width, height, px)
-    f = g["fonts"]
-    lines = ['<screen name="GTEpisodeListScreen" position="0,0" size="{},{}" flags="wfNoBorder" backgroundColor="#020617">'.format(width, height)]
+def episode_footer(download=False):
+    from .remote_footer import footer_item
+    return (footer_item('up_down','Episode'),footer_item('left_right','Season'),
+            footer_item('ok','download' if download else 'play'),footer_item('ok_long','Watched'),
+            footer_item('red','Favorites'),footer_item('green','refresh'),
+            footer_item('menu','download'),footer_item('exit','back'))
 
-    def tag(name, box, font=1, color="#F8FAFC", background=None, pixmap=None,
-            z=3, extra="", transparent=1, scale=1):
-        a, b, c, d = box
-        attrs = 'name="{}" position="{},{}" size="{},{}" zPosition="{}"'.format(name, a, b, c, d, z)
-        if pixmap is not None:
-            attrs += ' pixmap="{}" alphatest="blend" scale="{}"'.format(escape(pixmap, {'"': '&quot;'}), int(scale))
-        elif name not in ("app_bg", "episode_backdrop"):
-            attrs += ' font="Regular;{}" foregroundColor="{}" transparent="{}"'.format(max(1, int(font)), color, transparent)
-            if background is not None:
-                attrs += ' backgroundColor="{}"'.format(background)
-        lines.append('    <widget {} {}/>'.format(attrs, extra))
 
-    tag("app_bg", (0, 0, int(width), int(height)), z=-30)
-    tag("episode_backdrop", g["backdrop"], z=-20)
-    tag("episode_scrim", g["scrim"], pixmap=episode_art("scrim"), z=-19)
-    for name in ("top_accent", "header", "screen_label", "content_panel", "list_accent", "items"):
-        tag(name, (0, 0, 1, 1), z=-1)
-    for text, key, font_key, color in (("GT IPTV", "brand", "brand", "#FFFFFF"), ("PLAYER PRO", "brand_sub", "brand_sub", "#58E7FF")):
-        a, b, c, d = g[key]
-        lines.append('    <eLabel position="{},{}" size="{},{}" text="{}" font="Regular;{}" foregroundColor="{}" transparent="1" zPosition="5" />'.format(a, b, c, d, text, f[font_key], color))
-    tag("breadcrumb", g["breadcrumb"], f["breadcrumb"], "#D7DFEF", extra='valign="center" noWrap="1"')
-    tag("episode_clock", g["clock"], f["clock"], "#FFFFFF", extra='halign="right" valign="center" noWrap="1"')
-    for name, key, font_key, color, extra in (
-        ("series_title", "title", "title", "#FFFFFF", 'valign="center" noWrap="0"'),
-        ("series_meta", "meta", "meta", "#D9E3F3", 'valign="center" noWrap="1"'),
-        ("series_genre", "genre", "genre", "#67DDF1", 'valign="center" noWrap="1"'),
-        ("series_plot", "plot", "plot", "#F1F5FA", 'valign="top" noWrap="0"'),
-        ("series_cast_label", "cast_label", "cast_label", "#A8B6CD", 'valign="center"'),
-        ("series_cast", "cast", "cast", "#E9EEF8", 'valign="top" noWrap="0"'),
-    ):
-        tag(name, g[key], f[font_key], color, extra=extra)
-    tag("episode_resume_button", g["resume"], pixmap=episode_art("action-yellow"), z=2)
-    for name, key in (("episode_favorite_button", "favorite"), ("episode_download_button", "download")):
-        artwork, scale = episode_action_outline_asset(*g[key][2:])
-        tag(name, g[key], pixmap=artwork, scale=scale, z=2)
-    tag("episode_resume_text", g["resume_text"], f["resume"], "#071325", z=5, extra='valign="center" halign="center" noWrap="1"')
-    tag("episode_resume_detail", g["resume_detail"], f["resume_detail"], "#C9D7EC", extra='valign="center" noWrap="1"')
-    tag("episode_favorite_key", g["favorite_key"], pixmap=plugin_path("skin", "images", "remote-key-red-v42.png"), z=5)
-    tag("episode_favorite_text", g["favorite_text"], f["favorite"], "#F8FAFC", z=5, extra='valign="center" halign="center" noWrap="1"')
-    tag("episode_download_key", g["download_key"], max(9, int(f["download"] * .78)), "#FFFFFF", "#0A162B", z=5, transparent=0, extra='valign="center" halign="center" noWrap="1"')
-    tag("episode_download_text", g["download_text"], f["download"], "#F8FAFC", z=5, extra='valign="center" halign="center" noWrap="1"')
-    fill_asset, border_asset = episode_focus_assets()
-    for i, action in enumerate(g["actions"]):
-        tag("episode_action_focus_{}".format(i), action, pixmap=border_asset, z=7)
-    tag("season_tabs_focus", g["season_tabs_focus"], pixmap=border_asset, z=2)
-    tag("season_progress_label", g["progress_label"], f["progress_label"], "#A8B6CD", extra='valign="center" noWrap="1"')
-    tag("season_progress_text", g["progress_text"], f["progress_text"], "#E7EEF8", extra='valign="center" noWrap="1"')
-    tag("season_progress_track", g["season_progress"], background="#3A4765", transparent=0)
-    tag("season_progress_fill", g["season_progress"], background="#FFCD44", z=4, transparent=0)
-    tag("season_progress_percent", g["progress_percent"], f["progress_percent"], "#C9D7EC", extra='halign="right" valign="center" noWrap="1"')
-    tag("season_tabs_rule", g["season_tabs_rule"], background="#15456D", transparent=0)
-    for i, tab in enumerate(g["season_tabs"]):
-        tag("season_tab_{}".format(i), tab, f["season"], "#FFFFFF", extra='valign="center" halign="center" noWrap="1"')
-        tag("season_tab_line_{}".format(i), g["season_tab_lines"][i], background="#22D3EE", z=4, transparent=0)
-    tag("season_count", g["season_count"], f["count"] if not g["compact"] else 1, "#A8B6CD", extra='valign="center" halign="right" noWrap="1"')
-    for i, row in enumerate(g["rows"]):
-        tag("episode_row_bg_{}".format(i), row["rule"], background="#164365", z=1, transparent=0)
-        tag("episode_focus_fill_{}".format(i), row["row"], pixmap=fill_asset, z=2)
-        tag("episode_focus_{}".format(i), row["row"], pixmap=border_asset, z=5)
-        tag("episode_number_{}".format(i), row["number"], f["number"], "#F3F7FC", extra='valign="center" halign="left" noWrap="1"')
-        tag("episode_name_{}".format(i), row["name"], f["name"], "#F8FAFC", extra='valign="center" halign="left" noWrap="1"')
-        tag("episode_status_{}".format(i), row["status"], f["status"], "#C5D0E4", extra='valign="center" halign="left" noWrap="1"')
-        tag("episode_watched_{}".format(i), row["watched"], pixmap=watched_icon, z=6)
-        tag("episode_progress_track_{}".format(i), row["progress"], background="#3A4765", transparent=0)
-        tag("episode_progress_fill_{}".format(i), row["progress"], background="#FFCD44", z=4, transparent=0)
-    tag("list_scroll_track", g["list_scroll"], background="#26344E", z=5, transparent=0)
-    tag("list_scroll_thumb", g["list_scroll"], background="#67A3CF", z=6, transparent=0)
-    tag("episode_position", g["episode_position"], f["position"], "#B9C6DD", extra='halign="right" valign="center" noWrap="1"')
-    tag("message", g["message"], max(12, f["status"]), "#FACC15", z=8, extra='valign="center" halign="center" noWrap="0"')
-    tag("footer", (0, g["footer_y"], width, g["footer_h"]), max(10, int(px(20))), "#D8E1EF", "#080E1A", z=10, transparent=0, extra='halign="center" valign="center"')
-    lines.append("</screen>")
-    return "\n".join(lines)
+def episode_skin(width,height,px,watched_icon):
+    g=episode_geometry(width,height,px);f=g['fonts'];names=set()
+    lines=['<screen name="GTEpisodeListScreen" position="0,0" size="{},{}" flags="wfNoBorder" backgroundColor="#030910">'.format(width,height)]
+    def tag(name,box,font=1,color='#EDF2F8',background=None,pixmap=None,z=5,align='left',wrap=False):
+        names.add(name);a,b,c,d=box
+        attrs='name="{}" position="{},{}" size="{},{}" zPosition="{}"'.format(name,a,b,c,d,z)
+        if name in EPISODE_PIXMAP_NAMES or name=='app_bg':
+            attrs+=' alphatest="blend" scale="1"'
+            if pixmap:attrs+=' pixmap="{}"'.format(escape(pixmap,{'"':'&quot;'}))
+        else:
+            attrs+=' font="Regular;{}" foregroundColor="{}" transparent="{}" valign="center" halign="{}" noWrap="{}"'.format(max(1,int(font)),color,0 if background else 1,align,0 if wrap else 1)
+            if background:attrs+=' backgroundColor="{}"'.format(background)
+        lines.append('<widget {}/>'.format(attrs))
+    tag('app_bg',(0,0,1,1),z=-40)
+    tag('episode_guard',(0,0,width,height),background='#030910',z=-30)
+    tag('episode_backdrop',g['backdrop'],z=-20)
+    tag('episode_scrim',g['scrim'],pixmap=plugin_path('skin','images','discovery-r48','hero-bottom-r48.png'),z=-19)
+    tag('episode_bottom_scrim',g['bottom_scrim'],pixmap=plugin_path('skin','images','discovery-r48','hero-bottom-r48.png'),z=-18)
+    for text,key,c in (('GT IPTV','brand','#FFFFFF'),('PLAYER','brand_sub','#31CFE5')):
+        a,b,w,h=g[key]
+        lines.append('<eLabel position="{},{}" size="{},{}" text="{}" font="Regular;{}" foregroundColor="{}" transparent="1" valign="center" zPosition="6"/>'.format(a,b,w,h,text,f[key],c))
+    tag('episode_header_divider',g['header_divider'],background='#566A7A')
+    tag('breadcrumb',g['breadcrumb'],f['breadcrumb'],color='#A9B8C9')
+    tag('episode_clock',g['clock'],f['clock'],align='right')
+    for name,key,font_key in (('series_title','title','title'),('series_meta','meta','meta'),
+                            ('series_genre','genre','genre'),('series_plot','plot','plot'),
+                            ('series_cast_label','cast_label','cast_label'),('series_cast','cast','cast'),
+                            ('episode_selected_caption','selected_caption','selected_caption'),
+                            ('episode_resume_text','resume_text','resume'),('episode_resume_detail','resume_detail','resume_detail'),
+                            ('episode_list_caption','list_caption','list_caption'),('episode_page_hint','page_hint','page_hint')):
+        tag(name,g[key],f[font_key],color='#FFFFFF' if name in ('series_title','episode_resume_text') else '#B9C8D8',wrap=name in ('series_title','series_plot'),align='right' if key=='page_hint' else 'left')
+    tag('season_progress_label',g['progress_label'],f['progress_label'],color='#A9B8C9')
+    tag('season_progress_text',g['progress_text'],f['progress_text'],color='#B9C8D8')
+    tag('season_progress_track',g['season_progress'],background='#24384E')
+    tag('season_progress_fill',g['season_progress'],background='#31CFE5',z=6)
+    tag('season_progress_percent',g['progress_percent'],f['progress_percent'],align='right')
+    tag('season_tabs_rule',g['season_tabs_rule'],background='#24415A')
+    for i,tab in enumerate(g['season_tabs']):
+        tag('season_tab_'+str(i),tab,f['season'],align='left')
+        tag('season_tab_line_'+str(i),g['season_tab_lines'][i],background='#31CFE5',z=6)
+    tag('season_count',g['season_count'],f['count'],align='right',color='#A9B8C9')
+    fill_asset,border_asset=episode_focus_assets()
+    for i,row in enumerate(g['rows']):
+        tag('episode_row_bg_'+str(i),row['rule'],background='#173549',z=1)
+        tag('episode_focus_fill_'+str(i),row['row'],pixmap=fill_asset,z=2)
+        tag('episode_focus_'+str(i),row['row'],pixmap=border_asset,z=6)
+        for part in ('number','name','status'):tag('episode_'+part+'_'+str(i),row[part],f[part],color='#FFFFFF' if part=='name' else '#B9C8D8')
+        tag('episode_watched_'+str(i),row['watched'],pixmap=watched_icon,z=7)
+        tag('episode_progress_track_'+str(i),row['progress'],background='#24384E')
+        tag('episode_progress_fill_'+str(i),row['progress'],background='#31CFE5',z=6)
+    tag('list_scroll_track',g['list_scroll'],background='#24384E')
+    tag('list_scroll_thumb',g['list_scroll'],background='#31CFE5',z=6)
+    tag('episode_position',g['episode_position'],f['position'],color='#A9B8C9')
+    tag('message',g['message'],max(11,f['status']),color='#F4CA77')
+    line_x=max(1,int(px(32)))
+    tag('episode_footer_line',(line_x,g['footer_y']-2,width-2*line_x,1),background='#24384E',z=30)
+    tag('footer',(0,g['footer_y'],width,g['footer_h']),int(px(20)),z=30)
+    for name in EPISODE_LABEL_NAMES+EPISODE_PIXMAP_NAMES+('top_accent','header','screen_label','content_panel','list_accent','items'):
+        if name not in names:tag(name,(0,0,1,1),z=-40)
+    lines.append('</screen>')
+    return '\n'.join(lines)

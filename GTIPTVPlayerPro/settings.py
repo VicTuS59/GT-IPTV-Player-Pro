@@ -77,7 +77,7 @@ def _player_config():
 
     if not hasattr(section, "live_service_type"):
         section.live_service_type = ConfigSelection(
-            default="4097",
+            default="5002",
             choices=["1", "4097", "5001", "5002"],
         )
     if not hasattr(section, "movie_service_type"):
@@ -399,7 +399,7 @@ class PlayerSettings(object):
 
     def __init__(
         self,
-        live_service_type=4097,
+        live_service_type=5002,
         movie_service_type=5002,
         series_service_type=5002,
         metadata_enabled=True,
@@ -419,7 +419,7 @@ class PlayerSettings(object):
         infobar_timeout=DEFAULT_INFOBAR_TIMEOUT,
     ):
         self.live_service_type = supported_service_type(
-            live_service_type, 4097
+            live_service_type, 5002
         )
         self.movie_service_type = supported_service_type(
             movie_service_type, 5002
@@ -451,7 +451,7 @@ class PlayerSettings(object):
     def from_dict(cls, payload):
         payload = payload if isinstance(payload, dict) else {}
         return cls(
-            live_service_type=payload.get("live_service_type", 4097),
+            live_service_type=payload.get("live_service_type", 5002),
             movie_service_type=payload.get("movie_service_type", 5002),
             series_service_type=payload.get("series_service_type", 5002),
             metadata_enabled=payload.get("metadata_enabled", True),
@@ -506,7 +506,7 @@ class PlayerSettings(object):
     def service_type_for(self, content_type):
         content_type = str(content_type or "").lower()
         if content_type == "live":
-            return supported_service_type(self.live_service_type, 4097)
+            return supported_service_type(self.live_service_type, 5002)
         if content_type == "movie":
             return supported_service_type(self.movie_service_type, 5002)
         if content_type == "series":

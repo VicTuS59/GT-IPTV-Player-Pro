@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: th\n"
+
+msgid "Move channel"
+msgstr "ย้ายช่อง"
+
+msgid "Channel moved."
+msgstr "ย้ายช่องแล้ว"
+
+msgid "Could not save channel order."
+msgstr "ไม่สามารถบันทึกลำดับช่องได้"

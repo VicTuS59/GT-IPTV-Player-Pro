@@ -1,0 +1,12 @@
+# Category recency r52
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: lv\n"
+
+msgid "Most recently added content"
+msgstr "Visjaunāk pievienotais saturs"
+
+msgid "Preparing category dates: {}/{} ({} items)"
+msgstr "Sagatavo kategoriju datumus: {}/{} ({} vienumi)"
+
+msgid "Category dates could not be completed. Select this option again to resume."
+msgstr "Kategoriju datumus neizdevās pabeigt. Lai turpinātu, izvēlieties šo iespēju vēlreiz."

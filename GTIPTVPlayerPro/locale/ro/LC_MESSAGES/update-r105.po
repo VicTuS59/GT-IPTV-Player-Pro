@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Actualizare software"
+
+msgid "Automatic update check"
+msgstr "Verificare automată a actualizărilor"
+
+msgid "Check for updates"
+msgstr "Caută actualizări"
+
+msgid "Download and verify"
+msgstr "Descarcă și verifică"
+
+msgid "Install update"
+msgstr "Instalează actualizarea"
+
+msgid "Update available"
+msgstr "Actualizare disponibilă"
+
+msgid "Up to date"
+msgstr "La zi"
+
+msgid "Update verified"
+msgstr "Actualizare verificată"
+
+msgid "Restart interface"
+msgstr "Repornește interfața"
+
+msgid "Update source is not ready"
+msgstr "Sursa de actualizare nu este încă pregătită"
+
+msgid "Update signature is invalid"
+msgstr "Semnătura actualizării nu este validă"
+
+msgid "Invalid update information"
+msgstr "Informații de actualizare nevalide"
+
+msgid "Update package is invalid"
+msgstr "Pachetul de actualizare nu este valid"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Actualizarea nu este compatibilă cu acest receptor"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Opriți înregistrările și descărcările înainte de actualizare"
+
+msgid "Update failed"
+msgstr "Actualizarea a eșuat"
+
+msgid "Update installed. Restart the interface."
+msgstr "Actualizare instalată. Reporniți interfața."
+
+msgid "Install the verified update?"
+msgstr "Instalați actualizarea verificată?"
+
+msgid "Update available. Open updater?"
+msgstr "Actualizare disponibilă. Deschideți actualizatorul?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Verificare automată la fiecare 6 ore."
+
+msgid "New version"
+msgstr "Versiune nouă"
+

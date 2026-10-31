@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: da\n"
+
+msgid "Trailer"
+msgstr "Trailer"
+
+msgid "Searching for the next episode trailer..."
+msgstr "Søger efter traileren til næste afsnit..."
+
+msgid "No trailer found for the next episode."
+msgstr "Ingen trailer fundet til næste afsnit."
+
+msgid "Next episode information is unavailable."
+msgstr "Oplysninger om næste afsnit er ikke tilgængelige."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "Kunne ikke søge efter en trailer. Prøv igen."

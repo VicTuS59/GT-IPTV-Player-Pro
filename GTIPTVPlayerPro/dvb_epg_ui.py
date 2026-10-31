@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-FileCopyrightText: 2026 VicTuS59
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Remote-control UI for Xtream XMLTV -> native DVB EPG imports.
+"""Remote-control UI for independent public XMLTV -> native DVB EPG imports.
 
 The core module deliberately has no Enigma2 dependency.  This module keeps
 all network/XML work on daemon workers and applies the already validated
@@ -18,6 +18,8 @@ from Components.Label import Label
 from Screens.Screen import Screen
 from enigma import eTimer, getDesktop
 
+from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven, poster_after
+from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from .background import attach_background
 from .dvb_epg import (
     DEFAULT_IMPORT_PAST_SECONDS,
@@ -25,18 +27,12 @@ from .dvb_epg import (
     MappingStoreError,
     OperationCancelled,
     block_automatic_mapping,
-    build_import_event_groups,
-    default_xmltv_cache_path,
-    download_xtream_xmltv,
     list_dvb_bouquets,
     load_dvb_services,
     load_manual_mappings,
-    match_xmltv_channels,
     normalise_channel_name,
     remove_manual_mapping,
-    scan_xmltv,
     set_manual_mapping,
-    xtream_source_key,
 )
 from .dvb_epg_settings import (
     ALL_BOUQUETS,
@@ -47,7 +43,10 @@ from .dvb_epg_settings import (
 )
 from .i18n import N_, _, ngettext
 from .paths import plugin_path
-from .playlist import load_sources
+from .dvb_epg_sources import (
+    load_guide_sources, guide_mapping_key, load_guide, match_guide, update_guide,
+)
+from .dvb_epg_text import tr as epg_tr, source_name
 from .remote_footer import (
     decorate_remote_footer,
     footer_item,
@@ -58,7 +57,7 @@ from .typography import clean_dynamic_text, ellipsize_dynamic_text, fit_dynamic_
 
 
 APP_BACKGROUND = plugin_path("skin", "images", "global-neon-v0912.png")
-UI_JOB_TIMEOUT_SECONDS = 180
+UI_JOB_TIMEOUT_SECONDS = 900
 MAPPING_PAGE_SIZE = 8
 PREFERENCE_FIELDS = (
     "enabled",
@@ -76,10 +75,11 @@ DEFAULT_SETTINGS_SAVER = save_dvb_epg_settings
 _SETTINGS_FALLBACK_LOCK = threading.RLock()
 
 DVB_SETTINGS_FOOTER_ITEMS = (
-    footer_item("arrows", "select_change", 1.2),
+    footer_item("up_down", "navigate", 0.9),
+    footer_item("left_right", "change", 0.9),
     footer_item("ok", "open", 0.75),
     footer_item("green", "save", 0.8),
-    footer_item("yellow", "refresh", 0.95),
+    footer_item("yellow", "dvb_import", 0.95),
     footer_item("blue", "channel_list", 1.15),
     footer_item("exit", "back", 0.75),
 )
@@ -189,6 +189,8 @@ def _scale():
     return width, height, px
 
 
+@seven_skin_after('automation', screen_name='GTDVBEPGAutomationScreen')
+@skin_after('epg')
 def _settings_skin(
     screen_name="GTDVBEPGSettingsScreen",
     row_positions=(190, 290, 390, 490, 590, 690),
@@ -280,6 +282,7 @@ def _settings_skin(
     )
 
 
+@seven_skin_after('mapping', screen_name='GTDVBEPGMappingScreen')
 def _list_skin(screen_name):
     width, height, px = _scale()
     margin = px(64)
@@ -381,17 +384,10 @@ def _list_skin(screen_name):
     )
 
 
-def _source_type(source):
-    return str(getattr(source, "source_type", "xtream") or "xtream").lower()
 
 
-def _source_name(account):
-    return str(
-        getattr(account, "display_name", "")
-        or getattr(account, "name", "")
-        or getattr(account, "host", "")
-        or "Xtream"
-    )[:160]
+def _source_name(source):
+    return source_name(source.key)
 
 
 def _clock_is_sane(now=None):
@@ -602,6 +598,7 @@ class GTDVBEPGAutomationScreen(Screen):
                 790,
             ),
             DVB_AUTOMATION_FOOTER_ITEMS,
+            skin_fonts_scaled=True, show_web_hint=False, show_dividers=False, transparent_panel=True,
         )
         Screen.__init__(self, session)
         self.settings_saver = settings_saver or save_dvb_epg_settings
@@ -619,14 +616,13 @@ class GTDVBEPGAutomationScreen(Screen):
         self._saved_settings = self.settings.copy()
         self.selected_index = 0
 
-        attach_background(self, "app_bg", APP_BACKGROUND)
         self["top_accent"] = Label("")
         self["header"] = Label(_("Settings"))
         self["subtitle"] = Label(_("DVB EPG AUTOMATIC UPDATES"))
         for index, label in enumerate(self.LABELS):
             self["row_bg_{}".format(index)] = Label("")
             self["focus_{}".format(index)] = Label("")
-            self["label_{}".format(index)] = Label(_(label))
+            self["label_{}".format(index)] = Label(epg_tr(label) if label == "Independent EPG source" else _(label))
             self["value_{}".format(index)] = Label("")
         self["message"] = Label(
             _("XMLTV offsets are converted to UTC automatically; no manual timezone is used.")
@@ -649,6 +645,7 @@ class GTDVBEPGAutomationScreen(Screen):
             },
             -1,
         )
+        setup_seven(self, 'automation', DVB_AUTOMATION_FOOTER_ITEMS)
         self._refresh()
         self.setTitle(_("Settings - DVB EPG"))
 
@@ -683,6 +680,7 @@ class GTDVBEPGAutomationScreen(Screen):
             _("Always off"),
         )
 
+    @seven_refresh_after
     def _refresh(self):
         for index, value in enumerate(self._values()):
             self["value_{}".format(index)].setText(str(value))
@@ -778,7 +776,7 @@ class GTDVBEPGAutomationScreen(Screen):
 class GTDVBEPGSettingsScreen(Screen):
     LABELS = (
         N_("Enable DVB EPG"),
-        N_("Xtream XMLTV source"),
+        N_("Independent EPG source"),
         N_("Target DVB bouquet"),
         N_("EPG range"),
         N_("Manual channel mapping"),
@@ -795,11 +793,16 @@ class GTDVBEPGSettingsScreen(Screen):
         self.skin = decorate_remote_footer(
             _settings_skin(),
             DVB_SETTINGS_FOOTER_ITEMS,
+            transparent_panel=True,
+            mask_legacy_frame=False,
+            skin_fonts_scaled=True,
+            show_web_hint=False,
+            show_dividers=False,
         )
         Screen.__init__(self, session)
         self.settings_loader = settings_loader or load_dvb_epg_settings
         self.settings_saver = settings_saver or save_dvb_epg_settings
-        self.source_loader = source_loader or load_sources
+        self.source_loader = source_loader or load_guide_sources
         try:
             loaded = self.settings_loader()
         except Exception:
@@ -810,8 +813,8 @@ class GTDVBEPGSettingsScreen(Screen):
             else DVBEPGSettings.from_dict(loaded)
         )
         self.selected_index = 0
-        self._accounts = []
-        self._account_keys = []
+        self._sources = []
+        self._source_keys = []
         self._bouquets = []
         self._closed = False
         self._bouquet_job = None
@@ -835,16 +838,15 @@ class GTDVBEPGSettingsScreen(Screen):
         self._state_lock = threading.Lock()
         self._timer = eTimer()
         self._timer_binding = _connect_timer(self._timer, self._poll_jobs)
-        self._load_accounts()
+        self._load_sources()
 
-        attach_background(self, "app_bg", APP_BACKGROUND)
         self["top_accent"] = Label("")
         self["header"] = Label(_("Settings"))
         self["subtitle"] = Label(_("DVB SATELLITE EPG"))
         for index, label in enumerate(self.LABELS):
             self["row_bg_{}".format(index)] = Label("")
             self["focus_{}".format(index)] = Label("")
-            self["label_{}".format(index)] = Label(_(label))
+            self["label_{}".format(index)] = Label(epg_tr(label) if label == "Independent EPG source" else _(label))
             self["value_{}".format(index)] = Label("")
         self["message"] = Label(self._summary_text())
         self["footer"] = Label("")
@@ -869,44 +871,29 @@ class GTDVBEPGSettingsScreen(Screen):
         )
         if hasattr(self, "onClose"):
             self.onClose.append(self._stop)
+        setup_utility_pages(self, 'epg', DVB_SETTINGS_FOOTER_ITEMS)
         self._refresh()
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._refresh)
         self._start_bouquet_scan()
         self.setTitle(_("Settings - DVB EPG"))
 
-    def _load_accounts(self):
-        try:
-            result = self.source_loader()
-            candidates = list(getattr(result, "accounts", ()) or ())
-        except Exception:
-            candidates = []
-        accounts = []
-        keys = []
-        for account in candidates:
-            if _source_type(account) != "xtream":
-                continue
-            try:
-                source_key = xtream_source_key(account)
-            except (TypeError, ValueError):
-                continue
-            accounts.append(account)
-            keys.append(source_key)
-        self._accounts = accounts
-        self._account_keys = keys
-        if keys and self.settings.source_key not in keys:
-            self.settings.source_key = keys[0]
+    def _load_sources(self):
+        self._sources = list(self.source_loader())
+        self._source_keys = [source.key for source in self._sources]
+        if self._source_keys and self.settings.source_key not in self._source_keys:
+            self.settings.source_key = self._source_keys[0]
 
-    def _selected_account(self):
+    def _selected_source(self):
         try:
-            index = self._account_keys.index(self.settings.source_key)
+            index = self._source_keys.index(self.settings.source_key)
         except ValueError:
             return None
-        return self._accounts[index]
+        return self._sources[index]
 
-    def _selected_account_index(self):
+    def _selected_source_index(self):
         try:
-            return self._account_keys.index(self.settings.source_key)
+            return self._source_keys.index(self.settings.source_key)
         except ValueError:
             return 0
 
@@ -958,8 +945,8 @@ class GTDVBEPGSettingsScreen(Screen):
         return _("Selected bouquet is unavailable")
 
     def _source_value(self):
-        account = self._selected_account()
-        return _source_name(account) if account is not None else _("No Xtream source")
+        source = self._selected_source()
+        return _source_name(source) if source is not None else epg_tr("No EPG source is available.")
 
     def _summary_text(self):
         if not self.settings.last_success_utc:
@@ -989,9 +976,10 @@ class GTDVBEPGSettingsScreen(Screen):
             automatic_value,
         )
 
+    @refresh_after
     def _refresh(self):
         dynamic_indexes = set()
-        if self._selected_account() is not None:
+        if self._selected_source() is not None:
             dynamic_indexes.add(1)
         if self.settings.bouquet_file != ALL_BOUQUETS and any(
             bouquet.filename == self.settings.bouquet_file
@@ -1031,12 +1019,12 @@ class GTDVBEPGSettingsScreen(Screen):
         if self.selected_index == 0:
             self.settings.enabled = not self.settings.enabled
         elif self.selected_index == 1:
-            if not self._account_keys:
-                self["message"].setText(_("No valid Xtream source was found."))
+            if not self._source_keys:
+                self["message"].setText(epg_tr("No EPG source is available."))
                 return
-            index = self._selected_account_index()
-            self.settings.source_key = self._account_keys[
-                (index + step) % len(self._account_keys)
+            index = self._selected_source_index()
+            self.settings.source_key = self._source_keys[
+                (index + step) % len(self._source_keys)
             ]
         elif self.selected_index == 2:
             if self._bouquet_job is not None:
@@ -1151,9 +1139,9 @@ class GTDVBEPGSettingsScreen(Screen):
         if not self.settings.enabled:
             self["message"].setText(_("Enable DVB EPG before starting an update."))
             return
-        account = self._selected_account()
-        if account is None:
-            self["message"].setText(_("Select a valid Xtream XMLTV source."))
+        source = self._selected_source()
+        if source is None:
+            self["message"].setText(epg_tr("Select an EPG source."))
             return
         if not _clock_is_sane():
             self["message"].setText(
@@ -1182,10 +1170,10 @@ class GTDVBEPGSettingsScreen(Screen):
         self._update_worker_active = True
         generation = self._update_generation
         snapshot = self.settings.copy()
-        self["message"].setText(_("Downloading and preparing the Xtream XMLTV guide..."))
+        self["message"].setText(epg_tr("Downloading DVB EPG sources..."))
         try:
             worker = threading.Thread(
-                target=lambda: self._run_update(job, generation, account, snapshot),
+                target=lambda: self._run_update(job, generation, source, snapshot),
                 name="GTDVBEPGUpdate",
             )
             worker.daemon = True
@@ -1201,7 +1189,7 @@ class GTDVBEPGSettingsScreen(Screen):
             return
         self._timer.start(120, True)
 
-    def _run_update(self, job, generation, account, settings):
+    def _run_update(self, job, generation, source, settings):
         payload = None
         try:
             bouquet_files = (
@@ -1216,33 +1204,9 @@ class GTDVBEPGSettingsScreen(Screen):
             )
             if not services:
                 raise DvbEpgError("no DVB services")
-            download = download_xtream_xmltv(
-                account,
-                cancel_event=job.cancel_event,
-                deadline=job.deadline,
-            )
-            scan = scan_xmltv(
-                download.path,
-                cancel_event=job.cancel_event,
-                deadline=job.deadline,
-            )
-            manual = load_manual_mappings()
-            source_key = xtream_source_key(account)
-            matched = match_xmltv_channels(
-                scan.channels,
-                services,
-                manual_entries=manual,
-                source_key=source_key,
-            )
-            imported = build_import_event_groups(
-                download.path,
-                matched.mappings,
-                now=int(time.time()),
-                past_seconds=DEFAULT_IMPORT_PAST_SECONDS,
-                future_seconds=int(settings.epg_days) * 24 * 60 * 60,
-                allowed_services=services,
-                cancel_event=job.cancel_event,
-                deadline=job.deadline,
+            matched, imported = update_guide(
+                source, services, settings.epg_days,
+                cancel_event=job.cancel_event, deadline=job.deadline,
             )
             job.check()
             payload = (True, matched, imported)
@@ -1408,9 +1372,9 @@ class GTDVBEPGSettingsScreen(Screen):
         if self._updating:
             self["message"].setText(_("DVB EPG update is still running..."))
             return
-        account = self._selected_account()
-        if account is None:
-            self["message"].setText(_("Select a valid Xtream XMLTV source."))
+        source = self._selected_source()
+        if source is None:
+            self["message"].setText(epg_tr("Select an EPG source."))
             return
         if not hasattr(self.session, "openWithCallback"):
             self["message"].setText(_("Manual channel mapping could not be opened."))
@@ -1418,7 +1382,7 @@ class GTDVBEPGSettingsScreen(Screen):
         self.session.openWithCallback(
             self._mapping_closed,
             GTDVBEPGMappingScreen,
-            account,
+            source,
             self.settings.bouquet_file,
         )
 
@@ -1515,14 +1479,15 @@ class GTDVBEPGSettingsScreen(Screen):
 class GTDVBEPGMappingScreen(Screen):
     page_size = MAPPING_PAGE_SIZE
 
-    def __init__(self, session, account, bouquet_file=ALL_BOUQUETS):
+    def __init__(self, session, source, bouquet_file=ALL_BOUQUETS):
         self.skin = decorate_remote_footer(
             _list_skin("GTDVBEPGMappingScreen"),
             DVB_MAPPING_FOOTER_ITEMS,
+            skin_fonts_scaled=True, show_web_hint=False, show_dividers=False, transparent_panel=True,
         )
         Screen.__init__(self, session)
-        self.account = account
-        self.source_key = xtream_source_key(account)
+        self.source = source
+        self.source_key = guide_mapping_key(source)
         self.bouquet_file = str(bouquet_file or ALL_BOUQUETS)
         self.selected_index = 0
         self._services = []
@@ -1549,7 +1514,6 @@ class GTDVBEPGMappingScreen(Screen):
         self._timer = eTimer()
         self._timer_binding = _connect_timer(self._timer, self._poll_job)
 
-        attach_background(self, "app_bg", APP_BACKGROUND)
         self["top_accent"] = Label("")
         self["header"] = Label(_("Manual channel mapping"))
         self["subtitle"] = Label("")
@@ -1589,6 +1553,7 @@ class GTDVBEPGMappingScreen(Screen):
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._fit_source_subtitle)
             self.onLayoutFinish.append(self._refresh_rows)
+        setup_seven(self, 'mapping', DVB_MAPPING_FOOTER_ITEMS)
         self._refresh_rows()
         self._start_load(download=False)
         self.setTitle(_("Manual channel mapping"))
@@ -1596,7 +1561,7 @@ class GTDVBEPGMappingScreen(Screen):
     def _fit_source_subtitle(self):
         ellipsize_dynamic_text(
             self["subtitle"],
-            _source_name(self.account),
+            _source_name(self.source),
             fallback_chars=108,
         )
 
@@ -1604,7 +1569,7 @@ class GTDVBEPGMappingScreen(Screen):
         if self._loading:
             return
         _cancel_job(self._job)
-        job = _UIJobToken(UI_JOB_TIMEOUT_SECONDS if download else 60)
+        job = _UIJobToken(UI_JOB_TIMEOUT_SECONDS)
         if download and not self._claim_download_runtime(job):
             self["message"].setText(
                 _("An automatic DVB EPG update is already running.")
@@ -1621,7 +1586,7 @@ class GTDVBEPGMappingScreen(Screen):
         service_snapshot = tuple(self._services) if reuse else None
         channel_snapshot = tuple(self._channels) if reuse else None
         self["message"].setText(
-            _("Downloading the Xtream XMLTV guide...")
+            epg_tr("Downloading DVB EPG sources...")
             if download
             else _("Loading DVB services and cached XMLTV channels...")
         )
@@ -1658,41 +1623,14 @@ class GTDVBEPGMappingScreen(Screen):
     ):
         payload = None
         try:
-            if service_snapshot is not None and channel_snapshot is not None:
-                services = service_snapshot
-                channels = channel_snapshot
-            else:
-                bouquet_files = (
-                    None
-                    if self.bouquet_file == ALL_BOUQUETS
-                    else (self.bouquet_file,)
-                )
-                services = load_dvb_services(
-                    bouquet_files=bouquet_files,
-                    cancel_event=job.cancel_event,
-                    deadline=job.deadline,
-                )
-                path = default_xmltv_cache_path(self.account)
-                if download:
-                    path = download_xtream_xmltv(
-                        self.account,
-                        cancel_event=job.cancel_event,
-                        deadline=job.deadline,
-                    ).path
-                channels = ()
-                if os.path.isfile(path) and not os.path.islink(path):
-                    channels = scan_xmltv(
-                        path,
-                        cancel_event=job.cancel_event,
-                        deadline=job.deadline,
-                    ).channels
+            bouquet_files = None if self.bouquet_file == ALL_BOUQUETS else (self.bouquet_file,)
+            services = load_dvb_services(bouquet_files=bouquet_files,
+                                         cancel_event=job.cancel_event, deadline=job.deadline)
+            snapshot = load_guide(self.source, services, download=download,
+                                  cancel_event=job.cancel_event, deadline=job.deadline)
+            channels = snapshot.channels
             manual = load_manual_mappings()
-            matched = match_xmltv_channels(
-                channels,
-                services,
-                manual_entries=manual,
-                source_key=self.source_key,
-            )
+            matched = match_guide(snapshot, manual)
             job.check()
             payload = (True, list(services), list(channels), list(manual), matched)
         except OperationCancelled:
@@ -1772,12 +1710,7 @@ class GTDVBEPGMappingScreen(Screen):
         self._channel_lookup = {
             channel.xmltv_id: channel for channel in self._channels
         }
-        self._mapped_lookup = {
-            service_ref: xmltv_id
-            for xmltv_id, service_ref in (
-                self._match.mappings.items() if self._match is not None else ()
-            )
-        }
+        self._mapped_lookup = dict(self._match.mappings) if self._match is not None else {}
 
     def _row_status(self, service):
         manual = self._manual_lookup.get(service.service_ref)
@@ -1843,6 +1776,7 @@ class GTDVBEPGMappingScreen(Screen):
             _release_update_runtime(self._mapping_runtime_owner)
             self._mapping_runtime_acquired = False
 
+    @seven_refresh_after
     def _refresh_rows(self):
         count = len(self._services)
         mapped_count = len(self._match.mappings) if self._match is not None else 0
@@ -1955,7 +1889,7 @@ class GTDVBEPGMappingScreen(Screen):
                 self.source_key,
                 service.service_ref,
                 channel.xmltv_id,
-                source_name=_source_name(self.account),
+                source_name=_source_name(self.source),
                 service_name=service.name,
                 xmltv_name=channel.display_name,
             )
@@ -2005,7 +1939,7 @@ class GTDVBEPGMappingScreen(Screen):
                 block_automatic_mapping(
                     self.source_key,
                     service.service_ref,
-                    source_name=_source_name(self.account),
+                    source_name=_source_name(self.source),
                     service_name=service.name,
                 )
                 message = _("EPG mapping removed and automatic matching blocked for {}.").format(

@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: tr\n"
+
+msgid "Provider order"
+msgstr "Sağlayıcı sırası"
+
+msgid "Newest added"
+msgstr "Yeni eklenenler"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Alfabetik (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Yayın tarihi (en yeni önce)"
+
+msgid "Saved manual order"
+msgstr "Kaydedilmiş manuel sıra"
+
+msgid "Sorting"
+msgstr "Sıralama"
+
+msgid "Sort content"
+msgstr "İçerikleri sırala"
+
+msgid "Sort channels"
+msgstr "Kanalları sırala"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Bu kaynak, bu sıralama için tarih bilgisi sağlamıyor."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Sıralama için kategorinin tamamı gerekli. Lütfen bekleyin veya yeniden deneyin."
+
+msgid "Could not save sorting preference."
+msgstr "Sıralama tercihi kaydedilemedi."

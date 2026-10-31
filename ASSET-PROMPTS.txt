@@ -1,0 +1,114 @@
+R96 approved utility screen PNG assets
+
+The 22 new RGBA PNGs are original code-native line icons, panels, state badges and colored dots, authored by scripts/utility-r96/build-assets.py. No image generation or edits of an existing bitmap were used for them. All provider data, source counts, settings, masked tokens and match results remain native dynamic widgets. Existing photos, selection assets and application data are unchanged.
+
+GTIPTVPlayerPro/skin/images/utility-r96/ball.png
+SHA256: 060742f5fd951024b0603585613a383eb24c73b2c7350aa566a80751a1d812ab
+GTIPTVPlayerPro/skin/images/utility-r96/chevron.png
+SHA256: 827a1a4e8eff1c295de500e4b44fdfd882803fc171bd4e7608f8284daa36401b
+GTIPTVPlayerPro/skin/images/utility-r96/count-badge.png
+SHA256: 987db61063814233506075bb90b9f461ffaa01c6d8fbdff300673c20e29c5862
+GTIPTVPlayerPro/skin/images/utility-r96/detail-panel.png
+SHA256: fa376fd372f1218c363b030e70ad636126db0272868c60bee45c5e4cbbc77275
+GTIPTVPlayerPro/skin/images/utility-r96/dot-blue.png
+SHA256: d006cdfe79b165c01ae18b1b0091043df00d53e20bb8c70241540c28a996ae74
+GTIPTVPlayerPro/skin/images/utility-r96/dot-green.png
+SHA256: 268c8e211fd9242e79abee9f5ec85e7bef52233ade7baaba95c7677c169fd8b1
+GTIPTVPlayerPro/skin/images/utility-r96/dot-red.png
+SHA256: 9f6e25bc5c061be114008cfb7b470cd08505caaf4deef37f0ae509b1f86293f4
+GTIPTVPlayerPro/skin/images/utility-r96/dot-yellow.png
+SHA256: ddb3164908324d53dd0b244f19661bf23fc4ea1b7fbb0e60e11a2cc52485c0aa
+GTIPTVPlayerPro/skin/images/utility-r96/folder.png
+SHA256: 3fe4af9f8ebe4393599581bce52d72425a701054bcb869e62c39f7fefba2bfe0
+GTIPTVPlayerPro/skin/images/utility-r96/info-panel.png
+SHA256: 1d7cd49a62905b93d3287e4f30cd6d7c92b543b2b8fef5d84701b411ddeec334
+GTIPTVPlayerPro/skin/images/utility-r96/info.png
+SHA256: b01a9dda78c16f37a73416b40f777335f297a20dfabf70c6ccc2e5921727a4fb
+GTIPTVPlayerPro/skin/images/utility-r96/portal.png
+SHA256: d38f96b34fa3e296a0d834b97805b95ac4b819d77f04aaeaa63143d1f684a2c0
+GTIPTVPlayerPro/skin/images/utility-r96/row-outline.png
+SHA256: 909a78fcd7a3347bd04559a3ab020f5c4a84f10e5b1bfde4fd6e62d74c3bf991
+GTIPTVPlayerPro/skin/images/utility-r96/row-selected.png
+SHA256: b442156f8de99eaa3d49d2c008fde88c682ebf83216af9d0a1c672f91c390923
+GTIPTVPlayerPro/skin/images/utility-r96/settings-tv.png
+SHA256: 204f86881a123810cf007bb118f1f972f7045bcc000677eb8a748bec6458e635
+GTIPTVPlayerPro/skin/images/utility-r96/source-row.png
+SHA256: 01e0fcfd4fa9b88f83ddb3ef0bd7865ee8d6478883f0d66a6684d5f6dca83905
+GTIPTVPlayerPro/skin/images/utility-r96/state-error.png
+SHA256: cacc17caac234fc3ddc73c105b3c4f68ca0860a3d9ea7b1ff8e9250fdac737aa
+GTIPTVPlayerPro/skin/images/utility-r96/state-off.png
+SHA256: 332b04119a3a8654a7d714f2b1ee193ac09d6acfc5638a42c7e21d45ca2112cd
+GTIPTVPlayerPro/skin/images/utility-r96/state-on.png
+SHA256: e01f4427433717fa1ea8c30c90751da495703b31f60e91e592756811a502e41f
+GTIPTVPlayerPro/skin/images/utility-r96/tab-active.png
+SHA256: feff48fa45516e4408c338157897cd94be4b5005b19a0700fda759d1f600bc4a
+GTIPTVPlayerPro/skin/images/utility-r96/tab-idle.png
+SHA256: 9e121510ad3984dc50a47da28aa364b7fdbb28af6380f97c632c168e0539f1ab
+GTIPTVPlayerPro/skin/images/utility-r96/value-panel.png
+SHA256: 5a9d727420bd052376a71c1a39a7a187e5b8d07f9118a7ed73aa67f35a2c7b85
+
+Inherited R95/R94 provenance:
+
+R95 welcome PNG assets
+
+Eight new RGBA PNG primitives were authored as native line-art shapes in scripts/welcome-r95/build-assets.py. No generative image tool was used for these shapes, and no provider data or text is baked into them. The existing play icon, selection fills/frames and automatic-login overlay PNGs are reused unchanged. All visible application text and data remain native Enigma2 widgets.
+
+GTIPTVPlayerPro/skin/images/welcome-r95/action-card.png
+SHA256: 0e7d10a805c99429e127a3a90a2d182e177e3f9f561fe4e14ad455a4add6eb09
+GTIPTVPlayerPro/skin/images/welcome-r95/add.png
+SHA256: 6f26aef3f1bfcbf290f6a45e21790f24db9b9b8f96168b6a52b39c4ea81df701
+GTIPTVPlayerPro/skin/images/welcome-r95/manage.png
+SHA256: 8765a9b0b16008a3e852920067322183331511e7c2ba0078007afb590d31dcd1
+GTIPTVPlayerPro/skin/images/welcome-r95/matches.png
+SHA256: f4dbe92c4cdd5539ad895e533dc361bd0f46a94b4be58bafdc56e395e210da8d
+GTIPTVPlayerPro/skin/images/welcome-r95/server.png
+SHA256: cbaa38c872e92b12b1141af844d9cfb8ad935fc004e99276adcb30eb4737257c
+GTIPTVPlayerPro/skin/images/welcome-r95/shield.png
+SHA256: 2c42e22cfdf24da88eb30998c415a7934846c63339fc84d87513c1c5a9f2c48a
+GTIPTVPlayerPro/skin/images/welcome-r95/source-card.png
+SHA256: 1c9121f8f3529ddd8682539995ef18307db7da5942400e299fd323b9beba1fc7
+GTIPTVPlayerPro/skin/images/welcome-r95/youtube.png
+SHA256: 73cc1c8ed3ff888880a75c6171f427b8ebd92bbba3b884e4d8a4465e5e8648c3
+
+Inherited R94 photo provenance (photographs unchanged):
+
+R94 görsel üretim notları / Asset provenance
+
+Mode: built-in image_gen.imagegen (imagegen), no CLI/API fallback.
+Three new photographs, transparent_background=false, no image inputs.
+Original generated PNG bytes copied unchanged into the runtime.
+
+GTIPTVPlayerPro/skin/images/dashboard-r94/live.png
+SHA256: 849ea3debbb0ec53675347538aa43410d099d246bc2d5afc9947f0ce0c58f2ff
+Final prompt:
+Use case: photorealistic-natural. Production background artwork for the approved GT IPTV Player main dashboard, NOT a screenshot or UI mockup. Generate a single 16:9 landscape photographic bitmap, ideally 1920x1080. Photorealistic football stadium at night, crisp ordinary white football with restrained navy panels on green turf in the LOWER RIGHT, goal and distant blurred spectators, floodlights on upper right, calm deep blue tones, no visible brands, no text. Main objects confined to right 55%; left 40% naturally very dark and uncluttered for a television app title. Wide shot, realistic high-end sports photography, NOT neon or illustration. Edge-to-edge picture, no interface, no frames, no glyphs, no writing, no watermark. Keep lighting restrained so white text can be overlaid later in real native widgets. No baked gradient overlay required; keep left exposure dark in the scene.
+
+GTIPTVPlayerPro/skin/images/dashboard-r94/cinema.png
+SHA256: b7bf9ec527bce979b0939c09dc2950d269fc835a6d218eb2248d012c7cbc1248
+Final prompt:
+Use case: photorealistic-natural. Production background artwork for the approved GT IPTV Player main dashboard, NOT a screenshot or UI mockup. Generate a single 16:9 landscape photographic bitmap, ideally 1920x1080. Photorealistic elegant empty cinema interior, dark navy velvet seats mainly in the LOWER RIGHT foreground, soft silver-blue projector beam from rear right across subtle haze, no visible screen text or branding, calm cinematic night palette. Main visual interest on right 55%; left 40% naturally very dark, clean negative space for television app title. Wide photography, restrained highlights, no neon, no purple, no people, no film posters, no text. Edge-to-edge picture, no interface, no frames, no glyphs, no writing, no watermark. Keep lighting restrained so white text can be overlaid later in real native widgets. No baked gradient overlay required; keep left exposure dark in the scene.
+
+GTIPTVPlayerPro/skin/images/dashboard-r94/lounge.png
+SHA256: d668c191c0e12bb81b6c25a7a3cc81850de32070cebfbd7092bd1a85567feb28
+Final prompt:
+Use case: photorealistic-natural. Production background artwork for the approved GT IPTV Player main dashboard, NOT a screenshot or UI mockup. Generate a single 16:9 landscape photographic bitmap, ideally 1920x1080. Photorealistic premium home cinema lounge at night, plush dark navy sofa and discreet remote on a side table in the LOWER RIGHT, wall TV with soft abstract blue light and no content or text on far right, calm ambient blue lighting. Main visual interest on right 55%; left 40% naturally very dark, clean uncluttered negative space for television app title. Wide realistic interior photography, no neon, no people, no logos or words. Edge-to-edge picture, no interface, no frames, no glyphs, no writing, no watermark. Keep lighting restrained so white text can be overlaid later in real native widgets. No baked gradient overlay required; keep left exposure dark in the scene.
+
+Native UI primitives: eight small line icons (icon-*.png) and row-outline.png are authored as vector-style shapes in scripts/dashboard-r94/build-icons.py, then rasterized for Enigma2. They contain no text. Existing focus/mask/key images are reused unchanged. No Pillow dependency is added on the receiver.
+
+
+R97 utility pages: 22 original code-native RGBA PNG primitives. No generated mockup is used as a UI wallpaper. Text and all values remain native. Reproduce with scripts/utility-r97/build-assets.py (build-time Pillow only).
+
+
+R97 utility pages: 22 original code-native RGBA PNG primitives. No generated mockup is used as a UI wallpaper. Text and all values remain native. Reproduce with scripts/utility-r97/build-assets.py (build-time Pillow only).
+
+R99: Ten original code-native account PNGs reproduce the approved account-panel composition. Rebuild with scripts/accounts-r99/build-assets.py. All labels, dates and counters are native, dynamic components.
+
+R100: 23 code-native PNG panels/icons measured against the seven approved previews; no generated poster or channel art is bundled. Dynamic labels and images stay native.
+
+R101: 22 original code-native PNG panels/icons measured against the four source/live previews and TV Archive preview. No channel logos, provider data or text is baked into the bundled assets.
+
+R102: 15 original code-native PNG panels/icons measured against the four approved live, TXT picker and movie/series search previews. No text, provider data or example programme art is baked into the bundled assets.
+
+R103: Ten original native PNG icons/frames plus one 350-byte palette canvas. Nine approved layouts use runtime labels and real provider data. 161 obsolete wallpaper files/fragments removed; the existing plain EPG master is retained.
+
+R104: two original native PNG drawer primitives, matching the approved category-panel preview. All category names and hints remain runtime text. No example photography or screenshot is bundled.

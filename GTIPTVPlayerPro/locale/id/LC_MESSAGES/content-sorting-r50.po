@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: id\n"
+
+msgid "Provider order"
+msgstr "Urutan penyedia"
+
+msgid "Newest added"
+msgstr "Baru ditambahkan"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Abjad (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Tanggal rilis (terbaru dahulu)"
+
+msgid "Saved manual order"
+msgstr "Urutan manual tersimpan"
+
+msgid "Sorting"
+msgstr "Pengurutan"
+
+msgid "Sort content"
+msgstr "Urutkan konten"
+
+msgid "Sort channels"
+msgstr "Urutkan saluran"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Sumber ini tidak menyediakan tanggal untuk urutan ini."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Pengurutan memerlukan kategori lengkap. Tunggu atau coba lagi."
+
+msgid "Could not save sorting preference."
+msgstr "Preferensi pengurutan tidak dapat disimpan."

@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: id\n"
+
+msgid "Live TV recording"
+msgstr "Perekaman TV langsung"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Tentukan folder rekaman di pengaturan plugin."
+
+msgid "Recording started."
+msgstr "Perekaman dimulai."
+
+msgid "Recording stopped."
+msgstr "Perekaman dihentikan."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Perekaman gagal. Periksa perangkat penyimpanan."
+
+msgid "Recording is not available for this stream."
+msgstr "Perekaman tidak tersedia untuk siaran ini."
+
+msgid "Open the channel again to enable recording."
+msgstr "Buka kembali saluran untuk mengaktifkan perekaman."

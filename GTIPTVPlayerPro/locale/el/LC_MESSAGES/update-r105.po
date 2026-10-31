@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Ενημέρωση λογισμικού"
+
+msgid "Automatic update check"
+msgstr "Αυτόματος έλεγχος ενημερώσεων"
+
+msgid "Check for updates"
+msgstr "Έλεγχος για ενημερώσεις"
+
+msgid "Download and verify"
+msgstr "Λήψη και επαλήθευση"
+
+msgid "Install update"
+msgstr "Εγκατάσταση ενημέρωσης"
+
+msgid "Update available"
+msgstr "Διαθέσιμη ενημέρωση"
+
+msgid "Up to date"
+msgstr "Ενημερωμένο"
+
+msgid "Update verified"
+msgstr "Η ενημέρωση επαληθεύτηκε"
+
+msgid "Restart interface"
+msgstr "Επανεκκίνηση διεπαφής"
+
+msgid "Update source is not ready"
+msgstr "Η πηγή ενημέρωσης δεν είναι ακόμη έτοιμη"
+
+msgid "Update signature is invalid"
+msgstr "Η υπογραφή της ενημέρωσης δεν είναι έγκυρη"
+
+msgid "Invalid update information"
+msgstr "Μη έγκυρες πληροφορίες ενημέρωσης"
+
+msgid "Update package is invalid"
+msgstr "Το πακέτο ενημέρωσης δεν είναι έγκυρο"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Η ενημέρωση δεν είναι συμβατή με αυτόν τον δέκτη"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Σταματήστε εγγραφές και λήψεις πριν από την ενημέρωση"
+
+msgid "Update failed"
+msgstr "Η ενημέρωση απέτυχε"
+
+msgid "Update installed. Restart the interface."
+msgstr "Η ενημέρωση εγκαταστάθηκε. Επανεκκινήστε τη διεπαφή."
+
+msgid "Install the verified update?"
+msgstr "Εγκατάσταση της επαληθευμένης ενημέρωσης;"
+
+msgid "Update available. Open updater?"
+msgstr "Διαθέσιμη ενημέρωση. Άνοιγμα εργαλείου ενημέρωσης;"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Αυτόματος έλεγχος κάθε 6 ώρες."
+
+msgid "New version"
+msgstr "Νέα έκδοση"
+

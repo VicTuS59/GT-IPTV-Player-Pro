@@ -23,15 +23,18 @@ from urllib.request import Request, build_opener, HTTPSHandler, ProxyHandler
 
 from . import PLUGIN_VERSION
 from .paths import plugin_path
-from .web_api import GTWebService, WebServiceError
+from .web_errors import WebServiceError, SubtitleError, AudioError
+from .web_lazy import LazyService
 from .web_auth import PairingManager, WebAuthError, local_client
-from .web_i18n import web_catalog
+def web_catalog(*args, **kwargs):
+    from .web_i18n import web_catalog as catalog
+    return catalog(*args, **kwargs)
 from .web_remote import WEB_REMOTE
-from .web_subtitles import WEB_SUBTITLES, SubtitleError
-from .web_audio import WEB_AUDIO, AudioError
-from .web_media import WEB_MEDIA
-from .web_tmdb import WEB_TMDB
-from .web_youtube import WEB_YOUTUBE
+WEB_SUBTITLES = LazyService('web_subtitles', 'WEB_SUBTITLES')
+WEB_AUDIO = LazyService('web_audio', 'WEB_AUDIO')
+WEB_MEDIA = LazyService('web_media', 'WEB_MEDIA')
+WEB_TMDB = LazyService('web_tmdb', 'WEB_TMDB')
+WEB_YOUTUBE = LazyService('web_youtube', 'WEB_YOUTUBE')
 
 
 WEB_PORT = 9999
@@ -165,7 +168,7 @@ def _parse_json(body):
 class GTWebApplication(object):
     def __init__(self, pairing=None, service=None):
         self.pairing = pairing or PairingManager()
-        self.service = service or GTWebService()
+        self.service = service if service is not None else LazyService('web_api', 'GTWebService', factory=True)
 
     def _security_headers(self, response):
         headers = [
@@ -366,7 +369,7 @@ class GTWebApplication(object):
                 else:
                     raise WebServiceError("not_found", "Not found", 404)
             elif path == "/api/v1/downloads" and method == "GET":
-                data = self.service.downloads()
+                data = self.service.downloads((query.get('offset') or ['0'])[0], (query.get('history') or [''])[0] == '1')
             elif path.startswith("/api/v1/downloads/") and method == "POST":
                 parts = path.strip("/").split("/")
                 if len(parts) != 5:

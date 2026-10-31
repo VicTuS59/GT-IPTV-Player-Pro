@@ -1,0 +1,12 @@
+# Category sorting r51
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: it\n"
+
+msgid "Edit categories"
+msgstr "Modifica categorie"
+
+msgid "Sort categories"
+msgstr "Ordina categorie"
+
+msgid "Alphabetical (Z–A)"
+msgstr "Alfabetico (Z–A)"

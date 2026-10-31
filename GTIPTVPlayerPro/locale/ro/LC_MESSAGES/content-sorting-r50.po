@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ro\n"
+
+msgid "Provider order"
+msgstr "Ordinea furnizorului"
+
+msgid "Newest added"
+msgstr "Adăugate recent"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Alfabetic (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Data lansării (cele mai noi întâi)"
+
+msgid "Saved manual order"
+msgstr "Ordine manuală salvată"
+
+msgid "Sorting"
+msgstr "Sortare"
+
+msgid "Sort content"
+msgstr "Sortează conținutul"
+
+msgid "Sort channels"
+msgstr "Sortează canalele"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Această sursă nu oferă date pentru această sortare."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Sortarea necesită categoria completă. Așteptați sau încercați din nou."
+
+msgid "Could not save sorting preference."
+msgstr "Preferința de sortare nu a putut fi salvată."

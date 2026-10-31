@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: he\n"
+
+msgid "Live TV recording"
+msgstr "הקלטת טלוויזיה בשידור חי"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "יש להגדיר את תיקיית ההקלטה בהגדרות התוסף."
+
+msgid "Recording started."
+msgstr "ההקלטה התחילה."
+
+msgid "Recording stopped."
+msgstr "ההקלטה הופסקה."
+
+msgid "Recording failed. Check the storage device."
+msgstr "ההקלטה נכשלה. בדוק את התקן האחסון."
+
+msgid "Recording is not available for this stream."
+msgstr "הקלטה אינה זמינה עבור שידור זה."
+
+msgid "Open the channel again to enable recording."
+msgstr "פתח את הערוץ מחדש כדי להפעיל הקלטה."

@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ku\n"
+
+msgid "Live TV recording"
+msgstr "Tomarkirina TVya zindî"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Ji kerema xwe peldanka tomarkirinê di mîhengên pêvekê de diyar bike."
+
+msgid "Recording started."
+msgstr "Tomarkirin dest pê kir."
+
+msgid "Recording stopped."
+msgstr "Tomarkirin hate rawestandin."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Tomarkirin bi ser neket. Amûra hilanînê kontrol bike."
+
+msgid "Recording is not available for this stream."
+msgstr "Tomarkirin ji bo vê weşanê ne berdest e."
+
+msgid "Open the channel again to enable recording."
+msgstr "Ji bo çalakkirina tomarkirinê kanalê ji nû ve veke."

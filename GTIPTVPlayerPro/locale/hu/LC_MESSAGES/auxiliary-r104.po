@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "M3U-forrás hozzáadása"
+
+msgid "Application"
+msgstr "Alkalmazás"
+
+msgid "Application information"
+msgstr "Alkalmazásinformációk"
+
+msgid "Category Management"
+msgstr "Kategóriakezelés"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "A módosítások a ZÖLD gomb megnyomásakor lépnek életbe."
+
+msgid "Choose the source name and location."
+msgstr "Válassza ki a forrás nevét és helyét."
+
+msgid "Compatibility"
+msgstr "Kompatibilitás"
+
+msgid "Country"
+msgstr "Ország"
+
+msgid "Developer"
+msgstr "Fejlesztő"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Az M3U-lejátszási lista közvetlen HTTP(S)-címe."
+
+msgid "District"
+msgstr "Járás"
+
+msgid "Frame rate"
+msgstr "Képkockasebesség"
+
+msgid "Language"
+msgstr "Nyelv"
+
+msgid "Platform"
+msgstr "Platform"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Másik csatornanév megadásához nyomja meg a KÉK gombot."
+
+msgid "Press GREEN to save the source."
+msgstr "A forrás mentéséhez nyomja meg a ZÖLD gombot."
+
+msgid "Press GREEN to use this folder."
+msgstr "A mappa használatához nyomja meg a ZÖLD gombot."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "A kiválasztott felirat letöltéséhez nyomja meg az OK gombot."
+
+msgid "Press OK to load this subtitle."
+msgstr "A felirat betöltéséhez nyomja meg az OK gombot."
+
+msgid "Press OK to play the selected video."
+msgstr "A kiválasztott videó lejátszásához nyomja meg az OK gombot."
+
+msgid "Press OK to search again."
+msgstr "Új kereséshez nyomja meg az OK gombot."
+
+msgid "Press OK to select this location."
+msgstr "A hely kiválasztásához nyomja meg az OK gombot."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "A kategória megjelenítéséhez vagy elrejtéséhez nyomja meg az OK gombot. A közös áthelyezéshez jelölje meg a kategóriákat a PIROS gombbal."
+
+msgid "Province"
+msgstr "Tartomány"
+
+msgid "Release"
+msgstr "Kiadás"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Keressen feliratokat, vagy módosítsa a szűrőt."
+
+msgid "Select a folder or subtitle file."
+msgstr "Válasszon mappát vagy feliratfájlt."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Válasszon lejátszási listát a vevőkészülékről, USB-ről vagy csatlakoztatott hálózati tárolóról."
+
+msgid "Selected category"
+msgstr "Kiválasztott kategória"
+
+msgid "Selected folder"
+msgstr "Kiválasztott mappa"
+
+msgid "Selected location"
+msgstr "Kiválasztott hely"
+
+msgid "Selected search"
+msgstr "Kiválasztott keresés"
+
+msgid "Selected subtitle"
+msgstr "Kiválasztott felirat"
+
+msgid "Selected video"
+msgstr "Kiválasztott videó"
+
+msgid "Source code"
+msgstr "Forráskód"
+
+msgid "Source location"
+msgstr "Forrás helye"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Feliratfájlok: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Támogatott formátum"
+

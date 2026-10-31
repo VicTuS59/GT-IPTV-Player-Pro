@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: vi\n"
+
+msgid "Provider order"
+msgstr "Thứ tự nhà cung cấp"
+
+msgid "Newest added"
+msgstr "Mới thêm gần đây"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Theo bảng chữ cái (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Ngày phát hành (mới nhất trước)"
+
+msgid "Saved manual order"
+msgstr "Thứ tự thủ công đã lưu"
+
+msgid "Sorting"
+msgstr "Sắp xếp"
+
+msgid "Sort content"
+msgstr "Sắp xếp nội dung"
+
+msgid "Sort channels"
+msgstr "Sắp xếp kênh"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Nguồn này không cung cấp ngày cho cách sắp xếp này."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Cần toàn bộ danh mục để sắp xếp. Vui lòng đợi hoặc thử lại."
+
+msgid "Could not save sorting preference."
+msgstr "Không thể lưu tùy chọn sắp xếp."

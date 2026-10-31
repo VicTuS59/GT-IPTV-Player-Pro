@@ -5,6 +5,7 @@
 
 import os
 
+from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
 from .channel_highlight import saved_selection_border
 from .main import _scale
 from .remote_footer import decorate_remote_footer, footer_item
@@ -19,6 +20,7 @@ def youtube_art(kind, width=None, border=None):
     return os.path.join(os.path.dirname(__file__), "skin", "images", name)
 
 
+@aux_skin_after('youtube' )
 def youtube_search_skin(footer, rows=5):
     width, height, px = _scale()
     # SD framebuffers may be 4:3 even when their output is anamorphic 16:9.

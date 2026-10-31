@@ -1,11 +1,11 @@
 Package: enigma2-plugin-extensions-gtiptvplayerpro
-Version: 1.7.0-r0
+Version: 1.7.0-r107
 Section: extra
 Priority: optional
 Architecture: all
 Maintainer: VicTuS59
-Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-math, python3-netclient, python3-netserver, python3-stringold, python3-threading, python3-xml
-Installed-Size: 50605
+Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-logging, python3-math, python3-netclient, python3-netserver, python3-stringold, python3-threading, python3-xml, python3-sqlite3, tzdata, ca-certificates
+Installed-Size: 21404
 Homepage: https://github.com/VicTuS59/GT-IPTV-Player-Pro
 License: GPL-2.0-or-later
 Description: GT IPTV Player Pro for Enigma2
@@ -63,3 +63,80 @@ Description: GT IPTV Player Pro for Enigma2
  Full receiver-folder navigation for local subtitle search and download destinations, including linked directories.
  Scoped VOD category timeout and timing diagnostics; explicit Xtream category browsing identity.
  Restore settings backups by supported archive format independently of plugin release numbers.
+ Stalker MPEG-TS live relay with bounded 32 MiB buffer and renewed portal sessions.
+ Exact transport-stream overlap removal and early upstream disconnect recovery.
+ Red-key live OSD for renewal counts, buffer usage and transfer rates.
+ Xtream live TS adapter using the same bounded transport engine and a separate red-key OSD.
+ Preserve the Stalker relay and authentication; keep Xtream HLS and VOD on their original routes.
+ Xtream-only PCR-paced output and a bounded startup cushion to smooth bursty source delivery.
+ Completed-match OK opens a localized YouTube highlights search; playback remains user-selected.
+ Verify highlight dates, teams and fixture identity; reject games and archives; rank known official channels first.
+ Lossless theme PNG recompression; remove only verified unused artwork.
+ Hidden 4668 live transport activation; default live playback engine 5002.
+ Relock and cancel live transports when the plugin root screen closes.
+ All-satellite DVB EPG catalogue and localized import action in all 43 languages.
+ Faster localized movie and series summaries, bounded selection workers and language-safe cache reuse.
+ Localized loading placeholder while movie and series metadata is pending; no interim provider synopsis.
+ PLAY opens an official next-episode trailer; localized hint and messages in all 43 device catalogs.
+ International episode notation and native titles; no invented upcoming episode when the schedule is absent.
+ Delimited portal language tags are removed before series identity search.
+ Prefer the next episode trailer; fall back to official series/season trailers and verified publisher embeds, localized in 43 languages.
+ Stalker-only early HTTP handoff, exact accelerated overlap scanning and progress-aware bounded retries.
+ Faster Stalker duplicate processing, one bounded fresh-session recovery round and clear connection failures in 43 languages.
+ Recover temporary portal failures using the held-0 fresh-session resolver while preserving the local player and queued TS.
+ Allow up to eight seconds for Stalker media reads, separately from fast connection opening and bounded recovery.
+ Restore failed established Stalker playback automatically after verified fresh TS prefill.
+ Pace Stalker TS output by original PCR and target a fixed three-second media reserve.
+ Pace Stalker TS output by original PCR and target a fixed three-second media reserve.
+ Pace Stalker TS output by original PCR and target a fixed three-second media reserve.
+ Initialize the inherited Xtream entry watcher lifecycle before launch.
+ Move Xtream and Stalker live channels with YELLOW, OK to save and EXIT to cancel.
+ Live TV REC recording through a shared TS/HLS playback path to a persistent HDD/USB folder.
+ Status-aware REC infobar: localized record/stop caption and a blinking recording indicator.
+ Start movie/series heroes sooner, adopt matching neighbor work, and prioritize foreground artwork within four slots.
+ Native cinematic movie discovery, portrait cards, inline remote guide and 43-language discovery hint.
+ Scope recording/download lists to the selected folder and prefill exact local M3U edit paths.
+ Folder-scoped recording lists, exact local M3U edits, shared yellow edit menus and scoped budgeted content sorting.
+ Independent persistent category ordering, with separate content and channel sorting.
+ Category ordering by latest actual addition, bounded streaming date summaries and resumable preparation.
+ Three category modes, five VOD modes, descending names, year grouping and first-result/stale-poll fixes.
+ Live category BLUE opens Edit and sorting options for Xtream and Stalker.
+ Isolated physical PLAY keys prevent OpenATV OK from starting a series trailer.
+ Movie PLAY trailers share the series hint and player; OK keeps normal movie playback.
+ Movie trailer exit preserves the current window, selected movie, cursor and sort.
+ YouTube default quality is 1080p across native settings and the web UI.
+ General batched movie/series synopsis movement; retain SF8008 safety profiles.
+ Prepare alpha logos off the GUI, reuse native-size text shadows, and trim graphics caches under RAM pressure.
+ Yield a fullscreen video frame before preparing the preview handoff infobar; cancel stale transitions.
+ Clear the live channel list before fullscreen handoff and suppress local window animations.
+ Keep live list Screen visibility consistent, restore mini TV before showing the list, and show the modal player before its first infobar.
+ Align welcome selectors with the actual action-row geometry and matching rounded frame assets.
+ Use bounded daily unified ESPN scores and received-competition filters across live, finished and upcoming tabs.
+ Use immutable scores records without the optional dataclasses module; retain all memory limits.
+ Add a country-filtered LiveOnSat tab with persistent choice and a ten-row broadcaster panel in the shared memory budget.
+ Optional 4668 live engine is supplied by the separate GTIPTVLivePatch package; external proxy/VPN removed.
+ Optimize opaque backgrounds, retain native SD/UHD art, and bound decoded wallpaper/cache surfaces by RAM and desktop resolution.
+ List, validate, play and delete completed HLS recording bundles.
+ Preserve full history with bounded working views and rebuildable paged indexes.
+ Prepare recording storage off the GUI; cancel stale preparation on channel change.
+ Exit idle download workers safely and release closed recording relays.
+ Load optional web services on demand; fall back to licensed pure-Python time zones.
+ Reuse decoded page artwork within existing memory caps and release it on plugin exit.
+ Bypass metadata/download workers for verified cached cards; pause hidden synopses.
+ Fixed FHD 8-bit palette themes scaled across SD, HD, FHD and UHD OSDs.
+ Worker-prepared movie/series opaque RGB heroes with baked shadows and bounded native fallback.
+ Resolve renamed palette backgrounds in clipped dynamic panels, including the dashboard menu.
+ Preserve native restore helper paths independently of the fixed FHD background name.
+ Remove the last unused bundled JPEG and clean its exact legacy installation path.
+ Allow LiveOnSat listings up to 8 MiB with unchanged chunked parsing and retained-memory caps.
+ Prioritize the current movie/series poster and its fallback; drain ready grid cards with shorter bounded continuations.
+ Deliver completed heroes through the GUI message pump; clear previous content on selection changes.
+ Validate selected content identity before reusing, decoding or publishing hero artwork.
+ Discovery-style movie/series pages with a wide hero and six visible portrait cards.
+ Confirm provider categories through a left overlay; cancel without changing the active category.
+ Top-right trailer hint and seven-item VOD guide with colored dots and outlined OK/MENU/EXIT keys.
+ Clean season/episode browser with selected-episode status, progress and direct season navigation.
+ Keep DVB service running on plugin entry; reveal the left side of episode artwork with vertical text shading.
+ Clean cinematic dashboard with eight native sidebar actions, one selected-section hero and a visible MENU guide.
+ Clean PNG welcome screen with one source card and five native action tiles; preserve automatic login and source health.
+ Approved PNG source choosers, four-row match browser and settings with dynamic details; keep all providers and persistence paths.

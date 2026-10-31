@@ -26,6 +26,7 @@ try:
 except ImportError:
     parseColor = None
 
+from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from .background import attach_background
 from .i18n import N_, _, localized_upper, supported_language_names
 from .online_subtitles import provider_display_name, subtitle_client
@@ -52,6 +53,8 @@ ROWS = 16
 # background.py selects its UHD/FHD/HD raster and fills SD desktops safely.
 BACKGROUND_PATH = plugin_path("skin", "images", "global-neon-v0912.png")
 FOOTER = (
+    footer_item("up_down", "navigate"),
+    footer_item("left_right", "change"),
     footer_item("red", "back"),
     footer_item("green", "save"),
     footer_item("yellow", "api_test"),
@@ -108,6 +111,7 @@ def _label(parts, px, name, x, y, w, h, size=25, color="#F8FAFC",
     )
 
 
+@skin_after('subtitles')
 def _settings_skin(size=None):
     """Build the two-panel glass settings page for UHD, FHD, HD and SD."""
     width, height = _desktop_size(size)
@@ -331,7 +335,6 @@ class GTSubtitleSettingsScreen(Screen):
         self._api_timer = eTimer()
         _connect_timer(self._api_timer, self._poll_api_test)
 
-        attach_background(self, "app_bg", BACKGROUND_PATH)
         for name in (
             "header_art", "left_panel_art", "preview_panel_art",
             "status_badge_art", "message_art",
@@ -390,6 +393,7 @@ class GTSubtitleSettingsScreen(Screen):
             self.onLayoutFinish.append(self._layout_ready)
         if hasattr(self, "onClose"):
             self.onClose.append(self._stop)
+        setup_utility_pages(self, 'subtitles', FOOTER)
         self._refresh()
         self.setTitle(_("Independent subtitles"))
 
@@ -568,6 +572,7 @@ class GTSubtitleSettingsScreen(Screen):
         except Exception:
             pass
 
+    @refresh_after
     def _refresh(self):
         for name in (
             "header", "settings_title", "appearance_title", "preview_title",

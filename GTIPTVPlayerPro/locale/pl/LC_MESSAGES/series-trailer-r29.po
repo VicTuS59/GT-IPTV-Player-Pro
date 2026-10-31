@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: pl\n"
+
+msgid "Trailer"
+msgstr "Zwiastun"
+
+msgid "Searching for the next episode trailer..."
+msgstr "Wyszukiwanie zwiastuna następnego odcinka..."
+
+msgid "No trailer found for the next episode."
+msgstr "Nie znaleziono zwiastuna następnego odcinka."
+
+msgid "Next episode information is unavailable."
+msgstr "Informacje o następnym odcinku są niedostępne."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "Nie udało się wyszukać zwiastuna. Spróbuj ponownie."

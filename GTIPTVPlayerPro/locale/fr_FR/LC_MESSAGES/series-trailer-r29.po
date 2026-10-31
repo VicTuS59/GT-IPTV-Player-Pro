@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: fr_FR\n"
+
+msgid "Trailer"
+msgstr "Bande-annonce"
+
+msgid "Searching for the next episode trailer..."
+msgstr "Recherche de la bande-annonce du prochain épisode..."
+
+msgid "No trailer found for the next episode."
+msgstr "Aucune bande-annonce trouvée pour le prochain épisode."
+
+msgid "Next episode information is unavailable."
+msgstr "Les informations du prochain épisode sont indisponibles."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "La recherche de bande-annonce a échoué. Réessayez."

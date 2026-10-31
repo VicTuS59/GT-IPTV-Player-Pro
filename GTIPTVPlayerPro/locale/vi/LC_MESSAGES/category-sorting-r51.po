@@ -1,0 +1,12 @@
+# Category sorting r51
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: vi\n"
+
+msgid "Edit categories"
+msgstr "Chỉnh sửa danh mục"
+
+msgid "Sort categories"
+msgstr "Sắp xếp danh mục"
+
+msgid "Alphabetical (Z–A)"
+msgstr "Theo bảng chữ cái (Z–A)"

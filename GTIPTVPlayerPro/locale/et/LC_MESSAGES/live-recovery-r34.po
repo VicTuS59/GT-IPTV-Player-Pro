@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: et\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "Ühenduse taastamine"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "Ühendus ebaõnnestus"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "Allikas lükkas videoühenduse tagasi (HTTP {status:d})"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "Allikas ei saada uusi andmeid"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "Ühenduse taastamise aeg sai läbi"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "Proovitakse uut ühendust allikaga"

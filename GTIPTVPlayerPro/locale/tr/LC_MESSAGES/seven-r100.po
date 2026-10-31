@@ -1,0 +1,88 @@
+# Approved seven-screen presentation
+msgid "Account being tested"
+msgstr "Test edilen hesap"
+
+msgid "Account information"
+msgstr "Hesap bilgisi"
+
+msgid "Account status"
+msgstr "Hesap durumu"
+
+msgid "Account test"
+msgstr "Hesap testi"
+
+msgid "Accounts are checked in order."
+msgstr "Hesaplar sırayla kontrol ediliyor."
+
+msgid "Continue from where you left off."
+msgstr "Kaldığınız yerden devam edin."
+
+msgid "DVB channel"
+msgstr "DVB kanalı"
+
+msgid "Enable or disable the external XMLTV guide."
+msgstr "Harici XMLTV rehberini açın veya kapatın."
+
+msgid "Every {}"
+msgstr "Her {}"
+
+msgid "Expiry"
+msgstr "Bitiş"
+
+msgid "Mapping"
+msgstr "Eşleştirme"
+
+msgid "Playback information"
+msgstr "İzleme bilgisi"
+
+msgid "Season {} · Episode {}"
+msgstr "{}. sezon · {}. bölüm"
+
+msgid "Selected channel"
+msgstr "Seçili kanal"
+
+msgid "Selected favorite"
+msgstr "Seçili favori"
+
+msgid "Server information"
+msgstr "Sunucu bilgisi"
+
+msgid "Server time"
+msgstr "Sunucu saati"
+
+msgid "Server version"
+msgstr "Sunucu sürümü"
+
+msgid "Source information"
+msgstr "Kaynak bilgisi"
+
+msgid "Test status"
+msgstr "Test durumu"
+
+msgid "Timezone"
+msgstr "Saat dilimi"
+
+msgid "Update plan"
+msgstr "Güncelleme planı"
+
+msgid "Waking from deep standby is disabled"
+msgstr "Derin beklemeden uyandırma kapalı"
+
+msgid "XMLTV channel"
+msgstr "XMLTV kanalı"
+
+msgid "{} / {} completed"
+msgstr "{} / {} tamamlandı"
+
+msgid "{} DVB services"
+msgstr "{} DVB servisi"
+
+msgid "{} favorites · Page {} / {}"
+msgstr "{} favori · Sayfa {} / {}"
+
+msgid "{} items · {} / {} pages"
+msgstr "{} içerik · {} / {} sayfa"
+
+msgid "{} mapped"
+msgstr "{} eşleşti"
+

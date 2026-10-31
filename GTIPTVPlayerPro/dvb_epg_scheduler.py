@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-FileCopyrightText: 2026 VicTuS59
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Session-owned automatic Xtream XMLTV to native DVB EPG scheduler."""
+"""Session-owned automatic public XMLTV to native DVB EPG scheduler."""
 
 import threading
 import time
@@ -11,13 +11,7 @@ from .dvb_epg import (
     DEFAULT_IMPORT_PAST_SECONDS,
     DvbEpgError,
     OperationCancelled,
-    build_import_event_groups,
-    download_xtream_xmltv,
     load_dvb_services,
-    load_manual_mappings,
-    match_xmltv_channels,
-    scan_xmltv,
-    xtream_source_key,
 )
 from .dvb_epg_runtime import (
     acquire_runtime,
@@ -31,16 +25,18 @@ from .dvb_epg_settings import (
     load_dvb_epg_settings,
     update_dvb_epg_settings,
 )
-from .playlist import load_accounts
+from .dvb_epg_sources import find_guide_source, update_guide, source_accepts_service
 
 
 STARTUP_DELAY_SECONDS = 90
+STARTUP_CACHE_RETRY_SECONDS = 60
+STARTUP_CACHE_QUERY_BATCH = 32
 STANDBY_DELAY_SECONDS = 15
 SETTINGS_DELAY_SECONDS = 5
 PLAYBACK_RETRY_SECONDS = 10 * 60
 FAILURE_RETRY_SECONDS = 30 * 60
 CLOCK_RETRY_SECONDS = 10 * 60
-WORKER_TIMEOUT_SECONDS = 180
+WORKER_TIMEOUT_SECONDS = 900
 WORKER_POLL_MILLISECONDS = 500
 IMPORT_POLL_MILLISECONDS = 120
 IMPORT_BATCH_EVENTS = 2000
@@ -64,8 +60,6 @@ def _clock_is_sane(now=None):
     return 2020 <= int(year) <= 2100
 
 
-def _source_type(source):
-    return str(getattr(source, "source_type", "xtream") or "xtream").lower()
 
 
 def _interval_hours(settings):
@@ -147,6 +141,9 @@ class DVBEPGScheduler(object):
         self._startup_suppression_pending = False
         self._startup_catchup_blocked = False
         self._startup_catchup_pending = False
+        self._startup_cache_check_pending = False
+        self._startup_empty_signature = None
+        self._startup_service_scan = None
         self._job_allow_current_service = False
         self._install_standby_notifier()
         self.notify_settings_changed(startup=True)
@@ -180,6 +177,17 @@ class DVBEPGScheduler(object):
             getattr(settings, "update_on_startup", True)
         )
         clock_ready = _clock_is_sane()
+        if (
+            not automatic
+            or not startup_enabled
+            or _pipeline_signature(previous) != _pipeline_signature(settings)
+        ):
+            self._startup_empty_signature = None
+            self._clear_startup_service_scan()
+        if startup:
+            self._startup_cache_check_pending = bool(automatic and startup_enabled)
+        elif not automatic or not startup_enabled:
+            self._startup_cache_check_pending = False
         if startup:
             startup_disabled = not startup_enabled
             self._startup_suppression_pending = bool(
@@ -241,6 +249,9 @@ class DVBEPGScheduler(object):
             return
         self._resolve_startup_suppression(settings)
         now = int(time.time())
+        if self._startup_cache_check_pending:
+            self._arm_startup_cache_check()
+            return
         if not self._is_due(settings, now):
             self._startup_catchup_pending = False
             self._clear_startup_suppression()
@@ -258,6 +269,7 @@ class DVBEPGScheduler(object):
         if self._stopped:
             return
         self._stopped = True
+        self._clear_startup_service_scan()
         self._disconnect_timer()
         self._remove_standby_notifier()
         self._cancel_preparation("shutdown")
@@ -322,6 +334,12 @@ class DVBEPGScheduler(object):
         self._timer = None
 
     def _is_due(self, settings, now=None):
+        if (
+            _automatic_enabled(settings)
+            and bool(getattr(settings, "update_on_startup", True))
+            and self._startup_empty_signature == _pipeline_signature(settings)
+        ):
+            return True
         now = int(time.time() if now is None else now)
         try:
             last_success = max(0, int(getattr(settings, "last_success_utc", 0)))
@@ -331,7 +349,120 @@ class DVBEPGScheduler(object):
             return True
         return now >= last_success + (_interval_hours(settings) * 60 * 60)
 
+    def _arm_startup_cache_check(self):
+        # Let Enigma2 finish loading its saved native cache before inspecting it.
+        remaining = (
+            self._session_started_monotonic + STARTUP_DELAY_SECONDS
+            - time.monotonic()
+        )
+        self._arm_timer(max(1, remaining), "startup-cache")
+
+    def _startup_cache_is_empty(self, settings, now):
+        """Read current/next native events; None means not ready, not empty.
+
+        Run only on the GUI timer. Inspect the selected bouquet and satellite
+        profile, without tuning, clearing EPG or making network requests. A
+        single real current/future event is enough to retain the normal timer.
+        """
+        try:
+            from enigma import eEPGCache
+
+            cache = eEPGCache.getInstance()
+            lookup = getattr(cache, "lookupEvent", None)
+            if not callable(lookup):
+                return None
+            source = find_guide_source(settings.source_key)
+            if source is None:
+                return None
+            services = self._startup_services(settings)
+            if services is None:
+                return None
+            refs = [
+                service.service_ref for service in services
+                if source_accepts_service(source, service)
+            ]
+            if not refs:
+                return False  # No eligible DVB target; do not force a download.
+            for offset in range(0, len(refs), STARTUP_CACHE_QUERY_BATCH):
+                query = ["BD"]
+                for ref in refs[offset : offset + STARTUP_CACHE_QUERY_BATCH]:
+                    query.extend(((ref, 0, now), (ref, 1, now)))
+                rows = lookup(query)
+                if not isinstance(rows, (list, tuple)):
+                    return None
+                for row in rows:
+                    if not isinstance(row, (list, tuple)) or len(row) != 2:
+                        return None
+                    begin, duration = row
+                    if begin is None or duration is None:
+                        return None
+                    if int(begin) > 0 and int(duration) > 0 and int(begin) + int(duration) > now:
+                        return False
+            return True
+        except Exception as error:
+            log_event("dvb_epg", "Startup native EPG check could not complete", error)
+            return None
+
+    def _clear_startup_service_scan(self):
+        scan = self._startup_service_scan
+        self._startup_service_scan = None
+        if scan is not None:
+            scan["token"].cancel("startup-check-finished")
+
+    def _startup_services(self, settings):
+        """Read bouquets/lamedb on a bounded worker; never block the GUI on disk."""
+        signature = _pipeline_signature(settings)
+        scan = self._startup_service_scan
+        if scan is not None and scan["signature"] != signature:
+            self._clear_startup_service_scan()
+            scan = None
+        if scan is None:
+            token = _JobToken(timeout=5)
+            scan = {"signature": signature, "token": token, "ready": False,
+                    "services": None, "error": None}
+            self._startup_service_scan = scan
+            bouquet_files = (
+                None if settings.bouquet_file == ALL_BOUQUETS
+                else (settings.bouquet_file,)
+            )
+
+            def prepare():
+                services, error = None, None
+                try:
+                    services = load_dvb_services(
+                        bouquet_files=bouquet_files,
+                        cancel_event=token.cancel_event, deadline=token.deadline,
+                    )
+                    token.check()
+                except Exception as caught:
+                    error = caught
+                with self._lock:
+                    scan["services"], scan["error"] = services, error
+                    scan["ready"] = True
+
+            try:
+                worker = threading.Thread(target=prepare, name="GTDVBEPGStartupScan")
+                worker.daemon = True
+                worker.start()
+            except Exception:
+                self._clear_startup_service_scan()
+                raise
+        with self._lock:
+            ready, services, error = scan["ready"], scan["services"], scan["error"]
+        if not ready:
+            if time.monotonic() >= scan["token"].deadline:
+                self._clear_startup_service_scan()
+                raise DvbEpgError("startup service scan timed out")
+            return None
+        if error is not None:
+            self._clear_startup_service_scan()
+            raise error
+        return services
+
     def _arm_due_timer(self, settings, now=None):
+        if self._startup_cache_check_pending:
+            self._arm_startup_cache_check()
+            return
         now = int(time.time() if now is None else now)
         try:
             last_success = max(0, int(getattr(settings, "last_success_utc", 0)))
@@ -378,6 +509,9 @@ class DVBEPGScheduler(object):
             return
         settings = self._settings
         if not _automatic_enabled(settings):
+            self._startup_cache_check_pending = False
+            self._startup_empty_signature = None
+            self._clear_startup_service_scan()
             self._startup_catchup_pending = False
             self._job_allow_current_service = False
             self._clear_startup_suppression()
@@ -387,6 +521,9 @@ class DVBEPGScheduler(object):
         if startup_enabled:
             self._clear_startup_suppression()
         else:
+            self._startup_cache_check_pending = False
+            self._startup_empty_signature = None
+            self._clear_startup_service_scan()
             self._startup_catchup_pending = False
             self._job_allow_current_service = False
         if not _clock_is_sane():
@@ -394,6 +531,28 @@ class DVBEPGScheduler(object):
             return
         self._resolve_startup_suppression(settings)
         now = int(time.time())
+        if self._startup_empty_signature != _pipeline_signature(settings):
+            self._startup_empty_signature = None
+        if self._startup_cache_check_pending:
+            if time.monotonic() < self._session_started_monotonic + STARTUP_DELAY_SECONDS:
+                self._arm_startup_cache_check()
+                return
+            # An already-due update must not depend on a readable native cache.
+            due = self._is_due(settings, now)
+            empty = False if due else self._startup_cache_is_empty(settings, now)
+            if empty is None:
+                scan = self._startup_service_scan
+                self._defer("epg-cache", 1 if scan is not None and not scan["ready"]
+                            else STARTUP_CACHE_RETRY_SECONDS)
+                return
+            self._startup_cache_check_pending = False
+            self._clear_startup_service_scan()
+            if due:
+                self._startup_catchup_pending = True
+            if empty:
+                self._startup_empty_signature = _pipeline_signature(settings)
+                self._startup_catchup_pending = True
+                log_event("dvb_epg", "Startup DVB EPG is empty; updating before the normal interval")
         if not self._is_due(settings, now):
             self._startup_catchup_pending = False
             self._clear_startup_suppression()
@@ -472,9 +631,9 @@ class DVBEPGScheduler(object):
     def _run_worker(self, token, settings):
         payload = None
         try:
-            account = self._find_account(settings.source_key)
-            if account is None:
-                raise DvbEpgError("configured Xtream source is unavailable")
+            source = find_guide_source(settings.source_key)
+            if source is None:
+                raise DvbEpgError("configured public EPG source is unavailable")
             bouquet_files = (
                 None
                 if settings.bouquet_file == ALL_BOUQUETS
@@ -487,31 +646,9 @@ class DVBEPGScheduler(object):
             )
             if not services:
                 raise DvbEpgError("no DVB services")
-            download = download_xtream_xmltv(
-                account,
-                cancel_event=token.cancel_event,
-                deadline=token.deadline,
-            )
-            scan = scan_xmltv(
-                download.path,
-                cancel_event=token.cancel_event,
-                deadline=token.deadline,
-            )
-            matched = match_xmltv_channels(
-                scan.channels,
-                services,
-                manual_entries=load_manual_mappings(),
-                source_key=xtream_source_key(account),
-            )
-            imported = build_import_event_groups(
-                download.path,
-                matched.mappings,
-                now=int(time.time()),
-                past_seconds=DEFAULT_IMPORT_PAST_SECONDS,
-                future_seconds=int(settings.epg_days) * 24 * 60 * 60,
-                allowed_services=services,
-                cancel_event=token.cancel_event,
-                deadline=token.deadline,
+            matched, imported = update_guide(
+                source, services, settings.epg_days,
+                cancel_event=token.cancel_event, deadline=token.deadline,
             )
             token.check()
             payload = (True, len(matched.mappings), imported)
@@ -533,20 +670,6 @@ class DVBEPGScheduler(object):
         if release_owner:
             release_runtime(self._owner)
 
-    def _find_account(self, source_key):
-        try:
-            candidates = list(getattr(load_accounts(), "accounts", ()) or ())
-        except Exception:
-            candidates = []
-        for account in candidates:
-            if _source_type(account) != "xtream":
-                continue
-            try:
-                if xtream_source_key(account) == source_key:
-                    return account
-            except (TypeError, ValueError):
-                continue
-        return None
 
     def _poll_busy(self):
         with self._lock:
@@ -741,6 +864,7 @@ class DVBEPGScheduler(object):
             ),
         )
         if persisted is True:
+            self._startup_empty_signature = None
             self._startup_catchup_pending = False
             retry_seconds = None
         elif persisted is None:
@@ -966,6 +1090,7 @@ class DVBEPGScheduler(object):
         self._last_defer_reason = reason
         messages = {
             "clock": "Automatic update deferred until the receiver clock is ready",
+            "epg-cache": "Automatic update deferred until the native EPG cache can be checked",
             "playback": "Automatic update deferred while a service is playing",
             "playback-cancel": "Automatic preparation cancelled because playback started",
             "runtime": "Automatic update deferred while another DVB EPG update is running",

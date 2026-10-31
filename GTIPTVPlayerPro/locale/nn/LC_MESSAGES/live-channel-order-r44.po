@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: nn\n"
+
+msgid "Move channel"
+msgstr "Flytt kanal"
+
+msgid "Channel moved."
+msgstr "Kanalen er flytta."
+
+msgid "Could not save channel order."
+msgstr "Kunne ikkje lagre kanalrekkjefølgja."

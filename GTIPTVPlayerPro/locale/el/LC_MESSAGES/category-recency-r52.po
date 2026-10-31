@@ -1,0 +1,12 @@
+# Category recency r52
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: el\n"
+
+msgid "Most recently added content"
+msgstr "Πιο πρόσφατες προσθήκες περιεχομένου"
+
+msgid "Preparing category dates: {}/{} ({} items)"
+msgstr "Προετοιμασία ημερομηνιών κατηγοριών: {}/{} ({} στοιχεία)"
+
+msgid "Category dates could not be completed. Select this option again to resume."
+msgstr "Οι ημερομηνίες κατηγοριών δεν ολοκληρώθηκαν. Επιλέξτε ξανά αυτή την επιλογή για συνέχεια."

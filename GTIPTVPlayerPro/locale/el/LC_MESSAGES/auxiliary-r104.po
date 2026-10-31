@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Προσθήκη πηγής M3U"
+
+msgid "Application"
+msgstr "Εφαρμογή"
+
+msgid "Application information"
+msgstr "Πληροφορίες εφαρμογής"
+
+msgid "Category Management"
+msgstr "Διαχείριση κατηγοριών"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Οι αλλαγές εφαρμόζονται πατώντας το ΠΡΑΣΙΝΟ πλήκτρο."
+
+msgid "Choose the source name and location."
+msgstr "Επιλέξτε όνομα και θέση για την πηγή."
+
+msgid "Compatibility"
+msgstr "Συμβατότητα"
+
+msgid "Country"
+msgstr "Χώρα"
+
+msgid "Developer"
+msgstr "Προγραμματιστής"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Απευθείας διεύθυνση HTTP(S) της λίστας M3U."
+
+msgid "District"
+msgstr "Δήμος"
+
+msgid "Frame rate"
+msgstr "Ρυθμός καρέ"
+
+msgid "Language"
+msgstr "Γλώσσα"
+
+msgid "Platform"
+msgstr "Πλατφόρμα"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Πατήστε το ΜΠΛΕ πλήκτρο για να εισαγάγετε άλλο όνομα καναλιού."
+
+msgid "Press GREEN to save the source."
+msgstr "Πατήστε το ΠΡΑΣΙΝΟ πλήκτρο για να αποθηκεύσετε την πηγή."
+
+msgid "Press GREEN to use this folder."
+msgstr "Πατήστε το ΠΡΑΣΙΝΟ πλήκτρο για να χρησιμοποιήσετε αυτόν τον φάκελο."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Πατήστε OK για να κατεβάσετε τον επιλεγμένο υπότιτλο."
+
+msgid "Press OK to load this subtitle."
+msgstr "Πατήστε OK για να φορτώσετε αυτόν τον υπότιτλο."
+
+msgid "Press OK to play the selected video."
+msgstr "Πατήστε OK για να αναπαραγάγετε το επιλεγμένο βίντεο."
+
+msgid "Press OK to search again."
+msgstr "Πατήστε OK για νέα αναζήτηση."
+
+msgid "Press OK to select this location."
+msgstr "Πατήστε OK για να επιλέξετε αυτήν την τοποθεσία."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Πατήστε OK για εμφάνιση ή απόκρυψη της κατηγορίας. Σημειώστε κατηγορίες με το ΚΟΚΚΙΝΟ πλήκτρο για να τις μετακινήσετε μαζί."
+
+msgid "Province"
+msgstr "Περιφέρεια"
+
+msgid "Release"
+msgstr "Έκδοση"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Αναζητήστε υπότιτλους ή αλλάξτε το φίλτρο."
+
+msgid "Select a folder or subtitle file."
+msgstr "Επιλέξτε φάκελο ή αρχείο υποτίτλων."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Επιλέξτε λίστα αναπαραγωγής από τον δέκτη, USB ή προσαρτημένο δικτυακό αποθηκευτικό χώρο."
+
+msgid "Selected category"
+msgstr "Επιλεγμένη κατηγορία"
+
+msgid "Selected folder"
+msgstr "Επιλεγμένος φάκελος"
+
+msgid "Selected location"
+msgstr "Επιλεγμένη τοποθεσία"
+
+msgid "Selected search"
+msgstr "Επιλεγμένη αναζήτηση"
+
+msgid "Selected subtitle"
+msgstr "Επιλεγμένος υπότιτλος"
+
+msgid "Selected video"
+msgstr "Επιλεγμένο βίντεο"
+
+msgid "Source code"
+msgstr "Πηγαίος κώδικας"
+
+msgid "Source location"
+msgstr "Θέση πηγής"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Αρχεία υποτίτλων: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Υποστηριζόμενη μορφή"
+

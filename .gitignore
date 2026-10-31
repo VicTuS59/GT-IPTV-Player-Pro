@@ -1,16 +1,9 @@
-# Python / Enigma2 build output
 __pycache__/
 *.py[cod]
-*.pyo
-*.ipk
-*.sha256
-
-# Local accounts, diagnostics and editor files
+dist/
+*.key
+*.pem
+!GTIPTVPlayerPro/update-public-key.pem
 .env
-*.log
-playlists.txt
-stalker_portal.txt
-settings.json
-.idea/
-.vscode/
-.DS_Store
+work/
+outputs/

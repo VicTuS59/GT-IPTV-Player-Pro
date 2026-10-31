@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: el\n"
+
+msgid "General trailer"
+msgstr "Γενικό τρέιλερ"
+
+msgid "Searching for a trailer..."
+msgstr "Αναζήτηση τρέιλερ..."
+
+msgid "No official trailer found."
+msgstr "Δεν βρέθηκε επίσημο τρέιλερ."

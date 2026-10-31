@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: is\n"
+
+msgid "Live TV recording"
+msgstr "Upptaka á beinu sjónvarpi"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Veldu upptökumöppuna í stillingum viðbótarinnar."
+
+msgid "Recording started."
+msgstr "Upptaka hafin."
+
+msgid "Recording stopped."
+msgstr "Upptaka stöðvuð."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Upptaka mistókst. Athugaðu geymslutækið."
+
+msgid "Recording is not available for this stream."
+msgstr "Upptaka er ekki í boði fyrir þetta streymi."
+
+msgid "Open the channel again to enable recording."
+msgstr "Opnaðu rásina aftur til að virkja upptöku."

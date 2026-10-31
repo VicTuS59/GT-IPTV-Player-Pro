@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: zh_HK\n"
+
+msgid "Live TV recording"
+msgstr "直播電視錄影"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "請在外掛程式設定中指定錄影資料夾。"
+
+msgid "Recording started."
+msgstr "錄影已開始。"
+
+msgid "Recording stopped."
+msgstr "錄影已停止。"
+
+msgid "Recording failed. Check the storage device."
+msgstr "錄影失敗。請檢查儲存裝置。"
+
+msgid "Recording is not available for this stream."
+msgstr "此直播串流無法錄影。"
+
+msgid "Open the channel again to enable recording."
+msgstr "請重新開啟頻道以啟用錄影。"

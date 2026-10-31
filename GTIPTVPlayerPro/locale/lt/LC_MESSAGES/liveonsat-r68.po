@@ -1,0 +1,159 @@
+# LiveOnSat guide r68. Country names: Unicode CLDR via Node Intl.DisplayNames.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: lt\n"
+
+msgctxt "Football scores"
+msgid "Select country"
+msgstr "Pasirinkti šalį"
+
+msgctxt "Football scores"
+msgid "Live broadcasts"
+msgstr "Tiesioginės transliacijos"
+
+msgctxt "Football scores"
+msgid "Broadcaster channels"
+msgstr "Transliuojantys kanalai"
+
+msgctxt "Football scores"
+msgid "No live broadcasts found."
+msgstr "Vykstančių rungtynių transliacijų nerasta."
+
+msgctxt "Football scores"
+msgid "Broadcasts could not be updated."
+msgstr "Nepavyko atnaujinti transliacijų."
+
+msgctxt "Football scores"
+msgid "Broadcast information may be incomplete."
+msgstr "Transliacijų informacija gali būti neišsami."
+
+msgctxt "Football scores"
+msgid "Country preference could not be saved."
+msgstr "Nepavyko išsaugoti pasirinktos šalies."
+
+msgctxt "Football scores"
+msgid "Source: LiveOnSat"
+msgstr "Šaltinis: LiveOnSat"
+
+msgctxt "Football scores"
+msgid "Turkey"
+msgstr "Turkija"
+
+msgctxt "Football scores"
+msgid "Germany"
+msgstr "Vokietija"
+
+msgctxt "Football scores"
+msgid "France"
+msgstr "Prancūzija"
+
+msgctxt "Football scores"
+msgid "United Kingdom"
+msgstr "Jungtinė Karalystė"
+
+msgctxt "Football scores"
+msgid "Ireland"
+msgstr "Airija"
+
+msgctxt "Football scores"
+msgid "Italy"
+msgstr "Italija"
+
+msgctxt "Football scores"
+msgid "Spain"
+msgstr "Ispanija"
+
+msgctxt "Football scores"
+msgid "Portugal"
+msgstr "Portugalija"
+
+msgctxt "Football scores"
+msgid "Netherlands"
+msgstr "Nyderlandai"
+
+msgctxt "Football scores"
+msgid "Belgium"
+msgstr "Belgija"
+
+msgctxt "Football scores"
+msgid "Poland"
+msgstr "Lenkija"
+
+msgctxt "Football scores"
+msgid "Romania"
+msgstr "Rumunija"
+
+msgctxt "Football scores"
+msgid "Bulgaria"
+msgstr "Bulgarija"
+
+msgctxt "Football scores"
+msgid "Greece"
+msgstr "Graikija"
+
+msgctxt "Football scores"
+msgid "Hungary"
+msgstr "Vengrija"
+
+msgctxt "Football scores"
+msgid "Czechia"
+msgstr "Čekija"
+
+msgctxt "Football scores"
+msgid "Slovakia"
+msgstr "Slovakija"
+
+msgctxt "Football scores"
+msgid "Denmark"
+msgstr "Danija"
+
+msgctxt "Football scores"
+msgid "Sweden"
+msgstr "Švedija"
+
+msgctxt "Football scores"
+msgid "Norway"
+msgstr "Norvegija"
+
+msgctxt "Football scores"
+msgid "Finland"
+msgstr "Suomija"
+
+msgctxt "Football scores"
+msgid "Croatia"
+msgstr "Kroatija"
+
+msgctxt "Football scores"
+msgid "Serbia"
+msgstr "Serbija"
+
+msgctxt "Football scores"
+msgid "Bosnia and Herzegovina"
+msgstr "Bosnija ir Hercegovina"
+
+msgctxt "Football scores"
+msgid "Slovenia"
+msgstr "Slovėnija"
+
+msgctxt "Football scores"
+msgid "Albania"
+msgstr "Albanija"
+
+msgctxt "Football scores"
+msgid "United States"
+msgstr "Jungtinės Valstijos"
+
+msgctxt "Football scores"
+msgid "Canada"
+msgstr "Kanada"
+
+msgctxt "Football scores"
+msgid "Brazil"
+msgstr "Brazilija"
+
+msgctxt "Football scores"
+msgid "Australia"
+msgstr "Australija"
+
+msgctxt "Football scores"
+msgid "Japan"
+msgstr "Japonija"

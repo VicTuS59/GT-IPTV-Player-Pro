@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Dodaj M3U izvor"
+
+msgid "Application"
+msgstr "Aplikacija"
+
+msgid "Application information"
+msgstr "Informacije o aplikaciji"
+
+msgid "Category Management"
+msgstr "Upravljanje kategorijama"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Promjene se primjenjuju pritiskom na ZELENU tipku."
+
+msgid "Choose the source name and location."
+msgstr "Odaberite naziv i lokaciju izvora."
+
+msgid "Compatibility"
+msgstr "Kompatibilnost"
+
+msgid "Country"
+msgstr "Država"
+
+msgid "Developer"
+msgstr "Razvojni programer"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Izravna HTTP(S) adresa M3U popisa."
+
+msgid "District"
+msgstr "Okrug"
+
+msgid "Frame rate"
+msgstr "Broj sličica u sekundi"
+
+msgid "Language"
+msgstr "Jezik"
+
+msgid "Platform"
+msgstr "Platforma"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Pritisnite PLAVU tipku za unos drugog naziva kanala."
+
+msgid "Press GREEN to save the source."
+msgstr "Pritisnite ZELENU tipku za spremanje izvora."
+
+msgid "Press GREEN to use this folder."
+msgstr "Pritisnite ZELENU tipku za uporabu ove mape."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Pritisnite OK za preuzimanje odabranog podnaslova."
+
+msgid "Press OK to load this subtitle."
+msgstr "Pritisnite OK za učitavanje ovog podnaslova."
+
+msgid "Press OK to play the selected video."
+msgstr "Pritisnite OK za reprodukciju odabranog videozapisa."
+
+msgid "Press OK to search again."
+msgstr "Pritisnite OK za ponovno pretraživanje."
+
+msgid "Press OK to select this location."
+msgstr "Pritisnite OK za odabir ove lokacije."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Pritisnite OK za prikaz ili skrivanje kategorije. Označite kategorije CRVENOM tipkom da biste ih zajedno premjestili."
+
+msgid "Province"
+msgstr "Pokrajina"
+
+msgid "Release"
+msgstr "Izdanje"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Potražite podnaslove ili promijenite filtar."
+
+msgid "Select a folder or subtitle file."
+msgstr "Odaberite mapu ili datoteku podnaslova."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Odaberite popis za reprodukciju s prijamnika, USB-a ili priključene mrežne pohrane."
+
+msgid "Selected category"
+msgstr "Odabrana kategorija"
+
+msgid "Selected folder"
+msgstr "Odabrana mapa"
+
+msgid "Selected location"
+msgstr "Odabrana lokacija"
+
+msgid "Selected search"
+msgstr "Odabrano pretraživanje"
+
+msgid "Selected subtitle"
+msgstr "Odabrani podnaslov"
+
+msgid "Selected video"
+msgstr "Odabrani videozapis"
+
+msgid "Source code"
+msgstr "Izvorni kod"
+
+msgid "Source location"
+msgstr "Lokacija izvora"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Datoteke podnaslova: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Podržani format"
+

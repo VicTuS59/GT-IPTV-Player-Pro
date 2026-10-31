@@ -12,9 +12,11 @@ import time
 
 from Components.ActionMap import ActionMap
 from Components.Label import Label
+from Components.Pixmap import Pixmap
 from Screens.Screen import Screen
 from enigma import eTimer, getDesktop
 
+from .broadcast_presentation import skin_after as broadcast_skin_after, refresh_after as broadcast_refresh_after, setup as setup_broadcast
 from .background import attach_background
 from .content import ContentError
 from .i18n import N_, _, localized_date_text, localized_short_weekday, localized_upper
@@ -64,6 +66,7 @@ def _connect_timer(timer, callback):
         timer.callback.append(callback)
 
 
+@broadcast_skin_after('archive')
 def _archive_skin():
     width, height, px = _scale()
     widgets = []
@@ -181,6 +184,7 @@ class GTArchiveScreen(Screen):
             _archive_skin(), ARCHIVE_FOOTER,
             alternate_items=widest_footer,
             transparent_panel=True, show_dividers=False,
+            skin_fonts_scaled=True, show_web_hint=False,
         )
         Screen.__init__(self, session)
         self.account = account
@@ -211,12 +215,7 @@ class GTArchiveScreen(Screen):
         import xml.etree.ElementTree as ElementTree
         for widget in ElementTree.fromstring(_archive_skin()).findall("widget"):
             if widget.attrib["name"] != "archive_bg":
-                self[widget.attrib["name"]] = Label("")
-        attach_background(
-            self, "archive_bg", os.path.join(
-                plugin_path(), "skin", "images", "global-neon-v0912.png",
-            ),
-        )
+                self[widget.attrib["name"]] = Label("") if widget.get("font") else Pixmap()
         install_remote_footer(self, ARCHIVE_FOOTER)
         self["brand_gt"].setText("GT")
         self["brand"].setText("IPTV PLAYER PRO")
@@ -240,6 +239,7 @@ class GTArchiveScreen(Screen):
         self.onLayoutFinish.append(self._refresh)
         self.onClose.append(self._stop)
         self.setTitle(_("TV Archive"))
+        setup_broadcast(self, 'archive', ARCHIVE_FOOTER)
         self._refresh()
 
     def _channel(self):
@@ -310,6 +310,7 @@ class GTArchiveScreen(Screen):
         else:
             self._refresh()
 
+    @broadcast_refresh_after
     def _update_clock(self):
         if self._closed or self._suspended:
             return
@@ -477,6 +478,7 @@ class GTArchiveScreen(Screen):
     def _text(self, name, value, chars=55, lines=1):
         fit_dynamic_text(self[name], value, max_lines=lines, fallback_chars=chars)
 
+    @broadcast_refresh_after
     def _refresh(self):
         if self._closed:
             return

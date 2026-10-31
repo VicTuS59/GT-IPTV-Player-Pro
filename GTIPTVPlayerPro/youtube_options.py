@@ -2,7 +2,7 @@
 """Shared receiver/web quality choices for YouTube."""
 
 YOUTUBE_QUALITIES = ("2160", "1440", "1080", "720", "480", "360")
-DEFAULT_YOUTUBE_QUALITY = "1440"
+DEFAULT_YOUTUBE_QUALITY = "1080"
 
 
 def quality_label(value):

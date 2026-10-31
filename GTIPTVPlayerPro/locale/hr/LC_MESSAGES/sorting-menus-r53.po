@@ -1,0 +1,18 @@
+# Sorting menus r53
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: hr\n"
+
+msgid "A–Z"
+msgstr "A–Z"
+
+msgid "Z–A"
+msgstr "Z–A"
+
+msgid "Last added"
+msgstr "Najnovije dodano"
+
+msgid "Original"
+msgstr "Izvorni redoslijed"
+
+msgid "Year"
+msgstr "Godina"

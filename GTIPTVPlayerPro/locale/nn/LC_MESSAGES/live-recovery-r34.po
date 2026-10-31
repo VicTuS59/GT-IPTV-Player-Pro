@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: nn\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "Gjenopprettar sambandet"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "Tilkoplinga mislukkast"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "Kjelda avviste videotilkoplinga (HTTP {status:d})"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "Kjelda sender ikkje nye data"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "Tida for gjenoppretting er ute"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "Prøver ei ny tilkopling til kjelda"

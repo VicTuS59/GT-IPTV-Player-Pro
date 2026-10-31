@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ca\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "S'està restablint la connexió"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "Ha fallat la connexió"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "La font ha rebutjat la connexió de vídeo (HTTP {status:d})"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "La font no envia dades noves"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "S'ha esgotat el temps per restablir la connexió"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "S'està provant una connexió nova amb la font"

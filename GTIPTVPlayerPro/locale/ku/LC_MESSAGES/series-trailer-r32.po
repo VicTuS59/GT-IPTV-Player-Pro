@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ku\n"
+
+msgid "General trailer"
+msgstr "Fragmana giştî"
+
+msgid "Searching for a trailer..."
+msgstr "Li fragmanekê digere..."
+
+msgid "No official trailer found."
+msgstr "Fragmaneke fermî nehat dîtin."

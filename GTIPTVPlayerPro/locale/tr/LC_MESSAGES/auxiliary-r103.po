@@ -1,0 +1,115 @@
+# Nine approved native layouts
+msgid "Application"
+msgstr "Uygulama"
+
+msgid "Application information"
+msgstr "Uygulama bilgisi"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Değişiklikleri uygulamak için YEŞİL tuşa basın."
+
+msgid "Choose the source name and location."
+msgstr "Kaynak adını ve konumunu belirleyin."
+
+msgid "Compatibility"
+msgstr "Uyumluluk"
+
+msgid "Country"
+msgstr "Ülke"
+
+msgid "Developer"
+msgstr "Geliştirici"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Doğrudan HTTP(S) M3U oynatma listesi adresi."
+
+msgid "District"
+msgstr "İlçe"
+
+msgid "Frame rate"
+msgstr "Kare hızı"
+
+msgid "Platform"
+msgstr "Platform"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Başka bir kanal adı girmek için MAVİ tuşa basın."
+
+msgid "Press GREEN to save the source."
+msgstr "Kaynağı kaydetmek için YEŞİL tuşa basın."
+
+msgid "Press GREEN to use this folder."
+msgstr "Bu klasörü seçmek için YEŞİL tuşa basın."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Seçili altyazıyı indirmek için OK tuşuna basın."
+
+msgid "Press OK to load this subtitle."
+msgstr "Bu altyazıyı açmak için OK tuşuna basın."
+
+msgid "Press OK to play the selected video."
+msgstr "Seçili videoyu oynatmak için OK tuşuna basın."
+
+msgid "Press OK to search again."
+msgstr "Yeniden aramak için OK tuşuna basın."
+
+msgid "Press OK to select this location."
+msgstr "Bu konumu seçmek için OK tuşuna basın."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Kategoriyi göstermek veya gizlemek için OK tuşuna basın. Birlikte taşımak için KIRMIZI ile işaretleyin."
+
+msgid "Province"
+msgstr "İl"
+
+msgid "Release"
+msgstr "Sürüm"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Altyazı arayın veya filtreyi değiştirin."
+
+msgid "Select a folder or subtitle file."
+msgstr "Bir klasör veya altyazı dosyası seçin."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Cihazdan, USB’den veya bağlı ağ depolamasından bir oynatma listesi seçin."
+
+msgid "Selected category"
+msgstr "Seçili kategori"
+
+msgid "Selected folder"
+msgstr "Seçili klasör"
+
+msgid "Selected location"
+msgstr "Seçili konum"
+
+msgid "Selected search"
+msgstr "Seçili arama"
+
+msgid "Selected subtitle"
+msgstr "Seçili altyazı"
+
+msgid "Selected video"
+msgstr "Seçili video"
+
+msgid "Source code"
+msgstr "Kaynak kodu"
+
+msgid "Source location"
+msgstr "Kaynak konumu"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Altyazı dosyaları: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Desteklenen biçim"
+
+msgid "Add M3U source"
+msgstr "M3U Kaynağı Ekle"
+
+msgid "Category Management"
+msgstr "Kategori Yönetimi"
+
+msgid "Language"
+msgstr "Dil"
+

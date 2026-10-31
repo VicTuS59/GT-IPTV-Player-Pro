@@ -1,0 +1,18 @@
+# Sorting menus r53
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: id\n"
+
+msgid "A–Z"
+msgstr "A–Z"
+
+msgid "Z–A"
+msgstr "Z–A"
+
+msgid "Last added"
+msgstr "Baru ditambahkan"
+
+msgid "Original"
+msgstr "Urutan asli"
+
+msgid "Year"
+msgstr "Tahun"

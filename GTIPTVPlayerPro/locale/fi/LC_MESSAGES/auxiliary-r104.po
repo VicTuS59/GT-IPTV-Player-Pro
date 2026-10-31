@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Lisää M3U-lähde"
+
+msgid "Application"
+msgstr "Sovellus"
+
+msgid "Application information"
+msgstr "Sovelluksen tiedot"
+
+msgid "Category Management"
+msgstr "Luokkien hallinta"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Muutokset otetaan käyttöön painamalla VIHREÄÄ."
+
+msgid "Choose the source name and location."
+msgstr "Valitse lähteen nimi ja sijainti."
+
+msgid "Compatibility"
+msgstr "Yhteensopivuus"
+
+msgid "Country"
+msgstr "Maa"
+
+msgid "Developer"
+msgstr "Kehittäjä"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "M3U-soittolistan suora HTTP(S)-osoite."
+
+msgid "District"
+msgstr "Alue"
+
+msgid "Frame rate"
+msgstr "Kuvataajuus"
+
+msgid "Language"
+msgstr "Kieli"
+
+msgid "Platform"
+msgstr "Alusta"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Anna toinen kanavan nimi painamalla SINISTÄ."
+
+msgid "Press GREEN to save the source."
+msgstr "Tallenna lähde painamalla VIHREÄÄ."
+
+msgid "Press GREEN to use this folder."
+msgstr "Käytä tätä kansiota painamalla VIHREÄÄ."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Lataa valittu tekstitys painamalla OK."
+
+msgid "Press OK to load this subtitle."
+msgstr "Avaa tämä tekstitys painamalla OK."
+
+msgid "Press OK to play the selected video."
+msgstr "Toista valittu video painamalla OK."
+
+msgid "Press OK to search again."
+msgstr "Hae uudelleen painamalla OK."
+
+msgid "Press OK to select this location."
+msgstr "Valitse tämä sijainti painamalla OK."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Näytä tai piilota luokka painamalla OK. Merkitse luokat PUNAISELLA, jos haluat siirtää ne yhdessä."
+
+msgid "Province"
+msgstr "Maakunta"
+
+msgid "Release"
+msgstr "Julkaisu"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Hae tekstityksiä tai muuta suodatinta."
+
+msgid "Select a folder or subtitle file."
+msgstr "Valitse kansio tai tekstitystiedosto."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Valitse soittolista vastaanottimesta, USB-muistista tai liitetystä verkkotallennustilasta."
+
+msgid "Selected category"
+msgstr "Valittu luokka"
+
+msgid "Selected folder"
+msgstr "Valittu kansio"
+
+msgid "Selected location"
+msgstr "Valittu sijainti"
+
+msgid "Selected search"
+msgstr "Valittu haku"
+
+msgid "Selected subtitle"
+msgstr "Valittu tekstitys"
+
+msgid "Selected video"
+msgstr "Valittu video"
+
+msgid "Source code"
+msgstr "Lähdekoodi"
+
+msgid "Source location"
+msgstr "Lähteen sijainti"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Tekstitystiedostot: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Tuettu muoto"
+

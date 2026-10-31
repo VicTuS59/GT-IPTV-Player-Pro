@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: zh\n"
+
+msgid "General trailer"
+msgstr "通用预告片"
+
+msgid "Searching for a trailer..."
+msgstr "正在搜索预告片..."
+
+msgid "No official trailer found."
+msgstr "未找到官方预告片。"

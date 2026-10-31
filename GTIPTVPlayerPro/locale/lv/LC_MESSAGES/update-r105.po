@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Programmatūras atjaunināšana"
+
+msgid "Automatic update check"
+msgstr "Automātiska atjauninājumu pārbaude"
+
+msgid "Check for updates"
+msgstr "Pārbaudīt atjauninājumus"
+
+msgid "Download and verify"
+msgstr "Lejupielādēt un pārbaudīt"
+
+msgid "Install update"
+msgstr "Instalēt atjauninājumu"
+
+msgid "Update available"
+msgstr "Pieejams atjauninājums"
+
+msgid "Up to date"
+msgstr "Atjaunināts"
+
+msgid "Update verified"
+msgstr "Atjauninājums pārbaudīts"
+
+msgid "Restart interface"
+msgstr "Pārstartēt saskarni"
+
+msgid "Update source is not ready"
+msgstr "Atjauninājumu avots vēl nav gatavs"
+
+msgid "Update signature is invalid"
+msgstr "Atjauninājuma paraksts nav derīgs"
+
+msgid "Invalid update information"
+msgstr "Nederīga atjauninājuma informācija"
+
+msgid "Update package is invalid"
+msgstr "Atjauninājuma pakotne nav derīga"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Atjauninājums nav saderīgs ar šo uztvērēju"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Pirms atjaunināšanas apturiet ierakstīšanu un lejupielādes"
+
+msgid "Update failed"
+msgstr "Atjaunināšana neizdevās"
+
+msgid "Update installed. Restart the interface."
+msgstr "Atjauninājums instalēts. Pārstartējiet saskarni."
+
+msgid "Install the verified update?"
+msgstr "Instalēt pārbaudīto atjauninājumu?"
+
+msgid "Update available. Open updater?"
+msgstr "Pieejams atjauninājums. Atvērt atjaunināšanas rīku?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Automātiska pārbaude ik pēc 6 stundām."
+
+msgid "New version"
+msgstr "Jauna versija"
+

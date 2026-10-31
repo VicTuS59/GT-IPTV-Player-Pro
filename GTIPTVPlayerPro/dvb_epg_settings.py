@@ -8,10 +8,12 @@ import os
 import threading
 import uuid
 
+from .dvb_epg_sources import DEFAULT_PROFILE, PROFILE_KEYS
+
 
 DVB_EPG_DATA_DIR = "/etc/enigma2/gtiptvplayer/dvb-epg"
 DVB_EPG_SETTINGS_PATH = os.path.join(DVB_EPG_DATA_DIR, "settings.json")
-DVB_EPG_SETTINGS_VERSION = 2
+DVB_EPG_SETTINGS_VERSION = 4
 MAX_SETTINGS_BYTES = 64 * 1024
 SUPPORTED_EPG_DAYS = (1, 3, 5, 7)
 SUPPORTED_UPDATE_MODES = ("manual", "automatic")
@@ -48,7 +50,7 @@ class DVBEPGSettings(object):
     def __init__(
         self,
         enabled=False,
-        source_key="",
+        source_key=DEFAULT_PROFILE,
         bouquet_file=ALL_BOUQUETS,
         epg_days=3,
         last_success_utc=0,
@@ -60,13 +62,15 @@ class DVBEPGSettings(object):
         update_in_standby=True,
     ):
         self.enabled = bool(enabled)
-        self.source_key = str(source_key or "").strip()[:128]
+        requested_source = str(source_key or "").strip()[:128]
+        migrated = requested_source not in PROFILE_KEYS
+        self.source_key = DEFAULT_PROFILE if migrated else requested_source
         self.bouquet_file = _safe_bouquet_file(bouquet_file)
         epg_days = _safe_int(epg_days, 3)
         self.epg_days = epg_days if epg_days in SUPPORTED_EPG_DAYS else 3
-        self.last_success_utc = max(0, _safe_int(last_success_utc, 0))
-        self.last_mapping_count = max(0, _safe_int(last_mapping_count, 0))
-        self.last_event_count = max(0, _safe_int(last_event_count, 0))
+        self.last_success_utc = 0 if migrated else max(0, _safe_int(last_success_utc, 0))
+        self.last_mapping_count = 0 if migrated else max(0, _safe_int(last_mapping_count, 0))
+        self.last_event_count = 0 if migrated else max(0, _safe_int(last_event_count, 0))
         update_mode = str(update_mode or "").strip().lower()
         self.update_mode = (
             update_mode
@@ -141,11 +145,14 @@ def _load_dvb_epg_settings_unlocked(path):
     if not isinstance(decoded, dict):
         return DVBEPGSettings()
     version = _safe_int(decoded.get("version", DVB_EPG_SETTINGS_VERSION), 0)
-    # Version 1 contains the original R28 DVB EPG fields.  Loading it through
-    # ``from_dict`` retains those values and supplies the safe version 2
-    # automatic-update defaults; the next normal save writes version 2.
-    if version not in (1, DVB_EPG_SETTINGS_VERSION):
+    # Retain scheduling and bouquet choices. Legacy account-specific source
+    # keys move to the public combined profile with a fresh success status.
+    # Manual account mappings remain intact on disk under their old identity.
+    if version not in (1, 2, 3, DVB_EPG_SETTINGS_VERSION):
         return DVBEPGSettings()
+    if version < DVB_EPG_SETTINGS_VERSION:
+        decoded = dict(decoded, source_key=DEFAULT_PROFILE,
+                       last_success_utc=0, last_mapping_count=0, last_event_count=0)
     return DVBEPGSettings.from_dict(decoded)
 
 

@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: lt\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "Atkuriamas ryšys"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "Prisijungti nepavyko"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "Šaltinis atmetė vaizdo ryšį (HTTP {status:d})"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "Šaltinis nesiunčia naujų duomenų"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "Baigėsi ryšio atkūrimo laikas"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "Bandomas naujas ryšys su šaltiniu"

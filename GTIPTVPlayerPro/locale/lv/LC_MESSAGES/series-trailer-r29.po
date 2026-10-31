@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: lv\n"
+
+msgid "Trailer"
+msgstr "Reklāmkadrs"
+
+msgid "Searching for the next episode trailer..."
+msgstr "Meklē nākamās sērijas reklāmkadrus..."
+
+msgid "No trailer found for the next episode."
+msgstr "Nākamās sērijas reklāmkadri nav atrasti."
+
+msgid "Next episode information is unavailable."
+msgstr "Informācija par nākamo sēriju nav pieejama."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "Neizdevās meklēt reklāmkadrus. Mēģiniet vēlreiz."

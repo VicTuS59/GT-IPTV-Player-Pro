@@ -15,7 +15,7 @@ from .settings import load_player_settings, save_player_settings
 from .youtube_history import YouTubeHistory, YouTubePlaybackHistory, normalize_query, youtube_resume_position
 from .youtube_options import YOUTUBE_QUALITIES
 
-from .web_api import WebServiceError
+from .web_errors import WebServiceError
 from .web_remote import WEB_REMOTE
 from .youtube_vendor.config import EXTRACT_LOCK, set_preferences
 from .diagnostics import log_event
@@ -323,6 +323,41 @@ def _results(data, seen):
                                     for badge in (entry.get("badges") or []) if isinstance(badge, dict))})
         if len(entries) >= 120:
             break
+    return entries
+
+
+def _trailer_channel(entry):
+    owner = entry.get("ownerText") or entry.get("longBylineText") or {}
+    channel_id = ""
+    for run in owner.get("runs", []) if isinstance(owner, dict) else []:
+        endpoint = run.get("navigationEndpoint") or {} if isinstance(run, dict) else {}
+        browse = endpoint.get("browseEndpoint") or {}
+        value = browse.get("browseId") if isinstance(browse, dict) else ""
+        if isinstance(value, str) and re.fullmatch(r"UC[A-Za-z0-9_-]{22}", value):
+            channel_id = value
+            break
+    verified = any(isinstance(b, dict) and isinstance(b.get("metadataBadgeRenderer"), dict)
+        and b["metadataBadgeRenderer"].get("style") == "BADGE_STYLE_TYPE_VERIFIED"
+        for b in (entry.get("ownerBadges") or []))
+    return channel_id, verified
+
+
+def trailer_search(query, cancel_event=None):
+    """One public search page, no device-language filter or search-history write."""
+    query = normalize_query(query)
+    if not query:
+        return []
+    if cancel_event is not None and cancel_event.is_set():
+        return []
+    data, unused_config = _search_page(query, "en-US")
+    if cancel_event is not None and cancel_event.is_set():
+        return []
+    entries = _results(data, set())
+    identities = {v.get("videoId"): _trailer_channel(v)
+        for v in _video_renderers(_search_items(data))}
+    for entry in entries:
+        ident, verified = identities.get(entry["id"], ("", False))
+        entry["channel_id"], entry["channel_verified"] = ident, verified
     return entries
 
 
@@ -665,7 +700,8 @@ class WebYouTube(object):
         return True
 
     def play(self, video_id, title, context="", _automatic=False, _guard=None,
-             _sequence_override=None, _preview_owner=None):
+             _sequence_override=None, _preview_owner=None, _request_owner=None,
+             _on_closed=None, _original_audio=False):
         if not isinstance(video_id, str) or not VIDEO_ID.fullmatch(video_id):
             raise WebServiceError("invalid_video", "Invalid video selection", 400)
         if not isinstance(context, str) or len(context) > 100:
@@ -700,9 +736,10 @@ class WebYouTube(object):
                         self._jobs[token]["state"] = "cancelled"
                     return
                 with EXTRACT_LOCK:
-                    set_preferences(player.youtube_resolution, _search_locale(metadata_language())[0],
+                    set_preferences(player.youtube_resolution,
+                                    "en" if _original_audio else _search_locale(metadata_language())[0],
                                     player.youtube_dash, player.youtube_stream_mode,
-                                    player.youtube_audio_preference)
+                                    "original" if _original_audio else player.youtube_audio_preference)
                     resolver = YouTubeVideoUrl()
                     resolver.preferred_quality = int(quality)
                     url = resolver.extract(video_id)
@@ -760,6 +797,10 @@ class WebYouTube(object):
                     reference = eServiceReference(service_type, 0, url)
                     reference.setName(title)
                     session = WEB_REMOTE.session
+                    if _request_owner is not None and (
+                            getattr(_request_owner, "_closed", True)
+                            or getattr(session, "current_dialog", None) is not _request_owner):
+                        return False
                     with self._lock:
                         active = self._player
                     preview = (_preview_owner if _preview_owner is not None else
@@ -810,16 +851,20 @@ class WebYouTube(object):
                         interrupted = getattr(session, "current_dialog", None)
                         suspend = getattr(interrupted, "suspend_for_web_video", None)
                         return_state = suspend() if callable(suspend) else None
+                        def open_player(*args, **kwargs):
+                            if _request_owner is not None and callable(_on_closed):
+                                return session.openWithCallback(_on_closed, *args, **kwargs)
+                            return session.open(*args, **kwargs)
                         try:
                             if return_state is not None:
-                                dialog = session.open(
+                                dialog = open_player(
                                     GTExternalPlayerScreen, reference, item,
                                     web_return_player=(interrupted, return_state),
                                     resume_store=self._playback_history,
                                     resume_key_value=video_id, start_position=start_position,
                                 )
                             else:
-                                dialog = session.open(
+                                dialog = open_player(
                                     GTExternalPlayerScreen, reference, item,
                                     resume_store=self._playback_history,
                                     resume_key_value=video_id, start_position=start_position,

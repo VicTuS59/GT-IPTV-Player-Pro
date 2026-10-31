@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: fy\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "Ferbining wurdt wersteld"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "Ferbining mislearre"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "De boarne hat de fideoferbining wegere (HTTP {status:d})"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "De boarne stjoert gjin nije gegevens"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "Tiid foar ferbiningsherstel ferrûn"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "In nije ferbining mei de boarne wurdt besocht"

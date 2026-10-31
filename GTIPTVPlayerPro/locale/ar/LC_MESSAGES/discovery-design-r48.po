@@ -1,0 +1,6 @@
+# Discovery design r48
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ar\n"
+
+msgid "Choose a movie, then search in IPTV."
+msgstr "اختر فيلماً، ثم ابحث عنه في IPTV."

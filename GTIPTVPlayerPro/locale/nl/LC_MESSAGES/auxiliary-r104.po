@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "M3U-bron toevoegen"
+
+msgid "Application"
+msgstr "Toepassing"
+
+msgid "Application information"
+msgstr "Toepassingsinformatie"
+
+msgid "Category Management"
+msgstr "Categoriebeheer"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Wijzigingen worden toegepast wanneer u op GROEN drukt."
+
+msgid "Choose the source name and location."
+msgstr "Kies de naam en locatie van de bron."
+
+msgid "Compatibility"
+msgstr "Compatibiliteit"
+
+msgid "Country"
+msgstr "Land"
+
+msgid "Developer"
+msgstr "Ontwikkelaar"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Rechtstreeks HTTP(S)-adres van de M3U-afspeellijst."
+
+msgid "District"
+msgstr "District"
+
+msgid "Frame rate"
+msgstr "Beeldsnelheid"
+
+msgid "Language"
+msgstr "Taal"
+
+msgid "Platform"
+msgstr "Platform"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Druk op BLAUW om een andere kanaalnaam in te voeren."
+
+msgid "Press GREEN to save the source."
+msgstr "Druk op GROEN om de bron op te slaan."
+
+msgid "Press GREEN to use this folder."
+msgstr "Druk op GROEN om deze map te gebruiken."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Druk op OK om de geselecteerde ondertiteling te downloaden."
+
+msgid "Press OK to load this subtitle."
+msgstr "Druk op OK om deze ondertiteling te laden."
+
+msgid "Press OK to play the selected video."
+msgstr "Druk op OK om de geselecteerde video af te spelen."
+
+msgid "Press OK to search again."
+msgstr "Druk op OK om opnieuw te zoeken."
+
+msgid "Press OK to select this location."
+msgstr "Druk op OK om deze locatie te selecteren."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Druk op OK om de categorie te tonen of te verbergen. Markeer categorieën met ROOD om ze samen te verplaatsen."
+
+msgid "Province"
+msgstr "Provincie"
+
+msgid "Release"
+msgstr "Versie"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Zoek ondertitels of wijzig het filter."
+
+msgid "Select a folder or subtitle file."
+msgstr "Selecteer een map of ondertitelbestand."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Selecteer een afspeellijst op de ontvanger, USB of gekoppelde netwerkopslag."
+
+msgid "Selected category"
+msgstr "Geselecteerde categorie"
+
+msgid "Selected folder"
+msgstr "Geselecteerde map"
+
+msgid "Selected location"
+msgstr "Geselecteerde locatie"
+
+msgid "Selected search"
+msgstr "Geselecteerde zoekopdracht"
+
+msgid "Selected subtitle"
+msgstr "Geselecteerde ondertiteling"
+
+msgid "Selected video"
+msgstr "Geselecteerde video"
+
+msgid "Source code"
+msgstr "Broncode"
+
+msgid "Source location"
+msgstr "Bronlocatie"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Ondertitelbestanden: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Ondersteund formaat"
+

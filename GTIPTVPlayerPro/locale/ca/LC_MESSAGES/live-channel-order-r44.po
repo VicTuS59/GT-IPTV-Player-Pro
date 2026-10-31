@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ca\n"
+
+msgid "Move channel"
+msgstr "Mou el canal"
+
+msgid "Channel moved."
+msgstr "Canal mogut."
+
+msgid "Could not save channel order."
+msgstr "No s'ha pogut desar l'ordre dels canals."

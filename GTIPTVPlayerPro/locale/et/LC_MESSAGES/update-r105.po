@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Tarkvarauuendus"
+
+msgid "Automatic update check"
+msgstr "Automaatne uuenduste kontroll"
+
+msgid "Check for updates"
+msgstr "Kontrolli uuendusi"
+
+msgid "Download and verify"
+msgstr "Laadi alla ja kontrolli"
+
+msgid "Install update"
+msgstr "Paigalda uuendus"
+
+msgid "Update available"
+msgstr "Uuendus on saadaval"
+
+msgid "Up to date"
+msgstr "Ajakohane"
+
+msgid "Update verified"
+msgstr "Uuendus kontrollitud"
+
+msgid "Restart interface"
+msgstr "Taaskäivita kasutajaliides"
+
+msgid "Update source is not ready"
+msgstr "Uuenduste allikas pole veel valmis"
+
+msgid "Update signature is invalid"
+msgstr "Uuenduse allkiri on vigane"
+
+msgid "Invalid update information"
+msgstr "Vigased uuenduse andmed"
+
+msgid "Update package is invalid"
+msgstr "Uuenduspakett on vigane"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Uuendus ei ühildu selle vastuvõtjaga"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Peata salvestused ja allalaadimised enne uuendamist"
+
+msgid "Update failed"
+msgstr "Uuendamine nurjus"
+
+msgid "Update installed. Restart the interface."
+msgstr "Uuendus paigaldatud. Taaskäivita kasutajaliides."
+
+msgid "Install the verified update?"
+msgstr "Kas paigaldada kontrollitud uuendus?"
+
+msgid "Update available. Open updater?"
+msgstr "Uuendus on saadaval. Kas avada uuendaja?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Automaatne kontroll iga 6 tunni järel."
+
+msgid "New version"
+msgstr "Uus versioon"
+

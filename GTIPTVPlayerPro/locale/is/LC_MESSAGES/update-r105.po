@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Hugbúnaðaruppfærsla"
+
+msgid "Automatic update check"
+msgstr "Sjálfvirk leit að uppfærslum"
+
+msgid "Check for updates"
+msgstr "Leita að uppfærslum"
+
+msgid "Download and verify"
+msgstr "Sækja og sannreyna"
+
+msgid "Install update"
+msgstr "Setja upp uppfærslu"
+
+msgid "Update available"
+msgstr "Uppfærsla í boði"
+
+msgid "Up to date"
+msgstr "Uppfært"
+
+msgid "Update verified"
+msgstr "Uppfærsla sannreynd"
+
+msgid "Restart interface"
+msgstr "Endurræsa viðmót"
+
+msgid "Update source is not ready"
+msgstr "Uppfærslugjafinn er ekki tilbúinn enn"
+
+msgid "Update signature is invalid"
+msgstr "Undirskrift uppfærslunnar er ógild"
+
+msgid "Invalid update information"
+msgstr "Ógildar upplýsingar um uppfærslu"
+
+msgid "Update package is invalid"
+msgstr "Uppfærslupakkinn er ógildur"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Uppfærslan er ekki samhæf þessum móttakara"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Stöðvaðu upptökur og niðurhal áður en uppfært er"
+
+msgid "Update failed"
+msgstr "Uppfærsla mistókst"
+
+msgid "Update installed. Restart the interface."
+msgstr "Uppfærsla uppsett. Endurræstu viðmótið."
+
+msgid "Install the verified update?"
+msgstr "Setja upp sannreyndu uppfærsluna?"
+
+msgid "Update available. Open updater?"
+msgstr "Uppfærsla í boði. Opna uppfærsluverkfæri?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Sjálfvirk athugun á 6 klukkustunda fresti."
+
+msgid "New version"
+msgstr "Ný útgáfa"
+

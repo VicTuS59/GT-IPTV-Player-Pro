@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: th\n"
+
+msgid "Trailer"
+msgstr "ตัวอย่าง"
+
+msgid "Searching for the next episode trailer..."
+msgstr "กำลังค้นหาตัวอย่างตอนถัดไป..."
+
+msgid "No trailer found for the next episode."
+msgstr "ไม่พบตัวอย่างสำหรับตอนถัดไป"
+
+msgid "Next episode information is unavailable."
+msgstr "ไม่มีข้อมูลตอนถัดไป"
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "ไม่สามารถค้นหาตัวอย่างได้ โปรดลองอีกครั้ง"

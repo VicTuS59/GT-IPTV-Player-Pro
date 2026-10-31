@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "軟件更新"
+
+msgid "Automatic update check"
+msgstr "自動檢查更新"
+
+msgid "Check for updates"
+msgstr "檢查更新"
+
+msgid "Download and verify"
+msgstr "下載並驗證"
+
+msgid "Install update"
+msgstr "安裝更新"
+
+msgid "Update available"
+msgstr "有可用更新"
+
+msgid "Up to date"
+msgstr "已是最新版本"
+
+msgid "Update verified"
+msgstr "更新已驗證"
+
+msgid "Restart interface"
+msgstr "重新啟動介面"
+
+msgid "Update source is not ready"
+msgstr "更新來源尚未準備好"
+
+msgid "Update signature is invalid"
+msgstr "更新簽章無效"
+
+msgid "Invalid update information"
+msgstr "更新資料無效"
+
+msgid "Update package is invalid"
+msgstr "更新套件無效"
+
+msgid "Update is not compatible with this receiver"
+msgstr "更新與此接收器不相容"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "更新前請停止錄影及下載"
+
+msgid "Update failed"
+msgstr "更新失敗"
+
+msgid "Update installed. Restart the interface."
+msgstr "更新已安裝。請重新啟動介面。"
+
+msgid "Install the verified update?"
+msgstr "安裝已驗證的更新？"
+
+msgid "Update available. Open updater?"
+msgstr "有可用更新。開啟更新工具？"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "每6小時自動檢查一次。"
+
+msgid "New version"
+msgstr "新版本"
+

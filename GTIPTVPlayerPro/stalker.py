@@ -60,6 +60,7 @@ from .content import (
 )
 from .diagnostics import log_event
 from .persistence import guarded_mutation
+from .content_sort import assign_sort_metadata
 from .i18n import N_, _, device_language
 from .network_security import (
     NetworkSecurityError,
@@ -2119,7 +2120,10 @@ class StalkerPortalClient(object):
             return None
         if generation not in (failed_generation, result_generation):
             return None
-        return ContentError(message, reason, http_status=http_status)
+        error = ContentError(message, reason, http_status=http_status)
+        error.portal_failure_cached = True
+        error.portal_retry_after_seconds = max(0.0, PORTAL_RENEWAL_FAILURE_COOLDOWN_SECONDS-age)
+        return error
 
     def _remember_renewal_failure(self, generation, error):
         """Keep only bounded classification data, never provider secrets."""
@@ -4667,12 +4671,13 @@ class StalkerPortalClient(object):
                     state["composite_usable_count"] += 1
                 with self._cache_state_lock:
                     self._check_catalog_generation(state)
-                    evicted = self._lru_store(
-                        self._vod_entry_cache, identity, dict(entry), VOD_ENTRY_CACHE_LIMIT,
-                    )
-                    for evicted_identity in evicted:
-                        self._vod_entry_sources.pop(evicted_identity, None)
-                    self._vod_entry_sources[identity] = source["request_type"]
+                    if not getattr(self._request_context, 'category_dates_only', False):
+                        evicted = self._lru_store(
+                            self._vod_entry_cache, identity, dict(entry), VOD_ENTRY_CACHE_LIMIT,
+                        )
+                        for evicted_identity in evicted:
+                            self._vod_entry_sources.pop(evicted_identity, None)
+                        self._vod_entry_sources[identity] = source["request_type"]
                 added.append(item)
                 matches += 1
                 if not state.get("streaming_catalog") and len(state["results"]) >= MAX_RESULTS:
@@ -4943,7 +4948,7 @@ class StalkerPortalClient(object):
         item.portal_disable_ad = StalkerPortalClient._portal_flag(
             entry.get("disable_ad")
         )
-        return item
+        return assign_sort_metadata(item, entry)
 
     def _load_vod_items(self, content_type, category_id):
         with self._vod_catalog_lock:
@@ -5766,7 +5771,7 @@ class StalkerPortalClient(object):
             },
             LIVE_CHANNEL_META_LIMIT,
         )
-        return item
+        return assign_sort_metadata(item, entry)
 
     def load_items(self, content_type, category_id=""):
         content_type = self._validate_type(content_type)
@@ -5786,6 +5791,16 @@ class StalkerPortalClient(object):
                 if key[0] == "movie":
                     self._vod_entry_cache.pop(key, None)
                     self._vod_entry_sources.pop(key, None)
+
+    @contextmanager
+    def category_dates_scope(self):
+        """Date scans must not populate/evict the playback-entry cache."""
+        previous = getattr(self._request_context, 'category_dates_only', False)
+        self._request_context.category_dates_only = True
+        try:
+            yield
+        finally:
+            self._request_context.category_dates_only = previous
 
     def iter_movie_catalog_items(self, category_id=""):
         """Stream portal pages into the shared bounded RAM catalogue.
@@ -5850,11 +5865,12 @@ class StalkerPortalClient(object):
                     item.portal_catalog_page = page
                     item.icon = _normalise_media_url(item.icon, self.account)
                     identity = ("movie", str(item.stream_id))
-                    with self._vod_catalog_critical():
-                        evicted = self._lru_store(self._vod_entry_cache, identity, dict(entry), VOD_ENTRY_CACHE_LIMIT)
-                        for evicted_identity in evicted:
-                            self._vod_entry_sources.pop(evicted_identity, None)
-                        self._vod_entry_sources[identity] = request_type
+                    if not getattr(self._request_context, 'category_dates_only', False):
+                        with self._vod_catalog_critical():
+                            evicted = self._lru_store(self._vod_entry_cache, identity, dict(entry), VOD_ENTRY_CACHE_LIMIT)
+                            for evicted_identity in evicted:
+                                self._vod_entry_sources.pop(evicted_identity, None)
+                            self._vod_entry_sources[identity] = request_type
                     yield item
                 if page == 0:
                     # Page one was already observed empty before the zero probe.
@@ -9180,6 +9196,18 @@ class StalkerContentClient(object):
 
     def __getattr__(self, name):
         attribute = getattr(self._client, name)
+        # Temporary Ultimo trial: decorate only live playback results. The
+        # relay renews through the underlying portal client to avoid recursion.
+        if name in ("playback_url", "refresh_playback_url",
+                    "recover_live_playback_url", "alternate_playback_url",
+                    "cached_playback_url") and callable(attribute):
+            def live_trial_invoke(*args, **kwargs):
+                from .live_patch import stalker_result as playback_result
+                return playback_result(
+                    self, name, args, kwargs,
+                    lambda: self._call(self._client, name, args, kwargs),
+                )
+            return live_trial_invoke
         if name not in _STALKER_COMPAT_OPERATIONS or not callable(attribute):
             return attribute
 

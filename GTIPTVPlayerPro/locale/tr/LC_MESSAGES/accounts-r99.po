@@ -1,0 +1,16 @@
+# Approved account layout r99
+msgid "Selected account"
+msgstr "Seçili hesap"
+
+msgid "Selected source"
+msgstr "Seçili kaynak"
+
+msgid "No account selected"
+msgstr "Hesap seçilmedi"
+
+msgid "Protocol"
+msgstr "Protokol"
+
+msgid "Active / Maximum"
+msgstr "Aktif / Maksimum"
+

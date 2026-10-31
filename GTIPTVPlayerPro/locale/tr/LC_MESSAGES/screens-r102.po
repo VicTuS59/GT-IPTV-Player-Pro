@@ -1,0 +1,43 @@
+# Four approved native layouts
+msgid "Choose file"
+msgstr "Dosya seç"
+
+msgid "Current location"
+msgstr "Bulunduğunuz konum"
+
+msgid "File filter"
+msgstr "Dosya filtresi"
+
+msgid "Folders and files"
+msgstr "Klasörler ve dosyalar"
+
+msgid "Movie name"
+msgstr "Film adı"
+
+msgid "No files found."
+msgstr "Dosya bulunamadı."
+
+msgid "Open the folder containing your playlist."
+msgstr "Oynatma listenizin bulunduğu klasörü açın."
+
+msgid "Open this folder to browse its contents."
+msgstr "İçeriğini görmek için klasörü açın."
+
+msgid "Playlist · Device, USB or mounted network storage · TXT / .txt"
+msgstr "Oynatma listesi · Cihaz, USB veya bağlı ağ depolaması · TXT / .txt"
+
+msgid "Press GREEN or OK to select this playlist."
+msgstr "Oynatma listesini seçmek için YEŞİL veya OK tuşuna basın."
+
+msgid "Series information"
+msgstr "Dizi bilgisi"
+
+msgid "Series name"
+msgstr "Dizi adı"
+
+msgid "Summary"
+msgstr "Özet"
+
+msgid "View connected storage locations."
+msgstr "Bağlı depolama konumlarını görüntüleyin."
+

@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Cập nhật phần mềm"
+
+msgid "Automatic update check"
+msgstr "Tự động kiểm tra bản cập nhật"
+
+msgid "Check for updates"
+msgstr "Kiểm tra bản cập nhật"
+
+msgid "Download and verify"
+msgstr "Tải xuống và xác minh"
+
+msgid "Install update"
+msgstr "Cài đặt bản cập nhật"
+
+msgid "Update available"
+msgstr "Có bản cập nhật"
+
+msgid "Up to date"
+msgstr "Đã cập nhật"
+
+msgid "Update verified"
+msgstr "Đã xác minh bản cập nhật"
+
+msgid "Restart interface"
+msgstr "Khởi động lại giao diện"
+
+msgid "Update source is not ready"
+msgstr "Nguồn cập nhật chưa sẵn sàng"
+
+msgid "Update signature is invalid"
+msgstr "Chữ ký bản cập nhật không hợp lệ"
+
+msgid "Invalid update information"
+msgstr "Thông tin cập nhật không hợp lệ"
+
+msgid "Update package is invalid"
+msgstr "Gói cập nhật không hợp lệ"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Bản cập nhật không tương thích với đầu thu này"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Dừng ghi và tải xuống trước khi cập nhật"
+
+msgid "Update failed"
+msgstr "Cập nhật thất bại"
+
+msgid "Update installed. Restart the interface."
+msgstr "Đã cài đặt bản cập nhật. Khởi động lại giao diện."
+
+msgid "Install the verified update?"
+msgstr "Cài đặt bản cập nhật đã xác minh?"
+
+msgid "Update available. Open updater?"
+msgstr "Có bản cập nhật. Mở trình cập nhật?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Tự động kiểm tra mỗi 6 giờ."
+
+msgid "New version"
+msgstr "Phiên bản mới"
+

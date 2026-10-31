@@ -1,0 +1,52 @@
+# Native utility presentation r97
+msgid "Field information"
+msgstr "Alan bilgisi"
+
+msgid "Location information"
+msgstr "Konum bilgisi"
+
+msgid "Selected item"
+msgstr "Seçili öğe"
+
+msgid "Normal text"
+msgstr "Normal metin"
+
+msgid "Enter the server URL supplied by your provider."
+msgstr "Sağlayıcınızın verdiği sunucu adresini girin."
+
+msgid "Press OK to edit"
+msgstr "Düzenlemek için OK tuşuna basın"
+
+msgid "Select a TS or M3U8 output supported by the server."
+msgstr "Sunucunun desteklediği TS veya M3U8 çıktısını seçin."
+
+msgid "Use LEFT / RIGHT to change the value."
+msgstr "Değeri sol / sağ tuşlarıyla değiştirin."
+
+msgid "Weather display settings"
+msgstr "Hava durumu görünüm ayarları"
+
+msgid "Select the video playback quality."
+msgstr "Video oynatma kalitesini seçin."
+
+msgid "Automatically play the next video."
+msgstr "Sonraki videoyu otomatik oynatın."
+
+msgid "Search language follows the interface language."
+msgstr "Arama dili arayüz dilini izler."
+
+msgid "EPG information"
+msgstr "EPG bilgisi"
+
+msgid "{} channels · {} events"
+msgstr "{} kanal · {} etkinlik"
+
+msgid "No backup file selected"
+msgstr "Yedek dosyası seçilmedi"
+
+msgid "Hold MENU for 3 seconds: Web interface"
+msgstr "MENU 3 sn · Web arayüzü"
+
+msgid "Temporary local web session"
+msgstr "Yerel web oturumu"
+

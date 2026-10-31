@@ -1,0 +1,6 @@
+# r80 history navigation
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ar\n"
+
+msgid "Download history"
+msgstr "سجل التنزيلات"

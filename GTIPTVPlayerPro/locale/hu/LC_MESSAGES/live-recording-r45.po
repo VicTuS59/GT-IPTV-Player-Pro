@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: hu\n"
+
+msgid "Live TV recording"
+msgstr "Élő TV felvétele"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Állítsa be a felvételi mappát a bővítmény beállításaiban."
+
+msgid "Recording started."
+msgstr "A felvétel elindult."
+
+msgid "Recording stopped."
+msgstr "A felvétel leállt."
+
+msgid "Recording failed. Check the storage device."
+msgstr "A felvétel sikertelen. Ellenőrizze a tárolóeszközt."
+
+msgid "Recording is not available for this stream."
+msgstr "Ehhez az adatfolyamhoz nem érhető el felvétel."
+
+msgid "Open the channel again to enable recording."
+msgstr "A felvétel engedélyezéséhez nyissa meg újra a csatornát."

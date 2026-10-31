@@ -13,6 +13,7 @@ try:
 except ImportError:
     parseColor = None
 
+from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from .background import attach_background
 from .i18n import N_, _
 from .remote_footer import (
@@ -192,6 +193,7 @@ def _desktop_size():
         return 1280, 720
 
 
+@skin_after('web')
 def _skin(layout=None):
     if layout is None:
         layout = web_layout(*_desktop_size(), font_profile=current_text_size())
@@ -217,7 +219,6 @@ class GTWebInterfaceScreen(Screen):
         self["detail"] = Label("")
         self["security"] = Label("")
         self["footer"] = Label("")
-        attach_background(self, "web_background", self._web_layout["background"])
         install_remote_footer(
             self, WEB_INTERFACE_FOOTER_ITEMS,
             stacked=self._web_layout["compact"],
@@ -245,6 +246,7 @@ class GTWebInterfaceScreen(Screen):
         if hasattr(self, "onClose"):
             self.onClose.append(self._closed)
         self.setTitle("GT IPTV Player Pro - {}".format(_("Web Interface")))
+        setup_utility_pages(self, 'web', WEB_INTERFACE_FOOTER_ITEMS)
         self.refresh()
 
     def _layout_ready(self):
@@ -287,6 +289,7 @@ class GTWebInterfaceScreen(Screen):
         value = str(value or "")
         return "{} {}".format(value[:3], value[3:]) if len(value) == 6 else "— —"
 
+    @refresh_after
     def refresh(self):
         state = self.runtime.status()
         pending = state.get("pending")

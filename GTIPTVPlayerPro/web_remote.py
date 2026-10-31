@@ -3,7 +3,7 @@
 
 import threading
 
-from .web_api import WebServiceError
+from .web_errors import WebServiceError
 
 REMOTE_KEYS = {
     "up": "KEY_UP", "down": "KEY_DOWN", "left": "KEY_LEFT",

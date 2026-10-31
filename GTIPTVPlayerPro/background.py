@@ -4,10 +4,20 @@
 
 from collections import OrderedDict
 import os
+import threading
 import time
 import weakref
 
 from .artwork_cache import ArtworkCacheBusy, PICON_CACHE
+from .alpha_artwork import prepare_alpha, prepared_destination, source_identity
+from .source_loader import SourceLoader
+from .artwork_file import decode_identity
+from .graphics_policy import cache_budget, wallpaper_size, wallpaper_path, window_path
+
+try:
+    from Tools.LoadPixmap import LoadPixmap
+except ImportError:
+    LoadPixmap = None
 
 try:
     from Components.Pixmap import Pixmap
@@ -32,7 +42,7 @@ _DECODE_RETIRE_TIMER = None
 _DECODE_RETIRE_CONNECTION = None
 _BACKGROUND_CACHE_LIMIT = 64
 _BACKGROUND_CACHE_DEFAULT_BYTES = 32 * 1024 * 1024
-_BACKGROUND_CACHE_MAX_BYTES = 192 * 1024 * 1024
+_BACKGROUND_CACHE_MAX_BYTES = 96 * 1024 * 1024
 _BACKGROUND_CACHE_MAX_PIXELS = _BACKGROUND_CACHE_MAX_BYTES // 4
 _BACKGROUND_CACHE_UHD_PIXELS = 3840 * 2160
 _BACKGROUND_CACHE_BUDGET_BYTES = [_BACKGROUND_CACHE_DEFAULT_BYTES]
@@ -40,8 +50,15 @@ _BACKGROUND_CACHE_UHD_CONFIGURED = [False]
 _BACKGROUND_CACHE_RECHECK_AT = [0.0]
 _BACKGROUND_CACHE_BYTES = [0]
 _BACKGROUND_CACHE_PIXELS = [0]
+_BACKGROUND_MEMORY = [None, None]
+_BACKGROUND_DESKTOP_PIXELS = [1920 * 1080]
 _BACKGROUND_READY_TIMEOUT_MS = 750
 _COVER_MAX_PIXELS = 24 * 1024 * 1024
+_BACKGROUND_MEMORY_RESERVE_BYTES = 64 * 1024 * 1024
+_CACHE_MAINTENANCE_TIMER = None
+_CACHE_MAINTENANCE_CONNECTION = None
+_ALPHA_PREPARER = None
+_ALPHA_PENDING_LIMIT = 64
 
 
 def cover_decode_size(width, height, ratio):
@@ -96,25 +113,12 @@ _SCREEN_ART_FAMILIES = {
 
 
 def _screen_wallpaper_for_desktop(path, width, height):
-    """Use the smallest opaque raster that covers the full-screen GUI widget."""
-    stem = _SCREEN_ART_FAMILIES.get(os.path.basename(path or ""))
-    if not stem:
-        return path
-    if stem.endswith(("-r90", "-r91")) and (width, height) in (
-            (720, 576), (720, 480), (640, 480)):
-        variant = {(720, 576): "sd576", (720, 480): "sd480",
-                   (640, 480): "sd640"}[(width, height)]
-    elif width <= 1280 and height <= 720:
-        variant = "720"
-    elif width <= 1920 and height <= 1080:
-        variant = "1080"
-    else:
-        variant = "2160"
-    candidate = os.path.join(os.path.dirname(path), "{}-{}.png".format(stem, variant))
-    return candidate if os.path.isfile(candidate) else path
+    """Resolve native SD/HD/FHD/UHD art, including optimized opaque JPEGs."""
+    return wallpaper_path(path, width, height)
 
 
 def _cache_get(key):
+    _cache_prepare_uhd(0)
     cached = _BACKGROUND_CACHE.pop(key, None)
     if cached is not None:
         _BACKGROUND_CACHE[key] = cached
@@ -122,16 +126,37 @@ def _cache_get(key):
     return None
 
 
+def _cache_drop(key):
+    cached = _BACKGROUND_CACHE.pop(key, None)
+    if cached is not None:
+        _BACKGROUND_CACHE_BYTES[0] -= cached[1]
+        _BACKGROUND_CACHE_PIXELS[0] -= cached[2]
+    if not _BACKGROUND_CACHE and _CACHE_MAINTENANCE_TIMER is not None:
+        _CACHE_MAINTENANCE_TIMER.stop()
+
+
+def clear_memory_cache():
+    """Release shared decoded artwork when the plugin's root screen closes.
+
+    Page widgets and in-flight decoders retain their own lifecycle. This only
+    drops reusable cache references, and never deletes downloaded artwork.
+    """
+    _BACKGROUND_CACHE.clear()
+    _BACKGROUND_CACHE_BYTES[0] = 0
+    _BACKGROUND_CACHE_PIXELS[0] = 0
+    _BACKGROUND_CACHE_RECHECK_AT[0] = 0.0
+    if _CACHE_MAINTENANCE_TIMER is not None:
+        _CACHE_MAINTENANCE_TIMER.stop()
+
+
 def _cache_prepare_uhd(pixels):
-    """Retain more UHD pages when RAM allows; shrink under memory pressure."""
+    """Recheck pressure for all images, including after leaving a UHD page."""
     now = time.monotonic()
-    if (
-        pixels < _BACKGROUND_CACHE_UHD_PIXELS
-        or (_BACKGROUND_CACHE_UHD_CONFIGURED[0]
-            and now < _BACKGROUND_CACHE_RECHECK_AT[0])
-    ):
+    newly_uhd = pixels >= _BACKGROUND_CACHE_UHD_PIXELS and not _BACKGROUND_CACHE_UHD_CONFIGURED[0]
+    if not newly_uhd and now < _BACKGROUND_CACHE_RECHECK_AT[0]:
         return
-    _BACKGROUND_CACHE_UHD_CONFIGURED[0] = True
+    if pixels >= _BACKGROUND_CACHE_UHD_PIXELS:
+        _BACKGROUND_CACHE_UHD_CONFIGURED[0] = True
     _BACKGROUND_CACHE_RECHECK_AT[0] = now + 5.0
     try:
         with open("/proc/meminfo", "r") as handle:
@@ -150,21 +175,41 @@ def _cache_prepare_uhd(pixels):
         if total <= 0 or not 0 <= available <= total:
             return
     except (IOError, OSError, KeyError, TypeError, ValueError, OverflowError):
-        _BACKGROUND_CACHE_BUDGET_BYTES[0] = _BACKGROUND_CACHE_DEFAULT_BYTES
+        _BACKGROUND_MEMORY[:] = [None, None]
+        _BACKGROUND_CACHE_BUDGET_BYTES[0] = min(
+            _BACKGROUND_CACHE_BUDGET_BYTES[0], cache_budget(_BACKGROUND_DESKTOP_PIXELS[0]))
         _cache_trim()
         return
-    # At most one eighth of total RAM and one quarter of the available/cache
-    # pool, capped at 192 MiB. Cached bytes are already in MemAvailable's cost;
-    # include them once so repeated checks do not continually shrink the pool.
-    _BACKGROUND_CACHE_BUDGET_BYTES[0] = max(
-        _BACKGROUND_CACHE_DEFAULT_BYTES,
-        min(
-            _BACKGROUND_CACHE_MAX_BYTES,
-            total // 8,
-            (available + _BACKGROUND_CACHE_BYTES[0]) // 4,
-        ),
-    )
+    _BACKGROUND_MEMORY[:] = [total, available]
+    # SD/HD/FHD use 8/16/32 MiB. UHD uses at most 32/64/96 MiB by total
+    # RAM, and all profiles shrink with MemAvailable while keeping a 64 MiB
+    # reserve. Existing cached bytes are credited once to avoid oscillation.
+    _BACKGROUND_CACHE_BUDGET_BYTES[0] = cache_budget(
+        _BACKGROUND_DESKTOP_PIXELS[0], total, available, _BACKGROUND_CACHE_BYTES[0])
     _cache_trim()
+
+
+def _cache_maintenance():
+    _cache_prepare_uhd(0)
+    if _BACKGROUND_CACHE and _CACHE_MAINTENANCE_TIMER is not None:
+        _CACHE_MAINTENANCE_TIMER.start(5000, True)
+
+
+def _arm_cache_maintenance():
+    global _CACHE_MAINTENANCE_TIMER, _CACHE_MAINTENANCE_CONNECTION
+    if eTimer is None or not _BACKGROUND_CACHE:
+        return
+    if _CACHE_MAINTENANCE_TIMER is None:
+        _CACHE_MAINTENANCE_TIMER = eTimer()
+        signal = getattr(_CACHE_MAINTENANCE_TIMER, 'timeout', None)
+        connect = getattr(signal, 'connect', None)
+        if callable(connect):
+            _CACHE_MAINTENANCE_CONNECTION = connect(_cache_maintenance)
+        else:
+            _CACHE_MAINTENANCE_TIMER.callback.append(_cache_maintenance)
+        _CACHE_MAINTENANCE_TIMER.start(5000, True)
+    elif not _CACHE_MAINTENANCE_TIMER.isActive():
+        _CACHE_MAINTENANCE_TIMER.start(5000, True)
 
 
 def _cache_trim():
@@ -212,6 +257,7 @@ def _cache_put(key, pixmap, width, height):
     _BACKGROUND_CACHE_BYTES[0] += cost
     _BACKGROUND_CACHE_PIXELS[0] += pixels
     _cache_trim()
+    _arm_cache_maintenance()
 
 
 class AsyncBackgroundLoader(object):
@@ -227,22 +273,31 @@ class AsyncBackgroundLoader(object):
         cover_alignment="center",
         stretch_to_widget=False,
         window_size=None,
+        decode_size=None,
+        show_on_load=True,
     ):
         self.screen = screen
         self.widget_name = widget_name
         self.path = path
+        self._source_path = path
+        self._wallpaper_key = None
         self.on_loaded = on_loaded
         self.cover_ratio = cover_ratio
         self.cover_alignment = str(cover_alignment or "center").lower()
         self.stretch_to_widget = bool(stretch_to_widget)
         self.window_size = window_size
+        self.decode_size = tuple(decode_size) if decode_size else None
+        self.show_on_load = bool(show_on_load)
         self.picload = None
         self.connection = None
         self.closed = False
         self._decode_entry = None
         self._cache_release = None
+        self._loaded = False
+        self._reuse_signature = None
 
     def _notify(self, loaded):
+        self._loaded = bool(loaded) and not self.closed
         release, self._cache_release = self._cache_release, None
         if release is not None:
             release()
@@ -253,6 +308,26 @@ class AsyncBackgroundLoader(object):
                 callback(bool(loaded))
             except Exception:
                 pass
+
+    def _request_signature(self, path, cover_ratio, cover_alignment):
+        """Identify verified artwork without opening/statting it on the GUI."""
+        identity = decode_identity(path)
+        if identity is None:
+            return None
+        try:
+            instance = self.screen[self.widget_name].instance
+            size = instance.size()
+            return (str(path), identity, int(size.width()), int(size.height()),
+                    id(instance), tuple(cover_ratio) if cover_ratio else None,
+                    str(cover_alignment or "center").lower(), self.decode_size)
+        except (AttributeError, KeyError, TypeError, ValueError, RuntimeError):
+            return None
+
+    def can_reuse(self, path, cover_ratio=None, cover_alignment="center", decode_size=None):
+        return bool(not self.closed and self._loaded and self._reuse_signature is not None
+                    and self.decode_size == (tuple(decode_size) if decode_size else None)
+                    and self._reuse_signature == self._request_signature(
+                        path, cover_ratio, cover_alignment))
 
     @staticmethod
     def _cover_scale_flags(alignment):
@@ -284,6 +359,9 @@ class AsyncBackgroundLoader(object):
     def start(self):
         if self.closed:
             return
+        self._loaded = False
+        self._reuse_signature = self._request_signature(
+            self.path, self.cover_ratio, self.cover_alignment)
         widget = self.screen[self.widget_name]
         instance = getattr(widget, "instance", None)
         if instance is None:
@@ -299,14 +377,44 @@ class AsyncBackgroundLoader(object):
                 height = int(desktop.height())
             except Exception:
                 width, height = 1280, 720
-        if self.stretch_to_widget:
-            self.path = _screen_wallpaper_for_desktop(self.path, width, height)
-        if self.window_size is not None:
-            # Decode the desktop-sized wallpaper, then let the native pixmap
-            # clip its right/top window. No runtime bitmap editing is needed.
-            width, height = [max(1, int(v)) for v in self.window_size]
-            self.path = _screen_wallpaper_for_desktop(self.path, width, height)
-            instance.setPixmapScale(self._cover_scale_flags("right_top"))
+        wallpaper = self.stretch_to_widget or self.window_size is not None
+        if self.decode_size is not None and not wallpaper:
+            width,height = [max(1,int(value)) for value in self.decode_size]
+            if width*height > 1920*1080:
+                self._notify(False)
+                return
+            reset_scale = getattr(instance, 'setPixmapScale', None)
+            if callable(reset_scale):
+                reset_scale(0)
+            instance.setScale(1)
+        if wallpaper:
+            desktop = tuple(max(1, int(v)) for v in (self.window_size or (width, height)))
+            pixels = desktop[0] * desktop[1]
+            if pixels != _BACKGROUND_DESKTOP_PIXELS[0]:
+                _BACKGROUND_DESKTOP_PIXELS[0] = pixels
+                _BACKGROUND_CACHE_RECHECK_AT[0] = 0.0
+            _cache_prepare_uhd(pixels)
+            target = wallpaper_size(*desktop, *_BACKGROUND_MEMORY, _BACKGROUND_CACHE_BYTES[0])
+            self.path = self._source_path
+            prepared = (window_path(self.path, desktop, (width, height), target)
+                        if self.window_size is not None else None)
+            if prepared is not None:
+                # The bundled crop is the same right/top source region. Scale
+                # only its background texture; text/widgets stay native size.
+                self.path, width, height = prepared
+                reset_scale = getattr(instance, "setPixmapScale", None)
+                if callable(reset_scale):
+                    reset_scale(0)
+                instance.setScale(1)
+            elif self.window_size is not None:
+                # Unknown desktop/window geometry keeps the exact previous
+                # native clipping behavior instead of distorting the crop.
+                width, height = desktop
+                self.path = _screen_wallpaper_for_desktop(self.path, width, height)
+                instance.setPixmapScale(self._cover_scale_flags("right_top"))
+            else:
+                width, height = target
+                self.path = _screen_wallpaper_for_desktop(self.path, width, height)
         if self._cache_release is not None:
             self._cache_release()
         try:
@@ -343,19 +451,26 @@ class AsyncBackgroundLoader(object):
             # ePixmap fills the skin widget even when the PNG differs by a
             # fraction of a pixel from the receiver desktop aspect ratio.
             instance.setScale(1)
-        try:
-            info = os.stat(self.path)
-            identity = (info.st_size, info.st_mtime_ns)
-        except OSError:
-            identity = None
+        identity = decode_identity(self.path)
+        if identity is None:
+            try:
+                info = os.stat(self.path)
+                identity = (info.st_size, info.st_mtime_ns)
+            except OSError:
+                identity = None
         key = (self.path, width, height, identity)
         if stretch:
             key += ("window" if self.window_size is not None else "fill",)
+        if wallpaper:
+            if self._wallpaper_key is not None and self._wallpaper_key != key:
+                _cache_drop(self._wallpaper_key)
+            self._wallpaper_key = key
         _cache_prepare_uhd(width * height)
         cached = _cache_get(key)
         if cached is not None:
             instance.setPixmap(cached)
-            widget.show()
+            if self.show_on_load:
+                widget.show()
             self._notify(True)
             return
         if ePicLoad is None:
@@ -363,7 +478,9 @@ class AsyncBackgroundLoader(object):
             return
         # Parameter identity matters: a clipped window uses a different
         # aspect policy from a full desktop wallpaper, even at equal sizes.
-        aspect = 0 if stretch and not self.stretch_to_widget else 1
+        # The fixed 16:9 source must also fill SD/anamorphic OSD rectangles.
+        # Dynamic photos retain their separate cover/aspect policy.
+        aspect = 0 if stretch else 1
         self._start_decode(key, aspect, instance)
 
     def _start_decode(self, key, aspect, instance=None):
@@ -447,7 +564,8 @@ class AsyncBackgroundLoader(object):
 
     def _accept_pixmap(self, pixmap):
         self.screen[self.widget_name].instance.setPixmap(pixmap)
-        self.screen[self.widget_name].show()
+        if self.show_on_load:
+            self.screen[self.widget_name].show()
         return True
 
     def _decoded(self, key, *args):
@@ -458,15 +576,41 @@ class AsyncBackgroundLoader(object):
         try:
             if self.cover_ratio or self.stretch_to_widget:
                 instance.setScale(1)
-            instance.setPixmapFromFile(self.path)
-            self.screen[self.widget_name].show()
+            if self.path.lower().endswith((".jpg", ".jpeg", ".png")):
+                if LoadPixmap is not None:
+                    pixmap = LoadPixmap(self.path, cached=False)
+                elif self.path.lower().endswith('.png'):
+                    from enigma import loadPNG
+                    pixmap = loadPNG(self.path)
+                else:
+                    from enigma import loadJPG
+                    pixmap = loadJPG(self.path)
+                if pixmap is None:
+                    raise RuntimeError("Image decode failed")
+                instance.setPixmap(pixmap)
+                if self._wallpaper_key is not None:
+                    size = pixmap.size()
+                    _cache_put(self._wallpaper_key, pixmap, size.width(), size.height())
+            else:
+                instance.setPixmapFromFile(self.path)
+            if self.show_on_load:
+                self.screen[self.widget_name].show()
             self._notify(True)
         except Exception:
             self._notify(False)
 
     def close(self):
+        if self.closed:
+            return
         self.closed = True
         self._detach_decode()
+        if self._wallpaper_key is not None:
+            # Retain only the bounded shared bitmap, not its screen/decoder.
+            # Pressure maintenance and LRU eviction remain authoritative.
+            try:
+                self.screen[self.widget_name].instance.setPixmap(None)
+            except (AttributeError, KeyError, RuntimeError, TypeError):
+                pass
         self._notify(False)
 
 
@@ -477,11 +621,14 @@ def prepared_pixmap_key(path, size, cover_ratio=None):
         if ePicLoad is None:
             return None
         width, height = cover_decode_size(width, height, cover_ratio)
-    try:
-        details = os.stat(path)
-    except OSError:
-        return None
-    return (path, width, height, (details.st_size, details.st_mtime_ns))
+    identity = decode_identity(path)
+    if identity is None:
+        try:
+            details = os.stat(path)
+            identity = (details.st_size, details.st_mtime_ns)
+        except OSError:
+            return None
+    return (path, width, height, identity)
 
 
 def pixmap_prepared(path, size, cover_ratio=None):
@@ -516,19 +663,102 @@ class PreparedPixmapLoader(AsyncBackgroundLoader):
         return True
 
 
-class NativeAlphaPixmapLoader(object):
-    """Load small RGBA artwork without ePicLoad flattening its alpha."""
+class _AlphaPreparationQueue(object):
+    """One cancellable worker; native pixmaps are published on the GUI loop."""
 
-    def __init__(self, screen, widget_name, path, on_loaded=None):
+    def __init__(self):
+        self.jobs = OrderedDict()
+        self.active = None
+        self.connection = None
+        self.reader = SourceLoader(eTimer(), self._connect, self._loaded)
+
+    def _connect(self, timer, callback):
+        connect = getattr(getattr(timer, 'timeout', None), 'connect', None)
+        if callable(connect):
+            self.connection = connect(callback)
+        else:
+            timer.callback.append(callback)
+
+    def request(self, owner):
+        key = owner._cache_key
+        entry = self.jobs.get(key)
+        if entry is None:
+            self._discard_empty()
+            if len(self.jobs) >= _ALPHA_PENDING_LIMIT:
+                owner._notify(False)
+                return
+            entry = dict(key=key, path=owner.path, size=owner._requested_size,
+                         identity=owner._identity, destination=owner._destination,
+                         cancel=threading.Event(), owners=weakref.WeakSet())
+            self.jobs[key] = entry
+        entry['owners'].add(owner)
+        self._start_next()
+
+    def _discard_empty(self):
+        for key, entry in list(self.jobs.items()):
+            if not entry['owners']:
+                entry['cancel'].set()
+                self.jobs.pop(key, None)
+                if entry is self.active:
+                    self.reader.cancel()
+                    self.active = None
+
+    def _start_next(self):
+        self._discard_empty()
+        if self.active is not None or not self.jobs:
+            return
+        entry = self.active = next(iter(self.jobs.values()))
+        self.reader.request(lambda: prepare_alpha(entry['path'], entry['size'],
+            entry['identity'], entry['destination'], entry['cancel']))
+
+    def _loaded(self, value, error):
+        entry, self.active = self.active, None
+        if entry is None:
+            return
+        self.jobs.pop(entry['key'], None)
+        shared = None
+        for owner in list(entry['owners']):
+            if owner.closed or owner._cache_key != entry['key']:
+                continue
+            try:
+                if error is None and value is not None:
+                    shared = owner._prepared_result(value, shared)
+                else:
+                    owner._notify(False)
+            except Exception:
+                owner._notify(False)
+        self._start_next()
+
+    def cancel(self, owner):
+        entry = self.jobs.get(owner._cache_key)
+        if entry is not None:
+            entry['owners'].discard(owner)
+        self._start_next()
+
+
+class NativeAlphaPixmapLoader(object):
+    """Prepare alpha-preserving target pixels and share the bounded cache."""
+
+    def __init__(self, screen, widget_name, path, on_loaded=None, show_on_load=True):
         self.screen = screen
         self.widget_name = widget_name
         self.path = path
         self.on_loaded = on_loaded
         self.closed = False
         self._cache_release = None
+        self._prepared_release = None
+        self._cache_key = None
+        self._source_cache_key = None
+        self._requested_size = None
+        self._identity = None
+        self._destination = None
+        self.show_on_load = bool(show_on_load)
 
     def _notify(self, loaded):
         release, self._cache_release = self._cache_release, None
+        if release is not None:
+            release()
+        release, self._prepared_release = self._prepared_release, None
         if release is not None:
             release()
         callback = self.on_loaded
@@ -540,6 +770,7 @@ class NativeAlphaPixmapLoader(object):
                 pass
 
     def start(self):
+        global _ALPHA_PREPARER
         if self.closed:
             return
         try:
@@ -547,26 +778,112 @@ class NativeAlphaPixmapLoader(object):
             instance = getattr(widget, "instance", None)
             if instance is None:
                 return
-            if self._cache_release is not None:
-                self._cache_release()
-            self._cache_release = PICON_CACHE.pin(self.path)
-            try:
-                instance.setScale(1)
-            except Exception:
-                pass
-            # The native loader retains PNG/GIF alpha. ePicLoad composites
-            # transparent pixels onto its decode background, which produces
-            # the black rectangles seen around provider channel logos.
-            instance.setPixmapFromFile(self.path)
-            if self.closed:
+            if _ALPHA_PREPARER is not None and self._cache_key is not None:
+                _ALPHA_PREPARER.cancel(self)
+            for release in (self._cache_release, self._prepared_release):
+                if release is not None:
+                    release()
+            self._cache_release = self._prepared_release = None
+            self._identity = getattr(self.path, "file_identity", None)
+            if self._identity is None:
+                self._identity = source_identity(self.path)
+            size = instance.size()
+            self._requested_size = (int(size.width()), int(size.height()))
+            width, height = self._requested_size
+            self._cache_key = (os.path.abspath(self.path), width, height, self._identity, 'alpha-target-r61')
+            self._source_cache_key = self._cache_key[:-1] + ('alpha-source-r61',)
+            cached = _cache_get(self._cache_key)
+            if cached is not None:
+                self._publish(cached, True)
+                self._notify(True)
                 return
-            widget.show()
-            self._notify(True)
+            cached = _cache_get(self._source_cache_key)
+            if cached is not None:
+                self._publish(cached, False)
+                self._notify(True)
+                return
+            self._cache_release = PICON_CACHE.pin(self.path)
+            self._destination = prepared_destination(self.path, self._requested_size, self._identity)
+            # Pin the deterministic future destination before its worker can
+            # publish it. A concurrent cache eviction cannot win that gap.
+            self._prepared_release = PICON_CACHE.pin(self._destination)
+            if eTimer is None:
+                self._prepared_result((self.path, 0, 0, False))
+            else:
+                if _ALPHA_PREPARER is None:
+                    _ALPHA_PREPARER = _AlphaPreparationQueue()
+                _ALPHA_PREPARER.request(self)
         except Exception:
             self._notify(False)
 
+    def _publish(self, pixmap, prescaled):
+        if self.closed:
+            return
+        widget = self.screen[self.widget_name]
+        instance = widget.instance
+        size = instance.size()
+        if (int(size.width()), int(size.height())) != self._requested_size:
+            raise RuntimeError('Alpha target changed size')
+        instance.setScale(0 if prescaled else 1)
+        instance.setPixmap(pixmap)
+        if self.show_on_load:
+            widget.show()
+
+    def _prepared_result(self, value, shared=None):
+        if self.closed:
+            return shared
+        path, width, height, prescaled = value
+        key = self._cache_key if prescaled else self._source_cache_key
+        pixmap = shared if shared is not None else _cache_get(key)
+        if pixmap is None:
+            if LoadPixmap is not None:
+                # Disable Enigma2's separate filename cache: these pixels are
+                # accounted only in our existing, pressure-aware shared pool.
+                try:
+                    pixmap = LoadPixmap(path, cached=False)
+                except Exception:
+                    # Older image helpers omit GIF/WebP; retain the native
+                    # compatibility decoder for those original file formats.
+                    if prescaled:
+                        raise
+                    self._publish_file(path, prescaled)
+                    self._notify(True)
+                    return None
+            else:
+                self._publish_file(path, prescaled)
+                self._notify(True)
+                return None
+            if pixmap is None:
+                raise RuntimeError('Native alpha decode failed')
+            try:
+                size = pixmap.size()
+                width, height = int(size.width()), int(size.height())
+            except (AttributeError, TypeError, ValueError):
+                pass
+            if width > 0 and height > 0:
+                _cache_put(key, pixmap, width, height)
+        self._publish(pixmap, prescaled)
+        self._notify(True)
+        return pixmap
+
+    def _publish_file(self, path, prescaled):
+        if self.closed:
+            return
+        widget = self.screen[self.widget_name]
+        size = widget.instance.size()
+        if (int(size.width()), int(size.height())) != self._requested_size:
+            raise RuntimeError('Alpha target changed size')
+        widget.instance.setScale(0 if prescaled else 1)
+        widget.instance.setPixmapFromFile(path)
+        if self.show_on_load:
+            widget.show()
+
     def close(self):
+        if self.closed:
+            return
         self.closed = True
+        if _ALPHA_PREPARER is not None and self._cache_key is not None:
+            _ALPHA_PREPARER.cancel(self)
         self._notify(False)
 
 
@@ -882,10 +1199,15 @@ def attach_pixmap(
     on_loaded=None,
     cover_ratio=None,
     cover_alignment="center",
+    decode_size=None,
+    show_on_load=True,
 ):
     """Decode a dynamic PNG/JPEG and keep ePicLoad alive until completion."""
     if Pixmap is None:
         raise RuntimeError("Enigma2 pixmap widgets are unavailable")
+    # Bundled themes also cover clipped panels, such as the dashboard menu.
+    # Resolve renamed sources before native decoding and loader/cache lookup.
+    path = wallpaper_path(path, 1920, 1080)
     loaders = getattr(screen, "_gt_pixmap_loaders", None)
     if loaders is None:
         loaders = {}
@@ -893,6 +1215,18 @@ def attach_pixmap(
         if hasattr(screen, "onClose"):
             screen.onClose.append(lambda: _close_dynamic_pixmaps(screen))
     loader_key = key if key is not None else widget_name
+    previous = loaders.get(loader_key)
+    if (isinstance(previous, AsyncBackgroundLoader) and previous.widget_name == widget_name
+            and previous.can_reuse(path, cover_ratio, cover_alignment, decode_size)):
+        widget = screen[widget_name]
+        if show_on_load and not getattr(widget, "visible", False):
+            widget.show()
+        if on_loaded is not None:
+            try:
+                on_loaded(True)
+            except Exception:
+                pass
+        return previous
     previous = loaders.pop(loader_key, None)
     if previous is not None:
         previous.close()
@@ -903,6 +1237,8 @@ def attach_pixmap(
         on_loaded=on_loaded,
         cover_ratio=cover_ratio,
         cover_alignment=cover_alignment,
+        decode_size=decode_size,
+        show_on_load=show_on_load,
     )
     loaders[loader_key] = loader
     widget = screen[widget_name]
@@ -922,6 +1258,7 @@ def attach_native_alpha_pixmap(
     path,
     key=None,
     on_loaded=None,
+    show_on_load=True,
 ):
     """Load small transparent artwork through Enigma2's native alpha path."""
     if Pixmap is None:
@@ -941,6 +1278,7 @@ def attach_native_alpha_pixmap(
         widget_name,
         path,
         on_loaded=on_loaded,
+        show_on_load=show_on_load,
     )
     loaders[loader_key] = loader
     widget = screen[widget_name]

@@ -11,7 +11,9 @@ from collections import OrderedDict, deque
 from copy import copy
 
 from . import background
+from .metadata import complete_media_for_device_language, media_metadata_ready
 from .source_loader import SourceLoader
+from .hero_artwork import prepare_hero, preparation_allowance, prepared_size, release_prepared
 
 
 class VODPreparation(object):
@@ -30,6 +32,7 @@ class VODPreparation(object):
         self.jobs, self.images = deque(), deque()
         self.heroes = OrderedDict()
         self.active = self.decoder = self.token = None
+        self.promoted = None
         self.more_requested = None
         self.touched_page = None
         self.decode_bytes = 0
@@ -44,13 +47,17 @@ class VODPreparation(object):
         return (self.kind, self._field("loaded_category_id", ""),
                 self._field("window_base", 0) + self._field("selected_index", 0))
 
-    def _stop_work(self):
-        self.epoch = object()
+    def _stop_work(self, keep_hero=False):
+        keep_hero = keep_hero and self._matching_active_hero()
         self.timer.stop()
-        if self.token is not None:
-            self.token.cancel()
-        self.token = self.active = None
-        self.reader.cancel()
+        if not keep_hero:
+            self.epoch = object()
+            if self.token is not None:
+                self.token.cancel()
+            self.token = self.active = self.promoted = None
+            self.reader.cancel()
+        else:
+            self.token.artwork_priority = True
         decoder, self.decoder = self.decoder, None
         if decoder is not None:
             decoder.close()
@@ -73,8 +80,31 @@ class VODPreparation(object):
             if self.last_index is not None and self.position is not None and position[:2] == self.position[:2]:
                 self.direction = 1 if position[2] >= self.last_index else -1
             self.last_index = position[2]
-            self._stop_work()
+            self._stop_work(keep_hero=True)
             self.position, self.plan = position, None
+
+    def _matching_active_hero(self):
+        if (self.closed or self.paused or self.active is None or self.active[0] != "hero"
+                or self.token is None or not self.token.active() or self.position is None
+                or self._position()[:2] != self.position[:2]
+                or getattr(self.screen, "_closed", False)
+                or getattr(self.screen, "_vod_work_suspended", False)
+                or self._field("search_child_open", False)
+                or getattr(self.screen, "_category_manager_child_open", False)
+                or self._field("pending_category_id") is not None):
+            return False
+        entries, index = self._field("entries", ()), self._field("selected_index", 0)
+        return bool(0 <= index < len(entries)
+                    and str(entries[index].stream_id) == str(self.active[2].stream_id))
+
+    def adopt_hero(self, kind, item, generation):
+        if kind != self.kind or not self._matching_active_hero(): return False
+        if str(item.stream_id) != str(self.active[2].stream_id): return False
+        self.token.artwork_priority = True
+        self.promoted = (kind, self._field("loaded_category_id", ""),
+            str(item.stream_id), generation, self.token)
+        self.timer.start(20, True)
+        return True
 
     def pause(self):
         self.paused = True
@@ -113,7 +143,8 @@ class VODPreparation(object):
         item = entries[self._field("selected_index", 0)]
         info = self.api._detail_cache_get(self._field("info_cache"),
             self._field("info_cache_lock"), item.stream_id)
-        if info is None or not getattr(info, "_vod_metadata_complete", False):
+        ready = media_metadata_ready(info)
+        if not ready:
             return False
         for suffix in ("pending_detail_generation", "detail_preview", "detail_result"):
             setattr(self.screen, "_" + kind + "_" + suffix, None)
@@ -194,7 +225,7 @@ class VODPreparation(object):
         signature = self._signature()
         if signature == self.plan:
             return
-        self._stop_work()
+        self._stop_work(keep_hero=True)
         self.plan = signature
         size = self.screen._poster_page_size
         selected = self._field("selected_index", 0)
@@ -271,9 +302,11 @@ class VODPreparation(object):
         hero_work = bool((self.active is not None and self.active[0] == "hero")
                          or (self.active is None and self.jobs and self.jobs[0][0] == "hero")
                          or (self.images and self.images[0][2] is not None))
-        if self._busy(artwork=hero_work):
+        if self._busy(artwork=hero_work) and not self._matching_active_hero():
             if self.active is not None:
-                self.jobs.appendleft(self.active)
+                if self.promoted is None:
+                    self.jobs.appendleft(self.active)
+                self.promoted = None
                 self.active = None
                 if self.token is not None:
                     self.token.cancel()
@@ -326,8 +359,18 @@ class VODPreparation(object):
             urls, resolved = list(candidates), ""
             metadata = self.screen._metadata_client
             resolver = getattr(metadata, "cinematic_backdrop", None)
-            if callable(resolver) and (not urls or (getattr(item, "portal_request_type", "")
-                                                  and not getattr(info, "fallback_backdrop", ""))):
+            path, selected_url = "", ""
+            # A valid explicit provider URL can avoid a serial metadata
+            # lookup. Keep the first failed attempt short before fallback.
+            attempted = set()
+            if urls:
+                url = urls[0]; attempted.add(url)
+                candidate = self.api._cached_picon_path(url) or self.screen._fetch_vod_card(
+                    url, token, priority=lambda: getattr(token, "artwork_priority", False), timeout=1.5)
+                if candidate and self.api._valid_cinematic_backdrop_file(candidate):
+                    path, selected_url = candidate, url
+            if not path and callable(resolver) and (not urls or (getattr(item, "portal_request_type", "")
+                                                                and not getattr(info, "fallback_backdrop", ""))):
                 try:
                     resolved = self.api._safe_picon_url(self.api._bounded_client_call(
                         metadata, token, lambda: resolver(kind, item, info)))
@@ -335,26 +378,32 @@ class VODPreparation(object):
                     token.check()
                 if resolved:
                     urls = [resolved] + [url for url in urls if url != resolved]
-            path, selected_url = "", ""
             for url in urls:
+                if path:
+                    break
+                if url in attempted:
+                    continue
                 token.check()
-                candidate = self.api._cached_picon_path(url) or self.screen._fetch_vod_card(url, token)
+                candidate = self.api._cached_picon_path(url) or self.screen._fetch_vod_card(
+                    url, token, priority=lambda: getattr(token, "artwork_priority", False))
                 if candidate and self.api._valid_cinematic_backdrop_file(candidate):
                     path, selected_url = candidate, url
                     break
             token.check()
+            path = prepare_hero(path, getattr(self.screen, '_cinematic_composite_plan', None), token, preparation_allowance())
+            token.check()
             return ("", selected_url, candidates, None, (path,) if path else ())
-        if info is None or not getattr(info, "_vod_metadata_complete", False):
+        ready = media_metadata_ready(info)
+        if not ready:
             info = copy(self.screen._vod_poster_info(kind, item, token))
             metadata = self.screen._metadata_client
             method = getattr(metadata, "complete_" + kind + "_cinematic", None) if getattr(self.screen, "_cinematic_enabled", False) else None
             if not callable(method):
                 method = getattr(metadata, "complete_" + kind)
-            info = self.api._bounded_client_call(metadata, token, lambda: method(item, info))
-            if info is not None:
-                info._vod_metadata_complete = True
-                if getattr(self.screen, "_poster_grid_enabled", False):
-                    info._grid_metadata_complete = True
+            info = self.api._bounded_client_call(
+                metadata, token,
+                lambda: complete_media_for_device_language(metadata, method, item, info),
+            )
         token.check()
         paths = []
         if getattr(self.screen, "_cinematic_enabled", False):
@@ -363,13 +412,35 @@ class VODPreparation(object):
                 if not path:
                     path = self.screen._fetch_vod_card(url, token)
                 if path and self.api._valid_cinematic_backdrop_file(path):
-                    paths.append(path)
+                    paths.append(prepare_hero(path, getattr(self.screen, '_cinematic_composite_plan', None), token, preparation_allowance()))
                     break
         token.check()
         return ("", "", "", info, tuple(paths))
 
     def _read_done(self, value, error):
         if self.closed or self.paused:
+            return
+        promoted = self.promoted
+        if promoted is not None:
+            if value is not None and (value[0] is not self.epoch or value[2] is not self.active): return
+            kind, category, identity, generation, token = promoted
+            valid = (self._matching_active_hero() and category == self._field("loaded_category_id", "")
+                and getattr(self.screen, "_cinematic_generation", -1) == generation
+                and getattr(self.screen, "_cinematic_token", None) is token)
+            if valid:
+                result = value[4] if error is None and value is not None else None
+                resolved = result[1] if result is not None else ""
+                candidates = result[2] if result is not None else ()
+                paths = result[4] if result is not None else ()
+                result = (kind, identity, paths[0] if paths else "",
+                    generation, candidates, resolved)
+                deliver = getattr(self.screen, '_cinematic_delivery_ready', None)
+                if callable(deliver):
+                    deliver(result, None)
+                else:
+                    self.screen._cinematic_result = result
+            self.promoted = self.active = self.token = None
+            self.timer.start(40, True)
             return
         if error is None and value is not None:
             epoch, kind, original_job, token, result = value
@@ -398,6 +469,7 @@ class VODPreparation(object):
                 candidates = requested if stage == "hero" else self._wide_urls(item, info)
                 self.remember_hero(kind, item, candidates, path, resolved)
                 self.images.appendleft((path, self._size(kind + "_backdrop"), self.api._cinematic_cover_ratio(path)))
+                release_prepared(path)
         else:
             self.active = None
         self.token = None
@@ -407,7 +479,10 @@ class VODPreparation(object):
         path, size, ratio = self.images.popleft()
         if size is None:
             return
-        if ratio is None:
+        composed_size = prepared_size(path)
+        if composed_size:
+            size, ratio = composed_size, None
+        if ratio is None and not composed_size:
             self.card_bytes_reserved = max(0, self.card_bytes_reserved - size[0] * size[1] * 4)
         try:
             key = background.prepared_pixmap_key(path, size, ratio)
@@ -415,7 +490,7 @@ class VODPreparation(object):
                 return
             cost = key[1] * key[2] * 4
             budget = min(48 * 1024 * 1024, background._BACKGROUND_CACHE_BUDGET_BYTES[0] // 2)
-            reserved = self.card_bytes_reserved if ratio is not None else 0
+            reserved = self.card_bytes_reserved if ratio is not None or composed_size else 0
             if self.decode_bytes + cost + reserved > budget:
                 return
             epoch = self.epoch

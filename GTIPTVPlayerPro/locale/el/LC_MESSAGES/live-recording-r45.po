@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: el\n"
+
+msgid "Live TV recording"
+msgstr "Εγγραφή ζωντανής τηλεόρασης"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Ορίστε τον φάκελο εγγραφής στις ρυθμίσεις του πρόσθετου."
+
+msgid "Recording started."
+msgstr "Η εγγραφή ξεκίνησε."
+
+msgid "Recording stopped."
+msgstr "Η εγγραφή σταμάτησε."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Η εγγραφή απέτυχε. Ελέγξτε τη συσκευή αποθήκευσης."
+
+msgid "Recording is not available for this stream."
+msgstr "Η εγγραφή δεν είναι διαθέσιμη για αυτήν τη ροή."
+
+msgid "Open the channel again to enable recording."
+msgstr "Ανοίξτε ξανά το κανάλι για να ενεργοποιήσετε την εγγραφή."

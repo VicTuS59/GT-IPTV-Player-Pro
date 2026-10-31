@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: fr_FR\n"
+
+msgid "Live TV recording"
+msgstr "Enregistrement TV en direct"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Veuillez définir le dossier d'enregistrement dans les paramètres du module."
+
+msgid "Recording started."
+msgstr "Enregistrement démarré."
+
+msgid "Recording stopped."
+msgstr "Enregistrement arrêté."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Échec de l'enregistrement. Vérifiez le périphérique de stockage."
+
+msgid "Recording is not available for this stream."
+msgstr "L'enregistrement n'est pas disponible pour ce flux."
+
+msgid "Open the channel again to enable recording."
+msgstr "Ouvrez à nouveau la chaîne pour activer l'enregistrement."

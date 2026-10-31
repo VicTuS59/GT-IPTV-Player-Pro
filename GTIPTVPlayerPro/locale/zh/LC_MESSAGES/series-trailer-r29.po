@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: zh\n"
+
+msgid "Trailer"
+msgstr "预告片"
+
+msgid "Searching for the next episode trailer..."
+msgstr "正在搜索下一集预告片..."
+
+msgid "No trailer found for the next episode."
+msgstr "未找到下一集的预告片。"
+
+msgid "Next episode information is unavailable."
+msgstr "暂无下一集的信息。"
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "无法搜索预告片，请重试。"

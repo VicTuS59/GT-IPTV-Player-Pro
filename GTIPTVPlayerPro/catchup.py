@@ -520,7 +520,7 @@ class ArchiveClient(object):
         zone = None
         if name:
             try:
-                from zoneinfo import ZoneInfo
+                from .timezone_compat import ZoneInfo
                 zone = ZoneInfo(name)
             except (ImportError, ValueError, KeyError):
                 pass

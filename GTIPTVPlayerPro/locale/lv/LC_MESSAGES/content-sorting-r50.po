@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: lv\n"
+
+msgid "Provider order"
+msgstr "Pakalpojuma sniedzēja secība"
+
+msgid "Newest added"
+msgstr "Jaunākie pievienotie"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Alfabētiski (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Izlaišanas datums (jaunākie vispirms)"
+
+msgid "Saved manual order"
+msgstr "Saglabātā manuālā secība"
+
+msgid "Sorting"
+msgstr "Kārtošana"
+
+msgid "Sort content"
+msgstr "Kārtot saturu"
+
+msgid "Sort channels"
+msgstr "Kārtot kanālus"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Šis avots nesniedz datumus šim kārtošanas veidam."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Kārtošanai nepieciešama visa kategorija. Uzgaidiet vai mēģiniet vēlreiz."
+
+msgid "Could not save sorting preference."
+msgstr "Neizdevās saglabāt kārtošanas iestatījumu."

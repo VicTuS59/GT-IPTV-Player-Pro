@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Ohjelmistopäivitys"
+
+msgid "Automatic update check"
+msgstr "Automaattinen päivitysten tarkistus"
+
+msgid "Check for updates"
+msgstr "Tarkista päivitykset"
+
+msgid "Download and verify"
+msgstr "Lataa ja varmista"
+
+msgid "Install update"
+msgstr "Asenna päivitys"
+
+msgid "Update available"
+msgstr "Päivitys saatavilla"
+
+msgid "Up to date"
+msgstr "Ajan tasalla"
+
+msgid "Update verified"
+msgstr "Päivitys varmennettu"
+
+msgid "Restart interface"
+msgstr "Käynnistä käyttöliittymä uudelleen"
+
+msgid "Update source is not ready"
+msgstr "Päivityslähde ei ole vielä valmis"
+
+msgid "Update signature is invalid"
+msgstr "Päivityksen allekirjoitus on virheellinen"
+
+msgid "Invalid update information"
+msgstr "Virheelliset päivitystiedot"
+
+msgid "Update package is invalid"
+msgstr "Päivityspaketti on virheellinen"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Päivitys ei ole yhteensopiva tämän vastaanottimen kanssa"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Pysäytä tallennukset ja lataukset ennen päivitystä"
+
+msgid "Update failed"
+msgstr "Päivitys epäonnistui"
+
+msgid "Update installed. Restart the interface."
+msgstr "Päivitys asennettu. Käynnistä käyttöliittymä uudelleen."
+
+msgid "Install the verified update?"
+msgstr "Asennetaanko varmennettu päivitys?"
+
+msgid "Update available. Open updater?"
+msgstr "Päivitys saatavilla. Avataanko päivitystoiminto?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Automaattinen tarkistus 6 tunnin välein."
+
+msgid "New version"
+msgstr "Uusi versio"
+

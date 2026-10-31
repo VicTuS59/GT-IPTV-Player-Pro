@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: mk\n"
+
+msgid "Move channel"
+msgstr "Премести канал"
+
+msgid "Channel moved."
+msgstr "Каналот е преместен."
+
+msgid "Could not save channel order."
+msgstr "Редоследот на каналите не може да се зачува."

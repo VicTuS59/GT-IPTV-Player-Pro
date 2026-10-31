@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Добавить источник M3U"
+
+msgid "Application"
+msgstr "Приложение"
+
+msgid "Application information"
+msgstr "Информация о приложении"
+
+msgid "Category Management"
+msgstr "Управление категориями"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Изменения применяются при нажатии ЗЕЛЁНОЙ кнопки."
+
+msgid "Choose the source name and location."
+msgstr "Выберите имя и расположение источника."
+
+msgid "Compatibility"
+msgstr "Совместимость"
+
+msgid "Country"
+msgstr "Страна"
+
+msgid "Developer"
+msgstr "Разработчик"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Прямой HTTP(S)-адрес списка M3U."
+
+msgid "District"
+msgstr "Район"
+
+msgid "Frame rate"
+msgstr "Частота кадров"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Platform"
+msgstr "Платформа"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Нажмите СИНЮЮ кнопку, чтобы ввести другое название канала."
+
+msgid "Press GREEN to save the source."
+msgstr "Нажмите ЗЕЛЁНУЮ кнопку, чтобы сохранить источник."
+
+msgid "Press GREEN to use this folder."
+msgstr "Нажмите ЗЕЛЁНУЮ кнопку, чтобы использовать эту папку."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Нажмите OK, чтобы скачать выбранные субтитры."
+
+msgid "Press OK to load this subtitle."
+msgstr "Нажмите OK, чтобы загрузить эти субтитры."
+
+msgid "Press OK to play the selected video."
+msgstr "Нажмите OK, чтобы воспроизвести выбранное видео."
+
+msgid "Press OK to search again."
+msgstr "Нажмите OK, чтобы повторить поиск."
+
+msgid "Press OK to select this location."
+msgstr "Нажмите OK, чтобы выбрать это место."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Нажмите OK, чтобы показать или скрыть категорию. Отметьте категории КРАСНОЙ кнопкой, чтобы переместить их вместе."
+
+msgid "Province"
+msgstr "Область"
+
+msgid "Release"
+msgstr "Релиз"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Найдите субтитры или измените фильтр."
+
+msgid "Select a folder or subtitle file."
+msgstr "Выберите папку или файл субтитров."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Выберите список воспроизведения на приёмнике, USB или подключённом сетевом хранилище."
+
+msgid "Selected category"
+msgstr "Выбранная категория"
+
+msgid "Selected folder"
+msgstr "Выбранная папка"
+
+msgid "Selected location"
+msgstr "Выбранное место"
+
+msgid "Selected search"
+msgstr "Выбранный поиск"
+
+msgid "Selected subtitle"
+msgstr "Выбранные субтитры"
+
+msgid "Selected video"
+msgstr "Выбранное видео"
+
+msgid "Source code"
+msgstr "Исходный код"
+
+msgid "Source location"
+msgstr "Расположение источника"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Файлы субтитров: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Поддерживаемый формат"
+

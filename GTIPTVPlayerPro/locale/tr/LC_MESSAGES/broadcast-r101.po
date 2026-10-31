@@ -1,0 +1,31 @@
+# Approved five source/broadcast layouts
+msgid "Broadcast schedule"
+msgstr "Yayın akışı"
+
+msgid "Duration"
+msgstr "Süre"
+
+msgid "Live TV categories"
+msgstr "Canlı TV kategorileri"
+
+msgid "Page {} / {}"
+msgstr "Sayfa {} / {}"
+
+msgid "Playlists"
+msgstr "Oynatma listeleri"
+
+msgid "Press OK to watch."
+msgstr "İzlemek için OK tuşuna basın."
+
+msgid "Programme information"
+msgstr "Program bilgisi"
+
+msgid "Selected playlist"
+msgstr "Seçili oynatma listesi"
+
+msgid "Time"
+msgstr "Saat"
+
+msgid "{} categories · {} / {}"
+msgstr "{} kategori · {} / {}"
+

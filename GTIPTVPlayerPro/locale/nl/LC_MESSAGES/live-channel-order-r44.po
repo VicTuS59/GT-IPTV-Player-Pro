@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: nl\n"
+
+msgid "Move channel"
+msgstr "Kanaal verplaatsen"
+
+msgid "Channel moved."
+msgstr "Kanaal verplaatst."
+
+msgid "Could not save channel order."
+msgstr "De kanaalvolgorde kon niet worden opgeslagen."

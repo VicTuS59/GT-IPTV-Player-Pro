@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: hu\n"
+
+msgid "General trailer"
+msgstr "Általános előzetes"
+
+msgid "Searching for a trailer..."
+msgstr "Előzetes keresése..."
+
+msgid "No official trailer found."
+msgstr "Nem található hivatalos előzetes."

@@ -1,0 +1,12 @@
+# Category recency r52
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ku\n"
+
+msgid "Most recently added content"
+msgstr "Naveroka herî dawî lê zêdekirî"
+
+msgid "Preparing category dates: {}/{} ({} items)"
+msgstr "Dîrokên kategoriyan têne amadekirin: {}/{} ({} hêman)"
+
+msgid "Category dates could not be completed. Select this option again to resume."
+msgstr "Dîrokên kategoriyan temam nebûn. Ji bo domandinê vê vebijarkê dîsa hilbijêre."

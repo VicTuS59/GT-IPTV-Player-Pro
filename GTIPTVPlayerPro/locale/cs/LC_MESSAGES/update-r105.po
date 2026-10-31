@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Aktualizace softwaru"
+
+msgid "Automatic update check"
+msgstr "Automatická kontrola aktualizací"
+
+msgid "Check for updates"
+msgstr "Vyhledat aktualizace"
+
+msgid "Download and verify"
+msgstr "Stáhnout a ověřit"
+
+msgid "Install update"
+msgstr "Nainstalovat aktualizaci"
+
+msgid "Update available"
+msgstr "Je dostupná aktualizace"
+
+msgid "Up to date"
+msgstr "Aktuální"
+
+msgid "Update verified"
+msgstr "Aktualizace ověřena"
+
+msgid "Restart interface"
+msgstr "Restartovat rozhraní"
+
+msgid "Update source is not ready"
+msgstr "Zdroj aktualizací ještě není připraven"
+
+msgid "Update signature is invalid"
+msgstr "Podpis aktualizace je neplatný"
+
+msgid "Invalid update information"
+msgstr "Neplatné informace o aktualizaci"
+
+msgid "Update package is invalid"
+msgstr "Balíček aktualizace je neplatný"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Aktualizace není kompatibilní s tímto přijímačem"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Před aktualizací zastavte nahrávání a stahování"
+
+msgid "Update failed"
+msgstr "Aktualizace se nezdařila"
+
+msgid "Update installed. Restart the interface."
+msgstr "Aktualizace nainstalována. Restartujte rozhraní."
+
+msgid "Install the verified update?"
+msgstr "Nainstalovat ověřenou aktualizaci?"
+
+msgid "Update available. Open updater?"
+msgstr "Je dostupná aktualizace. Otevřít aktualizátor?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Automatická kontrola každých 6 hodin."
+
+msgid "New version"
+msgstr "Nová verze"
+

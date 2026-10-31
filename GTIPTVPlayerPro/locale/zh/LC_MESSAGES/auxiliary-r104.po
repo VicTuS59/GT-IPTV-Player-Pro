@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "添加 M3U 来源"
+
+msgid "Application"
+msgstr "应用程序"
+
+msgid "Application information"
+msgstr "应用程序信息"
+
+msgid "Category Management"
+msgstr "分类管理"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "按绿键应用更改。"
+
+msgid "Choose the source name and location."
+msgstr "选择来源名称和位置。"
+
+msgid "Compatibility"
+msgstr "兼容性"
+
+msgid "Country"
+msgstr "国家"
+
+msgid "Developer"
+msgstr "开发者"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "M3U 播放列表的直接 HTTP(S) 地址。"
+
+msgid "District"
+msgstr "区县"
+
+msgid "Frame rate"
+msgstr "帧率"
+
+msgid "Language"
+msgstr "语言"
+
+msgid "Platform"
+msgstr "平台"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "按蓝键输入其他频道名称。"
+
+msgid "Press GREEN to save the source."
+msgstr "按绿键保存来源。"
+
+msgid "Press GREEN to use this folder."
+msgstr "按绿键使用此文件夹。"
+
+msgid "Press OK to download the selected subtitle."
+msgstr "按 OK 下载选中的字幕。"
+
+msgid "Press OK to load this subtitle."
+msgstr "按 OK 加载此字幕。"
+
+msgid "Press OK to play the selected video."
+msgstr "按 OK 播放选中的视频。"
+
+msgid "Press OK to search again."
+msgstr "按 OK 重新搜索。"
+
+msgid "Press OK to select this location."
+msgstr "按 OK 选择此位置。"
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "按 OK 显示或隐藏分类。用红键标记分类，以便一起移动。"
+
+msgid "Province"
+msgstr "省份"
+
+msgid "Release"
+msgstr "发行版本"
+
+msgid "Search for subtitles or change the filter."
+msgstr "搜索字幕或更改筛选条件。"
+
+msgid "Select a folder or subtitle file."
+msgstr "选择文件夹或字幕文件。"
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "从接收器、USB 或已挂载的网络存储中选择播放列表。"
+
+msgid "Selected category"
+msgstr "选中的分类"
+
+msgid "Selected folder"
+msgstr "选中的文件夹"
+
+msgid "Selected location"
+msgstr "选中的位置"
+
+msgid "Selected search"
+msgstr "选中的搜索"
+
+msgid "Selected subtitle"
+msgstr "选中的字幕"
+
+msgid "Selected video"
+msgstr "选中的视频"
+
+msgid "Source code"
+msgstr "源代码"
+
+msgid "Source location"
+msgstr "来源位置"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "字幕文件：SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "支持的格式"
+

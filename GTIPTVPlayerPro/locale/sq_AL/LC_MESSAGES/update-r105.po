@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Përditësim i softuerit"
+
+msgid "Automatic update check"
+msgstr "Kontroll automatik për përditësime"
+
+msgid "Check for updates"
+msgstr "Kontrollo për përditësime"
+
+msgid "Download and verify"
+msgstr "Shkarko dhe verifiko"
+
+msgid "Install update"
+msgstr "Instalo përditësimin"
+
+msgid "Update available"
+msgstr "Ka përditësim"
+
+msgid "Up to date"
+msgstr "I përditësuar"
+
+msgid "Update verified"
+msgstr "Përditësimi u verifikua"
+
+msgid "Restart interface"
+msgstr "Rinis ndërfaqen"
+
+msgid "Update source is not ready"
+msgstr "Burimi i përditësimit nuk është ende gati"
+
+msgid "Update signature is invalid"
+msgstr "Nënshkrimi i përditësimit është i pavlefshëm"
+
+msgid "Invalid update information"
+msgstr "Informacion i pavlefshëm për përditësimin"
+
+msgid "Update package is invalid"
+msgstr "Paketa e përditësimit është e pavlefshme"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Përditësimi nuk përputhet me këtë marrës"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Ndaloni regjistrimet dhe shkarkimet para përditësimit"
+
+msgid "Update failed"
+msgstr "Përditësimi dështoi"
+
+msgid "Update installed. Restart the interface."
+msgstr "Përditësimi u instalua. Rinisni ndërfaqen."
+
+msgid "Install the verified update?"
+msgstr "Të instalohet përditësimi i verifikuar?"
+
+msgid "Update available. Open updater?"
+msgstr "Ka përditësim. Të hapet përditësuesi?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Kontroll automatik çdo 6 orë."
+
+msgid "New version"
+msgstr "Version i ri"
+

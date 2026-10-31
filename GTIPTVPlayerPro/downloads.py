@@ -14,6 +14,7 @@ import json
 import os
 import re
 import stat
+import shutil
 import sys
 import threading
 import time
@@ -21,8 +22,10 @@ import uuid
 from contextlib import contextmanager, nullcontext
 
 from .i18n import N_
+from . import PLUGIN_VERSION
 from .persistence import RESTORE_COORDINATOR
 from .playback import resume_account_scope
+from .history_index import HistoryIndex, RemovedPaths, document as history_document, rewrite as rewrite_history
 
 RUNTIME = "/tmp/gtiptv-downloads"
 HISTORY = "/etc/enigma2/gtiptvplayer/downloads.json"
@@ -127,8 +130,37 @@ def _write(path, value, sync=False):
 
 def _history(state):
     _private_directory(os.path.dirname(HISTORY))
-    value = {key: state.get(key) for key in ("boot", "jobs", "folder", "limit", "hold")}
-    _write(HISTORY, value)
+    value = {key: state.get(key) for key in ("boot", "folder", "limit", "hold")}
+    updates = {str(job['id']): job for job in state.get('jobs', ())}
+    removed = set(state.get('_forgotten_ids', ()))
+    def records():
+        for key, job in history_document(HISTORY, 'jobs'):
+            if key is None and isinstance(job, dict) and str(job.get('id', '')) not in updates and str(job.get('id', '')) not in removed:
+                yield job
+        yield from updates.values()
+    rewrite_history(HISTORY, 'jobs', records(), value)
+
+
+def _working_history():
+    value = {'jobs': []}
+    for key, record in history_document(HISTORY, 'jobs'):
+        if key is None:
+            if isinstance(record, dict) and record.get('status') not in TERMINAL:
+                value['jobs'].append(record)
+        else:
+            value[key] = record
+    return value
+
+
+def _runtime_state(state):
+    result = dict(state)
+    worker = state.get('worker') or {}
+    legacy = alive(worker) and worker.get('version') != PLUGIN_VERSION
+    # An already running r79 worker still writes the old full-history format.
+    # Do not remove its rows until it has finished and relinquished ownership.
+    result['jobs'] = list(state.get('jobs', ())) if legacy else [job for job in state.get('jobs', ()) if job.get('status') not in TERMINAL]
+    result.pop('_forgotten_ids', None)
+    return result
 
 
 def _snapshot_document(path):
@@ -176,6 +208,35 @@ def _recover_commit():
     if not os.path.lexists(journal):
         return
     value = _read(journal, strict=True)
+    if value.get('version') == 2:
+        if set(value) != {'version', 'runtime', 'history_exists'} or not isinstance(value['history_exists'], bool):
+            raise OSError('Invalid download commit journal')
+        if value['runtime'] is not None:
+            base64.b64decode(value['runtime'].encode('ascii'), validate=True)
+        backup = HISTORY + '.rollback-r80'
+        if value['history_exists']:
+            info = os.lstat(backup)
+            if not stat.S_ISREG(info.st_mode): raise OSError('Invalid history rollback')
+            temporary = HISTORY+'.'+uuid.uuid4().hex+'.tmp'
+            try:
+                try: os.link(backup, temporary)
+                except OSError:
+                    fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                    with os.fdopen(fd, 'wb') as target, open(backup, 'rb') as source:
+                        shutil.copyfileobj(source, target, 65536)
+                        target.flush(); os.fsync(target.fileno())
+                os.replace(temporary, HISTORY)
+            finally:
+                try: os.unlink(temporary)
+                except FileNotFoundError: pass
+        else:
+            try: os.unlink(HISTORY)
+            except FileNotFoundError: pass
+        _restore_document(os.path.join(RUNTIME, 'state.json'), value['runtime'])
+        os.unlink(journal)
+        try: os.unlink(backup)
+        except FileNotFoundError: pass
+        return
     if (value.get("version") != 1 or set(value) != {"version", "runtime", "history"}
             or any(value[key] is not None and not isinstance(value[key], str)
                    for key in ("runtime", "history"))):
@@ -200,13 +261,26 @@ def _commit_state(state):
     """
     runtime = os.path.join(RUNTIME, "state.json")
     journal = _journal_path()
-    previous = {"version": 1, "runtime": _snapshot_document(runtime),
-                "history": _snapshot_document(HISTORY)}
+    backup = HISTORY + '.rollback-r80'
+    try: os.unlink(backup)
+    except FileNotFoundError: pass
+    exists = os.path.isfile(HISTORY)
+    if exists:
+        if os.path.islink(HISTORY): raise OSError('Unsafe history document')
+        try: os.link(HISTORY, backup)
+        except OSError:
+            fd = os.open(backup, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+            with os.fdopen(fd, 'wb') as target, open(HISTORY, 'rb') as source:
+                shutil.copyfileobj(source, target, 65536)
+                target.flush(); os.fsync(target.fileno())
+    previous = {"version": 2, "runtime": _snapshot_document(runtime), 'history_exists': exists}
     _write(journal, previous, sync=True)
     try:
         _history(state)
-        _write(runtime, state)
+        _write(runtime, _runtime_state(state))
         os.unlink(journal)
+        try: os.unlink(backup)
+        except FileNotFoundError: pass
     except BaseException:
         # Recovery can itself fail (e.g. a full second volume). Keep the
         # journal in that case so subsequent workers/readers fail closed.
@@ -243,8 +317,14 @@ def _initial_state(read_only=False, needs_history=None):
                     job.update(status="error", error="failed")
             state["hold"] = True
             state["worker_start"] = 0
+        owner = state.get('worker') or {}
+        if (alive(owner) and owner.get('version') != PLUGIN_VERSION
+                and not state.get('shutdown') and not any(job.get('status') in ACTIVE for job in state.get('jobs', ()))
+                and (state.get('hold') or not any(job.get('status') == 'queued' for job in state.get('jobs', ())))):
+            state['shutdown'] = True
+            state['_legacy_shutdown_pending'] = True
         return state
-    state = _read(HISTORY)
+    state = _working_history()
     state.setdefault("jobs", [])
     for job in state["jobs"]:
         if job.get("status") == "deleting":
@@ -322,23 +402,59 @@ def transaction(persist=False, read_only=False, timeout=0.25):
         with _state_lock(read_only=read_only, timeout=timeout):
             needs_history = []
             state = _initial_state(read_only=True, needs_history=needs_history)
+            legacy_shutdown = state.pop('_legacy_shutdown_pending', False)
             previous = deepcopy(state) if not read_only else None
             yield state
             if not read_only:
                 if persist or needs_history[0]:
                     _commit_state(state)
-                elif state != previous or not os.path.exists(os.path.join(RUNTIME, "state.json")):
+                elif legacy_shutdown or state != previous or not os.path.exists(os.path.join(RUNTIME, "state.json")):
                     _write(os.path.join(RUNTIME, "state.json"), state)
 
 
-def snapshot():
+def snapshot(history_offset=0, history_size=100):
+    history_offset, history_size = max(0, int(history_offset)), max(1, min(100, int(history_size)))
     with transaction(read_only=True) as state:
-        removed = _removed_paths()
         result = {key: json.loads(json.dumps(state.get(key)))
-                  for key in ("jobs", "folder", "limit", "hold", "worker")}
-        result["removed_paths"] = sorted(removed)
-        result["jobs"] = visible_entries(result["jobs"] or [], removed)
-        return result
+                  for key in ("folder", "limit", "hold", "worker")}
+        result['jobs'] = [dict(job) for job in state.get('jobs', ()) if job.get('status') not in TERMINAL]
+        owner = state.get('worker') or {}
+        legacy = alive(owner) and owner.get('version') != PLUGIN_VERSION
+        archive_runtime = not legacy and any(job.get('status') in TERMINAL for job in state.get('jobs', ()))
+        retire_legacy = legacy and state.get('shutdown') and not any(job.get('status') in ACTIVE for job in state.get('jobs', ()))
+    # Migrate an old, idle runtime once, after releasing the read lock. Archive
+    # before pruning; an alive old worker keeps its original schema until exit.
+    if archive_runtime or retire_legacy:
+        with transaction(persist=archive_runtime):
+            pass
+    # Index construction and large-history reads never hold the worker's
+    # cross-process queue lock. Progress, cancellation and enqueue stay live.
+    removed = _removed_paths()
+    folder = str(result.get('folder') or '')
+    archived, total = HistoryIndex(HISTORY, 'jobs').page(history_offset, history_size, folder, terminal=True) if folder else ([], 0)
+    current = {job['id'] for job in result['jobs']}
+    result['jobs'] = visible_entries(result['jobs']+[job for job in archived if job['id'] not in current], removed)
+    result['removed_paths'] = []
+    result['history_offset'], result['history_total'] = history_offset, total
+    result['history_more'] = history_offset + len(archived) < total
+    return result
+
+
+
+def history_page(offset=0, size=100, folder=None):
+    with transaction(read_only=True):
+        return HistoryIndex(HISTORY, 'jobs').page(offset, size, folder, terminal=True)
+
+
+def _job_by_id(state, identity):
+    job = next((row for row in state['jobs'] if row.get('id') == identity), None)
+    return job if job is not None else HistoryIndex(HISTORY, 'jobs').get_many((identity,)).get(identity)
+
+
+def entry_by_id(identity):
+    with transaction(read_only=True) as state:
+        value = _job_by_id(state, identity)
+        return dict(value) if value is not None else None
 
 
 def _path_key(path, parents=None):
@@ -358,16 +474,15 @@ def _path_key(path, parents=None):
 def _removed_paths():
     # This independent document is never rewritten by a download worker or
     # a folder/limit change. Missing files are not pruned: removal is permanent.
-    value = _read(REMOVED, {"version": 1, "paths": []}, strict=True)
-    paths = value.get("paths")
-    if (value.get("version") != 1 or not isinstance(paths, list) or any(not isinstance(path, str)
-            or not os.path.isabs(path) or "\x00" in path for path in paths)):
-        raise OSError("Invalid removed-download entries")
-    return set(paths)
+    return RemovedPaths(REMOVED)
 
 
 def visible_entries(entries, removed_paths):
-    removed = set(removed_paths or ())
+    if isinstance(removed_paths, RemovedPaths):
+        entries = list(entries)
+        removed = removed_paths.matching(key for entry in entries for key in (_path_key(entry.get('path')), os.path.normcase(os.path.normpath(str(entry.get('path') or '')))))
+    else: removed = set(removed_paths or ())
+    if not removed: return list(entries)
     if not removed:
         return list(entries)
     # Queue paths and scan folders are already canonical. Never touch a NAS
@@ -375,6 +490,38 @@ def visible_entries(entries, removed_paths):
     # alongside canonical paths when an entry is removed.
     return [entry for entry in entries
             if os.path.normcase(os.path.normpath(str(entry.get("path") or ""))) not in removed]
+
+
+def folder_entries(jobs, folder, local_entries=(), removed_paths=(), include_missing=False):
+    """Build one folder's view without changing the shared queue/history.
+
+    Enqueue and folder selection already store canonical paths. Use lexical
+    comparison here so a GUI refresh never resolves every history path on a
+    disconnected NAS. Match the complete parent, including directory bounds.
+    A queue row owns its file's actions while a scan supplies other local files.
+    Completed history needs a matching scanned file; pending work stays
+    manageable before its destination file is created.
+    """
+    if not isinstance(folder, str) or not os.path.isabs(folder) or "\x00" in folder:
+        return []
+    selected = os.path.normcase(os.path.normpath(folder))
+    local_entries = list(local_entries or ())
+    scanned = {os.path.normcase(os.path.normpath(str(entry.get("path") or "")))
+               for entry in local_entries}
+    result, seen = [], set()
+    entries = visible_entries(list(jobs or ()) + local_entries, removed_paths)
+    for entry in entries:
+        path = entry.get("path")
+        if not isinstance(path, str) or not os.path.isabs(path) or "\x00" in path:
+            continue
+        key = os.path.normcase(os.path.normpath(path))
+        if not include_missing and entry.get("status") == "completed" and key not in scanned:
+            continue
+        parent = os.path.dirname(str(entry.get('bundle') or key)) if entry.get('bundle') else os.path.dirname(key)
+        if os.path.normcase(os.path.normpath(parent)) == selected and key not in seen:
+            result.append(entry)
+            seen.add(key)
+    return result
 
 
 def remove_entry(entry):
@@ -391,21 +538,30 @@ def remove_entry(entry):
         raise DownloadError("remove_failed")
     try:
         with transaction(persist=True) as state:
-            job = next((row for row in state["jobs"] if row["id"] == identity), None)
+            job = _job_by_id(state, identity)
             if not local and (job is None or job.get("path") != path):
                 raise DownloadError("remove_failed")
-            if local and os.path.realpath(os.path.dirname(path)) != os.path.realpath(state.get("folder") or "/"):
+            directory = os.path.dirname(entry.get('bundle') or path)
+            if local and os.path.realpath(directory) != os.path.realpath(state.get("folder") or "/"):
                 raise DownloadError("remove_failed")
             parents = {}
             matches = [row for row in state["jobs"] if _path_key(row.get("path"), parents) == key]
             if any(row.get("status") in ACTIVE + ("deleting",) for row in matches):
                 raise DownloadError("delete_active")
-            removed = _removed_paths()
-            removed.update((key, os.path.normcase(os.path.normpath(path))))
+            additions = {key, os.path.normcase(os.path.normpath(path))}
             _private_directory(os.path.dirname(REMOVED))
-            _write(REMOVED, {"version": 1, "paths": sorted(removed)}, sync=True)
+            def paths():
+                for name, old in history_document(REMOVED, 'paths'):
+                    if name is None:
+                        if not isinstance(old, str) or not os.path.isabs(old) or '\0' in old:
+                            raise OSError('Invalid removed-download entries')
+                        if old not in additions: yield old
+                yield from sorted(additions)
+            rewrite_history(REMOVED, 'paths', paths(), {'version': 1})
             identities = {row["id"] for row in matches}
+            if not local: identities.add(identity)
             state["jobs"] = [row for row in state["jobs"] if row["id"] not in identities]
+            state.setdefault('_forgotten_ids', []).extend(identities)
             for removed_id in identities:
                 state["private"].pop(removed_id, None)
     except DownloadError:
@@ -415,7 +571,7 @@ def remove_entry(entry):
 
 
 def _restored_state(worker=None):
-    restored = _read(HISTORY)
+    restored = _working_history()
     restored.setdefault("jobs", [])
     for job in restored["jobs"]:
         job.pop("command", None)
@@ -652,25 +808,34 @@ def delete_entry(entry):
     if not identity or not os.path.isabs(path):
         raise DownloadError("delete_failed")
     with transaction(persist=True) as state:
-        job = next((row for row in state["jobs"] if row["id"] == identity), None)
+        job = _job_by_id(state, identity)
         if not local and (job is None or job.get("path") != path):
             raise DownloadError("delete_failed")
         if any(row.get("path") == path and row.get("status") in ACTIVE + ("deleting",)
                for row in state["jobs"]):
             raise DownloadError("delete_active")
-        if local and os.path.realpath(os.path.dirname(path)) != os.path.realpath(state.get("folder") or "/"):
+        directory = os.path.dirname(entry.get('bundle') or path)
+        if local and os.path.realpath(directory) != os.path.realpath(state.get("folder") or "/"):
             raise DownloadError("delete_failed")
         record = dict(job or entry)
         if job is not None:
+            if not any(row.get('id') == identity for row in state['jobs']): state['jobs'].append(job)
             job.update(delete_previous=job["status"], status="deleting",
                        delete_owner={"pid": os.getpid(), "stamp": process_stamp()})
     try:
-        folder = folder_ready(os.path.dirname(path))
+        folder = folder_ready(os.path.dirname(record.get('bundle') or path))
         device = record.get("device")
         if device is not None and os.stat(folder).st_dev != device:
             raise DownloadError("delete_failed")
         # External symlinks are never followed to remove their targets.
-        paths = (path,) if local else (path, path + ".part")
+        if record.get('bundle'):
+            from .recording_bundle import delete_entry as delete_bundle
+            from .live_recording import current
+            recording = current()
+            if recording is not None and recording.path == path and recording.state in ('recording', 'stopping'):
+                raise DownloadError('delete_active')
+            delete_bundle(record)
+        paths = () if record.get('bundle') else (path,) if local else (path, path + ".part")
         for candidate in paths:
             try:
                 info = os.lstat(candidate)
@@ -685,7 +850,7 @@ def delete_entry(entry):
             os.unlink(candidate)
     except Exception:
         with transaction(persist=True) as state:
-            job = next((row for row in state["jobs"] if row["id"] == identity), None)
+            job = _job_by_id(state, identity)
             if job is not None and job.get("status") == "deleting":
                 job["status"] = job.pop("delete_previous", "error")
                 job.pop("delete_owner", None)
@@ -693,6 +858,7 @@ def delete_entry(entry):
         raise DownloadError("delete_failed")
     with transaction(persist=True) as state:
         state["jobs"] = [row for row in state["jobs"] if row["id"] != identity]
+        state.setdefault('_forgotten_ids', []).append(identity)
         state["private"].pop(identity, None)
     # Only artwork owned by this job is eligible for cleanup.
     poster = record.get("poster") or ""
@@ -705,43 +871,43 @@ def delete_entry(entry):
 
 
 def ensure_worker():
-    """Exec a fresh interpreter, detached from the Enigma2 GUI lifetime."""
+    """Start the detached worker without running Python after a GUI fork."""
     with transaction() as state:
         if alive(state.get("worker")):
             return
         if state.get("worker_start", 0) > time.time():
             return
-        state["worker_start"] = time.time() + 20
+        start_deadline = time.time() + 20
+        state["worker_start"] = start_deadline
     # In embedded Enigma2, sys.executable can point to enigma2 itself.
     # Never launch that binary as if it were the standalone interpreter.
     interpreter = next((path for path in ("/usr/bin/python3", "/usr/local/bin/python3")
                         if os.path.isfile(path) and os.access(path, os.X_OK)), "")
     if not interpreter and os.path.basename(sys.executable).startswith("python"):
         interpreter = sys.executable
-    if not interpreter:
-        raise DownloadError("failed")
-    worker = os.path.join(os.path.dirname(__file__), "download_worker.py")
-    child = os.fork()
-    if child:
-        try:
-            os.waitpid(child, 0)
-        except ChildProcessError:
-            pass
-        return
+    import subprocess
+
     try:
-        os.setsid()
-        if os.fork():
-            os._exit(0)
-        os.umask(0o077)
-        os.chdir("/")
-        os.closerange(0, 65536)
-        null = os.open(os.devnull, os.O_RDWR)
-        os.dup2(null, 0)
-        os.dup2(null, 1)
-        os.dup2(null, 2)
-        os.execl(interpreter, interpreter, worker, "run")
-    finally:
-        os._exit(1)
+        if not interpreter:
+            raise OSError("standalone Python interpreter is unavailable")
+        launcher = os.path.join(os.path.dirname(__file__), "download_launcher.py")
+        # The short-lived launcher is reaped here. Its detached child is
+        # adopted by init, so Enigma2 needs no permanent reaper thread or
+        # replacement SIGCHLD handler. Popen performs child setup in C;
+        # never add preexec_fn or Python-side fork callbacks here.
+        subprocess.run(
+            [interpreter, launcher], check=True, timeout=8,
+            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL, close_fds=True,
+            start_new_session=True, cwd="/", umask=0o077,
+        )
+    except (OSError, subprocess.SubprocessError) as error:
+        with transaction() as state:
+            if state.get("worker_start") == start_deadline:
+                state["worker_start"] = 0
+        from .diagnostics import log_event
+        log_event("downloads", "worker-launch-failed", error)
+        raise DownloadError("failed") from error
 
 
 def local_files(folder):
@@ -752,9 +918,14 @@ def local_files(folder):
     result = []
     with os.scandir(folder) as entries:
         for entry in entries:
-            if os.path.splitext(entry.name)[1].lower() not in VIDEO_EXTENSIONS:
+            if entry.is_dir(follow_symlinks=False):
+                try:
+                    from .recording_bundle import inspect_bundle
+                    bundle = inspect_bundle(entry.path)
+                    result.append(bundle)
+                except (OSError, ValueError, UnicodeError): pass
                 continue
-            if os.path.normcase(os.path.join(canonical_folder, entry.name)) in removed:
+            if os.path.splitext(entry.name)[1].lower() not in VIDEO_EXTENSIONS:
                 continue
             if not entry.is_file():
                 continue
@@ -765,5 +936,5 @@ def local_files(folder):
                 name=os.path.splitext(entry.name)[0], path=entry.path, status="local", source="local",
                 downloaded=info.st_size, total=info.st_size, speed=0, eta=0, poster="", created=info.st_mtime,
                 device=info.st_dev, file_token=(info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns)))
-    return sorted(result, key=lambda row: row["name"].casefold())
+    return sorted(visible_entries(result, removed), key=lambda row: row["name"].casefold())
 

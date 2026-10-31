@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "הוספת מקור M3U"
+
+msgid "Application"
+msgstr "יישום"
+
+msgid "Application information"
+msgstr "מידע על היישום"
+
+msgid "Category Management"
+msgstr "ניהול קטגוריות"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "השינויים מוחלים בלחיצה על הכפתור הירוק."
+
+msgid "Choose the source name and location."
+msgstr "בחרו שם ומיקום למקור."
+
+msgid "Compatibility"
+msgstr "תאימות"
+
+msgid "Country"
+msgstr "מדינה"
+
+msgid "Developer"
+msgstr "מפתח"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "כתובת HTTP(S) ישירה של רשימת M3U."
+
+msgid "District"
+msgstr "נפה"
+
+msgid "Frame rate"
+msgstr "קצב פריימים"
+
+msgid "Language"
+msgstr "שפה"
+
+msgid "Platform"
+msgstr "פלטפורמה"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "לחצו על הכפתור הכחול כדי להזין שם ערוץ אחר."
+
+msgid "Press GREEN to save the source."
+msgstr "לחצו על הכפתור הירוק כדי לשמור את המקור."
+
+msgid "Press GREEN to use this folder."
+msgstr "לחצו על הכפתור הירוק כדי להשתמש בתיקייה זו."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "לחצו על OK כדי להוריד את הכתוביות שנבחרו."
+
+msgid "Press OK to load this subtitle."
+msgstr "לחצו על OK כדי לטעון כתוביות אלו."
+
+msgid "Press OK to play the selected video."
+msgstr "לחצו על OK כדי להפעיל את הסרטון שנבחר."
+
+msgid "Press OK to search again."
+msgstr "לחצו על OK כדי לחפש שוב."
+
+msgid "Press OK to select this location."
+msgstr "לחצו על OK כדי לבחור במיקום זה."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "לחצו על OK כדי להציג או להסתיר את הקטגוריה. סמנו קטגוריות בכפתור האדום כדי להעביר אותן יחד."
+
+msgid "Province"
+msgstr "מחוז"
+
+msgid "Release"
+msgstr "גרסה"
+
+msgid "Search for subtitles or change the filter."
+msgstr "חפשו כתוביות או שנו את המסנן."
+
+msgid "Select a folder or subtitle file."
+msgstr "בחרו תיקייה או קובץ כתוביות."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "בחרו רשימת השמעה מהמקלט, מ-USB או מאחסון רשת מחובר."
+
+msgid "Selected category"
+msgstr "הקטגוריה שנבחרה"
+
+msgid "Selected folder"
+msgstr "התיקייה שנבחרה"
+
+msgid "Selected location"
+msgstr "המיקום שנבחר"
+
+msgid "Selected search"
+msgstr "החיפוש שנבחר"
+
+msgid "Selected subtitle"
+msgstr "הכתוביות שנבחרו"
+
+msgid "Selected video"
+msgstr "הסרטון שנבחר"
+
+msgid "Source code"
+msgstr "קוד מקור"
+
+msgid "Source location"
+msgstr "מיקום המקור"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "קובצי כתוביות: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "תבנית נתמכת"
+

@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Shto burim M3U"
+
+msgid "Application"
+msgstr "Aplikacioni"
+
+msgid "Application information"
+msgstr "Informacion për aplikacionin"
+
+msgid "Category Management"
+msgstr "Menaxhimi i kategorive"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Ndryshimet zbatohen kur shtypni butonin e GJELBËR."
+
+msgid "Choose the source name and location."
+msgstr "Zgjidhni emrin dhe vendndodhjen e burimit."
+
+msgid "Compatibility"
+msgstr "Përputhshmëria"
+
+msgid "Country"
+msgstr "Shteti"
+
+msgid "Developer"
+msgstr "Zhvilluesi"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Adresa e drejtpërdrejtë HTTP(S) e listës M3U."
+
+msgid "District"
+msgstr "Rrethi"
+
+msgid "Frame rate"
+msgstr "Shpejtësia e kuadrove"
+
+msgid "Language"
+msgstr "Gjuha"
+
+msgid "Platform"
+msgstr "Platforma"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Shtypni butonin BLU për të futur një emër tjetër kanali."
+
+msgid "Press GREEN to save the source."
+msgstr "Shtypni butonin e GJELBËR për të ruajtur burimin."
+
+msgid "Press GREEN to use this folder."
+msgstr "Shtypni butonin e GJELBËR për të përdorur këtë dosje."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Shtypni OK për të shkarkuar titrën e zgjedhur."
+
+msgid "Press OK to load this subtitle."
+msgstr "Shtypni OK për të ngarkuar këtë titër."
+
+msgid "Press OK to play the selected video."
+msgstr "Shtypni OK për të luajtur videon e zgjedhur."
+
+msgid "Press OK to search again."
+msgstr "Shtypni OK për të kërkuar përsëri."
+
+msgid "Press OK to select this location."
+msgstr "Shtypni OK për të zgjedhur këtë vendndodhje."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Shtypni OK për të shfaqur ose fshehur kategorinë. Shënoni kategoritë me butonin e KUQ për t’i zhvendosur së bashku."
+
+msgid "Province"
+msgstr "Provinca"
+
+msgid "Release"
+msgstr "Versioni"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Kërkoni titra ose ndryshoni filtrin."
+
+msgid "Select a folder or subtitle file."
+msgstr "Zgjidhni një dosje ose skedar titrash."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Zgjidhni një listë luajtjeje nga marrësi, USB ose hapësira e montuar e ruajtjes në rrjet."
+
+msgid "Selected category"
+msgstr "Kategoria e zgjedhur"
+
+msgid "Selected folder"
+msgstr "Dosja e zgjedhur"
+
+msgid "Selected location"
+msgstr "Vendndodhja e zgjedhur"
+
+msgid "Selected search"
+msgstr "Kërkimi i zgjedhur"
+
+msgid "Selected subtitle"
+msgstr "Titra e zgjedhur"
+
+msgid "Selected video"
+msgstr "Videoja e zgjedhur"
+
+msgid "Source code"
+msgstr "Kodi burimor"
+
+msgid "Source location"
+msgstr "Vendndodhja e burimit"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Skedarë titrash: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Formati i mbështetur"
+

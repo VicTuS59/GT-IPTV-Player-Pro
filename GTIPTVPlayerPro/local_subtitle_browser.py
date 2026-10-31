@@ -6,6 +6,7 @@
 import os
 import threading
 
+from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
 from .i18n import _, localized_language_name
 from .paths import plugin_path
 from .remote_footer import decorate_remote_footer, footer_item, install_remote_footer
@@ -65,6 +66,7 @@ def _language_codes(settings):
     return tuple(result)
 
 
+@aux_skin_after('local' )
 def local_subtitle_browser_skin(size=None, folder_picker=False):
     """Use the existing glass artwork at SD, HD, FHD and UHD sizes."""
     width, height = _desktop_size(size)
@@ -137,7 +139,6 @@ class GTLocalSubtitleBrowserScreen(Screen):
         self._cancel = threading.Event()
         self._reader = SourceLoader(eTimer(), _connect, self._io_ready)
         from .background import attach_background
-        attach_background(self, "app_bg", plugin_path("skin", "images", "global-neon-v0912.png"))
         for name in ("content_glass", "header_art", "programme_art", "toolbar_art"):
             self[name] = Pixmap()
         for name in ("video_guard", "header", "programme", "path", "summary", "page", "message", "footer"):
@@ -164,6 +165,8 @@ class GTLocalSubtitleBrowserScreen(Screen):
         self.onLayoutFinish.append(self._render)
         self.onClose.append(self._stop)
         self._render()
+
+        setup_aux(self, 'local', FOLDER_FOOTER if self._folder_picker else FILE_FOOTER)
 
     def _shown(self):
         self._render()
@@ -259,6 +262,7 @@ class GTLocalSubtitleBrowserScreen(Screen):
                     "limited": bool(getattr(rows, "limited", False))}
         self._submit("list", read)
 
+    @aux_refresh_after
     def _render(self):
         if self._closed:
             return

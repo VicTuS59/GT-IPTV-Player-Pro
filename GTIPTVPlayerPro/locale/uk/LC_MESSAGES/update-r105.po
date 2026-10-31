@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Оновлення ПЗ"
+
+msgid "Automatic update check"
+msgstr "Автоматична перевірка оновлень"
+
+msgid "Check for updates"
+msgstr "Перевірити оновлення"
+
+msgid "Download and verify"
+msgstr "Завантажити й перевірити"
+
+msgid "Install update"
+msgstr "Установити оновлення"
+
+msgid "Update available"
+msgstr "Доступне оновлення"
+
+msgid "Up to date"
+msgstr "Актуальна версія"
+
+msgid "Update verified"
+msgstr "Оновлення перевірено"
+
+msgid "Restart interface"
+msgstr "Перезапустити інтерфейс"
+
+msgid "Update source is not ready"
+msgstr "Джерело оновлень ще не готове"
+
+msgid "Update signature is invalid"
+msgstr "Підпис оновлення недійсний"
+
+msgid "Invalid update information"
+msgstr "Неприпустимі відомості про оновлення"
+
+msgid "Update package is invalid"
+msgstr "Пакет оновлення недійсний"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Оновлення несумісне із цим приймачем"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Зупиніть записи й завантаження перед оновленням"
+
+msgid "Update failed"
+msgstr "Не вдалося оновити"
+
+msgid "Update installed. Restart the interface."
+msgstr "Оновлення встановлено. Перезапустіть інтерфейс."
+
+msgid "Install the verified update?"
+msgstr "Установити перевірене оновлення?"
+
+msgid "Update available. Open updater?"
+msgstr "Доступне оновлення. Відкрити засіб оновлення?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Автоматична перевірка кожні 6 годин."
+
+msgid "New version"
+msgstr "Нова версія"
+

@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Pridėti M3U šaltinį"
+
+msgid "Application"
+msgstr "Programa"
+
+msgid "Application information"
+msgstr "Programos informacija"
+
+msgid "Category Management"
+msgstr "Kategorijų tvarkymas"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Pakeitimai pritaikomi paspaudus ŽALIĄ mygtuką."
+
+msgid "Choose the source name and location."
+msgstr "Pasirinkite šaltinio pavadinimą ir vietą."
+
+msgid "Compatibility"
+msgstr "Suderinamumas"
+
+msgid "Country"
+msgstr "Šalis"
+
+msgid "Developer"
+msgstr "Kūrėjas"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Tiesioginis M3U grojaraščio HTTP(S) adresas."
+
+msgid "District"
+msgstr "Rajonas"
+
+msgid "Frame rate"
+msgstr "Kadrų dažnis"
+
+msgid "Language"
+msgstr "Kalba"
+
+msgid "Platform"
+msgstr "Platforma"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Paspauskite MĖLYNĄ mygtuką, kad įvestumėte kitą kanalo pavadinimą."
+
+msgid "Press GREEN to save the source."
+msgstr "Paspauskite ŽALIĄ mygtuką, kad išsaugotumėte šaltinį."
+
+msgid "Press GREEN to use this folder."
+msgstr "Paspauskite ŽALIĄ mygtuką, kad naudotumėte šį aplanką."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Paspauskite OK, kad atsisiųstumėte pasirinktus subtitrus."
+
+msgid "Press OK to load this subtitle."
+msgstr "Paspauskite OK, kad įkeltumėte šiuos subtitrus."
+
+msgid "Press OK to play the selected video."
+msgstr "Paspauskite OK, kad paleistumėte pasirinktą vaizdo įrašą."
+
+msgid "Press OK to search again."
+msgstr "Paspauskite OK, kad ieškotumėte dar kartą."
+
+msgid "Press OK to select this location."
+msgstr "Paspauskite OK, kad pasirinktumėte šią vietą."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Paspauskite OK, kad rodytumėte arba slėptumėte kategoriją. Pažymėkite kategorijas RAUDONU mygtuku, kad perkeltumėte jas kartu."
+
+msgid "Province"
+msgstr "Apskritis"
+
+msgid "Release"
+msgstr "Laida"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Ieškokite subtitrų arba pakeiskite filtrą."
+
+msgid "Select a folder or subtitle file."
+msgstr "Pasirinkite aplanką arba subtitrų failą."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Pasirinkite grojaraštį iš imtuvo, USB arba prijungtos tinklo saugyklos."
+
+msgid "Selected category"
+msgstr "Pasirinkta kategorija"
+
+msgid "Selected folder"
+msgstr "Pasirinktas aplankas"
+
+msgid "Selected location"
+msgstr "Pasirinkta vieta"
+
+msgid "Selected search"
+msgstr "Pasirinkta paieška"
+
+msgid "Selected subtitle"
+msgstr "Pasirinkti subtitrai"
+
+msgid "Selected video"
+msgstr "Pasirinktas vaizdo įrašas"
+
+msgid "Source code"
+msgstr "Pirminis kodas"
+
+msgid "Source location"
+msgstr "Šaltinio vieta"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Subtitrų failai: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Palaikomas formatas"
+

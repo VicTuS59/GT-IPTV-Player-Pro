@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Adaugă sursă M3U"
+
+msgid "Application"
+msgstr "Aplicație"
+
+msgid "Application information"
+msgstr "Informații despre aplicație"
+
+msgid "Category Management"
+msgstr "Gestionarea categoriilor"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Modificările se aplică la apăsarea butonului VERDE."
+
+msgid "Choose the source name and location."
+msgstr "Alegeți numele și locația sursei."
+
+msgid "Compatibility"
+msgstr "Compatibilitate"
+
+msgid "Country"
+msgstr "Țară"
+
+msgid "Developer"
+msgstr "Dezvoltator"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Adresa HTTP(S) directă a listei M3U."
+
+msgid "District"
+msgstr "District"
+
+msgid "Frame rate"
+msgstr "Frecvența cadrelor"
+
+msgid "Language"
+msgstr "Limbă"
+
+msgid "Platform"
+msgstr "Platformă"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Apăsați ALBASTRU pentru a introduce alt nume de canal."
+
+msgid "Press GREEN to save the source."
+msgstr "Apăsați VERDE pentru a salva sursa."
+
+msgid "Press GREEN to use this folder."
+msgstr "Apăsați VERDE pentru a folosi acest dosar."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Apăsați OK pentru a descărca subtitrarea selectată."
+
+msgid "Press OK to load this subtitle."
+msgstr "Apăsați OK pentru a încărca această subtitrare."
+
+msgid "Press OK to play the selected video."
+msgstr "Apăsați OK pentru a reda videoclipul selectat."
+
+msgid "Press OK to search again."
+msgstr "Apăsați OK pentru a căuta din nou."
+
+msgid "Press OK to select this location."
+msgstr "Apăsați OK pentru a selecta această locație."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Apăsați OK pentru a afișa sau ascunde categoria. Marcați categoriile cu ROȘU pentru a le muta împreună."
+
+msgid "Province"
+msgstr "Provincie"
+
+msgid "Release"
+msgstr "Versiune"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Căutați subtitrări sau schimbați filtrul."
+
+msgid "Select a folder or subtitle file."
+msgstr "Selectați un dosar sau un fișier de subtitrare."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Selectați o listă de redare din receptor, USB sau stocare de rețea montată."
+
+msgid "Selected category"
+msgstr "Categorie selectată"
+
+msgid "Selected folder"
+msgstr "Dosar selectat"
+
+msgid "Selected location"
+msgstr "Locație selectată"
+
+msgid "Selected search"
+msgstr "Căutare selectată"
+
+msgid "Selected subtitle"
+msgstr "Subtitrare selectată"
+
+msgid "Selected video"
+msgstr "Videoclip selectat"
+
+msgid "Source code"
+msgstr "Cod sursă"
+
+msgid "Source location"
+msgstr "Locația sursei"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Fișiere de subtitrare: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Format acceptat"
+

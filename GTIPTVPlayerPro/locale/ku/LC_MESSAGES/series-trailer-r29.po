@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ku\n"
+
+msgid "Trailer"
+msgstr "Fragman"
+
+msgid "Searching for the next episode trailer..."
+msgstr "Li fragmana beşa paşîn tê gerîn..."
+
+msgid "No trailer found for the next episode."
+msgstr "Fragmana beşa paşîn nehat dîtin."
+
+msgid "Next episode information is unavailable."
+msgstr "Agahiyên beşa paşîn berdest nînin."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "Lêgerîna fragmanê bi ser neket. Dîsa biceribîne."

@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: fa\n"
+
+msgid "Move channel"
+msgstr "جابجایی کانال"
+
+msgid "Channel moved."
+msgstr "کانال جابجا شد."
+
+msgid "Could not save channel order."
+msgstr "ذخیره ترتیب کانال‌ها ممکن نشد."

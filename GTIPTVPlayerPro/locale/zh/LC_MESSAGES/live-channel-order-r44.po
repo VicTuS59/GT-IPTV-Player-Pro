@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: zh\n"
+
+msgid "Move channel"
+msgstr "移动频道"
+
+msgid "Channel moved."
+msgstr "频道已移动。"
+
+msgid "Could not save channel order."
+msgstr "无法保存频道顺序。"

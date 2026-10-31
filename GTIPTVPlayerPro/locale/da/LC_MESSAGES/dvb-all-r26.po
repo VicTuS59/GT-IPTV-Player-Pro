@@ -1,0 +1,11 @@
+# DVB EPG all-satellite scope and import caption.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.7.0-r26\nLanguage: da\nContent-Type: text/plain; charset=UTF-8\n"
+
+msgctxt "Independent DVB EPG"
+msgid "Import"
+msgstr "Importér"
+
+msgctxt "Independent DVB EPG"
+msgid "All satellites · All sources"
+msgstr "Alle satellitter · Alle kilder"

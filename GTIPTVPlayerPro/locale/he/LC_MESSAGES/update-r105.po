@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "עדכון תוכנה"
+
+msgid "Automatic update check"
+msgstr "בדיקה אוטומטית של עדכונים"
+
+msgid "Check for updates"
+msgstr "בדוק עדכונים"
+
+msgid "Download and verify"
+msgstr "הורד ואמת"
+
+msgid "Install update"
+msgstr "התקן עדכון"
+
+msgid "Update available"
+msgstr "עדכון זמין"
+
+msgid "Up to date"
+msgstr "מעודכן"
+
+msgid "Update verified"
+msgstr "העדכון אומת"
+
+msgid "Restart interface"
+msgstr "הפעל מחדש את הממשק"
+
+msgid "Update source is not ready"
+msgstr "מקור העדכון עדיין אינו מוכן"
+
+msgid "Update signature is invalid"
+msgstr "חתימת העדכון אינה תקינה"
+
+msgid "Invalid update information"
+msgstr "פרטי העדכון אינם תקינים"
+
+msgid "Update package is invalid"
+msgstr "חבילת העדכון אינה תקינה"
+
+msgid "Update is not compatible with this receiver"
+msgstr "העדכון אינו תואם למקלט זה"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "עצור הקלטות והורדות לפני העדכון"
+
+msgid "Update failed"
+msgstr "העדכון נכשל"
+
+msgid "Update installed. Restart the interface."
+msgstr "העדכון הותקן. הפעל מחדש את הממשק."
+
+msgid "Install the verified update?"
+msgstr "להתקין את העדכון המאומת?"
+
+msgid "Update available. Open updater?"
+msgstr "עדכון זמין. לפתוח את כלי העדכון?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "בדיקה אוטומטית כל 6 שעות."
+
+msgid "New version"
+msgstr "גרסה חדשה"
+

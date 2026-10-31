@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Ажурирање софтвера"
+
+msgid "Automatic update check"
+msgstr "Аутоматска провера ажурирања"
+
+msgid "Check for updates"
+msgstr "Провери ажурирања"
+
+msgid "Download and verify"
+msgstr "Преузми и провери"
+
+msgid "Install update"
+msgstr "Инсталирај ажурирање"
+
+msgid "Update available"
+msgstr "Доступно је ажурирање"
+
+msgid "Up to date"
+msgstr "Ажурирано"
+
+msgid "Update verified"
+msgstr "Ажурирање је проверено"
+
+msgid "Restart interface"
+msgstr "Поново покрени интерфејс"
+
+msgid "Update source is not ready"
+msgstr "Извор ажурирања још није спреман"
+
+msgid "Update signature is invalid"
+msgstr "Потпис ажурирања није важећи"
+
+msgid "Invalid update information"
+msgstr "Неважећи подаци о ажурирању"
+
+msgid "Update package is invalid"
+msgstr "Пакет ажурирања није важећи"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Ажурирање није компатибилно са овим пријемником"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Пре ажурирања зауставите снимања и преузимања"
+
+msgid "Update failed"
+msgstr "Ажурирање није успело"
+
+msgid "Update installed. Restart the interface."
+msgstr "Ажурирање је инсталирано. Поново покрените интерфејс."
+
+msgid "Install the verified update?"
+msgstr "Инсталирати проверено ажурирање?"
+
+msgid "Update available. Open updater?"
+msgstr "Доступно је ажурирање. Отворити алатку за ажурирање?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Аутоматска провера на сваких 6 сати."
+
+msgid "New version"
+msgstr "Нова верзија"
+

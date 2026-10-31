@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "M3U மூலத்தைச் சேர்"
+
+msgid "Application"
+msgstr "செயலி"
+
+msgid "Application information"
+msgstr "செயலி விவரங்கள்"
+
+msgid "Category Management"
+msgstr "வகை மேலாண்மை"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "பச்சை பொத்தானை அழுத்தும்போது மாற்றங்கள் செயல்படுத்தப்படும்."
+
+msgid "Choose the source name and location."
+msgstr "மூலத்தின் பெயரையும் இருப்பிடத்தையும் தேர்ந்தெடுக்கவும்."
+
+msgid "Compatibility"
+msgstr "இணக்கத்தன்மை"
+
+msgid "Country"
+msgstr "நாடு"
+
+msgid "Developer"
+msgstr "உருவாக்குநர்"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "M3U இயக்கப்பட்டியலின் நேரடி HTTP(S) முகவரி."
+
+msgid "District"
+msgstr "மாவட்டம்"
+
+msgid "Frame rate"
+msgstr "சட்டக வீதம்"
+
+msgid "Language"
+msgstr "மொழி"
+
+msgid "Platform"
+msgstr "தளம்"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "வேறொரு சேனல் பெயரை உள்ளிட நீல பொத்தானை அழுத்தவும்."
+
+msgid "Press GREEN to save the source."
+msgstr "மூலத்தைச் சேமிக்க பச்சை பொத்தானை அழுத்தவும்."
+
+msgid "Press GREEN to use this folder."
+msgstr "இந்தக் கோப்புறையைப் பயன்படுத்த பச்சை பொத்தானை அழுத்தவும்."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "தேர்ந்தெடுத்த வசனவரியைப் பதிவிறக்க OK அழுத்தவும்."
+
+msgid "Press OK to load this subtitle."
+msgstr "இந்த வசனவரியை ஏற்ற OK அழுத்தவும்."
+
+msgid "Press OK to play the selected video."
+msgstr "தேர்ந்தெடுத்த காணொளியை இயக்க OK அழுத்தவும்."
+
+msgid "Press OK to search again."
+msgstr "மீண்டும் தேட OK அழுத்தவும்."
+
+msgid "Press OK to select this location."
+msgstr "இந்த இருப்பிடத்தைத் தேர்ந்தெடுக்க OK அழுத்தவும்."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "வகையைக் காட்ட அல்லது மறைக்க OK அழுத்தவும். வகைகளை ஒன்றாக நகர்த்த சிவப்பு பொத்தானால் குறிக்கவும்."
+
+msgid "Province"
+msgstr "மாகாணம்"
+
+msgid "Release"
+msgstr "பதிப்பு"
+
+msgid "Search for subtitles or change the filter."
+msgstr "வசனவரிகளைத் தேடவும் அல்லது வடிகட்டியை மாற்றவும்."
+
+msgid "Select a folder or subtitle file."
+msgstr "ஒரு கோப்புறை அல்லது வசனவரிக் கோப்பைத் தேர்ந்தெடுக்கவும்."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "பெறுநர், USB அல்லது இணைக்கப்பட்ட பிணையச் சேமிப்பிலிருந்து இயக்கப்பட்டியலைத் தேர்ந்தெடுக்கவும்."
+
+msgid "Selected category"
+msgstr "தேர்ந்தெடுத்த வகை"
+
+msgid "Selected folder"
+msgstr "தேர்ந்தெடுத்த கோப்புறை"
+
+msgid "Selected location"
+msgstr "தேர்ந்தெடுத்த இருப்பிடம்"
+
+msgid "Selected search"
+msgstr "தேர்ந்தெடுத்த தேடல்"
+
+msgid "Selected subtitle"
+msgstr "தேர்ந்தெடுத்த வசனவரி"
+
+msgid "Selected video"
+msgstr "தேர்ந்தெடுத்த காணொளி"
+
+msgid "Source code"
+msgstr "மூலக் குறியீடு"
+
+msgid "Source location"
+msgstr "மூல இருப்பிடம்"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "வசனவரிக் கோப்புகள்: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "ஆதரிக்கப்படும் வடிவம்"
+

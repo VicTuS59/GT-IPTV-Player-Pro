@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Softwareopdatering"
+
+msgid "Automatic update check"
+msgstr "Automatisk søgning efter opdateringer"
+
+msgid "Check for updates"
+msgstr "Søg efter opdateringer"
+
+msgid "Download and verify"
+msgstr "Hent og verificer"
+
+msgid "Install update"
+msgstr "Installer opdatering"
+
+msgid "Update available"
+msgstr "Opdatering tilgængelig"
+
+msgid "Up to date"
+msgstr "Opdateret"
+
+msgid "Update verified"
+msgstr "Opdatering verificeret"
+
+msgid "Restart interface"
+msgstr "Genstart grænseflade"
+
+msgid "Update source is not ready"
+msgstr "Opdateringskilden er endnu ikke klar"
+
+msgid "Update signature is invalid"
+msgstr "Opdateringens signatur er ugyldig"
+
+msgid "Invalid update information"
+msgstr "Ugyldige opdateringsoplysninger"
+
+msgid "Update package is invalid"
+msgstr "Opdateringspakken er ugyldig"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Opdateringen er ikke kompatibel med denne modtager"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Stop optagelser og overførsler før opdatering"
+
+msgid "Update failed"
+msgstr "Opdatering mislykkedes"
+
+msgid "Update installed. Restart the interface."
+msgstr "Opdatering installeret. Genstart grænsefladen."
+
+msgid "Install the verified update?"
+msgstr "Installer den verificerede opdatering?"
+
+msgid "Update available. Open updater?"
+msgstr "Opdatering tilgængelig. Åbn opdatering?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Automatisk kontrol hver 6. time."
+
+msgid "New version"
+msgstr "Ny version"
+

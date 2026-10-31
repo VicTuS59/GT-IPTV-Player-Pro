@@ -179,6 +179,8 @@ class MemoryCatalog:
         record = self.owner._record(item)
         record["t"] = str(getattr(item, "tmdb_id", "") or "")[:32]
         record["b"] = str(getattr(item, "imdb_id", "") or "")[:32]
+        record["sa"] = int(getattr(item, "sort_added", 0) or 0)
+        record["sr"] = int(getattr(item, "sort_release", 0) or 0)
         record["u"] = _movie_search_text(record["n"] + " " + record["y"])
         ids = set(content_item_category_ids(item))
         if category_id:

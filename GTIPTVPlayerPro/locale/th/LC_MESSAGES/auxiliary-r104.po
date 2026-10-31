@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "เพิ่มแหล่งข้อมูล M3U"
+
+msgid "Application"
+msgstr "แอปพลิเคชัน"
+
+msgid "Application information"
+msgstr "ข้อมูลแอปพลิเคชัน"
+
+msgid "Category Management"
+msgstr "จัดการหมวดหมู่"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "การเปลี่ยนแปลงจะมีผลเมื่อกดปุ่มสีเขียว"
+
+msgid "Choose the source name and location."
+msgstr "เลือกชื่อและตำแหน่งของแหล่งข้อมูล"
+
+msgid "Compatibility"
+msgstr "ความเข้ากันได้"
+
+msgid "Country"
+msgstr "ประเทศ"
+
+msgid "Developer"
+msgstr "ผู้พัฒนา"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "ที่อยู่ HTTP(S) โดยตรงของรายการเล่น M3U"
+
+msgid "District"
+msgstr "อำเภอ"
+
+msgid "Frame rate"
+msgstr "อัตราเฟรม"
+
+msgid "Language"
+msgstr "ภาษา"
+
+msgid "Platform"
+msgstr "แพลตฟอร์ม"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "กดปุ่มสีน้ำเงินเพื่อป้อนชื่อช่องอื่น"
+
+msgid "Press GREEN to save the source."
+msgstr "กดปุ่มสีเขียวเพื่อบันทึกแหล่งข้อมูล"
+
+msgid "Press GREEN to use this folder."
+msgstr "กดปุ่มสีเขียวเพื่อใช้โฟลเดอร์นี้"
+
+msgid "Press OK to download the selected subtitle."
+msgstr "กด OK เพื่อดาวน์โหลดคำบรรยายที่เลือก"
+
+msgid "Press OK to load this subtitle."
+msgstr "กด OK เพื่อโหลดคำบรรยายนี้"
+
+msgid "Press OK to play the selected video."
+msgstr "กด OK เพื่อเล่นวิดีโอที่เลือก"
+
+msgid "Press OK to search again."
+msgstr "กด OK เพื่อค้นหาอีกครั้ง"
+
+msgid "Press OK to select this location."
+msgstr "กด OK เพื่อเลือกตำแหน่งนี้"
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "กด OK เพื่อแสดงหรือซ่อนหมวดหมู่ ทำเครื่องหมายหมวดหมู่ด้วยปุ่มสีแดงเพื่อย้ายพร้อมกัน"
+
+msgid "Province"
+msgstr "จังหวัด"
+
+msgid "Release"
+msgstr "รุ่น"
+
+msgid "Search for subtitles or change the filter."
+msgstr "ค้นหาคำบรรยายหรือเปลี่ยนตัวกรอง"
+
+msgid "Select a folder or subtitle file."
+msgstr "เลือกโฟลเดอร์หรือไฟล์คำบรรยาย"
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "เลือกรายการเล่นจากเครื่องรับ USB หรือที่เก็บข้อมูลเครือข่ายที่เชื่อมต่อ"
+
+msgid "Selected category"
+msgstr "หมวดหมู่ที่เลือก"
+
+msgid "Selected folder"
+msgstr "โฟลเดอร์ที่เลือก"
+
+msgid "Selected location"
+msgstr "ตำแหน่งที่เลือก"
+
+msgid "Selected search"
+msgstr "การค้นหาที่เลือก"
+
+msgid "Selected subtitle"
+msgstr "คำบรรยายที่เลือก"
+
+msgid "Selected video"
+msgstr "วิดีโอที่เลือก"
+
+msgid "Source code"
+msgstr "ซอร์สโค้ด"
+
+msgid "Source location"
+msgstr "ตำแหน่งแหล่งข้อมูล"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "ไฟล์คำบรรยาย: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "รูปแบบที่รองรับ"
+

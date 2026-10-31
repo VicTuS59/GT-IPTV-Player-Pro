@@ -1,0 +1,6 @@
+# Recording infobar, r46.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: gl\n"
+
+msgid "Record live TV"
+msgstr "Gravar TV en directo"

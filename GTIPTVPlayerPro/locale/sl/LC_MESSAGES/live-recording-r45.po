@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sl\n"
+
+msgid "Live TV recording"
+msgstr "Snemanje televizije v živo"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Nastavite mapo za snemanje v nastavitvah vtičnika."
+
+msgid "Recording started."
+msgstr "Snemanje se je začelo."
+
+msgid "Recording stopped."
+msgstr "Snemanje se je ustavilo."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Snemanje ni uspelo. Preverite napravo za shranjevanje."
+
+msgid "Recording is not available for this stream."
+msgstr "Snemanje tega toka ni na voljo."
+
+msgid "Open the channel again to enable recording."
+msgstr "Za omogočanje snemanja znova odprite kanal."

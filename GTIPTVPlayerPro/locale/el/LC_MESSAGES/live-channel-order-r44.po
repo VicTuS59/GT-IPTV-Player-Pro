@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: el\n"
+
+msgid "Move channel"
+msgstr "Μετακίνηση καναλιού"
+
+msgid "Channel moved."
+msgstr "Το κανάλι μετακινήθηκε."
+
+msgid "Could not save channel order."
+msgstr "Δεν ήταν δυνατή η αποθήκευση της σειράς καναλιών."

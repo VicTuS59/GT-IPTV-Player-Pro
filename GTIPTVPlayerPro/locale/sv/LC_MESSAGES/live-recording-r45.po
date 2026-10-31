@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sv\n"
+
+msgid "Live TV recording"
+msgstr "Inspelning av direktsänd TV"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Ange inspelningsmappen i tilläggets inställningar."
+
+msgid "Recording started."
+msgstr "Inspelning startad."
+
+msgid "Recording stopped."
+msgstr "Inspelning stoppad."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Inspelningen misslyckades. Kontrollera lagringsenheten."
+
+msgid "Recording is not available for this stream."
+msgstr "Inspelning är inte tillgänglig för den här strömmen."
+
+msgid "Open the channel again to enable recording."
+msgstr "Öppna kanalen igen för att aktivera inspelning."

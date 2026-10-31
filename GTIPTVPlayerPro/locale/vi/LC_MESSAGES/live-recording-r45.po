@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: vi\n"
+
+msgid "Live TV recording"
+msgstr "Ghi truyền hình trực tiếp"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Vui lòng đặt thư mục ghi trong cài đặt tiện ích."
+
+msgid "Recording started."
+msgstr "Đã bắt đầu ghi."
+
+msgid "Recording stopped."
+msgstr "Đã dừng ghi."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Ghi thất bại. Kiểm tra thiết bị lưu trữ."
+
+msgid "Recording is not available for this stream."
+msgstr "Không thể ghi luồng phát này."
+
+msgid "Open the channel again to enable recording."
+msgstr "Mở lại kênh để bật tính năng ghi."

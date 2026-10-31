@@ -18,12 +18,7 @@ MAX_TRACKS = 64
 TOKEN_LIFETIME = 90
 
 
-class AudioError(Exception):
-    def __init__(self, code, status=400):
-        self.code = code
-        self.status = status
-        self.message = code.replace("_", " ")
-        Exception.__init__(self, self.message)
+from .web_errors import AudioError
 
 
 def _active_player(session):

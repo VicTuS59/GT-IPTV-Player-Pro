@@ -272,6 +272,120 @@ elif [ -d "$PLUGIN_DIR" ]; then
     done
 fi
 
+# r76 moves the optional live engine to a separately owned sibling IPK.
+# Remove only the known old embedded sources (also covers manual installs).
+# Never follow a substituted host/trial/locale directory or touch the addon.
+if [ ! -L "$PLUGIN_DIR" ] && [ -d "$PLUGIN_DIR" ]; then
+    for OLD_LIVE_FILE in \
+        "$PLUGIN_DIR/stalker_live_trial.py" \
+        "$PLUGIN_DIR/stalker_pacing.py" \
+        "$PLUGIN_DIR/stalker_transition.py" \
+        "$PLUGIN_DIR/stalker_packets.py" \
+        "$PLUGIN_DIR/stalker_prescan.py" \
+        "$PLUGIN_DIR/stalker_overlap.py" \
+        "$PLUGIN_DIR/stalker_recovery.py" \
+        "$PLUGIN_DIR/stalker_live_edge.py" \
+        "$PLUGIN_DIR/stalker_auto_recovery.py" \
+        "$PLUGIN_DIR/stalker_trial_metrics.py" \
+        "$PLUGIN_DIR/stalker_trial_osd.py" \
+        "$PLUGIN_DIR/xtream_live.py" \
+        "$PLUGIN_DIR/xtream_pacing.py" \
+        "$PLUGIN_DIR/xtream_transition.py" \
+        "$PLUGIN_DIR/xtream_route.py" \
+        "$PLUGIN_DIR/xtream_live_osd.py" \
+        "$PLUGIN_DIR/live_osd_text.py" \
+        "$PLUGIN_DIR/m3u_live.py" \
+        "$PLUGIN_DIR/m3u_live_osd.py" \
+        "$PLUGIN_DIR/live_vpn.py" \
+        "$PLUGIN_DIR/live_vpn_backend.py" \
+        "$PLUGIN_DIR/live_vpn_transport.py" \
+        "$PLUGIN_DIR/live_vpn_session.py" \
+        "$PLUGIN_DIR/live_vpn_text.py" \
+        "$PLUGIN_DIR/live_proxy_backend.py" \
+        "$PLUGIN_DIR/live_proxy_pool.py" \
+        "$PLUGIN_DIR/proxy_errors.py" \
+        "$PLUGIN_DIR/proxy_switch.py" \
+        "$PLUGIN_DIR/m3u_proxy.py" \
+        "$PLUGIN_DIR/m3u_hls.py" \
+        "$PLUGIN_DIR/hls_manifest.py" \
+        "$PLUGIN_DIR/stalker_trial.enabled" \
+        "$PLUGIN_DIR/xtream_live.enabled"
+    do
+        if [ -L "$OLD_LIVE_FILE" ] || [ -f "$OLD_LIVE_FILE" ]; then rm -f "$OLD_LIVE_FILE"; fi
+    done
+    OLD_TRIAL_DIR="$PLUGIN_DIR/stalker_trial"
+    if [ ! -L "$OLD_TRIAL_DIR" ] && [ -d "$OLD_TRIAL_DIR" ]; then
+        for OLD_TRIAL_NAME in __init__ mpegts_clock relay_base relay_splice ts_overlap; do
+            rm -f "$OLD_TRIAL_DIR/$OLD_TRIAL_NAME.py" "$OLD_TRIAL_DIR/$OLD_TRIAL_NAME.pyc" "$OLD_TRIAL_DIR/$OLD_TRIAL_NAME.pyo"
+            if [ ! -L "$OLD_TRIAL_DIR/__pycache__" ]; then
+                for OLD_TRIAL_CACHE in "$OLD_TRIAL_DIR/__pycache__/$OLD_TRIAL_NAME".*.pyc; do
+                    if [ -L "$OLD_TRIAL_CACHE" ] || [ -f "$OLD_TRIAL_CACHE" ]; then rm -f "$OLD_TRIAL_CACHE"; fi
+                done
+            fi
+        done
+        rmdir "$OLD_TRIAL_DIR/__pycache__" "$OLD_TRIAL_DIR" 2>/dev/null || true
+    fi
+    if [ ! -L "$PLUGIN_DIR/locale" ]; then
+        for OLD_LOCALE_DIR in "$PLUGIN_DIR/locale"/*; do
+            if [ -L "$OLD_LOCALE_DIR" ] || [ -L "$OLD_LOCALE_DIR/LC_MESSAGES" ]; then continue; fi
+            for OLD_LOCALE_NAME in live-osd-r6.po live-vpn-r69.po live-proxy-r70.po live-proxy-r71.po live-proxy-r72.po live-proxy-r73.po live-proxy-r75.po; do
+                OLD_LOCALE_FILE="$OLD_LOCALE_DIR/LC_MESSAGES/$OLD_LOCALE_NAME"
+                if [ -L "$OLD_LOCALE_FILE" ] || [ -f "$OLD_LOCALE_FILE" ]; then rm -f "$OLD_LOCALE_FILE"; fi
+            done
+        done
+    fi
+fi
+
+# r77 obsolete PNGs and the unused JPEG removed in r84.
+# Clean only exact obsolete artwork names left by old/manual installations.
+if [ ! -L "$PLUGIN_DIR" ] && [ ! -L "$PLUGIN_DIR/skin" ] && [ ! -L "$PLUGIN_DIR/skin/images" ]; then
+    for OLD_WALLPAPER_FILE in \
+        "$PLUGIN_DIR/skin/images/live-category-background-r84.jpg" \
+        "$PLUGIN_DIR/skin/images/live-category-background-r84.png" \
+        "$PLUGIN_DIR/skin/images/matches-r20-bg-1080-5.png" \
+        "$PLUGIN_DIR/skin/images/matches-r20-bg-1080-6.png" \
+        "$PLUGIN_DIR/skin/images/matches-r20-bg-2160-5.png" \
+        "$PLUGIN_DIR/skin/images/matches-r20-bg-2160-6.png" \
+        "$PLUGIN_DIR/skin/images/matches-r20-bg-720-5.png" \
+        "$PLUGIN_DIR/skin/images/matches-r20-bg-720-6.png" \
+        "$PLUGIN_DIR/skin/images/screen-accounts-r89-1080.png" \
+        "$PLUGIN_DIR/skin/images/screen-accounts-r89-2160.png" \
+        "$PLUGIN_DIR/skin/images/screen-accounts-r89-720.png" \
+        "$PLUGIN_DIR/skin/images/screen-cinematic-glass-r90-1080.png" \
+        "$PLUGIN_DIR/skin/images/screen-cinematic-glass-r90-2160.png" \
+        "$PLUGIN_DIR/skin/images/screen-cinematic-glass-r90-720.png" \
+        "$PLUGIN_DIR/skin/images/screen-continue-glass-r91-1080.png" \
+        "$PLUGIN_DIR/skin/images/screen-continue-glass-r91-2160.png" \
+        "$PLUGIN_DIR/skin/images/screen-continue-glass-r91-720.png" \
+        "$PLUGIN_DIR/skin/images/screen-dashboard-r89-1080.png" \
+        "$PLUGIN_DIR/skin/images/screen-dashboard-r89-2160.png" \
+        "$PLUGIN_DIR/skin/images/screen-dashboard-r89-720.png" \
+        "$PLUGIN_DIR/skin/images/screen-favorites-glass-r91-1080.png" \
+        "$PLUGIN_DIR/skin/images/screen-favorites-glass-r91-2160.png" \
+        "$PLUGIN_DIR/skin/images/screen-favorites-glass-r91-720.png" \
+        "$PLUGIN_DIR/skin/images/screen-global-r89-1080.png" \
+        "$PLUGIN_DIR/skin/images/screen-global-r89-2160.png" \
+        "$PLUGIN_DIR/skin/images/screen-global-r89-720.png" \
+        "$PLUGIN_DIR/skin/images/screen-live-category-r89-1080.png" \
+        "$PLUGIN_DIR/skin/images/screen-live-category-r89-2160.png" \
+        "$PLUGIN_DIR/skin/images/screen-live-category-r89-720.png" \
+        "$PLUGIN_DIR/skin/images/screen-live-guide-r89-1080.png" \
+        "$PLUGIN_DIR/skin/images/screen-live-guide-r89-2160.png" \
+        "$PLUGIN_DIR/skin/images/screen-live-guide-r89-720.png" \
+        "$PLUGIN_DIR/skin/images/screen-source-glass-r90-1080.png" \
+        "$PLUGIN_DIR/skin/images/screen-source-glass-r90-2160.png" \
+        "$PLUGIN_DIR/skin/images/screen-source-glass-r90-720.png" \
+        "$PLUGIN_DIR/skin/images/welcome-clean-r19-1080.png" \
+        "$PLUGIN_DIR/skin/images/welcome-clean-r19-2160.png" \
+        "$PLUGIN_DIR/skin/images/welcome-clean-r19-720.png" \
+        "$PLUGIN_DIR/skin/images/welcome-vector-r88-1080.png" \
+        "$PLUGIN_DIR/skin/images/welcome-vector-r88-2160.png" \
+        "$PLUGIN_DIR/skin/images/welcome-vector-r88-720.png"
+    do
+        if [ -L "$OLD_WALLPAPER_FILE" ] || [ -f "$OLD_WALLPAPER_FILE" ]; then rm -f "$OLD_WALLPAPER_FILE"; fi
+    done
+fi
+
 # R95 and the first R96 build installed main.py with the same timestamp and
 # byte size.  Timestamp-based Python caches can therefore retain R95's removed
 # dashboard filename even after an upgrade.  Remove only generated bytecode

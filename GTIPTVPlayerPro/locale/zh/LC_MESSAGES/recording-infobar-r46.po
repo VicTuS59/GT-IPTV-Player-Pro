@@ -1,0 +1,6 @@
+# Recording infobar, r46.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: zh\n"
+
+msgid "Record live TV"
+msgstr "录制电视直播"

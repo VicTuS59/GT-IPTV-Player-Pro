@@ -1,0 +1,12 @@
+# Category recency r52
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: hu\n"
+
+msgid "Most recently added content"
+msgstr "Legutóbb hozzáadott tartalom"
+
+msgid "Preparing category dates: {}/{} ({} items)"
+msgstr "Kategóriadátumok előkészítése: {}/{} ({} elem)"
+
+msgid "Category dates could not be completed. Select this option again to resume."
+msgstr "A kategóriadátumok feldolgozása nem fejeződött be. A folytatáshoz válaszd újra ezt a lehetőséget."

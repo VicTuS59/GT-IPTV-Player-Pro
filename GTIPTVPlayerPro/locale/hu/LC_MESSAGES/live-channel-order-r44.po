@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: hu\n"
+
+msgid "Move channel"
+msgstr "Csatorna áthelyezése"
+
+msgid "Channel moved."
+msgstr "Csatorna áthelyezve."
+
+msgid "Could not save channel order."
+msgstr "A csatornasorrendet nem sikerült menteni."

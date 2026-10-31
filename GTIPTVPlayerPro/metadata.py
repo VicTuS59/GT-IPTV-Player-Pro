@@ -12,7 +12,7 @@ import tempfile
 import threading
 import time
 import unicodedata
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request
@@ -21,7 +21,7 @@ from . import PLUGIN_VERSION
 from .content import MovieInfo, SeriesInfo
 from .diagnostics import log_event
 from .http_transport import build_credential_urlopen
-from .i18n import N_, _
+from .i18n import N_, _, metadata_language
 
 
 TMDB_API_BASE = "https://api.themoviedb.org/3"
@@ -30,6 +30,10 @@ DEFAULT_METADATA_CACHE_PATH = "/etc/enigma2/gtiptvplayerpro-metadata.json"
 METADATA_CACHE_SECONDS = 30 * 24 * 60 * 60
 NEGATIVE_CACHE_SECONDS = 24 * 60 * 60
 POSTER_NEGATIVE_CACHE_SECONDS = 5 * 60
+MEDIA_INCOMPLETE_CACHE_SECONDS = 5 * 60
+MOVIE_INCOMPLETE_CACHE_SECONDS = MEDIA_INCOMPLETE_CACHE_SECONDS
+MAX_ARTWORK_CACHE_ENTRIES = 250
+CATALOGUE_PREVIEW_TIMEOUT = 2.5
 MAX_CACHE_ENTRIES = 1000
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 RESPONSE_READ_CHUNK_BYTES = 64 * 1024
@@ -39,6 +43,47 @@ CACHE_MATCH_VERSION = 4
 CACHE_PAYLOAD_VERSION = 5
 _CACHE_PATH_LOCKS = {}
 _CACHE_PATH_LOCKS_GUARD = threading.Lock()
+
+
+def media_metadata_ready(info):
+    """Reuse completed detail only in the current locale and retry window."""
+    language = metadata_language().replace("_", "-").lower()
+    try:
+        retry_at = float(getattr(info, "_metadata_retry_at",
+            getattr(info, "_movie_metadata_retry_at", 0)) or 0)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    if retry_at and not time.time() < retry_at < float("inf"):
+        return False
+    return bool(info is not None and getattr(info, "_vod_metadata_complete", False)
+        and getattr(info, "_metadata_language",
+            getattr(info, "_movie_metadata_language", "")) == language)
+
+
+def movie_metadata_ready(info):
+    return media_metadata_ready(info)
+
+
+def complete_media_for_device_language(client, completer, item, info):
+    """Freeze the locale for one movie/series lookup, including its cache key."""
+    language = metadata_language()
+    scope = getattr(client, "language_scope", None)
+    with scope(language) if callable(scope) else nullcontext():
+        completed = completer(item, info)
+    if completed is not None:
+        failed = bool(getattr(completed, "_metadata_lookup_failed",
+            getattr(completed, "_movie_metadata_lookup_failed", bool(getattr(client, "last_error", "")))))
+        completed._metadata_language = language.replace("_", "-").lower()
+        completed._vod_metadata_complete = not failed
+        completed._grid_metadata_complete = not failed
+    return completed
+
+
+def complete_movie_for_device_language(client, completer, item, info):
+    completed = complete_media_for_device_language(client, completer, item, info)
+    if completed is not None:
+        completed._movie_metadata_language = completed._metadata_language
+    return completed
 
 
 @contextmanager
@@ -273,6 +318,28 @@ class TMDbMetadataClient(object):
     def available(self):
         return self.enabled and bool(self.api_key)
 
+    @property
+    def language(self):
+        context = getattr(self, "_request_context", None)
+        return getattr(context, "language", self._language)
+
+    @language.setter
+    def language(self, value):
+        self._language = str(value or "tr-TR").strip() or "tr-TR"
+
+    @contextmanager
+    def language_scope(self, language):
+        """A language change must not alter concurrent poster/detail requests."""
+        previous = getattr(self._request_context, "language", None)
+        self._request_context.language = str(language or self._language)
+        try:
+            yield self
+        finally:
+            if previous is None:
+                del self._request_context.language
+            else:
+                self._request_context.language = previous
+
     @contextmanager
     def request_scope(self, cancel_event=None, deadline=None):
         previous = getattr(self._request_context, "limits", None)
@@ -446,7 +513,7 @@ class TMDbMetadataClient(object):
             if callable(close):
                 try:
                     close()
-                except (AttributeError, OSError, ValueError):
+                except (AttributeError, KeyError, OSError, ValueError):
                     pass
             log_event("metadata", N_("TMDb HTTP error path={}").format(path)
                       + " status={}".format(error.code), error)
@@ -474,6 +541,7 @@ class TMDbMetadataClient(object):
             if status_code in (3, 7, 10, 14, 16, 30, 31, 32, 33):
                 raise MetadataError(N_("TMDb API key is invalid"))
             raise MetadataError(N_("TMDb request was rejected"))
+        payload["_requested_language"] = str(language or "").replace("_", "-").lower()
         return payload
 
     def _load_cache(self):
@@ -562,13 +630,22 @@ class TMDbMetadataClient(object):
                                 stamp = float(entry.get("cached_at", 0))
                             except (TypeError, ValueError, OverflowError):
                                 continue
+                            try:
+                                if int(entry.get("payload_version", 1)) < CACHE_PAYLOAD_VERSION:
+                                    continue
+                            except (TypeError, ValueError, OverflowError):
+                                continue
                             previous = merged.get(key)
                             if previous is None or stamp >= float(previous.get("cached_at", 0)):
                                 merged[key] = entry
-                    if len(merged) > MAX_CACHE_ENTRIES:
-                        merged = dict(sorted(merged.items(),
-                            key=lambda pair: float(pair[1].get("cached_at", 0)),
-                            reverse=True)[:MAX_CACHE_ENTRIES])
+                    newest = sorted(merged.items(),
+                        key=lambda pair: float(pair[1].get("cached_at", 0)), reverse=True)
+                    metadata = [pair for pair in newest if not pair[1].get("poster_lookup")]
+                    artwork = [pair for pair in newest if pair[1].get("poster_lookup")]
+                    selected = metadata[:MAX_CACHE_ENTRIES]
+                    selected += artwork[:min(MAX_ARTWORK_CACHE_ENTRIES,
+                        MAX_CACHE_ENTRIES - len(selected))]
+                    merged = dict(selected)
                     entries.clear()
                     entries.update(merged)
                     # mkstemp creates a private, exclusive inode for this
@@ -617,13 +694,22 @@ class TMDbMetadataClient(object):
         )
         return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
-    def _cached(self, key):
+    def _cached(self, key, media_type=None):
         entry = self._load_cache().get(key)
         if not isinstance(entry, dict):
             return False, None
         ttl = METADATA_CACHE_SECONDS if entry.get("found") else (
             POSTER_NEGATIVE_CACHE_SECONDS if entry.get("poster_lookup") else NEGATIVE_CACHE_SECONDS
         )
+        data = entry.get("data")
+        if media_type in ("movie", "series") and (
+            not entry.get("found")
+            or not isinstance(data, dict)
+            or not _text(data.get("localized_plot"))
+        ):
+            # Apply the shorter policy to legacy records too, without
+            # invalidating translated movies/series or artwork caches.
+            ttl = MEDIA_INCOMPLETE_CACHE_SECONDS
         try:
             fresh = self.clock() - float(entry.get("cached_at", 0)) < ttl
         except (TypeError, ValueError, OverflowError):
@@ -631,7 +717,6 @@ class TMDbMetadataClient(object):
         if not fresh:
             self._load_cache().pop(key, None)
             return False, None
-        data = entry.get("data")
         return True, data if isinstance(data, dict) else None
 
     @staticmethod
@@ -689,7 +774,9 @@ class TMDbMetadataClient(object):
                 ]
                 ranked.sort(key=lambda pair: pair[0], reverse=True)
                 if ranked and ranked[0][0] >= 68:
-                    return ranked[0][1]
+                    selected = dict(ranked[0][1])
+                    selected["_requested_language"] = str(language).replace("_", "-").lower()
+                    return selected
         return None
 
     @staticmethod
@@ -705,6 +792,8 @@ class TMDbMetadataClient(object):
 
     def _poster_record(self, media_type, payload):
         result = self._poster_identity(payload, media_type)
+        if payload.get("_requested_language") == self.language.replace("_", "-").lower():
+            result["localized_plot"] = _text(payload.get("overview"))[:2000]
         if not result["cover"] and result["tmdb_id"].isdigit():
             root = "/tv" if media_type == "series" else "/movie"
             images = self._request_json(root + "/" + result["tmdb_id"] + "/images")
@@ -784,6 +873,8 @@ class TMDbMetadataClient(object):
 
     def _backdrop_record(self, media_type, payload):
         result = self._poster_identity(payload, media_type)
+        if payload.get("_requested_language") == self.language.replace("_", "-").lower():
+            result["localized_plot"] = _text(payload.get("overview"))[:2000]
         result["backdrop"] = _image_url(payload.get("backdrop_path"), "w780")
         if not result["backdrop"] and result["tmdb_id"].isdigit():
             root = "/tv" if media_type == "series" else "/movie"
@@ -1024,6 +1115,7 @@ class TMDbMetadataClient(object):
         title,
         requested_year="",
         required_payload_version=1,
+        outcome=None,
     ):
         if not self.available:
             self.last_error = (
@@ -1051,7 +1143,7 @@ class TMDbMetadataClient(object):
         # global cache lock or every poster waits for the previous one.
         with self._lookup_guard(key):
             with self._lock:
-                cached, value = self._cached(key)
+                cached, value = self._cached(key, media_type)
                 entry = self._load_cache().get(key) if cached else None
                 try:
                     payload_version = int(
@@ -1063,6 +1155,8 @@ class TMDbMetadataClient(object):
                     not value
                     or payload_version >= required_payload_version
                 ):
+                    if outcome is not None:
+                        outcome["cached_at"] = entry.get("cached_at", self.clock())
                     self.last_error = (
                         "" if value else N_("No TMDb match was found")
                     )
@@ -1076,13 +1170,19 @@ class TMDbMetadataClient(object):
                 self.last_error = N_("Could not load TMDb information")
                 raise MetadataError(N_("Could not load TMDb information"))
             with self._lock:
+                cached_at = self.clock()
                 self._load_cache()[key] = {
-                    "cached_at": self.clock(),
+                    "cached_at": cached_at,
                     "found": bool(value),
                     "data": value or {},
                     "payload_version": CACHE_PAYLOAD_VERSION,
                 }
+                if value and self._valid_tmdb_id(value.get("tmdb_id")):
+                    alias = self._cache_key(media_type, "tmdb-id:" + value["tmdb_id"], "")
+                    self._load_cache()[alias] = dict(self._load_cache()[key])
                 self._cache_changed()
+                if outcome is not None:
+                    outcome["cached_at"] = cached_at
             self.last_error = "" if value else N_("No TMDb match was found")
             return value
 
@@ -1091,6 +1191,7 @@ class TMDbMetadataClient(object):
         media_type,
         tmdb_id,
         required_payload_version=CACHE_PAYLOAD_VERSION,
+        outcome=None,
     ):
         """Load an exact TMDb record when the IPTV provider supplies its ID."""
         if not self.available:
@@ -1119,7 +1220,7 @@ class TMDbMetadataClient(object):
             required_payload_version = CACHE_PAYLOAD_VERSION
         with self._lookup_guard(key):
             with self._lock:
-                cached, value = self._cached(key)
+                cached, value = self._cached(key, media_type)
                 entry = self._load_cache().get(key) if cached else None
                 try:
                     payload_version = int(
@@ -1131,6 +1232,8 @@ class TMDbMetadataClient(object):
                     not value
                     or payload_version >= required_payload_version
                 ):
+                    if outcome is not None:
+                        outcome["cached_at"] = entry.get("cached_at", self.clock())
                     self.last_error = (
                         "" if value else N_("No TMDb match was found")
                     )
@@ -1144,26 +1247,35 @@ class TMDbMetadataClient(object):
                 self.last_error = N_("Could not load TMDb information")
                 raise MetadataError(N_("Could not load TMDb information"))
             with self._lock:
+                cached_at = self.clock()
                 self._load_cache()[key] = {
-                    "cached_at": self.clock(),
+                    "cached_at": cached_at,
                     "found": bool(value),
                     "data": value or {},
                     "payload_version": CACHE_PAYLOAD_VERSION,
                 }
                 self._cache_changed()
+                if outcome is not None:
+                    outcome["cached_at"] = cached_at
             self.last_error = "" if value else N_("No TMDb match was found")
             return value
 
-    def _lookup_for_completion(self, media_type, item, title, year, tmdb_id):
+    def _lookup_for_completion(self, media_type, item, title, year, tmdb_id, outcome=None):
         """Fetch localized metadata while retaining provider details on failure."""
         external = None
         try:
             if tmdb_id:
-                external = self.lookup_by_id(
-                    media_type,
-                    tmdb_id,
-                    required_payload_version=CACHE_PAYLOAD_VERSION,
-                )
+                try:
+                    external = self.lookup_by_id(
+                        media_type, tmdb_id,
+                        required_payload_version=CACHE_PAYLOAD_VERSION,
+                        outcome=outcome,
+                    )
+                except MetadataError as error:
+                    if error.http_status != 404:
+                        raise
+                    # A stale provider ID must still allow a title/year match.
+                    tmdb_id = ""
                 if (
                     external is not None
                     and getattr(item, "portal_request_type", "")
@@ -1179,13 +1291,74 @@ class TMDbMetadataClient(object):
                     title,
                     year,
                     required_payload_version=CACHE_PAYLOAD_VERSION,
+                    outcome=outcome,
                 )
         except MetadataError as error:
+            if outcome is not None:
+                outcome["failed"] = True
             self.last_error = str(error)
             # A missing translation or failed service must not erase the
             # provider's summary; cancellation/deadlines still stop the worker.
             self._check_request_limits()
         return external or {}, tmdb_id
+
+    def _completion_state(self, completed, external, outcome):
+        completed._metadata_localized_plot = _text(external.get("localized_plot"))
+        completed._metadata_lookup_failed = bool(outcome.get("failed"))
+        completed._metadata_retry_at = 0
+        if (self.available and not completed._metadata_lookup_failed
+                and not completed._metadata_localized_plot):
+            completed._metadata_retry_at = (
+                float(outcome.get("cached_at", self.clock())) + MEDIA_INCOMPLETE_CACHE_SECONDS)
+
+    def catalogue_preview(self, media_type, item):
+        """Get localized text before provider enrichment, within a small budget."""
+        if not self.available:
+            return None
+        with self.language_scope(metadata_language()):
+            seed = self._artwork_synopsis(media_type, item)
+            if seed is not None:
+                return seed
+        method = self.complete_series if media_type == "series" else self.complete_movie
+        try:
+            with self.request_scope(deadline=time.monotonic() + CATALOGUE_PREVIEW_TIMEOUT):
+                result = complete_media_for_device_language(self, method, item, None)
+            return result if getattr(result, "_metadata_localized_plot", "") else None
+        except MetadataError:
+            # The preview's shorter deadline must not cancel provider enrichment.
+            # Parent selection cancellation still propagates after scope restore.
+            self._check_request_limits()
+            return None
+
+    def _artwork_synopsis(self, media_type, item):
+        """Reuse language-proven artwork text without marking partial data complete."""
+        title = clean_media_title(getattr(item, "name", ""))
+        year = _year(getattr(item, "year", "")) or _year(getattr(item, "name", ""))
+        tmdb_id = self._valid_tmdb_id(getattr(item, "tmdb_id", ""))
+        imdb_id = str(getattr(item, "imdb_id", "") or "")
+        if not re.fullmatch(r"tt\d{5,12}", imdb_id):
+            imdb_id = ""
+        with self._lock:
+            for prefix in ("poster-v1", "backdrop-v1"):
+                key = self._cache_key(media_type,
+                    "{}:{}:{}:{}".format(prefix, tmdb_id, imdb_id, title), year)
+                found, value = self._cached(key)
+                if not found or not value or not value.get("localized_plot"):
+                    continue
+                if (getattr(item, "portal_request_type", "") and not
+                        self._provider_identity_matches(media_type, title, year, value)):
+                    continue
+                cls = SeriesInfo if media_type == "series" else MovieInfo
+                result = cls(title=getattr(item, "name", "") or value.get("title"),
+                    plot=value["localized_plot"], year=year or value.get("year"),
+                    cover=getattr(item, "icon", "") or value.get("cover"),
+                    backdrop=value.get("backdrop"), tmdb_id=value.get("tmdb_id"))
+                result._metadata_localized_plot = value["localized_plot"]
+                result._metadata_language = self.language.replace("_", "-").lower()
+                result._vod_metadata_complete = False
+                result._grid_metadata_complete = False
+                return result
+        return None
 
     def complete_movie(
         self,
@@ -1215,6 +1388,7 @@ class TMDbMetadataClient(object):
             or getattr(item, "imdb_id", "")
         )
         external = None
+        outcome = {}
         needs_lookup = (
             self.available
             or bool(force_cover_fallback)
@@ -1227,6 +1401,7 @@ class TMDbMetadataClient(object):
         if needs_lookup:
             external, tmdb_id = self._lookup_for_completion(
                 "movie", item, title or getattr(item, "name", ""), year, tmdb_id,
+                outcome=outcome,
             )
         else:
             self.last_error = ""
@@ -1250,6 +1425,9 @@ class TMDbMetadataClient(object):
             cover_urls=getattr(info, "cover_urls", ()),
         )
         completed._provider_plot = plot
+        self._completion_state(completed, external, outcome)
+        completed._movie_metadata_lookup_failed = completed._metadata_lookup_failed
+        completed._movie_metadata_retry_at = completed._metadata_retry_at
         completed.tmdb_rating = external.get("rating") or getattr(info, "tmdb_rating", "")
         external_backdrop = str(external.get("backdrop") or "").strip()
         completed.fallback_backdrop = (
@@ -1293,6 +1471,7 @@ class TMDbMetadataClient(object):
             or getattr(item, "imdb_id", "")
         )
         external = None
+        outcome = {}
         needs_lookup = (
             self.available
             or bool(force_cover_fallback)
@@ -1305,6 +1484,7 @@ class TMDbMetadataClient(object):
         if needs_lookup:
             external, tmdb_id = self._lookup_for_completion(
                 "series", item, title or getattr(item, "name", ""), year, tmdb_id,
+                outcome=outcome,
             )
         else:
             self.last_error = ""
@@ -1329,6 +1509,7 @@ class TMDbMetadataClient(object):
             cover_urls=getattr(info, "cover_urls", ()),
         )
         completed._provider_plot = plot
+        self._completion_state(completed, external, outcome)
         completed.tmdb_rating = external.get("rating") or getattr(info, "tmdb_rating", "")
         completed.duration = getattr(info, "duration", "") or external.get("duration", "")
         external_backdrop = str(external.get("backdrop") or "").strip()

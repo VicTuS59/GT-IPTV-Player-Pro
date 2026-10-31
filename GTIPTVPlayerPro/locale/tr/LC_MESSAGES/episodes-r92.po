@@ -1,0 +1,12 @@
+# Episode presentation captions r92
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: tr\n"
+
+msgid "Episode"
+msgstr "Bölüm"
+
+msgid "Selected episode"
+msgstr "Seçili bölüm"
+
+msgid "Not watched"
+msgstr "İzlenmedi"

@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Lisa M3U-allikas"
+
+msgid "Application"
+msgstr "Rakendus"
+
+msgid "Application information"
+msgstr "Rakenduse teave"
+
+msgid "Category Management"
+msgstr "Kategooriate haldus"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Muudatused rakendatakse ROHELISE nupu vajutamisel."
+
+msgid "Choose the source name and location."
+msgstr "Vali allika nimi ja asukoht."
+
+msgid "Compatibility"
+msgstr "Ühilduvus"
+
+msgid "Country"
+msgstr "Riik"
+
+msgid "Developer"
+msgstr "Arendaja"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "M3U-esitusloendi otsene HTTP(S)-aadress."
+
+msgid "District"
+msgstr "Omavalitsus"
+
+msgid "Frame rate"
+msgstr "Kaadrisagedus"
+
+msgid "Language"
+msgstr "Keel"
+
+msgid "Platform"
+msgstr "Platvorm"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Teise kanalinime sisestamiseks vajuta SINIST nuppu."
+
+msgid "Press GREEN to save the source."
+msgstr "Allika salvestamiseks vajuta ROHELIST nuppu."
+
+msgid "Press GREEN to use this folder."
+msgstr "Selle kausta kasutamiseks vajuta ROHELIST nuppu."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Valitud subtiitrite allalaadimiseks vajuta OK."
+
+msgid "Press OK to load this subtitle."
+msgstr "Nende subtiitrite laadimiseks vajuta OK."
+
+msgid "Press OK to play the selected video."
+msgstr "Valitud video esitamiseks vajuta OK."
+
+msgid "Press OK to search again."
+msgstr "Uuesti otsimiseks vajuta OK."
+
+msgid "Press OK to select this location."
+msgstr "Selle asukoha valimiseks vajuta OK."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Kategooria näitamiseks või peitmiseks vajuta OK. Kategooriate koos teisaldamiseks märgi need PUNASE nupuga."
+
+msgid "Province"
+msgstr "Maakond"
+
+msgid "Release"
+msgstr "Väljalase"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Otsi subtiitreid või muuda filtrit."
+
+msgid "Select a folder or subtitle file."
+msgstr "Vali kaust või subtiitrifail."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Vali esitusloend vastuvõtjast, USB-lt või ühendatud võrgusalvestist."
+
+msgid "Selected category"
+msgstr "Valitud kategooria"
+
+msgid "Selected folder"
+msgstr "Valitud kaust"
+
+msgid "Selected location"
+msgstr "Valitud asukoht"
+
+msgid "Selected search"
+msgstr "Valitud otsing"
+
+msgid "Selected subtitle"
+msgstr "Valitud subtiitrid"
+
+msgid "Selected video"
+msgstr "Valitud video"
+
+msgid "Source code"
+msgstr "Lähtekood"
+
+msgid "Source location"
+msgstr "Allika asukoht"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Subtiitrifailid: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Toetatud vorming"
+

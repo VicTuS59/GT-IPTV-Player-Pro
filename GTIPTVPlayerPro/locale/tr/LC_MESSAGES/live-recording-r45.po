@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: tr\n"
+
+msgid "Live TV recording"
+msgstr "Canlı TV kaydetme"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Lütfen eklenti ayarlarından dosya yolunu belirleyin."
+
+msgid "Recording started."
+msgstr "Kayıt başladı."
+
+msgid "Recording stopped."
+msgstr "Kayıt durduruldu."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Kayıt başarısız. Depolama aygıtını kontrol edin."
+
+msgid "Recording is not available for this stream."
+msgstr "Bu yayın için kayıt kullanılamıyor."
+
+msgid "Open the channel again to enable recording."
+msgstr "Kaydı etkinleştirmek için kanalı yeniden açın."

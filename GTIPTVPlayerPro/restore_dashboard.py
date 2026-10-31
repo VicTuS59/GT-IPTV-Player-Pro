@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 
+from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from . import backup_dashboard as base
 from .backup_scope import GROUPS
 from .i18n import N_, _
@@ -25,7 +26,8 @@ PRESERVE = N_("Unselected sections are preserved.")
 
 
 def asset(name):
-    return base.asset("background").replace("backup-r5-background-", "restore-r7-" + name + "-")
+    # Only the background has a fixed FHD source; helpers retain native sizes.
+    return base.asset(name).replace("backup-r5-", "restore-r7-", 1)
 
 
 def footer():
@@ -34,6 +36,7 @@ def footer():
             footer_item("blue", N_("Backup file")), footer_item("exit", "back"))
 
 
+@skin_after('restore')
 def skin():
     tree = ET.fromstring(base.skin())
     tree.set("name", "GTRestoreDashboardScreen")

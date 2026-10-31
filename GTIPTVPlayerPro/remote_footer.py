@@ -122,7 +122,11 @@ def prepared_skin(builder, *args, **kwargs):
     try:
         hash(key)
     except TypeError:
-        return builder(*args, **kwargs)
+        skin = builder(*args, **kwargs)
+        if isinstance(skin, str):
+            from .graphics_policy import rewrite_wallpaper_skin
+            skin = rewrite_wallpaper_skin(skin)
+        return skin
     with _SKIN_CACHE_LOCK:
         cached = _SKIN_CACHE.get(key)
         if cached is not None:
@@ -131,6 +135,8 @@ def prepared_skin(builder, *args, **kwargs):
     skin = builder(*args, **kwargs)
     if not isinstance(skin, str):
         return skin
+    from .graphics_policy import rewrite_wallpaper_skin
+    skin = rewrite_wallpaper_skin(skin)
     # Count both the produced XML and string arguments (the footer receives
     # the base XML). getsizeof includes Python's Unicode storage width.
     cost = sys.getsizeof(skin) + sum(
@@ -693,6 +699,9 @@ def decorate_remote_footer(
 
 
 def remote_action_text(action):
+    if action == "dvb_import":
+        from .dvb_epg_text import tr
+        return tr("Import")
     action = str(action)
     if action == "open_play":
         return _(_ACTION_TEXT["open"])

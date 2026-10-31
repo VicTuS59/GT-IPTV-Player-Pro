@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Pievienot M3U avotu"
+
+msgid "Application"
+msgstr "Lietotne"
+
+msgid "Application information"
+msgstr "Informācija par lietotni"
+
+msgid "Category Management"
+msgstr "Kategoriju pārvaldība"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Izmaiņas tiek lietotas, nospiežot ZAĻO pogu."
+
+msgid "Choose the source name and location."
+msgstr "Izvēlieties avota nosaukumu un atrašanās vietu."
+
+msgid "Compatibility"
+msgstr "Saderība"
+
+msgid "Country"
+msgstr "Valsts"
+
+msgid "Developer"
+msgstr "Izstrādātājs"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "M3U atskaņošanas saraksta tiešā HTTP(S) adrese."
+
+msgid "District"
+msgstr "Novads"
+
+msgid "Frame rate"
+msgstr "Kadru ātrums"
+
+msgid "Language"
+msgstr "Valoda"
+
+msgid "Platform"
+msgstr "Platforma"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Nospiediet ZILO pogu, lai ievadītu citu kanāla nosaukumu."
+
+msgid "Press GREEN to save the source."
+msgstr "Nospiediet ZAĻO pogu, lai saglabātu avotu."
+
+msgid "Press GREEN to use this folder."
+msgstr "Nospiediet ZAĻO pogu, lai izmantotu šo mapi."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Nospiediet OK, lai lejupielādētu atlasītos subtitrus."
+
+msgid "Press OK to load this subtitle."
+msgstr "Nospiediet OK, lai ielādētu šos subtitrus."
+
+msgid "Press OK to play the selected video."
+msgstr "Nospiediet OK, lai atskaņotu atlasīto video."
+
+msgid "Press OK to search again."
+msgstr "Nospiediet OK, lai meklētu vēlreiz."
+
+msgid "Press OK to select this location."
+msgstr "Nospiediet OK, lai atlasītu šo atrašanās vietu."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Nospiediet OK, lai rādītu vai slēptu kategoriju. Atzīmējiet kategorijas ar SARKANO pogu, lai pārvietotu tās kopā."
+
+msgid "Province"
+msgstr "Reģions"
+
+msgid "Release"
+msgstr "Laidiens"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Meklējiet subtitrus vai mainiet filtru."
+
+msgid "Select a folder or subtitle file."
+msgstr "Atlasiet mapi vai subtitru failu."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Atlasiet atskaņošanas sarakstu no uztvērēja, USB vai pievienotas tīkla krātuves."
+
+msgid "Selected category"
+msgstr "Atlasītā kategorija"
+
+msgid "Selected folder"
+msgstr "Atlasītā mape"
+
+msgid "Selected location"
+msgstr "Atlasītā atrašanās vieta"
+
+msgid "Selected search"
+msgstr "Atlasītais meklējums"
+
+msgid "Selected subtitle"
+msgstr "Atlasītie subtitri"
+
+msgid "Selected video"
+msgstr "Atlasītais video"
+
+msgid "Source code"
+msgstr "Pirmkods"
+
+msgid "Source location"
+msgstr "Avota atrašanās vieta"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Subtitru faili: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Atbalstītais formāts"
+

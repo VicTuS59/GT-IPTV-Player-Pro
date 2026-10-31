@@ -1,0 +1,18 @@
+# Sorting menus r53
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sq_AL\n"
+
+msgid "A–Z"
+msgstr "A–Z"
+
+msgid "Z–A"
+msgstr "Z–A"
+
+msgid "Last added"
+msgstr "Të shtuara së fundmi"
+
+msgid "Original"
+msgstr "Renditja fillestare"
+
+msgid "Year"
+msgstr "Vit"

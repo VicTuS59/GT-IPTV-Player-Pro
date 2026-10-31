@@ -1,0 +1,12 @@
+# Category sorting r51
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ta\n"
+
+msgid "Edit categories"
+msgstr "வகைகளைத் திருத்து"
+
+msgid "Sort categories"
+msgstr "வகைகளை வரிசைப்படுத்து"
+
+msgid "Alphabetical (Z–A)"
+msgstr "அகரவரிசை (Z–A)"

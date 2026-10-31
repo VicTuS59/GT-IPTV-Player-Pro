@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: th\n"
+
+msgid "Live TV recording"
+msgstr "บันทึกทีวีสด"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "โปรดตั้งค่าโฟลเดอร์บันทึกในการตั้งค่าปลั๊กอิน"
+
+msgid "Recording started."
+msgstr "เริ่มบันทึกแล้ว"
+
+msgid "Recording stopped."
+msgstr "หยุดบันทึกแล้ว"
+
+msgid "Recording failed. Check the storage device."
+msgstr "การบันทึกล้มเหลว โปรดตรวจสอบอุปกรณ์จัดเก็บข้อมูล"
+
+msgid "Recording is not available for this stream."
+msgstr "ไม่สามารถบันทึกสตรีมนี้ได้"
+
+msgid "Open the channel again to enable recording."
+msgstr "เปิดช่องอีกครั้งเพื่อเปิดใช้งานการบันทึก"

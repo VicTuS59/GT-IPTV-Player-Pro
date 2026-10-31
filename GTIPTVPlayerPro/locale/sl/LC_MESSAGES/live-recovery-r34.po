@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sl\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "Obnavljanje povezave"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "Povezava ni uspela"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "Vir je zavrnil videopovezavo (HTTP {status:d})"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "Vir ne pošilja novih podatkov"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "Čas za obnovitev povezave je potekel"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "Poskus nove povezave z virom"

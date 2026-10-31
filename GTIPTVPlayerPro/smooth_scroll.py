@@ -8,6 +8,9 @@ Most receivers can move Enigma2's native ``ScrollLabel`` child one pixel at a
 time.  The SF8008 framebuffer driver visibly shakes that moving widget even at
 the reduced R118 cadence.  On that receiver we therefore keep the widget
 fixed and redraw the text at successive offsets on Enigma2's software canvas.
+Movie and series synopses batch two one-pixel moves into one repaint at the
+same average travel speed on all native receivers. Other screens retain their
+existing receiver profiles, including SX88 V2's native batched movement.
 """
 
 from enigma import eTimer
@@ -70,6 +73,7 @@ SMOOTH_SCROLL_STEP_PX = 1
 DRIVER_SAFE_SCROLL_TICK_MS = 200
 DRIVER_SAFE_SCROLL_END_PAUSE_MS = 3200
 DRIVER_SAFE_MODEL_MARKERS = ("sf8008",)
+BATCHED_SCROLL_MODEL_MARKERS = ("sx88v2",)
 RECEIVER_IDENTITY_PATHS = (
     "/proc/stb/info/model",
     "/proc/stb/info/boxtype",
@@ -108,6 +112,16 @@ def _requires_driver_safe_scroll(identity=None):
 DRIVER_SAFE_SCROLL = _requires_driver_safe_scroll()
 
 
+def _requires_batched_scroll(identity=None):
+    if identity is None:
+        identity = _receiver_identity()
+    normalised = _normalise_receiver_identity(identity)
+    return any(marker in normalised for marker in BATCHED_SCROLL_MODEL_MARKERS)
+
+
+BATCHED_SCROLL = _requires_batched_scroll()
+
+
 def _connect_timer(timer, callback):
     try:
         timer.timeout.connect(callback)
@@ -115,10 +129,51 @@ def _connect_timer(timer, callback):
         timer.callback.append(callback)
 
 
-class GTNativeSmoothScrollLabel(ScrollLabel):
+class _ScrollActivity(object):
+    """Pause hidden text, including updates arriving after the screen hides."""
+
+    def _init_scroll_activity(self):
+        self._gt_scroll_suspended = False
+        self._gt_pending_text = None
+
+    def suspend_scroll(self):
+        self._gt_scroll_suspended = True
+        self._gt_scroll_timer.stop()
+
+    def resume_scroll(self):
+        if not self._gt_scroll_suspended:
+            return
+        self._gt_scroll_suspended = False
+        pending, self._gt_pending_text = self._gt_pending_text, None
+        if pending is not None:
+            self.setText(pending)
+        if self._gt_last_position() > 0:
+            if self._gt_scroll_phase == "idle":
+                self._gt_scroll_phase = "scroll"
+            self._gt_start_timer(SMOOTH_SCROLL_INITIAL_DELAY_MS)
+
+    def defer_scroll(self):
+        """Let navigation settle without moving or re-laying out the label."""
+        self._gt_scroll_timer.stop()
+        if not self._gt_scroll_suspended and self._gt_last_position() > 0:
+            self._gt_start_timer(SMOOTH_SCROLL_INITIAL_DELAY_MS)
+
+    def _defer_hidden_text(self, rendered):
+        if not self._gt_scroll_suspended:
+            return False
+        self._gt_pending_text = rendered
+        return True
+
+
+class GTNativeSmoothScrollLabel(_ScrollActivity, ScrollLabel):
     """A clipped ScrollLabel which continuously advances one pixel at a time."""
 
+    SCROLL_STEP_PX = SMOOTH_SCROLL_STEP_PX
+    SCROLL_TICK_MS = SMOOTH_SCROLL_TICK_MS
+    SCROLL_END_PAUSE_MS = SMOOTH_SCROLL_END_PAUSE_MS
+
     def __init__(self, text=""):
+        self._init_scroll_activity()
         ScrollLabel.__init__(self, text)
         self._gt_scroll_timer = eTimer()
         self._gt_scroll_phase = "idle"
@@ -180,6 +235,8 @@ class GTNativeSmoothScrollLabel(ScrollLabel):
     def restart_scroll(self):
         """Return to the first pixel and re-arm only when text overflows."""
         self.stop_scroll()
+        if self._gt_scroll_suspended:
+            return
         self._gt_set_position(0)
         if self._gt_last_position() <= 0:
             return
@@ -194,6 +251,9 @@ class GTNativeSmoothScrollLabel(ScrollLabel):
         self._gt_scroll_phase = "idle"
 
     def _gt_scroll_tick(self):
+        if self._gt_scroll_suspended:
+            self._gt_scroll_timer.stop()
+            return
         last_position = self._gt_last_position()
         if last_position <= 0:
             self.stop_scroll()
@@ -212,9 +272,9 @@ class GTNativeSmoothScrollLabel(ScrollLabel):
             tick_ms = DRIVER_SAFE_SCROLL_TICK_MS
             end_pause_ms = DRIVER_SAFE_SCROLL_END_PAUSE_MS
         else:
-            step = SMOOTH_SCROLL_STEP_PX
-            tick_ms = SMOOTH_SCROLL_TICK_MS
-            end_pause_ms = SMOOTH_SCROLL_END_PAUSE_MS
+            step = self.SCROLL_STEP_PX
+            tick_ms = self.SCROLL_TICK_MS
+            end_pause_ms = self.SCROLL_END_PAUSE_MS
         next_position = min(last_position, self._gt_current_position() + step)
         self._gt_set_position(next_position)
         if next_position >= last_position:
@@ -226,6 +286,8 @@ class GTNativeSmoothScrollLabel(ScrollLabel):
 
     def setText(self, text, *args, **kwargs):
         rendered = "" if text is None else str(text)
+        if self._defer_hidden_text(rendered):
+            return None
         if (
             self._gt_rendered_ready
             and self._gt_rendered_text == rendered
@@ -248,6 +310,8 @@ class GTNativeSmoothScrollLabel(ScrollLabel):
         return result
 
     def GUIdelete(self):
+        self._gt_scroll_suspended = True
+        self._gt_pending_text = None
         self.stop_scroll()
         self._gt_rendered_ready = False
         return ScrollLabel.GUIdelete(self)
@@ -271,7 +335,7 @@ def _skin_truth(value):
     )
 
 
-class GTSF8008CanvasScrollLabel(GUIComponent):
+class GTSF8008CanvasScrollLabel(_ScrollActivity, GUIComponent):
     """Fixed software canvas used only by the SF8008 synopsis surface.
 
     The canvas itself never moves.  Each timer tick clears its private 32-bit
@@ -283,6 +347,7 @@ class GTSF8008CanvasScrollLabel(GUIComponent):
     GUI_WIDGET = eCanvas
 
     def __init__(self, text=""):
+        self._init_scroll_activity()
         GUIComponent.__init__(self)
         self.message = "" if text is None else str(text)
         self._gt_rendered_text = None
@@ -484,6 +549,8 @@ class GTSF8008CanvasScrollLabel(GUIComponent):
 
     def restart_scroll(self):
         self.stop_scroll()
+        if self._gt_scroll_suspended:
+            return
         self._gt_measure()
         self._gt_set_position(0, force=True)
         if self._gt_last_position() <= 0:
@@ -499,6 +566,9 @@ class GTSF8008CanvasScrollLabel(GUIComponent):
         self._gt_scroll_phase = "idle"
 
     def _gt_scroll_tick(self):
+        if self._gt_scroll_suspended:
+            self._gt_scroll_timer.stop()
+            return
         last_position = self._gt_last_position()
         if last_position <= 0:
             self.stop_scroll()
@@ -523,6 +593,8 @@ class GTSF8008CanvasScrollLabel(GUIComponent):
 
     def setText(self, text, *unused_args, **unused_kwargs):
         rendered = "" if text is None else str(text)
+        if self._defer_hidden_text(rendered):
+            return None
         if self._gt_rendered_ready and self._gt_rendered_text == rendered:
             return None
         self.message = rendered
@@ -562,19 +634,33 @@ class GTSF8008CanvasScrollLabel(GUIComponent):
             self._gt_measure_label = None
 
     def GUIdelete(self):
+        self._gt_scroll_suspended = True
+        self._gt_pending_text = None
         self.stop_scroll()
         self._gt_rendered_ready = False
         self._gt_measure_label = None
         return GUIComponent.GUIdelete(self)
 
 
-def GTSmoothScrollLabel(text=""):
-    """Return the receiver-specific synopsis component.
+class GTBatchedNativeScrollLabel(GTNativeSmoothScrollLabel):
+    """Reuse native text layout with half as many movement requests."""
 
-    SF8008 uses the fixed software canvas.  Every other receiver keeps the
-    R109 native one-pixel ScrollLabel path and its original 80 ms cadence.
+    SCROLL_STEP_PX = SMOOTH_SCROLL_STEP_PX * 2
+    SCROLL_TICK_MS = SMOOTH_SCROLL_TICK_MS * 2
+
+
+def GTSmoothScrollLabel(text="", lightweight=False):
+    """Return the synopsis component with receiver safety taking precedence.
+
+    Movie and series callers request the general two-pixel/160 ms profile.
+    SF8008 keeps its fixed canvas (or native safety fallback). Other callers
+    keep their existing receiver profile, including SX88 V2's batched path.
     """
-    if DRIVER_SAFE_SCROLL and CANVAS_SCROLL_AVAILABLE:
-        return GTSF8008CanvasScrollLabel(text)
+    if DRIVER_SAFE_SCROLL:
+        if CANVAS_SCROLL_AVAILABLE:
+            return GTSF8008CanvasScrollLabel(text)
+        return GTNativeSmoothScrollLabel(text)
+    if lightweight or BATCHED_SCROLL:
+        return GTBatchedNativeScrollLabel(text)
     return GTNativeSmoothScrollLabel(text)
 

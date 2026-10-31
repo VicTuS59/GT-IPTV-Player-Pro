@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: fa\n"
+
+msgid "Trailer"
+msgstr "پیش‌نمایش"
+
+msgid "Searching for the next episode trailer..."
+msgstr "در حال جستجوی پیش‌نمایش قسمت بعدی..."
+
+msgid "No trailer found for the next episode."
+msgstr "پیش‌نمایشی برای قسمت بعدی پیدا نشد."
+
+msgid "Next episode information is unavailable."
+msgstr "اطلاعات قسمت بعدی در دسترس نیست."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "جستجوی پیش‌نمایش انجام نشد. دوباره تلاش کنید."

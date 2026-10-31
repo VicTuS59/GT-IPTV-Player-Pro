@@ -147,6 +147,7 @@ class MovieCatalogIndex:
         if item is not None:
             item.content_type = self.content_type
             item.tmdb_id, item.imdb_id = record.get("t", ""), record.get("b", "")
+            item.sort_added, item.sort_release = int(record.get("sa", 0) or 0), int(record.get("sr", 0) or 0)
             if "j" in record:
                 item.portal_catalog_page = int(record["j"])
         return item

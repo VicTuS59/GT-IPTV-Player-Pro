@@ -99,7 +99,7 @@ def _path(value):
 
 
 def _transient(name):
-    return (name == "__pycache__" or name.endswith((".pyc", ".pyo", ".lock", ".tmp"))
+    return (name == "__pycache__" or name.endswith((".pyc", ".pyo", ".lock", ".tmp", '.history-index.sqlite3', '.history-index.sqlite3-journal', '.tmp-journal', '.rollback-r80'))
             or name.startswith((".save-", ".gtiptv-restore-", ".gtiptv-backup-")))
 
 

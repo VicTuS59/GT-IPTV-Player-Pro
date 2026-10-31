@@ -10,6 +10,7 @@ from Components.Label import Label
 from Components.Pixmap import MultiPixmap, Pixmap
 from enigma import getDesktop
 
+from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from .backup import BackupError
 from .backup_scope import GROUPS
 from .i18n import N_, _
@@ -42,7 +43,11 @@ def asset(name):
     variant = "2160" if width > 1920 or height > 1080 else "1080" if width > 1280 else "720"
     if width <= 720:
         variant = "sd576" if height > 480 else "sd640" if width <= 640 else "sd480"
-    return plugin_path("skin", "images", "backup-r5-{}-{}.png".format(name, variant))
+    path = plugin_path("skin", "images", "backup-r5-{}-{}.png".format(name, variant))
+    if name == "background":
+        from .graphics_policy import wallpaper_path
+        return wallpaper_path(path, width, height)
+    return path
 
 
 def footer():
@@ -51,6 +56,7 @@ def footer():
             footer_item("blue", N_("File path")), footer_item("exit", "back"))
 
 
+@skin_after('backup')
 def skin():
     width, height, px, py = geometry()
     factor = min(width / 1920.0, height / 1080.0)

@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Actualización de software"
+
+msgid "Automatic update check"
+msgstr "Comprobación automática de actualizaciones"
+
+msgid "Check for updates"
+msgstr "Buscar actualizaciones"
+
+msgid "Download and verify"
+msgstr "Descargar y verificar"
+
+msgid "Install update"
+msgstr "Instalar actualización"
+
+msgid "Update available"
+msgstr "Actualización disponible"
+
+msgid "Up to date"
+msgstr "Actualizado"
+
+msgid "Update verified"
+msgstr "Actualización verificada"
+
+msgid "Restart interface"
+msgstr "Reiniciar interfaz"
+
+msgid "Update source is not ready"
+msgstr "La fuente de actualización aún no está lista"
+
+msgid "Update signature is invalid"
+msgstr "La firma de la actualización no es válida"
+
+msgid "Invalid update information"
+msgstr "Información de actualización no válida"
+
+msgid "Update package is invalid"
+msgstr "El paquete de actualización no es válido"
+
+msgid "Update is not compatible with this receiver"
+msgstr "La actualización no es compatible con este receptor"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Detén las grabaciones y descargas antes de actualizar"
+
+msgid "Update failed"
+msgstr "Error de actualización"
+
+msgid "Update installed. Restart the interface."
+msgstr "Actualización instalada. Reinicia la interfaz."
+
+msgid "Install the verified update?"
+msgstr "¿Instalar la actualización verificada?"
+
+msgid "Update available. Open updater?"
+msgstr "Actualización disponible. ¿Abrir el actualizador?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Comprobación automática cada 6 horas."
+
+msgid "New version"
+msgstr "Nueva versión"
+

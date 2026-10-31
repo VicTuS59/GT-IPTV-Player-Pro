@@ -1,0 +1,6 @@
+# Discovery design r48
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: zh_HK\n"
+
+msgid "Choose a movie, then search in IPTV."
+msgstr "選擇電影，然後在 IPTV 中搜尋。"

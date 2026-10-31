@@ -7,6 +7,9 @@
   var scriptPath = scriptUrl ? scriptUrl.pathname : "/assets/app.js";
   var basePath = scriptPath.replace(/\/assets\/app\.js$/, "");
   var state = {
+    downloadHistory: false,
+    downloadOffset: 0,
+    downloadRequestSerial: 0,
     clientVersion: scriptUrl ? String(scriptUrl.searchParams.get("v") || "") : "",
     youtubeResults: [],
     youtubeHistory: [],
@@ -288,7 +291,7 @@
     if (!byId("sourceModal").hidden) {
       byId("sourceModalTitle").textContent = byId("sourceId").value ? t("edit", "Edit") : t("add_source", "Add Source");
     }
-    var quality = String((state.youtubeSettings || {}).resolution || byId("youtubeResolution").value || "1440");
+    var quality = String((state.youtubeSettings || {}).resolution || byId("youtubeResolution").value || "1080");
     byId("youtubeSearchQuality").textContent = t("youtube_actual_quality", "Quality") + " · " + youTubeQualityLabel(quality);
     if (!byId("appView").hidden) {
       renderCurrentData();
@@ -575,7 +578,7 @@
           renderAutomaticTest(state.automaticTest);
         }
       } else if (state.page === "downloads") {
-        renderDownloads(dashboard.download_items || []);
+        if (!state.downloadHistory) renderDownloads(dashboard.download_items || []);
       }
       refreshSession();
     } catch (error) {
@@ -1209,8 +1212,19 @@
   }
 
   async function loadDownloads() {
+    var serial = ++state.downloadRequestSerial;
     try {
-      var result = await api("/downloads");
+      var result = await api("/downloads?history=" + (state.downloadHistory ? "1" : "0") + "&offset=" + state.downloadOffset);
+      if (serial !== state.downloadRequestSerial) return;
+      if (state.downloadHistory && result.history_total > 0 && state.downloadOffset >= result.history_total) {
+        state.downloadOffset = Math.floor((result.history_total - 1) / 100) * 100;
+        return loadDownloads();
+      }
+      byId("downloadHistoryButton").setAttribute("aria-pressed", state.downloadHistory ? "true" : "false");
+      byId("downloadHistoryPager").hidden = !state.downloadHistory;
+      byId("downloadHistoryPrevious").disabled = state.downloadOffset === 0;
+      byId("downloadHistoryNext").disabled = !result.history_more;
+      byId("downloadHistoryPosition").textContent = (result.items.length ? state.downloadOffset + 1 : 0) + "–" + (state.downloadOffset + result.items.length) + " / " + (result.history_total || 0);
       renderDownloads(result.items || []);
     } catch (error) {
       toast(error.message, true);
@@ -1428,7 +1442,7 @@
 
   function renderYouTubeSettings(settings) {
     state.youtubeSettings = settings || {};
-    var quality = String(settings.resolution || "1440");
+    var quality = String(settings.resolution || "1080");
     state.youtubeQuality = quality;
     byId("youtubeResolution").value = quality;
     byId("youtubeAutoplay").value = settings.autoplay ? "on" : "off";
@@ -1695,7 +1709,7 @@
     byId("youtubeMessage").textContent = t("searching", "Searching…");
     try {
       await getYouTubeSearch(query, "", serial, function (result) {
-        state.youtubeQuality = String((state.youtubeSettings || {}).resolution || result.quality || "1440");
+        state.youtubeQuality = String((state.youtubeSettings || {}).resolution || result.quality || "1080");
         byId("youtubeSearchQuality").textContent = t("youtube_actual_quality", "Quality") + " · " + youTubeQualityLabel(state.youtubeQuality);
         state.youtubePages = [result];
         state.youtubePage = 1;
@@ -2636,6 +2650,9 @@
     byId("quickEpg").addEventListener("click", function () { refreshAllEpg(byId("quickEpg")); });
     byId("refreshEpgButton").addEventListener("click", function () { refreshAllEpg(byId("refreshEpgButton")); });
     byId("refreshDownloadsButton").addEventListener("click", loadDownloads);
+    byId("downloadHistoryButton").addEventListener("click", function () { state.downloadHistory = !state.downloadHistory; state.downloadOffset = 0; loadDownloads(); });
+    byId("downloadHistoryPrevious").addEventListener("click", function () { state.downloadOffset = Math.max(0, state.downloadOffset - 100); loadDownloads(); });
+    byId("downloadHistoryNext").addEventListener("click", function () { state.downloadOffset += 100; loadDownloads(); });
     byId("closeSourceModal").addEventListener("click", closeSourceModal);
     byId("cancelSource").addEventListener("click", closeSourceModal);
     byId("sourceModal").addEventListener("click", function (event) {

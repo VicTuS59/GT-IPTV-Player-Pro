@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: el\n"
+
+msgid "Provider order"
+msgstr "Σειρά παρόχου"
+
+msgid "Newest added"
+msgstr "Πρόσφατες προσθήκες"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Αλφαβητικά (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Ημερομηνία κυκλοφορίας (νεότερα πρώτα)"
+
+msgid "Saved manual order"
+msgstr "Αποθηκευμένη χειροκίνητη σειρά"
+
+msgid "Sorting"
+msgstr "Ταξινόμηση"
+
+msgid "Sort content"
+msgstr "Ταξινόμηση περιεχομένου"
+
+msgid "Sort channels"
+msgstr "Ταξινόμηση καναλιών"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Αυτή η πηγή δεν παρέχει ημερομηνίες για αυτή την ταξινόμηση."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Η ταξινόμηση απαιτεί ολόκληρη την κατηγορία. Περιμένετε ή δοκιμάστε ξανά."
+
+msgid "Could not save sorting preference."
+msgstr "Δεν ήταν δυνατή η αποθήκευση της προτίμησης ταξινόμησης."

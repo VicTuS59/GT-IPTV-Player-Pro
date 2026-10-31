@@ -18,6 +18,7 @@ from .downloads import (
     TERMINAL as DOWNLOAD_TERMINAL,
     command as download_command,
     delete_entry as delete_download_entry,
+    folder_entries,
     local_files,
     snapshot as download_snapshot,
 )
@@ -42,12 +43,7 @@ AUTOMATIC_TEST_TYPES = frozenset(("xtream", "stalker"))
 AUTOMATIC_TEST_TIMEOUT_SECONDS = 4.0
 
 
-class WebServiceError(Exception):
-    def __init__(self, code, message="", status=400):
-        self.code = str(code or "request_failed")
-        self.message = str(message or self.code)[:MAX_WEB_TEXT]
-        self.status = int(status)
-        Exception.__init__(self, self.message)
+from .web_errors import WebServiceError
 
 
 def _clean(value, maximum=MAX_WEB_TEXT):
@@ -278,14 +274,13 @@ class GTWebService(object):
             kind = _clean(getattr(source, "kind", ""), 16)
             payload["kind"] = kind
             if kind == "file":
-                # A phone needs a recognizable label, not the receiver's
-                # private absolute filesystem layout.  Blank also means
-                # "preserve the current path" when editing this source.
+                # Keep the source card concise; its paired edit form needs
+                # the exact path, including repeated spaces and Unicode.
                 payload["endpoint"] = _clean(
                     os.path.basename(str(getattr(source, "location", "") or "")),
                     180,
                 )
-                payload["location"] = ""
+                payload["location"] = str(getattr(source, "location", "") or "")[:1024]
             else:
                 payload["location"] = _source_endpoint(source)
         elif source_type == "xtream":
@@ -650,26 +645,28 @@ class GTWebService(object):
             "can_delete": status in DOWNLOAD_TERMINAL + ("local", "error"),
         }
 
-    def downloads(self):
+    def downloads(self, offset=0, history=False):
         try:
-            state = download_snapshot()
+            state = download_snapshot(max(0, int(offset)))
         except Exception:
             state = {"jobs": [], "folder": "", "limit": 0, "hold": True}
-        jobs = list(state.get("jobs") or [])
         folder = str(state.get("folder") or "")
         try:
-            known_paths = {str(job.get("path") or "") for job in jobs}
-            jobs.extend(
-                item for item in local_files(folder)
-                if str(item.get("path") or "") not in known_paths
-            )
+            scanned = [] if history else local_files(folder)
         except (IOError, OSError, TypeError, ValueError):
-            pass
+            scanned = []
+        values = state.get('jobs') or []
+        if history: values = [row for row in values if row.get('status') in DOWNLOAD_TERMINAL]
+        jobs = folder_entries(values, folder, scanned,
+                              state.get("removed_paths") or (), include_missing=history)
         return {
             "items": [self._download_entry(job) for job in jobs],
             "folder": os.path.basename(folder.rstrip("/")) if folder else "",
             "limit": max(0, _safe_int(state.get("limit"))),
             "hold": bool(state.get("hold")),
+            'history_offset': state.get('history_offset', 0),
+            'history_total': state.get('history_total', 0),
+            'history_more': state.get('history_more', False),
         }
 
     def download_action(self, identity, action):
@@ -685,6 +682,9 @@ class GTWebService(object):
             except (IOError, OSError, TypeError, ValueError):
                 pass
         entry = next((item for item in entries if item.get("id") == identity), None)
+        if entry is None and not identity.startswith('local:'):
+            from .downloads import entry_by_id
+            entry = entry_by_id(identity)
         if entry is None:
             raise WebServiceError("download_not_found", "Download not found", 404)
         try:
@@ -821,6 +821,7 @@ class GTWebService(object):
             health = "neutral"
 
         folder = ""
+        state = {}
         try:
             state = download_snapshot()
             folder = str(state.get("folder") or "")
@@ -835,7 +836,7 @@ class GTWebService(object):
         except OSError:
             pass
         active_count = sum(
-            1 for item in download_payload["items"]
+            1 for item in state.get("jobs") or ()
             if item.get("status") in DOWNLOAD_ACTIVE + ("queued", "paused")
         )
         return {

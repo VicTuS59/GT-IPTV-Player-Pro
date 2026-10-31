@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: zh\n"
+
+msgid "Provider order"
+msgstr "提供商顺序"
+
+msgid "Newest added"
+msgstr "最近添加"
+
+msgid "Alphabetical (A–Z)"
+msgstr "按字母排序 (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "发布日期（最新优先）"
+
+msgid "Saved manual order"
+msgstr "已保存的手动顺序"
+
+msgid "Sorting"
+msgstr "排序"
+
+msgid "Sort content"
+msgstr "内容排序"
+
+msgid "Sort channels"
+msgstr "频道排序"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "此来源未提供此排序方式所需的日期。"
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "排序需要完整分类。请稍候或重试。"
+
+msgid "Could not save sorting preference."
+msgstr "无法保存排序偏好。"

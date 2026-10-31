@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sq_AL\n"
+
+msgid "Trailer"
+msgstr "Traileri"
+
+msgid "Searching for the next episode trailer..."
+msgstr "Po kërkohet traileri i episodit të ardhshëm..."
+
+msgid "No trailer found for the next episode."
+msgstr "Nuk u gjet trailer për episodin e ardhshëm."
+
+msgid "Next episode information is unavailable."
+msgstr "Informacioni për episodin e ardhshëm nuk është i disponueshëm."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "Kërkimi i trailerit dështoi. Provoni përsëri."

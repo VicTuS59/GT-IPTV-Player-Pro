@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: fa\n"
+
+msgid "Live TV recording"
+msgstr "ضبط تلویزیون زنده"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "لطفاً پوشه ضبط را در تنظیمات افزونه تعیین کنید."
+
+msgid "Recording started."
+msgstr "ضبط آغاز شد."
+
+msgid "Recording stopped."
+msgstr "ضبط متوقف شد."
+
+msgid "Recording failed. Check the storage device."
+msgstr "ضبط ناموفق بود. دستگاه ذخیره‌سازی را بررسی کنید."
+
+msgid "Recording is not available for this stream."
+msgstr "ضبط برای این پخش در دسترس نیست."
+
+msgid "Open the channel again to enable recording."
+msgstr "برای فعال کردن ضبط، کانال را دوباره باز کنید."

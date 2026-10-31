@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: th\n"
+
+msgid "Provider order"
+msgstr "ลำดับของผู้ให้บริการ"
+
+msgid "Newest added"
+msgstr "เพิ่มล่าสุด"
+
+msgid "Alphabetical (A–Z)"
+msgstr "ตามตัวอักษร (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "วันที่เผยแพร่ (ใหม่ที่สุดก่อน)"
+
+msgid "Saved manual order"
+msgstr "ลำดับที่จัดเองที่บันทึกไว้"
+
+msgid "Sorting"
+msgstr "การเรียงลำดับ"
+
+msgid "Sort content"
+msgstr "เรียงเนื้อหา"
+
+msgid "Sort channels"
+msgstr "เรียงช่อง"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "แหล่งข้อมูลนี้ไม่มีวันที่สำหรับการเรียงลำดับแบบนี้"
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "ต้องโหลดหมวดหมู่ครบก่อนเรียงลำดับ โปรดรอหรือลองอีกครั้ง"
+
+msgid "Could not save sorting preference."
+msgstr "ไม่สามารถบันทึกการตั้งค่าการเรียงลำดับได้"

@@ -2,7 +2,7 @@
 """Web configuration of the existing receiver TMDb metadata client."""
 from .metadata import TMDbMetadataClient
 from .settings import load_player_settings, save_player_settings
-from .web_api import WebServiceError
+from .web_errors import WebServiceError
 from .web_remote import WEB_REMOTE
 
 

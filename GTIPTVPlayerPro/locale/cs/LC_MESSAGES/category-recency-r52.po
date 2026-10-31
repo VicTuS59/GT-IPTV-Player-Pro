@@ -1,0 +1,12 @@
+# Category recency r52
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: cs\n"
+
+msgid "Most recently added content"
+msgstr "S nejnověji přidaným obsahem"
+
+msgid "Preparing category dates: {}/{} ({} items)"
+msgstr "Příprava dat kategorií: {}/{} ({} položek)"
+
+msgid "Category dates could not be completed. Select this option again to resume."
+msgstr "Data kategorií se nepodařilo dokončit. Pro pokračování zvolte tuto možnost znovu."

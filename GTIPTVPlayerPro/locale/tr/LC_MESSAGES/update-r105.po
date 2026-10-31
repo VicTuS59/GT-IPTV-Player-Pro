@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Yazılım güncelleme"
+
+msgid "Automatic update check"
+msgstr "Otomatik güncelleme kontrolü"
+
+msgid "Check for updates"
+msgstr "Güncellemeleri denetle"
+
+msgid "Download and verify"
+msgstr "İndir ve doğrula"
+
+msgid "Install update"
+msgstr "Güncellemeyi kur"
+
+msgid "Update available"
+msgstr "Güncelleme mevcut"
+
+msgid "Up to date"
+msgstr "Güncel"
+
+msgid "Update verified"
+msgstr "Güncelleme doğrulandı"
+
+msgid "Restart interface"
+msgstr "Arayüzü yeniden başlat"
+
+msgid "Update source is not ready"
+msgstr "Güncelleme kaynağı henüz hazır değil"
+
+msgid "Update signature is invalid"
+msgstr "Güncelleme imzası geçersiz"
+
+msgid "Invalid update information"
+msgstr "Güncelleme bilgileri geçersiz"
+
+msgid "Update package is invalid"
+msgstr "Güncelleme paketi geçersiz"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Güncelleme bu alıcıyla uyumlu değil"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Güncellemeden önce kayıt ve indirmeleri durdurun"
+
+msgid "Update failed"
+msgstr "Güncelleme başarısız"
+
+msgid "Update installed. Restart the interface."
+msgstr "Güncelleme kuruldu. Arayüzü yeniden başlatın."
+
+msgid "Install the verified update?"
+msgstr "Doğrulanan güncelleme kurulsun mu?"
+
+msgid "Update available. Open updater?"
+msgstr "Güncelleme mevcut. Güncelleyici açılsın mı?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Otomatik kontrol 6 saatte bir yapılır."
+
+msgid "New version"
+msgstr "Yeni sürüm"
+

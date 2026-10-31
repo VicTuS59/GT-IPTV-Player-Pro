@@ -19,6 +19,7 @@ from urllib.request import Request
 from . import PLUGIN_VERSION
 from .diagnostics import log_event
 from .http_transport import build_credential_urlopen
+from .content_sort import assign_sort_metadata
 from .i18n import N_, _
 from .portal_identity import safe_composite_id
 from .category_visibility import category_ids_visible, hidden_category_match_ids
@@ -1258,7 +1259,7 @@ class XtreamContentClient(object):
             ),
         )
         item.catalog_category_id = str(catalog_category_id or "")
-        return item
+        return assign_sort_metadata(item, entry)
 
     def _new_live_item_state(self, category_id):
         parameters = None
@@ -1905,7 +1906,7 @@ class XtreamContentClient(object):
                 ContentError.INVALID_PLAYBACK_ITEM,
             )
         try:
-            return self.account.stream_url(
+            value = self.account.stream_url(
                 item.content_type,
                 item.stream_id,
                 item.extension,
@@ -1915,3 +1916,7 @@ class XtreamContentClient(object):
                 N_("Could not create the stream URL"),
                 ContentError.PLAYBACK_URL,
             )
+        if item.content_type == "live":
+            from .live_patch import playback_result
+            return playback_result(self, item, value)
+        return value

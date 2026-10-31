@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Szoftverfrissítés"
+
+msgid "Automatic update check"
+msgstr "Frissítések automatikus keresése"
+
+msgid "Check for updates"
+msgstr "Frissítések keresése"
+
+msgid "Download and verify"
+msgstr "Letöltés és ellenőrzés"
+
+msgid "Install update"
+msgstr "Frissítés telepítése"
+
+msgid "Update available"
+msgstr "Frissítés érhető el"
+
+msgid "Up to date"
+msgstr "Naprakész"
+
+msgid "Update verified"
+msgstr "Frissítés ellenőrizve"
+
+msgid "Restart interface"
+msgstr "Kezelőfelület újraindítása"
+
+msgid "Update source is not ready"
+msgstr "A frissítési forrás még nem áll készen"
+
+msgid "Update signature is invalid"
+msgstr "A frissítés aláírása érvénytelen"
+
+msgid "Invalid update information"
+msgstr "Érvénytelen frissítési adatok"
+
+msgid "Update package is invalid"
+msgstr "A frissítési csomag érvénytelen"
+
+msgid "Update is not compatible with this receiver"
+msgstr "A frissítés nem kompatibilis ezzel a vevővel"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Frissítés előtt állítsa le a felvételeket és letöltéseket"
+
+msgid "Update failed"
+msgstr "A frissítés sikertelen"
+
+msgid "Update installed. Restart the interface."
+msgstr "A frissítés telepítve. Indítsa újra a kezelőfelületet."
+
+msgid "Install the verified update?"
+msgstr "Telepíti az ellenőrzött frissítést?"
+
+msgid "Update available. Open updater?"
+msgstr "Frissítés érhető el. Megnyitja a frissítőt?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Automatikus ellenőrzés 6 óránként."
+
+msgid "New version"
+msgstr "Új verzió"
+

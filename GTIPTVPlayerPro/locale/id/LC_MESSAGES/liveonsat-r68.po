@@ -1,0 +1,159 @@
+# LiveOnSat guide r68. Country names: Unicode CLDR via Node Intl.DisplayNames.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: id\n"
+
+msgctxt "Football scores"
+msgid "Select country"
+msgstr "Pilih negara"
+
+msgctxt "Football scores"
+msgid "Live broadcasts"
+msgstr "Siaran langsung"
+
+msgctxt "Football scores"
+msgid "Broadcaster channels"
+msgstr "Saluran penyiar"
+
+msgctxt "Football scores"
+msgid "No live broadcasts found."
+msgstr "Tidak ditemukan siaran pertandingan yang sedang berlangsung."
+
+msgctxt "Football scores"
+msgid "Broadcasts could not be updated."
+msgstr "Siaran tidak dapat diperbarui."
+
+msgctxt "Football scores"
+msgid "Broadcast information may be incomplete."
+msgstr "Informasi siaran mungkin belum lengkap."
+
+msgctxt "Football scores"
+msgid "Country preference could not be saved."
+msgstr "Negara pilihan tidak dapat disimpan."
+
+msgctxt "Football scores"
+msgid "Source: LiveOnSat"
+msgstr "Sumber: LiveOnSat"
+
+msgctxt "Football scores"
+msgid "Turkey"
+msgstr "Turki"
+
+msgctxt "Football scores"
+msgid "Germany"
+msgstr "Jerman"
+
+msgctxt "Football scores"
+msgid "France"
+msgstr "Prancis"
+
+msgctxt "Football scores"
+msgid "United Kingdom"
+msgstr "Inggris Raya"
+
+msgctxt "Football scores"
+msgid "Ireland"
+msgstr "Irlandia"
+
+msgctxt "Football scores"
+msgid "Italy"
+msgstr "Italia"
+
+msgctxt "Football scores"
+msgid "Spain"
+msgstr "Spanyol"
+
+msgctxt "Football scores"
+msgid "Portugal"
+msgstr "Portugal"
+
+msgctxt "Football scores"
+msgid "Netherlands"
+msgstr "Belanda"
+
+msgctxt "Football scores"
+msgid "Belgium"
+msgstr "Belgia"
+
+msgctxt "Football scores"
+msgid "Poland"
+msgstr "Polandia"
+
+msgctxt "Football scores"
+msgid "Romania"
+msgstr "Rumania"
+
+msgctxt "Football scores"
+msgid "Bulgaria"
+msgstr "Bulgaria"
+
+msgctxt "Football scores"
+msgid "Greece"
+msgstr "Yunani"
+
+msgctxt "Football scores"
+msgid "Hungary"
+msgstr "Hungaria"
+
+msgctxt "Football scores"
+msgid "Czechia"
+msgstr "Ceko"
+
+msgctxt "Football scores"
+msgid "Slovakia"
+msgstr "Slovakia"
+
+msgctxt "Football scores"
+msgid "Denmark"
+msgstr "Denmark"
+
+msgctxt "Football scores"
+msgid "Sweden"
+msgstr "Swedia"
+
+msgctxt "Football scores"
+msgid "Norway"
+msgstr "Norwegia"
+
+msgctxt "Football scores"
+msgid "Finland"
+msgstr "Finlandia"
+
+msgctxt "Football scores"
+msgid "Croatia"
+msgstr "Kroasia"
+
+msgctxt "Football scores"
+msgid "Serbia"
+msgstr "Serbia"
+
+msgctxt "Football scores"
+msgid "Bosnia and Herzegovina"
+msgstr "Bosnia dan Herzegovina"
+
+msgctxt "Football scores"
+msgid "Slovenia"
+msgstr "Slovenia"
+
+msgctxt "Football scores"
+msgid "Albania"
+msgstr "Albania"
+
+msgctxt "Football scores"
+msgid "United States"
+msgstr "Amerika Serikat"
+
+msgctxt "Football scores"
+msgid "Canada"
+msgstr "Kanada"
+
+msgctxt "Football scores"
+msgid "Brazil"
+msgstr "Brasil"
+
+msgctxt "Football scores"
+msgid "Australia"
+msgstr "Australia"
+
+msgctxt "Football scores"
+msgid "Japan"
+msgstr "Jepang"

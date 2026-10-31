@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: bg\n"
+
+msgid "Live TV recording"
+msgstr "Запис на телевизия на живо"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Задайте папката за запис в настройките на разширението."
+
+msgid "Recording started."
+msgstr "Записът започна."
+
+msgid "Recording stopped."
+msgstr "Записът спря."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Записът е неуспешен. Проверете устройството за съхранение."
+
+msgid "Recording is not available for this stream."
+msgstr "Записът не е наличен за този поток."
+
+msgid "Open the channel again to enable recording."
+msgstr "Отворете канала отново, за да активирате записа."

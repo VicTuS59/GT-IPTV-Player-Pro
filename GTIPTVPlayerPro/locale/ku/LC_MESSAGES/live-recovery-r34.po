@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ku\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "Girêdan tê vegerandin"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "Girêdan bi ser neket"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "Çavkaniyê girêdana vîdyoyê red kir (HTTP {status:d})"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "Çavkanî daneyên nû naşîne"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "Dema vegerandina girêdanê qediya"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "Girêdaneke nû bi çavkaniyê re tê ceribandin"

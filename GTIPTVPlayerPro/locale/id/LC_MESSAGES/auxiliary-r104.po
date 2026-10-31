@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Tambah sumber M3U"
+
+msgid "Application"
+msgstr "Aplikasi"
+
+msgid "Application information"
+msgstr "Informasi aplikasi"
+
+msgid "Category Management"
+msgstr "Pengelolaan kategori"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Perubahan diterapkan saat Anda menekan tombol HIJAU."
+
+msgid "Choose the source name and location."
+msgstr "Pilih nama dan lokasi sumber."
+
+msgid "Compatibility"
+msgstr "Kompatibilitas"
+
+msgid "Country"
+msgstr "Negara"
+
+msgid "Developer"
+msgstr "Pengembang"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Alamat HTTP(S) langsung untuk daftar putar M3U."
+
+msgid "District"
+msgstr "Distrik"
+
+msgid "Frame rate"
+msgstr "Laju bingkai"
+
+msgid "Language"
+msgstr "Bahasa"
+
+msgid "Platform"
+msgstr "Platform"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Tekan tombol BIRU untuk memasukkan nama saluran lain."
+
+msgid "Press GREEN to save the source."
+msgstr "Tekan tombol HIJAU untuk menyimpan sumber."
+
+msgid "Press GREEN to use this folder."
+msgstr "Tekan tombol HIJAU untuk menggunakan folder ini."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Tekan OK untuk mengunduh takarir yang dipilih."
+
+msgid "Press OK to load this subtitle."
+msgstr "Tekan OK untuk memuat takarir ini."
+
+msgid "Press OK to play the selected video."
+msgstr "Tekan OK untuk memutar video yang dipilih."
+
+msgid "Press OK to search again."
+msgstr "Tekan OK untuk mencari lagi."
+
+msgid "Press OK to select this location."
+msgstr "Tekan OK untuk memilih lokasi ini."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Tekan OK untuk menampilkan atau menyembunyikan kategori. Tandai kategori dengan tombol MERAH untuk memindahkannya bersama-sama."
+
+msgid "Province"
+msgstr "Provinsi"
+
+msgid "Release"
+msgstr "Rilis"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Cari takarir atau ubah filter."
+
+msgid "Select a folder or subtitle file."
+msgstr "Pilih folder atau berkas takarir."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Pilih daftar putar dari penerima, USB, atau penyimpanan jaringan yang terpasang."
+
+msgid "Selected category"
+msgstr "Kategori yang dipilih"
+
+msgid "Selected folder"
+msgstr "Folder yang dipilih"
+
+msgid "Selected location"
+msgstr "Lokasi yang dipilih"
+
+msgid "Selected search"
+msgstr "Pencarian yang dipilih"
+
+msgid "Selected subtitle"
+msgstr "Takarir yang dipilih"
+
+msgid "Selected video"
+msgstr "Video yang dipilih"
+
+msgid "Source code"
+msgstr "Kode sumber"
+
+msgid "Source location"
+msgstr "Lokasi sumber"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Berkas takarir: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Format yang didukung"
+

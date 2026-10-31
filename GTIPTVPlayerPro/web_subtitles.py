@@ -54,12 +54,7 @@ MAX_RESULTS = 60
 MAX_SYNC_MS = 30 * 60 * 1000
 
 
-class SubtitleError(Exception):
-    def __init__(self, code, status=400):
-        self.code = code
-        self.status = status
-        self.message = code.replace("_", " ")
-        Exception.__init__(self, self.message)
+from .web_errors import SubtitleError
 
 
 class _SafeRedirect(HTTPRedirectHandler):

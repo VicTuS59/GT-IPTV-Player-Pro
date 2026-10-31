@@ -11,7 +11,7 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 PROJECT_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd -P)
 PLUGIN_ROOT="$PROJECT_ROOT/GTIPTVPlayerPro"
 CONTROL_ROOT="$PROJECT_ROOT/CONTROL"
-DEFAULT_OUTPUT="$PROJECT_ROOT/dist/enigma2-plugin-extensions-gtiptvplayerpro_1.7.0-r0_all.ipk"
+DEFAULT_OUTPUT="$PROJECT_ROOT/dist/enigma2-plugin-extensions-gtiptvplayerpro_1.7.0-r107_all.ipk"
 
 if [ "$#" -gt 1 ]; then
     die 'usage: build-ipk.sh [output.ipk]'
@@ -105,6 +105,11 @@ LC_ALL=C sort -z "$BUILD_DIR/payload.unsorted" > "$BUILD_DIR/payload.members"
     tar --null --no-recursion -T "$BUILD_DIR/payload.members" -cf "$BUILD_DIR/payload.tar"
 )
 tar -C "$PLUGIN_STAGE" -xf "$BUILD_DIR/payload.tar"
+
+# Recalculate from staged payload bytes for every future release as well.
+PAYLOAD_BYTES=$(find "$PLUGIN_STAGE" -type f -printf '%s\n' | awk '{total+=$1} END {printf "%.0f",total}')
+INSTALLED_SIZE=$(( (PAYLOAD_BYTES + 1023) / 1024 ))
+sed -i "s/^Installed-Size:.*/Installed-Size: $INSTALLED_SIZE/" "$CONTROL_STAGE/control"
 
 # Do not inherit a developer's umask, ownership, or executable bits.  The
 # final tar commands also force numeric root ownership and the fixed mtime.

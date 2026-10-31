@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "อัปเดตซอฟต์แวร์"
+
+msgid "Automatic update check"
+msgstr "ตรวจสอบอัปเดตอัตโนมัติ"
+
+msgid "Check for updates"
+msgstr "ตรวจสอบอัปเดต"
+
+msgid "Download and verify"
+msgstr "ดาวน์โหลดและตรวจสอบ"
+
+msgid "Install update"
+msgstr "ติดตั้งอัปเดต"
+
+msgid "Update available"
+msgstr "มีอัปเดตพร้อมใช้งาน"
+
+msgid "Up to date"
+msgstr "เป็นเวอร์ชันล่าสุดแล้ว"
+
+msgid "Update verified"
+msgstr "ตรวจสอบอัปเดตแล้ว"
+
+msgid "Restart interface"
+msgstr "เริ่มส่วนติดต่อใหม่"
+
+msgid "Update source is not ready"
+msgstr "แหล่งอัปเดตยังไม่พร้อม"
+
+msgid "Update signature is invalid"
+msgstr "ลายเซ็นอัปเดตไม่ถูกต้อง"
+
+msgid "Invalid update information"
+msgstr "ข้อมูลอัปเดตไม่ถูกต้อง"
+
+msgid "Update package is invalid"
+msgstr "แพ็กเกจอัปเดตไม่ถูกต้อง"
+
+msgid "Update is not compatible with this receiver"
+msgstr "อัปเดตไม่เข้ากันกับเครื่องรับนี้"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "หยุดการบันทึกและดาวน์โหลดก่อนอัปเดต"
+
+msgid "Update failed"
+msgstr "อัปเดตไม่สำเร็จ"
+
+msgid "Update installed. Restart the interface."
+msgstr "ติดตั้งอัปเดตแล้ว โปรดเริ่มส่วนติดต่อใหม่"
+
+msgid "Install the verified update?"
+msgstr "ติดตั้งอัปเดตที่ตรวจสอบแล้วหรือไม่?"
+
+msgid "Update available. Open updater?"
+msgstr "มีอัปเดตพร้อมใช้งาน เปิดเครื่องมืออัปเดตหรือไม่?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "ตรวจสอบอัตโนมัติทุก 6 ชั่วโมง"
+
+msgid "New version"
+msgstr "เวอร์ชันใหม่"
+

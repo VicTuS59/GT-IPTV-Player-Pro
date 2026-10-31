@@ -15,6 +15,7 @@ from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from enigma import eTimer, getDesktop
 
+from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from .backup import BackupError, BackupManager, CONFIG_PREFIX, EXTENSION, SETTINGS_PATH
 from .background import attach_background
 from .diagnostics import log_event
@@ -256,7 +257,6 @@ class GTBackupScreen(Screen):
         self._notice_timer = eTimer()
         self._notice_connection = _timer_connect(self._notice_timer, self._show_backup_notice)
         background = dashboard.asset("background")
-        attach_background(self, "app_bg", background)
         self["title"] = Label(_("Restore from backup") if mode == "restore" else _("Backup dashboard"))
         self["path"] = Label("")
         # ScrollLabel creates a container and child widgets. Some receiver
@@ -286,6 +286,7 @@ class GTBackupScreen(Screen):
         self.onExecBegin.append(self.first_show)
         self.onClose.append(self._closed)
         self.setTitle(_("Restore from backup") if mode == "restore" else _("Backup dashboard"))
+        setup_utility_pages(self, 'restore' if self.mode == 'restore' else 'backup', dashboard.footer())
 
     def first_show(self):
         if self._first and not self._screen_closed:
@@ -305,6 +306,7 @@ class GTBackupScreen(Screen):
         else:
             self.refresh_dashboard()
 
+    @refresh_after
     def refresh_dashboard(self):
         if not self._screen_closed:
             if self.mode == "restore":

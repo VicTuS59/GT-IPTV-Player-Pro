@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: fr_FR\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "Rétablissement de la connexion"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "Échec de la connexion"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "La source a refusé la connexion vidéo (HTTP {status:d})"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "La source n'envoie pas de nouvelles données"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "Le délai de rétablissement est dépassé"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "Tentative d'une nouvelle connexion à la source"

@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ta\n"
+
+msgid "Live TV recording"
+msgstr "நேரலைத் தொலைக்காட்சிப் பதிவு"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "செருகுநிரல் அமைப்புகளில் பதிவுக் கோப்புறையைத் தேர்ந்தெடுக்கவும்."
+
+msgid "Recording started."
+msgstr "பதிவு தொடங்கியது."
+
+msgid "Recording stopped."
+msgstr "பதிவு நிறுத்தப்பட்டது."
+
+msgid "Recording failed. Check the storage device."
+msgstr "பதிவு தோல்வியடைந்தது. சேமிப்பகச் சாதனத்தைச் சரிபார்க்கவும்."
+
+msgid "Recording is not available for this stream."
+msgstr "இந்த ஒளிபரப்பிற்குப் பதிவு கிடைக்கவில்லை."
+
+msgid "Open the channel again to enable recording."
+msgstr "பதிவைச் செயல்படுத்த சேனலை மீண்டும் திறக்கவும்."

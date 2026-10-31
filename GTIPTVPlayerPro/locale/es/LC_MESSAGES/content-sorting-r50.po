@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: es\n"
+
+msgid "Provider order"
+msgstr "Orden del proveedor"
+
+msgid "Newest added"
+msgstr "Añadidos recientemente"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Alfabético (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Fecha de estreno (más recientes primero)"
+
+msgid "Saved manual order"
+msgstr "Orden manual guardado"
+
+msgid "Sorting"
+msgstr "Ordenación"
+
+msgid "Sort content"
+msgstr "Ordenar contenido"
+
+msgid "Sort channels"
+msgstr "Ordenar canales"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Esta fuente no proporciona fechas para este orden."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "La ordenación requiere la categoría completa. Espera o vuelve a intentarlo."
+
+msgid "Could not save sorting preference."
+msgstr "No se pudo guardar la preferencia de ordenación."

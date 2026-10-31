@@ -1,0 +1,24 @@
+# Live TV recording, r45.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: fy\n"
+
+msgid "Live TV recording"
+msgstr "Live-tv opnimme"
+
+msgid "Please set the recording folder in the plugin settings."
+msgstr "Stel de opnamemap yn by de ynstellingen fan de útwreiding."
+
+msgid "Recording started."
+msgstr "Opname begûn."
+
+msgid "Recording stopped."
+msgstr "Opname stoppe."
+
+msgid "Recording failed. Check the storage device."
+msgstr "Opname mislearre. Kontrolearje it opslachapparaat."
+
+msgid "Recording is not available for this stream."
+msgstr "Opnimmen is net beskikber foar dizze stream."
+
+msgid "Open the channel again to enable recording."
+msgstr "Iepenje it kanaal opnij om opnimmen yn te skeakeljen."

@@ -1,0 +1,12 @@
+# Live channel move, r44.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ta\n"
+
+msgid "Move channel"
+msgstr "சேனலை நகர்த்து"
+
+msgid "Channel moved."
+msgstr "சேனல் நகர்த்தப்பட்டது."
+
+msgid "Could not save channel order."
+msgstr "சேனல் வரிசையைச் சேமிக்க முடியவில்லை."

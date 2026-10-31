@@ -21,6 +21,7 @@ if not __package__:
     __package__ = "GTIPTVPlayerPro"
 
 from . import downloads as store
+from . import PLUGIN_VERSION
 from .content import ContentItem, XtreamContentClient
 from .playlist import PlaylistAccount
 from .diagnostics import log_event
@@ -386,7 +387,7 @@ class Worker(object):
         signal.signal(signal.SIGINT, self.stop)
         try:
             with store.transaction(persist=True) as state:
-                state["worker"] = {"pid": os.getpid(), "stamp": store.process_stamp()}
+                state["worker"] = {"pid": os.getpid(), "stamp": store.process_stamp(), 'version': PLUGIN_VERSION}
                 state["worker_start"] = 0
                 for job in state["jobs"]:
                     if job["status"] in store.ACTIVE:
@@ -412,16 +413,26 @@ class Worker(object):
                             job = dict(candidate)
                             self.limit = int(state.get("limit") or store.DEFAULT_SPEED)
                             break
+                    if job is None and (state.get('hold') or not any(row.get('status') == 'queued' for row in state['jobs'])):
+                        # Ownership and flock are released while enqueue is
+                        # still excluded by the state lock. A new request can
+                        # never observe a live owner which is already exiting.
+                        if any(row.get('status') in store.TERMINAL for row in state['jobs']):
+                            store._commit_state(state)
+                            state['jobs'] = store._runtime_state(state)['jobs']
+                        state['worker'] = {}
+                        os.close(lock); lock = None
+                        return
                 if job:
                     self._run_job(job, payload)
                 else:
-                    # Stay idle for this boot. This also avoids an enqueue
-                    # racing a worker's last idle check and process exit.
-                    self.stopping.wait(0.6)
+                    # Only eligible queued jobs blocked by playback remain.
+                    self.stopping.wait(2.0)
         finally:
             with store.transaction() as state:
-                state["worker"] = {}
-            os.close(lock)
+                if state.get('worker', {}).get('pid') == os.getpid():
+                    state["worker"] = {}
+            if lock is not None: os.close(lock)
 
 
 def stop_existing():

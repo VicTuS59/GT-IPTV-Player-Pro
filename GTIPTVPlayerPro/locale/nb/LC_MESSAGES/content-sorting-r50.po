@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: nb\n"
+
+msgid "Provider order"
+msgstr "Leverandørens rekkefølge"
+
+msgid "Newest added"
+msgstr "Nylig lagt til"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Alfabetisk (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Utgivelsesdato (nyeste først)"
+
+msgid "Saved manual order"
+msgstr "Lagret manuell rekkefølge"
+
+msgid "Sorting"
+msgstr "Sortering"
+
+msgid "Sort content"
+msgstr "Sorter innhold"
+
+msgid "Sort channels"
+msgstr "Sorter kanaler"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Denne kilden oppgir ikke datoer for denne sorteringen."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Sortering krever hele kategorien. Vent eller prøv igjen."
+
+msgid "Could not save sorting preference."
+msgstr "Sorteringsinnstillingen kunne ikke lagres."

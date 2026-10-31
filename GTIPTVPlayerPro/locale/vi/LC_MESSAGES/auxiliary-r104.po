@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Thêm nguồn M3U"
+
+msgid "Application"
+msgstr "Ứng dụng"
+
+msgid "Application information"
+msgstr "Thông tin ứng dụng"
+
+msgid "Category Management"
+msgstr "Quản lý danh mục"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Các thay đổi được áp dụng khi nhấn nút XANH LÁ."
+
+msgid "Choose the source name and location."
+msgstr "Chọn tên và vị trí của nguồn."
+
+msgid "Compatibility"
+msgstr "Khả năng tương thích"
+
+msgid "Country"
+msgstr "Quốc gia"
+
+msgid "Developer"
+msgstr "Nhà phát triển"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Địa chỉ HTTP(S) trực tiếp của danh sách phát M3U."
+
+msgid "District"
+msgstr "Quận/Huyện"
+
+msgid "Frame rate"
+msgstr "Tốc độ khung hình"
+
+msgid "Language"
+msgstr "Ngôn ngữ"
+
+msgid "Platform"
+msgstr "Nền tảng"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Nhấn nút XANH DƯƠNG để nhập tên kênh khác."
+
+msgid "Press GREEN to save the source."
+msgstr "Nhấn nút XANH LÁ để lưu nguồn."
+
+msgid "Press GREEN to use this folder."
+msgstr "Nhấn nút XANH LÁ để sử dụng thư mục này."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Nhấn OK để tải xuống phụ đề đã chọn."
+
+msgid "Press OK to load this subtitle."
+msgstr "Nhấn OK để nạp phụ đề này."
+
+msgid "Press OK to play the selected video."
+msgstr "Nhấn OK để phát video đã chọn."
+
+msgid "Press OK to search again."
+msgstr "Nhấn OK để tìm kiếm lại."
+
+msgid "Press OK to select this location."
+msgstr "Nhấn OK để chọn vị trí này."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Nhấn OK để hiện hoặc ẩn danh mục. Đánh dấu các danh mục bằng nút ĐỎ để di chuyển chúng cùng nhau."
+
+msgid "Province"
+msgstr "Tỉnh"
+
+msgid "Release"
+msgstr "Bản phát hành"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Tìm phụ đề hoặc thay đổi bộ lọc."
+
+msgid "Select a folder or subtitle file."
+msgstr "Chọn một thư mục hoặc tệp phụ đề."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Chọn danh sách phát từ đầu thu, USB hoặc bộ nhớ mạng đã gắn."
+
+msgid "Selected category"
+msgstr "Danh mục đã chọn"
+
+msgid "Selected folder"
+msgstr "Thư mục đã chọn"
+
+msgid "Selected location"
+msgstr "Vị trí đã chọn"
+
+msgid "Selected search"
+msgstr "Tìm kiếm đã chọn"
+
+msgid "Selected subtitle"
+msgstr "Phụ đề đã chọn"
+
+msgid "Selected video"
+msgstr "Video đã chọn"
+
+msgid "Source code"
+msgstr "Mã nguồn"
+
+msgid "Source location"
+msgstr "Vị trí nguồn"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Tệp phụ đề: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Định dạng được hỗ trợ"
+

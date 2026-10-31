@@ -21,6 +21,7 @@ from Components.Label import Label
 from Screens.Screen import Screen
 from enigma import getDesktop
 
+from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven, poster_after
 from .background import attach_background
 from .i18n import N_, _, localized_upper, ngettext
 from .m3u_epg_settings import (
@@ -146,6 +147,7 @@ def _scale():
     return width, height, px
 
 
+@seven_skin_after('xmltv', screen_name=None)
 def _m3u_xmltv_settings_skin():
     width, height, px = _scale()
     margin = px(64)
@@ -763,6 +765,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
         self.skin = decorate_remote_footer(
             _m3u_xmltv_settings_skin(),
             XMLTV_SETTINGS_FOOTER_ITEMS,
+            skin_fonts_scaled=True, show_web_hint=False, show_dividers=False, transparent_panel=True,
         )
         Screen.__init__(self, session)
         self.source = source
@@ -792,7 +795,6 @@ class GTM3UXMLTVSettingsScreen(Screen):
         self.binding = _binding_snapshot(loaded, self.source_id)
         self._saved_binding = _binding_snapshot(self.binding, self.source_id)
 
-        attach_background(self, "app_bg", APP_BACKGROUND)
         self["top_accent"] = Label("")
         self["header"] = Label(_("External XMLTV EPG"))
         self["subtitle"] = Label("")
@@ -826,6 +828,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
             },
             -1,
         )
+        setup_seven(self, 'xmltv', XMLTV_SETTINGS_FOOTER_ITEMS)
         self._refresh()
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._fit_source_subtitle)
@@ -857,6 +860,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
             _status_text(self.binding, self._refresh_runtime_state),
         )
 
+    @seven_refresh_after
     def _refresh(self):
         has_dynamic_endpoint = bool(_binding_endpoint(self.binding))
         for index, value in enumerate(self._values()):

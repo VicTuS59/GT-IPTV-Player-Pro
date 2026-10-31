@@ -6,6 +6,8 @@
 import threading
 from collections import OrderedDict, deque
 
+from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
+from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from .vod_grid import LatestPosterWorkers
 
 from Components.ActionMap import ActionMap
@@ -53,6 +55,7 @@ SETTINGS_FOOTER = (
 )
 
 
+@skin_after('youtube')
 def _settings_skin():
     width, height, px = _scale()
     parts = ['<screen name="GTYouTubeSettingsScreen" position="0,0" size="{},{}" '
@@ -100,7 +103,6 @@ class GTYouTubeSettingsScreen(Screen):
         self.settings.youtube_resolution = shared.youtube_resolution
         self.settings.youtube_autoplay = shared.youtube_autoplay
         self.selected_index = 0
-        attach_background(self, "app_bg", APP_BACKGROUND)
         self["header"] = Label(_("YouTube settings"))
         self["brand"] = Label("GT IPTV PLAYER PRO")
         self["section"] = Label("YouTube")
@@ -118,9 +120,11 @@ class GTYouTubeSettingsScreen(Screen):
              "left": lambda: self.change(-1), "right": lambda: self.change(1),
              "ok": lambda: self.change(1), "green": self.save,
              "red": self.cancel, "cancel": self.cancel, "back": self.cancel}, -1)
+        setup_utility_pages(self, 'youtube', SETTINGS_FOOTER)
         self._refresh()
         self.setTitle(_("YouTube settings"))
 
+    @refresh_after
     def _refresh(self):
         values = (
             quality_label(self.settings.youtube_resolution),
@@ -173,6 +177,7 @@ class GTYouTubeSettingsScreen(Screen):
         self.close(None)
 
 
+@aux_skin_after('history' )
 def _history_skin(footer=FOOTER):
     width, height, px = _scale()
     parts = ['<screen name="GTYouTubeSearchScreen" position="0,0" size="{},{}" '
@@ -266,7 +271,6 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         _connect_timer(self._keyboard_timer, self._open_initial_search)
         self._init_youtube_preview(VideoWindow is not None)
 
-        attach_background(self, "app_bg", APP_BACKGROUND)
         for name in ("video_guard", "header", "header_divider", "youtube_brand", "quality", "search_text", "section",
                      "pages", "status", "footer", "preview_mask", "preview_badge",
                      "preview_title", "preview_detail", "preview_action", "preview_live", "preview_resolution"):
@@ -313,6 +317,8 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         self.onClose.append(self._stop)
         self.setTitle("YouTube")
         self._render()
+
+        setup_aux(self, 'youtube', FOOTER)
 
     def _cover_live_video(self):
         self["video_guard"].show()
@@ -750,6 +756,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         self._thumb_workers.replace([work])
         self._poll_timer.start(100, True)
 
+    @aux_refresh_after
     def _render(self):
         if self._closed:
             return
@@ -885,6 +892,8 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         self._poll_timer.start(100, True)
 
     def _refresh_youtube_border(self):
+        if getattr(self, '_aux_kind', None) == 'youtube':
+            return
         from .channel_highlight import saved_selection_border
         border = saved_selection_border()
         if border == self._youtube_border:
@@ -904,6 +913,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                          preferred_size=max(minimum, font_px(px, size)),
                          min_size=max(5, px(10)))
 
+    @aux_refresh_after
     def _render_preview(self):
         if self._closed:
             return
@@ -1007,7 +1017,6 @@ class GTYouTubeHistoryScreen(Screen):
         self._service = service if service is not None else WEB_YOUTUBE
         self._entries = self._load_history()
         self._selected = self._top = 0
-        attach_background(self, "app_bg", APP_BACKGROUND)
         for name in ("video_guard", "header", "quality", "search_frame", "search_body",
                      "search_text", "section", "pages", "status", "footer"):
             self[name] = Label("")
@@ -1033,6 +1042,8 @@ class GTYouTubeHistoryScreen(Screen):
         self.setTitle(_(self.HISTORY_TITLE))
         self._render()
 
+        setup_aux(self, 'history', self.HISTORY_FOOTER)
+
     def _load_history(self):
         return self._service.history().get("queries", [])
 
@@ -1052,6 +1063,7 @@ class GTYouTubeHistoryScreen(Screen):
             self._top = self._selected - HISTORY_ROWS + 1
         self._render()
 
+    @aux_refresh_after
     def _render(self):
         self["quality"].setText(quality_label(load_player_settings().youtube_resolution))
         for index in range(HISTORY_ROWS):

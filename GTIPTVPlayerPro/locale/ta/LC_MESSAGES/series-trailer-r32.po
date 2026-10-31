@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ta\n"
+
+msgid "General trailer"
+msgstr "பொதுவான முன்னோட்டம்"
+
+msgid "Searching for a trailer..."
+msgstr "முன்னோட்டம் தேடப்படுகிறது..."
+
+msgid "No official trailer found."
+msgstr "அதிகாரப்பூர்வ முன்னோட்டம் கிடைக்கவில்லை."

@@ -689,3 +689,4 @@ textarea { resize: vertical; min-height: 94px; line-height: 1.45; }
   .remote-layout { margin-inline: -8px; }
   .remote-panel { padding: 6px; gap: 4px; }
 }
+.download-history-tools { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px; } #downloadHistoryPager:not([hidden]) { display:flex; align-items:center; gap:10px; } #downloadHistoryButton[aria-pressed="true"] { border-color:var(--accent, #22d3ee); }

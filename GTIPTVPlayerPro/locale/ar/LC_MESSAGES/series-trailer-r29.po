@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ar\n"
+
+msgid "Trailer"
+msgstr "إعلان تشويقي"
+
+msgid "Searching for the next episode trailer..."
+msgstr "جارٍ البحث عن إعلان الحلقة القادمة..."
+
+msgid "No trailer found for the next episode."
+msgstr "لم يُعثر على إعلان للحلقة القادمة."
+
+msgid "Next episode information is unavailable."
+msgstr "معلومات الحلقة القادمة غير متاحة."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "تعذّر البحث عن الإعلان. يُرجى المحاولة مجددًا."

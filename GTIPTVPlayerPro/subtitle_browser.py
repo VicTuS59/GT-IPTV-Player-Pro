@@ -6,6 +6,7 @@
 import os
 from copy import deepcopy
 
+from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
 from .i18n import _
 from .online_subtitles import (
     canonical_subtitle_fps, polish_search_providers, provider_display_name,
@@ -143,6 +144,7 @@ def manual_subtitle_metadata(metadata, title):
     return override
 
 
+@aux_skin_after('online' )
 def subtitle_browser_skin(size=None):
     """Return the glass subtitle browser at UHD, FHD, HD and SD sizes."""
     width, height = _desktop_size(size)
@@ -300,11 +302,6 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         self._flag_keys = [None] * ROWS
 
         from .background import attach_background
-        attach_background(
-            self,
-            "app_bg",
-            plugin_path("skin", "images", "global-neon-v0912.png"),
-        )
         for name in (
             "content_glass", "header_art", "programme_art", "filter_art",
             "toolbar_art",
@@ -366,6 +363,8 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         self._restore_state()
         self._render()
         self._start_profile_check()
+
+        setup_aux(self, 'online', SUBTITLE_BROWSER_FOOTER)
 
     def _start_profile_check(self):
         if eTimer is None:
@@ -644,6 +643,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
     def _filtered(self):
         return filtered_subtitle_results(self.results, self.provider_filter)
 
+    @aux_refresh_after
     def _render(self):
         self._refresh_playback_profile()
         if self.provider_filter not in self._available_filters():

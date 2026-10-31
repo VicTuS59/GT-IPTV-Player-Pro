@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sq_AL\n"
+
+msgid "Provider order"
+msgstr "Rendi i ofruesit"
+
+msgid "Newest added"
+msgstr "Të shtuara së fundmi"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Alfabetikisht (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Data e publikimit (më të rejat në fillim)"
+
+msgid "Saved manual order"
+msgstr "Rendi manual i ruajtur"
+
+msgid "Sorting"
+msgstr "Renditja"
+
+msgid "Sort content"
+msgstr "Rendit përmbajtjen"
+
+msgid "Sort channels"
+msgstr "Rendit kanalet"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Ky burim nuk jep data për këtë mënyrë renditjeje."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Renditja kërkon kategorinë e plotë. Prisni ose provoni përsëri."
+
+msgid "Could not save sorting preference."
+msgstr "Preferenca e renditjes nuk mund të ruhej."

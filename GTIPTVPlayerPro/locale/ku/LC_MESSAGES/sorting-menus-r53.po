@@ -1,0 +1,18 @@
+# Sorting menus r53
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ku\n"
+
+msgid "A–Z"
+msgstr "A–Z"
+
+msgid "Z–A"
+msgstr "Z–A"
+
+msgid "Last added"
+msgstr "Herî nû hatine zêdekirin"
+
+msgid "Original"
+msgstr "Rêza resen"
+
+msgid "Year"
+msgstr "Sal"

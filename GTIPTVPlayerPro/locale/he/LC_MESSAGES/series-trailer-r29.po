@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: he\n"
+
+msgid "Trailer"
+msgstr "קדימון"
+
+msgid "Searching for the next episode trailer..."
+msgstr "מחפש קדימון לפרק הבא..."
+
+msgid "No trailer found for the next episode."
+msgstr "לא נמצא קדימון לפרק הבא."
+
+msgid "Next episode information is unavailable."
+msgstr "המידע על הפרק הבא אינו זמין."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "לא ניתן לחפש קדימון. יש לנסות שוב."

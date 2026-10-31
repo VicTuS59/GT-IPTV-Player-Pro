@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ca\n"
+
+msgid "Provider order"
+msgstr "Ordre del proveïdor"
+
+msgid "Newest added"
+msgstr "Afegits més recentment"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Alfabètic (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Data d’estrena (més recents primer)"
+
+msgid "Saved manual order"
+msgstr "Ordre manual desat"
+
+msgid "Sorting"
+msgstr "Ordenació"
+
+msgid "Sort content"
+msgstr "Ordena el contingut"
+
+msgid "Sort channels"
+msgstr "Ordena els canals"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Aquesta font no proporciona dates per a aquesta ordenació."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "L’ordenació requereix la categoria completa. Espereu o torneu-ho a provar."
+
+msgid "Could not save sorting preference."
+msgstr "No s’ha pogut desar la preferència d’ordenació."

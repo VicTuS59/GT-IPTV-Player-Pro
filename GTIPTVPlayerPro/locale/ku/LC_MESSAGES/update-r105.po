@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Nûkirina nermalavê"
+
+msgid "Automatic update check"
+msgstr "Kontrola xweber a nûkirinan"
+
+msgid "Check for updates"
+msgstr "Li nûkirinan bigere"
+
+msgid "Download and verify"
+msgstr "Daxîne û piştrast bike"
+
+msgid "Install update"
+msgstr "Nûkirinê saz bike"
+
+msgid "Update available"
+msgstr "Nûkirin heye"
+
+msgid "Up to date"
+msgstr "Rojane ye"
+
+msgid "Update verified"
+msgstr "Nûkirin hat piştrastkirin"
+
+msgid "Restart interface"
+msgstr "Navrûyê ji nû ve bide destpêkirin"
+
+msgid "Update source is not ready"
+msgstr "Çavkaniya nûkirinê hê amade nîne"
+
+msgid "Update signature is invalid"
+msgstr "Îmzeya nûkirinê nederbasdar e"
+
+msgid "Invalid update information"
+msgstr "Agahiya nûkirinê nederbasdar e"
+
+msgid "Update package is invalid"
+msgstr "Pakêta nûkirinê nederbasdar e"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Nûkirin bi vê wergirê re lihevhatî nîne"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Berî nûkirinê tomar û daxistinan rawestîne"
+
+msgid "Update failed"
+msgstr "Nûkirin bi ser neket"
+
+msgid "Update installed. Restart the interface."
+msgstr "Nûkirin hat sazkirin. Navrûyê ji nû ve bide destpêkirin."
+
+msgid "Install the verified update?"
+msgstr "Nûkirina piştrastkirî were sazkirin?"
+
+msgid "Update available. Open updater?"
+msgstr "Nûkirin heye. Amûra nûkirinê were vekirin?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Kontrola xweber her 6 saetan tê kirin."
+
+msgid "New version"
+msgstr "Guhertoya nû"
+

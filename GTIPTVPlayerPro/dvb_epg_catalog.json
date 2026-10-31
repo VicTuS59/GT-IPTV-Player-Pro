@@ -1,0 +1,1122 @@
+{
+  "version": 1,
+  "source_repository": "https://github.com/oe-alliance/EPGImport-Sources",
+  "retrieved": "2026-10-25",
+  "source_files": {
+    "rytec.sources.xml": "02c73e53a806a117c1fa28ea8a2f94dece1e3801ee29b810ea6c3df256dd5814",
+    "polandAzman.sources.xml": "21f60c03a092495a19abdef686fc13b2c4608a430ad7457984611daaa45c0d5a",
+    "spainKoala.sources.xml": "30135540c15126a5e6e463c21cda9d63a51fbe9eb433d5e4b881cad88478d04f",
+    "russian.sources.xml": "cd879e07cf8bd0107e27acc4937b3937a00a6581b61603570c6cb462f9b9637f"
+  },
+  "feeds": [
+    {
+      "key": "news",
+      "label": "News Channels (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecNWS.xz",
+        "http://rytecepg.wanwizard.eu/rytecNWS.xz",
+        "http://epg.vuplus-community.net/rytecNWS.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "rytec-rytecero-xz",
+      "label": "Erotic (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecERO.xz",
+        "http://rytecepg.wanwizard.eu/rytecERO.xz",
+        "http://epg.vuplus-community.net/rytecERO.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "rytec-rytecafn-xz",
+      "label": "AFN (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecAFN.xz",
+        "http://rytecepg.wanwizard.eu/rytecAFN.xz",
+        "http://epg.vuplus-community.net/rytecAFN.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "rytec-ryteciptv-xz",
+      "label": "Rytec IPTV XMLTV (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecIPTV.xz",
+        "http://rytecepg.wanwizard.eu/rytecIPTV.xz",
+        "http://epg.vuplus-community.net/rytecIPTV.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "misc",
+      "label": "Miscellaneous XMLTV (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecMisc.xz",
+        "http://rytecepg.wanwizard.eu/rytecMisc.xz",
+        "http://epg.vuplus-community.net/rytecMisc.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "rytec-rytecnl-basic-xz",
+      "label": "Nederland - Basis (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecNL_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecNL_Basic.xz",
+        "http://epg.vuplus-community.net/rytecNL_Basic.xz"
+      ],
+      "regions": [
+        "nl"
+      ]
+    },
+    {
+      "key": "rytec-rytecbe-vl-basic-xz",
+      "label": "Vlaanderen - Basis (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecBE_VL_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecBE_VL_Basic.xz",
+        "http://epg.vuplus-community.net/rytecBE_VL_Basic.xz"
+      ],
+      "regions": [
+        "be"
+      ]
+    },
+    {
+      "key": "rytec-rytecbe-nl-common-xz",
+      "label": "Vlaanderen/Nederland - Gemeenschappelijk (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecBE_NL_Common.xz",
+        "http://rytecepg.wanwizard.eu/rytecBE_NL_Common.xz",
+        "http://epg.vuplus-community.net/rytecBE_NL_Common.xz"
+      ],
+      "regions": [
+        "be",
+        "nl"
+      ]
+    },
+    {
+      "key": "rytec-rytecnl-extra-xz",
+      "label": "Nederland - Sport/Movies (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecNL_Extra.xz",
+        "http://rytecepg.wanwizard.eu/rytecNL_Extra.xz",
+        "http://epg.vuplus-community.net/rytecNL_Extra.xz"
+      ],
+      "regions": [
+        "nl"
+      ]
+    },
+    {
+      "key": "rytec-rytecbe-fr-basic-xz",
+      "label": "Wallonie - Telesat Base (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecBE_FR_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecBE_FR_Basic.xz",
+        "http://epg.vuplus-community.net/rytecBE_FR_Basic.xz"
+      ],
+      "regions": [
+        "be",
+        "fr"
+      ]
+    },
+    {
+      "key": "fr-tnt",
+      "label": "France - TNT (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecTNT_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecTNT_Basic.xz",
+        "http://epg.vuplus-community.net/rytecTNT_Basic.xz"
+      ],
+      "regions": [
+        "fr"
+      ]
+    },
+    {
+      "key": "rytec-rytecbe-fr-common-xz",
+      "label": "France/Wallonie - Commun (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecBE_FR_Common.xz",
+        "http://rytecepg.wanwizard.eu/rytecBE_FR_Common.xz",
+        "http://epg.vuplus-community.net/rytecBE_FR_Common.xz"
+      ],
+      "regions": [
+        "be",
+        "fr"
+      ]
+    },
+    {
+      "key": "fr-misc",
+      "label": "France - Mixte (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecFR_Mixte.xz",
+        "http://rytecepg.wanwizard.eu/rytecFR_Mixte.xz",
+        "http://epg.vuplus-community.net/rytecFR_Mixte.xz"
+      ],
+      "regions": [
+        "fr"
+      ]
+    },
+    {
+      "key": "fr-extra",
+      "label": "France - Sport/Cinema (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecFR_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecFR_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecFR_SportMovies.xz"
+      ],
+      "regions": [
+        "fr"
+      ]
+    },
+    {
+      "key": "rytec-rytecbg-xz",
+      "label": "Bulgaria",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecBG.xz",
+        "http://rytecepg.wanwizard.eu/rytecBG.xz",
+        "http://epg.vuplus-community.net/rytecBG.xz"
+      ],
+      "regions": [
+        "bg"
+      ]
+    },
+    {
+      "key": "rytec-rytecsk-basic-xz",
+      "label": "Slovensko - Bazicky (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecSK_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecSK_Basic.xz",
+        "http://epg.vuplus-community.net/rytecSK_Basic.xz"
+      ],
+      "regions": [
+        "sk"
+      ]
+    },
+    {
+      "key": "rytec-ryteccz-basic-xz",
+      "label": "Ceska - Bazicky (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecCZ_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecCZ_Basic.xz",
+        "http://epg.vuplus-community.net/rytecCZ_Basic.xz"
+      ],
+      "regions": [
+        "cs",
+        "cz"
+      ]
+    },
+    {
+      "key": "rytec-ryteccz-sk-common-xz",
+      "label": "Ceska/Slovensko - Rozdeleny (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecCZ_SK_Common.xz",
+        "http://rytecepg.wanwizard.eu/rytecCZ_SK_Common.xz",
+        "http://epg.vuplus-community.net/rytecCZ_SK_Common.xz"
+      ],
+      "regions": [
+        "cs",
+        "cz",
+        "sk"
+      ]
+    },
+    {
+      "key": "rytec-ryteccz-sk-sportmovies-xz",
+      "label": "Ceska/Slovensko - Sportove/Filmy (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecCZ_SK_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecCZ_SK_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecCZ_SK_SportMovies.xz"
+      ],
+      "regions": [
+        "cs",
+        "cz",
+        "sk"
+      ]
+    },
+    {
+      "key": "rytec-rytecdk-basic-xz",
+      "label": "Danmark - Grundleggende (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecDK_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecDK_Basic.xz",
+        "http://epg.vuplus-community.net/rytecDK_Basic.xz"
+      ],
+      "regions": [
+        "da",
+        "dk"
+      ]
+    },
+    {
+      "key": "rytec-rytecdk-misc-xz",
+      "label": "Danmark - Delt (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecDK_Misc.xz",
+        "http://rytecepg.wanwizard.eu/rytecDK_Misc.xz",
+        "http://epg.vuplus-community.net/rytecDK_Misc.xz"
+      ],
+      "regions": [
+        "da",
+        "dk"
+      ]
+    },
+    {
+      "key": "rytec-rytecdk-sportmovies-xz",
+      "label": "Danmark - Sport/Movies (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecDK_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecDK_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecDK_SportMovies.xz"
+      ],
+      "regions": [
+        "da",
+        "dk"
+      ]
+    },
+    {
+      "key": "de-basic",
+      "label": "Deutschland - Basis  (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecDE_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecDE_Basic.xz",
+        "http://epg.vuplus-community.net/rytecDE_Basic.xz"
+      ],
+      "regions": [
+        "de"
+      ]
+    },
+    {
+      "key": "at-basic",
+      "label": "Osterreich - Basis  (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecAT_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecAT_Basic.xz",
+        "http://epg.vuplus-community.net/rytecAT_Basic.xz"
+      ],
+      "regions": [
+        "at"
+      ]
+    },
+    {
+      "key": "ch-basic",
+      "label": "Switzerland - Basis  (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecCH_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecCH_Basic.xz",
+        "http://epg.vuplus-community.net/rytecCH_Basic.xz"
+      ],
+      "regions": [
+        "ch"
+      ]
+    },
+    {
+      "key": "de-common",
+      "label": "Deutschland/Osterreich/Switzerland - Gemeinsam  (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecDE_Common.xz",
+        "http://rytecepg.wanwizard.eu/rytecDE_Common.xz",
+        "http://epg.vuplus-community.net/rytecDE_Common.xz"
+      ],
+      "regions": [
+        "at",
+        "ch",
+        "de"
+      ]
+    },
+    {
+      "key": "de-extra",
+      "label": "Deutschland/Osterreich/Switzerland - Sports/Film  (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecDE_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecDE_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecDE_SportMovies.xz"
+      ],
+      "regions": [
+        "at",
+        "ch",
+        "de"
+      ]
+    },
+    {
+      "key": "gr-basic",
+      "label": "Ellada - Genikos (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecGR_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecGR_Basic.xz",
+        "http://epg.vuplus-community.net/rytecGR_Basic.xz"
+      ],
+      "regions": [
+        "el",
+        "gr"
+      ]
+    },
+    {
+      "key": "gr-extra",
+      "label": "Ellada - Athlitismos/Kinimatografou (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecGR_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecGR_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecGR_SportMovies.xz"
+      ],
+      "regions": [
+        "el",
+        "gr"
+      ]
+    },
+    {
+      "key": "it-basic",
+      "label": "Italia - Basis (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecIT_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecIT_Basic.xz",
+        "http://epg.vuplus-community.net/rytecIT_Basic.xz"
+      ],
+      "regions": [
+        "it"
+      ]
+    },
+    {
+      "key": "it-sky",
+      "label": "Italia - Sky (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecIT_Sky.xz",
+        "http://rytecepg.wanwizard.eu/rytecIT_Sky.xz",
+        "http://epg.vuplus-community.net/rytecIT_Sky.xz"
+      ],
+      "regions": [
+        "it"
+      ]
+    },
+    {
+      "key": "it-extra",
+      "label": "Italia - Sports/Film/Premium (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecIT_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecIT_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecIT_SportMovies.xz"
+      ],
+      "regions": [
+        "it"
+      ]
+    },
+    {
+      "key": "rytec-rytecpt-xz",
+      "label": "Portugal (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecPT.xz",
+        "http://rytecepg.wanwizard.eu/rytecPT.xz",
+        "http://epg.vuplus-community.net/rytecPT.xz"
+      ],
+      "regions": [
+        "pt"
+      ]
+    },
+    {
+      "key": "rytec-rytecno-basic-xz",
+      "label": "Norge - Basic (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecNO_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecNO_Basic.xz",
+        "http://epg.vuplus-community.net/rytecNO_Basic.xz"
+      ],
+      "regions": [
+        "nb",
+        "nn",
+        "no"
+      ]
+    },
+    {
+      "key": "rytec-rytecno-misc-xz",
+      "label": "Norge - Delt (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecNO_Misc.xz",
+        "http://rytecepg.wanwizard.eu/rytecNO_Misc.xz",
+        "http://epg.vuplus-community.net/rytecNO_Misc.xz"
+      ],
+      "regions": [
+        "nb",
+        "nn",
+        "no"
+      ]
+    },
+    {
+      "key": "rytec-rytecno-sportmovies-xz",
+      "label": "Norge - Sport/Movies (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecNO_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecNO_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecNO_SportMovies.xz"
+      ],
+      "regions": [
+        "nb",
+        "nn",
+        "no"
+      ]
+    },
+    {
+      "key": "rytec-rytecro-basic-xz",
+      "label": "Romania - Baza (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecRO_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecRO_Basic.xz",
+        "http://epg.vuplus-community.net/rytecRO_Basic.xz"
+      ],
+      "regions": [
+        "ro"
+      ]
+    },
+    {
+      "key": "rytec-rytecro-sportmovies-xz",
+      "label": "Romania - Sport/Film (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecRO_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecRO_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecRO_SportMovies.xz"
+      ],
+      "regions": [
+        "ro"
+      ]
+    },
+    {
+      "key": "rytec-rytechrv-basic-xz",
+      "label": "Hrvatska - Osnovni (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecHRV_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecHRV_Basic.xz",
+        "http://epg.vuplus-community.net/rytecHRV_Basic.xz"
+      ],
+      "regions": [
+        "hr"
+      ]
+    },
+    {
+      "key": "rytec-rytechrv-misc-xz",
+      "label": "Hrvatska - Dodatni (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecHRV_Misc.xz",
+        "http://rytecepg.wanwizard.eu/rytecHRV_Misc.xz",
+        "http://epg.vuplus-community.net/rytecHRV_Misc.xz"
+      ],
+      "regions": [
+        "hr"
+      ]
+    },
+    {
+      "key": "rytec-rytechrv-sportmovies-xz",
+      "label": "Hrvatska - Sport/Film (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecHRV_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecHRV_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecHRV_SportMovies.xz"
+      ],
+      "regions": [
+        "hr"
+      ]
+    },
+    {
+      "key": "rytec-rytecsrb-basic-xz",
+      "label": "Srbija/Crna Gora - Osnovni (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecSRB_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecSRB_Basic.xz",
+        "http://epg.vuplus-community.net/rytecSRB_Basic.xz"
+      ],
+      "regions": [
+        "me",
+        "rs",
+        "sr"
+      ]
+    },
+    {
+      "key": "rytec-rytecsrb-misc-xz",
+      "label": "Srbija/Crna Gora - Dodatni (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecSRB_Misc.xz",
+        "http://rytecepg.wanwizard.eu/rytecSRB_Misc.xz",
+        "http://epg.vuplus-community.net/rytecSRB_Misc.xz"
+      ],
+      "regions": [
+        "me",
+        "rs",
+        "sr"
+      ]
+    },
+    {
+      "key": "rytec-rytecsvn-basic-xz",
+      "label": "Slovenija - Podlaga (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecSVN_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecSVN_Basic.xz",
+        "http://epg.vuplus-community.net/rytecSVN_Basic.xz"
+      ],
+      "regions": [
+        "si",
+        "sl",
+        "svn"
+      ]
+    },
+    {
+      "key": "rytec-rytecsvn-misc-xz",
+      "label": "Slovenija - Dodatni (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecSVN_Misc.xz",
+        "http://rytecepg.wanwizard.eu/rytecSVN_Misc.xz",
+        "http://epg.vuplus-community.net/rytecSVN_Misc.xz"
+      ],
+      "regions": [
+        "si",
+        "sl",
+        "svn"
+      ]
+    },
+    {
+      "key": "rytec-rytecsvn-sportmovies-xz",
+      "label": "Slovenija - Sport/Film (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecSVN_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecSVN_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecSVN_SportMovies.xz"
+      ],
+      "regions": [
+        "si",
+        "sl",
+        "svn"
+      ]
+    },
+    {
+      "key": "rytec-rytecse-basic-xz",
+      "label": "Sverige - Grundlaggande (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecSE_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecSE_Basic.xz",
+        "http://epg.vuplus-community.net/rytecSE_Basic.xz"
+      ],
+      "regions": [
+        "se",
+        "sv"
+      ]
+    },
+    {
+      "key": "rytec-rytecse-misc-xz",
+      "label": "Sverige - Diverse (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecSE_Misc.xz",
+        "http://rytecepg.wanwizard.eu/rytecSE_Misc.xz",
+        "http://epg.vuplus-community.net/rytecSE_Misc.xz"
+      ],
+      "regions": [
+        "se",
+        "sv"
+      ]
+    },
+    {
+      "key": "rytec-rytecse-sportmovies-xz",
+      "label": "Sverige - Sport/Filmer (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecSE_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecSE_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecSE_SportMovies.xz"
+      ],
+      "regions": [
+        "se",
+        "sv"
+      ]
+    },
+    {
+      "key": "rytec-rytecfi-basic-xz",
+      "label": "Suomi - Perustiedot (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecFI_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecFI_Basic.xz",
+        "http://epg.vuplus-community.net/rytecFI_Basic.xz"
+      ],
+      "regions": [
+        "fi"
+      ]
+    },
+    {
+      "key": "rytec-rytecfi-misc-xz",
+      "label": "Suomi - Yhteinen (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecFI_Misc.xz",
+        "http://rytecepg.wanwizard.eu/rytecFI_Misc.xz",
+        "http://epg.vuplus-community.net/rytecFI_Misc.xz"
+      ],
+      "regions": [
+        "fi"
+      ]
+    },
+    {
+      "key": "rytec-rytecfi-sportmovies-xz",
+      "label": "Suomi - Sport/Movies (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecFI_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecFI_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecFI_SportMovies.xz"
+      ],
+      "regions": [
+        "fi"
+      ]
+    },
+    {
+      "key": "rytec-rytecuk-basic-xz",
+      "label": "UK/Ireland - FreeSat/FTA (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecUK_Basic.xz",
+        "http://rytecepg.wanwizard.eu/rytecUK_Basic.xz",
+        "http://epg.vuplus-community.net/rytecUK_Basic.xz"
+      ],
+      "regions": [
+        "gb",
+        "ie",
+        "uk"
+      ]
+    },
+    {
+      "key": "rytec-rytecuk-skylive-xz",
+      "label": "UK/Ireland - Sky (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecUK_SkyLive.xz",
+        "http://rytecepg.wanwizard.eu/rytecUK_SkyLive.xz",
+        "http://epg.vuplus-community.net/rytecUK_SkyLive.xz"
+      ],
+      "regions": [
+        "gb",
+        "ie",
+        "uk"
+      ]
+    },
+    {
+      "key": "rytec-rytecuk-sportmovies-xz",
+      "label": "UK/Ireland - Sports/Movies (xz)",
+      "family": "rytec",
+      "urls": [
+        "http://www.xmltvepg.nl/rytecUK_SportMovies.xz",
+        "http://rytecepg.wanwizard.eu/rytecUK_SportMovies.xz",
+        "http://epg.vuplus-community.net/rytecUK_SportMovies.xz"
+      ],
+      "regions": [
+        "gb",
+        "ie",
+        "uk"
+      ]
+    },
+    {
+      "key": "pl-basic",
+      "label": "Polska - Podstawowy",
+      "family": "azman",
+      "urls": [
+        "http://www.topolowa4.pl/azman_basic.xml.xz",
+        "http://www.xmltvepg.nl/azman_basic.xml.xz",
+        "http://rytecepg.wanwizard.eu/azman_basic.xml.xz",
+        "http://epg.vuplus-community.net/azman_basic.xml.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "pl-misc",
+      "label": "Polska - Dodatkowy",
+      "family": "azman",
+      "urls": [
+        "http://www.topolowa4.pl/azman_misc.xml.xz",
+        "http://www.xmltvepg.nl/azman_misc.xml.xz",
+        "http://rytecepg.wanwizard.eu/azman_misc.xml.xz",
+        "http://epg.vuplus-community.net/azman_misc.xml.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "azman-azman-iptv-xml-xz",
+      "label": "Polska - IPTV",
+      "family": "azman",
+      "urls": [
+        "http://www.topolowa4.pl/azman_iptv.xml.xz",
+        "http://www.xmltvepg.nl/azman_iptv.xml.xz",
+        "http://rytecepg.wanwizard.eu/azman_iptv.xml.xz",
+        "http://epg.vuplus-community.net/azman_iptv.xml.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "azman-azman-radio-xml-xz",
+      "label": "Polska - Radio",
+      "family": "azman",
+      "urls": [
+        "http://www.topolowa4.pl/azman_radio.xml.xz",
+        "http://www.xmltvepg.nl/azman_radio.xml.xz",
+        "http://rytecepg.wanwizard.eu/azman_radio.xml.xz",
+        "http://epg.vuplus-community.net/azman_radio.xml.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "azman-azman-vod-pb-xml-xz",
+      "label": "Polsat Box VOD/FAST",
+      "family": "azman",
+      "urls": [
+        "http://www.topolowa4.pl/azman_vod_pb.xml.xz",
+        "http://www.xmltvepg.nl/azman_vod_pb.xml.xz",
+        "http://rytecepg.wanwizard.eu/azman_vod_pb.xml.xz",
+        "http://epg.vuplus-community.net/azman_vod_pb.xml.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "azman-azman-itvn-xml-xz",
+      "label": "iTVN (Timezone)",
+      "family": "azman",
+      "urls": [
+        "http://www.topolowa4.pl/azman_itvn.xml.xz",
+        "http://www.xmltvepg.nl/azman_itvn.xml.xz",
+        "http://rytecepg.wanwizard.eu/azman_itvn.xml.xz",
+        "http://epg.vuplus-community.net/azman_itvn.xml.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "azman-azman-fast-tv-xml-xz",
+      "label": "Private Azman FAST TV",
+      "family": "azman",
+      "urls": [
+        "http://www.topolowa4.pl/azman_fast_tv.xml.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "azman-azman-testy-xml-xz",
+      "label": "Testy EPG",
+      "family": "azman",
+      "urls": [
+        "http://www.topolowa4.pl/azman_testy.xml.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "koala1",
+      "label": "Koala 7 dias - Classic XMLTV",
+      "family": "koala1",
+      "urls": [
+        "http://tropical.jungle-team.online/epg/koala7.xml.gz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "koala2",
+      "label": "Koala 15 dias XMLTV",
+      "family": "koala2",
+      "urls": [
+        "http://tropical.jungle-team.online/epg/koala15.xml.xz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "runigma-sat",
+      "label": "Runigma satellite XMLTV",
+      "family": "runigma-sat",
+      "urls": [
+        "http://runigma.com.ua/EPG/SAT/epg-sat.xml.gz"
+      ],
+      "regions": []
+    },
+    {
+      "key": "runigma-tricolor",
+      "label": "Tricolor satellite XMLTV",
+      "family": "runigma-tricolor",
+      "urls": [
+        "http://iptvx.one/epg/epg.xml.gz"
+      ],
+      "regions": []
+    }
+  ],
+  "mappings": {
+    "rytec": [
+      {
+        "key": "rytec-map",
+        "urls": [
+          "http://www.xmltvepg.nl/rytec.channels.xml.xz",
+          "http://rytecepg.wanwizard.eu/rytec.channels.xml.xz",
+          "http://epg.vuplus-community.net/rytec.channels.xml.xz"
+        ],
+        "satellites": null
+      }
+    ],
+    "azman": [
+      {
+        "key": "azman-map",
+        "urls": [
+          "http://www.topolowa4.pl/azman.channels.xml.xz",
+          "http://www.xmltvepg.nl/azman.channels.xml.xz",
+          "http://rytecepg.wanwizard.eu/azman.channels.xml.xz",
+          "http://epg.vuplus-community.net/azman.channels.xml.xz"
+        ],
+        "satellites": null
+      }
+    ],
+    "koala1": [
+      {
+        "key": "koala1-map",
+        "urls": [
+          "http://tropical.jungle-team.online/epg/koala7.channels.xml.gz"
+        ],
+        "satellites": null
+      }
+    ],
+    "koala2": [
+      {
+        "key": "koala2-map",
+        "urls": [
+          "http://tropical.jungle-team.online/epg/koala_epg.channels.xml.xz"
+        ],
+        "satellites": null
+      }
+    ],
+    "runigma-sat": [
+      {
+        "key": "runigma-sat-map-3560",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-4W.xml.gz"
+        ],
+        "satellites": [
+          3560
+        ]
+      },
+      {
+        "key": "runigma-sat-map-3590",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-1W.xml.gz"
+        ],
+        "satellites": [
+          3590
+        ]
+      },
+      {
+        "key": "runigma-sat-map-49",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-49E.xml.gz"
+        ],
+        "satellites": [
+          49
+        ]
+      },
+      {
+        "key": "runigma-sat-map-90",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-90E.xml.gz"
+        ],
+        "satellites": [
+          90
+        ]
+      },
+      {
+        "key": "runigma-sat-map-130",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-130E.xml.gz"
+        ],
+        "satellites": [
+          130
+        ]
+      },
+      {
+        "key": "runigma-sat-map-192",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-190E.xml.gz"
+        ],
+        "satellites": [
+          192
+        ]
+      },
+      {
+        "key": "runigma-sat-map-282",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-282E.xml.gz"
+        ],
+        "satellites": [
+          282
+        ]
+      },
+      {
+        "key": "runigma-sat-map-315",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-315E.xml.gz"
+        ],
+        "satellites": [
+          315
+        ]
+      },
+      {
+        "key": "runigma-sat-map-360",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-360E.xml.gz"
+        ],
+        "satellites": [
+          360
+        ]
+      },
+      {
+        "key": "runigma-sat-map-400",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-400E.xml.gz"
+        ],
+        "satellites": [
+          400
+        ]
+      },
+      {
+        "key": "runigma-sat-map-460",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-460E.xml.gz"
+        ],
+        "satellites": [
+          460
+        ]
+      },
+      {
+        "key": "runigma-sat-map-515",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-515E.xml.gz"
+        ],
+        "satellites": [
+          515
+        ]
+      },
+      {
+        "key": "runigma-sat-map-530",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-530E.xml.gz"
+        ],
+        "satellites": [
+          530
+        ]
+      },
+      {
+        "key": "runigma-sat-map-549",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-549E.xml.gz"
+        ],
+        "satellites": [
+          549
+        ]
+      },
+      {
+        "key": "runigma-sat-map-560",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-560E.xml.gz"
+        ],
+        "satellites": [
+          560
+        ]
+      },
+      {
+        "key": "runigma-sat-map-600",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-600E.xml.gz"
+        ],
+        "satellites": [
+          600
+        ]
+      },
+      {
+        "key": "runigma-sat-map-749",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-749E.xml.gz"
+        ],
+        "satellites": [
+          749
+        ]
+      },
+      {
+        "key": "runigma-sat-map-800",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-800E.xml.gz"
+        ],
+        "satellites": [
+          800
+        ]
+      },
+      {
+        "key": "runigma-sat-map-900",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-900E.xml.gz"
+        ],
+        "satellites": [
+          900
+        ]
+      },
+      {
+        "key": "runigma-sat-map-965",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-965E.xml.gz"
+        ],
+        "satellites": [
+          965
+        ]
+      }
+    ],
+    "runigma-tricolor": [
+      {
+        "key": "runigma-tricolor-map-360-tricolor",
+        "urls": [
+          "http://runigma.com.ua/EPG/SAT/channels-tricolor-360E.xml.gz"
+        ],
+        "satellites": [
+          360
+        ]
+      }
+    ]
+  }
+}

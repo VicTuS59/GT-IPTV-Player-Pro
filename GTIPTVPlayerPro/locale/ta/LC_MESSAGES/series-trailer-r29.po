@@ -1,0 +1,18 @@
+# Next episode trailer.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ta\n"
+
+msgid "Trailer"
+msgstr "முன்னோட்டம்"
+
+msgid "Searching for the next episode trailer..."
+msgstr "அடுத்த அத்தியாயத்தின் முன்னோட்டம் தேடப்படுகிறது..."
+
+msgid "No trailer found for the next episode."
+msgstr "அடுத்த அத்தியாயத்திற்கான முன்னோட்டம் கிடைக்கவில்லை."
+
+msgid "Next episode information is unavailable."
+msgstr "அடுத்த அத்தியாயத்தின் தகவல் கிடைக்கவில்லை."
+
+msgid "Could not search for a trailer. Please try again."
+msgstr "முன்னோட்டத்தைத் தேட முடியவில்லை. மீண்டும் முயற்சிக்கவும்."

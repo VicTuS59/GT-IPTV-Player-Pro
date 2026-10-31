@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: bg\n"
+
+msgid "Provider order"
+msgstr "Ред на доставчика"
+
+msgid "Newest added"
+msgstr "Най-скоро добавени"
+
+msgid "Alphabetical (A–Z)"
+msgstr "По азбучен ред (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Дата на издаване (най-новите първо)"
+
+msgid "Saved manual order"
+msgstr "Запазен ръчен ред"
+
+msgid "Sorting"
+msgstr "Сортиране"
+
+msgid "Sort content"
+msgstr "Сортиране на съдържанието"
+
+msgid "Sort channels"
+msgstr "Сортиране на каналите"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Този източник не предоставя дати за този ред на сортиране."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Сортирането изисква цялата категория. Изчакайте или опитайте отново."
+
+msgid "Could not save sorting preference."
+msgstr "Настройката за сортиране не можа да бъде запазена."

@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "تحديث البرنامج"
+
+msgid "Automatic update check"
+msgstr "التحقق التلقائي من التحديثات"
+
+msgid "Check for updates"
+msgstr "التحقق من التحديثات"
+
+msgid "Download and verify"
+msgstr "تنزيل والتحقق"
+
+msgid "Install update"
+msgstr "تثبيت التحديث"
+
+msgid "Update available"
+msgstr "يتوفر تحديث"
+
+msgid "Up to date"
+msgstr "محدّث"
+
+msgid "Update verified"
+msgstr "تم التحقق من التحديث"
+
+msgid "Restart interface"
+msgstr "إعادة تشغيل الواجهة"
+
+msgid "Update source is not ready"
+msgstr "مصدر التحديث غير جاهز بعد"
+
+msgid "Update signature is invalid"
+msgstr "توقيع التحديث غير صالح"
+
+msgid "Invalid update information"
+msgstr "معلومات التحديث غير صالحة"
+
+msgid "Update package is invalid"
+msgstr "حزمة التحديث غير صالحة"
+
+msgid "Update is not compatible with this receiver"
+msgstr "التحديث غير متوافق مع جهاز الاستقبال هذا"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "أوقف التسجيلات والتنزيلات قبل التحديث"
+
+msgid "Update failed"
+msgstr "فشل التحديث"
+
+msgid "Update installed. Restart the interface."
+msgstr "تم تثبيت التحديث. أعد تشغيل الواجهة."
+
+msgid "Install the verified update?"
+msgstr "هل تريد تثبيت التحديث الذي تم التحقق منه؟"
+
+msgid "Update available. Open updater?"
+msgstr "يتوفر تحديث. هل تريد فتح أداة التحديث؟"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "يُجرى التحقق التلقائي كل 6 ساعات."
+
+msgid "New version"
+msgstr "إصدار جديد"
+

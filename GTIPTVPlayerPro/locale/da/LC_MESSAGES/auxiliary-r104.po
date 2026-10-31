@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Tilføj M3U-kilde"
+
+msgid "Application"
+msgstr "Program"
+
+msgid "Application information"
+msgstr "Programoplysninger"
+
+msgid "Category Management"
+msgstr "Kategoristyring"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Ændringerne anvendes, når du trykker på GRØN."
+
+msgid "Choose the source name and location."
+msgstr "Vælg kildens navn og placering."
+
+msgid "Compatibility"
+msgstr "Kompatibilitet"
+
+msgid "Country"
+msgstr "Land"
+
+msgid "Developer"
+msgstr "Udvikler"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Direkte HTTP(S)-adresse til M3U-afspilningslisten."
+
+msgid "District"
+msgstr "Distrikt"
+
+msgid "Frame rate"
+msgstr "Billedfrekvens"
+
+msgid "Language"
+msgstr "Sprog"
+
+msgid "Platform"
+msgstr "Platform"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Tryk på BLÅ for at indtaste et andet kanalnavn."
+
+msgid "Press GREEN to save the source."
+msgstr "Tryk på GRØN for at gemme kilden."
+
+msgid "Press GREEN to use this folder."
+msgstr "Tryk på GRØN for at bruge denne mappe."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Tryk på OK for at hente den valgte undertekst."
+
+msgid "Press OK to load this subtitle."
+msgstr "Tryk på OK for at indlæse denne undertekst."
+
+msgid "Press OK to play the selected video."
+msgstr "Tryk på OK for at afspille den valgte video."
+
+msgid "Press OK to search again."
+msgstr "Tryk på OK for at søge igen."
+
+msgid "Press OK to select this location."
+msgstr "Tryk på OK for at vælge dette sted."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Tryk på OK for at vise eller skjule kategorien. Markér kategorier med RØD for at flytte dem sammen."
+
+msgid "Province"
+msgstr "Provins"
+
+msgid "Release"
+msgstr "Udgave"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Søg efter undertekster, eller skift filteret."
+
+msgid "Select a folder or subtitle file."
+msgstr "Vælg en mappe eller en undertekstfil."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Vælg en afspilningsliste fra modtageren, USB eller tilsluttet netværkslager."
+
+msgid "Selected category"
+msgstr "Valgt kategori"
+
+msgid "Selected folder"
+msgstr "Valgt mappe"
+
+msgid "Selected location"
+msgstr "Valgt sted"
+
+msgid "Selected search"
+msgstr "Valgt søgning"
+
+msgid "Selected subtitle"
+msgstr "Valgt undertekst"
+
+msgid "Selected video"
+msgstr "Valgt video"
+
+msgid "Source code"
+msgstr "Kildekode"
+
+msgid "Source location"
+msgstr "Kildens placering"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Undertekstfiler: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Understøttet format"
+

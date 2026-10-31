@@ -1,0 +1,12 @@
+# Category sorting r51
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: hu\n"
+
+msgid "Edit categories"
+msgstr "Kategóriák szerkesztése"
+
+msgid "Sort categories"
+msgstr "Kategóriák rendezése"
+
+msgid "Alphabetical (Z–A)"
+msgstr "Ábécérend (Z–A)"

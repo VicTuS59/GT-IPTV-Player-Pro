@@ -22,6 +22,10 @@ APPEARANCE_DESKTOPS = (
 
 def set_appearance_pixmap(screen, component, path):
     """Share native RGBA surfaces within this page; never flatten their alpha."""
+    from .graphics_policy import wallpaper_path
+    original_path = path
+    path = wallpaper_path(path, 1920, 1080)
+    wallpaper = path != original_path or path.endswith('-fhd-r82.png')
     instance = getattr(component, "instance", None)
     if instance is None:
         return False
@@ -37,10 +41,12 @@ def set_appearance_pixmap(screen, component, path):
     if pixmap is None and callable(getattr(instance, "setPixmap", None)):
         try:
             from Tools.LoadPixmap import LoadPixmap
-            pixmap = LoadPixmap(path=path)
+            pixmap = LoadPixmap(path=path, cached=False) if wallpaper else LoadPixmap(path=path)
         except (ImportError, AttributeError, OSError, RuntimeError, TypeError, ValueError):
             pixmap = None
     try:
+        if wallpaper:
+            instance.setScale(1)
         if pixmap is not None:
             instance.setPixmap(pixmap)
             pool[path] = pixmap

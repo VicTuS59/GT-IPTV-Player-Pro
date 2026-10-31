@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keymap>
+    <map context="GTIPTVPlayerProSeriesTrailerActions">
+        <key id="KEY_PLAY" mapto="playTrailer" flags="m" />
+        <key id="KEY_PLAYPAUSE" mapto="playTrailer" flags="m" />
+    </map>
+</keymap>

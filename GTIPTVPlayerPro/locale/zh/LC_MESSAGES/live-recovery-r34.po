@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: zh\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "正在恢复连接"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "连接失败"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "源拒绝了视频连接（HTTP {status:d}）"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "源未发送新数据"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "连接恢复超时"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "正在尝试重新连接源"

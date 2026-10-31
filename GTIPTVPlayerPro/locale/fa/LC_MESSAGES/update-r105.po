@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "به‌روزرسانی نرم‌افزار"
+
+msgid "Automatic update check"
+msgstr "بررسی خودکار به‌روزرسانی‌ها"
+
+msgid "Check for updates"
+msgstr "بررسی به‌روزرسانی‌ها"
+
+msgid "Download and verify"
+msgstr "دریافت و بررسی"
+
+msgid "Install update"
+msgstr "نصب به‌روزرسانی"
+
+msgid "Update available"
+msgstr "به‌روزرسانی موجود است"
+
+msgid "Up to date"
+msgstr "به‌روز است"
+
+msgid "Update verified"
+msgstr "به‌روزرسانی تأیید شد"
+
+msgid "Restart interface"
+msgstr "راه‌اندازی دوباره رابط"
+
+msgid "Update source is not ready"
+msgstr "منبع به‌روزرسانی هنوز آماده نیست"
+
+msgid "Update signature is invalid"
+msgstr "امضای به‌روزرسانی معتبر نیست"
+
+msgid "Invalid update information"
+msgstr "اطلاعات به‌روزرسانی نامعتبر است"
+
+msgid "Update package is invalid"
+msgstr "بسته به‌روزرسانی معتبر نیست"
+
+msgid "Update is not compatible with this receiver"
+msgstr "به‌روزرسانی با این گیرنده سازگار نیست"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "پیش از به‌روزرسانی ضبط‌ها و دریافت‌ها را متوقف کنید"
+
+msgid "Update failed"
+msgstr "به‌روزرسانی ناموفق بود"
+
+msgid "Update installed. Restart the interface."
+msgstr "به‌روزرسانی نصب شد. رابط را دوباره راه‌اندازی کنید."
+
+msgid "Install the verified update?"
+msgstr "به‌روزرسانی تأییدشده نصب شود؟"
+
+msgid "Update available. Open updater?"
+msgstr "به‌روزرسانی موجود است. ابزار به‌روزرسانی باز شود؟"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "بررسی خودکار هر 6 ساعت انجام می‌شود."
+
+msgid "New version"
+msgstr "نسخه جدید"
+

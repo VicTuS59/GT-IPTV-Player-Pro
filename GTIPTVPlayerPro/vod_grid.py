@@ -228,7 +228,7 @@ def poster_grid_skin(kind, width, height, px, favorite_star, cinematic_skin):
         ("title", "info_title", 34, "#FFFFFF"),
         ("rating", "info_rating", 22, "#FACC15"),
         ("meta", "info_meta", 22, "#CBD5E1"),
-        ("plot", "info_plot", 23, "#E2E8F0"),
+        ("plot", "info_plot", 29, "#E2E8F0"),
         ("people", "info_people", 20, "#CBD5E1"),
     ):
         widget(kind + "_" + suffix, geometry[rect], px(font), colour,

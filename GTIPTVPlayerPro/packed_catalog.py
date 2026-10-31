@@ -22,6 +22,9 @@ class PackedRows:
         self.names = bytearray()
         self.ends = array("I", [0])
         self.codes = array("I")
+        self.sort_added = array("Q")
+        self.sort_release = array("Q")
+        self.has_sort_added = self.has_sort_release = False
         self.groups = [()]
         self.group_codes = {(): 0}
         self.blocks = []
@@ -36,6 +39,9 @@ class PackedRows:
         self.names.clear()
         self.ends = array("I", [0])
         self.codes = array("I")
+        self.sort_added = array("Q")
+        self.sort_release = array("Q")
+        self.has_sort_added = self.has_sort_release = False
         self.groups = [()]
         self.group_codes = {(): 0}
         self.blocks.clear()
@@ -65,10 +71,15 @@ class PackedRows:
                 self.groups.append(group)
                 self.group_codes[group] = code
             self.codes[previous] = code
+            if not self.sort_added[previous] and record.get('sa'):
+                self.sort_added[previous] = int(record['sa']);self.has_sort_added = True
+            if not self.sort_release[previous] and record.get('sr'):
+                self.sort_release[previous] = int(record['sr']);self.has_sort_release = True
             return
         if len(self.pending) == BLOCK_ROWS:
             self.flush()
         body = dict(record)
+        sort_added, sort_release = int(body.pop("sa", 0) or 0), int(body.pop("sr", 0) or 0)
         name = body.pop("u").replace("\x00", " ").encode("utf-8") + b"\0"
         body.pop("a", None)
         raw = json.dumps(body, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -76,7 +87,7 @@ class PackedRows:
             error = CatalogLimitError("record-size")
             error.limit_kind = "record-size"
             raise error
-        cost = sys.getsizeof(key) + 128 + sys.getsizeof(raw) + len(name) + 24 + group_cost
+        cost = sys.getsizeof(key) + 128 + sys.getsizeof(raw) + len(name) + 40 + group_cost
         self.resize(cost)
         count, name_size, old_groups = len(self), len(self.names), len(self.groups)
         try:
@@ -88,18 +99,24 @@ class PackedRows:
             self.names.extend(name)
             self.ends.append(len(self.names))
             self.codes.append(code)
+            self.sort_added.append(sort_added)
+            self.sort_release.append(sort_release)
             self.pending.append(raw)
         except BaseException:
             self.by_id.pop(key, None)
             del self.names[name_size:]
             del self.ends[count + 1:]
             del self.codes[count:]
+            del self.sort_added[count:]
+            del self.sort_release[count:]
             del self.pending[count % BLOCK_ROWS:]
             if len(self.groups) > old_groups:
                 self.groups.pop()
                 self.group_codes.pop(group, None)
             self.resize(-cost)
             raise
+        self.has_sort_added = self.has_sort_added or bool(sort_added)
+        self.has_sort_release = self.has_sort_release or bool(sort_release)
         if len(self.pending) == BLOCK_ROWS:
             self.flush()
 
@@ -146,6 +163,8 @@ class PackedRows:
             raw = cached[0][offset]
         record = json.loads(raw)
         record["a"] = self.groups[self.codes[position]]
+        record["sa"] = self.sort_added[position]
+        record["sr"] = self.sort_release[position]
         return record
 
     def matches(self, terms, permitted, check):

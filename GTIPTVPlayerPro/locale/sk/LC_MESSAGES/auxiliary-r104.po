@@ -1,0 +1,115 @@
+# R104: complete the 38 auxiliary UI translations
+msgid "Add M3U source"
+msgstr "Pridať zdroj M3U"
+
+msgid "Application"
+msgstr "Aplikácia"
+
+msgid "Application information"
+msgstr "Informácie o aplikácii"
+
+msgid "Category Management"
+msgstr "Správa kategórií"
+
+msgid "Changes are applied when you press GREEN."
+msgstr "Zmeny sa použijú po stlačení ZELENÉHO tlačidla."
+
+msgid "Choose the source name and location."
+msgstr "Vyberte názov a umiestnenie zdroja."
+
+msgid "Compatibility"
+msgstr "Kompatibilita"
+
+msgid "Country"
+msgstr "Krajina"
+
+msgid "Developer"
+msgstr "Vývojár"
+
+msgid "Direct HTTP(S) M3U playlist address."
+msgstr "Priama HTTP(S) adresa zoznamu M3U."
+
+msgid "District"
+msgstr "Okres"
+
+msgid "Frame rate"
+msgstr "Snímková frekvencia"
+
+msgid "Language"
+msgstr "Jazyk"
+
+msgid "Platform"
+msgstr "Platforma"
+
+msgid "Press BLUE to enter another channel name."
+msgstr "Stlačením MODRÉHO tlačidla zadajte iný názov kanála."
+
+msgid "Press GREEN to save the source."
+msgstr "Stlačením ZELENÉHO tlačidla uložte zdroj."
+
+msgid "Press GREEN to use this folder."
+msgstr "Stlačením ZELENÉHO tlačidla použite tento priečinok."
+
+msgid "Press OK to download the selected subtitle."
+msgstr "Stlačením OK stiahnite vybrané titulky."
+
+msgid "Press OK to load this subtitle."
+msgstr "Stlačením OK načítajte tieto titulky."
+
+msgid "Press OK to play the selected video."
+msgstr "Stlačením OK prehrajte vybrané video."
+
+msgid "Press OK to search again."
+msgstr "Stlačením OK vyhľadajte znova."
+
+msgid "Press OK to select this location."
+msgstr "Stlačením OK vyberte toto miesto."
+
+msgid "Press OK to show or hide the category. Mark categories with RED to move them together."
+msgstr "Stlačením OK zobrazíte alebo skryjete kategóriu. Kategórie označte ČERVENÝM tlačidlom, aby ste ich presunuli spoločne."
+
+msgid "Province"
+msgstr "Provincia"
+
+msgid "Release"
+msgstr "Verzia"
+
+msgid "Search for subtitles or change the filter."
+msgstr "Vyhľadajte titulky alebo zmeňte filter."
+
+msgid "Select a folder or subtitle file."
+msgstr "Vyberte priečinok alebo súbor titulkov."
+
+msgid "Select a playlist from the receiver, USB or mounted network storage."
+msgstr "Vyberte zoznam prehrávania z prijímača, USB alebo pripojeného sieťového úložiska."
+
+msgid "Selected category"
+msgstr "Vybraná kategória"
+
+msgid "Selected folder"
+msgstr "Vybraný priečinok"
+
+msgid "Selected location"
+msgstr "Vybrané miesto"
+
+msgid "Selected search"
+msgstr "Vybrané vyhľadávanie"
+
+msgid "Selected subtitle"
+msgstr "Vybrané titulky"
+
+msgid "Selected video"
+msgstr "Vybrané video"
+
+msgid "Source code"
+msgstr "Zdrojový kód"
+
+msgid "Source location"
+msgstr "Umiestnenie zdroja"
+
+msgid "Subtitle files: SRT / ASS / SSA / SUB / VTT"
+msgstr "Súbory titulkov: SRT / ASS / SSA / SUB / VTT"
+
+msgid "Supported format"
+msgstr "Podporovaný formát"
+

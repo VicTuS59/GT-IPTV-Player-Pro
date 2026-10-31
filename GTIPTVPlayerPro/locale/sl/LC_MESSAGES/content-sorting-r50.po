@@ -1,0 +1,36 @@
+# Content sorting r50
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sl\n"
+
+msgid "Provider order"
+msgstr "Vrstni red ponudnika"
+
+msgid "Newest added"
+msgstr "Najnovejše dodano"
+
+msgid "Alphabetical (A–Z)"
+msgstr "Abecedno (A–Z)"
+
+msgid "Release date (newest first)"
+msgstr "Datum izida (najnovejši najprej)"
+
+msgid "Saved manual order"
+msgstr "Shranjen ročni vrstni red"
+
+msgid "Sorting"
+msgstr "Razvrščanje"
+
+msgid "Sort content"
+msgstr "Razvrsti vsebino"
+
+msgid "Sort channels"
+msgstr "Razvrsti kanale"
+
+msgid "This source does not provide dates for this sort order."
+msgstr "Ta vir ne zagotavlja datumov za ta način razvrščanja."
+
+msgid "Sorting requires the complete category. Please wait or retry."
+msgstr "Razvrščanje zahteva celotno kategorijo. Počakajte ali poskusite znova."
+
+msgid "Could not save sorting preference."
+msgstr "Nastavitve razvrščanja ni bilo mogoče shraniti."

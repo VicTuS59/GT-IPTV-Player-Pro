@@ -1,0 +1,6 @@
+# Welcome heading r95
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: tr\n"
+
+msgid "Ready to watch?"
+msgstr "İzlemeye hazır mısın?"

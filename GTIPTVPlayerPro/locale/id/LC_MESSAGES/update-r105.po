@@ -1,0 +1,64 @@
+# R106 software updater: single stable source
+msgid "Software update"
+msgstr "Pembaruan perangkat lunak"
+
+msgid "Automatic update check"
+msgstr "Pemeriksaan pembaruan otomatis"
+
+msgid "Check for updates"
+msgstr "Periksa pembaruan"
+
+msgid "Download and verify"
+msgstr "Unduh dan verifikasi"
+
+msgid "Install update"
+msgstr "Pasang pembaruan"
+
+msgid "Update available"
+msgstr "Pembaruan tersedia"
+
+msgid "Up to date"
+msgstr "Sudah terbaru"
+
+msgid "Update verified"
+msgstr "Pembaruan terverifikasi"
+
+msgid "Restart interface"
+msgstr "Mulai ulang antarmuka"
+
+msgid "Update source is not ready"
+msgstr "Sumber pembaruan belum siap"
+
+msgid "Update signature is invalid"
+msgstr "Tanda tangan pembaruan tidak valid"
+
+msgid "Invalid update information"
+msgstr "Informasi pembaruan tidak valid"
+
+msgid "Update package is invalid"
+msgstr "Paket pembaruan tidak valid"
+
+msgid "Update is not compatible with this receiver"
+msgstr "Pembaruan tidak kompatibel dengan penerima ini"
+
+msgid "Stop recordings and downloads before updating"
+msgstr "Hentikan perekaman dan unduhan sebelum memperbarui"
+
+msgid "Update failed"
+msgstr "Pembaruan gagal"
+
+msgid "Update installed. Restart the interface."
+msgstr "Pembaruan terpasang. Mulai ulang antarmuka."
+
+msgid "Install the verified update?"
+msgstr "Pasang pembaruan yang telah diverifikasi?"
+
+msgid "Update available. Open updater?"
+msgstr "Pembaruan tersedia. Buka pembaru?"
+
+msgid "Automatic checks run every 6 hours."
+msgstr "Pemeriksaan otomatis setiap 6 jam."
+
+msgid "New version"
+msgstr "Versi baru"
+

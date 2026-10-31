@@ -1,0 +1,27 @@
+# Stalker connection recovery, r34.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: hu\n"
+
+msgctxt "Live stream panel"
+msgid "Restoring connection"
+msgstr "Kapcsolat helyreállítása"
+
+msgctxt "Live stream panel"
+msgid "Connection failed"
+msgstr "A kapcsolódás sikertelen"
+
+msgctxt "Live stream panel"
+msgid "Source rejected video connection (HTTP {status:d})"
+msgstr "A forrás elutasította a videokapcsolatot (HTTP {status:d})"
+
+msgctxt "Live stream panel"
+msgid "Source is not sending new data"
+msgstr "A forrás nem küld új adatokat"
+
+msgctxt "Live stream panel"
+msgid "Connection recovery timed out"
+msgstr "Lejárt a kapcsolat helyreállításának ideje"
+
+msgctxt "Live stream panel"
+msgid "Trying a fresh source connection"
+msgstr "Új kapcsolat próbálása a forrással"

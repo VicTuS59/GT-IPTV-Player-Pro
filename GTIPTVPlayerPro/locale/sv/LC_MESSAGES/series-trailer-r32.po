@@ -1,0 +1,12 @@
+# General official trailer fallback.
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: sv\n"
+
+msgid "General trailer"
+msgstr "Allmän trailer"
+
+msgid "Searching for a trailer..."
+msgstr "Söker efter en trailer..."
+
+msgid "No official trailer found."
+msgstr "Ingen officiell trailer hittades."
