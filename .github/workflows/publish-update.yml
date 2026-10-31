@@ -18,7 +18,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Offline updater security and package tests
-        run: python3 -B tests/test-updater.py
+        run: |
+          python3 -B tests/test-updater.py
+          python3 -B tests/test-update-backup.py
       - name: Build, sign and publish stable update
         env:
           GH_TOKEN: ${{ github.token }}

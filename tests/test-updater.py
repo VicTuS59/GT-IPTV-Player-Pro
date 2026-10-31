@@ -171,6 +171,11 @@ class UpdateServiceTests(unittest.TestCase):
   runner=Mock();busy=Mock(side_effect=[False,True])
   with self.assertRaises(UpdateError):self.install_call(runner=runner,busy=busy)
   self.assertEqual(busy.call_count,2);runner.assert_not_called()
+ def test_flash_space_is_rechecked_after_backup_before_opkg(self):
+  runner=Mock(return_value=0);safety=Mock(return_value=str(Path(self.folder)/'safety.gtbackup'))
+  with patch.object(service.shutil,'disk_usage',side_effect=[types.SimpleNamespace(free=10**9),types.SimpleNamespace(free=10**9),types.SimpleNamespace(free=1)]),self.assertRaises(UpdateError) as error:
+   self.install_call(runner=runner,backup=safety)
+  self.assertEqual(error.exception.code,'space');safety.assert_called_once();runner.assert_not_called()
  def test_opkg_failure_is_visible_and_keeps_backup(self):
   for effect in (1,OSError('failed')):
    run=Mock(return_value=effect) if isinstance(effect,int) else Mock(side_effect=effect)

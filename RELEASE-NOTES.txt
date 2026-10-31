@@ -1,1 +1,1 @@
-Removed unnecessary menu text from the plugin.
+Fixed update installation on receivers without a mounted backup drive.

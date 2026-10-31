@@ -158,7 +158,9 @@ class GTSoftwareUpdateScreen(Screen):
     def _error(self,error):
         code=getattr(error,'code','failed')
         self._status=code if code in LABELS else 'current' if code=='version' else 'installed' if code=='restart' else 'failed'
-        self._detail=_('Cancelled') if code=='cancelled' else _('Not enough free space.') if code=='space' else ''
+        details={'cancelled':'Cancelled','space':'Not enough free space.',
+                 'storage':'Storage is unavailable or not writable.','backup':'Backup or restore failed.'}
+        self._detail=_(details[code]) if code in details else ''
 
     def up(self):
         if not self._busy:self._selected=(self._selected-1)%2;self._render()

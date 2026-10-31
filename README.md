@@ -1,6 +1,7 @@
-# GT IPTV Player Pro 1.7.0-r107
+# GT IPTV Player Pro 1.7.0-r108
 
-Removed unnecessary menu text from the plugin.
+Fixed update installation on receivers without a mounted backup drive.
 
-Signed stable updates are available through Settings > Software update.
-Publishing instructions: [UPDATING.md](UPDATING.md). Offline updater checks: `python3 -B tests/test-updater.py`.
+The updater honors the configured backup folder and falls back to private internal storage when the drive is unavailable or full. A safety backup is still required before installation. Existing installations with the old updater may need a one-time manual installation on receivers without a backup drive.
+
+Signed stable updates: Settings > Software update. Publishing: [UPDATING.md](UPDATING.md). Offline checks: `python3 -B tests/test-updater.py` and `python3 -B tests/test-update-backup.py`.

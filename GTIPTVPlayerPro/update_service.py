@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Updater state, bounded verified downloads and explicitly requested opkg installation."""
 import base64
+import errno
 import hashlib
 import json
 import os
@@ -19,6 +20,7 @@ from .update_package import inspect_ipk
 
 SETTINGS='/etc/enigma2/gtiptvplayer/update-settings.json'
 CACHE='/tmp/gtiptv-updates'
+BACKUP_FALLBACK='/etc/enigma2'
 INTERVAL=6*60*60
 _STATE_LOCK=threading.RLock()
 _CHECK_LOCK=threading.Lock()
@@ -187,6 +189,8 @@ class UpdateService:
             safety=backup()
             if not isinstance(safety,str) or not os.path.isfile(safety):raise UpdateError('backup')
             if busy():raise UpdateError('busy')
+            # A fallback backup can consume the same flash that opkg needs.
+            if shutil.disk_usage(root).free<required:raise UpdateError('space')
             # Revalidate bytes and identity after the backup and immediately
             # before crossing the package-manager execution boundary.
             inspect_ipk(path,manifest)
@@ -231,20 +235,54 @@ def receiver_busy(session):
     return False
 
 def create_safety_backup():
-    from .backup import BackupManager
-    from .settings import load_player_settings
-    preferred=getattr(load_player_settings(),'backup_folder','/media/hdd')
-    parent=os.path.realpath(preferred) if os.path.isdir(preferred) and os.access(preferred,os.W_OK) else '/etc/enigma2'
-    folder=private_directory(os.path.join(parent,'gtiptv-update-backups'))
-    result=BackupManager().create(folder,label='safety')
-    if not isinstance(result,dict) or not result.get('path'):raise UpdateError('backup')
+    from .backup import BackupError,BackupManager
+    from .settings import plugin_config_section
+    section=plugin_config_section()
+    preferred=getattr(getattr(section,'backup_folder',None),'value','') or '/media/hdd'
+    if not isinstance(preferred,str) or not os.path.isabs(preferred):preferred='/media/hdd'
+    manager=BackupManager();attempted=set();failure='storage'
+    for parent in (preferred,BACKUP_FALLBACK):
+        try:
+            # Use the backup manager's mount, writable-storage and source-path
+            # checks before creating a directory. /media/hdd may be a writable
+            # placeholder on a tiny tmpfs even when no disk is connected.
+            parent=manager.destination(parent)
+            if parent in attempted:continue
+            attempted.add(parent)
+            folder=private_directory(os.path.join(parent,'gtiptv-update-backups'))
+            # create() rechecks the destination and the actual archive size
+            # under its persistence lock; never bypass backup to allow opkg.
+            result=manager.create(folder,label='safety')
+        except BackupError as error:
+            if error.code not in ('storage','space'):
+                raise UpdateError(error.code if error.code in ('busy','cancelled') else 'backup') from error
+            failure=error.code
+            continue
+        except OSError as error:
+            failure='space' if error.errno in (errno.ENOSPC,getattr(errno,'EDQUOT',errno.ENOSPC)) else 'storage'
+            continue
+        except UpdateError as error:
+            if error.code!='storage':raise
+            failure=error.code
+            continue
+        if not isinstance(result,dict) or not isinstance(result.get('path'),str) or not os.path.isfile(result['path']):
+            raise UpdateError('backup')
+        _trim_safety_backups(folder,result['path'])
+        return result['path']
+    raise UpdateError(failure)
+
+
+def _trim_safety_backups(folder,current):
     # This dedicated directory owns only automatic pre-update backups.
     from .backup import EXTENSION
-    owned=[]
-    for name in os.listdir(folder):
-        if name.startswith('GTIPTVPlayerPro-') and '-safety-' in name and name.endswith(EXTENSION):
-            path=os.path.join(folder,name);info=os.lstat(path)
-            if stat.S_ISREG(info.st_mode) and info.st_uid==os.geteuid():owned.append((info.st_mtime_ns,path))
-    for unused,path in sorted(owned,reverse=True)[3:]:
-        if path!=result['path']:os.unlink(path)
-    return result['path']
+    try:
+        owned=[]
+        for name in os.listdir(folder):
+            if name.startswith('GTIPTVPlayerPro-') and '-safety-' in name and name.endswith(EXTENSION):
+                path=os.path.join(folder,name);info=os.lstat(path)
+                if stat.S_ISREG(info.st_mode) and info.st_uid==os.geteuid() and path!=current:
+                    owned.append((info.st_mtime_ns,path))
+        for unused,path in sorted(owned,reverse=True)[2:]:os.unlink(path)
+    except OSError:
+        # Retention is housekeeping; a completed safety backup remains usable.
+        pass
