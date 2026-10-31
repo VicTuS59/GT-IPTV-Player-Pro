@@ -1,1 +1,1 @@
-Fixed update installation on receivers without a mounted backup drive.
+Fixed update progress feedback and automatic interface restart confirmation.

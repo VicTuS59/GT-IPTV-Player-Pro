@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "Staðfesti uppfærslu..."
+
+msgid "Installing update..."
+msgstr "Set upp uppfærslu..."
+
+msgid "Configuring update..."
+msgstr "Stilli uppfærslu..."
+

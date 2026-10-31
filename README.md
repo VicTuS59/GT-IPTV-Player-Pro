@@ -1,7 +1,7 @@
-# GT IPTV Player Pro 1.7.0-r108
+# GT IPTV Player Pro 1.7.0-r110
 
-Fixed update installation on receivers without a mounted backup drive.
+Fixed update progress feedback and automatic interface restart confirmation.
 
-The updater honors the configured backup folder and falls back to private internal storage when the drive is unavailable or full. A safety backup is still required before installation. Existing installations with the old updater may need a one-time manual installation on receivers without a backup drive.
+Measured download/backup progress, bounded package-manager stage feedback, and an automatic restart question after the native screen becomes ready. Restart still requires user consent.
 
-Signed stable updates: Settings > Software update. Publishing: [UPDATING.md](UPDATING.md). Offline checks: `python3 -B tests/test-updater.py` and `python3 -B tests/test-update-backup.py`.
+Offline checks: `python3 -B tests/test-updater.py`, `python3 -B tests/test-update-backup.py`, `python3 -B tests/test-update-feedback.py`. Publishing: [UPDATING.md](UPDATING.md).

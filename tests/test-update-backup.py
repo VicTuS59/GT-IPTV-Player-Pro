@@ -50,6 +50,11 @@ class SafetyBackupTests(unittest.TestCase):
   path=self.create();self.assertEqual(path.parent,self.drive/'gtiptv-update-backups')
   self.assertFalse((self.flash/'gtiptv-update-backups').exists())
 
+ def test_actual_backup_bytes_and_completion_reach_the_feedback_consumer(self):
+  events=[];path=service.create_safety_backup(progress=lambda *e:events.append(e))
+  self.assertTrue(Path(path).is_file());self.assertTrue(events)
+  self.assertTrue(all(e[0]=='backup' for e in events));self.assertEqual(events[-1],('backup',1,1))
+  self.assertTrue(any(e[2]>0 and e[1]>0 for e in events))
  def test_missing_drive_falls_back_without_recreating_missing_parent(self):
   missing=self.root/'missing-disk';self.section.backup_folder.value=str(missing)
   self.assertEqual(self.create().parent,self.flash/'gtiptv-update-backups');self.assertFalse(missing.exists())

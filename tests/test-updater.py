@@ -181,6 +181,20 @@ class UpdateServiceTests(unittest.TestCase):
    run=Mock(return_value=effect) if isinstance(effect,int) else Mock(side_effect=effect)
    with self.assertRaises(UpdateError):self.install_call(runner=run)
    self.assertEqual(self.state.read()['result'],'install-failed');self.assertTrue(Path(self.state.read()['backup']).is_file())
+ def test_cached_download_reports_verified_completion_without_another_transfer(self):
+  offer=self.offer();self.s.download(offer);events=[];progress=[];calls=len(self.network.calls)
+  self.s.download(offer,progress=lambda a,b:progress.append((a,b)),feedback=lambda *e:events.append(e))
+  self.assertEqual(len(self.network.calls),calls);self.assertEqual(progress[-1],(len(ipk()),len(ipk())))
+  self.assertEqual([e[0] for e in events],['verify','downloaded'])
+ def test_installer_completion_follows_persisted_success_and_failures_never_complete(self):
+  events=[]
+  def progress(phase,done,total):events.append((phase,self.state.read()['result']))
+  self.install_call(progress=progress)
+  self.assertEqual([e[0] for e in events],['verify','backup','verify','install','complete'])
+  self.assertEqual(events[-1],('complete','installed'))
+  self.state=MemoryState();self.s.state=self.state;events.clear()
+  with self.assertRaises(UpdateError):self.install_call(progress=progress,runner=Mock(return_value=1))
+  self.assertNotIn('complete',[e[0] for e in events]);self.assertEqual(self.state.read()['result'],'install-failed')
  def test_atomic_state_preserves_options_and_private_mode(self):
   state=service.UpdateState(str(Path(self.folder)/'state/settings.json'));self.assertTrue(state.read()['auto'])
   state.write(auto=False);state.write(skipped='1.7.0-r107');self.assertEqual(state.read()['channel'],'stable');self.assertFalse(state.read()['auto'])

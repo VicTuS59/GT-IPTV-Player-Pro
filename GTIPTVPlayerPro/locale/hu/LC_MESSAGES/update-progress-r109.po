@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "Frissítés ellenőrzése..."
+
+msgid "Installing update..."
+msgstr "Frissítés telepítése..."
+
+msgid "Configuring update..."
+msgstr "Frissítés beállítása..."
+

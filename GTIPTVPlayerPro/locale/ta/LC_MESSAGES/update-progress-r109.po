@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "புதுப்பிப்பைச் சரிபார்க்கிறது..."
+
+msgid "Installing update..."
+msgstr "புதுப்பிப்பை நிறுவுகிறது..."
+
+msgid "Configuring update..."
+msgstr "புதுப்பிப்பை அமைக்கிறது..."
+

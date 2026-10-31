@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "Γίνεται επαλήθευση ενημέρωσης..."
+
+msgid "Installing update..."
+msgstr "Γίνεται εγκατάσταση ενημέρωσης..."
+
+msgid "Configuring update..."
+msgstr "Γίνεται ρύθμιση ενημέρωσης..."
+

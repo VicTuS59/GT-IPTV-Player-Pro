@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "Güncelleme doğrulanıyor..."
+
+msgid "Installing update..."
+msgstr "Güncelleme kuruluyor..."
+
+msgid "Configuring update..."
+msgstr "Güncelleme yapılandırılıyor..."
+

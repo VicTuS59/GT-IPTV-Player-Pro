@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "Đang xác minh bản cập nhật..."
+
+msgid "Installing update..."
+msgstr "Đang cài đặt bản cập nhật..."
+
+msgid "Configuring update..."
+msgstr "Đang định cấu hình bản cập nhật..."
+

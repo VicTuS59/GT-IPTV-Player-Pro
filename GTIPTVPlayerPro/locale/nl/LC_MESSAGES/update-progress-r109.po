@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "Update controleren..."
+
+msgid "Installing update..."
+msgstr "Update installeren..."
+
+msgid "Configuring update..."
+msgstr "Update configureren..."
+

@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "S'està verificant l'actualització..."
+
+msgid "Installing update..."
+msgstr "S'està instal·lant l'actualització..."
+
+msgid "Configuring update..."
+msgstr "S'està configurant l'actualització..."
+

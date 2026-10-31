@@ -17,6 +17,7 @@ from contextlib import contextmanager
 from . import PLUGIN_VERSION
 from .update_protocol import UpdateError,UpdateTransport,MAX_METADATA,canonical,json_document,source_url,verify_envelope,version_tuple
 from .update_package import inspect_ipk
+from .update_feedback import emit,installer_phase
 
 SETTINGS='/etc/enigma2/gtiptvplayer/update-settings.json'
 CACHE='/tmp/gtiptv-updates'
@@ -116,12 +117,16 @@ class UpdateService:
 
     def path_for(self,manifest):return os.path.join(self.cache,manifest['sha256']+'.ipk')
 
-    def download(self,offer,cancel=None,progress=None):
+    def download(self,offer,cancel=None,progress=None,feedback=None):
         manifest=self.verified_offer(offer);private_directory(self.cache)
         path=self.path_for(manifest)
         if os.path.lexists(path):
             try:
-                inspect_ipk(path,manifest,cancel);return path
+                emit(feedback,'verify')
+                inspect_ipk(path,manifest,cancel)
+                if progress is not None:progress(manifest['bytes'],manifest['bytes'])
+                emit(feedback,'downloaded',1,1)
+                return path
             except UpdateError as error:
                 if error.code=='cancelled':raise
                 # Only this updater's content-addressed cache entry is removed.
@@ -138,9 +143,11 @@ class UpdateService:
                 count=self.transfer(manifest['url'],manifest['bytes'],cancel=cancel,sink=sink)
                 output.flush();os.fsync(output.fileno())
             if count!=manifest['bytes'] or written!=manifest['bytes'] or digest.hexdigest()!=manifest['sha256']:raise UpdateError('package')
+            emit(feedback,'verify')
             inspect_ipk(temporary,manifest,cancel)
             os.chmod(temporary,0o600);os.replace(temporary,path);temporary=None
             self._trim_cache(path)
+            emit(feedback,'downloaded',1,1)
             return path
         except UpdateError:raise
         except Exception:raise UpdateError('storage')
@@ -176,16 +183,18 @@ class UpdateService:
             if fd is not None:os.close(fd)
             _INSTALL_LOCK.release()
 
-    def install(self,offer,path,busy,backup,runner=None,root='/',uid=None):
+    def install(self,offer,path,busy,backup,runner=None,root='/',uid=None,progress=None):
         """Called only after GUI confirmation; never called by a check/download."""
         with self.installation_lock():
             manifest=self.verified_offer(offer)
             if (os.geteuid() if uid is None else uid)!=0:raise UpdateError('install')
             if os.path.abspath(path)!=os.path.abspath(self.path_for(manifest)):raise UpdateError('package')
+            emit(progress,'verify')
             inspect_ipk(path,manifest)
             if busy():raise UpdateError('busy')
             required=manifest['installed_bytes']*2+16*1024*1024
             if shutil.disk_usage(root).free<required:raise UpdateError('space')
+            emit(progress,'backup')
             safety=backup()
             if not isinstance(safety,str) or not os.path.isfile(safety):raise UpdateError('backup')
             if busy():raise UpdateError('busy')
@@ -193,10 +202,12 @@ class UpdateService:
             if shutil.disk_usage(root).free<required:raise UpdateError('space')
             # Revalidate bytes and identity after the backup and immediately
             # before crossing the package-manager execution boundary.
+            emit(progress,'verify')
             inspect_ipk(path,manifest)
             log=os.path.join(self.cache,'install.log')
             self.state.write(backup=safety,result='installing')
-            try:code=(runner or run_opkg)(path,log)
+            emit(progress,'install')
+            try:code=runner(path,log) if runner is not None else run_opkg(path,log,progress=progress)
             except Exception:
                 self.state.write(backup=safety,result='install-failed')
                 raise UpdateError('install')
@@ -204,18 +215,39 @@ class UpdateService:
                 self.state.write(backup=safety,result='install-failed')
                 raise UpdateError('install')
             self.state.write(installed=manifest['version'],backup=safety,result='installed',offer='')
+            emit(progress,'complete',1,1)
             return dict(version=manifest['version'],backup=safety,log=log)
 
-def run_opkg(path,log):
+def run_opkg(path,log,progress=None):
     binary=next((p for p in ('/usr/bin/opkg','/bin/opkg') if os.path.isfile(p) and os.access(p,os.X_OK)),None)
     if binary is None:raise UpdateError('install')
     fd=os.open(log,os.O_WRONLY|os.O_CREAT|os.O_TRUNC|getattr(os,'O_NOFOLLOW',0),0o600)
     with os.fdopen(fd,'wb') as output:
         process=subprocess.Popen([binary,'install',path],stdin=subprocess.DEVNULL,stdout=output,stderr=subprocess.STDOUT,
                                  close_fds=True,start_new_session=True,env=dict(os.environ,LANG='C',LC_ALL='C'))
-        # Never kill opkg halfway through unpack/configure. The GUI remains
-        # responsive and disallows closing this installation screen meanwhile.
-        return process.wait()
+        # The child writes directly to the private log, never a bounded pipe.
+        # Read at most 8 KiB per tick and retain at most a partial 1 KiB line.
+        # Only known phase names cross into the GUI; log text stays on device.
+        offset=0;partial=b'';phase=None
+        while True:
+            try:code=process.wait(timeout=0.2);finished=True
+            except subprocess.TimeoutExpired:finished=False
+            if progress is not None:
+                try:
+                    read_fd=os.open(log,os.O_RDONLY|getattr(os,'O_NOFOLLOW',0))
+                    with os.fdopen(read_fd,'rb') as source:
+                        original=os.fstat(output.fileno());current=os.fstat(source.fileno())
+                        if (original.st_dev,original.st_ino)!=(current.st_dev,current.st_ino):raise OSError('log identity')
+                        source.seek(offset);chunk=source.read(8192);offset+=len(chunk)
+                    rows=(partial+chunk).split(b'\n');partial=rows.pop()[-1024:]
+                    if finished and partial:rows.append(partial);partial=b''
+                    for line in rows:
+                        found=installer_phase(line.decode('utf-8',errors='replace'))
+                        if found is not None and found!=phase:phase=found;emit(progress,phase)
+                except OSError:pass
+            # Never kill opkg halfway through unpack/configure, including when
+            # progress reporting fails or the UI closes unexpectedly.
+            if finished:return code
 
 def receiver_busy(session):
     try:
@@ -234,7 +266,7 @@ def receiver_busy(session):
         return True
     return False
 
-def create_safety_backup():
+def create_safety_backup(progress=None):
     from .backup import BackupError,BackupManager
     from .settings import plugin_config_section
     section=plugin_config_section()
@@ -252,7 +284,8 @@ def create_safety_backup():
             folder=private_directory(os.path.join(parent,'gtiptv-update-backups'))
             # create() rechecks the destination and the actual archive size
             # under its persistence lock; never bypass backup to allow opkg.
-            result=manager.create(folder,label='safety')
+            if progress is None:result=manager.create(folder,label='safety')
+            else:result=manager.create(folder,label='safety',progress=lambda phase,done,total:emit(progress,'backup',done,total))
         except BackupError as error:
             if error.code not in ('storage','space'):
                 raise UpdateError(error.code if error.code in ('busy','cancelled') else 'backup') from error
@@ -268,6 +301,7 @@ def create_safety_backup():
         if not isinstance(result,dict) or not isinstance(result.get('path'),str) or not os.path.isfile(result['path']):
             raise UpdateError('backup')
         _trim_safety_backups(folder,result['path'])
+        emit(progress,'backup',1,1)
         return result['path']
     raise UpdateError(failure)
 

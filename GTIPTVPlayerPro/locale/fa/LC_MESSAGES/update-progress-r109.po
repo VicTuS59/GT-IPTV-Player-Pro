@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "در حال بررسی به‌روزرسانی..."
+
+msgid "Installing update..."
+msgstr "در حال نصب به‌روزرسانی..."
+
+msgid "Configuring update..."
+msgstr "در حال پیکربندی به‌روزرسانی..."
+

@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "Tikrinamas naujinimas..."
+
+msgid "Installing update..."
+msgstr "Diegiamas naujinimas..."
+
+msgid "Configuring update..."
+msgstr "Konfigūruojamas naujinimas..."
+

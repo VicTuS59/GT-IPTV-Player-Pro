@@ -1,0 +1,10 @@
+# Update stage captions
+msgid "Verifying update..."
+msgstr "Fernijing kontrolearje..."
+
+msgid "Installing update..."
+msgstr "Fernijing ynstallearje..."
+
+msgid "Configuring update..."
+msgstr "Fernijing ynstelle..."
+
