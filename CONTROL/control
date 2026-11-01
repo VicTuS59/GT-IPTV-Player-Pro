@@ -1,11 +1,11 @@
 Package: enigma2-plugin-extensions-gtiptvplayerpro
-Version: 1.8.0-r0
+Version: 1.8.5-r0
 Section: extra
 Priority: optional
 Architecture: all
 Maintainer: VicTuS59
-Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-logging, python3-math, python3-netclient, python3-netserver, python3-stringold, python3-threading, python3-xml, python3-sqlite3, tzdata, ca-certificates
-Installed-Size: 21439
+Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-logging, python3-math, python3-netclient, python3-netserver, python3-stringold, python3-threading, python3-xml, tzdata, ca-certificates
+Installed-Size: 21528
 Homepage: https://github.com/VicTuS59/GT-IPTV-Player-Pro
 License: GPL-2.0-or-later
 Description: GT IPTV Player Pro for Enigma2
@@ -19,7 +19,7 @@ Description: GT IPTV Player Pro for Enigma2
  Persistent watched-episode ticks across playback, resume, seeking and receiver restarts.
  Immediate BLUE-key account-wide series search with season/episode selection.
  Optional 14-poster movie/series grid with details and vertical page navigation.
- Movie/series catalogues kept only in RAM, with no SQLite or temporary cache files.
+ Movie/series catalogues kept only in RAM, with no persistent index or temporary cache files.
  Shared Stalker/Xtream browsing and fast RAM title search for 200,000 films or series.
  Packed metadata blocks, bounded display windows and immediate cached searches.
  Optional single-account automatic login with a translated connection overlay.
@@ -117,7 +117,7 @@ Description: GT IPTV Player Pro for Enigma2
  Optional 4668 live engine is supplied by the separate GTIPTVLivePatch package; external proxy/VPN removed.
  Optimize opaque backgrounds, retain native SD/UHD art, and bound decoded wallpaper/cache surfaces by RAM and desktop resolution.
  List, validate, play and delete completed HLS recording bundles.
- Preserve full history with bounded working views and rebuildable paged indexes.
+ Preserve full JSON history with bounded working views and process-memory query caches.
  Prepare recording storage off the GUI; cancel stale preparation on channel change.
  Exit idle download workers safely and release closed recording relays.
  Load optional web services on demand; fall back to licensed pure-Python time zones.

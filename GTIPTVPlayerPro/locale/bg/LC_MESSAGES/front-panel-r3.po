@@ -1,0 +1,15 @@
+# Receiver front-panel captions, 1.8.0-r3.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: bg\n"
+
+msgid "Elapsed"
+msgstr "Изминало"
+
+msgid "Total"
+msgstr "Общо"
+
+#, python-format
+msgid "Season %(season)s · Episode %(episode)s"
+msgstr "Сезон %(season)s · Епизод %(episode)s"

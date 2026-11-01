@@ -20,7 +20,11 @@ version must never be replaced with different package bytes; use a higher versio
 The release-pointer job also verifies normal releases published through GitHub's UI.
 
 Receivers use the public signed `updates/stable.json` pointer. Automatic checks
-are enabled by default and limited to every six hours while the plugin is open.
+are enabled by default and start in a background worker immediately when the
+plugin opens. Each new launch refreshes metadata even if the preceding check
+was less than six hours ago. Welcome and dashboard screens share the same
+in-flight check, and subsequent checks run every six hours while the plugin
+remains open. Disabling automatic checks prevents these network requests.
 Users can check immediately in **Settings > Software update**, using GREEN.
 Download, installation and interface restart require the user's actions/consent.
 

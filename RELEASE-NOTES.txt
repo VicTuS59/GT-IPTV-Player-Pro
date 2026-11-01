@@ -1,23 +1,13 @@
-★ **DVB EPG:** Programme guide for satellite channels and manual EPG import. (Rebuilt.)
+★ **SQLite-free installation:** Removed the python3-sqlite3 package dependency and replaced the plugin's SQLite working caches with bounded JSON indexes. Existing resume positions, watched episodes and user settings are preserved.
 
-★ **Reordering settings:** Move rows with the Yellow button and save the order permanently.
+★ **Live TV channel logos:** Added bounded recovery for failed logo loads and fixed incorrect logos after channel changes. Missing logo or EPG data can no longer inherit the first channel's data.
 
-★ **Matches page:** Live, completed and upcoming matches, with scores, team logos and filters.
+★ **Movie and series seeking:** Combine repeated seek requests, verify that playback advances, and attempt one bounded recovery using the same playback engine when seeking stalls. Intentional pauses and resume bookmarks are protected.
 
-★ **YouTube match highlights:** Search for highlights of completed matches with team and date verification.
+★ **Front panel displays:** Larger text and playback times, scrolling titles, and layouts that adapt to the display size.
 
-★ **LiveOnSat tab:** View the channels broadcasting each match, with a saved country selection.
+★ **YouTube:** Fixed playback quality text overlapping search results.
 
-★ **Movie and series trailers:** Search for and play official trailers with the PLAY button; prioritize trailers for new episodes of series.
+★ **Update checks:** When automatic checks are enabled, the background check starts as soon as the plugin opens.
 
-★ **Moving Live TV channels:** Move channels with the Yellow button in Xtream and Stalker; press OK to save or EXIT to cancel.
-
-★ **Category sorting:** **A–Z, Z–A and Original** options for Xtream and Stalker.
-
-★ **Movie and series sorting:** **A–Z, Z–A, Recently Added, Year and Original**, including All Movies and All Series.
-
-★ **Live TV recording with REC:** Save an HDD/USB recording folder, start or stop recordings, and show a blinking REC indicator in the infobar.
-
-★ **Overall theme design:** Redesigned and improved.
-
-★ **Updates:** Added remote software updates.
+★ **Installation cleanup:** Improved legacy cache cleanup and corrected the misleading deferred count for temporary-directory aliases.

@@ -126,6 +126,14 @@ class UpdateServiceTests(unittest.TestCase):
   self.state.write(auto=False);self.s.check(automatic=True,clock=lambda:200000);self.assertEqual(len(self.network.calls),1)
   self.state.write(auto=True);self.s.check(automatic=True,clock=lambda:200000);self.assertEqual(len(self.network.calls),2)
   self.s.check(automatic=True,clock=lambda:1);self.assertEqual(len(self.network.calls),3)
+ def test_plugin_entry_refreshes_metadata_before_six_hours(self):
+  self.offer();self.s.check(automatic=True,on_entry=True,clock=lambda:100001)
+  self.assertEqual(len(self.network.calls),2)
+  self.s.check(automatic=True,clock=lambda:100002);self.assertEqual(len(self.network.calls),2)
+ def test_plugin_entry_still_respects_automatic_check_opt_out(self):
+  self.offer();self.state.write(auto=False)
+  self.s.check(automatic=True,on_entry=True,clock=lambda:100001)
+  self.assertEqual(len(self.network.calls),1)
  def test_older_current_and_pending_restart_block_repeat_install(self):
   self.s.current='1.7.0-r107';self.assertIsNone(self.offer());self.assertIsNone(self.s.cached())
   self.s.current='1.7.0-r106';offer=self.offer();self.state.write(installed='1.7.0-r107')

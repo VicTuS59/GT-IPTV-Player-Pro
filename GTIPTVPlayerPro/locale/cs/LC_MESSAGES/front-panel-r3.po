@@ -1,0 +1,15 @@
+# Receiver front-panel captions, 1.8.0-r3.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: cs\n"
+
+msgid "Elapsed"
+msgstr "Uplynulo"
+
+msgid "Total"
+msgstr "Celkem"
+
+#, python-format
+msgid "Season %(season)s · Episode %(episode)s"
+msgstr "Řada %(season)s · Díl %(episode)s"

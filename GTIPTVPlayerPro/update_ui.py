@@ -16,7 +16,7 @@ from .auxiliary_layout import shell,panel,shared
 from .auxiliary_presentation import _footer_skin,_footer,text
 from .remote_footer import decorate_remote_footer,footer_item,install_remote_footer
 from .update_service import UpdateState,UpdateService,effective_version,receiver_busy,create_safety_backup
-from .update_protocol import UpdateError
+from .update_protocol import UpdateError,version_tuple
 from .update_feedback import PHASE_LABELS,progress_geometry
 
 LABELS={
@@ -26,7 +26,7 @@ LABELS={
  'signature':'Update signature is invalid','metadata':'Invalid update information','package':'Update package is invalid',
  'compatibility':'Update is not compatible with this receiver','busy':'Stop recordings and downloads before updating',
  'failed':'Update failed','installed':'Update installed. Restart the interface.','confirm':'Install the verified update?',
- 'notice':'Update available. Open updater?','interval':'Automatic checks run every 6 hours.','new':'New version',
+ 'notice':'Update available. Open updater?','interval':'Updates are checked when the plugin opens and every 6 hours.','new':'New version',
 }
 FOOTER=tuple(footer_item(key,action) for key,action in (
  ('arrows','navigate'),('ok','change'),('green',LABELS['check']),('yellow',LABELS['download']),
@@ -284,38 +284,120 @@ class GTSoftwareUpdateScreen(Screen):
         text(self,'update_progress',('{}%'.format(percent) if percent is not None else _('Please wait')) if active else '',28)
         _footer(self)
 
-class UpdateNotice:
-    def __init__(self,screen):
-        self.screen=screen;self.service=UpdateService();self.cancel=threading.Event();self.closed=False
+class UpdateMonitor:
+    """One asynchronous check per launch, shared across foreground menus."""
+    def __init__(self,session):
+        self.session=session;self.service=UpdateService();self.cancel=threading.Event()
+        self.closed=False;self.started=False;self.checking=False;self.notices=[]
+        self.offer=None;self.open_requested=None;self.prompt_open=False;self.offered=''
+        self._request_entry=False;self._retry_entry=False;self._notify_attempts=0
         self._timer_connections=[]
         self.timer=eTimer();self._connect_timer(self.timer,self._check)
+        self.notice_timer=eTimer();self._connect_timer(self.notice_timer,self._notify)
         self.reader=SourceLoader(eTimer(),self._connect_timer,self._applied)
-        screen.onShown.append(self._shown);screen.onClose.append(self._stop)
+
     def _connect_timer(self,timer,callback):
         connection=connect(timer,callback)
         if connection is not None:self._timer_connections.append(connection)
-    def _shown(self):
-        if not self.closed:self.timer.start(5000,True)
-    def _check(self):
-        if self.closed:return
-        self.reader.request(lambda:self.service.check(automatic=True,cancel=self.cancel))
-        self.timer.start(6*60*60*1000,True)
-    def _applied(self,offer,error):
-        if self.closed or error is not None or not offer:return
-        try:
-            if (getattr(self.screen.session,'current_dialog',None) is not self.screen
-                    or getattr(self.screen,'_child_screen_open',False) is True
-                    or getattr(self.screen,'_dashboard_child_open',False) is True):return
-            state=self.service.state.read();version=offer['manifest']['version']
-            if state['skipped']==version or not state['auto']:return
-            self.service.state.write(skipped=version)
-            self.screen.session.openWithCallback(self._reply,MessageBox,message('notice')+'\n'+version,type=MessageBox.TYPE_YESNO,default=False)
-        except Exception:pass
-    def _reply(self,answer):
-        if answer is True and not self.closed:self.screen.session.open(GTSoftwareUpdateScreen)
-    def _stop(self):
-        self.closed=True;self.cancel.set();self.timer.stop();self.reader.close()
 
-def attach_update_notice(screen):
+    def shown(self):
+        if self.closed:return
+        self._notify_attempts=0
+        if not self.started:
+            self.started=True
+            # SourceLoader starts only a worker here. TLS and network access
+            # never run on the GUI thread, and there is no artificial delay.
+            self._request(on_entry=True)
+        self._notify()
+
+    def _check(self):
+        self._request(on_entry=self._retry_entry)
+
+    def _request(self,on_entry=False):
+        if self.closed or self.checking:return
+        self.checking=True;self._request_entry=on_entry
+        self.reader.request(lambda:self.service.check(automatic=True,cancel=self.cancel,on_entry=on_entry))
+        self.timer.start(6*60*60*1000,True)
+
+    def _applied(self,offer,error):
+        if self.closed:return
+        self.checking=False
+        if error is not None:
+            if getattr(error,'code','')=='busy':
+                self._retry_entry=self._request_entry
+                self.timer.start(250,True)
+            return
+        self._retry_entry=False;self.offer=offer
+        self._notify()
+
+    def _retry_notice(self):
+        if not self.closed and self._notify_attempts<50:
+            self._notify_attempts+=1;self.notice_timer.start(100,True)
+
+    def _notify(self):
+        if self.closed or self.prompt_open or (not self.offer and self.open_requested is None):return
+        current=getattr(self.session,'current_dialog',None)
+        active=next((notice for notice in self.notices if not notice.closed and notice.screen is current),None)
+        if active is None:
+            if self.open_requested is not None:self._retry_notice()
+            return  # A child dialog returns through a menu's onShown hook.
+        screen=active.screen
+        if (getattr(screen,'_child_screen_open',False) is True or
+                getattr(screen,'_dashboard_child_open',False) is True):return
+        if not getattr(screen,'execing',True) or not getattr(self.session,'in_exec',True):
+            self._retry_notice();return
+        if self.open_requested is not None:
+            if self.open_requested is not active:return
+            try:self.session.open(GTSoftwareUpdateScreen)
+            except Exception:self._retry_notice();return
+            self.open_requested=None;return
+        try:
+            state=self.service.state.read();version=self.offer['manifest']['version']
+            if (state['skipped']==version or self.offered==version or not state['auto'] or
+                    version_tuple(version)<=version_tuple(effective_version(state))):return
+            self.prompt_open=True
+            try:self.session.openWithCallback(active._reply,MessageBox,message('notice')+'\n'+version,type=MessageBox.TYPE_YESNO,default=False)
+            except Exception:
+                self.prompt_open=False;self._retry_notice();return
+            self.offered=version
+            self.service.state.write(skipped=version)
+        except Exception:self.prompt_open=False
+
+    def detach(self,notice):
+        if notice in self.notices:self.notices.remove(notice)
+        if self.open_requested is notice:self.open_requested=None
+        if not self.notices:
+            self.closed=True;self.cancel.set();self.timer.stop();self.notice_timer.stop();self.reader.close()
+            self.offer=None
+            if getattr(self.session,'_gtiptv_update_monitor',None) is self:
+                self.session._gtiptv_update_monitor=None
+
+
+class UpdateNotice:
+    def __init__(self,screen,monitor):
+        self.screen=screen;self.monitor=monitor;self.closed=False
+        monitor.notices.append(self)
+        screen.onShown.append(self._shown);screen.onClose.append(self._stop)
+
+    def _shown(self):
+        if not self.closed:self.monitor.shown()
+
+    def _reply(self,answer):
+        if self.closed:return
+        self.monitor.prompt_open=False
+        if answer is True:
+            self.monitor.open_requested=self
+            self.monitor._notify_attempts=0
+            self.monitor.notice_timer.start(1,True)
+
+    def _stop(self):
+        if not self.closed:
+            self.closed=True;self.monitor.detach(self);self.screen=None
+
+def attach_update_notice(screen,entry=False):
     # Constructors perform no network request or SSL-context initialization.
-    screen._update_notice=UpdateNotice(screen)
+    monitor=getattr(screen.session,'_gtiptv_update_monitor',None)
+    if entry or not isinstance(monitor,UpdateMonitor) or monitor.closed:
+        monitor=UpdateMonitor(screen.session)
+        screen.session._gtiptv_update_monitor=monitor
+    screen._update_notice=UpdateNotice(screen,monitor)

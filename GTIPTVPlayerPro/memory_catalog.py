@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-FileCopyrightText: 2026 VicTuS59
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Process-only movie/series metadata; no cache files, SQLite or spill files."""
+"""Process-only movie/series metadata; no persistent index or spill files."""
 from collections import OrderedDict
 from array import array
 import sys

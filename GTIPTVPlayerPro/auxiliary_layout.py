@@ -84,7 +84,7 @@ def youtube(s):
  s.pic('search_frame',(48,104,1830,78),shared('search-bar'))
  s.pic('search_icon',(72,123,40,40),shared('search'),z=5)
  s.label('search_text',(146,114,1688,56),37)
- s.label('section',(48,192,1100,36),27,MUTED)
+ s.label('section',(48,192,360,36),27,MUTED)
  for i in range(5):
   y=236+i*136
   s.pic('row_'+str(i),(48,y,1144,126),older('stream-row'))
@@ -108,7 +108,7 @@ def youtube(s):
  divider(s,'aux_preview_divider',(1236,859,616,2))
  s.label('preview_action',(1236,870,616,38),27)
  s.label('pages',(48,922,1144,38),26,CYAN,align='center')
- s.label('status',(70,450,1100,180),29,MUTED,align='center',lines=5)
+ s.label('status',(428,192,764,36),24,MUTED,align='right')
 
 def online_subtitles(s):
  s.label('programme',(42,104,1400,58),38)

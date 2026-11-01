@@ -95,11 +95,11 @@ class UpdateService:
         if version_tuple(manifest['version'])<=version_tuple(effective_version(state,self.current)):return None
         return dict(body=body,manifest=manifest)
 
-    def check(self,automatic=False,cancel=None,clock=time.time):
+    def check(self,automatic=False,cancel=None,clock=time.time,on_entry=False):
         if not _CHECK_LOCK.acquire(False):raise UpdateError('busy')
         try:
             state=self.state.read();now=clock();elapsed=now-state['last_check']
-            if automatic and (not state['auto'] or 0<=elapsed<INTERVAL):return self.cached()
+            if automatic and (not state['auto'] or (not on_entry and 0<=elapsed<INTERVAL)):return self.cached()
             self.state.write(last_check=now)
             body=self.transfer(source_url(),MAX_METADATA,cancel=cancel,seconds=25)
             manifest=verify_envelope(body)

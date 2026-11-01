@@ -1,29 +1,79 @@
-"""Paged, rebuildable history indexes. The original JSON remains authoritative.
-
-Indexes never contain credentials and are not backups. Writes stream the JSON
-to an atomic replacement; no history is truncated to fit an in-memory cache.
-"""
+"""Bounded JSON history queries and atomic, lossless history writes."""
 from collections import OrderedDict
-from contextlib import contextmanager
-import hashlib
+import math
 import json
 import os
 import stat
+import sys
 import threading
 import uuid
 
-SUFFIX = '.history-index.sqlite3'
 CHUNK = 65536
 MAX_VALUE = 2 * 1024 * 1024
 PAGE_SIZE = 100
-MAX_INDEX_BYTES = 8 * 1024 * 1024
+PARTITION_BYTES = 512 * 1024
+METADATA_BYTES = 3 * 1024 * 1024
+RESULT_CACHE_BYTES = 256 * 1024
+RESULT_CACHE_ENTRIES = 24
+CURSOR_ENTRIES = 128
 _LOCK = threading.RLock()
-_DECLINED = OrderedDict()
+_READ_LOCK = threading.RLock()
+_RESULTS = OrderedDict()
+_CURSORS = OrderedDict()
+_RESULT_BYTES = 0
 
 
-def _sqlite():
-    import sqlite3
-    return sqlite3
+def _json_bytes(value):
+    return json.dumps(value, ensure_ascii=False, separators=(',', ':'), allow_nan=False).encode('utf-8')
+
+
+def clear_history_cache():
+    global _RESULT_BYTES
+    with _LOCK:
+        _RESULTS.clear(); _CURSORS.clear(); _RESULT_BYTES = 0
+
+
+def _cached_result(key):
+    with _LOCK:
+        body = _RESULTS.get(key)
+        if body is not None: _RESULTS.move_to_end(key)
+    # Return an independent value: GUI/download consumers may mutate their row.
+    return json.loads(body) if body is not None else None
+
+
+def _remember_result(key, result):
+    global _RESULT_BYTES
+    if len(repr(key)) > 8192: return
+    body = _json_bytes(result)
+    if len(body) > RESULT_CACHE_BYTES: return
+    with _LOCK:
+        for old in tuple(_RESULTS):
+            if old[:3] == key[:3] and old[3] != key[3]:
+                _RESULT_BYTES -= len(_RESULTS.pop(old))
+        previous = _RESULTS.pop(key, b'')
+        _RESULT_BYTES += len(body) - len(previous)
+        _RESULTS[key] = body
+        while _RESULT_BYTES > RESULT_CACHE_BYTES or len(_RESULTS) > RESULT_CACHE_ENTRIES:
+            _RESULT_BYTES -= len(_RESULTS.popitem(last=False)[1])
+
+
+def _nearest_cursor(scope, offset):
+    position, order = 0, None
+    with _LOCK:
+        for (owner, found), boundary in _CURSORS.items():
+            if owner == scope and position < found <= offset:
+                position, order = found, boundary
+    return position, order
+
+
+def _remember_cursor(scope, position, order):
+    if len(repr(scope)) + len(repr(order)) > 8192: return
+    with _LOCK:
+        key = (scope, position)
+        _CURSORS[key] = order; _CURSORS.move_to_end(key)
+        while len(_CURSORS) > CURSOR_ENTRIES: _CURSORS.popitem(last=False)
+
+
 
 
 class Reader:
@@ -68,7 +118,7 @@ def document(path, field, mapping=False):
     """Yield (top-level key, value); the large field is yielded per record.
 
     Field records are marked by a None top-level key. Parsing finishes before
-    an index is published, including the final envelope and trailing bytes.
+    a query result is returned, including the final envelope and trailing bytes.
     """
     try:
         if os.path.islink(path): raise OSError('Unsafe history document')
@@ -110,7 +160,8 @@ def document(path, field, mapping=False):
 
 def signature(path):
     try:
-        value = os.stat(path)
+        value = os.lstat(path)
+        if not stat.S_ISREG(value.st_mode): raise OSError('Unsafe history document')
         return (value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
     except FileNotFoundError:
         return None
@@ -154,9 +205,13 @@ def rewrite(path, field, records, metadata):
 
 
 class HistoryIndex:
+    """Compatibility API backed by streamed JSON and bounded process memory.
+
+    The original documents remain the only persistent history. No database,
+    sidecar index or temporary read cache is opened or created.
+    """
     def __init__(self, path, field, mapping=False):
         self.path, self.field, self.mapping = os.path.abspath(path), field, mapping
-        self.index = self.path + SUFFIX
 
     def _records(self):
         version = None
@@ -172,140 +227,163 @@ class HistoryIndex:
                     raise ValueError('Invalid removed-download entry')
             else:
                 item = value; identity = item.get('id', '') if isinstance(item, dict) else ''
-            if not isinstance(identity, str) or not identity: continue
-            yield identity, item
+            if isinstance(identity, str) and identity:
+                yield identity, item
         if os.path.exists(self.path) and (self.mapping and version not in (1, 2) or self.field == 'paths' and version != 1):
             raise ValueError('Unsupported history version')
 
-    @staticmethod
-    def _connect(path):
-        connection = _sqlite().connect(path, timeout=2)
-        try:
-            connection.execute('PRAGMA cache_size=-64')
-            connection.execute('PRAGMA mmap_size=0')
-            connection.execute('PRAGMA temp_store=FILE')
-        except BaseException:
-            connection.close(); raise
-        return connection
+    def _query(self, query, read):
+        # Like the previous shared history backend, allow only one bounded
+        # working block at a time; nested selected-row lookups are reentrant.
+        with _READ_LOCK:
+            return self._read_query(query, read)
 
-    def _build(self, expected):
-        parent = os.path.dirname(self.index); os.makedirs(parent, mode=0o700, exist_ok=True)
-        temporary = self.index + '.' + uuid.uuid4().hex + '.tmp'
-        fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600); os.close(fd)
-        connection = None
-        try:
-            connection = self._connect(temporary)
-            connection.executescript('CREATE TABLE meta(signature TEXT); CREATE TABLE rows(id TEXT PRIMARY KEY, path TEXT, directory TEXT, status TEXT, created REAL, body TEXT); CREATE INDEX row_path ON rows(path); CREATE INDEX row_time ON rows(created DESC,id); CREATE INDEX row_directory ON rows(directory,created DESC,id);')
-            for identity, item in self._records():
-                value = item if isinstance(item, dict) else {}
-                created = value.get('created') or 0
-                try: created = float(created)
-                except (TypeError, ValueError, OverflowError): created = 0
-                path = str(value.get('path') or '')
-                connection.execute('INSERT OR REPLACE INTO rows VALUES(?,?,?,?,?,?)',
-                    (identity, path, os.path.normcase(os.path.normpath(os.path.dirname(path))), str(value.get('status') or ''), created,
-                     json.dumps(item, ensure_ascii=False, separators=(',', ':'), allow_nan=False)))
-                if os.path.getsize(temporary) > MAX_INDEX_BYTES:
-                    _DECLINED[self.path] = expected
-                    while len(_DECLINED) > 16: _DECLINED.popitem(last=False)
-                    raise OSError('History index exceeds disk budget')
-            if signature(self.path) != expected: raise InterruptedError('History changed during indexing')
-            connection.execute('INSERT INTO meta VALUES(?)', (json.dumps({'source': expected, 'version': 1}),))
-            connection.commit(); connection.close(); connection = None
-            if os.path.getsize(temporary) > MAX_INDEX_BYTES:
-                _DECLINED[self.path] = expected
-                while len(_DECLINED) > 16: _DECLINED.popitem(last=False)
-                raise OSError('History index exceeds disk budget')
-            with open(temporary, 'rb') as handle: os.fsync(handle.fileno())
-            os.replace(temporary, self.index)
-        finally:
-            if connection is not None: connection.close()
-            for candidate in (temporary, temporary+'-journal'):
-                try: os.unlink(candidate)
-                except FileNotFoundError: pass
-
-    @contextmanager
-    def connection(self):
-        # The cache is disposable; a corrupt/missing/stale index is rebuilt
-        # without replacing or deleting any authoritative history document.
-        with _LOCK:
-            sqlite3 = _sqlite()
-            for attempt in range(3):
-                expected = signature(self.path)
-                if self.path in _DECLINED and _DECLINED[self.path] == expected:
-                    raise OSError('History index exceeds disk budget')
-                connection = None
-                try:
-                    info = os.lstat(self.index)
-                    if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1
-                            or info.st_uid != getattr(os, 'geteuid', lambda: info.st_uid)()
-                            or os.name == 'posix' and info.st_mode & 0o022): raise OSError('Unsafe history index')
-                    connection = self._connect(self.index)
-                    row = connection.execute('SELECT signature FROM meta').fetchone()
-                    if row and json.loads(row[0]) == {'source': list(expected) if expected is not None else None, 'version': 1}: break
-                except (sqlite3.DatabaseError, OSError, ValueError): pass
-                if connection is not None: connection.close(); connection = None
-                try: self._build(expected)
-                except InterruptedError:
-                    if attempt == 2: raise
-                else:
-                    connection = self._connect(self.index)
-                    break
-            try: yield connection
-            finally:
-                if connection is not None: connection.close()
+    def _read_query(self, query, read):
+        # A cache entry belongs to one complete filesystem generation. Reading
+        # to EOF validates the JSON envelope/version even after finding a key.
+        for unused in range(3):
+            expected = signature(self.path)
+            key = (self.path, self.field, self.mapping, expected, query)
+            cached = _cached_result(key)
+            if cached is not None:
+                if signature(self.path) == expected:
+                    return cached
+                continue
+            result = read(expected)
+            if signature(self.path) == expected:
+                _remember_result(key, result)
+                return result
+        raise InterruptedError('History changed during reading')
 
     def get_many(self, identities):
-        result = {}
-        # Chunk before opening the cache so read-only/full storage can always
-        # fall back to authoritative JSON without consuming a one-shot iterator.
-        keys = iter(identities)
-        while True:
-            batch = []
-            for unused in range(100):
-                try: batch.append(str(next(keys)))
-                except StopIteration: break
-            if not batch: return result
-            try:
-                with self.connection() as connection:
-                    for key, body in connection.execute('SELECT id,body FROM rows WHERE id IN ('+','.join('?' for key in batch)+')', batch):
-                        result[key] = json.loads(body)
-            except (OSError, _sqlite().Error):
-                wanted = set(batch)
-                wanted.update(str(key) for key in keys)
-                for key, value in self._records():
-                    if key in wanted: result[key] = value
-                return result
+        keys = tuple(dict.fromkeys(str(key) for key in identities))
+        if not keys: return {}
+        wanted = set(keys)
+        def read(unused_signature):
+            result = {}
+            for key, value in self._records():
+                if key in wanted: result[key] = value
+            return result
+        return self._query(('keys', keys), read)
+
+    def _ordered_records(self, prefix='', project=None):
+        """Yield unique IDs in the former index's binary order, last value wins.
+
+        Small histories need one pass. Large histories are partitioned by ID
+        using bounded working blocks, never by loading the entire document.
+        Shared prefixes are skipped together to avoid one pass per character.
+        """
+        rows, costs, working, common, split = {}, {}, 0, None, False
+        for key, value in self._records():
+            encoded = key.encode('utf-8').hex()
+            if not encoded.startswith(prefix): continue
+            if project is not None: value = project(value)
+            if common is None:
+                common = encoded
+            else:
+                length = min(len(common), len(encoded))
+                i = len(prefix)
+                while i < length and common[i] == encoded[i]: i += 1
+                common = common[:i]
+            if split: continue
+            cost = (sys.getsizeof(key) + sys.getsizeof(value) + 128 if project is not None
+                    else 256 + len(key.encode('utf-8')) * 3 + len(_json_bytes(value)) * 3)
+            working += cost - costs.get(key, 0)
+            rows[key], costs[key] = value, cost
+            # One record may exceed the small-block budget; the parser's
+            # existing MAX_VALUE cap still bounds that individual record.
+            budget = METADATA_BYTES if project is not None else PARTITION_BYTES
+            if working > budget and len(rows) > 1:
+                split = True
+                rows.clear(); costs.clear()
+        if not split:
+            for key in sorted(rows): yield key, rows[key]
+            return
+        branches, exact = set(), None
+        for key, value in self._records():
+            encoded = key.encode('utf-8').hex()
+            if not encoded.startswith(common): continue
+            if len(encoded) == len(common): exact = (key, project(value) if project is not None else value)
+            else: branches.add(encoded[len(common)])
+        if exact is not None: yield exact
+        for character in sorted(branches):
+            yield from self._ordered_records(common + character, project)
 
     def items(self):
-        try:
-            with self.connection() as connection:
-                for key, body in connection.execute('SELECT id,body FROM rows ORDER BY id'):
-                    yield key, json.loads(body)
-        except (OSError, _sqlite().Error):
-            yield from self._records()
+        with _READ_LOCK:
+            expected = signature(self.path)
+            yield from self._ordered_records()
+            if signature(self.path) != expected:
+                raise InterruptedError('History changed during reading')
+
+    def _window(self, after, size, folder, terminal, reverse=False):
+        total = [0]
+        def project(item):
+            if not isinstance(item, dict): return None
+            if terminal and item.get('status') not in ('completed', 'cancelled'): return None
+            path = str(item.get('path') or '')
+            directory = os.path.normcase(os.path.normpath(os.path.dirname(path)))
+            if folder is not None and directory != folder: return None
+            try: created = float(item.get('created') or 0)
+            except (TypeError, ValueError, OverflowError): created = 0
+            return created if math.isfinite(created) else 0
+        def ranked():
+            # Retain only ID/time scalars while choosing a page. Full row
+            # bodies are loaded for the selected 100 records at most.
+            for identity, created in self._ordered_records(project=project):
+                if created is None: continue
+                order = (-created, identity)
+                total[0] += 1
+                if after is None or (order < after if reverse else order > after):
+                    yield order, identity
+        # Keep a sorted window with built-in operations only. This avoids
+        # adding another optional Python module to minimal receiver images.
+        rows = []
+        for order, identity in ranked():
+            if len(rows) == size and (order <= rows[-1][0] if reverse else order >= rows[-1][0]):
+                continue
+            low, high = 0, len(rows)
+            while low < high:
+                middle = (low + high) // 2
+                earlier = order > rows[middle][0] if reverse else order < rows[middle][0]
+                if earlier: high = middle
+                else: low = middle + 1
+            rows.insert(low, (order, identity))
+            if len(rows) > size: rows.pop()
+        values = self.get_many(identity for order, identity in rows)
+        return [(order, values[identity]) for order, identity in rows if identity in values], total[0]
 
     def page(self, offset=0, size=PAGE_SIZE, folder=None, terminal=False):
         offset, size = max(0, int(offset)), max(1, min(PAGE_SIZE, int(size)))
-        where, args = [], []
-        if terminal: where.append("status IN ('completed','cancelled')")
-        if folder is not None:
-            where.append('directory=?')
-            args.append(os.path.normcase(os.path.normpath(folder)))
-        clause = (' WHERE '+' AND '.join(where)) if where else ''
-        try:
-            with self.connection() as connection:
-                total = connection.execute('SELECT count(*) FROM rows'+clause, args).fetchone()[0]
-                rows = connection.execute('SELECT body FROM rows'+clause+' ORDER BY created DESC,id LIMIT ? OFFSET ?', args+[size,offset])
-                return [json.loads(row[0]) for row in rows], total
-        except (OSError, _sqlite().Error):
-            values, total = [], 0
-            for key, value in self._records():
-                if terminal and value.get('status') not in ('completed', 'cancelled'): continue
-                if folder is not None and os.path.dirname(value.get('path', '')) != folder: continue
-                if offset <= total < offset+size: values.append(value)
-                total += 1
-            return values, total
+        folder = os.path.normcase(os.path.normpath(folder)) if folder is not None else None
+        def read(expected):
+            scope = (self.path, self.field, self.mapping, expected, folder, bool(terminal))
+            position, after = _nearest_cursor(scope, offset)
+            while position < offset:
+                rows, total = self._window(after, min(PAGE_SIZE, offset-position), folder, terminal)
+                if not rows: return [], total
+                position += len(rows); after = rows[-1][0]
+                _remember_cursor(scope, position, after)
+                if offset >= total: return [], total
+                # A direct jump near the end must not walk every earlier page.
+                # Work backwards from the end when it needs fewer bounded
+                # windows; normal next-page navigation uses its RAM cursor.
+                tail = max(0, total-offset-size)
+                if tail + size < offset-position:
+                    boundary = None
+                    while tail:
+                        backward, unused_total = self._window(boundary, min(PAGE_SIZE, tail), folder, terminal, True)
+                        if not backward: return [], total
+                        tail -= len(backward); boundary = backward[-1][0]
+                    backward, total = self._window(boundary, min(size, total-offset), folder, terminal, True)
+                    rows = list(reversed(backward))
+                    if rows: _remember_cursor(scope, offset+len(rows), rows[-1][0])
+                    return [value for order, value in rows], total
+            rows, total = self._window(after, size, folder, terminal)
+            if rows: _remember_cursor(scope, position+len(rows), rows[-1][0])
+            return [value for order, value in rows], total
+        result = self._query(('page', offset, size, folder, bool(terminal)), read)
+        return result[0], result[1]
 
 
 class RemovedPaths:

@@ -1,0 +1,8 @@
+# Immediate plugin-entry update checks, 1.8.0-r5.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: es\n"
+
+msgid "Updates are checked when the plugin opens and every 6 hours."
+msgstr "Se buscan actualizaciones al abrir el complemento y cada 6 horas."

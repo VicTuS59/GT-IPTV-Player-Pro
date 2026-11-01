@@ -1,0 +1,15 @@
+# Receiver front-panel captions, 1.8.0-r3.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh\n"
+
+msgid "Elapsed"
+msgstr "已播放"
+
+msgid "Total"
+msgstr "总时长"
+
+#, python-format
+msgid "Season %(season)s · Episode %(episode)s"
+msgstr "第%(season)s季 · 第%(episode)s集"

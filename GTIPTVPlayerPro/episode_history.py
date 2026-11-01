@@ -197,7 +197,7 @@ class WatchedEpisodeStore(object):
             if not finished_at: return False
         with _STORE_LOCK:
             try:
-                # Complete validation happens during index construction before
+                # Complete validation happens during the JSON lookup before
                 # a source document is ever replaced.
                 previous = HistoryIndex(self.path, 'items', mapping=True).get_many((key,)).get(key)
                 old = _item_record(previous)

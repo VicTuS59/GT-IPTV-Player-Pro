@@ -22,6 +22,8 @@ try:
 except ImportError:
     _PlayableServiceEvents = None
 from .source_loader import SourceLoader
+from .front_panel import (GTPlayerFrontPanelSummary, front_panel_size as _front_panel_size,
+                          front_panel_layout as _front_panel_layout, front_panel_skin as _front_panel_skin)
 from .artwork_file import ArtworkPath, artwork_path
 from .content import ContentCategory, ContentItem, CONTENT_LABELS, ContentError, XtreamContentClient
 from .diagnostics import log_event, redact
@@ -57,90 +59,9 @@ from .download_guard import cancel_pending as _cancel_download_pending
 from .downloads import DownloadError as _DownloadError
 from .browser_common import ARCHIVE_DECODER_RELEASE_MS, ARCHIVE_DECODER_TRANSITION_TICKS, ARCHIVE_PORTAL_KEEPALIVE_SECONDS, ARCHIVE_PORTAL_REQUEST_SECONDS, ARCHIVE_POSITION_NEAR_ZERO_TICKS, ARCHIVE_PROVIDER_RETRY_SECONDS, ARCHIVE_STARTUP_ACQUIRE_SECONDS, ARCHIVE_STARTUP_OVERALL_SECONDS, ARCHIVE_STARTUP_SAMPLE_MS, ARCHIVE_STARTUP_SECONDS, ARCHIVE_STARTUP_SETTLE_SECONDS, BLUE_LONG_REPEAT_SUPPRESS_SECONDS, BLUE_LONG_SHORT_SUPPRESS_SECONDS, CHANNEL_KEY_DUPLICATE_GUARD_MS, CHANNEL_LINK_POLL_MS, CHANNEL_LINK_TIMEOUT_SECONDS, CHANNEL_SWITCH_DEBOUNCE_MS, DIRECTION_HOLD_MS, LIVE_DETAIL_EMPTY_RETRY_SECONDS, LIVE_EPG_CACHE_MAX_ENTRIES, LIVE_EPG_FETCH_LIMIT, LIVE_FULLSCREEN_RESULT_KIND, LIVE_INFO_EPG_TIMEOUT_SECONDS, LIVE_INFO_FALLBACK_MS, LIVE_INFO_METADATA_INITIAL_DELAY_MS, LIVE_INFO_POLL_MS, LIVE_INFO_READY_MIN_SAMPLES, LIVE_INFO_SETTLE_MS, LIVE_METADATA_INITIAL_DELAY_MS, LIVE_METADATA_MAX_SAMPLES, LIVE_METADATA_RETRY_DELAY_MS, LIVE_PICON_DOWNLOAD_TIMEOUT, LIVE_RECONNECT_RELEASE_DELAY_MS, MAX_AUDIO_TRACKS, RESUME_4097_STABLE_SAMPLES, RESUME_INITIAL_DELAY_MS, RESUME_LENGTH_STABILITY_TOLERANCE_SECONDS, RESUME_MAX_ATTEMPTS, RESUME_RETRY_DELAY_MS, SEEK_ASYNC_VERIFY_TIMEOUT_SECONDS, SEEK_STARTUP_GRACE_SECONDS, SEEK_VERIFY_DELAY_MS, SEEK_VERIFY_MAX_CHECKS, STALKER_LIVE_EPG_QUIET_MS, SUBTITLE_AUTO_MATCH_DELAY_MS, SUBTITLE_MESSAGE_TIMEOUT_SECONDS, VIDEO_CODECS, WEATHER_ICON_DIR, WORKER_LIST_TIMEOUT_SECONDS, WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS, WORKER_POSTER_TIMEOUT_SECONDS, WORKER_WEATHER_TIMEOUT_SECONDS, _ARCHIVE_PTS_MASK, _ARCHIVE_PTS_MODULO, _ARCHIVE_RETRY_PENDING, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _connect_timer, _debug, _debug_identifier, _desktop_size, _disable_live_window_animation, _download_client_image, _epg_event_starts_in_future, _is_stalker_client, _load_live_picon_path, _load_shared_live_epg, _normalise_video_codec, _picon_cache_path, _picon_failure_active, _read_proc_number, _read_proc_text, _safe_picon_url, _scale, _trace_fullscreen_osd, _valid_live_picon_file
 from .browser_live import _LiveStartupRecoverySupport
-
-def _front_panel_size():
-    """Return the dedicated LCD/VFD desktop size without touching TV output."""
-    try:
-        size = getDesktop(1).size()
-        width = int(size.width())
-        height = int(size.height())
-        if width > 0 and height > 0:
-            return (width, height)
-    except Exception:
-        pass
-    return (132, 64)
-
-def _front_panel_layout(live=False, vod=False):
-    """Calculate a large-type layout shared by the skin and fill renderer."""
-    width, height = _front_panel_size()
-    compact = width <= 240 or height <= 120
-    if compact:
-        margin = max(1, min(width, height) // 32)
-        progress_h = max(3, height // 12)
-        progress_y = max(margin, height - margin - progress_h)
-        detail_h = max(8, height // 5)
-        detail_y = max(margin, progress_y - detail_h)
-        subtitle_h = max(8, height // 5)
-        subtitle_y = max(margin, detail_y - subtitle_h)
-        kind_h = max(8, height // 6)
-        kind_y = margin
-        title_y = kind_y + kind_h
-        title_h = max(8, subtitle_y - title_y)
-        kind_font = max(8, min(14, kind_h - 1))
-        title_font = max(10, min(20, title_h - 1, width // 7))
-        subtitle_font = max(8, min(15, subtitle_h - 1, width // 10))
-        detail_font = subtitle_font
-    else:
-        margin = max(8, min(width, height) // 24)
-        progress_h = max(8, height // 18)
-        progress_y = height - margin - progress_h
-        detail_h = max(24, height // 9)
-        detail_y = progress_y - max(4, margin // 2) - detail_h
-        kind_h = max(22, height // 10)
-        kind_y = margin
-        title_y = kind_y + kind_h
-        title_h = max(36, height // 4)
-        subtitle_y = title_y + title_h
-        subtitle_room = max(20, detail_y - subtitle_y - max(4, margin // 2))
-        subtitle_h = min(max(30, height // 5), subtitle_room)
-        kind_font = max(16, min(32, kind_h - 2))
-        title_font = max(22, min(66, title_h - 4, width // 8))
-        subtitle_font = max(16, min(42, subtitle_h - 4, width // 13))
-        detail_font = max(15, min(30, detail_h - 2))
-    content_w = max(1, width - margin * 2)
-    clock_y = progress_y
-    clock_h = 1
-    clock_font = 1
-    remaining_y = progress_y
-    remaining_h = 1
-    remaining_font = 1
-    vod_detail = bool(vod and (not compact))
-    if live:
-        subtitle_h = min(subtitle_h, max(subtitle_font + 6, height // 8))
-        detail_y = subtitle_y + subtitle_h
-        detail_h = 0 if compact else min(detail_h, max(16, height // 20))
-        detail_font = max(8, min(detail_font, detail_h - 2))
-        clock_y = detail_y + detail_h
-        clock_h = max(1, progress_y - max(1, margin // 2) - clock_y)
-        clock_font = max(1, min(clock_h - (1 if compact else 4), content_w // 5))
-        detail_h = max(1, detail_h)
-    elif vod_detail:
-        subtitle_h = max(26, height // 6)
-        subtitle_font = max(16, min(height * 2 // 15, subtitle_h - 4, content_w // 10))
-        detail_y = subtitle_y + subtitle_h + max(2, margin * 2 // 5)
-        detail_h = max(20, height // 10)
-        detail_font = max(12, min(height * 11 // 120, detail_h - 4))
-        remaining_y = detail_y + detail_h
-        remaining_h = max(1, progress_y - max(1, margin // 2) - remaining_y)
-        remaining_font = max(1, min(height // 5, remaining_h - 4, content_w // 5))
-    title_capacity = max(8, int(float(content_w) / max(1.0, float(title_font) * 0.58)))
-    subtitle_capacity = max(10, int(float(content_w) / max(1.0, float(subtitle_font) * 0.55)))
-    return {'width': width, 'height': height, 'margin': margin, 'content_w': content_w, 'kind_y': kind_y, 'kind_h': kind_h, 'kind_font': kind_font, 'title_y': title_y, 'title_h': title_h, 'title_font': title_font, 'title_capacity': title_capacity, 'subtitle_y': subtitle_y, 'subtitle_h': subtitle_h, 'subtitle_font': subtitle_font, 'subtitle_capacity': subtitle_capacity, 'detail_y': detail_y, 'detail_h': detail_h, 'detail_font': detail_font, 'progress_y': progress_y, 'progress_h': progress_h, 'clock_y': clock_y, 'clock_h': clock_h, 'clock_font': clock_font, 'live_detail': bool(live and (not compact)), 'vod_detail': vod_detail, 'remaining_y': remaining_y, 'remaining_h': remaining_h, 'remaining_font': remaining_font}
-
-def _front_panel_skin(live=False, vod=False):
-    """Build an adaptive LCD/VFD skin using reliable label-based bars."""
-    layout = _front_panel_layout(live, vod)
-    return '\n<screen name="GTPlayerFrontPanelSummary" position="0,0" size="{width},{height}"\n        flags="wfNoBorder" backgroundColor="#000000">\n    <widget name="kind" position="{margin},{kind_y}" size="{content_w},{kind_h}"\n            font="Regular;{kind_font}" foregroundColor="#A855F7"\n            backgroundColor="#000000" transparent="0" noWrap="1"\n            valign="center" halign="center" />\n    <widget name="title" position="{margin},{title_y}" size="{content_w},{title_h}"\n            font="Regular;{title_font}" foregroundColor="#FFFFFF"\n            backgroundColor="#000000" transparent="0" noWrap="1"\n            valign="center" halign="center" />\n    <widget name="subtitle" position="{margin},{subtitle_y}"\n            size="{content_w},{subtitle_h}" font="Regular;{subtitle_font}"\n            foregroundColor="#D8E0EA" backgroundColor="#000000"\n            transparent="0" noWrap="1" valign="center" halign="center" />\n    <widget name="detail" position="{margin},{detail_y}" size="{content_w},{detail_h}"\n            font="Regular;{detail_font}" foregroundColor="#22D3EE"\n            backgroundColor="#000000" transparent="0" noWrap="1"\n            valign="center" halign="center" />\n    <widget name="clock" position="{margin},{clock_y}" size="{content_w},{clock_h}"\n            font="Regular;{clock_font}" foregroundColor="#FFFFFF"\n            backgroundColor="#000000" transparent="0" noWrap="1"\n            valign="center" halign="center" zPosition="3" />\n    <widget name="remaining" position="{margin},{remaining_y}" size="{content_w},{remaining_h}"\n            font="Regular;{remaining_font}" foregroundColor="#22D3EE"\n            backgroundColor="#000000" transparent="0" noWrap="1"\n            valign="center" halign="center" zPosition="3" />\n    <widget name="progress_bg" position="{margin},{progress_y}"\n            size="{content_w},{progress_h}" font="Regular;1"\n            backgroundColor="#26344E" transparent="0" zPosition="1" />\n    <widget name="progress_fill" position="{margin},{progress_y}"\n            size="1,{progress_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="2" />\n</screen>\n'.format(**layout)
+from .browser_common import _picon_failure_remaining, _discard_invalid_live_picon_cache
+from .live_picon_retry import LivePiconRetry, DOWNLOAD_TIMEOUT as LIVE_INFO_PICON_TIMEOUT, DOWNLOAD_BUDGET as LIVE_INFO_PICON_BUDGET
+from .vod_seek import VodSeekSupport
 
 def _player_skin():
     width, height = _desktop_size()
@@ -1438,196 +1359,6 @@ class GTPlayerInfoOverlay(Screen):
             for name in ('shortcut_record_dot', 'shortcut_record_key', 'shortcut_record_frame', 'shortcut_record', 'shortcut_epg_key', 'shortcut_epg', 'shortcut_aspect_dot', 'shortcut_aspect', 'epg_now_time', 'epg_next_time'):
                 self[name].hide()
 
-class GTPlayerFrontPanelSummary(Screen):
-    """Mirror the active IPTV programme on supported receiver displays."""
-
-    def __init__(self, session, parent):
-        self._static_live = bool(str(getattr(getattr(parent, 'current_item', None), 'content_type', '') or '').lower() == 'live')
-        vod = str(getattr(getattr(parent, 'current_item', None), 'content_type', '') or '').lower() in ('movie', 'series', 'catchup')
-        self._layout = _front_panel_layout(self._static_live, vod)
-        self.skin = _front_panel_skin(self._static_live, vod)
-        self._remaining_text = ''
-        try:
-            Screen.__init__(self, session, parent=parent)
-        except TypeError:
-            Screen.__init__(self, session)
-            self.parent = parent
-        self._player = parent
-        self._active = False
-        self._progress_value = 0
-        try:
-            parent._front_panel_summary = self
-        except Exception:
-            pass
-        self['kind'] = Label('')
-        self['title'] = Label('')
-        self['subtitle'] = Label('')
-        self['detail'] = Label('')
-        self['clock'] = Label('')
-        self['remaining'] = Label('')
-        self['progress_bg'] = Label('')
-        self['progress_fill'] = Label('')
-        self._refresh_timer = eTimer()
-        _connect_timer(self._refresh_timer, self._refresh)
-        if hasattr(self, 'onShown'):
-            self.onShown.append(self._start)
-        if hasattr(self, 'onLayoutFinish'):
-            self.onLayoutFinish.append(self._render)
-            self.onLayoutFinish.append(self._apply_progress_fill)
-        if hasattr(self, 'onClose'):
-            self.onClose.append(self._stop)
-        if hasattr(self, 'onHide'):
-            self.onHide.append(self._pause)
-        self._start()
-
-    @staticmethod
-    def _clock_text(seconds):
-        try:
-            seconds = max(0, int(seconds))
-        except (TypeError, ValueError, OverflowError):
-            seconds = 0
-        hours, remainder = divmod(seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        if hours:
-            return '{:02d}:{:02d}:{:02d}'.format(hours, minutes, seconds)
-        return '{:02d}:{:02d}'.format(minutes, seconds)
-
-    @staticmethod
-    def _clean_text(value):
-        return ' '.join(str(value or '').replace('\r', ' ').replace('\n', ' ').split())
-
-    def _set_front_panel_text(self, name, value):
-        capacity = self._layout['title_capacity' if name == 'title' else 'subtitle_capacity']
-        return ellipsize_dynamic_text(self[name], self._clean_text(value), fallback_chars=capacity)
-
-    def _set_progress(self, percent):
-        try:
-            value = max(0, min(100, int(round(float(percent)))))
-        except (TypeError, ValueError, OverflowError):
-            value = 0
-        self._progress_value = value
-        self._apply_progress_fill()
-        return value
-
-    def _apply_progress_fill(self):
-        fill = self['progress_fill']
-        if self._progress_value <= 0:
-            fill.hide()
-            return
-        width = max(1, int(round(self._layout['content_w'] * (float(self._progress_value) / 100.0))))
-        try:
-            fill.instance.resize(eSize(width, self._layout['progress_h']))
-        except Exception:
-            pass
-        fill.show()
-
-    def _render_live(self, item):
-        title = self._clean_text(getattr(item, 'name', '')) or 'GT IPTV'
-        events = list(getattr(self._player, '_current_epg_events', []) or [])
-        if not events:
-            return (N_('LIVE TV'), title, _('EPG information unavailable'), '', 0)
-        event = events[0]
-        subtitle = self._clean_text(getattr(event, 'title', ''))
-        start = int(getattr(event, 'start_timestamp', 0) or 0)
-        end = int(getattr(event, 'end_timestamp', 0) or 0)
-        now = int(time.time())
-        if start and start > now:
-            detail = ''
-            if end > start:
-                detail = '{} - {}'.format(datetime.datetime.fromtimestamp(start).strftime('%H:%M'), datetime.datetime.fromtimestamp(end).strftime('%H:%M'))
-            return (N_('LIVE TV'), title, '{}: {}'.format(_('NEXT'), subtitle), detail, 0)
-        if not start or not end or end <= start:
-            return (N_('LIVE TV'), title, subtitle, '', 0)
-        if self._static_live:
-            detail = '{} - {}'.format(datetime.datetime.fromtimestamp(start).strftime('%H:%M'), datetime.datetime.fromtimestamp(end).strftime('%H:%M'))
-            return (N_('LIVE TV'), title, subtitle, detail, 0)
-        ratio = min(1.0, max(0.0, float(now - start) / float(end - start)))
-        percent = int(round(ratio * 100.0))
-        remaining = max(0, end - now)
-        detail = '{}%  {} {}'.format(percent, _('REMAINING'), self._clock_text(remaining))
-        return (N_('LIVE TV'), title, subtitle, detail, percent)
-
-    def _render_vod(self, item, content_type):
-        self._remaining_text = ''
-        title = self._clean_text(getattr(item, 'name', '')) or 'GT IPTV'
-        kind = N_('TV Archive') if content_type == 'catchup' else N_('SERIES') if content_type == 'series' else N_('MOVIES')
-        position, length = self._player._seek_position()
-        if position < 0 or length <= 0:
-            return (kind, title, _('Please wait'), '', 0)
-        position = min(max(0, int(position)), int(length))
-        length = max(1, int(length))
-        remaining = max(0, length - position)
-        percent = int(round(float(position) / float(length) * 100.0))
-        subtitle = '{} / {}'.format(self._clock_text(position), self._clock_text(length))
-        detail = '{}%  {} {}'.format(percent, _('REMAINING'), self._clock_text(remaining))
-        if self._layout['vod_detail']:
-            self._remaining_text = self._clock_text(remaining)
-            detail = '{}% {}'.format(percent, _('REMAINING'))
-        return (kind, title, subtitle, detail, percent)
-
-    def _render(self):
-        item = getattr(self._player, 'current_item', None)
-        content_type = str(getattr(item, 'content_type', '') or '').lower()
-        if content_type == 'live':
-            kind, title, subtitle, detail, percent = self._render_live(item)
-        elif content_type in ('movie', 'series', 'catchup'):
-            kind, title, subtitle, detail, percent = self._render_vod(item, content_type)
-        else:
-            kind, title, subtitle, detail, percent = ('GT IPTV', self._clean_text(getattr(item, 'name', '')), '', '', 0)
-        self['kind'].setText(_(kind))
-        self._set_front_panel_text('title', title)
-        self._set_front_panel_text('subtitle', subtitle)
-        self['detail'].setText(detail)
-        if self._static_live:
-            if not self._layout['live_detail']:
-                self['detail'].hide()
-            self['clock'].show()
-            self._update_clock()
-        else:
-            self['clock'].hide()
-        if self._layout['vod_detail'] and self._remaining_text:
-            self['remaining'].setText(self._remaining_text)
-            self['remaining'].show()
-        else:
-            self['remaining'].hide()
-        self._set_progress(percent)
-
-    def _update_clock(self):
-        self['clock'].setText(time.strftime('%H:%M:%S', time.localtime()))
-
-    def _start(self):
-        self._active = True
-        self._render()
-        self._refresh_timer.start(1000, True)
-
-    def refresh_now(self):
-        """Apply a channel/EPG/playback change without waiting for a timer."""
-        self._render()
-
-    def _refresh(self):
-        if not self._active:
-            return
-        if self._static_live:
-            self._update_clock()
-        else:
-            self._render()
-        self._refresh_timer.start(1000, True)
-
-    def _pause(self):
-        self._active = False
-        try:
-            self._refresh_timer.stop()
-        except Exception:
-            pass
-
-    def _stop(self):
-        self._pause()
-        try:
-            if self._player._front_panel_summary is self:
-                self._player._front_panel_summary = None
-        except Exception:
-            pass
-
 class GTMinuteSeekScreen(Screen):
     """Enter an integer number of minutes without replacing the video."""
 
@@ -1682,7 +1413,7 @@ class GTMinuteSeekScreen(Screen):
     def cancel(self):
         self.close(None)
 
-class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Screen):
+class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _FavoriteSupport, Screen):
 
     def __init__(self, session, reference, item, client=None, items=None, selected_index=0, keep_playing_on_exit=False, weather_settings_loader=None, weather_service=None, resume_store=None, resume_key_value='', start_position=0, live_snapshot=None, favorite_store=None, favorite_parent=None, favorite_keys=None, adopt_playing_service=False, old_reference_override=None, live_startup_recovery=None, playback_owner=None, archive_initial_playback=None, stream_diag_play_id='', stream_diag_started_at=0.0, web_return_player=None, live_hidden_category_ids=None, live_category_id='', live_list_context=None, live_source_categories=None, fullscreen_osd_trace=None):
         self.skin = prepared_skin(_player_skin)
@@ -1763,6 +1494,7 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
         self._cached_picon_generation = -1
         self._picon_request_generation = -1
         self._picon_request_token = 0
+        self._live_picon_retry = None
         self._live_info_ready_samples = 0
         self._live_play_started_at = 0.0
         candidate_id = str(stream_diag_play_id or '').lower()
@@ -2363,9 +2095,14 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
             selected = channels.get(stream_id)
             if not isinstance(selected, dict):
                 return common
+            # Only weather belongs to the whole screen. Merging a partial B
+            # entry over the top-level A snapshot would borrow A's picon/EPG
+            # and incorrectly mark that artwork as B's completed logo.
+            snapshot = dict(common)
             snapshot.update(selected)
+            snapshot.setdefault('stream_id', stream_id)
         snapshot_stream_id = str(snapshot.get('stream_id', '') or '')
-        if snapshot_stream_id and snapshot_stream_id != stream_id:
+        if not stream_id or snapshot_stream_id != stream_id:
             _debug('live snapshot rejected expected_id={} actual_id={}'.format(stream_id, snapshot_stream_id))
             return common
         return snapshot
@@ -2447,14 +2184,86 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
         self._refresh_front_panel()
         return True
 
+    def _live_picon_status(self):
+        key = (self._generation, str(getattr(self.current_item, 'stream_id', '') or ''))
+        state = getattr(self, '_live_picon_retry', None)
+        if state is None or state.key != key:
+            state = self._live_picon_retry = LivePiconRetry(key, time.monotonic())
+        return state
+
+    def _defer_live_picon(self):
+        if self._closed or not self._is_live_item() or self._live_transition_in_progress():
+            return False
+        state = self._live_picon_status()
+        self._picon_visible = False
+        self._cached_picon_generation = self._picon_request_generation = -1
+        self._sync_picon_visibility()
+        url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
+        delay = state.defer(time.monotonic(), _picon_failure_remaining(url) if url else 0.0)
+        if delay is None:
+            self._picon_timer.stop()
+            return False
+        self._picon_timer.start(delay, True)
+        return True
+
+    def _live_picon_tick(self):
+        if self._closed or not self._is_live_item() or self._live_transition_in_progress():
+            return
+        state = self._live_picon_status()
+        now = time.monotonic()
+        if state.phase == 'decode':
+            remaining = state.decode_deadline - now
+            if remaining > 0:
+                self._picon_timer.start(max(1, int(round(remaining * 1000))), True)
+                return
+            # A native decoder which never calls back must not permanently
+            # reserve this channel's logo. Reject any late completion first.
+            self._picon_request_token += 1
+            loaders = getattr(self._info_dialog, '_gt_pixmap_loaders', {})
+            previous = loaders.pop('player-picon', None)
+            if previous is not None:
+                try:
+                    previous.close()
+                except Exception:
+                    pass
+            self._defer_live_picon()
+            return
+        if state.phase:
+            return
+        if now < state.retry_at:
+            if state.retry_at < state.deadline:
+                self._picon_timer.start(max(1, int(round((state.retry_at - now) * 1000))), True)
+            return
+        if not state.ready(now):
+            return
+        if self._apply_live_snapshot_picon():
+            return
+        url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
+        if not url or self.client is None:
+            return
+        if _picon_failure_active(url):
+            self._defer_live_picon()
+            return
+        self._live_info_queued_generation = self._generation
+        elapsed_ms = max(0, int(round((now - self._live_play_started_at) * 1000)))
+        started = self._start_live_info_completion(force=elapsed_ms >= LIVE_INFO_FALLBACK_MS, picon_only=True)
+        if not started and state.ready(time.monotonic()):
+            # A bounded EPG worker may still own the metadata delivery slot.
+            self._picon_timer.start(100, True)
+
     def _apply_live_snapshot_picon(self, snapshot=None):
         """Decode snapshot/cache artwork without creating a network request."""
-        if not self._is_live_item() or not self._started:
+        if self._closed or not self._is_live_item() or not self._started or self._live_transition_in_progress():
             return False
+        state = self._live_picon_status()
+        if state.phase in ('download', 'decode'):
+            return True
         if snapshot is None:
             snapshot = self._live_snapshot_for_current_item()
-        if self._picon_request_generation == self._generation and self._cached_picon_generation == self._generation:
+        if self._picon_visible and self._picon_request_generation == self._generation and self._cached_picon_generation == self._generation:
             return True
+        if not state.ready(time.monotonic()):
+            return False
         path = artwork_path(snapshot.get('picon_path', '') or '')
         if not path or not _valid_live_picon_file(path):
             url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
@@ -2463,10 +2272,8 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
                 self._remember_live_snapshot_component(getattr(self.current_item, 'stream_id', ''), 'picon_path', path)
         if not path or not _valid_live_picon_file(path):
             return False
-        self._cached_picon_generation = self._generation
-        self._picon_request_generation = self._generation
         self._apply_picon(self._generation, path)
-        return True
+        return state.phase in ('decode', 'ready')
 
     def _apply_live_snapshot(self):
         """Apply list-screen EPG/weather/picon without any network I/O."""
@@ -2523,7 +2330,12 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
         needs_epg = bool((not has_epg or self._live_info_epg_refresh_generation == self._generation) and now_mono >= retry_after and (self._live_info_loader() is not None))
         has_picon = self._apply_live_snapshot_picon(snapshot)
         picon_url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
-        needs_picon = bool(not has_picon and picon_url and (not _picon_failure_active(picon_url)))
+        needs_picon = False
+        if not has_picon and picon_url and self._live_picon_status().ready(time.monotonic()):
+            if _picon_failure_active(picon_url):
+                self._defer_live_picon()
+            else:
+                needs_picon = True
         return (needs_epg, needs_picon)
 
     def _arm_live_info_fallback(self):
@@ -2553,6 +2365,12 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
         if state is not None:
             for token in state.get('tokens', {}).values():
                 _cancel_worker_token(token)
+        retry = getattr(self, '_live_picon_retry', None)
+        if retry is not None and retry.phase == 'download':
+            # Cancelling a metadata slot must not leave its logo permanently
+            # marked as pending. A later infobar opening can resume the budget.
+            retry.defer(time.monotonic())
+            self._picon_request_generation = -1
         self._live_info_state = None
         self._live_info_queued_generation = -1
         self._live_info_due_at = 0.0
@@ -2560,7 +2378,7 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
         with self._live_info_results_lock:
             self._live_info_results.clear()
 
-    def _start_live_info_completion(self, force=False):
+    def _start_live_info_completion(self, force=False, picon_only=False):
         if self._closed or self._live_info_queued_generation != self._generation or (not self._is_live_item()) or self._live_transition_in_progress():
             return False
         elapsed_ms = max(0, int(round((time.monotonic() - self._live_play_started_at) * 1000)))
@@ -2577,6 +2395,8 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
             self._live_info_timer.start(LIVE_INFO_POLL_MS, True)
             return False
         needs_epg, needs_picon = self._live_info_missing_components()
+        if picon_only:
+            needs_epg = False
         defer_stalker_epg = bool(needs_epg and str(getattr(self.client, 'source_type', '') or '') == 'stalker' and (elapsed_ms < STALKER_LIVE_EPG_QUIET_MS))
         if defer_stalker_epg:
             needs_epg = False
@@ -2591,13 +2411,16 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
             token = _WorkerToken(LIVE_INFO_EPG_TIMEOUT_SECONDS)
             state['events']['events'] = event
             state['tokens']['events'] = token
-            workers.append(threading.Thread(target=self._load_live_info_epg_worker, args=(generation, stream_id, event, token, refresh_epg)))
+            workers.append(('events', threading.Thread(target=self._load_live_info_epg_worker, args=(generation, stream_id, event, token, refresh_epg))))
         if needs_picon:
-            event = threading.Event()
-            token = _WorkerToken(max(3, LIVE_PICON_DOWNLOAD_TIMEOUT + 1))
-            state['events']['picon_path'] = event
-            state['tokens']['picon_path'] = token
-            workers.append(threading.Thread(target=self._load_live_info_picon_worker, args=(generation, stream_id, self.current_item, event, token)))
+            if self._live_picon_status().begin('download', time.monotonic()):
+                self._picon_request_token += 1
+                self._picon_request_generation = generation
+                event = threading.Event()
+                token = _WorkerToken(LIVE_INFO_PICON_BUDGET)
+                state['events']['picon_path'] = event
+                state['tokens']['picon_path'] = token
+                workers.append(('picon_path', threading.Thread(target=self._load_live_info_picon_worker, args=(generation, stream_id, self.current_item, event, token))))
         if defer_stalker_epg:
             delay_ms = max(10, STALKER_LIVE_EPG_QUIET_MS - elapsed_ms)
             self._live_info_queued_generation = generation
@@ -2610,9 +2433,13 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
                 self._live_info_timer.start(delay_ms, True)
             return False
         self._live_info_state = state
-        for worker in workers:
+        for component, worker in workers:
             worker.daemon = True
-            worker.start()
+            try:
+                worker.start()
+            except (OSError, RuntimeError):
+                state['tokens'][component].cancel()
+                state['events'][component].set()
         self._live_info_timer.start(LIVE_INFO_POLL_MS, True)
         _debug('live info completion started id={} epg={} picon={}'.format(stream_id, needs_epg, needs_picon))
         return True
@@ -2641,7 +2468,7 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
 
     def _load_live_info_picon_worker(self, generation, stream_id, item, worker_event, worker_token):
         try:
-            path = _load_live_picon_path(self.client, item, worker_token=worker_token)
+            path = _load_live_picon_path(self.client, item, worker_token=worker_token, timeout=LIVE_INFO_PICON_TIMEOUT)
             self._publish_live_info_result(generation, stream_id, 'picon_path', path, worker_token)
         except _WorkerCancelled:
             pass
@@ -2675,10 +2502,9 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
         if component == 'picon_path':
             path = str(value or '').strip()
             if not path or not _valid_live_picon_file(path):
+                self._defer_live_picon()
                 return False
             self._remember_live_snapshot_component(stream_id, 'picon_path', path)
-            self._cached_picon_generation = generation
-            self._picon_request_generation = generation
             self._apply_picon(generation, path)
             return True
         return False
@@ -2714,6 +2540,9 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
         if not finished:
             self._live_info_timer.start(LIVE_INFO_POLL_MS, True)
             return
+        if 'picon_path' in state.get('events', {}) and 'picon_path' not in state['applied']:
+            if generation == self._generation and stream_id == str(getattr(self.current_item, 'stream_id', '') or ''):
+                self._defer_live_picon()
         self._live_info_state = None
         if self._live_info_queued_generation == self._generation:
             elapsed_ms = max(0, int(round((time.monotonic() - self._live_play_started_at) * 1000)))
@@ -4569,6 +4398,10 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
                 self._render_live_snapshot_epg(now=time.time())
                 if not getattr(self, '_defer_live_metadata_once', False):
                     self._refresh_live_metadata_once()
+                    if not self._closed and self._started and not self._picon_visible:
+                        retry = self._live_picon_status()
+                        if retry.phase == 'decode' or retry.can_wait(time.monotonic()):
+                            self._picon_timer.start(1, True)
         self._info_visible = True
         self._refresh_infobar_telemetry()
         self._set_subtitle_infobar_visible(True)
@@ -5127,7 +4960,7 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
         if getattr(self.current_item, 'content_type', '') == 'live':
             self._seek_unavailable()
             return
-        if not self._seeking:
+        if not self._seeking and not (self._vod_seek_enabled() and self._pending_seek_verification is not None):
             self._cancel_seek_verification()
         seeker = self._seek_interface()
         position, length = self._seek_position(seeker)
@@ -5136,7 +4969,8 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
             return
         if not self._seeking:
             self._seeking = True
-            self._seek_target = position
+            pending = self._pending_seek_verification
+            self._seek_target = (pending.get('queued_target') if pending.get('queued_target') is not None else pending['target']) if self._vod_seek_enabled() and pending is not None else position
             self._seek_length = length
             try:
                 self._hide_timer.stop()
@@ -5217,12 +5051,16 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
             guard = getattr(self, '_resume_bookmark_guard', None)
             if guard is not None:
                 guard['manual_seek'] = {'origin': int(origin), 'target': int(target)}
+        if self._vod_seek_enabled():
+            self._arm_vod_seek(self._pending_seek_verification)
         self._seek_verify_timer.start(SEEK_VERIFY_DELAY_MS, True)
 
     def _request_seek(self, seeker, origin, target, startup_resume=False):
         """Seek absolutely first, falling back immediately on explicit failure."""
         origin = int(origin)
         target = int(target)
+        if self._vod_seek_enabled() and self._queue_vod_seek(target):
+            return True
         if seeker is None:
             return False
         absolute = getattr(seeker, 'seekTo', None)
@@ -5257,6 +5095,9 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
     def _verify_seek_result(self):
         state = self._pending_seek_verification
         if state is None or self._closed:
+            return
+        if 'guard' in state:
+            self._verify_vod_seek(state)
             return
         current_stream_id = str(getattr(self.current_item, 'stream_id', '') or '')
         if current_stream_id != state['stream_id']:
@@ -5305,6 +5146,13 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
     def _seek_immediately(self, delta_seconds):
         if getattr(self.current_item, 'content_type', '') == 'live':
             self._seek_unavailable()
+            return
+        pending = self._pending_seek_verification
+        if self._vod_seek_enabled() and isinstance(pending, dict) and 'guard' in pending and self._vod_seek_context(pending):
+            base = pending.get('queued_target') if pending.get('queued_target') is not None else pending['target']
+            target = min(max(0, int(base) + int(delta_seconds)), max(0, int(pending['length'])))
+            self._queue_vod_seek(target)
+            self.show_info()
             return
         seeker = self._seek_interface()
         position, length = self._seek_position(seeker)
@@ -5456,7 +5304,8 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
             self._seek_not_ready()
             return True
         target = min(max(0, int(self._seek_target)), int(length))
-        self._cancel_seek_verification()
+        if not (self._vod_seek_enabled() and self._pending_seek_verification is not None):
+            self._cancel_seek_verification()
         if not self._request_seek(seeker, position, target):
             self._seek_unavailable()
             return True
@@ -5509,6 +5358,10 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
             return
         if self._paused:
             return
+        if self._vod_seek_pause_transport():
+            self._paused = True
+            self._show_seek_overlay(N_('PAUSED'), N_('PLAY / PAUSE to continue   •   STOP to close the video'))
+            return
         pauseable = self._pause_interface()
         if pauseable is None:
             self._show_seek_overlay(N_('PAUSE IS NOT AVAILABLE'), N_('This server or playback format does not support pausing'))
@@ -5532,6 +5385,19 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
 
     def resume_playback(self):
         if not self._paused:
+            state = self._pending_seek_verification
+            if self._vod_seek_enabled() and isinstance(state, dict) and 'guard' in state and state['phase'] == 'check' and time.monotonic() - state['guard'].started >= 2.0:
+                if self._nudge_vod_seek(state):self._seek_verify_timer.start(SEEK_VERIFY_DELAY_MS, True)
+            return
+        if self._vod_seek_pause_transport():
+            self._paused = False
+            pauseable = self._pause_interface()
+            try:
+                if pauseable is not None:pauseable.unpause()
+            except Exception:
+                pass
+            self._hide_seek_overlay()
+            self._seek_verify_timer.start(1, True)
             return
         pauseable = self._pause_interface()
         if pauseable is None:
@@ -5777,6 +5643,8 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
         guard = getattr(self, '_resume_bookmark_guard', None)
         if guard is None:
             return True
+        if guard.get('vod_seek_unconfirmed'):
+            return False
         if guard['key'] != self._resume_key:
             self._resume_bookmark_guard = None
             return True
@@ -6067,6 +5935,9 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
             self._picon_timer.stop()
         except Exception:
             pass
+        # Invalidate callbacks before closing the old native decoder.
+        self._picon_request_token += 1
+        self._live_picon_retry = None
         loaders = getattr(self._info_dialog, '_gt_pixmap_loaders', None)
         if loaders is not None:
             previous = loaders.pop('player-picon', None)
@@ -6078,7 +5949,6 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
         self._picon_visible = False
         self._cached_picon_generation = -1
         self._picon_request_generation = -1
-        self._picon_request_token += 1
         _cancel_worker_token(self._picon_worker_token)
         self._picon_worker_token = None
         self._picon_results = {}
@@ -6153,6 +6023,9 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
     def _picon_tick(self, _unused=None):
         if self._closed:
             return
+        if self._is_live_item():
+            self._live_picon_tick()
+            return
         if self._live_network_silent():
             try:
                 self._picon_timer.stop()
@@ -6181,15 +6054,52 @@ class GTExternalPlayerScreen(_LiveStartupRecoverySupport, _FavoriteSupport, Scre
             return
         if self._is_live_item() and (not _valid_live_picon_file(path)):
             return
+        live = self._is_live_item()
+        state = self._live_picon_status() if live else None
+        if live:
+            if state.phase == 'decode' or not state.begin('decode', time.monotonic()):
+                return
+            self._picon_request_token += 1
+            self._picon_request_generation = generation
+            self._cached_picon_generation = -1
+            self._picon_timer.start(max(1, int(round((state.decode_deadline - time.monotonic()) * 1000))), True)
         request_token = self._picon_request_token
+        completed = [False]
 
         def loaded(success):
-            if self._closed or generation != self._generation or request_token != self._picon_request_token:
+            if completed[0] or self._closed or generation != self._generation or request_token != self._picon_request_token:
                 return
+            completed[0] = True
+            if live:
+                if state is not self._live_picon_retry:
+                    return
+                if not success:
+                    # After the alpha path and compatibility decoder both
+                    # fail, remove only this URL's recognised disposable file.
+                    if state.decode_attempts == 2:
+                        url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
+                        if url:
+                            try:
+                                _discard_invalid_live_picon_cache(url, path)
+                            except Exception:
+                                pass
+                    self._defer_live_picon()
+                    return
+                state.succeeded()
+                self._cached_picon_generation = generation
+                self._picon_timer.stop()
+                if self._info_visible:
+                    self._start_info_hide_timer()
             self._picon_visible = bool(success)
             self._sync_picon_visibility()
-        loader = attach_native_alpha_pixmap if self._is_live_item() else attach_pixmap
-        loader(self._info_dialog, 'picon', path, key='player-picon', on_loaded=loaded)
+        loader = attach_native_alpha_pixmap if live and state.decode_attempts == 1 else attach_pixmap
+        if live:
+            try:
+                loader(self._info_dialog, 'picon', path, key='player-picon', on_loaded=loaded)
+            except Exception:
+                loaded(False)
+        else:
+            loader(self._info_dialog, 'picon', path, key='player-picon', on_loaded=loaded)
 
     def stop_playback(self):
         self._cancel_recording_preparation()

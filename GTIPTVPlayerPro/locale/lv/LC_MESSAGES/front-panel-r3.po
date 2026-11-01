@@ -1,0 +1,15 @@
+# Receiver front-panel captions, 1.8.0-r3.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: lv\n"
+
+msgid "Elapsed"
+msgstr "Pagājis"
+
+msgid "Total"
+msgstr "Kopā"
+
+#, python-format
+msgid "Season %(season)s · Episode %(episode)s"
+msgstr "%(season)s. sezona · %(episode)s. sērija"

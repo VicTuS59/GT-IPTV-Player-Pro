@@ -1,0 +1,8 @@
+# Immediate plugin-entry update checks, 1.8.0-r5.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fi\n"
+
+msgid "Updates are checked when the plugin opens and every 6 hours."
+msgstr "Päivitykset tarkistetaan lisäosan avautuessa ja 6 tunnin välein."

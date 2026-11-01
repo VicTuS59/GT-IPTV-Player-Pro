@@ -1106,7 +1106,7 @@ def _download_client_image(client, url, destination, timeout=None, token=None, p
     request_headers, user_agent = _provider_image_request_context(client, url)
     return _download_picon(url, destination, timeout=timeout, token=token, request_headers=request_headers, user_agent=user_agent, **{'priority': priority} if priority else {})
 
-def _load_live_picon_path(client, item, worker_token=None):
+def _load_live_picon_path(client, item, worker_token=None, timeout=None):
     """Return one validated live logo using the shared bounded downloader."""
     if worker_token is not None:
         worker_token.check()
@@ -1122,11 +1122,17 @@ def _load_live_picon_path(client, item, worker_token=None):
             _mark_picon_failure(url)
             return ''
     try:
-        path = _download_client_image(client, url, _picon_cache_path(url), timeout=LIVE_PICON_DOWNLOAD_TIMEOUT, token=worker_token)
+        path = _download_client_image(client, url, _picon_cache_path(url), timeout=LIVE_PICON_DOWNLOAD_TIMEOUT if timeout is None else timeout, token=worker_token)
     except _WorkerCancelled:
         raise
-    except Exception:
-        path = ''
+    except Exception as error:
+        if worker_token is not None:
+            worker_token.check()
+        # Preserve the downloader's transient/rate-limit cooldown instead of
+        # replacing a temporary failure with the default five-minute delay.
+        if not _picon_failure_active(url):
+            _mark_picon_failure(url, error)
+        return ''
     if worker_token is not None:
         worker_token.check()
     if path and _valid_live_picon_file(path):
@@ -1134,7 +1140,8 @@ def _load_live_picon_path(client, item, worker_token=None):
         return path
     if path:
         _discard_invalid_live_picon_cache(url, path)
-    _mark_picon_failure(url)
+    if not _picon_failure_active(url):
+        _mark_picon_failure(url)
     return ''
 
 def _provider_picon_timeout(metadata_client, url):

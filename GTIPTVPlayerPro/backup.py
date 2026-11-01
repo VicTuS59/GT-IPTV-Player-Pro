@@ -27,6 +27,7 @@ from .backup_scope import (GROUPS, SHARED_JSON, file_group, merge_document,
                            native_group, normalize_groups, project_document)
 from .persistence import RESTORE_COORDINATOR, PersistenceBusy
 from . import PLUGIN_VERSION
+from .legacy_storage_cleanup import is_history_sidecar
 
 
 PACKAGE_VERSION = PLUGIN_VERSION
@@ -99,7 +100,8 @@ def _path(value):
 
 
 def _transient(name):
-    return (name == "__pycache__" or name.endswith((".pyc", ".pyo", ".lock", ".tmp", '.history-index.sqlite3', '.history-index.sqlite3-journal', '.tmp-journal', '.rollback-r80'))
+    return (name == "__pycache__" or is_history_sidecar(name)
+            or name.endswith((".pyc", ".pyo", ".lock", ".tmp", '.tmp-journal', '.rollback-r80'))
             or name.startswith((".save-", ".gtiptv-restore-", ".gtiptv-backup-")))
 
 

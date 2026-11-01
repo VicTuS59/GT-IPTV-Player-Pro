@@ -418,6 +418,17 @@ elif [ -d "$PLUGIN_DIR" ]; then
     fi
 fi
 
+# Remove only this plugin's recognised disposable history/catalogue storage.
+# The standalone helper uses Python core/filesystem APIs, never a database
+# driver. It honours offline image roots and refuses substituted directories.
+if [ ! -L "$PLUGIN_DIR" ] && [ -d "$PLUGIN_DIR" ] && \
+   [ ! -L "$PLUGIN_DIR/legacy_storage_cleanup.py" ] && \
+   [ -f "$PLUGIN_DIR/legacy_storage_cleanup.py" ] && command -v python3 >/dev/null 2>&1; then
+    if ! python3 -B "$PLUGIN_DIR/legacy_storage_cleanup.py" --root "${TARGET_ROOT:-/}"; then
+        echo 'GT IPTV Player Pro: old-cache cleanup deferred until plugin entry.' >&2
+    fi
+fi
+
 echo 'GT IPTV Player Pro installed; restart the Enigma2 GUI before opening the plugin.'
 exit 0
 

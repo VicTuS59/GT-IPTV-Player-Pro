@@ -408,11 +408,11 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
             try:
                 from Screens.VirtualKeyBoard import VirtualKeyboard as VirtualKeyBoard
             except ImportError:
-                self["status"].setText(_("The virtual keyboard is unavailable on this image."))
+                self._set_status(_("The virtual keyboard is unavailable on this image."))
                 return
         opener = getattr(self.session, "openWithCallback", None)
         if not callable(opener):
-            self["status"].setText(_("Could not open the virtual keyboard."))
+            self._set_status(_("Could not open the virtual keyboard."))
             return
         self._keyboard_open = True
         try:
@@ -420,7 +420,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                    text=self._query)
         except Exception:
             self._keyboard_open = False
-            self["status"].setText(_("Could not open the virtual keyboard."))
+            self._set_status(_("Could not open the virtual keyboard."))
 
     def _query_entered(self, value=None):
         self._keyboard_open = False
@@ -428,7 +428,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
             return
         query = str(value).strip()[:120]
         if len(query) < 2:
-            self["status"].setText(_("Search") + " · 2+")
+            self._set_status(_("Search") + " · 2+")
             return
         self._query = query
         self._history_fullscreen_id = ""
@@ -493,7 +493,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         if cursor is None or (page > 1 and not cursor):
             if page <= self._highest_page:
                 self._page_expired = True
-                self["status"].setText(_("Request timed out") + " · MENU · " + _("Retry"))
+                self._set_status(_("Request timed out") + " · MENU · " + _("Retry"))
             return
         self._page_expired = False
         if page in self._page_cursors:
@@ -513,7 +513,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                 return
             self._cancel_token(prepared["token"])
         self._busy = True
-        self["status"].setText(_("Loading data... Please wait."))
+        self._set_status(_("Loading data... Please wait."))
         start = getattr(self._service, "search_async", None)
         if callable(start):
             try:
@@ -524,7 +524,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                 self._search_update(response)
             except Exception:
                 self._busy = False
-                self["status"].setText(_("Could not load content") + " · MENU · " + _("Retry"))
+                self._set_status(_("Could not load content") + " · MENU · " + _("Retry"))
             self._poll_timer.start(100, True)
             return
         generation, query, service = self._generation, self._query, self._service
@@ -614,7 +614,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         if self._selected >= self._top + ROWS:
             self._top = self._selected - ROWS + 1
         self._render()
-        self["status"].setText(
+        self._set_status(
             _("Loading data... Please wait.") if pending else
             _("Could not load content") + " · MENU · " + _("Retry") if error or response.get("pagination_warning") else
             "" if entries else _("No results found"))
@@ -636,7 +636,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                 if getattr(exc, "code", "") == "youtube_quality_changed":
                     self._query_entered(self._query)
                 else:
-                    self["status"].setText(_("Could not load content") + " · MENU · " + _("Retry"))
+                    self._set_status(_("Could not load content") + " · MENU · " + _("Retry"))
         self._poll_prefetch()
         with self._event_lock:
             events = list(self._events)
@@ -651,11 +651,11 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                     self._query_entered(self._query)
                     continue
                 if error or not isinstance(response, dict):
-                    self["status"].setText(_("Could not load content") + " · MENU · " + _("Retry"))
+                    self._set_status(_("Could not load content") + " · MENU · " + _("Retry"))
                     continue
                 self._cache_page(page, response)
                 self._page, self._selected, self._top = page, 0, 0
-                self["status"].setText("")
+                self._set_status("")
                 self._render()
             elif event[0] == "thumb":
                 unused_kind, key, index, video_id, path = event
@@ -680,7 +680,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                 self._play_token = ""
                 self._pending_play_id = ""
                 if state in ("failed", "cancelled", None):
-                    self["status"].setText(
+                    self._set_status(
                         (_("No videos found at the selected quality.") if job.get("error") == "youtube_quality_unavailable"
                          else _("Quality changed. Search again.") if job.get("error") == "youtube_quality_changed"
                          else _("Could not start the player."))
@@ -688,13 +688,9 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
                            if job.get("error") == "youtube_native_player_required" else "")
                     )
                 else:
-                    quality = int(job.get("quality") or 0)
-                    requested = str(job.get("requested_quality") or load_player_settings().youtube_resolution)
-                    self["status"].setText(
-                        "{} · {}P{}".format(_("Quality"), requested,
-                                            " → {}P".format(quality) if quality and str(quality) != requested else "")
-                        if quality else ""
-                    )
+                    # The right preview pane already reports actual resolution.
+                    # A successful start must not place quality over list rows.
+                    self._set_status("")
         if self._history_fullscreen_id and not self._play_token:
             video_id = self._history_fullscreen_id
             self._history_fullscreen_id = ""
@@ -811,9 +807,9 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
             numbers.append("…  ›")
         self["pages"].setText(_("Page") + "  " + "   ".join(numbers))
         if response.get("pagination_warning") == "youtube_unavailable" and not self._busy:
-            self["status"].setText(_("Could not load content") + " · MENU · " + _("Retry"))
+            self._set_status(_("Could not load content") + " · MENU · " + _("Retry"))
         elif not entries and not self._busy and response:
-            self["status"].setText(_("No results found"))
+            self._set_status(_("No results found"))
 
     def move(self, step):
         if self._closed or self._keyboard_open:
@@ -867,7 +863,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
 
     def _play_video(self, video, context=""):
         if not self._preview_available:
-            self["status"].setText(_("Could not start the player."))
+            self._set_status(_("Could not start the player."))
             return
         video_id = video.get("id", "")
         if self._play_token and video_id == self._pending_play_id:
@@ -886,9 +882,9 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
             self._play_token = result["token"]
             self._pending_play_id = video_id
         except Exception:
-            self["status"].setText(_("Could not start the player."))
+            self._set_status(_("Could not start the player."))
             return
-        self["status"].setText(_("Please wait"))
+        self._set_status(_("Please wait"))
         self._poll_timer.start(100, True)
 
     def _refresh_youtube_border(self):
@@ -906,6 +902,9 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
             self._youtube_border = border
         except (ImportError, AttributeError, TypeError):
             pass
+
+    def _set_status(self, value):
+        ellipsize_dynamic_text(self["status"], value, fallback_chars=64)
 
     def _fit_youtube_caption(self, name, text, size, minimum=12, max_lines=1):
         _width, _height, px = _scale()
@@ -983,9 +982,9 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         if save_player_settings(settings):
             self._sync_quality()
             if not self._query:
-                self["status"].setText(_("Quality") + " · " + quality_label(settings.youtube_resolution))
+                self._set_status(_("Quality") + " · " + quality_label(settings.youtube_resolution))
         else:
-            self["status"].setText(_("Settings could not be saved. Check the receiver storage."))
+            self._set_status(_("Settings could not be saved. Check the receiver storage."))
 
 
 

@@ -9146,6 +9146,10 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
         install_auto_login_overlay(self, desktop_width, desktop_height)
         install_remote_footer(self, WELCOME_FOOTER_ITEMS)
         self._setup_welcome(_scale(), WELCOME_FOOTER_ITEMS, PLUGIN_VERSION)
+        # Repeat the installer migration once after GUI restart, in case an
+        # old loaded R0 module recreated a disposable cache before restarting.
+        from .legacy_storage_cleanup import schedule_legacy_cleanup
+        schedule_legacy_cleanup()
         self["actions"] = ActionMap(
             [
                 "OkCancelActions",
@@ -9193,7 +9197,7 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
         self.setTitle("{} v{}".format(PLUGIN_NAME, PLUGIN_VERSION))
 
         from .update_ui import attach_update_notice
-        attach_update_notice(self)
+        attach_update_notice(self, entry=True)
 
     def _prepare_auto_login_overlay(self):
         # Labels stay native/gettext widgets at every OSD resolution.

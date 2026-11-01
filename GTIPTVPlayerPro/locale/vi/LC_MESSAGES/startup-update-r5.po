@@ -1,0 +1,8 @@
+# Immediate plugin-entry update checks, 1.8.0-r5.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: vi\n"
+
+msgid "Updates are checked when the plugin opens and every 6 hours."
+msgstr "Kiểm tra bản cập nhật khi mở tiện ích và mỗi 6 giờ."

@@ -12,7 +12,7 @@ from .vod_catalog import DEFAULT_VOD_CATALOG_DIR
 
 _guard = threading.Lock()
 _done = False
-_OLD = re.compile(r"^[0-9a-f]{64}\.(?:sqlite3(?:-wal|-shm|-journal|\.lock)?|portable\.(?:json(?:\.tmp)?|lock|probe|[0-9]+\.(?:body|members)|mi-[0-9]+-[0-9]+-[0-9]+))$")
+_OLD = re.compile(r"^[0-9a-f]{64}\.portable\.(?:json(?:\.tmp)?|lock|probe|[0-9]+\.(?:body|members)|mi-[0-9]+-[0-9]+-[0-9]+)$")
 _R3 = re.compile(r"^[0-9a-f]{64}\.(?:movie|series)\.portable\.(?:json(?:\.tmp)?|lock|probe|[0-9]+\.(?:body|members)|mi-[0-9]+-[0-9]+-[0-9]+)$")
 
 
