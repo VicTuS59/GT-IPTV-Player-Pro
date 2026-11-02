@@ -1,31 +1,9 @@
 # GT IPTV Player Pro 1.8.6-r0
 
-This revision removes the mandatory backup from the updater, adds detailed
-update failures in all 43 UI catalogues, and fixes CH+/CH− release-note paging
-for OpenPLi and OpenATV. Manual backup and restore remain in Settings.
+★ **Automatic pre-update backups removed:** Backup errors no longer block updates. Manual backup and restore options in Settings have been preserved.
 
-Install this revision manually once if an older updater is blocked while
-creating its safety backup, then restart the Enigma2 interface.
+★ **Detailed error messages in 43 languages:** The stage at which an update fails and the reason for the failure are displayed in the receiver’s language. Explanations have been added for connection, storage, missing package, and active recording/download conditions.
 
-Validation: `python3 -B tests/test-updater.py`, `tests/test-update-backup.py`,
-`tests/test-update-feedback.py`, `tests/test-update-errors.py` and
-`tests/test-startup-update.py`. Rebuild catalogue additions with
-`python3 -B scripts/localize-updater-r1.py` (GNU gettext required).
-
-Changes inherited from 1.8.5-r0:
-
-★ **SQLite-free installation:** Removed the python3-sqlite3 package dependency and replaced the plugin's SQLite working caches with bounded JSON indexes. Existing resume positions, watched episodes and user settings are preserved.
-
-★ **Live TV channel logos:** Added bounded recovery for failed logo loads and fixed incorrect logos after channel changes. Missing logo or EPG data can no longer inherit the first channel's data.
-
-★ **Movie and series seeking:** Combine repeated seek requests, verify that playback advances, and attempt one bounded recovery using the same playback engine when seeking stalls. Intentional pauses and resume bookmarks are protected.
-
-★ **Front panel displays:** Larger text and playback times, scrolling titles, and layouts that adapt to the display size.
-
-★ **YouTube:** Fixed playback quality text overlapping search results.
-
-★ **Update checks:** When automatic checks are enabled, the background check starts as soon as the plugin opens.
-
-★ **Installation cleanup:** Improved legacy cache cleanup and corrected the misleading deferred count for temporary-directory aliases.
+**Installation note:** Users who are unable to update older versions because of a pre-update backup error must install version 1.8.6-r0 manually once. Restart the Enigma2 interface after installation.
 
 Signed stable updates: Settings > Software update. Publishing: [UPDATING.md](UPDATING.md).
