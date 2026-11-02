@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: hu\nLanguage: hu\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Nem lehet csatlakozni a frissítési kiszolgálóhoz. Ellenőrizze a hálózatot, majd próbálja újra."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "A DNS-feloldás sikertelen. Ellenőrizze a hálózati beállításokat."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "A biztonságos kapcsolat sikertelen. Ellenőrizze a vevő dátumát és tanúsítványait."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "A frissítési kiszolgáló HTTP {status} hibát jelzett. Próbálja később."
+
+msgid "Download interrupted. Download the update again."
+msgstr "A letöltés megszakadt. Töltse le újra a frissítést."
+
+msgid "Storage is read-only."
+msgstr "A tároló csak olvasható."
+
+msgid "Storage access denied. Check permissions."
+msgstr "A tárolóhoz való hozzáférés megtagadva. Ellenőrizze a jogosultságokat."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "A frissítési beállítások nem olvashatók vagy menthetők. Indítsa újra a vevőt."
+
+msgid "Stop the active recording before updating."
+msgstr "Frissítés előtt állítsa le a folyamatban lévő felvételt."
+
+msgid "Pause active downloads before updating."
+msgstr "Frissítés előtt szüneteltesse az aktív letöltéseket."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "A tevékenység állapota nem ellenőrizhető. Indítsa újra a vevőt."
+
+msgid "Another update is running. Please wait."
+msgstr "Már folyamatban van egy másik frissítés. Kérjük, várjon."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "A csomag telepítése sikertelen. Ellenőrizze a telepítési naplót."
+
+msgid "Required package missing: {package}."
+msgstr "Hiányzó szükséges csomag: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Csomagütközés. Ellenőrizze a telepített csomagokat."
+
+msgid "The package manager is busy. Try again later."
+msgstr "A csomagkezelő foglalt. Próbálja később."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "A csomagkezelő nem érhető el ezen a vevőn."
+
+msgid "Administrator permission is required to install updates."
+msgstr "A frissítések telepítéséhez rendszergazdai jogosultság szükséges."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "A csomag beállítása sikertelen. Indítsa újra a vevőt, majd próbálja újra."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Váratlan frissítési hiba. Indítsa újra a vevőt, majd próbálja újra."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "A frissítés települt, de az állapota nem menthető. Indítsa újra a kezelőfelületet."

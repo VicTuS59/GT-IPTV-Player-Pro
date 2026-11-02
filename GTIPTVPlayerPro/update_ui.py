@@ -15,9 +15,10 @@ from .utility_design import NativeSkin,bind_missing
 from .auxiliary_layout import shell,panel,shared
 from .auxiliary_presentation import _footer_skin,_footer,text
 from .remote_footer import decorate_remote_footer,footer_item,install_remote_footer
-from .update_service import UpdateState,UpdateService,effective_version,receiver_busy,create_safety_backup
+from .update_service import UpdateState,UpdateService,effective_version,receiver_busy,receiver_activity
 from .update_protocol import UpdateError,version_tuple
 from .update_feedback import PHASE_LABELS,progress_geometry
+from .update_errors import format_error,STAGE_TEXTS,POST_INSTALL_WARNING
 
 LABELS={
  'title':'Software update','auto':'Automatic update check',
@@ -48,8 +49,8 @@ def update_skin():
         s.pic('update_focus_'+str(i),(64,y,1036,94),shared('search-focus'),z=4)
         s.label('update_label_'+str(i),(92,y+10,630,72),32,lines=2)
         s.label('update_value_'+str(i),(744,y+10,330,72),30,'#20D5ED',align='right',lines=2)
-    s.label('update_status',(84,536,994,110),38,'#20D5ED',lines=3)
-    s.label('update_detail',(84,662,994,84),27,'#AFC1D8',lines=3)
+    s.label('update_status',(84,430,994,110),38,'#20D5ED',lines=3)
+    s.label('update_detail',(84,550,994,192),27,'#AFC1D8',lines=6)
     s.label('update_track',(84,770,984,14),background='#253D54')
     s.label('update_fill',(84,770,1,14),background='#20D5ED',z=6)
     s.label('update_progress',(84,794,984,44),28,'#20D5ED',align='right')
@@ -68,6 +69,7 @@ class GTSoftwareUpdateScreen(Screen):
         self._selected=0;self._notes_offset=0;self._initial=False;self._cancel_event=threading.Event();self._progress=(0,0)
         self._progress_lock=threading.Lock();self._status='';self._detail='';self._installed=False
         self._phase='';self._pulse=0;self._timer_connections=[]
+        self._error_pending='';self._error_attempts=0;self._error_stage=''
         self._restart_pending=False;self._restart_open=False;self._restart_confirmed=False;self._restart_attempts=0
         self._activity_lock=threading.Lock();self._activity_request=None
         self._aux_kind='updater';self._aux_text={};self._aux_force_fit=False;self._aux_footer_keys=tuple(i[0] for i in FOOTER)
@@ -77,11 +79,14 @@ class GTSoftwareUpdateScreen(Screen):
         self._reader=SourceLoader(eTimer(),self._connect_timer,self._applied)
         self._progress_timer=eTimer();self._connect_timer(self._progress_timer,self._poll_progress)
         self._restart_timer=eTimer();self._connect_timer(self._restart_timer,self._restart_ready)
-        self['actions']=ActionMap(['OkCancelActions','DirectionActions','ColorActions','MenuActions','ChannelSelectBaseActions'],{
+        self._error_timer=eTimer();self._connect_timer(self._error_timer,self._show_error)
+        self['actions']=ActionMap(['OkCancelActions','DirectionActions','ColorActions','MenuActions','ChannelSelectBaseActions','MoviePlayerActions'],{
             'ok':self.change,'cancel':self.back,'back':self.back,'up':self.up,'down':self.down,
             'upRepeated':self.up,'downRepeated':self.down,'left':self.change,'right':self.change,
             'green':self.check,'yellow':self.download,'blue':self.install,'menu':self.menu,
-            'channelUp':self.notes_up,'channelDown':self.notes_down},-1)
+            'channelUp':self.notes_down,'channelDown':self.notes_up,
+            'nextBouquet':self.notes_down,'prevBouquet':self.notes_up,
+            'chplus':self.notes_down,'chminus':self.notes_up},-1)
         self.onShown.append(self._shown);self.onLayoutFinish.append(self._layout_ready);self.onClose.append(self._stop)
         self.onExecBegin.append(self._resumed)
         self.setTitle(message('title'));self._render()
@@ -106,6 +111,7 @@ class GTSoftwareUpdateScreen(Screen):
 
     def _start(self,kind,job):
         if self._busy or self._closed:return
+        self._error_pending='';self._error_timer.stop()
         self._busy=kind;self._cancel_event=threading.Event();self._detail='';self._pulse=0
         self._set_feedback('verify' if kind=='install' else kind)
         self._reader.request(job);self._progress_timer.start(200,True);self._render()
@@ -125,18 +131,20 @@ class GTSoftwareUpdateScreen(Screen):
 
     def _confirmed(self,confirmed):
         if confirmed is not True or self._closed or self._busy:return
-        if receiver_busy(self.session):self._status='busy';self._render();return
+        reason=receiver_activity(self.session)
+        if reason:
+            self._error_stage='install';self._error(UpdateError('busy',reason));self._render();return
         self._start('install',lambda:self.service.install(self._offer,self._verified,
-                    busy=self._activity_busy,backup=lambda:create_safety_backup(progress=self._set_feedback),progress=self._set_feedback))
+                    busy=self._activity_busy,progress=self._set_feedback))
 
     def _activity_busy(self):
         # Installation workers ask the GUI timer to read native navigation.
         # No Enigma C++/GUI object is accessed from the package-manager thread.
-        request=dict(event=threading.Event(),busy=True)
+        request=dict(event=threading.Event(),busy='activity')
         with self._activity_lock:
-            if self._closed:return True
+            if self._closed:return 'activity'
             self._activity_request=request
-        if not request['event'].wait(5):return True
+        if not request['event'].wait(5):return 'activity'
         return request['busy']
 
     def _set_progress(self,done,total):
@@ -151,7 +159,7 @@ class GTSoftwareUpdateScreen(Screen):
         with self._activity_lock:
             request,self._activity_request=self._activity_request,None
         if request is not None:
-            try:request['busy']=receiver_busy(self.session)
+            try:request['busy']=receiver_activity(self.session)
             finally:request['event'].set()
         self._pulse=(self._pulse+1)%30;self._render()
         if self._busy:self._progress_timer.start(200,True)
@@ -159,6 +167,7 @@ class GTSoftwareUpdateScreen(Screen):
     def _applied(self,value,error):
         if self._closed:return
         kind,self._busy=self._busy,'';self._progress_timer.stop()
+        self._error_stage=kind
         if error is not None:
             self._error(error)
             if kind=='download':self._verified=None
@@ -166,7 +175,8 @@ class GTSoftwareUpdateScreen(Screen):
             self._offer=value;self._verified=None;self._notes_offset=0;self._status='available' if value else 'current'
         elif kind=='download':self._verified=value;self._status='verified';self._set_feedback('downloaded',1,1)
         elif kind=='install':
-            self._status='installed';self._installed=True;self._verified=None;self._detail=value['backup'];self._offer=None
+            self._status='installed';self._installed=True;self._verified=None;self._offer=None
+            self._detail=_(POST_INSTALL_WARNING) if value.get('warning') else ''
             self._set_feedback('complete',1,1)
         self._render()
         if kind=='install' and error is None:self._ask_restart()
@@ -174,9 +184,29 @@ class GTSoftwareUpdateScreen(Screen):
     def _error(self,error):
         code=getattr(error,'code','failed')
         self._status=code if code in LABELS else 'current' if code=='version' else 'installed' if code=='restart' else 'failed'
-        details={'cancelled':'Cancelled','space':'Not enough free space.',
-                 'storage':'Storage is unavailable or not writable.','backup':'Backup or restore failed.'}
-        self._detail=_(details[code]) if code in details else ''
+        if code=='busy':self._status='failed'
+        self._detail=format_error(error,_)
+        if code not in ('cancelled','version','restart'):
+            stage=getattr(error,'stage','') or self._error_stage
+            heading=_(STAGE_TEXTS.get(stage,LABELS['title']))
+            self._error_pending=heading+'\n\n'+self._detail;self._error_attempts=0
+            self._error_timer.start(100,True)
+
+    def _show_error(self):
+        self._error_timer.stop()
+        if self._closed or not self._error_pending:return
+        if (self._busy or not getattr(self,'execing',False)
+                or not getattr(self.session,'in_exec',True)
+                or getattr(self.session,'current_dialog',None) is not self):
+            self._error_attempts+=1
+            if self._error_attempts<50:self._error_timer.start(100,True)
+            return
+        try:
+            self.session.open(MessageBox,self._error_pending,type=MessageBox.TYPE_ERROR)
+            self._error_pending=''
+        except RuntimeError:
+            self._error_attempts+=1
+            if self._error_attempts<50:self._error_timer.start(100,True)
 
     def up(self):
         if not self._busy:self._selected=(self._selected-1)%2;self._render()
@@ -202,13 +232,14 @@ class GTSoftwareUpdateScreen(Screen):
     def menu(self):
         if not self._busy:self._ask_restart()
     def _ask_restart(self):
-        try:pending=effective_version(self.service.state.read())!=PLUGIN_VERSION
-        except UpdateError:pending=False
+        try:pending=getattr(self,'_installed',False) or effective_version(self.service.state.read())!=PLUGIN_VERSION
+        except UpdateError:pending=getattr(self,'_installed',False)
         if not pending:return
         self._restart_pending=True;self._restart_attempts=0
         self._restart_timer.start(200,True)
 
     def _resumed(self):
+        if getattr(self,'_error_pending','') and not self._closed:self._error_timer.start(100,True)
         if self._restart_pending and not self._closed and not self._restart_open:
             self._restart_attempts=0;self._restart_timer.start(200,True)
 
@@ -247,18 +278,21 @@ class GTSoftwareUpdateScreen(Screen):
         if self._busy=='install':return
         self.close()
     def _stop(self):
-        self._closed=True;self._cancel_event.set();self._reader.close();self._progress_timer.stop();self._restart_timer.stop()
+        self._closed=True;self._cancel_event.set();self._reader.close();self._progress_timer.stop();self._restart_timer.stop();self._error_timer.stop()
+        self._error_pending=''
         self._restart_pending=False
         with self._activity_lock:
             request,self._activity_request=self._activity_request,None
-        if request is not None:request['busy']=True;request['event'].set()
+            if request is not None:request['busy']='activity';request['event'].set()
 
     def _render(self):
         if self._closed:return
         text(self,'aux_gt','GT',60);text(self,'aux_brand','IPTV PLAYER PRO',40);text(self,'aux_title',message('title'),46)
         self['aux_web_hint'].hide()
         try:state=self.service.state.read()
-        except UpdateError:state=dict(auto=False,installed='');self._status='failed'
+        except UpdateError:
+            state=dict(auto=False,installed='')
+            if not self._installed:self._status='failed'
         values=(_('On') if state['auto'] else _('Off'),effective_version(state))
         for i,(label,value) in enumerate(zip((message('auto'),_('Version')),values)):
             text(self,'update_label_'+str(i),label,32,2);text(self,'update_value_'+str(i),value,30,2)
@@ -266,7 +300,10 @@ class GTSoftwareUpdateScreen(Screen):
         status=message(self._busy) if self._busy in LABELS else message(self._status) if self._status in LABELS else message('interval')
         with self._progress_lock:done,total=self._progress;phase=self._phase
         if self._busy and phase in PHASE_LABELS:status=_(PHASE_LABELS[phase])
-        text(self,'update_status',status,36,3);text(self,'update_detail',self._detail,27,3)
+        text(self,'update_status',status,36,3)
+        # Preserve the separate reason, target and free-space lines. Generic
+        # title fitting normalises whitespace and would flatten these details.
+        self['update_detail'].setText(self._detail)
         text(self,'update_hint',message('interval'),25,2)
         text(self,'update_caption',message('new'),36)
         manifest=self._offer['manifest'] if self._offer else None
@@ -275,7 +312,7 @@ class GTSoftwareUpdateScreen(Screen):
         pages=self._note_pages();self._notes_offset=min(self._notes_offset,len(pages)-1)
         # Preserve signed release-note paragraphs; generic title fitting flattens them.
         self['update_notes'].setText(pages[self._notes_offset])
-        text(self,'update_notes_hint','CH± · '+_('Page')+' {}/{}'.format(self._notes_offset+1,len(pages)),25)
+        text(self,'update_notes_hint','CH+ / CH− · '+_('Page')+' {}/{}'.format(self._notes_offset+1,len(pages)),25)
         active=self._busy in ('download','install') or (phase in ('downloaded','complete') and self._status in ('verified','installed'))
         offset,width,percent=progress_geometry(done,total,self._pulse)
         self['update_fill'].show() if active else self['update_fill'].hide()

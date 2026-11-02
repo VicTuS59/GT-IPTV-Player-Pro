@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: es\nLanguage: es\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "No se puede conectar al servidor de actualizaciones. Compruebe la red e inténtelo de nuevo."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "Error de resolución DNS. Compruebe la configuración de red."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Falló la conexión segura. Compruebe la fecha y los certificados del receptor."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "El servidor de actualizaciones devolvió HTTP {status}. Inténtelo más tarde."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Descarga interrumpida. Descargue la actualización de nuevo."
+
+msgid "Storage is read-only."
+msgstr "El almacenamiento es de solo lectura."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Acceso al almacenamiento denegado. Compruebe los permisos."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "No se pudieron leer o guardar los ajustes de actualización. Reinicie el receptor."
+
+msgid "Stop the active recording before updating."
+msgstr "Detenga la grabación activa antes de actualizar."
+
+msgid "Pause active downloads before updating."
+msgstr "Pause las descargas activas antes de actualizar."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "No se pudo comprobar el estado de actividad. Reinicie el receptor."
+
+msgid "Another update is running. Please wait."
+msgstr "Hay otra actualización en curso. Espere."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Falló la instalación del paquete. Compruebe el registro de instalación."
+
+msgid "Required package missing: {package}."
+msgstr "Falta un paquete necesario: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Conflicto de paquetes. Compruebe los paquetes instalados."
+
+msgid "The package manager is busy. Try again later."
+msgstr "El gestor de paquetes está ocupado. Inténtelo más tarde."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "El gestor de paquetes no está disponible en este receptor."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Se requieren permisos de administrador para instalar actualizaciones."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Falló la configuración del paquete. Reinicie el receptor e inténtelo de nuevo."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Error inesperado de actualización. Reinicie el receptor e inténtelo de nuevo."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Actualización instalada, pero no se pudo guardar su estado. Reinicie la interfaz."

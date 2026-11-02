@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: zh_HK\nLanguage: zh_HK\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "無法連接更新伺服器。請檢查網絡後重試。"
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "DNS 解析失敗。請檢查網絡設定。"
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "安全連線失敗。請檢查接收機日期和憑證。"
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "更新伺服器傳回 HTTP {status}。請稍後重試。"
+
+msgid "Download interrupted. Download the update again."
+msgstr "下載中斷。請重新下載更新。"
+
+msgid "Storage is read-only."
+msgstr "儲存裝置為唯讀。"
+
+msgid "Storage access denied. Check permissions."
+msgstr "儲存存取被拒絕。請檢查權限。"
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "無法讀取或儲存更新設定。請重新啟動接收機。"
+
+msgid "Stop the active recording before updating."
+msgstr "更新前請停止正在進行的錄影。"
+
+msgid "Pause active downloads before updating."
+msgstr "更新前請暫停正在進行的下載。"
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "無法檢查活動狀態。請重新啟動接收機。"
+
+msgid "Another update is running. Please wait."
+msgstr "另一個更新正在進行中。請稍候。"
+
+msgid "Package installation failed. Check the installation log."
+msgstr "套件安裝失敗。請檢查安裝記錄。"
+
+msgid "Required package missing: {package}."
+msgstr "缺少必要的套件：{package}。"
+
+msgid "Package conflict. Check installed packages."
+msgstr "套件衝突。請檢查已安裝的套件。"
+
+msgid "The package manager is busy. Try again later."
+msgstr "套件管理員忙碌中。請稍後重試。"
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "此接收機的套件管理員無法使用。"
+
+msgid "Administrator permission is required to install updates."
+msgstr "安裝更新需要管理員權限。"
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "套件設定失敗。請重新啟動接收機後重試。"
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "發生非預期的更新錯誤。請重新啟動接收機後重試。"
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "更新已安裝，但無法儲存其狀態。請重新啟動介面。"

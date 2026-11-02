@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: bg\nLanguage: bg\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Няма връзка със сървъра за обновяване. Проверете мрежата и опитайте отново."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "Неуспешно DNS разрешаване. Проверете мрежовите настройки."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Неуспешна защитена връзка. Проверете датата и сертификатите на приемника."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Сървърът за обновяване върна HTTP {status}. Опитайте по-късно."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Изтеглянето е прекъснато. Изтеглете обновяването отново."
+
+msgid "Storage is read-only."
+msgstr "Носителят е само за четене."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Достъпът до носителя е отказан. Проверете разрешенията."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Настройките за обновяване не могат да се прочетат или запазят. Рестартирайте приемника."
+
+msgid "Stop the active recording before updating."
+msgstr "Спрете текущия запис преди обновяване."
+
+msgid "Pause active downloads before updating."
+msgstr "Поставете активните изтегляния на пауза преди обновяване."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Състоянието на активността не може да се провери. Рестартирайте приемника."
+
+msgid "Another update is running. Please wait."
+msgstr "Изпълнява се друго обновяване. Моля, изчакайте."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Неуспешна инсталация на пакета. Проверете инсталационния журнал."
+
+msgid "Required package missing: {package}."
+msgstr "Липсва необходим пакет: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Конфликт на пакети. Проверете инсталираните пакети."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Пакетният мениджър е зает. Опитайте по-късно."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Пакетният мениджър не е достъпен на този приемник."
+
+msgid "Administrator permission is required to install updates."
+msgstr "За инсталиране на обновявания са необходими администраторски права."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Неуспешно конфигуриране на пакета. Рестартирайте приемника и опитайте отново."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Неочаквана грешка при обновяване. Рестартирайте приемника и опитайте отново."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Обновяването е инсталирано, но състоянието му не е запазено. Рестартирайте интерфейса."

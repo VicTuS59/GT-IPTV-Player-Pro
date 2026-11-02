@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: da\nLanguage: da\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Kan ikke oprette forbindelse til opdateringsserveren. Kontrollér netværket, og prøv igen."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "DNS-opslag mislykkedes. Kontrollér netværksindstillingerne."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Sikker forbindelse mislykkedes. Kontrollér modtagerens dato og certifikater."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Opdateringsserveren returnerede HTTP {status}. Prøv igen senere."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Hentningen blev afbrudt. Hent opdateringen igen."
+
+msgid "Storage is read-only."
+msgstr "Lageret er skrivebeskyttet."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Adgang til lageret blev nægtet. Kontrollér tilladelserne."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Opdateringsindstillingerne kunne ikke læses eller gemmes. Genstart modtageren."
+
+msgid "Stop the active recording before updating."
+msgstr "Stop den igangværende optagelse før opdatering."
+
+msgid "Pause active downloads before updating."
+msgstr "Sæt aktive hentninger på pause før opdatering."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Aktivitetsstatus kunne ikke kontrolleres. Genstart modtageren."
+
+msgid "Another update is running. Please wait."
+msgstr "En anden opdatering er i gang. Vent venligst."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Pakkeinstallationen mislykkedes. Kontrollér installationsloggen."
+
+msgid "Required package missing: {package}."
+msgstr "Påkrævet pakke mangler: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Pakkekonflikt. Kontrollér installerede pakker."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Pakkehåndteringen er optaget. Prøv igen senere."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Pakkehåndteringen er ikke tilgængelig på denne modtager."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Administratorrettigheder er nødvendige for at installere opdateringer."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Pakkekonfigurationen mislykkedes. Genstart modtageren, og prøv igen."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Uventet opdateringsfejl. Genstart modtageren, og prøv igen."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Opdateringen er installeret, men status kunne ikke gemmes. Genstart brugerfladen."

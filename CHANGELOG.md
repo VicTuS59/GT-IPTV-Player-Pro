@@ -1,5 +1,16 @@
 # Change log
 
+## 1.8.6-r0
+
+- Remove the mandatory pre-update backup while retaining manual backup/restore.
+- Preserve typed update failures through the UI, with translated explanations
+  in all 43 catalogues and an error dialog after native screen handoff.
+- Distinguish network, DNS, TLS, HTTP, storage, active recording/download and
+  package-manager failures; report required/free space and missing dependencies.
+- Fix CH+/CH− release-note paging across OpenPLi and OpenATV action contexts.
+- Budget one unpacked package plus working space, tolerate nonessential cache
+  cleanup failures, and distinguish installed packages from status-save failures.
+
 ## 1.4.0 — 1.4.0-r0
 
 This release promotes the reviewed 1.3.0-r56 runtime to 1.4.0.

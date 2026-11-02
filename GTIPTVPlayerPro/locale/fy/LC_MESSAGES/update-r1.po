@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: fy\nLanguage: fy\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Gjin ferbining mei de fernijingstsjinner. Kontrolearje it netwurk en besykje opnij."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "DNS-opsykjen mislearre. Kontrolearje de netwurkynstellingen."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Feilige ferbining mislearre. Kontrolearje de datum en sertifikaten fan de ûntfanger."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "De fernijingstsjinner joech HTTP {status}. Besykje it letter opnij."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Download ûnderbrutsen. Download de fernijing opnij."
+
+msgid "Storage is read-only."
+msgstr "De opslach is allinnich-lêze."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Tagong ta de opslach wegere. Kontrolearje de rjochten."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Fernijingsynstellingen koene net lêzen of bewarre wurde. Start de ûntfanger opnij."
+
+msgid "Stop the active recording before updating."
+msgstr "Stopje de aktive opname foar it fernijen."
+
+msgid "Pause active downloads before updating."
+msgstr "Pauzearje aktive downloads foar it fernijen."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "De aktiviteitsstatus koe net kontrolearre wurde. Start de ûntfanger opnij."
+
+msgid "Another update is running. Please wait."
+msgstr "Der rint al in oare fernijing. Wachtsje efkes."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Pakketynstallaasje mislearre. Kontrolearje it ynstallaasjelogboek."
+
+msgid "Required package missing: {package}."
+msgstr "Fereaske pakket ûntbrekt: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Pakketkonflikt. Kontrolearje ynstallearre pakketten."
+
+msgid "The package manager is busy. Try again later."
+msgstr "De pakketbehearder is dwaande. Besykje it letter opnij."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "De pakketbehearder is net beskikber op dizze ûntfanger."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Beheardersrjochten binne nedich om fernijingen te ynstallearjen."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Pakketkonfiguraasje mislearre. Start de ûntfanger opnij en besykje opnij."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Unferwachte fernijingsflater. Start de ûntfanger opnij en besykje opnij."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Fernijing ynstallearre, mar de status koe net bewarre wurde. Start de ynterface opnij."

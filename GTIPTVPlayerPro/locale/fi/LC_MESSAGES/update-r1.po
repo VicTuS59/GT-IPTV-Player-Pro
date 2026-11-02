@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: fi\nLanguage: fi\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Päivityspalvelimeen ei saada yhteyttä. Tarkista verkko ja yritä uudelleen."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "DNS-haku epäonnistui. Tarkista verkkoasetukset."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Suojattu yhteys epäonnistui. Tarkista vastaanottimen päiväys ja varmenteet."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Päivityspalvelin palautti HTTP {status}. Yritä myöhemmin uudelleen."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Lataus keskeytyi. Lataa päivitys uudelleen."
+
+msgid "Storage is read-only."
+msgstr "Tallennustila on vain luku -tilassa."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Tallennustilan käyttö estetty. Tarkista käyttöoikeudet."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Päivitysasetuksia ei voitu lukea tai tallentaa. Käynnistä vastaanotin uudelleen."
+
+msgid "Stop the active recording before updating."
+msgstr "Pysäytä käynnissä oleva tallennus ennen päivitystä."
+
+msgid "Pause active downloads before updating."
+msgstr "Keskeytä aktiiviset lataukset ennen päivitystä."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Toiminnan tilaa ei voitu tarkistaa. Käynnistä vastaanotin uudelleen."
+
+msgid "Another update is running. Please wait."
+msgstr "Toinen päivitys on käynnissä. Odota."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Paketin asennus epäonnistui. Tarkista asennusloki."
+
+msgid "Required package missing: {package}."
+msgstr "Vaadittu paketti puuttuu: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Pakettiristiriita. Tarkista asennetut paketit."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Paketinhallinta on varattu. Yritä myöhemmin uudelleen."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Paketinhallinta ei ole käytettävissä tässä vastaanottimessa."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Päivitysten asentamiseen tarvitaan järjestelmänvalvojan oikeudet."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Paketin määritys epäonnistui. Käynnistä vastaanotin uudelleen ja yritä uudelleen."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Odottamaton päivitysvirhe. Käynnistä vastaanotin uudelleen ja yritä uudelleen."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Päivitys asennettiin, mutta sen tilaa ei voitu tallentaa. Käynnistä käyttöliittymä uudelleen."

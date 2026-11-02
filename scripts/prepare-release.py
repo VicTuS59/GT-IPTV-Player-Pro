@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Advance local release version and notes before committing/publishing; no network."""
-import argparse,ast,os,re,tempfile
+import argparse,ast,os,re,stat,tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 def version(value):
@@ -17,6 +17,7 @@ def prepare(target,notes_file,dry_run=False):
   for path,text in changes.items():
    fd,tmp=tempfile.mkstemp(prefix='.release-',dir=path.parent)
    try:
+    os.fchmod(fd,stat.S_IMODE(path.stat().st_mode))
     with os.fdopen(fd,'w',encoding='utf-8',newline='\n') as handle:handle.write(text)
     os.replace(tmp,path)
    finally:

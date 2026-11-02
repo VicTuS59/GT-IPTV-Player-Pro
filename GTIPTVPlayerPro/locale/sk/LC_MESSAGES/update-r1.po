@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: sk\nLanguage: sk\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n == 1) ? 0 : (n >= 2 && n <= 4) ? 1 : 2;\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Nedá sa pripojiť k serveru aktualizácií. Skontrolujte sieť a skúste to znova."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "Preklad DNS zlyhal. Skontrolujte nastavenia siete."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Zabezpečené pripojenie zlyhalo. Skontrolujte dátum a certifikáty prijímača."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Server aktualizácií vrátil HTTP {status}. Skúste to neskôr."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Sťahovanie bolo prerušené. Stiahnite aktualizáciu znova."
+
+msgid "Storage is read-only."
+msgstr "Úložisko je iba na čítanie."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Prístup k úložisku bol zamietnutý. Skontrolujte oprávnenia."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Nastavenia aktualizácií sa nedajú prečítať alebo uložiť. Reštartujte prijímač."
+
+msgid "Stop the active recording before updating."
+msgstr "Pred aktualizáciou zastavte prebiehajúce nahrávanie."
+
+msgid "Pause active downloads before updating."
+msgstr "Pred aktualizáciou pozastavte aktívne sťahovania."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Stav aktivity sa nedá overiť. Reštartujte prijímač."
+
+msgid "Another update is running. Please wait."
+msgstr "Prebieha iná aktualizácia. Počkajte, prosím."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Inštalácia balíka zlyhala. Skontrolujte protokol inštalácie."
+
+msgid "Required package missing: {package}."
+msgstr "Chýba požadovaný balík: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Konflikt balíkov. Skontrolujte nainštalované balíky."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Správca balíkov je zaneprázdnený. Skúste to neskôr."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Správca balíkov nie je na tomto prijímači dostupný."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Inštalácia aktualizácií vyžaduje oprávnenia správcu."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Konfigurácia balíka zlyhala. Reštartujte prijímač a skúste to znova."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Neočakávaná chyba aktualizácie. Reštartujte prijímač a skúste to znova."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Aktualizácia je nainštalovaná, ale jej stav sa nedá uložiť. Reštartujte rozhranie."

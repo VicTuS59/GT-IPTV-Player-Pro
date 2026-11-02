@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Icelandic\nLanguage: is\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Ekki næst samband við uppfærsluþjón. Athugaðu netið og reyndu aftur."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "DNS-uppfletting mistókst. Athugaðu netstillingarnar."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Örugg tenging mistókst. Athugaðu dagsetningu og skilríki móttakarans."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Uppfærsluþjónninn skilaði HTTP {status}. Reyndu aftur síðar."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Niðurhal rofnaði. Sæktu uppfærsluna aftur."
+
+msgid "Storage is read-only."
+msgstr "Geymslan er skrifvarin."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Aðgangi að geymslu hafnað. Athugaðu aðgangsheimildir."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Ekki tókst að lesa eða vista uppfærslustillingar. Endurræstu móttakarann."
+
+msgid "Stop the active recording before updating."
+msgstr "Stöðvaðu virka upptöku áður en uppfært er."
+
+msgid "Pause active downloads before updating."
+msgstr "Gerðu hlé á virku niðurhali áður en uppfært er."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Ekki tókst að athuga stöðu aðgerða. Endurræstu móttakarann."
+
+msgid "Another update is running. Please wait."
+msgstr "Önnur uppfærsla er í gangi. Bíddu aðeins."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Uppsetning pakka mistókst. Athugaðu uppsetningarskrána."
+
+msgid "Required package missing: {package}."
+msgstr "Nauðsynlegan pakka vantar: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Árekstur milli pakka. Athugaðu uppsetta pakka."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Pakkastjórinn er upptekinn. Reyndu aftur síðar."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Pakkastjórinn er ekki tiltækur á þessum móttakara."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Stjórnandaheimildir þarf til að setja upp uppfærslur."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Stilling pakka mistókst. Endurræstu móttakarann og reyndu aftur."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Óvænt uppfærsluvilla. Endurræstu móttakarann og reyndu aftur."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Uppfærslan var sett upp en ekki tókst að vista stöðuna. Endurræstu viðmótið."

@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: el\nLanguage: el\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Αδυναμία σύνδεσης με τον διακομιστή ενημερώσεων. Ελέγξτε το δίκτυο και δοκιμάστε ξανά."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "Αποτυχία επίλυσης DNS. Ελέγξτε τις ρυθμίσεις δικτύου."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Αποτυχία ασφαλούς σύνδεσης. Ελέγξτε την ημερομηνία και τα πιστοποιητικά του δέκτη."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Ο διακομιστής ενημερώσεων επέστρεψε HTTP {status}. Δοκιμάστε αργότερα."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Η λήψη διακόπηκε. Κατεβάστε ξανά την ενημέρωση."
+
+msgid "Storage is read-only."
+msgstr "Ο αποθηκευτικός χώρος είναι μόνο για ανάγνωση."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Δεν επιτρέπεται η πρόσβαση στην αποθήκευση. Ελέγξτε τα δικαιώματα."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Δεν ήταν δυνατή η ανάγνωση ή αποθήκευση των ρυθμίσεων ενημέρωσης. Επανεκκινήστε τον δέκτη."
+
+msgid "Stop the active recording before updating."
+msgstr "Σταματήστε την ενεργή εγγραφή πριν από την ενημέρωση."
+
+msgid "Pause active downloads before updating."
+msgstr "Παύστε τις ενεργές λήψεις πριν από την ενημέρωση."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Δεν ήταν δυνατός ο έλεγχος δραστηριότητας. Επανεκκινήστε τον δέκτη."
+
+msgid "Another update is running. Please wait."
+msgstr "Εκτελείται άλλη ενημέρωση. Παρακαλώ περιμένετε."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Αποτυχία εγκατάστασης πακέτου. Ελέγξτε το αρχείο καταγραφής εγκατάστασης."
+
+msgid "Required package missing: {package}."
+msgstr "Λείπει απαραίτητο πακέτο: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Σύγκρουση πακέτων. Ελέγξτε τα εγκατεστημένα πακέτα."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Ο διαχειριστής πακέτων είναι απασχολημένος. Δοκιμάστε αργότερα."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Ο διαχειριστής πακέτων δεν είναι διαθέσιμος σε αυτόν τον δέκτη."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Απαιτούνται δικαιώματα διαχειριστή για την εγκατάσταση ενημερώσεων."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Αποτυχία ρύθμισης πακέτου. Επανεκκινήστε τον δέκτη και δοκιμάστε ξανά."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Απρόσμενο σφάλμα ενημέρωσης. Επανεκκινήστε τον δέκτη και δοκιμάστε ξανά."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Η ενημέρωση εγκαταστάθηκε, αλλά η κατάστασή της δεν αποθηκεύτηκε. Επανεκκινήστε το περιβάλλον χρήστη."

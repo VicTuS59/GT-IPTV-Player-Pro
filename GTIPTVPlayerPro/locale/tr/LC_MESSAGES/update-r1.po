@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Turkish\nLanguage: tr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Güncelleme sunucusuna bağlanılamıyor. Ağı kontrol edip yeniden deneyin."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "DNS çözümlemesi başarısız. Ağ ayarlarını kontrol edin."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Güvenli bağlantı kurulamadı. Cihazın tarihini ve sertifikalarını kontrol edin."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Güncelleme sunucusu HTTP {status} hatası verdi. Daha sonra yeniden deneyin."
+
+msgid "Download interrupted. Download the update again."
+msgstr "İndirme kesildi. Güncellemeyi yeniden indirin."
+
+msgid "Storage is read-only."
+msgstr "Depolama alanı salt okunur durumda."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Depolamaya erişim reddedildi. İzinleri kontrol edin."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Güncelleme ayarları okunamadı veya kaydedilemedi. Cihazı yeniden başlatın."
+
+msgid "Stop the active recording before updating."
+msgstr "Güncellemeden önce devam eden kaydı durdurun."
+
+msgid "Pause active downloads before updating."
+msgstr "Güncellemeden önce devam eden indirmeleri duraklatın."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "İşlem durumu kontrol edilemedi. Cihazı yeniden başlatın."
+
+msgid "Another update is running. Please wait."
+msgstr "Başka bir güncelleme devam ediyor. Lütfen bekleyin."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Paket kurulumu başarısız. Kurulum hata kaydını kontrol edin."
+
+msgid "Required package missing: {package}."
+msgstr "Gerekli paket eksik: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Paket çakışması var. Kurulu paketleri kontrol edin."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Paket yöneticisi meşgul. Daha sonra yeniden deneyin."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Bu cihazda paket yöneticisi kullanılamıyor."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Güncellemeleri kurmak için yönetici izni gerekiyor."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Paket yapılandırılamadı. Cihazı yeniden başlatıp tekrar deneyin."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Beklenmeyen güncelleme hatası. Cihazı yeniden başlatıp tekrar deneyin."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Güncelleme kuruldu ancak durumu kaydedilemedi. Arayüzü yeniden başlatın."

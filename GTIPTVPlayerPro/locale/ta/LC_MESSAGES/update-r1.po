@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Tamil\nLanguage: ta\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1); \n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "புதுப்பிப்பு சேவையகத்துடன் இணைக்க முடியவில்லை. பிணையத்தைச் சரிபார்த்து மீண்டும் முயலவும்."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "DNS தேடல் தோல்வியடைந்தது. பிணைய அமைப்புகளைச் சரிபார்க்கவும்."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "பாதுகாப்பான இணைப்பு தோல்வியடைந்தது. பெறுநியின் தேதி மற்றும் சான்றிதழ்களைச் சரிபார்க்கவும்."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "புதுப்பிப்பு சேவையகம் HTTP {status} என்பதை வழங்கியது. பின்னர் மீண்டும் முயலவும்."
+
+msgid "Download interrupted. Download the update again."
+msgstr "பதிவிறக்கம் தடைபட்டது. புதுப்பிப்பை மீண்டும் பதிவிறக்கவும்."
+
+msgid "Storage is read-only."
+msgstr "சேமிப்பகம் படிக்க மட்டும் உள்ளது."
+
+msgid "Storage access denied. Check permissions."
+msgstr "சேமிப்பக அணுகல் மறுக்கப்பட்டது. அனுமதிகளைச் சரிபார்க்கவும்."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "புதுப்பிப்பு அமைப்புகளைப் படிக்கவோ சேமிக்கவோ முடியவில்லை. பெறுநியை மறுதொடக்கம் செய்யவும்."
+
+msgid "Stop the active recording before updating."
+msgstr "புதுப்பிக்கும் முன் நடைபெறும் பதிவை நிறுத்தவும்."
+
+msgid "Pause active downloads before updating."
+msgstr "புதுப்பிக்கும் முன் நடைபெறும் பதிவிறக்கங்களை இடைநிறுத்தவும்."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "செயல்பாட்டு நிலையைச் சரிபார்க்க முடியவில்லை. பெறுநியை மறுதொடக்கம் செய்யவும்."
+
+msgid "Another update is running. Please wait."
+msgstr "வேறொரு புதுப்பிப்பு நடைபெறுகிறது. காத்திருக்கவும்."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "தொகுப்பு நிறுவல் தோல்வியடைந்தது. நிறுவல் பதிவைச் சரிபார்க்கவும்."
+
+msgid "Required package missing: {package}."
+msgstr "தேவையான தொகுப்பு இல்லை: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "தொகுப்பு முரண்பாடு. நிறுவப்பட்ட தொகுப்புகளைச் சரிபார்க்கவும்."
+
+msgid "The package manager is busy. Try again later."
+msgstr "தொகுப்பு மேலாளர் பயன்பாட்டில் உள்ளது. பின்னர் மீண்டும் முயலவும்."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "இந்தப் பெறுநியில் தொகுப்பு மேலாளர் கிடைக்கவில்லை."
+
+msgid "Administrator permission is required to install updates."
+msgstr "புதுப்பிப்புகளை நிறுவ நிர்வாகி அனுமதி தேவை."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "தொகுப்பு உள்ளமைவு தோல்வியடைந்தது. பெறுநியை மறுதொடக்கம் செய்து மீண்டும் முயலவும்."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "எதிர்பாராத புதுப்பிப்பு பிழை. பெறுநியை மறுதொடக்கம் செய்து மீண்டும் முயலவும்."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "புதுப்பிப்பு நிறுவப்பட்டது, ஆனால் அதன் நிலையைச் சேமிக்க முடியவில்லை. இடைமுகத்தை மறுதொடக்கம் செய்யவும்."

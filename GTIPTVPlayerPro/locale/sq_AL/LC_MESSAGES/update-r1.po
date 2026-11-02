@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: sq_AL\nLanguage: sq_AL\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Nuk mund të lidhet me serverin e përditësimeve. Kontrolloni rrjetin dhe provoni përsëri."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "Zgjidhja DNS dështoi. Kontrolloni cilësimet e rrjetit."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Lidhja e sigurt dështoi. Kontrolloni datën dhe certifikatat e marrësit."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Serveri i përditësimeve ktheu HTTP {status}. Provoni më vonë."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Shkarkimi u ndërpre. Shkarkoni përsëri përditësimin."
+
+msgid "Storage is read-only."
+msgstr "Hapësira e ruajtjes është vetëm për lexim."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Qasja në hapësirën e ruajtjes u refuzua. Kontrolloni lejet."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Cilësimet e përditësimit nuk mund të lexohen ose ruhen. Rinisni marrësin."
+
+msgid "Stop the active recording before updating."
+msgstr "Ndaloni regjistrimin aktiv përpara përditësimit."
+
+msgid "Pause active downloads before updating."
+msgstr "Pezulloni shkarkimet aktive përpara përditësimit."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Gjendja e aktivitetit nuk mund të kontrollohet. Rinisni marrësin."
+
+msgid "Another update is running. Please wait."
+msgstr "Po kryhet një përditësim tjetër. Ju lutemi prisni."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Instalimi i paketës dështoi. Kontrolloni regjistrin e instalimit."
+
+msgid "Required package missing: {package}."
+msgstr "Mungon paketa e kërkuar: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Konflikt paketash. Kontrolloni paketat e instaluara."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Menaxheri i paketave është i zënë. Provoni më vonë."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Menaxheri i paketave nuk është i disponueshëm në këtë marrës."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Për instalimin e përditësimeve kërkohen leje administratori."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Konfigurimi i paketës dështoi. Rinisni marrësin dhe provoni përsëri."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Gabim i papritur gjatë përditësimit. Rinisni marrësin dhe provoni përsëri."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Përditësimi u instalua, por gjendja nuk mund të ruhej. Rinisni ndërfaqen."

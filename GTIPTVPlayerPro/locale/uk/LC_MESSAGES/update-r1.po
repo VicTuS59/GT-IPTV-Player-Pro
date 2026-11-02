@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Ukrainian\nLanguage: uk\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Не вдалося підключитися до сервера оновлень. Перевірте мережу та повторіть спробу."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "Помилка визначення DNS. Перевірте налаштування мережі."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Помилка захищеного з’єднання. Перевірте дату та сертифікати приймача."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Сервер оновлень повернув HTTP {status}. Спробуйте пізніше."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Завантаження перервано. Завантажте оновлення знову."
+
+msgid "Storage is read-only."
+msgstr "Сховище доступне лише для читання."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Доступ до сховища заборонено. Перевірте дозволи."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Не вдалося прочитати або зберегти налаштування оновлення. Перезапустіть приймач."
+
+msgid "Stop the active recording before updating."
+msgstr "Зупиніть поточний запис перед оновленням."
+
+msgid "Pause active downloads before updating."
+msgstr "Призупиніть активні завантаження перед оновленням."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Не вдалося перевірити стан активності. Перезапустіть приймач."
+
+msgid "Another update is running. Please wait."
+msgstr "Уже виконується інше оновлення. Зачекайте."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Не вдалося встановити пакунок. Перевірте журнал встановлення."
+
+msgid "Required package missing: {package}."
+msgstr "Відсутній потрібний пакунок: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Конфлікт пакунків. Перевірте встановлені пакунки."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Менеджер пакунків зайнятий. Спробуйте пізніше."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Менеджер пакунків недоступний на цьому приймачі."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Для встановлення оновлень потрібні права адміністратора."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Не вдалося налаштувати пакунок. Перезапустіть приймач і повторіть спробу."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Неочікувана помилка оновлення. Перезапустіть приймач і повторіть спробу."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Оновлення встановлено, але його стан не збережено. Перезапустіть інтерфейс."

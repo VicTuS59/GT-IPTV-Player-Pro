@@ -22,6 +22,7 @@ jobs:
           python3 -B tests/test-updater.py
           python3 -B tests/test-update-backup.py
           python3 -B tests/test-update-feedback.py
+          python3 -B tests/test-update-errors.py
           python3 -B tests/test-json-history.py
           python3 -B tests/test-legacy-storage-cleanup.py
           python3 -B tests/test-welcome-localization.py

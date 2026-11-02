@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: ar\nLanguage: ar\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=6; plural=(n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 && n % 100 <= 99 ? 4 : 5);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "تعذر الاتصال بخادم التحديث. تحقق من الشبكة وحاول مجددًا."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "فشل تحليل DNS. تحقق من إعدادات الشبكة."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "فشل الاتصال الآمن. تحقق من تاريخ جهاز الاستقبال والشهادات."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "أعاد خادم التحديث خطأ HTTP {status}. حاول لاحقًا."
+
+msgid "Download interrupted. Download the update again."
+msgstr "انقطع التنزيل. نزّل التحديث مجددًا."
+
+msgid "Storage is read-only."
+msgstr "وحدة التخزين للقراءة فقط."
+
+msgid "Storage access denied. Check permissions."
+msgstr "رُفض الوصول إلى التخزين. تحقق من الأذونات."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "تعذرت قراءة إعدادات التحديث أو حفظها. أعد تشغيل جهاز الاستقبال."
+
+msgid "Stop the active recording before updating."
+msgstr "أوقف التسجيل الجاري قبل التحديث."
+
+msgid "Pause active downloads before updating."
+msgstr "أوقف التنزيلات الجارية مؤقتًا قبل التحديث."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "تعذر التحقق من حالة النشاط. أعد تشغيل جهاز الاستقبال."
+
+msgid "Another update is running. Please wait."
+msgstr "هناك تحديث آخر قيد التنفيذ. يرجى الانتظار."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "فشل تثبيت الحزمة. تحقق من سجل التثبيت."
+
+msgid "Required package missing: {package}."
+msgstr "حزمة مطلوبة مفقودة: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "تعارض بين الحزم. تحقق من الحزم المثبتة."
+
+msgid "The package manager is busy. Try again later."
+msgstr "مدير الحزم مشغول. حاول لاحقًا."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "مدير الحزم غير متاح على جهاز الاستقبال هذا."
+
+msgid "Administrator permission is required to install updates."
+msgstr "تلزم صلاحية المسؤول لتثبيت التحديثات."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "فشلت تهيئة الحزمة. أعد تشغيل جهاز الاستقبال وحاول مجددًا."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "خطأ غير متوقع في التحديث. أعد تشغيل جهاز الاستقبال وحاول مجددًا."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "تم تثبيت التحديث، لكن تعذر حفظ حالته. أعد تشغيل الواجهة."

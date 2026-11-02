@@ -1,4 +1,18 @@
-# GT IPTV Player Pro 1.8.5-r0
+# GT IPTV Player Pro 1.8.6-r0
+
+This revision removes the mandatory backup from the updater, adds detailed
+update failures in all 43 UI catalogues, and fixes CH+/CH− release-note paging
+for OpenPLi and OpenATV. Manual backup and restore remain in Settings.
+
+Install this revision manually once if an older updater is blocked while
+creating its safety backup, then restart the Enigma2 interface.
+
+Validation: `python3 -B tests/test-updater.py`, `tests/test-update-backup.py`,
+`tests/test-update-feedback.py`, `tests/test-update-errors.py` and
+`tests/test-startup-update.py`. Rebuild catalogue additions with
+`python3 -B scripts/localize-updater-r1.py` (GNU gettext required).
+
+Changes inherited from 1.8.5-r0:
 
 ★ **SQLite-free installation:** Removed the python3-sqlite3 package dependency and replaced the plugin's SQLite working caches with bounded JSON indexes. Existing resume positions, watched episodes and user settings are preserved.
 

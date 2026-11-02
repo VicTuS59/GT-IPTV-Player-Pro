@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: sr\nLanguage: sr\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2;\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Повезивање са сервером за ажурирање није успело. Проверите мрежу и покушајте поново."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "DNS разрешавање није успело. Проверите мрежна подешавања."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Безбедна веза није успела. Проверите датум и сертификате пријемника."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Сервер за ажурирање вратио је HTTP {status}. Покушајте касније."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Преузимање је прекинуто. Поново преузмите ажурирање."
+
+msgid "Storage is read-only."
+msgstr "Складиште је само за читање."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Приступ складишту је одбијен. Проверите дозволе."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Подешавања ажурирања није могуће прочитати или сачувати. Поново покрените пријемник."
+
+msgid "Stop the active recording before updating."
+msgstr "Пре ажурирања зауставите активно снимање."
+
+msgid "Pause active downloads before updating."
+msgstr "Пре ажурирања паузирајте активна преузимања."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Статус активности није могуће проверити. Поново покрените пријемник."
+
+msgid "Another update is running. Please wait."
+msgstr "Друго ажурирање је већ у току. Сачекајте."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Инсталација пакета није успела. Проверите дневник инсталације."
+
+msgid "Required package missing: {package}."
+msgstr "Недостаје потребан пакет: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Сукоб пакета. Проверите инсталиране пакете."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Управљач пакетима је заузет. Покушајте касније."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Управљач пакетима није доступан на овом пријемнику."
+
+msgid "Administrator permission is required to install updates."
+msgstr "За инсталацију ажурирања потребна су администраторска права."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Подешавање пакета није успело. Поново покрените пријемник и покушајте поново."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Неочекивана грешка ажурирања. Поново покрените пријемник и покушајте поново."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Ажурирање је инсталирано, али његов статус није сачуван. Поново покрените интерфејс."

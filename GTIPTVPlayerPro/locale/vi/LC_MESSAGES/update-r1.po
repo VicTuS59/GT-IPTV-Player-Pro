@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: Vietnamese\nLanguage: vi\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Không thể kết nối với máy chủ cập nhật. Kiểm tra mạng và thử lại."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "Tra cứu DNS thất bại. Kiểm tra cài đặt mạng."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Kết nối bảo mật thất bại. Kiểm tra ngày và chứng chỉ của đầu thu."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Máy chủ cập nhật trả về HTTP {status}. Vui lòng thử lại sau."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Tải xuống bị gián đoạn. Hãy tải lại bản cập nhật."
+
+msgid "Storage is read-only."
+msgstr "Bộ nhớ lưu trữ ở chế độ chỉ đọc."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Truy cập bộ nhớ bị từ chối. Kiểm tra quyền truy cập."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Không thể đọc hoặc lưu cài đặt cập nhật. Khởi động lại đầu thu."
+
+msgid "Stop the active recording before updating."
+msgstr "Dừng ghi hình đang chạy trước khi cập nhật."
+
+msgid "Pause active downloads before updating."
+msgstr "Tạm dừng các lượt tải đang chạy trước khi cập nhật."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Không thể kiểm tra trạng thái hoạt động. Khởi động lại đầu thu."
+
+msgid "Another update is running. Please wait."
+msgstr "Một bản cập nhật khác đang chạy. Vui lòng chờ."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Cài đặt gói thất bại. Kiểm tra nhật ký cài đặt."
+
+msgid "Required package missing: {package}."
+msgstr "Thiếu gói cần thiết: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Xung đột gói. Kiểm tra các gói đã cài đặt."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Trình quản lý gói đang bận. Vui lòng thử lại sau."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Trình quản lý gói không khả dụng trên đầu thu này."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Cần quyền quản trị viên để cài đặt bản cập nhật."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Cấu hình gói thất bại. Khởi động lại đầu thu và thử lại."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Lỗi cập nhật không mong đợi. Khởi động lại đầu thu và thử lại."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Đã cài đặt bản cập nhật nhưng không lưu được trạng thái. Khởi động lại giao diện."

@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: lv\nLanguage: lv\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Nevar izveidot savienojumu ar atjauninājumu serveri. Pārbaudiet tīklu un mēģiniet vēlreiz."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "DNS uzmeklēšana neizdevās. Pārbaudiet tīkla iestatījumus."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Drošs savienojums neizdevās. Pārbaudiet uztvērēja datumu un sertifikātus."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Atjauninājumu serveris atgrieza HTTP {status}. Mēģiniet vēlāk."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Lejupielāde pārtraukta. Lejupielādējiet atjauninājumu vēlreiz."
+
+msgid "Storage is read-only."
+msgstr "Krātuve ir tikai lasāma."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Piekļuve krātuvei liegta. Pārbaudiet atļaujas."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Nevar nolasīt vai saglabāt atjauninājumu iestatījumus. Pārstartējiet uztvērēju."
+
+msgid "Stop the active recording before updating."
+msgstr "Pirms atjaunināšanas apturiet aktīvo ierakstīšanu."
+
+msgid "Pause active downloads before updating."
+msgstr "Pirms atjaunināšanas pauzējiet aktīvās lejupielādes."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Nevar pārbaudīt darbību stāvokli. Pārstartējiet uztvērēju."
+
+msgid "Another update is running. Please wait."
+msgstr "Jau notiek cits atjauninājums. Lūdzu, uzgaidiet."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Pakotnes instalēšana neizdevās. Pārbaudiet instalēšanas žurnālu."
+
+msgid "Required package missing: {package}."
+msgstr "Trūkst nepieciešamās pakotnes: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Pakotņu konflikts. Pārbaudiet instalētās pakotnes."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Pakotņu pārvaldnieks ir aizņemts. Mēģiniet vēlāk."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Pakotņu pārvaldnieks šajā uztvērējā nav pieejams."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Atjauninājumu instalēšanai nepieciešamas administratora tiesības."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Pakotnes konfigurēšana neizdevās. Pārstartējiet uztvērēju un mēģiniet vēlreiz."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Negaidīta atjaunināšanas kļūda. Pārstartējiet uztvērēju un mēģiniet vēlreiz."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Atjauninājums instalēts, bet tā stāvokli nevarēja saglabāt. Pārstartējiet saskarni."

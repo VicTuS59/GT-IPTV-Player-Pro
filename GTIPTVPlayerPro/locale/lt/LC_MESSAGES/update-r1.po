@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: lt\nLanguage: lt\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : n%10==0 || (n%100>=11 && n%100<=19) ? 2 : 3);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Nepavyksta prisijungti prie naujinimų serverio. Patikrinkite tinklą ir bandykite dar kartą."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "DNS paieška nepavyko. Patikrinkite tinklo nustatymus."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Saugus ryšys nepavyko. Patikrinkite imtuvo datą ir sertifikatus."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Naujinimų serveris grąžino HTTP {status}. Bandykite vėliau."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Atsisiuntimas nutrauktas. Atsisiųskite naujinimą dar kartą."
+
+msgid "Storage is read-only."
+msgstr "Saugykla skirta tik skaityti."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Prieiga prie saugyklos uždrausta. Patikrinkite leidimus."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Nepavyko perskaityti ar išsaugoti naujinimo nustatymų. Paleiskite imtuvą iš naujo."
+
+msgid "Stop the active recording before updating."
+msgstr "Prieš naujindami sustabdykite vykstantį įrašymą."
+
+msgid "Pause active downloads before updating."
+msgstr "Prieš naujindami pristabdykite aktyvius atsisiuntimus."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Nepavyko patikrinti veiklos būsenos. Paleiskite imtuvą iš naujo."
+
+msgid "Another update is running. Please wait."
+msgstr "Jau vykdomas kitas naujinimas. Palaukite."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Paketo įdiegti nepavyko. Patikrinkite diegimo žurnalą."
+
+msgid "Required package missing: {package}."
+msgstr "Trūksta būtino paketo: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Paketų konfliktas. Patikrinkite įdiegtus paketus."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Paketų tvarkytuvė užimta. Bandykite vėliau."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Paketų tvarkytuvė šiame imtuve nepasiekiama."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Naujinimams įdiegti reikia administratoriaus teisių."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Paketo sukonfigūruoti nepavyko. Paleiskite imtuvą iš naujo ir bandykite dar kartą."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Netikėta naujinimo klaida. Paleiskite imtuvą iš naujo ir bandykite dar kartą."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Naujinimas įdiegtas, bet jo būsenos išsaugoti nepavyko. Paleiskite sąsają iš naujo."

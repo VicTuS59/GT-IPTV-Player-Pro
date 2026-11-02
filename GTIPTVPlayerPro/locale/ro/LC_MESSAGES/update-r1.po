@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro\nLanguage-Team: Romanian\nLanguage: ro\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Conectarea la serverul de actualizări nu este posibilă. Verificați rețeaua și încercați din nou."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "Rezolvarea DNS a eșuat. Verificați setările de rețea."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Conexiunea securizată a eșuat. Verificați data și certificatele receptorului."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Serverul de actualizări a returnat HTTP {status}. Încercați mai târziu."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Descărcare întreruptă. Descărcați din nou actualizarea."
+
+msgid "Storage is read-only."
+msgstr "Stocarea este doar pentru citire."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Acces la stocare refuzat. Verificați permisiunile."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Setările de actualizare nu pot fi citite sau salvate. Reporniți receptorul."
+
+msgid "Stop the active recording before updating."
+msgstr "Opriți înregistrarea activă înainte de actualizare."
+
+msgid "Pause active downloads before updating."
+msgstr "Întrerupeți temporar descărcările active înainte de actualizare."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Starea activității nu poate fi verificată. Reporniți receptorul."
+
+msgid "Another update is running. Please wait."
+msgstr "O altă actualizare este în curs. Așteptați."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Instalarea pachetului a eșuat. Verificați jurnalul de instalare."
+
+msgid "Required package missing: {package}."
+msgstr "Lipsește un pachet necesar: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Conflict între pachete. Verificați pachetele instalate."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Managerul de pachete este ocupat. Încercați mai târziu."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Managerul de pachete nu este disponibil pe acest receptor."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Instalarea actualizărilor necesită drepturi de administrator."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Configurarea pachetului a eșuat. Reporniți receptorul și încercați din nou."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Eroare neașteptată de actualizare. Reporniți receptorul și încercați din nou."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Actualizarea a fost instalată, dar starea nu a putut fi salvată. Reporniți interfața."

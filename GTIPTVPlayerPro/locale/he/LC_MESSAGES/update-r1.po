@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Hebrew\nLanguage: he\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=4; plural=(n == 1 ? 0 : n == 2 ? 1 : (n > 10 && n % 10 == 0) ? 2 : 3); \n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "לא ניתן להתחבר לשרת העדכונים. בדקו את הרשת ונסו שוב."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "פענוח DNS נכשל. בדקו את הגדרות הרשת."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "החיבור המאובטח נכשל. בדקו את התאריך והתעודות של המקלט."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "שרת העדכונים החזיר HTTP {status}. נסו שוב מאוחר יותר."
+
+msgid "Download interrupted. Download the update again."
+msgstr "ההורדה נקטעה. הורידו את העדכון שוב."
+
+msgid "Storage is read-only."
+msgstr "האחסון מיועד לקריאה בלבד."
+
+msgid "Storage access denied. Check permissions."
+msgstr "הגישה לאחסון נדחתה. בדקו הרשאות."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "לא ניתן לקרוא או לשמור את הגדרות העדכון. הפעילו את המקלט מחדש."
+
+msgid "Stop the active recording before updating."
+msgstr "עצרו את ההקלטה הפעילה לפני העדכון."
+
+msgid "Pause active downloads before updating."
+msgstr "השהו הורדות פעילות לפני העדכון."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "לא ניתן לבדוק את מצב הפעילות. הפעילו את המקלט מחדש."
+
+msgid "Another update is running. Please wait."
+msgstr "עדכון אחר מתבצע כעת. אנא המתינו."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "התקנת החבילה נכשלה. בדקו את יומן ההתקנה."
+
+msgid "Required package missing: {package}."
+msgstr "חסרה חבילה נדרשת: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "התנגשות בין חבילות. בדקו את החבילות המותקנות."
+
+msgid "The package manager is busy. Try again later."
+msgstr "מנהל החבילות עסוק. נסו שוב מאוחר יותר."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "מנהל החבילות אינו זמין במקלט זה."
+
+msgid "Administrator permission is required to install updates."
+msgstr "נדרשות הרשאות מנהל כדי להתקין עדכונים."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "הגדרת החבילה נכשלה. הפעילו את המקלט מחדש ונסו שוב."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "שגיאת עדכון לא צפויה. הפעילו את המקלט מחדש ונסו שוב."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "העדכון הותקן, אך לא ניתן לשמור את מצבו. הפעילו את הממשק מחדש."

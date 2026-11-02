@@ -14,6 +14,7 @@ from urllib.parse import urlsplit
 from urllib.request import Request,build_opener,HTTPSHandler,HTTPRedirectHandler,ProxyHandler
 from urllib.error import HTTPError
 from .update_trust import KEY_ID,RSA_N,RSA_E
+from .update_errors import UpdateError,network_error
 
 REPOSITORY='VicTuS59/GT-IPTV-Player-Pro'
 PACKAGE='enigma2-plugin-extensions-gtiptvplayerpro'
@@ -25,9 +26,6 @@ MAX_INSTALLED=256*1024*1024
 VERSION=re.compile(r'(0|[1-9][0-9]{0,5})\.(0|[1-9][0-9]{0,5})\.(0|[1-9][0-9]{0,5})-r(0|[1-9][0-9]{0,5})\Z')
 SHA256=re.compile(r'[0-9a-f]{64}\Z')
 ALLOWED_HOSTS=frozenset(('raw.githubusercontent.com','github.com','release-assets.githubusercontent.com','objects.githubusercontent.com'))
-
-class UpdateError(Exception):
-    def __init__(self,code):self.code=code;super().__init__(code)
 
 def version_tuple(value):
     if not isinstance(value,str):raise UpdateError('metadata')
@@ -113,7 +111,7 @@ def verify_envelope(body,channel='stable',python_version=None):
 
 def check_cancel(cancel,deadline):
     if cancel is not None and cancel.is_set():raise UpdateError('cancelled')
-    if time.monotonic()>deadline:raise UpdateError('network')
+    if time.monotonic()>deadline:raise UpdateError('network','timeout')
 
 class _Redirect(HTTPRedirectHandler):
     def redirect_request(self,req,fp,code,msg,headers,newurl):
@@ -123,13 +121,15 @@ class _Redirect(HTTPRedirectHandler):
 class UpdateTransport:
     def __init__(self):
         # Independent of IPTV provider transports and their credentials/options.
-        self.context=ssl.create_default_context()
+        try:self.context=ssl.create_default_context()
+        except Exception as error:raise UpdateError('network','certificate') from error
         # Some receiver images compile OpenSSL against /usr/lib/ssl-1.1 while
         # ca-certificates installs the real trust bundle under /etc/ssl/certs.
         # Load that system bundle explicitly; certificate/hostname checks stay on.
         for path in ('/etc/ssl/certs/ca-certificates.crt','/etc/pki/tls/certs/ca-bundle.crt'):
             if os.path.isfile(path):
-                self.context.load_verify_locations(cafile=path)
+                try:self.context.load_verify_locations(cafile=path)
+                except Exception as error:raise UpdateError('network','certificate') from error
                 break
         self.opener=build_opener(ProxyHandler({}),HTTPSHandler(context=self.context),_Redirect())
 
@@ -139,7 +139,7 @@ class UpdateTransport:
         try:
             with self.opener.open(req,timeout=10) as response:
                 safe_url(response.geturl())
-                if response.getcode()!=200:raise UpdateError('network')
+                if response.getcode()!=200:raise UpdateError('network','http',status=response.getcode())
                 length=response.headers.get('Content-Length')
                 if length is not None and (not length.isdigit() or int(length)>maximum):raise UpdateError('metadata')
                 if response.headers.get('Content-Encoding','identity').lower() not in ('','identity'):raise UpdateError('metadata')
@@ -152,12 +152,12 @@ class UpdateTransport:
                     if total>maximum:raise UpdateError('metadata')
                     if sink is None:parts.append(chunk)
                     else:sink(chunk)
-                if length is not None and total!=int(length):raise UpdateError('network')
+                if length is not None and total!=int(length):raise UpdateError('network','interrupted')
                 return b''.join(parts) if sink is None else total
         except UpdateError:raise
         except HTTPError as error:
             code=error.code
             try:error.close()
             except Exception:pass
-            raise UpdateError('source' if code==404 else 'network')
-        except Exception:raise UpdateError('network')
+            raise UpdateError('source' if code==404 else 'network','source' if code==404 else 'http',status=code) from error
+        except Exception as error:raise network_error(error) from error

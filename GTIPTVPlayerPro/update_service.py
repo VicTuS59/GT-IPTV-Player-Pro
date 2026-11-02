@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Updater state, bounded verified downloads and explicitly requested opkg installation."""
-import base64
-import errno
 import hashlib
-import json
 import os
 import re
 import shutil
@@ -18,10 +15,10 @@ from . import PLUGIN_VERSION
 from .update_protocol import UpdateError,UpdateTransport,MAX_METADATA,canonical,json_document,source_url,verify_envelope,version_tuple
 from .update_package import inspect_ipk
 from .update_feedback import emit,installer_phase
+from .update_errors import reported,storage_error,require_space,installation_error
 
 SETTINGS='/etc/enigma2/gtiptvplayer/update-settings.json'
 CACHE='/tmp/gtiptv-updates'
-BACKUP_FALLBACK='/etc/enigma2'
 INTERVAL=6*60*60
 _STATE_LOCK=threading.RLock()
 _CHECK_LOCK=threading.Lock()
@@ -30,7 +27,7 @@ _INSTALL_LOCK=threading.Lock()
 def private_directory(path):
     os.makedirs(path,mode=0o700,exist_ok=True)
     info=os.lstat(path)
-    if not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.geteuid():raise UpdateError('storage')
+    if not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.geteuid():raise UpdateError('storage',path=path)
     if stat.S_IMODE(info.st_mode)!=0o700:os.chmod(path,0o700)
     return path
 
@@ -54,8 +51,8 @@ class UpdateState:
             # from another source or postponing the first stable check.
             if data.get('channel','stable')!='stable':defaults.update(last_check=0,skipped='',offer='')
         except FileNotFoundError:pass
-        except UpdateError:raise
-        except Exception:raise UpdateError('storage')
+        except OSError as error:raise storage_error(error,self.path) from error
+        except Exception as error:raise UpdateError('storage','state',path=self.path) from error
         return defaults
     def write(self,**changes):
         if changes.get('channel','stable')!='stable':raise UpdateError('metadata')
@@ -67,7 +64,8 @@ class UpdateState:
                 fd,temporary=tempfile.mkstemp(prefix='.update-state-',dir=directory)
                 with os.fdopen(fd,'wb') as handle:handle.write(body);handle.flush();os.fsync(handle.fileno())
                 os.chmod(temporary,0o600);os.replace(temporary,self.path);temporary=None
-            except Exception:raise UpdateError('storage')
+            except OSError as error:raise storage_error(error,self.path) from error
+            except Exception as error:raise UpdateError('storage','state',path=self.path) from error
             finally:
                 if temporary is not None:
                     try:os.unlink(temporary)
@@ -95,6 +93,7 @@ class UpdateService:
         if version_tuple(manifest['version'])<=version_tuple(effective_version(state,self.current)):return None
         return dict(body=body,manifest=manifest)
 
+    @reported('check')
     def check(self,automatic=False,cancel=None,clock=time.time,on_entry=False):
         if not _CHECK_LOCK.acquire(False):raise UpdateError('busy')
         try:
@@ -117,6 +116,7 @@ class UpdateService:
 
     def path_for(self,manifest):return os.path.join(self.cache,manifest['sha256']+'.ipk')
 
+    @reported('download')
     def download(self,offer,cancel=None,progress=None,feedback=None):
         manifest=self.verified_offer(offer);private_directory(self.cache)
         path=self.path_for(manifest)
@@ -131,14 +131,16 @@ class UpdateService:
                 if error.code=='cancelled':raise
                 # Only this updater's content-addressed cache entry is removed.
                 os.unlink(path)
-        if shutil.disk_usage(self.cache).free<manifest['bytes']+8*1024*1024:raise UpdateError('space')
+        require_space(self.cache,manifest['bytes']+8*1024*1024)
         temporary=None;written=0;digest=hashlib.sha256()
         try:
             fd,temporary=tempfile.mkstemp(prefix='.update-',suffix='.part',dir=self.cache)
             with os.fdopen(fd,'wb') as output:
                 def sink(chunk):
                     nonlocal written
-                    output.write(chunk);written+=len(chunk);digest.update(chunk)
+                    try:output.write(chunk)
+                    except OSError as error:raise storage_error(error,self.cache) from error
+                    written+=len(chunk);digest.update(chunk)
                     if progress is not None:progress(written,manifest['bytes'])
                 count=self.transfer(manifest['url'],manifest['bytes'],cancel=cancel,sink=sink)
                 output.flush();os.fsync(output.fileno())
@@ -150,7 +152,7 @@ class UpdateService:
             emit(feedback,'downloaded',1,1)
             return path
         except UpdateError:raise
-        except Exception:raise UpdateError('storage')
+        except OSError as error:raise storage_error(error,self.cache) from error
         finally:
             if temporary is not None:
                 try:os.unlink(temporary)
@@ -160,9 +162,13 @@ class UpdateService:
         # Keep at most two verified downloads in the updater-owned /tmp folder.
         if _INSTALL_LOCK.locked():return
         owned=[]
-        for name in os.listdir(self.cache):
+        try:names=os.listdir(self.cache)
+        except OSError:return
+        for name in names:
             if not re.fullmatch(r'[0-9a-f]{64}\.ipk',name):continue
-            path=os.path.join(self.cache,name);info=os.lstat(path)
+            path=os.path.join(self.cache,name)
+            try:info=os.lstat(path)
+            except OSError:continue
             if stat.S_ISREG(info.st_mode) and info.st_uid==os.geteuid() and path!=current:owned.append((info.st_mtime_ns,path))
         for unused,path in sorted(owned,reverse=True)[1:]:
             try:os.unlink(path)
@@ -173,54 +179,76 @@ class UpdateService:
         if not _INSTALL_LOCK.acquire(False):raise UpdateError('busy')
         fd=None
         try:
-            import fcntl
             private_directory(self.cache)
             fd=os.open(os.path.join(self.cache,'install.lock'),os.O_WRONLY|os.O_CREAT|getattr(os,'O_NOFOLLOW',0),0o600)
-            fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
+            try:
+                import fcntl
+                fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
+            except BlockingIOError as error:raise UpdateError('busy') from error
+            except ImportError as error:raise UpdateError('install','opkg_missing') from error
             yield
-        except (BlockingIOError,ImportError):raise UpdateError('busy')
         finally:
             if fd is not None:os.close(fd)
             _INSTALL_LOCK.release()
 
-    def install(self,offer,path,busy,backup,runner=None,root='/',uid=None,progress=None):
+    @reported('install')
+    def install(self,offer,path,busy,runner=None,root='/',uid=None,progress=None):
         """Called only after GUI confirmation; never called by a check/download."""
         with self.installation_lock():
             manifest=self.verified_offer(offer)
-            if (os.geteuid() if uid is None else uid)!=0:raise UpdateError('install')
+            if (os.geteuid() if uid is None else uid)!=0:raise UpdateError('install','root')
             if os.path.abspath(path)!=os.path.abspath(self.path_for(manifest)):raise UpdateError('package')
             emit(progress,'verify')
             inspect_ipk(path,manifest)
-            if busy():raise UpdateError('busy')
-            required=manifest['installed_bytes']*2+16*1024*1024
-            if shutil.disk_usage(root).free<required:raise UpdateError('space')
-            emit(progress,'backup')
-            safety=backup()
-            if not isinstance(safety,str) or not os.path.isfile(safety):raise UpdateError('backup')
-            if busy():raise UpdateError('busy')
-            # A fallback backup can consume the same flash that opkg needs.
-            if shutil.disk_usage(root).free<required:raise UpdateError('space')
-            # Revalidate bytes and identity after the backup and immediately
-            # before crossing the package-manager execution boundary.
+            self._check_activity(busy)
+            # Reserve one complete unpacked payload plus working space. There
+            # is no update backup and no second payload to budget on flash.
+            required=manifest['installed_bytes']+8*1024*1024
+            require_space(root,required)
+            # Revalidate after the native activity check, which may yield to
+            # the UI, and immediately before the package-manager boundary.
             emit(progress,'verify')
             inspect_ipk(path,manifest)
+            self._check_activity(busy)
+            require_space(root,required)
             log=os.path.join(self.cache,'install.log')
-            self.state.write(backup=safety,result='installing')
+            self.state.write(result='installing')
             emit(progress,'install')
             try:code=runner(path,log) if runner is not None else run_opkg(path,log,progress=progress)
-            except Exception:
-                self.state.write(backup=safety,result='install-failed')
-                raise UpdateError('install')
+            except UpdateError:
+                self._mark_install_failed()
+                raise
+            except OSError as error:
+                self._mark_install_failed()
+                raise storage_error(error,self.cache) from error
+            except Exception as error:
+                self._mark_install_failed()
+                raise UpdateError('install') from error
             if code!=0:
-                self.state.write(backup=safety,result='install-failed')
-                raise UpdateError('install')
-            self.state.write(installed=manifest['version'],backup=safety,result='installed',offer='')
+                self._mark_install_failed()
+                raise installation_error(log,code)
+            warning=''
+            try:self.state.write(installed=manifest['version'],result='installed',offer='')
+            except Exception:
+                # opkg has already succeeded. Do not report the installed
+                # package as failed just because a bookkeeping write failed.
+                warning='state'
             emit(progress,'complete',1,1)
-            return dict(version=manifest['version'],backup=safety,log=log)
+            return dict(version=manifest['version'],log=log,warning=warning)
+
+    @staticmethod
+    def _check_activity(callback):
+        reason=callback()
+        if reason:
+            raise UpdateError('busy',reason if reason in ('recording','downloading','activity') else 'busy')
+
+    def _mark_install_failed(self):
+        try:self.state.write(result='install-failed')
+        except Exception:pass
 
 def run_opkg(path,log,progress=None):
     binary=next((p for p in ('/usr/bin/opkg','/bin/opkg') if os.path.isfile(p) and os.access(p,os.X_OK)),None)
-    if binary is None:raise UpdateError('install')
+    if binary is None:raise UpdateError('install','opkg_missing')
     fd=os.open(log,os.O_WRONLY|os.O_CREAT|os.O_TRUNC|getattr(os,'O_NOFOLLOW',0),0o600)
     with os.fdopen(fd,'wb') as output:
         process=subprocess.Popen([binary,'install',path],stdin=subprocess.DEVNULL,stdout=output,stderr=subprocess.STDOUT,
@@ -249,74 +277,23 @@ def run_opkg(path,log,progress=None):
             # progress reporting fails or the UI closes unexpectedly.
             if finished:return code
 
-def receiver_busy(session):
+def receiver_activity(session):
     try:
         nav=session.nav
-        if callable(getattr(nav,'getRecordings',None)) and nav.getRecordings():return True
+        if callable(getattr(nav,'getRecordings',None)) and nav.getRecordings():return 'recording'
         timer=getattr(nav,'RecordTimer',None)
-        if callable(getattr(timer,'isRecording',None)) and timer.isRecording():return True
+        if callable(getattr(timer,'isRecording',None)) and timer.isRecording():return 'recording'
         from . import downloads,live_recording
         with downloads.transaction(read_only=True) as state:
-            if any(job.get('status') in downloads.ACTIVE for job in state.get('jobs',())):return True
+            if any(job.get('status') in downloads.ACTIVE for job in state.get('jobs',())):return 'downloading'
         job=live_recording.current()
-        if job is not None and job.snapshot().get('state') in ('recording','stopping'):return True
-        if getattr(live_recording,'_preparing',None) is not None:return True
+        if job is not None and job.snapshot().get('state') in ('recording','stopping'):return 'recording'
+        if getattr(live_recording,'_preparing',None) is not None:return 'recording'
     except Exception:
         # An unreadable activity state is not permission to replace running code.
-        return True
-    return False
-
-def create_safety_backup(progress=None):
-    from .backup import BackupError,BackupManager
-    from .settings import plugin_config_section
-    section=plugin_config_section()
-    preferred=getattr(getattr(section,'backup_folder',None),'value','') or '/media/hdd'
-    if not isinstance(preferred,str) or not os.path.isabs(preferred):preferred='/media/hdd'
-    manager=BackupManager();attempted=set();failure='storage'
-    for parent in (preferred,BACKUP_FALLBACK):
-        try:
-            # Use the backup manager's mount, writable-storage and source-path
-            # checks before creating a directory. /media/hdd may be a writable
-            # placeholder on a tiny tmpfs even when no disk is connected.
-            parent=manager.destination(parent)
-            if parent in attempted:continue
-            attempted.add(parent)
-            folder=private_directory(os.path.join(parent,'gtiptv-update-backups'))
-            # create() rechecks the destination and the actual archive size
-            # under its persistence lock; never bypass backup to allow opkg.
-            if progress is None:result=manager.create(folder,label='safety')
-            else:result=manager.create(folder,label='safety',progress=lambda phase,done,total:emit(progress,'backup',done,total))
-        except BackupError as error:
-            if error.code not in ('storage','space'):
-                raise UpdateError(error.code if error.code in ('busy','cancelled') else 'backup') from error
-            failure=error.code
-            continue
-        except OSError as error:
-            failure='space' if error.errno in (errno.ENOSPC,getattr(errno,'EDQUOT',errno.ENOSPC)) else 'storage'
-            continue
-        except UpdateError as error:
-            if error.code!='storage':raise
-            failure=error.code
-            continue
-        if not isinstance(result,dict) or not isinstance(result.get('path'),str) or not os.path.isfile(result['path']):
-            raise UpdateError('backup')
-        _trim_safety_backups(folder,result['path'])
-        emit(progress,'backup',1,1)
-        return result['path']
-    raise UpdateError(failure)
+        return 'activity'
+    return ''
 
 
-def _trim_safety_backups(folder,current):
-    # This dedicated directory owns only automatic pre-update backups.
-    from .backup import EXTENSION
-    try:
-        owned=[]
-        for name in os.listdir(folder):
-            if name.startswith('GTIPTVPlayerPro-') and '-safety-' in name and name.endswith(EXTENSION):
-                path=os.path.join(folder,name);info=os.lstat(path)
-                if stat.S_ISREG(info.st_mode) and info.st_uid==os.geteuid() and path!=current:
-                    owned.append((info.st_mtime_ns,path))
-        for unused,path in sorted(owned,reverse=True)[2:]:os.unlink(path)
-    except OSError:
-        # Retention is housekeeping; a completed safety backup remains usable.
-        pass
+def receiver_busy(session):
+    return bool(receiver_activity(session))

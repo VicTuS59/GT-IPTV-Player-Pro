@@ -2,7 +2,7 @@
 """Bounded stage feedback; percentages describe measured bytes, never opkg time."""
 from .update_protocol import PACKAGE
 
-PHASE_LABELS={'verify':'Verifying update...','backup':'Creating backup...',
+PHASE_LABELS={'verify':'Verifying update...',
               'install':'Installing update...','configure':'Configuring update...'}
 
 def emit(callback,phase,done=0,total=0):

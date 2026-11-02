@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: ca\nLanguage: ca\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "No es pot connectar al servidor d’actualitzacions. Comproveu la xarxa i torneu-ho a provar."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "Ha fallat la resolució DNS. Comproveu la configuració de xarxa."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Ha fallat la connexió segura. Comproveu la data i els certificats del receptor."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "El servidor d’actualitzacions ha retornat HTTP {status}. Proveu-ho més tard."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Baixada interrompuda. Torneu a baixar l’actualització."
+
+msgid "Storage is read-only."
+msgstr "L’emmagatzematge és només de lectura."
+
+msgid "Storage access denied. Check permissions."
+msgstr "S’ha denegat l’accés a l’emmagatzematge. Comproveu els permisos."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "No s’han pogut llegir o desar els ajustos d’actualització. Reinicieu el receptor."
+
+msgid "Stop the active recording before updating."
+msgstr "Atureu l’enregistrament actiu abans d’actualitzar."
+
+msgid "Pause active downloads before updating."
+msgstr "Poseu en pausa les baixades actives abans d’actualitzar."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "No s’ha pogut comprovar l’estat de l’activitat. Reinicieu el receptor."
+
+msgid "Another update is running. Please wait."
+msgstr "Hi ha una altra actualització en curs. Espereu."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Ha fallat la instal·lació del paquet. Comproveu el registre d’instal·lació."
+
+msgid "Required package missing: {package}."
+msgstr "Falta un paquet necessari: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Conflicte de paquets. Comproveu els paquets instal·lats."
+
+msgid "The package manager is busy. Try again later."
+msgstr "El gestor de paquets està ocupat. Proveu-ho més tard."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "El gestor de paquets no està disponible en aquest receptor."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Calen permisos d’administrador per instal·lar actualitzacions."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Ha fallat la configuració del paquet. Reinicieu el receptor i torneu-ho a provar."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Error d’actualització inesperat. Reinicieu el receptor i torneu-ho a provar."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Actualització instal·lada, però no se n’ha pogut desar l’estat. Reinicieu la interfície."

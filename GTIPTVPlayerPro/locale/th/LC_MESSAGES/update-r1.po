@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro Team\nLanguage-Team: Thai\nLanguage: th\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "เชื่อมต่อเซิร์ฟเวอร์อัปเดตไม่ได้ ตรวจสอบเครือข่ายแล้วลองอีกครั้ง"
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "ค้นหา DNS ไม่สำเร็จ ตรวจสอบการตั้งค่าเครือข่าย"
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "เชื่อมต่อแบบปลอดภัยไม่สำเร็จ ตรวจสอบวันที่และใบรับรองของเครื่องรับ"
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "เซิร์ฟเวอร์อัปเดตส่งคืน HTTP {status} โปรดลองอีกครั้งภายหลัง"
+
+msgid "Download interrupted. Download the update again."
+msgstr "การดาวน์โหลดถูกขัดจังหวะ โปรดดาวน์โหลดอัปเดตอีกครั้ง"
+
+msgid "Storage is read-only."
+msgstr "พื้นที่จัดเก็บเป็นแบบอ่านอย่างเดียว"
+
+msgid "Storage access denied. Check permissions."
+msgstr "ถูกปฏิเสธการเข้าถึงพื้นที่จัดเก็บ ตรวจสอบสิทธิ์"
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "อ่านหรือบันทึกการตั้งค่าอัปเดตไม่ได้ โปรดเริ่มเครื่องรับใหม่"
+
+msgid "Stop the active recording before updating."
+msgstr "หยุดการบันทึกที่กำลังทำงานก่อนอัปเดต"
+
+msgid "Pause active downloads before updating."
+msgstr "พักการดาวน์โหลดที่กำลังทำงานก่อนอัปเดต"
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "ตรวจสอบสถานะการทำงานไม่ได้ โปรดเริ่มเครื่องรับใหม่"
+
+msgid "Another update is running. Please wait."
+msgstr "กำลังอัปเดตอื่นอยู่ โปรดรอสักครู่"
+
+msgid "Package installation failed. Check the installation log."
+msgstr "ติดตั้งแพ็กเกจไม่สำเร็จ ตรวจสอบบันทึกการติดตั้ง"
+
+msgid "Required package missing: {package}."
+msgstr "ขาดแพ็กเกจที่จำเป็น: {package}"
+
+msgid "Package conflict. Check installed packages."
+msgstr "แพ็กเกจขัดแย้งกัน ตรวจสอบแพ็กเกจที่ติดตั้ง"
+
+msgid "The package manager is busy. Try again later."
+msgstr "ตัวจัดการแพ็กเกจไม่ว่าง โปรดลองอีกครั้งภายหลัง"
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "ตัวจัดการแพ็กเกจไม่พร้อมใช้งานบนเครื่องรับนี้"
+
+msgid "Administrator permission is required to install updates."
+msgstr "ต้องมีสิทธิ์ผู้ดูแลระบบเพื่อติดตั้งอัปเดต"
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "กำหนดค่าแพ็กเกจไม่สำเร็จ เริ่มเครื่องรับใหม่แล้วลองอีกครั้ง"
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "เกิดข้อผิดพลาดในการอัปเดตที่ไม่คาดคิด เริ่มเครื่องรับใหม่แล้วลองอีกครั้ง"
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "ติดตั้งอัปเดตแล้วแต่บันทึกสถานะไม่ได้ โปรดเริ่มส่วนติดต่อผู้ใช้ใหม่"

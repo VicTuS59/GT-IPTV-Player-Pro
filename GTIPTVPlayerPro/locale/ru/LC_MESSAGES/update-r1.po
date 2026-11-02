@@ -1,0 +1,66 @@
+# Updater 1.8.5-r1: translated failure reasons.
+msgid ""
+msgstr "Project-Id-Version: GT IPTV Player Pro 1.4.0\nReport-Msgid-Bugs-To: https://github.com/VicTuS59/GT-IPTV-Player-Pro/issues\nPO-Revision-Date: 2026-10-01 19:14+0000\nLast-Translator: GT IPTV Player Pro contributors\nLanguage-Team: ru\nLanguage: ru\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=3; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2;\n"
+
+msgid "Cannot connect to the update server. Check the network and retry."
+msgstr "Не удалось подключиться к серверу обновлений. Проверьте сеть и повторите попытку."
+
+msgid "DNS lookup failed. Check the network settings."
+msgstr "Ошибка разрешения DNS. Проверьте настройки сети."
+
+msgid "Secure connection failed. Check the receiver date and certificates."
+msgstr "Ошибка защищённого соединения. Проверьте дату и сертификаты ресивера."
+
+msgid "Update server returned HTTP {status}. Try again later."
+msgstr "Сервер обновлений вернул HTTP {status}. Повторите попытку позже."
+
+msgid "Download interrupted. Download the update again."
+msgstr "Загрузка прервана. Загрузите обновление заново."
+
+msgid "Storage is read-only."
+msgstr "Накопитель доступен только для чтения."
+
+msgid "Storage access denied. Check permissions."
+msgstr "Доступ к накопителю запрещён. Проверьте права доступа."
+
+msgid "Update settings could not be read or saved. Restart the receiver."
+msgstr "Не удалось прочитать или сохранить настройки обновления. Перезапустите ресивер."
+
+msgid "Stop the active recording before updating."
+msgstr "Остановите текущую запись перед обновлением."
+
+msgid "Pause active downloads before updating."
+msgstr "Приостановите активные загрузки перед обновлением."
+
+msgid "Activity status could not be checked. Restart the receiver."
+msgstr "Не удалось проверить состояние активности. Перезапустите ресивер."
+
+msgid "Another update is running. Please wait."
+msgstr "Уже выполняется другое обновление. Подождите."
+
+msgid "Package installation failed. Check the installation log."
+msgstr "Не удалось установить пакет. Проверьте журнал установки."
+
+msgid "Required package missing: {package}."
+msgstr "Отсутствует необходимый пакет: {package}."
+
+msgid "Package conflict. Check installed packages."
+msgstr "Конфликт пакетов. Проверьте установленные пакеты."
+
+msgid "The package manager is busy. Try again later."
+msgstr "Менеджер пакетов занят. Повторите попытку позже."
+
+msgid "The package manager is unavailable on this receiver."
+msgstr "Менеджер пакетов недоступен на этом ресивере."
+
+msgid "Administrator permission is required to install updates."
+msgstr "Для установки обновлений нужны права администратора."
+
+msgid "Package configuration failed. Restart the receiver and retry."
+msgstr "Не удалось настроить пакет. Перезапустите ресивер и повторите попытку."
+
+msgid "Unexpected update error. Restart the receiver and retry."
+msgstr "Непредвиденная ошибка обновления. Перезапустите ресивер и повторите попытку."
+
+msgid "Update installed, but its status could not be saved. Restart the interface."
+msgstr "Обновление установлено, но его состояние не сохранено. Перезапустите интерфейс."

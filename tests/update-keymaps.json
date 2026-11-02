@@ -1,0 +1,26 @@
+{
+  "OpenPLi": {
+    "MoviePlayerActions": {
+      "KEY_CHANNELUP": "channelUp",
+      "KEY_CHANNELDOWN": "channelDown"
+    },
+    "ChannelSelectBaseActions": {
+      "KEY_CHANNELUP": "nextBouquet",
+      "KEY_CHANNELDOWN": "prevBouquet"
+    }
+  },
+  "OpenATV": {
+    "ChannelSelectBaseActions": {
+      "KEY_CHANNELUP": "nextBouquet",
+      "KEY_CHANNELDOWN": "prevBouquet"
+    },
+    "DirectionActions": {
+      "KEY_CHANNELUP": "chplus",
+      "KEY_CHANNELDOWN": "chminus"
+    },
+    "MoviePlayerActions": {
+      "KEY_CHANNELUP": "channelUp",
+      "KEY_CHANNELDOWN": "channelDown"
+    }
+  }
+}

@@ -163,32 +163,32 @@ class UpdateServiceTests(unittest.TestCase):
   invalid=dict(offer,body=vector('test'))
   with self.assertRaises(UpdateError):self.s.download(invalid)
  def install_call(self,**kw):
-  offer=self.offer();p=self.s.download(offer);backup=Path(self.folder)/'safety.gtbackup';backup.write_bytes(b'preserved-user-data')
+  offer=self.offer();p=self.s.download(offer)
   with patch.object(self.s,'installation_lock',side_effect=lambda:contextlib.nullcontext()):
-   return self.s.install(offer,p,busy=kw.pop('busy',lambda:False),backup=kw.pop('backup',lambda:str(backup)),runner=kw.pop('runner',Mock(return_value=0)),uid=kw.pop('uid',0),root=self.folder,**kw)
+   return self.s.install(offer,p,busy=kw.pop('busy',lambda:False),runner=kw.pop('runner',Mock(return_value=0)),uid=kw.pop('uid',0),root=self.folder,**kw)
  def test_confirmed_installer_only_specific_plugin_and_persists_restart(self):
   runner=Mock(return_value=0);result=self.install_call(runner=runner)
   path,log=runner.call_args.args;self.assertEqual(path,self.s.path_for(manifest()));self.assertTrue(log.endswith('install.log'))
-  self.assertEqual(Path(result['backup']).read_bytes(),b'preserved-user-data');self.assertEqual(self.state.read()['installed'],'1.7.0-r107')
- def test_busy_or_not_root_or_backup_failure_never_runs_installer(self):
-  for params in ({'busy':lambda:True},{'uid':1},{'backup':lambda:''}):
+  self.assertNotIn('backup',result);self.assertFalse(list(Path(self.folder).glob('*.gtbackup')));self.assertEqual(self.state.read()['installed'],'1.7.0-r107')
+ def test_busy_or_not_root_or_unknown_activity_never_runs_installer(self):
+  for params in ({'busy':lambda:True},{'uid':1},{'busy':lambda:'activity'}):
    runner=Mock(return_value=0)
    with self.assertRaises(UpdateError):self.install_call(runner=runner,**params)
    runner.assert_not_called()
- def test_second_activity_guard_after_backup(self):
+ def test_second_activity_guard_before_package_manager(self):
   runner=Mock();busy=Mock(side_effect=[False,True])
   with self.assertRaises(UpdateError):self.install_call(runner=runner,busy=busy)
   self.assertEqual(busy.call_count,2);runner.assert_not_called()
- def test_flash_space_is_rechecked_after_backup_before_opkg(self):
-  runner=Mock(return_value=0);safety=Mock(return_value=str(Path(self.folder)/'safety.gtbackup'))
+ def test_flash_space_is_rechecked_before_opkg_without_creating_a_backup(self):
+  runner=Mock(return_value=0)
   with patch.object(service.shutil,'disk_usage',side_effect=[types.SimpleNamespace(free=10**9),types.SimpleNamespace(free=10**9),types.SimpleNamespace(free=1)]),self.assertRaises(UpdateError) as error:
-   self.install_call(runner=runner,backup=safety)
-  self.assertEqual(error.exception.code,'space');safety.assert_called_once();runner.assert_not_called()
- def test_opkg_failure_is_visible_and_keeps_backup(self):
+   self.install_call(runner=runner)
+  self.assertEqual(error.exception.code,'space');runner.assert_not_called()
+ def test_opkg_failure_is_visible_and_keeps_failed_state(self):
   for effect in (1,OSError('failed')):
    run=Mock(return_value=effect) if isinstance(effect,int) else Mock(side_effect=effect)
    with self.assertRaises(UpdateError):self.install_call(runner=run)
-   self.assertEqual(self.state.read()['result'],'install-failed');self.assertTrue(Path(self.state.read()['backup']).is_file())
+   self.assertEqual(self.state.read()['result'],'install-failed');self.assertEqual(self.state.read()['backup'],'')
  def test_cached_download_reports_verified_completion_without_another_transfer(self):
   offer=self.offer();self.s.download(offer);events=[];progress=[];calls=len(self.network.calls)
   self.s.download(offer,progress=lambda a,b:progress.append((a,b)),feedback=lambda *e:events.append(e))
@@ -198,7 +198,7 @@ class UpdateServiceTests(unittest.TestCase):
   events=[]
   def progress(phase,done,total):events.append((phase,self.state.read()['result']))
   self.install_call(progress=progress)
-  self.assertEqual([e[0] for e in events],['verify','backup','verify','install','complete'])
+  self.assertEqual([e[0] for e in events],['verify','verify','install','complete'])
   self.assertEqual(events[-1],('complete','installed'))
   self.state=MemoryState();self.s.state=self.state;events.clear()
   with self.assertRaises(UpdateError):self.install_call(progress=progress,runner=Mock(return_value=1))
@@ -224,11 +224,11 @@ class UpdateServiceTests(unittest.TestCase):
    p=Path(self.folder)/(str(i)*64+'.ipk');p.write_bytes(b'old');os.utime(p,ns=(i+1,i+1));paths.append(p)
   unrelated=Path(self.folder)/'user.ipk';unrelated.write_bytes(b'user');self.s._trim_cache(str(paths[-1]))
   self.assertFalse(paths[0].exists());self.assertFalse(paths[1].exists());self.assertTrue(paths[2].exists());self.assertTrue(paths[3].exists());self.assertTrue(unrelated.exists())
- def test_package_is_revalidated_after_backup_before_opkg(self):
+ def test_package_is_revalidated_after_activity_check_before_opkg(self):
   runner=Mock(return_value=0)
-  def backup():
-   Path(self.s.path_for(manifest())).write_bytes(b'tampered during backup');p=Path(self.folder)/'safe';p.write_bytes(b'safety');return str(p)
-  with self.assertRaises(UpdateError):self.install_call(backup=backup,runner=runner)
+  def busy():
+   Path(self.s.path_for(manifest())).write_bytes(b'tampered during activity check');return False
+  with self.assertRaises(UpdateError):self.install_call(busy=busy,runner=runner)
   runner.assert_not_called()
  def test_state_rejects_untrusted_json(self):
   path=Path(self.folder)/'settings.json';path.write_bytes(b'{"auto":true,"auto":false}')
@@ -239,4 +239,22 @@ class UpdateServiceTests(unittest.TestCase):
    self.assertEqual(service.run_opkg('/cache/verified.ipk',log),0)
   self.assertEqual(popen.call_args.args[0],['/usr/bin/opkg','install','/cache/verified.ipk']);self.assertNotIn('shell',popen.call_args.kwargs)
   process.wait.assert_called_once();process.kill.assert_not_called();process.terminate.assert_not_called()
+ def test_successful_install_is_not_reported_failed_when_final_state_write_fails(self):
+  write=self.state.write
+  def save(**changes):
+   if 'installed' in changes:raise OSError('flash status write failed')
+   return write(**changes)
+  self.state.write=save;runner=Mock(return_value=0);events=[]
+  result=self.install_call(runner=runner,progress=lambda *e:events.append(e))
+  self.assertEqual(result['warning'],'state');self.assertEqual(result['version'],'1.7.0-r107')
+  self.assertEqual(events[-1],('complete',1,1));runner.assert_called_once()
+ def test_activity_reason_is_retained_for_the_translated_ui(self):
+  for reason in ('recording','downloading','activity'):
+   runner=Mock(return_value=0)
+   with self.assertRaises(UpdateError) as caught:self.install_call(busy=lambda:reason,runner=runner)
+   self.assertEqual(caught.exception.reason,reason);runner.assert_not_called()
+ def test_noncritical_cache_cleanup_does_not_fail_verified_download(self):
+  offer=self.offer()
+  with patch.object(service.os,'listdir',side_effect=PermissionError):path=self.s.download(offer)
+  self.assertEqual(Path(path).read_bytes(),ipk())
 if __name__=='__main__':unittest.main(verbosity=2)
