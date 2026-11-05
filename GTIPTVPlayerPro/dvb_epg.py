@@ -3014,12 +3014,6 @@ def _atomic_write(path, body, mode):
         raise
 
 
-def _install_staged_file(staged_path, destination, mode):
-    _validate_atomic_target(destination)
-    os.chmod(staged_path, mode)
-    os.replace(staged_path, destination)
-    os.chmod(destination, mode)
-    _fsync_directory(os.path.dirname(destination) or ".")
 
 
 def _fsync_directory(directory):

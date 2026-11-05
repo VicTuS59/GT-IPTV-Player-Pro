@@ -13,7 +13,7 @@ DEFAULT_SETTINGS_ORDER = (
     "live_service_type", "movie_service_type", "series_service_type",
     "metadata_enabled", "tmdb_api_key", "dvb_epg", "category_lock",
     "appearance", "subtitles", "playlist_files", "downloads", "weather",
-    "web_interface", "youtube", "backup", "restore", "live_recording", "software_update",
+    "web_interface", "youtube", "backup", "restore", "software_update",
 )
 DEFAULT_ORDER_PATH = "/etc/enigma2/gtiptvplayer/settings-order.json"
 MAX_ORDER_BYTES = 4096

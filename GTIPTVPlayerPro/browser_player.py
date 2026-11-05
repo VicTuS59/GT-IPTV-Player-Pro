@@ -24,34 +24,34 @@ except ImportError:
 from .source_loader import SourceLoader
 from .front_panel import (GTPlayerFrontPanelSummary, front_panel_size as _front_panel_size,
                           front_panel_layout as _front_panel_layout, front_panel_skin as _front_panel_skin)
-from .artwork_file import ArtworkPath, artwork_path
-from .content import ContentCategory, ContentItem, CONTENT_LABELS, ContentError, XtreamContentClient
-from .diagnostics import log_event, redact
-from .i18n import N_, _, ngettext, localized_date_text, localized_short_weekday, localized_language_name, localized_upper, metadata_language
+from .artwork_file import artwork_path
+from .content import ContentError
+from .diagnostics import log_event
+from .i18n import N_, _, localized_date_text, localized_language_name, localized_upper
 from .live_recovery import media_snapshot as _decoder_media_snapshot
 from .live_zero import LiveZeroKey
 from .live_patch import UnlockCode, activate as activate_live_patch
 from .live_patch import enabled as live_patch_enabled, supports as supports_live_patch
 from .subtitle_sync import GTSubtitleSyncOverlay, SubtitleSyncKeys
-from .live_history import LiveChannelListContext, clear_live_channel_history, current_live_channel_context, live_channel_key, previous_live_channel_selection, remember_live_channel
-from .background import attach_background, attach_background_window, attach_native_alpha_pixmap, attach_pixmap
-from .category_visibility import category_filter_active, category_visibility_ids, filter_hidden_category_items, hidden_category_match_ids
+from .live_history import current_live_channel_context, live_channel_key, previous_live_channel_selection, remember_live_channel
+from .background import attach_native_alpha_pixmap, attach_pixmap
+from .category_visibility import filter_hidden_category_items
 from .playback import PlaybackResumeStore, resume_account_scope, resume_key, should_save_resume
-from .episode_history import EpisodeCompletionWatcher, WatchedEpisodeStore, episode_watch_key
+from .episode_history import EpisodeCompletionWatcher
 from .subtitle_resume import SubtitleResumeStore
 from .persistence import queue_playback_save, queue_playback_clear
 from .infobar import infobar_progress_geometry, infobar_skin, network_rate_text, remaining_time_text, source_account_text, split_epg_text
 from .network_rate import NetworkRateSampler
 from .device_usage import DeviceUsageSampler, DeviceUsageGauge, usage_text
 from .stream_resolution import ResolutionTracker, resolution_text, youtube_resolution_hint
-from .remote_footer import web_shortcut_hint_text, decorate_remote_footer, prepared_skin, footer_item, install_remote_footer, set_remote_footer
+from .remote_footer import prepared_skin
 from .settings import DEFAULT_INFOBAR_TIMEOUT, available_service_types, load_player_settings, normalize_infobar_timeout, serviceapp_uses_async_seek, service_engine_label
 from .subtitles import MovieSubtitleController
 from .video_aspect import aspect_groups, apply_aspect_choice
 from .youtube_playback import youtube_duration_seconds, NATIVE_AUDIO_SERVICE_TYPE, YouTubeEndWatcher
 from .youtube_history import youtube_resume_position
-from .typography import _grapheme_boundaries, _line_fits, _text_units, clean_dynamic_text, current_text_size, ellipsize_dynamic_text, fit_dynamic_text, font_px, scale_skin_fonts, set_static_text, set_text_if_changed, visible_count
-from .weather import DEFAULT_CITY, WeatherError, WeatherService, day_name, load_weather_settings, shared_weather_service, weather_description, weather_icon_name
+from .typography import ellipsize_dynamic_text, fit_dynamic_text, font_px, scale_skin_fonts, set_static_text, set_text_if_changed, visible_count
+from .weather import DEFAULT_CITY, WeatherError, WeatherService, load_weather_settings, shared_weather_service, weather_description, weather_icon_name
 from .download_guard import allow as _allow_account_playback
 from .download_guard import remember as _remember_account_url
 from .download_guard import play_service as _guarded_play_service
@@ -105,13 +105,6 @@ def build_extplayer_reference(url, title, content_type='movie', service_type=Non
             explicit_http_ts = False
         if not explicit_http_ts:
             service_type = 4097
-    if content_type == 'live':
-        from .live_recording import wrap_url
-        from .download_guard import alias_url
-        original_url = url
-        url = wrap_url(url)
-        if url != original_url:
-            alias_url(original_url, url)
     reference = eServiceReference(service_type, 0, url)
     set_name = getattr(reference, 'setName', None)
     if set_name is not None:
@@ -882,7 +875,7 @@ class _ArchivePlaybackWatchdog(object):
 def _launch_extplayer(session, client, item, url, items=None, selected_index=0, favorite_store=None, favorite_parent=None, favorite_keys=None, owner=None, archive_initial_playback=None):
     _remember_account_url(client, url)
     reference = build_extplayer_reference(url, item.name, getattr(item, 'content_type', 'movie'))
-    entries = list(items or [])
+    entries = items if getattr(items, 'full_category', False) else list(items or [])
     store = PlaybackResumeStore()
     key = resume_key(client, item)
     bookmark = store.get(key)
@@ -984,7 +977,7 @@ class _AsyncPlaybackResolver(object):
         self.session = session
         self.client = client
         self.item = item
-        self.items = list(items or [])
+        self.items = items if getattr(items, 'full_category', False) else list(items or [])
         self.selected_index = int(selected_index or 0)
         self.owner = owner
         self.favorite_store = favorite_store
@@ -1206,7 +1199,7 @@ class GTPlayerInfoOverlay(Screen):
         self['web_shortcut_hint'] = Label('')
         self['web_shortcut_hint'].hide()
         self['web_shortcut_background'] = Label('')
-        for name in ('account_source', 'info_chip_background', 'stream_bitrate_frame', 'stream_bitrate', 'audio_language', 'subtitle_status', 'epg_now_time', 'epg_next_time', 'player_progress_start', 'player_progress_end', 'shortcut_separator', 'shortcut_epg_key', 'shortcut_epg', 'shortcut_audio_dot', 'shortcut_audio', 'shortcut_aspect_dot', 'shortcut_aspect', 'shortcut_web_key', 'shortcut_record_dot', 'shortcut_record_key', 'shortcut_record_frame', 'shortcut_record'):
+        for name in ('account_source', 'info_chip_background', 'stream_bitrate_frame', 'stream_bitrate', 'audio_language', 'subtitle_status', 'epg_now_time', 'epg_next_time', 'player_progress_start', 'player_progress_end', 'shortcut_separator', 'shortcut_epg_key', 'shortcut_epg', 'shortcut_audio_dot', 'shortcut_audio', 'shortcut_aspect_dot', 'shortcut_aspect', 'shortcut_web_key'):
             self[name] = Label('')
         self['shortcut_web_key'].hide()
         self.onLayoutFinish.append(self._fit_shortcut_captions)
@@ -1255,14 +1248,6 @@ class GTPlayerInfoOverlay(Screen):
         self.onShow.append(self.refresh_device_usage)
         self.onHide.append(self.reset_device_usage)
         self.onClose.append(self.reset_device_usage)
-        self._recording_badge_timer = eTimer()
-        _connect_timer(self._recording_badge_timer, self._tick_recording_badge)
-        self._recording_badge_on = True
-        self._recording_badge_active = False
-        self._recording_badge_caption = None
-        self.onShow.append(self._start_recording_badge)
-        self.onHide.append(self._stop_recording_badge)
-        self.onClose.append(self._stop_recording_badge)
 
     def _trace_osd_layout(self):
         _trace_fullscreen_osd(self, 'infobar-layout-ready')
@@ -1276,43 +1261,9 @@ class GTPlayerInfoOverlay(Screen):
     def _disable_live_animation(self):
         _disable_live_window_animation(self)
 
-    def _refresh_recording_badge(self, blink=False, force=False):
-        if not self._infobar_live:
-            return
-        from .live_recording import current
-        job = current()
-        active = bool(job is not None and job.snapshot()['state'] in ('recording', 'stopping'))
-        if not active or not self._recording_badge_active:
-            self._recording_badge_on = True
-        elif blink:
-            self._recording_badge_on = not self._recording_badge_on
-        self._recording_badge_active = active
-        caption = _('Stop') if active else _('Record live TV')
-        if force or caption != self._recording_badge_caption:
-            unused_width, unused_height, px = _scale()
-            fit_dynamic_text(self['shortcut_record'], caption, max_lines=1, preferred_size=font_px(px, 20), min_size=max(6, px(12)))
-            self._recording_badge_caption = caption
-        visible = not active or self._recording_badge_on
-        self['shortcut_record_key'].setText('REC' if visible else '')
-        self['shortcut_record_dot'].show() if visible else self['shortcut_record_dot'].hide()
 
-    def _start_recording_badge(self):
-        if not self._infobar_live:
-            return
-        self._recording_badge_timer.stop()
-        self._recording_badge_active = False
-        self._refresh_recording_badge(force=True)
-        self._recording_badge_timer.start(500, False)
 
-    def _tick_recording_badge(self):
-        if not self.shown or self.instance is None:
-            self._stop_recording_badge()
-            return
-        self._refresh_recording_badge(blink=True)
 
-    def _stop_recording_badge(self):
-        self._recording_badge_timer.stop()
-        self._recording_badge_active = False
 
     def reset_device_usage(self):
         self._device_usage_sampler.reset()
@@ -1350,13 +1301,13 @@ class GTPlayerInfoOverlay(Screen):
 
     def _fit_shortcut_captions(self):
         unused_width, unused_height, px = _scale()
-        captions = {'shortcut_epg_key': 'EPG', 'shortcut_epg': _('Programme guide'), 'shortcut_audio': _('Audio / Subtitles'), 'shortcut_aspect': _('Aspect ratio'), 'shortcut_record_key': 'REC'}
+        captions = {'shortcut_epg_key': 'EPG', 'shortcut_epg': _('Programme guide'), 'shortcut_audio': _('Audio / Subtitles'), 'shortcut_aspect': _('Aspect ratio')}
         for name, text in captions.items():
             fit_dynamic_text(self[name], text, max_lines=1, preferred_size=font_px(px, 20), min_size=max(6, px(12)))
-        self['shortcut_record_dot'].setText('●')
-        self._refresh_recording_badge(force=True)
+        self['shortcut_audio_dot'].setText('●')
+        self['shortcut_aspect_dot'].setText('●')
         if not self._infobar_live:
-            for name in ('shortcut_record_dot', 'shortcut_record_key', 'shortcut_record_frame', 'shortcut_record', 'shortcut_epg_key', 'shortcut_epg', 'shortcut_aspect_dot', 'shortcut_aspect', 'epg_now_time', 'epg_next_time'):
+            for name in ('shortcut_epg_key', 'shortcut_epg', 'shortcut_aspect_dot', 'shortcut_aspect', 'epg_now_time', 'epg_next_time'):
                 self[name].hide()
 
 class GTMinuteSeekScreen(Screen):
@@ -1452,7 +1403,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         self._archive_terminal_attempts = 0
         self._archive_portal_keepalive_token = None
         self._archive_portal_initialized = False
-        self._entries = list(items or [])
+        self._entries = items if getattr(items, 'full_category', False) else list(items or [])
         self._live_recall_base_count = len(self._entries)
         self._live_recall_extra_keys = set()
         self._live_recall_hidden_category_ids = live_hidden_category_ids
@@ -1654,12 +1605,6 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         _connect_timer(self._channel_switch_timer, self._commit_channel_switch)
         _connect_timer(self._archive_portal_timer, self._archive_portal_keepalive)
         exit_action = self.return_to_list if self.keep_playing_on_exit else self.stop_and_close
-        self._recording_timer = eTimer()
-        _connect_timer(self._recording_timer, self._poll_live_recording)
-        self._recording_seen = None
-        self._recording_request = None
-        self.onClose.append(self._cancel_recording_preparation)
-        self._recording_last_press = 0
         player_contexts = ['OkCancelActions', 'ColorActions', 'MoviePlayerActions', 'MediaPlayerActions', 'DirectionActions', 'NumberActions', 'InfobarEPGActions', 'TVRadioActions']
         player_actions = {'cancel': self.cancel_or_exit, 'red': self._toggle_stalker_trial_osd, 'blue': self.toggle_current_favorite, 'stop': self.stop_and_close, 'ok': self.ok_or_confirm_seek, 'playpauseService': self.toggle_pause, 'pauseService': self.pause_playback, 'unPauseService': self.resume_playback, 'play': self.resume_playback, 'pause': self.pause_playback, 'right': self.seek_right_or_info, 'left': self.seek_left_or_info, 'up': self.open_live_channel_list, 'down': self.open_live_channel_list, 'channelUp': self.next_channel, 'channelDown': self.previous_channel, '0': lambda: self._live_patch_digit_action('0', self.recall_previous_live_channel), '1': lambda: self._live_patch_digit_action('1', self.cycle_player_service_type), '4': lambda: self._live_patch_digit_action('4', self.subtitle_sync_minus), '5': lambda: self._live_patch_digit_action('5', self.subtitle_sync_reset), '6': lambda: self._live_patch_digit_action('6', self.subtitle_sync_plus), 'info': self.open_epg_guide, 'tv': self.toggle_info, 'showEventInfo': self.open_epg_guide, 'showEventView': self.open_epg_guide, 'showEventInfoSingleEPG': self.open_epg_guide, 'showEventGuidePlugin': self.open_epg_guide, 'showEventInfoPlugin': self.open_epg_guide, 'EPGPressed': self.open_epg_guide, 'InfoPressed': self.open_epg_guide, 'IPressed': self.open_epg_guide, 'keyTV': self.toggle_info}
         content_type = getattr(self.current_item, 'content_type', '')
@@ -1675,8 +1620,6 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             player_contexts[2:2] = ['InfobarSeekActions', 'InfobarSeekActionsPTS']
             player_actions.update({'seekFwd': self.seek_forward, 'seekBack': self.seek_backward, 'SeekbarFwd': self.begin_seek_mode, 'SeekbarBack': self.begin_seek_mode, 'seekFwdManual': self.begin_seek_mode, 'seekBackManual': self.begin_seek_mode, 'fastForward': self.seek_forward, 'fastforward': self.seek_forward, 'rewind': self.seek_backward, 'rightRepeated': self.seek_right_or_info, 'leftRepeated': self.seek_left_or_info})
         if content_type == 'live':
-            player_contexts.append('InfobarInstantRecord')
-            player_actions['instantRecord'] = self.toggle_live_recording
             for digit in ('2', '3', '7', '8', '9'):
                 player_actions[digit] = lambda value=digit: self._live_patch_digit_action(value)
             player_contexts.append('InfobarSubtitleSelectionActions')
@@ -2776,6 +2719,29 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             self._youtube_end_watcher.callback = callback
             self._youtube_end_watcher.arm()
 
+    def retry_youtube_start(self, reference, item, resume_store=None, start_position=0):
+        """Retry a rejected initial YouTube start in the already open screen."""
+        if (self._closed or self._started
+                or getattr(self.session, 'current_dialog', None) is not self
+                or not bool(getattr(self.current_item, 'youtube_native', False))
+                or not bool(getattr(item, 'youtube_native', False))):
+            return False
+        navigation = getattr(self.session, 'nav', None)
+        try:
+            current = navigation.getCurrentlyPlayingServiceReference()
+        except Exception:
+            return False
+        if self._reference_identity(current) != self._reference_identity(self.old_reference):
+            return False
+        self.reference = reference
+        self.current_item = item
+        self._active_live_service_type = reference_service_type(reference, 4097)
+        self._resume_store = resume_store
+        self._resume_key = str(getattr(item, 'stream_id', '') or '')
+        self._resume_start_position = youtube_resume_position(start_position, youtube_duration_seconds(item))
+        self.start_playback()
+        return self._started
+
     def replace_web_video(self, reference, item, resume_store=None, start_position=0):
         """Replace an active web video without pushing another modal screen.
 
@@ -2988,66 +2954,8 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
     def subtitle_sync_plus(self):
         return self._subtitle_sync_shortcut('plus')
 
-    def toggle_live_recording(self):
-        if not self._is_live_item():
-            return
-        now = time.monotonic()
-        if now - self._recording_last_press < 0.4:
-            return
-        self._recording_last_press = now
-        if getattr(self, '_recording_request', None) is not None:
-            self._cancel_recording_preparation()
-            return
-        from . import live_recording as recorder
-        job = recorder.current()
-        if job is not None and job.snapshot()['state'] in ('recording', 'stopping'):
-            recorder.stop()
-            self._recording_seen = job
-            self._recording_timer.start(500, False)
-            return
-        try:
-            self._recording_request = recorder.request_begin(reference_stream_url(self.reference), self.current_item.name)
-        except Exception as error:
-            from .live_recording_ui import recording_message
-            self.session.open(MessageBox, recording_message(getattr(error, 'code', 'storage')), MessageBox.TYPE_INFO)
-            return
-        self._recording_timer.start(100, False)
 
-    def _cancel_recording_preparation(self):
-        request, self._recording_request = getattr(self, '_recording_request', None), None
-        if request is not None:
-            request.cancel()
-            self._recording_timer.stop()
 
-    def _poll_live_recording(self):
-        request = getattr(self, '_recording_request', None)
-        if request is not None:
-            if self._closed or reference_stream_url(self.reference) != request.url:
-                self._cancel_recording_preparation(); self._recording_timer.stop(); return
-            if not request.done.is_set(): return
-            self._recording_request = None
-            if request.cancelled.is_set() or request.job is None:
-                self._recording_timer.stop()
-                if request.error:
-                    from .live_recording_ui import recording_message
-                    self.session.open(MessageBox, recording_message(request.error), MessageBox.TYPE_INFO)
-                return
-            self._recording_seen = request.job
-            self._recording_timer.start(500, False)
-            self.session.open(MessageBox, _('Recording started.'), MessageBox.TYPE_INFO, timeout=3)
-        job = self._recording_seen
-        if job is None:
-            return
-        result = job.snapshot()
-        if result['state'] not in ('completed', 'error'):
-            return
-        self._recording_timer.stop()
-        self._recording_seen = None
-        if self._closed:
-            return
-        from .live_recording_ui import recording_message
-        text = recording_message(result['error']) if result['error'] else _('Recording stopped.')
-        self.session.open(MessageBox, text, MessageBox.TYPE_INFO, timeout=5)
 
     def _bind_player_key_handler(self):
         """Receive remote events independently of image-specific keymaps."""
@@ -3056,7 +2964,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         try:
             from enigma import eActionMap
             from keyids import KEYIDS
-            self._player_key_ids = {name: KEYIDS[name] for name in ('KEY_0', 'KEY_1', 'KEY_2', 'KEY_3', 'KEY_4', 'KEY_5', 'KEY_6', 'KEY_7', 'KEY_8', 'KEY_9', 'KEY_RECORD', 'KEY_YELLOW', 'KEY_GREEN', 'KEY_LEFT', 'KEY_RIGHT', 'KEY_EPG', 'KEY_INFO') if name in KEYIDS}
+            self._player_key_ids = {name: KEYIDS[name] for name in ('KEY_0', 'KEY_1', 'KEY_2', 'KEY_3', 'KEY_4', 'KEY_5', 'KEY_6', 'KEY_7', 'KEY_8', 'KEY_9', 'KEY_YELLOW', 'KEY_GREEN', 'KEY_LEFT', 'KEY_RIGHT', 'KEY_EPG', 'KEY_INFO') if name in KEYIDS}
             self._player_key_map = eActionMap.getInstance()
             self._player_key_map.bindAction('', -100, self._player_key_callback)
             self._player_keys_bound = True
@@ -3092,10 +3000,6 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         if self._closed or getattr(self.session, 'current_dialog', None) is not self:
             return 0
         kind = getattr(self.current_item, 'content_type', '')
-        if kind == 'live' and key_ids.get('KEY_RECORD') is not None and (key == key_ids['KEY_RECORD']):
-            if flag == 0:
-                self.toggle_live_recording()
-            return 1
         if self._handle_live_patch_key(key, flag):
             return 1
         for name, command in (('KEY_4', 'minus'), ('KEY_5', 'reset'), ('KEY_6', 'plus')):
@@ -3996,6 +3900,8 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         self._switch_channel(0, target_index=index)
 
     def _request_catalog_player_window(self, direction):
+        if getattr(self._entries, 'full_category', False):
+            return False
         owner = getattr(self, '_playback_owner', None)
         native = getattr(owner, '_movie_native_window', None)
         catalog = getattr(owner, '_movie_browser_catalog', None) or native
@@ -6102,7 +6008,6 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             loader(self._info_dialog, 'picon', path, key='player-picon', on_loaded=loaded)
 
     def stop_playback(self):
-        self._cancel_recording_preparation()
         self._stop_player_stream_diag()
         try:
             self._direction_hold_timer.stop()
@@ -6233,7 +6138,6 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         self.show_info()
 
     def _on_close(self):
-        self._recording_timer.stop()
         self._cancel_stalker_auto_recovery()
         self._stop_player_weather()
         self._network_rate_sampler.reset()

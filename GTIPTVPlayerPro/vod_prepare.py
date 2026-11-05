@@ -211,7 +211,7 @@ class VODPreparation(object):
         start = self._field("selected_index", 0) // page_size * page_size
         nearby = entries[max(0, start - page_size):start + page_size * 2]
         return (self._position(), self._field("window_base", 0), start,
-                len(entries), tuple((str(item.stream_id), str(getattr(item, "icon", ""))) for item in nearby))
+                tuple((str(item.stream_id), str(getattr(item, "icon", ""))) for item in nearby))
 
     def update(self, kind):
         self.kind = kind
@@ -265,6 +265,9 @@ class VODPreparation(object):
             if identity not in seen:
                 seen.add(identity)
                 targets.append(item)
+        # One nearby synopsis/hero is enough. The visible selection always
+        # owns foreground workers; speculative detail cannot occupy the lane.
+        targets = targets[:1]
         if getattr(self.screen, "_cinematic_enabled", False):
             for item in targets:
                 self.jobs.append(("hero", 0, item))

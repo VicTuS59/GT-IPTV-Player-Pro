@@ -6,7 +6,11 @@ import os
 import threading
 import time
 
+from .ui_update import set_value
 from Components.ActionMap import ActionMap
+from .ui_update import set_visible
+from .ui_update import set_foreground
+from .typography import set_text_if_changed
 from Components.FileList import FileList
 from Components.Label import Label
 from Components.Pixmap import Pixmap
@@ -18,12 +22,12 @@ from enigma import eTimer, getDesktop
 
 from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from . import downloads as manager
-from .background import attach_background, attach_pixmap
+from .background import attach_pixmap
 from .channel_highlight import apply_selection_color
-from .i18n import N_, _
-from .paths import plugin_path
+from .i18n import N_, _, device_language
+from .remote_footer import prepared_skin
 from .remote_footer import decorate_remote_footer, footer_item, install_remote_footer, set_remote_footer
-from .typography import font_px, fit_dynamic_text, ellipsize_dynamic_text, clean_dynamic_text
+from .typography import current_text_size, font_px, fit_dynamic_text, ellipsize_dynamic_text, clean_dynamic_text
 from .smooth_scroll import GTSmoothScrollLabel
 from .local_media import MediaFileError, inspect_media
 from .diagnostics import log_event
@@ -202,15 +206,15 @@ class GTDownloadsScreen(Screen):
         self["detail_title"] = GTSmoothScrollLabel("")
         self["detail"] = GTSmoothScrollLabel("")
         self["poster"] = Pixmap()
-        self["brand"].setText("GT IPTV PLAYER PRO")
-        self["crumb"].setText(_("Settings") + "  ›  " + _("Downloads"))
-        self["title"].setText(_("Downloads"))
-        if self._history_mode: self['title'].setText(_('Download history'))
-        self["detail_heading"].setText(_("Download details"))
-        self["poster_placeholder"].setText("GT")
+        set_text_if_changed(self["brand"], "GT IPTV PLAYER PRO")
+        set_text_if_changed(self["crumb"], _("Settings") + "  ›  " + _("Downloads"))
+        set_text_if_changed(self["title"], _("Downloads"))
+        if self._history_mode: set_text_if_changed(self['title'], _('Download history'))
+        set_text_if_changed(self["detail_heading"], _("Download details"))
+        set_text_if_changed(self["poster_placeholder"], "GT")
         install_remote_footer(self, DOWNLOAD_FOOTER, stacked=True)
-        self["arrow_up"].setText("▲")
-        self["arrow_down"].setText("▼")
+        set_text_if_changed(self["arrow_up"], "▲")
+        set_text_if_changed(self["arrow_down"], "▼")
         for row in range(5):
             for name in ("row", "focus", "marker", "placeholder", "name", "meta", "status", "percent"):
                 self["{}_{}".format(name, row)] = Label("GT" if name == "placeholder" else "")
@@ -245,6 +249,7 @@ class GTDownloadsScreen(Screen):
 
     def _shown(self):
         self._visible = True
+        self._painted_snapshot = None
         pending = self._pending_download
         self._pending_download = None
         if pending is not None:
@@ -336,6 +341,16 @@ class GTDownloadsScreen(Screen):
             if not self._history_mode and not self._scanning and (time.monotonic() >= self._scan_at or folder != self._scan_folder):
                 self._scan_at = time.monotonic() + 8
                 self._scan(folder)
+            # The worker snapshots own their dictionaries. Keep only the
+            # last painted state so an idle poll can leave the screen alone.
+            snapshot = (folder, state.get('jobs'), state.get('removed_paths'),
+                        state.get('limit'), state.get('history_total'), state.get('history_more'),
+                        self._history_offset, self._locals, self._free, self._initial_id,
+                        bool(self._operation), device_language(), current_text_size())
+            if getattr(self, '_painted_snapshot', None) == snapshot:
+                if self._visible:
+                    self.timer.start(800, True)
+                return
             selected = self.selected().get("id") or self._initial_id
             values = state.get('jobs') or []
             if self._history_mode: values = [row for row in values if row.get('status') in manager.TERMINAL]
@@ -353,14 +368,12 @@ class GTDownloadsScreen(Screen):
                                     (("completed",), "Completed"), (("error",), "Error")):
                 counts.append("{} {}".format(sum(j["status"] in statuses for j in jobs), _(label)))
             ellipsize_dynamic_text(self["summary"], "  •  ".join(counts))
-            self["message"].setText(_("Speed limit") + ": " + _rate(state.get("limit") or manager.DEFAULT_SPEED))
+            self._painted_snapshot = snapshot
             self._draw()
-            if self._operation:
-                self["message"].setText(_("Please wait"))
-            ellipsize_dynamic_text(self["message"], self["message"].getText())
         except Exception as error:
+            self._painted_snapshot = None
             log_event("downloads", "screen-refresh-failed", error)
-            self["message"].setText(_(manager.MESSAGES["failed"]))
+            set_text_if_changed(self["message"], _(manager.MESSAGES["failed"]))
         if self._visible:
             self.timer.start(800, True)
 
@@ -388,7 +401,7 @@ class GTDownloadsScreen(Screen):
         self._entries = []
         self.index = 0 if delta > 0 else 99
         self._initial_id = ''
-        self['message'].setText(_('Loading...'))
+        set_text_if_changed(self['message'], _('Loading...'))
         self.refresh()
 
     def _poster(self, name, path):
@@ -396,7 +409,7 @@ class GTDownloadsScreen(Screen):
         if self._posters.get(name) == path:
             return
         self._posters[name] = path
-        self[name].hide()
+        set_visible(self[name], False)
         if path:
             attach_pixmap(self, name, path, cover_ratio=(16, 9) if name.startswith("thumb") else None)
         else:
@@ -411,18 +424,18 @@ class GTDownloadsScreen(Screen):
         if self.index >= self._start + 5:
             self._start = self.index - 4
         self._start = min(self._start, max(0, len(self._entries)-5))
-        self["arrow_up"].show() if self._start or self._history_mode and self._history_offset else self["arrow_up"].hide()
-        self["arrow_down"].show() if self._start + 5 < len(self._entries) or self._history_mode and self._state.get('history_more') else self["arrow_down"].hide()
+        set_visible(self["arrow_up"], True) if self._start or self._history_mode and self._history_offset else set_visible(self["arrow_up"], False)
+        set_visible(self["arrow_down"], True) if self._start + 5 < len(self._entries) or self._history_mode and self._state.get('history_more') else set_visible(self["arrow_down"], False)
         offset = self._history_offset if self._history_mode else 0
         total = self._state.get('history_total', 0) if self._history_mode else len(self._entries)
-        self["page"].setText("{} / {}".format(offset+self.index+1 if self._entries else 0, total))
+        set_text_if_changed(self["page"], "{} / {}".format(offset+self.index+1 if self._entries else 0, total))
         for row in range(5):
             absolute = self._start + row
             job = self._entries[absolute] if absolute < len(self._entries) else None
             for name in ("row", "placeholder", "name", "meta", "status", "percent", "progress"):
-                self["{}_{}".format(name, row)].show() if job else self["{}_{}".format(name, row)].hide()
+                set_visible(self["{}_{}".format(name, row)], True) if job else set_visible(self["{}_{}".format(name, row)], False)
             for name in ("focus", "marker"):
-                self["{}_{}".format(name, row)].show() if job and absolute == self.index else self["{}_{}".format(name, row)].hide()
+                set_visible(self["{}_{}".format(name, row)], True) if job and absolute == self.index else set_visible(self["{}_{}".format(name, row)], False)
             self._poster("thumb_{}".format(row), job.get("poster", "") if job else "")
             if not job:
                 continue
@@ -433,23 +446,29 @@ class GTDownloadsScreen(Screen):
             source = "Stalker / MAC" if job.get("source") == "stalker" else "IPTV" if job.get("source") == "xtream" else _("Local file")
             ellipsize_dynamic_text(self["meta_{}".format(row)], source + "  •  " + _size(got) + (" / " + _size(total) if total else ""))
             fit_dynamic_text(self["status_{}".format(row)], _(manager.STATUS.get(status, "Error")), max_lines=2)
-            self["percent_{}".format(row)].setText("{}%".format(percent) if total else "—")
-            self["progress_{}".format(row)].setValue(percent)
+            set_text_if_changed(self["percent_{}".format(row)], "{}%".format(percent) if total else "—")
+            set_value(self['progress_{}'.format(row)], percent)
             try:
-                from skin import parseColor
                 color = "#64E87B" if status in ("completed", "local") else "#FF6D79" if status == "error" else "#FFD15A" if status in ("queued", "paused") else "#21CFED"
-                self["status_{}".format(row)].instance.setForegroundColor(parseColor(color))
-                self["progress_{}".format(row)].instance.setForegroundColor(parseColor(color))
+                set_foreground(self["status_{}".format(row)], color)
+                set_foreground(self["progress_{}".format(row)], color)
             except Exception:
                 pass
         job = self.selected()
         self._poster("poster", job.get("poster", ""))
-        self["detail_title"].setText(clean_dynamic_text(job.get("name") or _("No downloads or local videos.")))
-        self["detail"].setText(self._details(job) if job else "")
+        set_text_if_changed(self["detail_title"], clean_dynamic_text(job.get("name") or _("No downloads or local videos.")))
+        set_text_if_changed(self["detail"], self._details(job) if job else "")
         set_remote_footer(self, DOWNLOAD_FOOTER if job.get("status") in ("completed", "local")
                           else DOWNLOAD_DETAILS_FOOTER)
-        if job.get("error"):
-            ellipsize_dynamic_text(self["message"], _(manager.MESSAGES.get(job["error"], manager.MESSAGES["failed"])))
+        if self._operation:
+            message = _("Please wait")
+        elif job.get("error"):
+            message = _(manager.MESSAGES.get(job["error"], manager.MESSAGES["failed"]))
+        elif getattr(self, '_painted_snapshot', None) is not None:
+            message = _("Speed limit") + ": " + _rate(self._state.get("limit") or manager.DEFAULT_SPEED)
+        else:
+            return
+        ellipsize_dynamic_text(self["message"], message)
 
     def _details(self, job):
         return "{}: {} / {}\n{}: {}\n{}: {}\n{}".format(
@@ -711,15 +730,15 @@ class GTSpeedLimitScreen(Screen):
             label = self["value_{}".format(row)]
             focus = self["focus_{}".format(row)]
             if index < len(manager.SPEEDS):
-                label.setText(_rate(manager.SPEEDS[index]))
-                label.show()
+                set_text_if_changed(label, _rate(manager.SPEEDS[index]))
+                set_visible(label, True)
             else:
-                label.setText("")
-                label.hide()
-            focus.show() if index == self.index else focus.hide()
-        self["position"].setText("{} / {}".format(self.index + 1, len(manager.SPEEDS)))
-        self["arrow_up"].show() if self._start else self["arrow_up"].hide()
-        self["arrow_down"].show() if self._start + self.visible_rows < len(manager.SPEEDS) else self["arrow_down"].hide()
+                set_text_if_changed(label, '')
+                set_visible(label, False)
+            set_visible(focus, True) if index == self.index else set_visible(focus, False)
+        set_text_if_changed(self["position"], "{} / {}".format(self.index + 1, len(manager.SPEEDS)))
+        set_visible(self["arrow_up"], True) if self._start else set_visible(self["arrow_up"], False)
+        set_visible(self["arrow_down"], True) if self._start + self.visible_rows < len(manager.SPEEDS) else set_visible(self["arrow_down"], False)
 
     def save(self):
         self.close(manager.SPEEDS[self.index])
@@ -727,7 +746,7 @@ class GTSpeedLimitScreen(Screen):
 
 class GTDownloadFolderScreen(Screen):
     def __init__(self, session, current=""):
-        self.skin = _folder_skin()
+        self.skin = prepared_skin(_folder_skin)
         Screen.__init__(self, session)
         self["title"] = Label(_("Save folder"))
         self["path"] = Label("")
@@ -744,7 +763,7 @@ class GTDownloadFolderScreen(Screen):
         self.setTitle(_("Save folder"))
 
     def draw(self):
-        self["path"].setText(self["filelist"].getCurrentDirectory() or _("Storage"))
+        set_text_if_changed(self["path"], self["filelist"].getCurrentDirectory() or _("Storage"))
 
     def descend(self):
         if self["filelist"].canDescent():

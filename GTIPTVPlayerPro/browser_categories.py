@@ -6,32 +6,37 @@
 import datetime
 import os
 import threading
-from collections import OrderedDict, deque
+from .typography import set_text_if_changed
+from .ui_update import set_visible
+from collections import OrderedDict
 from Components.ActionMap import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Screens.MessageBox import MessageBox
 from enigma import ePoint, eSize, eTimer, getDesktop, iServiceInformation
-from .broadcast_presentation import skin_after as broadcast_skin_after, refresh_after as broadcast_refresh_after, setup as setup_broadcast
+from .broadcast_presentation import refresh_after as broadcast_refresh_after, setup as setup_broadcast
+from .broadcast_presentation import refresh_category_list, refresh_category_weather
 from . import sorting_ui as content_sort_ui
-from .content import ContentCategory, ContentItem, CONTENT_LABELS, ContentError, XtreamContentClient
-from .i18n import N_, _, ngettext, localized_date_text, localized_short_weekday, localized_language_name, localized_upper, metadata_language
-from .live_history import LiveChannelListContext, clear_live_channel_history, current_live_channel_context, live_channel_key, previous_live_channel_selection, remember_live_channel
-from .category_preferences import MAX_CATEGORIES_PER_SOURCE, CategoryPreferences, LiveCategoryPreferenceStore, arrange_categories, category_preferences_path
-from .category_visibility import category_filter_active, category_visibility_ids, filter_hidden_category_items, hidden_category_match_ids
+from .content import CONTENT_LABELS
+from .i18n import N_, _, localized_upper, metadata_language
+from .live_history import clear_live_channel_history
+from .category_preferences import CategoryPreferences, LiveCategoryPreferenceStore, arrange_categories, category_preferences_path
+from .category_visibility import category_filter_active, category_visibility_ids
 from .category_lock import CategoryEditLockStore
 from .category_lock_ui import GTCategoryCodeInputScreen, RECOVERY_REQUEST
-from .metadata import MetadataError, TMDbMetadataClient, complete_movie_for_device_language, movie_metadata_ready, media_metadata_ready, complete_media_for_device_language
+from .metadata import TMDbMetadataClient
 from .category_browse import CategoryBrowseCatalog
-from .vod_grid import CINEMATIC_POSTER_COLUMNS, GRID_COLUMNS, GRID_PAGE_SIZE, LatestPosterWorkers, PosterRetryQueue, cinematic_poster_geometry, grid_geometry, grid_move, page_position, poster_grid_skin
-from .vod_prepare import VODPreparation
-from .playback import PlaybackResumeStore, resume_account_scope, resume_key, should_save_resume
-from .remote_footer import web_shortcut_hint_text, decorate_remote_footer, prepared_skin, footer_item, install_remote_footer, set_remote_footer
-from .scrollbar import hide_scrollbar, update_horizontal_scrollbar, update_scrollbar
-from .settings import DEFAULT_INFOBAR_TIMEOUT, available_service_types, load_player_settings, normalize_infobar_timeout, serviceapp_uses_async_seek, service_engine_label
-from .typography import _grapheme_boundaries, _line_fits, _text_units, clean_dynamic_text, current_text_size, ellipsize_dynamic_text, fit_dynamic_text, font_px, scale_skin_fonts, set_static_text, set_text_if_changed, visible_count
-from .weather import DEFAULT_CITY, WeatherError, WeatherService, day_name, load_weather_settings, shared_weather_service, weather_description, weather_icon_name
-from .browser_common import CINEMATIC_CATEGORY_PAGE_SIZE, CINEMATIC_GLASS_BACKGROUND_PATH, GTAsyncListScreen, LIVE_CATEGORY_BACKGROUND_PATH, LIVE_CATEGORY_FOOTER_ITEMS, M3U_LIVE_CATEGORY_FOOTER_ITEMS, MOVIE_FOOTER_ITEMS, MOVIE_RAIL_PAGE_SIZE, SERIES_FOOTER_ITEMS, SERIES_GRID_PAGE_SIZE, WEATHER_ICON_DIR, WORKER_WEATHER_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _cancel_worker_token, _client_supports, _connect_timer, _is_m3u_client, _scale, _validated_content_type, content_client_for
+from .category_titles import load_category_titles
+from .vod_grid import CINEMATIC_POSTER_COLUMNS, GRID_PAGE_SIZE, PosterRetryQueue
+from .playback import resume_account_scope
+from .remote_footer import prepared_skin
+from .scrollbar import hide_scrollbar, update_scrollbar
+from .settings import load_player_settings
+from .typography import current_text_size, ellipsize_dynamic_text, set_text_if_changed
+from .weather import WeatherError, day_name, load_weather_settings, shared_weather_service, weather_description, weather_icon_name
+from .browser_common import GTAsyncListScreen, LIVE_CATEGORY_FOOTER_ITEMS, M3U_LIVE_CATEGORY_FOOTER_ITEMS, MOVIE_RAIL_PAGE_SIZE, WEATHER_ICON_DIR, WORKER_WEATHER_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _cancel_worker_token, _client_supports, _connect_timer, _is_m3u_client, _scale, _validated_content_type, content_client_for
+
+LIVE_PREVIEW_RETURN_RESTORE_MS = 160
 
 class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
 
@@ -65,22 +70,21 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         except Exception:
             browser_settings = None
         if isinstance(browser_settings, dict):
-            cinematic_view = browser_settings.get('cinematic_view', True)
             metadata_api_key = browser_settings.get('tmdb_api_key', '')
             metadata_enabled = browser_settings.get('metadata_enabled', True)
         else:
-            cinematic_view = getattr(browser_settings, 'cinematic_view', True)
             metadata_api_key = getattr(browser_settings, 'tmdb_api_key', '')
             metadata_enabled = getattr(browser_settings, 'metadata_enabled', True)
-        self._cinematic_enabled = bool(self.content_type in ('movie', 'series') and cinematic_view)
-        self._vod_discovery_layout = self._cinematic_enabled
+        if isinstance(browser_settings, dict):
+            self._light_palette=(browser_settings.get('channel_highlight','navy'),browser_settings.get('selection_border','navy'))
+        else:
+            self._light_palette=(getattr(browser_settings,'channel_highlight','navy'),getattr(browser_settings,'selection_border','navy'))
+        self._light_vod_enabled = self.content_type in ('movie', 'series')
+        self._cinematic_enabled = False
+        self._vod_discovery_layout = False
         self._cinematic_composite_plan = None
         self._cinematic_composite_visible = False
-        if self._cinematic_enabled and not self._vod_discovery_layout:
-            from .hero_artwork import hero_plan, strip_overlay_skin
-            desktop_width, desktop_height, unused_scale = _scale()
-            self._cinematic_composite_plan = hero_plan(desktop_width, desktop_height)
-        self._poster_grid_enabled = bool(self.content_type in ('movie', 'series') and (not self._cinematic_enabled))
+        self._poster_grid_enabled = False
         self._poster_page_size = GRID_PAGE_SIZE if self._poster_grid_enabled else 6 if self._vod_discovery_layout else CINEMATIC_POSTER_COLUMNS
         self._poster_slot_count = self._poster_page_size
         self._vod_poster_retries = PosterRetryQueue()
@@ -118,6 +122,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._weather_timer = eTimer()
         _connect_timer(self._weather_timer, self._poll_weather)
         if self.content_type == 'live':
+            self._returned_preview = None
+            self._returned_preview_timer = eTimer()
+            _connect_timer(self._returned_preview_timer, self._restore_returned_preview)
             self._footer_layout_items = M3U_LIVE_CATEGORY_FOOTER_ITEMS if _client_supports(self.client, 'search') and _is_m3u_client(self.client) else LIVE_CATEGORY_FOOTER_ITEMS
             self._screen_background_path = ''
             self._opaque_background = True
@@ -130,26 +137,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             width, height, px = _scale()
             self._list_scroll_geometry = (px(50 + 945 - 15), px(145), px(10), px(716))
         elif self.content_type == 'movie':
-            self._footer_layout_items = MOVIE_FOOTER_ITEMS
-            self._screen_background_path = CINEMATIC_GLASS_BACKGROUND_PATH
-            from .browser_vod import _movie_browser_skin
-            self.skin = prepared_skin(_movie_browser_skin, self._cinematic_enabled)
-            from .series_trailer_ui import add_hint_skin
-            self.skin = add_hint_skin(self.skin, *_scale(), cinematic=self._cinematic_enabled, prefix='movie')
-            if self._cinematic_composite_plan is not None:
-                self.skin = strip_overlay_skin(self.skin, self._cinematic_composite_plan)
-            self.page_size = CINEMATIC_CATEGORY_PAGE_SIZE
-            width, height, px = _scale()
-            if self._cinematic_enabled:
-                from .browser_vod import _cinematic_scroll_geometries
-                self._list_scroll_geometry, self._poster_scroll_geometry = _cinematic_scroll_geometries(width, height, px)
-            else:
-                geometry = grid_geometry(width, height, px)
-                self._list_scroll_geometry = geometry['category_scroll']
-                self._poster_scroll_geometry = geometry['poster_scroll']
+            from .vod_light import configure
+            configure(self)
             self._movie_catalog_entries = []
             self._movie_entries = []
-            self._movie_browser_catalog = CategoryBrowseCatalog(self.client) if source_type in ('xtream', 'stalker') else None
+            self._movie_browser_catalog = CategoryBrowseCatalog(self.client, native=True) if source_type in ('xtream', 'stalker') else None
             self._movie_browse_cursor = 0
             self._movie_index_reload_when_done = False
             self._movie_selected_index = 0
@@ -202,25 +194,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._movie_search_resume_timer = eTimer()
             _connect_timer(self._movie_search_resume_timer, self._poll_movie_search_resume)
         elif self.content_type == 'series':
-            self._footer_layout_items = SERIES_FOOTER_ITEMS
-            self._screen_background_path = CINEMATIC_GLASS_BACKGROUND_PATH
-            from .browser_vod import _series_browser_skin
-            self.skin = prepared_skin(_series_browser_skin, self._cinematic_enabled)
-            from .series_trailer_ui import add_hint_skin
-            self.skin = add_hint_skin(self.skin, *_scale(), cinematic=self._cinematic_enabled)
-            if self._cinematic_composite_plan is not None:
-                self.skin = strip_overlay_skin(self.skin, self._cinematic_composite_plan)
-            self.page_size = CINEMATIC_CATEGORY_PAGE_SIZE
-            width, height, px = _scale()
-            if self._cinematic_enabled:
-                from .browser_vod import _cinematic_scroll_geometries
-                self._list_scroll_geometry, self._poster_scroll_geometry = _cinematic_scroll_geometries(width, height, px)
-            else:
-                geometry = grid_geometry(width, height, px)
-                self._list_scroll_geometry = geometry['category_scroll']
-                self._poster_scroll_geometry = geometry['poster_scroll']
+            from .vod_light import configure
+            configure(self)
             self._series_entries = []
-            self._series_browser_catalog = CategoryBrowseCatalog(self.client, content_type='series') if source_type in ('xtream', 'stalker') else None
+            self._series_browser_catalog = CategoryBrowseCatalog(self.client, content_type='series', native=True) if source_type in ('xtream', 'stalker') else None
             self._series_browse_cursor = 0
             self._series_index_reload_when_done = False
             self._series_selected_index = 0
@@ -337,6 +314,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             if hasattr(self, 'onShown'):
                 self.onShown.append(self.start_weather)
             if hasattr(self, 'onClose'):
+                self.onClose.append(self._restore_returned_preview)
                 self.onClose.append(self._stop_weather)
                 self.onClose.append(self._clear_live_recall_history)
         elif self.content_type == 'movie':
@@ -355,11 +333,6 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self.onLayoutFinish.append(self._refit_content_dynamic_layout)
             if self.content_type in ('movie', 'series'):
                 self.onLayoutFinish.append(self._prepare_cinematic_shadows)
-        if self.content_type in ('movie', 'series'):
-            self._vod_preparation = VODPreparation(self)
-            self.onClose.append(self._vod_preparation.close)
-            self.onHide.append(self._vod_preparation.pause)
-            self.onShown.append(self._vod_preparation.resume)
         if self.content_type == 'live': setup_broadcast(self, 'categories', self._footer_layout_items)
 
     def _refit_content_dynamic_layout(self):
@@ -424,7 +397,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         ellipsize_dynamic_text(self['message'], self._favorite_message(item, added), fallback_chars=24)
 
     def load_items(self):
-        return self.client.load_categories(self.content_type)
+        return load_category_titles(self.client, self.content_type,
+            force=getattr(self, '_category_titles_refresh', False))
 
     def _prepare_loaded_items(self, values):
         """Load and arrange category preferences away from the GUI thread."""
@@ -468,10 +442,20 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         GTAsyncListScreen._poll_result(self)
 
     def start_load(self):
+        if getattr(self, '_light_vod_enabled', False) and not self._loading and not self._closed:
+            prefix = '_' + self.content_type + '_'
+            setattr(self, prefix + 'loaded_category_id', None)
+            setattr(self, prefix + 'category_load_started', False)
+            setattr(self, prefix + 'entries', [])
+            setattr(self, prefix + 'focus', 'categories')
+            self._light_render_rows()
+            self._light_waiting()
         if self._category_preferences_enabled and (not self._loading) and (not self._closed):
             self._all_categories = []
             self._live_all_categories = self._all_categories
         GTAsyncListScreen.start_load(self)
+        if getattr(self, '_broadcast_kind', None) == 'categories' and self._loading:
+            refresh_category_list(self, full=True)
 
     def _client_has_more_items(self, content_type, category_id):
         checker = getattr(self.client, 'has_more_items', None)
@@ -499,19 +483,23 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
 
     @broadcast_refresh_after
     def _refresh_live_categories(self):
+        if self._loading:
+            return
         if self._error:
-            self['items'].setText(_('Could not open the content list.'))
+            set_text_if_changed(self['items'], _('Could not open the content list.'))
             ellipsize_dynamic_text(self['message'], _(self._error), fallback_chars=70)
             self._clear_live_rows()
             hide_scrollbar(self, 'list_scroll')
             return
         if not self._entries:
-            self['items'].setText(_(self.empty_message()))
-            self['message'].setText(_('No categories found; press GREEN to try again.'))
+            set_text_if_changed(self['items'], _(self.empty_message()))
+            set_text_if_changed(self['message'], _('No categories found; press GREEN to try again.'))
             self._clear_live_rows()
             hide_scrollbar(self, 'list_scroll')
             return
         self.selected_index %= len(self._entries)
+        if getattr(self, '_broadcast_kind', None) == 'categories':
+            return
         page_start = int(self.selected_index / self.page_size) * self.page_size
         page_items = self._entries[page_start:page_start + self.page_size]
         page_key = (page_start, current_text_size(), tuple(((str(getattr(item, 'category_id', '') or ''), item.name) for item in page_items)))
@@ -526,10 +514,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                     absolute_index = page_start + row_index
                     rendered_row = ellipsize_dynamic_text(self['category_row_{}'.format(row_index)], '{:02d}   {}'.format(absolute_index + 1, item.name), fallback_chars=35)
                     plain_lines.append(rendered_row)
-                    self['category_row_art_{}'.format(row_index)].show()
+                    set_visible(self['category_row_art_{}'.format(row_index)], True)
                 else:
-                    self['category_row_{}'.format(row_index)].setText('')
-                    self['category_row_art_{}'.format(row_index)].hide()
+                    set_text_if_changed(self['category_row_{}'.format(row_index)], '')
+                    set_visible(self['category_row_art_{}'.format(row_index)], False)
             set_text_if_changed(self['items'], '\n'.join(plain_lines))
         affected_rows = range(self.page_size) if page_changed else (previous_row, selected_row) if selected_row != previous_row else ()
         for row_index in affected_rows:
@@ -539,15 +527,15 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             for suffix in ('focus_art', 'icon'):
                 component = self['category_{}_{}'.format(suffix, row_index)]
                 if selected:
-                    component.show()
+                    set_visible(component, True)
                 else:
-                    component.hide()
+                    set_visible(component, False)
             for edge in ('fill', 'top', 'bottom', 'left', 'right'):
                 focus = self['category_focus_{}_{}'.format(row_index, edge)]
                 if selected:
-                    focus.show()
+                    set_visible(focus, True)
                 else:
-                    focus.hide()
+                    set_visible(focus, False)
         self._live_category_render_page_key = page_key
         self._live_category_render_selected_row = selected_row
         set_text_if_changed(self['message'], '{}: {} | {}/{}'.format(_('Categories'), len(self._entries), self.selected_index + 1, len(self._entries)))
@@ -557,16 +545,17 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._live_category_render_page_key = None
         self._live_category_render_selected_row = -1
         for row_index in range(8):
-            self['category_row_{}'.format(row_index)].setText('')
+            set_text_if_changed(self['category_row_{}'.format(row_index)], '')
             for suffix in ('row_art', 'focus_art', 'icon'):
-                self['category_{}_{}'.format(suffix, row_index)].hide()
+                set_visible(self['category_{}_{}'.format(suffix, row_index)], False)
             for edge in ('fill', 'top', 'bottom', 'left', 'right'):
-                self['category_focus_{}_{}'.format(row_index, edge)].hide()
+                set_visible(self['category_focus_{}_{}'.format(row_index, edge)], False)
 
     def refresh_all(self):
         for name in ('_load_token', '_live_more_token'):
             _cancel_worker_token(getattr(self, name, None))
         self._loading = False
+        self._category_titles_refresh = True
         invalidator = getattr(self.client, 'invalidate_cache', None)
         if invalidator is not None:
             try:
@@ -756,7 +745,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 self._movie_focus = 'categories'
                 category = self._entries[self.selected_index]
                 category_id = str(getattr(category, 'category_id', '') or '').strip()
-                if filters_changed or category_id != self._movie_loaded_category_id:
+                if getattr(self, '_light_vod_enabled', False) and not self._movie_category_load_started:
+                    self._refresh_movie_categories(schedule_load=False)
+                    self._render_movie_posters()
+                elif filters_changed or category_id != self._movie_loaded_category_id:
                     self._start_movie_load(category)
                 else:
                     self._refresh_movie_categories(schedule_load=False)
@@ -765,7 +757,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 self._series_focus = 'categories'
                 category = self._entries[self.selected_index]
                 category_id = str(getattr(category, 'category_id', '') or '').strip()
-                if filters_changed or not category_id or category_id != str(self._series_loaded_category_id or '').strip():
+                if getattr(self, '_light_vod_enabled', False) and not self._series_category_load_started:
+                    self._refresh_series_categories()
+                    self._render_series_tiles()
+                elif filters_changed or not category_id or category_id != str(self._series_loaded_category_id or '').strip():
                     self._start_series_load(category)
                 else:
                     self._refresh_series_categories()
@@ -794,6 +789,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
     def _m3u_search_closed(self, *args):
         self._reload_favorite_keys()
         self._weather_child_closed(*args)
+
+    def _select(self, index):
+        if getattr(self, '_broadcast_kind', None) != 'categories':
+            return GTAsyncListScreen._select(self, index)
+        if self._closed or self._loading or self._error or not self._entries:
+            return
+        index %= len(self._entries)
+        if index != self.selected_index:
+            self.selected_index = index
+            refresh_category_list(self)
 
     def move_up(self):
         if getattr(self, '_poster_grid_enabled', False) and self.content_type == 'movie' and (self._movie_focus == 'posters'):
@@ -915,10 +920,11 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self['weather_temp'].setText('--')
             self['weather_desc'].setText(_('Weather is disabled'))
             self['weather_updated'].setText(_('You can enable it in Settings.'))
-            return
-        self['weather_temp'].setText('--°')
-        self['weather_desc'].setText(_('Loading forecast'))
-        self['weather_updated'].setText('Open-Meteo')
+        else:
+            self['weather_temp'].setText('--°')
+            self['weather_desc'].setText(_('Loading forecast'))
+            self['weather_updated'].setText('Open-Meteo')
+        refresh_category_weather(self)
 
     def _clear_weather_days(self):
         for index in range(5):
@@ -991,7 +997,6 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._weather_error = error_text
         self._weather_ready = True
 
-    @broadcast_refresh_after
     def _poll_weather(self):
         if self._closed:
             return
@@ -1002,6 +1007,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 self._weather_error = N_('Weather request timed out')
                 self['weather_desc'].setText(_('Weather data unavailable.'))
                 ellipsize_dynamic_text(self['weather_updated'], _(self._weather_error), fallback_chars=50)
+                refresh_category_weather(self)
                 return
             self._weather_timer.start(150, True)
             return
@@ -1010,6 +1016,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if self._weather_forecast is None:
             self['weather_desc'].setText(_('Weather data unavailable.'))
             ellipsize_dynamic_text(self['weather_updated'], _(self._weather_error), fallback_chars=50)
+            refresh_category_weather(self)
             return
         forecast = self._weather_forecast
         degree = forecast.degree
@@ -1034,6 +1041,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self['weather_day_high_{}'.format(index)].setText('{:.0f}°'.format(day.maximum))
             self['weather_day_low_{}'.format(index)].setText('{:.0f}°'.format(day.minimum))
             self._apply_weather_icon('weather_day_icon_{}'.format(index), day.code)
+        refresh_category_weather(self)
 
     def open_weather_settings(self):
         from .main import GTWeatherSettingsScreen
@@ -1044,6 +1052,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
 
     def _suspend_for_playback(self, keep_catalog=False):
         """Silence optional parent work; search keeps the shared producer."""
+        if self.content_type in ('movie', 'series'):
+            content_sort_ui.cancel_loading(self, self.content_type)
         preparation = getattr(self, '_vod_preparation', None)
         if preparation is not None:
             preparation.pause()
@@ -1116,15 +1126,29 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if self.content_type == 'live' and args and isinstance(args[0], dict):
             result = args[0]
             if result.get('kind') == 'live-list-category':
+                self._returned_preview = result.get('preview_restore')
+                if self._returned_preview is not None:
+                    # The category frame is already queued for the renderer.
+                    self._returned_preview_timer.start(LIVE_PREVIEW_RETURN_RESTORE_MS, True)
                 category_id = str(result.get('category_id', '') or '')
                 for index, category in enumerate(self._entries):
                     if str(getattr(category, 'category_id', '') or '') == category_id:
-                        self.selected_index = index
-                        self._refresh()
+                        if index != self.selected_index:
+                            self.selected_index = index
+                            self._refresh()
                         break
         self._weather_suspended = False
         if self._weather_forecast is None:
             self.start_weather()
+
+    def _restore_returned_preview(self):
+        preview = self._returned_preview
+        if preview is None:
+            return
+        self._returned_preview = None
+        self._returned_preview_timer.stop()
+        from .browser_live import GTStreamListScreen
+        GTStreamListScreen.restore_returned_preview(getattr(self.session, 'nav', None), *preview)
 
     def _clear_live_recall_history(self):
         if self.content_type == 'live':
@@ -1167,11 +1191,13 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self.open_series_episode_list()
             return
         from .browser_live import GTStreamListScreen
+        if self.content_type == 'live':
+            self._restore_returned_preview()
         arguments = (GTStreamListScreen, self.account, self.content_type, self._entries[self.selected_index], self.client)
         snapshot = self._weather_forecast
         self._stop_weather(suspend=True)
         opener = getattr(self.session, 'openWithCallback', None)
         if callable(opener):
-            opener(self._weather_child_closed, *arguments, weather_forecast=snapshot, favorite_store=self.favorite_store, hidden_category_ids=self._hidden_category_ids, live_source_categories=self._all_categories)
+            opener(self._weather_child_closed, *arguments, weather_forecast=snapshot, favorite_store=self.favorite_store, hidden_category_ids=self._hidden_category_ids, live_source_categories=self._all_categories, defer_preview_exit=self.content_type == 'live')
             return
         self.session.open(*arguments, weather_forecast=snapshot, favorite_store=self.favorite_store, hidden_category_ids=self._hidden_category_ids, live_source_categories=self._all_categories)

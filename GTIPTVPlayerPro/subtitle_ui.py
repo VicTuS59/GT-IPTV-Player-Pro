@@ -26,11 +26,11 @@ try:
 except ImportError:
     parseColor = None
 
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
-from .background import attach_background
 from .i18n import N_, _, localized_upper, supported_language_names
 from .online_subtitles import provider_display_name, subtitle_client
-from .paths import plugin_path
 from .remote_footer import decorate_remote_footer, footer_item, install_remote_footer
 from .subtitle_settings import (
     BACKGROUND_STYLES,
@@ -46,12 +46,6 @@ from .typography import fit_dynamic_text, font_px
 
 
 ROWS = 16
-# The r90 settings wallpaper already contains the legacy one-panel rows and
-# footer frame.  This screen builds its own two-panel glass layout, so drawing
-# the legacy wallpaper underneath produces doubled borders and long horizontal
-# lines through the live preview.  Reuse the clean responsive neon wallpaper;
-# background.py selects its UHD/FHD/HD raster and fills SD desktops safely.
-BACKGROUND_PATH = plugin_path("skin", "images", "global-neon-v0912.png")
 FOOTER = (
     footer_item("up_down", "navigate"),
     footer_item("left_right", "change"),
@@ -113,117 +107,16 @@ def _label(parts, px, name, x, y, w, h, size=25, color="#F8FAFC",
 
 @skin_after('subtitles')
 def _settings_skin(size=None):
-    """Build the two-panel glass settings page for UHD, FHD, HD and SD."""
     width, height = _desktop_size(size)
-    sx = float(width) / 1920.0
-    sy = float(height) / 1080.0
-    sf = min(sx, sy)
-    glass_panel = plugin_path("skin", "images", "category-glass-panel-r84.png")
-    glass_row = plugin_path("skin", "images", "category-glass-row-r84.png")
-
-    def x(value):
-        return max(0, int(round(float(value) * sx)))
-
-    def y(value):
-        return max(0, int(round(float(value) * sy)))
-
-    def font(value):
-        return max(10, int(round(float(value) * sf)))
-
-    parts = [
-        '<screen name="GTSubtitleSettingsScreen" position="0,0" size="{},{}" '
-        'flags="wfNoBorder" backgroundColor="#020617" transparent="0">'.format(
-            width, height
-        ),
-        '<widget name="video_guard" position="0,0" size="{},{}" '
-        'font="Regular;1" backgroundColor="#020617" transparent="0" '
-        'zPosition="-30" />'.format(width, height),
-        '<widget name="app_bg" position="0,0" size="{},{}" zPosition="0" />'.format(
-            width, height
-        ),
-    ]
-
-    def pixmap(name, left, top, item_width, item_height, path, z=1):
-        parts.append(
-            '<widget name="{}" position="{},{}" size="{},{}" '
-            'pixmap="{}" alphatest="blend" scale="1" zPosition="{}" />'.format(
-                name, x(left), y(top), x(item_width), y(item_height), path, z,
-            )
-        )
-
-    def label(name, left, top, item_width, item_height, text_size=25,
-              color="#F8FAFC", background=None, align="left", z=3,
-              nowrap=True):
-        background_xml = (
-            'backgroundColor="{}" transparent="0"'.format(background)
-            if background else 'transparent="1"'
-        )
-        parts.append(
-            '<widget name="{}" position="{},{}" size="{},{}" '
-            'font="Regular;{}" foregroundColor="{}" {} zPosition="{}" '
-            'halign="{}" valign="center" noWrap="{}" />'.format(
-                name, x(left), y(top), x(item_width), y(item_height),
-                font(text_size), color, background_xml, z, align,
-                "1" if nowrap else "0",
-            )
-        )
-
-    pixmap("header_art", 35, 28, 1850, 82, glass_row, z=1)
-    pixmap("left_panel_art", 35, 130, 990, 820, glass_panel, z=1)
-    pixmap("preview_panel_art", 1040, 130, 845, 820, glass_panel, z=1)
-    pixmap(
-        "status_badge_art", 1500, 43, 350, 54,
-        plugin_path("skin", "images", "status-neutral-r64.png"), z=2,
-    )
-    label("header", 75, 31, 1395, 76, 36)
-    label("status_dot", 1518, 43, 34, 54, 25, "#22C55E", align="center", z=4)
-    label("status_badge", 1555, 43, 275, 54, 19, "#D8E6F4",
-          align="center", z=4)
-    label("settings_title", 80, 143, 880, 48, 27, "#CFE5FF")
-    label("appearance_title", 80, 646, 880, 44, 26, "#CFE5FF")
-    label("preview_title", 1080, 143, 740, 48, 27, "#CFE5FF")
-
-    for index in range(ROWS):
-        top = (196 + index * 40) if index < 11 else (697 + (index - 11) * 45)
-        row_height = 37 if index < 11 else 41
-        text_height = row_height - 2
-        pixmap("row_art_{}".format(index), 62, top, 936, row_height, glass_row, z=2)
-        label("focus_{}_top".format(index), 62, top, 936, 2, 1,
-              background="#00E5FF", z=7)
-        label("focus_{}_bottom".format(index), 62, top + row_height - 2, 936, 2, 1,
-              background="#C33BEE", z=7)
-        label("focus_{}_left".format(index), 62, top, 2, row_height, 1,
-              background="#00E5FF", z=7)
-        label("focus_{}_right".format(index), 996, top, 2, row_height, 1,
-              background="#C33BEE", z=7)
-        label("label_{}".format(index), 92, top + 1, 500, text_height, 21, z=5)
-        label("arrow_left_{}".format(index), 605, top + 1, 42, text_height, 27,
-              "#8EDCFF", align="center", z=5)
-        label("value_{}".format(index), 650, top + 1, 292, text_height, 20,
-              "#DCEAFF", align="center", z=5)
-        label("arrow_right_{}".format(index), 946, top + 1, 42, text_height, 27,
-              "#8EDCFF", align="center", z=5)
-
-    label("preview_caption", 1090, 183, 715, 30, 18, "#8298B8",
-          align="center", z=3)
-    label("screen_frame", 1070, 215, 785, 630, 1,
-          background="#17679D", z=2)
-    label("screen_body", 1075, 220, 775, 620, 1,
-          background="#020A18", z=3)
-    label("preview_text", 1120, 690, 685, 110, 38, "#F8FAFC",
-          background="#A0000000", align="center", z=4, nowrap=False)
-    label("preview_detail", 1110, 805, 705, 42, 18, "#94A3B8",
-          align="center", z=4, nowrap=False)
-    pixmap("message_art", 1070, 870, 785, 55, glass_row, z=2)
-    label("message", 1090, 872, 745, 51, 20, "#67E8F9", align="center", z=4)
-    label("footer", 0, 962, 1920, 108, 1)
-    parts.append("</screen>")
+    root = ('<screen name="GTSubtitleSettingsScreen" position="0,0" size="{},{}" '
+            'flags="wfNoBorder" backgroundColor="#020617" transparent="0">'
+            '<widget name="footer" position="0,0" size="1,1" font="Regular;1" />'
+            '</screen>').format(width, height)
     return decorate_remote_footer(
-        "\n".join(parts), FOOTER, transparent_panel=False,
+        root, FOOTER, transparent_panel=False,
         show_dividers=False, stacked=True, skin_fonts_scaled=True,
         panel_height=100, content_y_offset=8,
     )
-
 
 def _preview_skin(settings):
     width, height, px = _scale()
@@ -335,19 +228,6 @@ class GTSubtitleSettingsScreen(Screen):
         self._api_timer = eTimer()
         _connect_timer(self._api_timer, self._poll_api_test)
 
-        for name in (
-            "header_art", "left_panel_art", "preview_panel_art",
-            "status_badge_art", "message_art",
-        ):
-            self[name] = Pixmap()
-        self["video_guard"] = Label("")
-        self["header"] = Label(
-            "GT IPTV PLAYER PRO  |  {}  ›  {}".format(
-                localized_upper(_("Settings")),
-                localized_upper(_("Subtitles")),
-            )
-        )
-        self["status_dot"] = Label("●")
         self["status_badge"] = Label("")
         self["settings_title"] = Label(
             localized_upper(_("Independent subtitles"))
@@ -355,13 +235,8 @@ class GTSubtitleSettingsScreen(Screen):
         self["appearance_title"] = Label(localized_upper(_("Appearance")))
         self["preview_title"] = Label(localized_upper(_("LIVE PREVIEW")))
         for index, label in enumerate(self.LABELS):
-            self["row_art_{}".format(index)] = Pixmap()
-            for side in ("top", "bottom", "left", "right"):
-                self["focus_{}_{}".format(index, side)] = Label("")
             self["label_{}".format(index)] = Label(_(label))
             self["value_{}".format(index)] = Label("")
-            self["arrow_left_{}".format(index)] = Label("‹")
-            self["arrow_right_{}".format(index)] = Label("›")
         self["preview_caption"] = Label(_("Television preview"))
         self["screen_frame"] = Label("")
         self["screen_body"] = Label("")
@@ -393,19 +268,11 @@ class GTSubtitleSettingsScreen(Screen):
             self.onLayoutFinish.append(self._layout_ready)
         if hasattr(self, "onClose"):
             self.onClose.append(self._stop)
-        setup_utility_pages(self, 'subtitles', FOOTER)
-        self._refresh()
+        setup_utility_pages(self, 'subtitles', FOOTER, auto_refresh=False)
         self.setTitle(_("Independent subtitles"))
 
     def _layout_ready(self):
-        self["video_guard"].show()
-        for name in (
-            "header_art", "left_panel_art", "preview_panel_art",
-            "status_badge_art", "message_art",
-        ):
-            self[name].show()
-        for index in range(ROWS):
-            self["row_art_{}".format(index)].show()
+        self._preview_style_key = None
         self._refresh()
 
     def _stop(self):
@@ -425,25 +292,6 @@ class GTSubtitleSettingsScreen(Screen):
         if self.settings.credentials_configured():
             return _("API KEY SAVED")
         return _("API KEY REQUIRED")
-
-    def _apply_api_status_style(self):
-        instance = getattr(self["status_dot"], "instance", None)
-        if instance is None or parseColor is None:
-            return
-        if self._api_pending:
-            color = "#FACC15"
-        elif self._api_result is True:
-            color = "#22C55E"
-        elif self._api_result is False:
-            color = "#EF4444"
-        elif self.settings.credentials_configured():
-            color = "#22C55E"
-        else:
-            color = "#94A3B8"
-        try:
-            instance.setForegroundColor(parseColor(color))
-        except Exception:
-            pass
 
     def _provider_text(self, message, provider=None):
         provider = provider if provider in PROVIDERS else self.settings.provider
@@ -528,6 +376,10 @@ class GTSubtitleSettingsScreen(Screen):
         if instance is None:
             return
         width, height = _desktop_size()
+        key = (id(instance), width, height, self.settings.font_size,
+               self.settings.font_color, self.settings.background, self.settings.vertical_position)
+        if getattr(self, '_preview_style_key', None) == key:
+            return
         scale = min(float(width) / 1920.0, float(height) / 1080.0)
         sx = float(width) / 1920.0
         sy = float(height) / 1080.0
@@ -569,14 +421,13 @@ class GTSubtitleSettingsScreen(Screen):
         )
         try:
             instance.move(ePoint(screen_x(1120), screen_y(y)))
+            self._preview_style_key = key
         except Exception:
             pass
 
     @refresh_after
     def _refresh(self):
-        for name in (
-            "header", "settings_title", "appearance_title", "preview_title",
-        ):
+        for name in ("settings_title", "appearance_title", "preview_title"):
             fit_dynamic_text(
                 self[name], self[name].getText(), max_lines=1,
             )
@@ -584,17 +435,10 @@ class GTSubtitleSettingsScreen(Screen):
             self["status_badge"], localized_upper(self._api_status()),
             max_lines=1,
         )
-        self._apply_api_status_style()
         for index in (2, 3, 4):
-            self["label_{}".format(index)].setText(
-                self._provider_text("SubDL API key", self._key_provider(index))
-            )
-        self["label_5"].setText(
-            "OpenSubtitles.com • " + _("Enter the username")
-        )
-        self["label_6"].setText(
-            "OpenSubtitles.com • " + _("Enter the password")
-        )
+            set_text_if_changed(self['label_{}'.format(index)], self._provider_text('SubDL API key', self._key_provider(index)))
+        set_text_if_changed(self['label_5'], 'OpenSubtitles.com • ' + _('Enter the username'))
+        set_text_if_changed(self['label_6'], 'OpenSubtitles.com • ' + _('Enter the password'))
         for index in range(ROWS):
             fit_dynamic_text(
                 self["label_{}".format(index)],
@@ -605,19 +449,15 @@ class GTSubtitleSettingsScreen(Screen):
                 self["value_{}".format(index)], self._value(index),
                 max_lines=1,
             )
-            for side in ("top", "bottom", "left", "right"):
-                focus = self["focus_{}_{}".format(index, side)]
-                focus.show() if index == self.selected_index else focus.hide()
-        self["preview_detail"].setText(
-            "{}  •  {}  •  {}".format(
-                self._value(11), self._value(13), self._value(14)
-            )
-        )
+        set_text_if_changed(self['preview_detail'], '{}  •  {}  •  {}'.format(self._value(11), self._value(13), self._value(14)))
         self._apply_preview_style()
 
     def move(self, step):
-        self.selected_index = (self.selected_index + int(step)) % ROWS
-        self._refresh()
+        previous = self.selected_index
+        self.selected_index = (previous + int(step)) % ROWS
+        if previous != self.selected_index:
+            set_visible(self['r97_focus_{}'.format(previous)], False)
+            set_visible(self['r97_focus_{}'.format(self.selected_index)], True)
 
     @staticmethod
     def _cycled(current, choices, step):

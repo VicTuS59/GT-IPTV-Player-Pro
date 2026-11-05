@@ -1,0 +1,21 @@
+<keymap>
+    <map context="GTIPTVLightListActions">
+        <key id="KEY_UP" mapto="listUp" flags="m" />
+        <key id="KEY_UP" mapto="listUpRepeat" flags="r" />
+        <key id="KEY_UP" mapto="navigationReleased" flags="b" />
+        <key id="KEY_DOWN" mapto="listDown" flags="m" />
+        <key id="KEY_DOWN" mapto="listDownRepeat" flags="r" />
+        <key id="KEY_DOWN" mapto="navigationReleased" flags="b" />
+        <key id="KEY_LEFT" mapto="pagePrevious" flags="m" />
+        <key id="KEY_LEFT" mapto="pagePreviousRepeat" flags="r" />
+        <key id="KEY_LEFT" mapto="navigationReleased" flags="b" />
+        <key id="KEY_RIGHT" mapto="pageNext" flags="m" />
+        <key id="KEY_RIGHT" mapto="pageNextRepeat" flags="r" />
+        <key id="KEY_RIGHT" mapto="navigationReleased" flags="b" />
+        <key id="KEY_CHANNELUP" mapto="ignorePageKey" flags="mr" />
+        <key id="KEY_CHANNELDOWN" mapto="ignorePageKey" flags="mr" />
+        <key id="KEY_PAGEUP" mapto="ignorePageKey" flags="mr" />
+        <key id="KEY_PAGEDOWN" mapto="ignorePageKey" flags="mr" />
+        <key id="KEY_INFO" mapto="showSynopsis" flags="m" />
+    </map>
+</keymap>

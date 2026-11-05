@@ -6,6 +6,7 @@ from array import array
 from bisect import bisect_right
 from collections import OrderedDict
 import json
+import re
 import sys
 import zlib
 
@@ -13,6 +14,35 @@ from .movie_catalog import CatalogLimitError
 
 
 BLOCK_ROWS = 128
+_SURROGATE = re.compile('[\ud800-\udfff]')
+
+
+def category_record_size_ok(body):
+    """Avoid serialization when a conservative JSON byte bound already fits.
+
+    JSON escapes need at most six bytes per Unicode character. Borderline
+    records and unusual value types still use the exact established check.
+    """
+    upper = 2
+    for key, value in body.items():
+        if not isinstance(key, str):
+            break
+        if not key.isascii() and _SURROGATE.search(key):
+            break
+        upper += len(key) * 6 + 8
+        if isinstance(value, str):
+            if not value.isascii() and _SURROGATE.search(value):
+                break
+            upper += len(value) * 6
+        elif type(value) is int and -(1 << 63) <= value < (1 << 63):
+            upper += 20
+        else:
+            break
+        if upper > 16384:
+            break
+    else:
+        return True
+    return len(json.dumps(body, ensure_ascii=False, separators=(',', ':')).encode('utf-8')) <= 16384
 
 
 class PackedRows:
@@ -182,3 +212,93 @@ class PackedRows:
             iterations += 1
             if permitted[self.codes[row]] and all(self.names.find(term, start, end) >= 0 for term in terms):
                 yield row
+
+
+class CategoryRows(PackedRows):
+    """Selected-category metadata as plain RAM dictionaries, without codecs.
+
+    Keep the existing identity/filter/sort columns so paging, hidden categories
+    and playback recovery use the same contract as an account-wide catalogue.
+    Only the chosen category owns these rows; leaving it releases the list.
+    """
+    def __init__(self, resize):
+        super().__init__(resize)
+        self.values = []
+
+    def clear(self):
+        self.values.clear()
+        super().clear()
+
+    def append(self, record):
+        key = self.identity(record['i'])
+        previous = self.by_id.get(key)
+        group = tuple(record.get('a', ()))
+        if previous is not None:
+            group = tuple(sorted(set(group).union(self.groups[self.codes[previous]])))
+        code = self.group_codes.get(group)
+        group_cost = (sys.getsizeof(group) + sum(sys.getsizeof(v) for v in group) + 128
+                      if code is None else 0)
+        if previous is not None:
+            self.resize(group_cost)
+            if code is None:
+                code = len(self.groups)
+                self.groups.append(group)
+                self.group_codes[group] = code
+            self.codes[previous] = code
+            if not self.sort_added[previous] and record.get('sa'):
+                self.sort_added[previous] = int(record['sa'])
+                self.has_sort_added = True
+            if not self.sort_release[previous] and record.get('sr'):
+                self.sort_release[previous] = int(record['sr'])
+                self.has_sort_release = True
+            return
+        body = dict(record)
+        added, released = int(body.pop('sa', 0) or 0), int(body.pop('sr', 0) or 0)
+        name = body.pop('u').replace('\x00', ' ').encode('utf-8') + b'\0'
+        body.pop('a', None)
+        # Keep the same byte bound without serializing ordinary small rows.
+        if not category_record_size_ok(body):
+            error = CatalogLimitError('record-size')
+            error.limit_kind = 'record-size'
+            raise error
+        cost = (sys.getsizeof(body) + sum(sys.getsizeof(v) for v in body.values())
+                + sys.getsizeof(key) + len(name) + 192 + group_cost)
+        self.resize(cost)
+        count, name_size, old_groups = len(self), len(self.names), len(self.groups)
+        try:
+            if code is None:
+                code = len(self.groups)
+                self.groups.append(group)
+                self.group_codes[group] = code
+            self.by_id[key] = count
+            self.names.extend(name)
+            self.ends.append(len(self.names))
+            self.codes.append(code)
+            self.sort_added.append(added)
+            self.sort_release.append(released)
+            self.values.append(body)
+        except BaseException:
+            self.by_id.pop(key, None)
+            del self.names[name_size:]
+            del self.ends[count + 1:]
+            del self.codes[count:]
+            del self.sort_added[count:]
+            del self.sort_release[count:]
+            del self.values[count:]
+            if len(self.groups) > old_groups:
+                self.groups.pop()
+                self.group_codes.pop(group, None)
+            self.resize(-cost)
+            raise
+        self.has_sort_added = self.has_sort_added or bool(added)
+        self.has_sort_release = self.has_sort_release or bool(released)
+
+    def flush(self):
+        pass
+
+    def record(self, position):
+        record = dict(self.values[position])
+        record['a'] = self.groups[self.codes[position]]
+        record['sa'] = self.sort_added[position]
+        record['sr'] = self.sort_release[position]
+        return record

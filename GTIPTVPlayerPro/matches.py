@@ -14,6 +14,7 @@ import threading
 import time
 from collections import OrderedDict, namedtuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from functools import lru_cache
 from urllib.parse import urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
@@ -390,15 +391,49 @@ class ESPNClient:
         except Exception:return None
 
 
+@lru_cache(maxsize=1)
+def _shared_scores_client():
+    return ESPNClient()
+
+
+_RECENT_MATCHES = OrderedDict()
+_RECENT_MATCHES_LOCK = threading.Lock()
+
+
 class MatchesLoader:
     """One screen worker, latest request wins; never touches native widgets."""
     def __init__(self, client=None):
-        self.client=client or ESPNClient()
+        self.client=client or _shared_scores_client()
+        self._share_results=client is None
         self._condition=threading.Condition()
         self._pending=None;self._result=None;self._active=None
         self._closed=False;self._generation=0;self._thread=None
         self._temp_root=os.path.realpath(tempfile.gettempdir())
         self._directory=tempfile.mkdtemp(prefix="gtiptv-matches-",dir=self._temp_root)
+
+    @staticmethod
+    def _snapshot_key(kind, value):
+        return kind, value if kind == "scores" else dt.date.today()
+
+    def cached(self, kind, value):
+        if not self._share_results:
+            return None
+        key = self._snapshot_key(kind, value)
+        max_age = 180 if kind == "scores" else REFRESH_SECONDS
+        with _RECENT_MATCHES_LOCK:
+            entry = _RECENT_MATCHES.get(key)
+            if entry is not None and time.monotonic() - entry[0] < max_age:
+                _RECENT_MATCHES.move_to_end(key)
+                return entry[1]
+            _RECENT_MATCHES.pop(key, None)
+        return None
+
+    def _remember_snapshot(self, key, payload):
+        with _RECENT_MATCHES_LOCK:
+            _RECENT_MATCHES[key] = (time.monotonic(), payload)
+            _RECENT_MATCHES.move_to_end(key)
+            while len(_RECENT_MATCHES) > 4:
+                _RECENT_MATCHES.popitem(last=False)
 
     def request(self, kind, value):
         with self._condition:
@@ -439,6 +474,7 @@ class MatchesLoader:
                     if self._closed:return
                     generation,kind,value=self._pending;self._pending=None
                     cancel=threading.Event();self._active=cancel
+                key = self._snapshot_key(kind, value)
                 try:
                     if kind=="scores":payload=self.client.fetch_day(value,cancel)
                     elif kind=="broadcasts":payload=self.client.fetch_broadcasts(cancel)
@@ -450,5 +486,9 @@ class MatchesLoader:
                 except Exception:payload=None;error=True
                 with self._condition:
                     if not self._closed and generation==self._generation:
+                        if self._share_results and not error and not cancel.is_set():
+                            if ((kind == "scores" and payload.updated_at and not payload.failed_leagues)
+                                    or (kind == "broadcasts" and payload.updated_at and not payload.failed)):
+                                self._remember_snapshot(key, payload)
                         self._result=(generation,kind,payload,error)
         finally:self._cleanup()

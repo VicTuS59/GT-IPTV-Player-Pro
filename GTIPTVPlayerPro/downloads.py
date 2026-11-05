@@ -830,10 +830,6 @@ def delete_entry(entry):
         # External symlinks are never followed to remove their targets.
         if record.get('bundle'):
             from .recording_bundle import delete_entry as delete_bundle
-            from .live_recording import current
-            recording = current()
-            if recording is not None and recording.path == path and recording.state in ('recording', 'stopping'):
-                raise DownloadError('delete_active')
             delete_bundle(record)
         paths = () if record.get('bundle') else (path,) if local else (path, path + ".part")
         for candidate in paths:

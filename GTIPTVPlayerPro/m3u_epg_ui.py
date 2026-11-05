@@ -11,6 +11,8 @@ started directly by an Enigma2 screen callback.
 import datetime
 import os
 from urllib.parse import urlsplit
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 
 from Components.ActionMap import ActionMap
 try:
@@ -21,7 +23,7 @@ from Components.Label import Label
 from Screens.Screen import Screen
 from enigma import getDesktop
 
-from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven, poster_after
+from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven
 from .background import attach_background
 from .i18n import N_, _, localized_upper, ngettext
 from .m3u_epg_settings import (
@@ -662,7 +664,7 @@ class GTM3UXMLTVFileBrowserScreen(Screen):
                 fallback_chars=122,
             )
         else:
-            self["path"].setText(_("Storage"))
+            set_text_if_changed(self["path"], _("Storage"))
 
     def _move(self, method):
         method()
@@ -693,7 +695,7 @@ class GTM3UXMLTVFileBrowserScreen(Screen):
                 )
                 if restore is not None:
                     self["filelist"].changeDir(restore)
-                self["message"].setText(_("This folder is outside the allowed storage locations."))
+                set_text_if_changed(self["message"], _("This folder is outside the allowed storage locations."))
             self._refresh_path()
             return
         self._select_file()
@@ -712,7 +714,7 @@ class GTM3UXMLTVFileBrowserScreen(Screen):
             or not locations
             or not hasattr(self.session, "openWithCallback")
         ):
-            self["message"].setText(_("No allowed storage location is available."))
+            set_text_if_changed(self["message"], _("No allowed storage location is available."))
             return
         self.session.openWithCallback(
             self._storage_selected,
@@ -726,7 +728,7 @@ class GTM3UXMLTVFileBrowserScreen(Screen):
             return
         directory = _xmltv_browser_directory(selection[1])
         if directory is None:
-            self["message"].setText(_("XMLTV file path is invalid."))
+            set_text_if_changed(self["message"], _("XMLTV file path is invalid."))
             return
         self["filelist"].changeDir(directory)
         self._refresh_path()
@@ -734,7 +736,7 @@ class GTM3UXMLTVFileBrowserScreen(Screen):
     def _select_file(self):
         path = _xmltv_file_list_selection(self["filelist"])
         if not _valid_local_xmltv_path(path, require_file=True):
-            self["message"].setText(_("XMLTV file path is invalid."))
+            set_text_if_changed(self["message"], _("XMLTV file path is invalid."))
             return
         self.close(path)
 
@@ -862,6 +864,8 @@ class GTM3UXMLTVSettingsScreen(Screen):
 
     @seven_refresh_after
     def _refresh(self):
+        if getattr(self, '_seven_kind', None) == 'xmltv':
+            return
         has_dynamic_endpoint = bool(_binding_endpoint(self.binding))
         for index, value in enumerate(self._values()):
             widget = self["value_{}".format(index)]
@@ -872,11 +876,11 @@ class GTM3UXMLTVSettingsScreen(Screen):
                     fallback_chars=50,
                 )
             else:
-                widget.setText(str(value))
+                set_text_if_changed(widget, str(value))
             if index == self.selected_index:
-                self["focus_{}".format(index)].show()
+                set_visible(self["focus_{}".format(index)], True)
             else:
-                self["focus_{}".format(index)].hide()
+                set_visible(self["focus_{}".format(index)], False)
 
     def move_up(self):
         self.selected_index = (self.selected_index - 1) % len(self.LABELS)
@@ -916,9 +920,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
     def _change(self, step):
         if self.selected_index == 0:
             if not self.binding.enabled and not self.binding.location:
-                self["message"].setText(
-                    _("Choose an XMLTV source before enabling this option.")
-                )
+                set_text_if_changed(self["message"], _("Choose an XMLTV source before enabling this option."))
                 return
             self._replace_preferences(enabled=not self.binding.enabled)
         elif self.selected_index == 1:
@@ -941,9 +943,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
             self._replace_preferences(update_mode=mode)
         elif self.selected_index == 4:
             if self.binding.update_mode != "automatic":
-                self["message"].setText(
-                    _("Switch Update mode to Automatic to change this option.")
-                )
+                set_text_if_changed(self["message"], _("Switch Update mode to Automatic to change this option."))
                 return
             try:
                 index = SUPPORTED_INTERVALS.index(self.binding.interval_hours)
@@ -955,9 +955,9 @@ class GTM3UXMLTVSettingsScreen(Screen):
                 ]
             )
         else:
-            self["message"].setText(_("Status information is read-only."))
+            set_text_if_changed(self["message"], _("Status information is read-only."))
             return
-        self["message"].setText(_("Press GREEN to save the changes."))
+        set_text_if_changed(self["message"], _("Press GREEN to save the changes."))
         self._refresh()
 
     def change_left(self):
@@ -975,7 +975,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
     def edit_location(self):
         if self.binding.kind == "file":
             if FileList is None or not hasattr(self.session, "openWithCallback"):
-                self["message"].setText(_("The XMLTV file browser is unavailable."))
+                set_text_if_changed(self["message"], _("The XMLTV file browser is unavailable."))
                 return
             self.session.openWithCallback(
                 self._file_selected,
@@ -986,12 +986,10 @@ class GTM3UXMLTVSettingsScreen(Screen):
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
         except ImportError:
-            self["message"].setText(
-                _("The virtual keyboard is unavailable on this image.")
-            )
+            set_text_if_changed(self["message"], _("The virtual keyboard is unavailable on this image."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("Could not open the virtual keyboard."))
+            set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
             return
         self._editing_location = True
         self.session.openWithCallback(
@@ -1003,44 +1001,42 @@ class GTM3UXMLTVSettingsScreen(Screen):
 
     def _file_selected(self, value):
         if value is None:
-            self["message"].setText(_("File selection cancelled."))
+            set_text_if_changed(self["message"], _("File selection cancelled."))
             return
         path = str(value or "").strip()
         if not _valid_local_xmltv_path(path, require_file=True):
-            self["message"].setText(_("XMLTV file path is invalid."))
+            set_text_if_changed(self["message"], _("XMLTV file path is invalid."))
             return
         try:
             self._replace_preferences(location=path)
         except (TypeError, ValueError):
-            self["message"].setText(_("XMLTV file path is invalid."))
+            set_text_if_changed(self["message"], _("XMLTV file path is invalid."))
             return
-        self["message"].setText(_("Press GREEN to save the changes."))
+        set_text_if_changed(self["message"], _("Press GREEN to save the changes."))
         self._refresh()
 
     def _url_entered(self, value):
         self._editing_location = False
         if value is None:
-            self["message"].setText(_("Field entry cancelled."))
+            set_text_if_changed(self["message"], _("Field entry cancelled."))
             return
         location = str(value or "").strip()
         if not _redacted_web_endpoint(location):
-            self["message"].setText(
-                _("XMLTV URL must start with http:// or https://.")
-            )
+            set_text_if_changed(self["message"], _("XMLTV URL must start with http:// or https://."))
             return
         try:
             self._replace_preferences(location=location)
         except (TypeError, ValueError):
-            self["message"].setText(_("XMLTV URL is invalid."))
+            set_text_if_changed(self["message"], _("XMLTV URL is invalid."))
             return
-        self["message"].setText(_("Press GREEN to save the changes."))
+        set_text_if_changed(self["message"], _("Press GREEN to save the changes."))
         self._refresh()
 
     def _validate_preferences(self):
         location = str(self.binding.location or "").strip()
         if not location:
             if self.binding.enabled:
-                self["message"].setText(_("Choose an XMLTV source before saving."))
+                set_text_if_changed(self["message"], _("Choose an XMLTV source before saving."))
                 return False
             return True
         if self.binding.kind == "file":
@@ -1049,12 +1045,10 @@ class GTM3UXMLTVSettingsScreen(Screen):
             # a canonical regular file and may never be a symbolic link.
             valid = _valid_local_xmltv_path(location, require_file=False)
             if not valid:
-                self["message"].setText(_("XMLTV file path is invalid."))
+                set_text_if_changed(self["message"], _("XMLTV file path is invalid."))
                 return False
         elif not _redacted_web_endpoint(location):
-            self["message"].setText(
-                _("XMLTV URL must start with http:// or https://.")
-            )
+            set_text_if_changed(self["message"], _("XMLTV URL must start with http:// or https://."))
             return False
         return True
 
@@ -1101,9 +1095,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
             if isinstance(saved, Binding):
                 candidate = _binding_snapshot(saved, self.source_id)
         except Exception:
-            self["message"].setText(
-                _("XMLTV settings could not be saved. Check the receiver storage.")
-            )
+            set_text_if_changed(self["message"], _("XMLTV settings could not be saved. Check the receiver storage."))
             return False
         self.binding = candidate
         self._saved_binding = _binding_snapshot(candidate, self.source_id)
@@ -1112,7 +1104,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
 
     def save(self):
         if self._save_preferences():
-            self["message"].setText(_("External XMLTV EPG settings saved."))
+            set_text_if_changed(self["message"], _("External XMLTV EPG settings saved."))
             self._refresh()
 
     def _arm_refresh_poll(self):
@@ -1163,7 +1155,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
         phase = state.get("state", "")
         if phase in REFRESH_ACTIVE_STATES:
             self._refresh_polling = True
-            self["message"].setText(_("Background update requested"))
+            set_text_if_changed(self["message"], _("Background update requested"))
             self._refresh()
             self._arm_refresh_poll()
             return
@@ -1177,13 +1169,11 @@ class GTM3UXMLTVSettingsScreen(Screen):
         self._refresh_runtime_state = dict(state)
         self._refresh()
         if phase == "success":
-            self["message"].setText(_status_text(self.binding))
+            set_text_if_changed(self["message"], _status_text(self.binding))
         elif phase == "cancelled":
-            self["message"].setText(_("Request cancelled"))
+            set_text_if_changed(self["message"], _("Request cancelled"))
         else:
-            self["message"].setText(
-                _("Update failed; the previous guide remains available.")
-            )
+            set_text_if_changed(self["message"], _("Update failed; the previous guide remains available."))
         self._refresh_runtime_state = None
 
     def _poll_refresh(self):
@@ -1221,9 +1211,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
 
     def request_refresh(self):
         if not self.binding.enabled:
-            self["message"].setText(
-                _("Enable external XMLTV EPG before requesting an update.")
-            )
+            set_text_if_changed(self["message"], _("Enable external XMLTV EPG before requesting an update."))
             return
         state = _get_refresh_state(self.source_id)
         if (
@@ -1236,9 +1224,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
             self._refresh_request_id = int(state.get("request_id", 0) or 0)
             self._refresh_polling = True
             self._refresh_runtime_state = dict(state)
-            self["message"].setText(
-                _("The XMLTV update was queued in the background.")
-            )
+            set_text_if_changed(self["message"], _("The XMLTV update was queued in the background."))
             self._refresh()
             self._arm_refresh_poll()
             return
@@ -1262,18 +1248,14 @@ class GTM3UXMLTVSettingsScreen(Screen):
                 "error_code": "",
                 "completed_at": 0,
             }
-            self["message"].setText(
-                _("The XMLTV update was queued in the background.")
-            )
+            set_text_if_changed(self["message"], _("The XMLTV update was queued in the background."))
             self._refresh()
             if state is not None and state.get("state") in REFRESH_TERMINAL_STATES:
                 self._apply_refresh_state(state)
             else:
                 self._arm_refresh_poll()
         else:
-            self["message"].setText(
-                _("The XMLTV update could not be queued. Try again shortly.")
-            )
+            set_text_if_changed(self["message"], _("The XMLTV update could not be queued. Try again shortly."))
 
     def close_screen(self):
         self._stop_refresh_tracking()

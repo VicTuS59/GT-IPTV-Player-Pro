@@ -4,12 +4,10 @@
 """Online-provider search, safe downloads and native subtitle parsing."""
 
 from bisect import bisect_right
-from hashlib import sha256
 from html import unescape
 import json
 import os
 import re
-import tempfile
 from time import monotonic
 from urllib.parse import quote, urlencode, urlsplit
 
@@ -2412,29 +2410,3 @@ def save_subtitle_file(content, metadata, result, root=None):
         raise SubtitleError("subtitle_cache_unavailable", 500)
 
 
-def _prune_subtitle_cache(root, current_path):
-    """Bound only files created by this module; cache cleanup is best effort."""
-    try:
-        entries = []
-        for entry in os.scandir(root):
-            if not re.fullmatch(r"[0-9a-f]{64}\.srt", entry.name):
-                continue
-            if not entry.is_file(follow_symlinks=False):
-                continue
-            stat = entry.stat(follow_symlinks=False)
-            entries.append((entry.path, stat.st_mtime, stat.st_size))
-        entries.sort(
-            key=lambda item: (item[0] == current_path, item[1]), reverse=True
-        )
-        total = 0
-        for index, (path, unused_mtime, size) in enumerate(entries):
-            total += max(0, int(size))
-            if index < MAX_CACHE_FILES and total <= MAX_CACHE_BYTES:
-                continue
-            if path != current_path:
-                try:
-                    os.unlink(path)
-                except OSError:
-                    pass
-    except OSError:
-        pass

@@ -4,7 +4,6 @@
 """On-demand full schedules; ordinary now/next reads remain unchanged."""
 
 import datetime
-import time
 
 from .content import ContentError, EPGEvent
 

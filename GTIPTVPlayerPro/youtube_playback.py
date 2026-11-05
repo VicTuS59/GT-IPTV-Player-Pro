@@ -8,8 +8,6 @@ input. Other service IDs cannot be assumed to support that contract. Keep
 the signed URLs byte-for-byte and never start a private FFmpeg remux.
 """
 
-import os
-import shutil
 import time
 from urllib.parse import urlsplit
 
@@ -47,25 +45,35 @@ def youtube_stream_parts(url):
 
 
 def native_audio_player_available():
-    """Check the executable on each play, including nonstandard PATH entries."""
-    return bool(shutil.which("exteplayer3")) or (
-        os.path.isfile("/usr/bin/exteplayer3")
-        and os.access("/usr/bin/exteplayer3", os.X_OK)
-    )
+    """A runnable native player, rather than just an executable filename."""
+    from .youtube_startup import probe_native_player
+    return probe_native_player()["available"]
 
 
-def youtube_service_type(url, preferred_type=4097, video_codec=""):
+def youtube_service_type(url, preferred_type=4097, video_codec="", available_types=None,
+                         native_available=None):
     """Select native separate audio/VP9 without rewriting saved preferences."""
     unused_video, audio = youtube_stream_parts(url)
     if audio or video_codec == "vp9":
-        if not native_audio_player_available():
+        if ((not native_audio_player_available() if native_available is None else not native_available)
+                or available_types is not None and NATIVE_AUDIO_SERVICE_TYPE not in available_types):
             raise YouTubeNativePlayerUnavailable("ServiceApp / ExtEplayer3 (5002)")
         return NATIVE_AUDIO_SERVICE_TYPE
     try:
         preferred_type = int(preferred_type)
     except (TypeError, ValueError, OverflowError):
         preferred_type = 4097
-    return preferred_type if preferred_type in (4097, 5001, 5002) else 4097
+    preferred_type = preferred_type if preferred_type in (4097, 5001, 5002) else 4097
+    if available_types is not None and preferred_type not in available_types:
+        if 4097 not in available_types:
+            from .youtube_startup import YouTubePlaybackError
+            raise YouTubePlaybackError("youtube_service_unavailable")
+        return 4097
+    if preferred_type == 5002 and native_available is False:
+        if available_types is None or 4097 in available_types:
+            return 4097
+        raise YouTubeNativePlayerUnavailable("ServiceApp / ExtEplayer3 (5002)")
+    return preferred_type
 
 
 def youtube_duration_seconds(item):

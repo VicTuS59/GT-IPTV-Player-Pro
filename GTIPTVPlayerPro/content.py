@@ -1463,8 +1463,34 @@ class XtreamContentClient(object):
         """Stream series headers; seasons and episodes are requested on demand."""
         return self._iter_catalog_items("series", category_id)
 
-    def _iter_catalog_items(self, content_type, category_id):
+    def iter_movie_catalog_records(self, category_id=""):
+        return self._iter_catalog_items('movie', category_id, records=True)
+
+    def iter_series_catalog_records(self, category_id=""):
+        return self._iter_catalog_items('series', category_id, records=True)
+
+    def iter_movie_category_rows(self, category_id=''):
+        return self._iter_catalog_items('movie', category_id, records='raw')
+
+    def iter_series_category_rows(self, category_id=''):
+        return self._iter_catalog_items('series', category_id, records='raw')
+
+    def iter_movie_category_batches(self, category_id=''):
+        return self._iter_catalog_items('movie', category_id, records='batch')
+
+    def iter_series_category_batches(self, category_id=''):
+        return self._iter_catalog_items('series', category_id, records='batch')
+
+    def iter_movie_native_batches(self, category_id=''):
+        return self._iter_catalog_items('movie', category_id, records='native')
+
+    def iter_series_native_batches(self, category_id=''):
+        return self._iter_catalog_items('series', category_id, records='native')
+
+    def _iter_catalog_items(self, content_type, category_id, records=False):
         from .streaming_json import iter_json_array
+        if records and records not in ('raw', 'batch', 'native'):
+            from .catalog_records import xtream_record
 
         category_id = str(category_id or "").strip()
         parameters = {"category_id": category_id} if category_id else None
@@ -1474,6 +1500,7 @@ class XtreamContentClient(object):
         })
         acquired = False
         response = None
+        entries = None
         try:
             self._check_request_limits()
             self._acquire_request_slot()
@@ -1488,8 +1515,24 @@ class XtreamContentClient(object):
                 self._set_response_timeout(response, self._request_timeout())
                 return reader(size)
 
-            for entry in iter_json_array(read, self._check_request_limits):
-                item = self._content_item(content_type, entry, category_id)
+            if records in ('batch','native'):
+                from .category_response import iter_category_batches
+                entries = iter_category_batches(read,self._check_request_limits,native=records=='native')
+            elif records == 'raw':
+                from .category_response import iter_category_array
+                entries = iter_category_array(read, self._check_request_limits)
+            else:
+                entries = iter_json_array(read, self._check_request_limits)
+            for entry in entries:
+                if records in ('batch','native'):
+                    yield entry
+                    continue
+                elif records == 'raw':
+                    item = entry if isinstance(entry, dict) else None
+                elif records:
+                    item = xtream_record(entry, content_type, self.account, category_id)
+                else:
+                    item = self._content_item(content_type, entry, category_id)
                 if item is not None:
                     yield item
         except HTTPError as error:
@@ -1503,6 +1546,11 @@ class XtreamContentClient(object):
         except (URLError, socket.timeout, OSError):
             raise ContentError(N_("Could not connect to the content server"), ContentError.CONNECTION)
         finally:
+            try:
+                closer = getattr(entries, 'close', None)
+                if callable(closer): closer()
+            except Exception:
+                pass
             try:
                 if response is not None:
                     response.close()

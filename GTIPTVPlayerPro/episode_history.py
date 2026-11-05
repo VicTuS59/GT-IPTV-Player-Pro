@@ -7,7 +7,6 @@ import hashlib
 import json
 import math
 import os
-import tempfile
 import threading
 import time
 import weakref

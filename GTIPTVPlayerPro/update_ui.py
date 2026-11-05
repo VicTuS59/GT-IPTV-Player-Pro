@@ -3,19 +3,21 @@
 """Native update screen and quiet, throttled foreground notifications."""
 import threading
 import textwrap
-from xml.etree import ElementTree as ET
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 from Components.ActionMap import ActionMap
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from enigma import eTimer,getDesktop
 from . import PLUGIN_VERSION
-from .i18n import _,localized_upper
+from .i18n import _
 from .source_loader import SourceLoader
 from .utility_design import NativeSkin,bind_missing
 from .auxiliary_layout import shell,panel,shared
 from .auxiliary_presentation import _footer_skin,_footer,text
 from .remote_footer import decorate_remote_footer,footer_item,install_remote_footer
-from .update_service import UpdateState,UpdateService,effective_version,receiver_busy,receiver_activity
+from .remote_footer import prepared_skin, skin_metadata
+from .update_service import UpdateService, effective_version, receiver_busy, receiver_activity
 from .update_protocol import UpdateError,version_tuple
 from .update_feedback import PHASE_LABELS,progress_geometry
 from .update_errors import format_error,STAGE_TEXTS,POST_INSTALL_WARNING
@@ -64,7 +66,7 @@ def update_skin():
 
 class GTSoftwareUpdateScreen(Screen):
     def __init__(self,session,service=None):
-        self.skin=update_skin();Screen.__init__(self,session)
+        self.skin=prepared_skin(update_skin);Screen.__init__(self,session)
         self.service=service or UpdateService();self._closed=False;self._busy='';self._offer=None;self._verified=None
         self._selected=0;self._notes_offset=0;self._initial=False;self._cancel_event=threading.Event();self._progress=(0,0)
         self._progress_lock=threading.Lock();self._status='';self._detail='';self._installed=False
@@ -72,8 +74,9 @@ class GTSoftwareUpdateScreen(Screen):
         self._error_pending='';self._error_attempts=0;self._error_stage=''
         self._restart_pending=False;self._restart_open=False;self._restart_confirmed=False;self._restart_attempts=0
         self._activity_lock=threading.Lock();self._activity_request=None
+        self._display_state=None
         self._aux_kind='updater';self._aux_text={};self._aux_force_fit=False;self._aux_footer_keys=tuple(i[0] for i in FOOTER)
-        w,h=map(int,ET.fromstring(self.skin).get('size').split(','));self._seven_size=(w,h)
+        w,h=skin_metadata(self.skin).size;self._seven_size=(w,h)
         self._seven_px=lambda n:max(1,round(n*min(w/1920.,h/1080.)));self._seven_rects={};self._seven_items=FOOTER
         install_remote_footer(self,FOOTER);bind_missing(self);self.skin=_footer_skin(self,FOOTER)
         self._reader=SourceLoader(eTimer(),self._connect_timer,self._applied)
@@ -178,6 +181,7 @@ class GTSoftwareUpdateScreen(Screen):
             self._status='installed';self._installed=True;self._verified=None;self._offer=None
             self._detail=_(POST_INSTALL_WARNING) if value.get('warning') else ''
             self._set_feedback('complete',1,1)
+        self._read_display_state()
         self._render()
         if kind=='install' and error is None:self._ask_restart()
 
@@ -219,6 +223,7 @@ class GTSoftwareUpdateScreen(Screen):
             if self._selected==0:self.service.state.write(auto=not state['auto'])
             else:self.check();return
         except UpdateError as error:self._error(error)
+        self._read_display_state()
         self._render()
     def _note_pages(self):
         notes=self._offer['manifest']['notes'] if self._offer else ''
@@ -239,6 +244,7 @@ class GTSoftwareUpdateScreen(Screen):
         self._restart_timer.start(200,True)
 
     def _resumed(self):
+        if not self._closed and not self._busy:self._read_display_state()
         if getattr(self,'_error_pending','') and not self._closed:self._error_timer.start(100,True)
         if self._restart_pending and not self._closed and not self._restart_open:
             self._restart_attempts=0;self._restart_timer.start(200,True)
@@ -285,25 +291,31 @@ class GTSoftwareUpdateScreen(Screen):
             request,self._activity_request=self._activity_request,None
             if request is not None:request['busy']='activity';request['event'].set()
 
+    def _read_display_state(self):
+        try:
+            state=self.service.state.read()
+            self._display_state=dict(auto=state['auto'],installed=state.get('installed',''))
+        except UpdateError:
+            self._display_state=dict(auto=False,installed='')
+            if not self._installed:self._status='failed'
+        return self._display_state
+
     def _render(self):
         if self._closed:return
         text(self,'aux_gt','GT',60);text(self,'aux_brand','IPTV PLAYER PRO',40);text(self,'aux_title',message('title'),46)
-        self['aux_web_hint'].hide()
-        try:state=self.service.state.read()
-        except UpdateError:
-            state=dict(auto=False,installed='')
-            if not self._installed:self._status='failed'
+        set_visible(self['aux_web_hint'], False)
+        state=self._display_state if self._display_state is not None else self._read_display_state()
         values=(_('On') if state['auto'] else _('Off'),effective_version(state))
         for i,(label,value) in enumerate(zip((message('auto'),_('Version')),values)):
             text(self,'update_label_'+str(i),label,32,2);text(self,'update_value_'+str(i),value,30,2)
-            (self['update_focus_'+str(i)].show if i==self._selected else self['update_focus_'+str(i)].hide)()
+            set_visible(self['update_focus_' + str(i)], i == self._selected)
         status=message(self._busy) if self._busy in LABELS else message(self._status) if self._status in LABELS else message('interval')
         with self._progress_lock:done,total=self._progress;phase=self._phase
         if self._busy and phase in PHASE_LABELS:status=_(PHASE_LABELS[phase])
         text(self,'update_status',status,36,3)
         # Preserve the separate reason, target and free-space lines. Generic
         # title fitting normalises whitespace and would flatten these details.
-        self['update_detail'].setText(self._detail)
+        set_text_if_changed(self['update_detail'], self._detail)
         text(self,'update_hint',message('interval'),25,2)
         text(self,'update_caption',message('new'),36)
         manifest=self._offer['manifest'] if self._offer else None
@@ -311,11 +323,11 @@ class GTSoftwareUpdateScreen(Screen):
         text(self,'update_package_size','{:.2f} MB · GitHub'.format(manifest['bytes']/1e6) if manifest else 'GitHub',27)
         pages=self._note_pages();self._notes_offset=min(self._notes_offset,len(pages)-1)
         # Preserve signed release-note paragraphs; generic title fitting flattens them.
-        self['update_notes'].setText(pages[self._notes_offset])
+        set_text_if_changed(self['update_notes'], pages[self._notes_offset])
         text(self,'update_notes_hint','CH+ / CH− · '+_('Page')+' {}/{}'.format(self._notes_offset+1,len(pages)),25)
         active=self._busy in ('download','install') or (phase in ('downloaded','complete') and self._status in ('verified','installed'))
         offset,width,percent=progress_geometry(done,total,self._pulse)
-        self['update_fill'].show() if active else self['update_fill'].hide()
+        set_visible(self['update_fill'], True) if active else set_visible(self['update_fill'], False)
         from .seven_presentation import rect
         rect(self,'update_fill',(84+984*offset/100.,770,max(1,984*width/100.),14))
         text(self,'update_progress',('{}%'.format(percent) if percent is not None else _('Please wait')) if active else '',28)

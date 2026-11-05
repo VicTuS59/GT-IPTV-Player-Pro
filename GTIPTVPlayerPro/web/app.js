@@ -1758,9 +1758,10 @@
       if (!state.youtubeSearchBusy && !data.autoplay_pending) { byId("youtubeMessage").textContent = ""; }
     }
     if (data.job && data.job.state === "failed") {
-      byId("youtubeMessage").textContent = t(data.job.error || "youtube_play_failed", "Video could not be played on this receiver. Try another video or quality setting.")
-        + (data.job.error === "youtube_native_player_required" ? " · ServiceApp / ExtEplayer3 (5002)" : "");
+      byId("youtubeMessage").textContent = t(data.job.error || "youtube_play_failed", "Video could not be played on this receiver. Try another video or quality setting.");
       state.youtubeJobToken = "";
+    } else if (data.job && data.job.state === "resolving" && data.job.attempt) {
+      byId("youtubeMessage").textContent = t("youtube_retrying", "Trying a compatible YouTube stream...");
     } else if (data.job && data.job.state === "playing") {
       if (!state.youtubeSearchBusy) { byId("youtubeMessage").textContent = ""; }
       state.youtubeJobToken = "";

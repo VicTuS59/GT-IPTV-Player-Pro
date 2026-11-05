@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """vod; loaded when its screen is needed."""
 
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 from .search_file_presentation import skin_after as search_file_skin_after, refresh_after as search_file_refresh_after, setup as setup_search_file
 import math
 import os
@@ -16,24 +18,24 @@ from Components.Pixmap import Pixmap
 from Screens.Screen import Screen
 from enigma import ePoint, eSize, eTimer, getDesktop, iServiceInformation
 from . import sorting_ui as content_sort_ui
-from .artwork import RETRY_DELAY_SECONDS, artwork_failure_ttl, artwork_request_profile, is_tmdb_artwork_url, poster_batch_timeout, prepare_webp, retryable_artwork_error, tmdb_poster_url, webp_dimensions
-from .content import ContentCategory, ContentItem, CONTENT_LABELS, ContentError, XtreamContentClient
-from .diagnostics import log_event, redact
-from .i18n import N_, _, ngettext, localized_date_text, localized_short_weekday, localized_language_name, localized_upper, metadata_language
-from .background import attach_background, attach_background_window, attach_native_alpha_pixmap, attach_pixmap
+from .provider_preview import catalogue_info
+from .artwork import is_tmdb_artwork_url, poster_batch_timeout, tmdb_poster_url
+from .content import ContentError, XtreamContentClient
+from .diagnostics import log_event
+from .i18n import N_, _, localized_upper
+from .background import attach_native_alpha_pixmap, attach_pixmap
 from .source_loader import SourceLoader
-from .vod_discovery import DiscoveryVODMethods, poster_geometry as discovery_poster_geometry, skin as discovery_vod_skin
+from .vod_discovery import DiscoveryVODMethods, skin as discovery_vod_skin
 from .hero_artwork import prepare_hero, preparation_allowance, is_composite, release_prepared
-from .category_visibility import category_filter_active, category_visibility_ids, filter_hidden_category_items, hidden_category_match_ids
-from .metadata import MetadataError, TMDbMetadataClient, complete_movie_for_device_language, movie_metadata_ready, media_metadata_ready, complete_media_for_device_language
-from .movie_catalog import MovieCatalogIndex, SeriesCatalogIndex, CatalogStorageError, CatalogLimitError
-from .vod_grid import CINEMATIC_POSTER_COLUMNS, GRID_COLUMNS, GRID_PAGE_SIZE, LatestPosterWorkers, PosterRetryQueue, cinematic_poster_geometry, grid_geometry, grid_move, page_position, poster_grid_skin
+from .category_visibility import category_filter_active, filter_hidden_category_items, hidden_category_match_ids
+from .metadata import MetadataError, complete_movie_for_device_language, media_metadata_ready, complete_media_for_device_language
+from .movie_catalog import MovieCatalogIndex, SeriesCatalogIndex, CatalogStorageError, CatalogLimitError, catalog_failure_message, RAM_UNAVAILABLE
+from .vod_grid import CINEMATIC_POSTER_COLUMNS, GRID_COLUMNS, GRID_PAGE_SIZE, LatestPosterWorkers, grid_move, page_position, poster_grid_skin
 from .native_browse import NativeBrowseWindow
-from .remote_footer import web_shortcut_hint_text, decorate_remote_footer, prepared_skin, footer_item, install_remote_footer, set_remote_footer
-from .scrollbar import hide_scrollbar, update_horizontal_scrollbar, update_scrollbar
-from .smooth_scroll import GTSmoothScrollLabel
-from .typography import _grapheme_boundaries, _line_fits, _text_units, clean_dynamic_text, current_text_size, ellipsize_dynamic_text, fit_dynamic_text, font_px, scale_skin_fonts, set_static_text, set_text_if_changed, visible_count
-from .browser_common import ALL_MOVIES_SEARCH_FOOTER_ITEMS, ALL_MOVIES_SEARCH_PAGE_SIZE, ALL_SERIES_SEARCH_FOOTER_ITEMS, APP_BACKGROUND_PATH, BACKGROUND_POSTER_WORKERS, CINEMATIC_BACKDROP_TIMEOUT_SECONDS, CINEMATIC_CANDIDATE_TIMEOUT_SECONDS, CINEMATIC_CATEGORY_PAGE_SIZE, CINEMATIC_CATEGORY_ROW_HEIGHT, CINEMATIC_FALLBACK_SHADOW_PATH, CINEMATIC_SCRIM_PATH, FAVORITE_STAR_PATH, HERO_DEBOUNCE_MS, MOVIE_CATEGORY_PAGE_SIZE, MOVIE_CATEGORY_TIMEOUT_SECONDS, MOVIE_SEARCH_TIMEOUT_SECONDS, NAVIGATION_DEBOUNCE_MS, PICON_DOWNLOAD_TIMEOUT, SERIES_CATEGORY_PAGE_SIZE, SERIES_GRID_COLUMNS, SERIES_GRID_PAGE_SIZE, SERIES_PROGRESSIVE_SCAN_DELAY_MS, SERIES_RAIL_PAGE_SIZE, SERIES_SEARCH_RESULT_LIMIT, WORKER_DETAIL_TIMEOUT_SECONDS, WORKER_LIST_TIMEOUT_SECONDS, WORKER_POSTER_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _attach_subtitle_detail_metadata, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _cinematic_cover_ratio, _clear_picon_failure, _connect_timer, _debug, _debug_identifier, _detail_cache_get, _detail_cache_put, _discard_invalid_live_picon_cache, _download_client_image, _is_stalker_client, _mark_picon_failure, _movie_search_text, _pending_vod_detail, _picon_cache_path, _picon_failure_remaining, _poster_jobs, _poster_metadata_token, _provider_picon_timeout, _rating_label, _safe_picon_url, _scale, _set_component_visible, _valid_cinematic_backdrop_file, _year_not_in_title, content_client_for
+from .remote_footer import decorate_remote_footer, prepared_skin, install_remote_footer
+from .scrollbar import hide_scrollbar, update_scrollbar
+from .typography import ellipsize_dynamic_text, fit_dynamic_text, font_px, set_static_text, set_text_if_changed
+from .browser_common import ALL_MOVIES_SEARCH_FOOTER_ITEMS, ALL_MOVIES_SEARCH_PAGE_SIZE, ALL_SERIES_SEARCH_FOOTER_ITEMS, BACKGROUND_POSTER_WORKERS, CINEMATIC_BACKDROP_TIMEOUT_SECONDS, CINEMATIC_CANDIDATE_TIMEOUT_SECONDS, CINEMATIC_CATEGORY_PAGE_SIZE, CINEMATIC_CATEGORY_ROW_HEIGHT, CINEMATIC_FALLBACK_SHADOW_PATH, FAVORITE_STAR_PATH, HERO_DEBOUNCE_MS, MOVIE_CATEGORY_TIMEOUT_SECONDS, MOVIE_SEARCH_TIMEOUT_SECONDS, NAVIGATION_DEBOUNCE_MS, PICON_DOWNLOAD_TIMEOUT, SERIES_GRID_COLUMNS, SERIES_GRID_PAGE_SIZE, SERIES_PROGRESSIVE_SCAN_DELAY_MS, SERIES_RAIL_PAGE_SIZE, SERIES_SEARCH_RESULT_LIMIT, WORKER_DETAIL_TIMEOUT_SECONDS, WORKER_LIST_TIMEOUT_SECONDS, WORKER_POSTER_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _attach_subtitle_detail_metadata, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _cinematic_cover_ratio, _clear_picon_failure, _connect_timer, _debug, _debug_identifier, _detail_cache_get, _detail_cache_put, _discard_invalid_live_picon_cache, _download_client_image, _is_stalker_client, _mark_picon_failure, _movie_search_text, _pending_vod_detail, _picon_cache_path, _picon_failure_remaining, _poster_jobs, _poster_metadata_token, _provider_picon_timeout, _rating_label, _safe_picon_url, _scale, _set_component_visible, _valid_cinematic_backdrop_file, _year_not_in_title, content_client_for
 
 def _cinematic_scroll_geometries(width, height, px):
     """Keep runtime cursors pixel-identical to the cinematic skin."""
@@ -49,96 +51,6 @@ def _movie_browser_skin(cinematic=False):
         return discovery_vod_skin('movie', width, height, px, FAVORITE_STAR_PATH)
     if not cinematic:
         return poster_grid_skin('movie', width, height, px, FAVORITE_STAR_PATH, _movie_browser_skin(True))
-    favorite_star = FAVORITE_STAR_PATH.replace('&', '&amp;').replace('"', '&quot;')
-    if cinematic:
-        footer_y = height - px(90)
-        category_x = px(8)
-        category_y = px(4)
-        category_w = px(348)
-        hero_x = px(365)
-        category_panel_x = 0
-        category_panel_w = hero_x
-        category_h = footer_y - category_y - px(30)
-        category_row_h = px(CINEMATIC_CATEGORY_ROW_HEIGHT)
-        category_list_y = category_y + px(54)
-        category_scroll_h = CINEMATIC_CATEGORY_PAGE_SIZE * category_row_h - px(8)
-        hero_y = 0
-        hero_w = width - hero_x
-        hero_h = px(616)
-        detail_x = hero_x
-        detail_y = 0
-        detail_w = px(530)
-        detail_h = hero_h
-        shadow_offset = 0
-        artwork_x = hero_x
-        artwork_y = hero_y
-        artwork_w = hero_w
-        artwork_h = hero_h
-        people_x = hero_x
-        people_y = px(500)
-        people_w = hero_w
-        people_h = px(54)
-        rail_x = hero_x
-        rail_w = hero_w
-        rail_caption_y = px(574)
-        rail_y = px(616)
-        gap = px(18)
-        poster_geometry = cinematic_poster_geometry(width, height, px)
-        cinematic_scrim = CINEMATIC_SCRIM_PATH.replace('&', '&amp;').replace('"', '&quot;')
-        cinematic_fallback_shadow = CINEMATIC_FALLBACK_SHADOW_PATH.replace('&', '&amp;').replace('"', '&quot;')
-        category_rows = []
-        for index in range(CINEMATIC_CATEGORY_PAGE_SIZE):
-            row_y = category_list_y + index * category_row_h
-            category_rows.append('\n    <widget name="movie_category_focus_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#172A45"\n            transparent="0" zPosition="2" />\n    <widget name="movie_category_marker_{index}" position="{x},{y}"\n            size="{marker_w},{h}" font="Regular;1" backgroundColor="#22D3EE"\n            transparent="0" zPosition="3" />\n    <widget name="movie_category_{index}" position="{text_x},{y}"\n            size="{text_w},{h}" font="Regular;{font}"\n            foregroundColor="#F8FAFC" transparent="1" zPosition="4"\n            valign="center" halign="left" noWrap="1" />'.format(index=index, x=category_x + px(14), y=row_y, w=category_w - px(28), h=category_row_h - px(8), marker_w=px(5), text_x=category_x + px(34), text_w=category_w - px(54), font=px(21)))
-        poster_tiles = []
-        for index, tile in enumerate(poster_geometry['tiles']):
-            tile_x, tile_y, tile_w, tile_h = tile['card']
-            image_x, image_y, image_w, image_h = tile['image']
-            title_x, title_y, title_w, title_h = tile['title']
-            poster_tiles.append('\n    <widget name="movie_tile_bg_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#111D31"\n            transparent="0" zPosition="1" />\n    <widget name="movie_tile_focus_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#22D3EE"\n            transparent="0" zPosition="2" />\n    <widget name="movie_tile_inner_{index}" position="{inner_x},{inner_y}"\n            size="{inner_w},{inner_h}" font="Regular;1"\n            backgroundColor="#081321" transparent="0" zPosition="3" />\n    <widget name="movie_tile_placeholder_{index}"\n            position="{image_x},{image_y}" size="{image_w},{image_h}"\n            font="Regular;{placeholder_font}" foregroundColor="#22D3EE"\n            backgroundColor="#101B2D" transparent="0" zPosition="4"\n            valign="center" halign="center" />\n    <widget name="movie_tile_poster_{index}"\n            position="{image_x},{image_y}" size="{image_w},{image_h}"\n            alphatest="blend" scale="1" zPosition="5" />\n    <widget name="movie_tile_favorite_{index}"\n            position="{favorite_x},{favorite_y}"\n            size="{favorite_size},{favorite_size}"\n            pixmap="{favorite_star}" alphatest="blend" scale="1"\n            zPosition="7" />\n    <widget name="movie_tile_title_{index}"\n            position="{title_x},{title_y}" size="{title_w},{title_h}"\n            font="Regular;{title_font}" foregroundColor="#F8FAFC"\n            transparent="1" zPosition="6" valign="center"\n            halign="center" noWrap="0" />'.format(index=index, x=tile_x, y=tile_y, w=tile_w, h=tile_h, inner_x=tile_x + px(4), inner_y=tile_y + px(4), inner_w=tile_w - px(8), inner_h=tile_h - px(8), image_x=image_x, image_y=image_y, image_w=image_w, image_h=image_h, placeholder_font=px(30), favorite_x=tile_x + tile_w - px(45), favorite_y=tile_y + px(16), favorite_size=px(31), favorite_star=favorite_star, title_x=title_x, title_y=title_y, title_w=title_w, title_h=title_h, title_font=px(18)))
-        return '\n<screen name="GTContentBrowserScreen" position="0,0" size="{width},{height}"\n        flags="wfNoBorder" backgroundColor="#020617">\n    <widget name="movie_video_guard" position="0,0"\n            size="{width},{height}" font="Regular;1"\n            backgroundColor="#020617" transparent="0" zPosition="-30" />\n    <widget name="app_bg" position="0,0" size="{width},{height}"\n            zPosition="-20" />\n    <widget name="top_accent" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="header" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="movie_server" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n\n    <widget name="movie_hero_panel" position="{hero_x},{hero_y}"\n            size="{hero_w},{hero_h}" font="Regular;1"\n            transparent="1" zPosition="-12" />\n    <widget name="movie_backdrop" position="{hero_x},{hero_y}"\n            size="{hero_w},{hero_h}" alphatest="blend" scale="1"\n            zPosition="-10" />\n    <widget name="movie_backdrop_scrim" position="{hero_x},{hero_y}"\n            size="{hero_w},{hero_h}" pixmap="{cinematic_scrim}"\n            alphatest="blend" scale="1" zPosition="-9" />\n    <widget name="movie_detail_shadow"\n            position="{detail_shadow_x},{detail_shadow_y}"\n            size="{detail_shadow_w},{detail_shadow_h}"\n            pixmap="{cinematic_fallback_shadow}" alphatest="blend"\n            scale="1" zPosition="-8" />\n    <widget name="movie_detail_panel" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="movie_detail_accent" position="{text_x},{divider_y}"\n            size="{text_w},{divider_h}" font="Regular;1"\n            backgroundColor="#164E63" transparent="0" zPosition="1" />\n    <widget name="movie_meta_divider"\n            position="{meta_divider_x},{meta_divider_y}"\n            size="{meta_divider_w},{meta_divider_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="1" />\n    <widget name="movie_people_shadow"\n            position="{people_shadow_x},{people_shadow_y}"\n            size="{people_shadow_w},{people_shadow_h}"\n            pixmap="{cinematic_fallback_shadow}" alphatest="blend"\n            scale="1" zPosition="-8" />\n    <widget name="movie_rail_shadow"\n            position="{rail_shadow_x},{rail_shadow_y}"\n            size="{rail_shadow_w},{rail_shadow_h}"\n            pixmap="{cinematic_fallback_shadow}" alphatest="blend"\n            scale="1" zPosition="-8" />\n    <widget name="movie_people_panel" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="movie_poster_frame" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="movie_poster_placeholder" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="movie_poster" position="0,0" size="1,1"\n            alphatest="blend" scale="1" />\n\n    <widget name="movie_title" position="{text_x},{title_y}"\n            size="{text_w},{title_h}" font="Regular;{title_font}"\n            foregroundColor="#FFFFFF" transparent="1" noWrap="0"\n            valign="center" halign="left" zPosition="2" />\n    <widget name="movie_rating" position="{text_x},{rating_y}"\n            size="{rating_w},{rating_h}" font="Regular;{rating_font}"\n            foregroundColor="#FACC15" transparent="1"\n            valign="center" halign="left" noWrap="1" zPosition="2" />\n    <widget name="movie_meta" position="{meta_x},{rating_y}"\n            size="{meta_w},{rating_h}" font="Regular;{meta_font}"\n            foregroundColor="#FFFFFF" transparent="1"\n            valign="center" halign="left" noWrap="1" zPosition="2" />\n    <widget name="movie_genre" position="{text_x},{genre_y}"\n            size="{text_w},{genre_h}" font="Regular;{genre_font}"\n            foregroundColor="#22D3EE" transparent="1"\n            valign="center" halign="left" noWrap="1" zPosition="2" />\n    <widget name="movie_plot_caption" position="{text_x},{caption_y}"\n            size="{text_w},{caption_h}" font="Regular;{caption_font}"\n            foregroundColor="#FACC15" transparent="1"\n            valign="center" halign="left" zPosition="2" />\n    <widget name="movie_plot" position="{text_x},{plot_y}"\n            size="{text_w},{plot_h}" font="Regular;{plot_font}"\n            foregroundColor="#FFFFFF" transparent="1" noWrap="0"\n            scrollbarMode="showNever" valign="top" halign="left"\n            zPosition="2" />\n    <widget name="movie_people" position="{people_text_x},{people_y}"\n            size="{people_text_w},{people_h}" font="Regular;{people_font}"\n            foregroundColor="#FFFFFF" transparent="1" noWrap="0"\n            valign="center" halign="left" zPosition="2" />\n\n    <widget name="movie_category_panel" position="{category_panel_x},{category_y}"\n            size="{category_panel_w},{category_h}" font="Regular;1"\n            transparent="1" />\n    <widget name="movie_category_accent" position="{category_panel_x},{category_y}"\n            size="{category_panel_w},{line_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="2" />\n    <widget name="movie_category_caption"\n            position="{category_caption_x},{category_caption_y}"\n            size="{category_caption_w},{category_caption_h}"\n            font="Regular;{caption_font}" foregroundColor="#22D3EE"\n            transparent="1" valign="center" halign="left" zPosition="4" />\n    {category_rows}\n    <widget name="list_scroll_track"\n            position="{category_scroll_x},{category_scroll_y}"\n            size="{category_scroll_w},{category_scroll_h}" font="Regular;1"\n            backgroundColor="#26344E" transparent="0" zPosition="5" />\n    <widget name="list_scroll_thumb"\n            position="{category_scroll_x},{category_scroll_y}"\n            size="{category_scroll_w},{category_scroll_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="6" />\n    <widget name="message" position="{message_x},{message_y}"\n            size="{message_w},{message_h}" font="Regular;{message_font}"\n            foregroundColor="#94A3B8" transparent="1"\n            valign="center" halign="center" />\n\n    <widget name="movie_rail_caption" position="{rail_x},{rail_caption_y}"\n            size="{rail_w},{rail_caption_h}" font="Regular;{caption_font}"\n            foregroundColor="#22D3EE" transparent="1"\n            valign="center" halign="left" />\n    {poster_tiles}\n    <widget name="poster_scroll_track"\n            position="{rail_x},{scroll_y}" size="{rail_w},{scroll_h}"\n            font="Regular;1" backgroundColor="#26344E"\n            transparent="0" zPosition="7" />\n    <widget name="poster_scroll_thumb"\n            position="{rail_x},{scroll_y}" size="{rail_w},{scroll_h}"\n            font="Regular;1" backgroundColor="#22D3EE"\n            transparent="0" zPosition="8" />\n\n    <widget name="footer" position="0,{footer_y}"\n            size="{width},{footer_h}" font="Regular;{footer_font}"\n            foregroundColor="#C8D2E3" backgroundColor="#080E1A"\n            transparent="0" valign="center" halign="center" />\n    <widget name="screen_label" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="content_panel" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="list_accent" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="breadcrumb" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="items" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n</screen>\n'.format(width=width, height=height, footer_y=footer_y, footer_h=height - footer_y, footer_font=px(18), hero_x=hero_x, hero_y=hero_y, hero_w=hero_w, hero_h=hero_h, artwork_x=artwork_x, artwork_y=artwork_y, artwork_w=artwork_w, artwork_h=artwork_h, cinematic_scrim=cinematic_scrim, cinematic_fallback_shadow=cinematic_fallback_shadow, detail_x=detail_x, detail_y=detail_y, detail_w=detail_w, detail_h=detail_h, detail_shadow_x=detail_x + shadow_offset, detail_shadow_y=detail_y + shadow_offset, detail_shadow_w=min(hero_w, detail_w + px(120)), detail_shadow_h=people_y, text_x=detail_x + px(38), text_w=detail_w - px(76), title_y=px(50), title_h=px(72), title_font=px(38), rating_y=px(132), rating_w=px(145), rating_h=px(42), rating_font=px(25), meta_divider_x=detail_x + px(188), meta_divider_y=px(140), meta_divider_w=px(3), meta_divider_h=px(26), meta_x=detail_x + px(213), meta_w=detail_w - px(251), meta_font=px(22), genre_y=px(176), genre_h=px(38), genre_font=px(21), divider_y=px(214), divider_h=px(3), caption_y=px(222), caption_h=px(38), caption_font=px(21), plot_y=px(266), plot_h=px(220), plot_font=px(28), people_x=people_x, people_y=people_y, people_w=people_w, people_h=people_h, people_shadow_x=people_x + px(7), people_shadow_y=people_y + px(7), people_shadow_w=max(px(1), people_w - px(14)), people_shadow_h=max(px(1), people_h - px(14)), people_text_x=people_x + px(32), people_text_w=people_w - px(64), people_font=px(18), rail_shadow_x=rail_x, rail_shadow_y=rail_caption_y, rail_shadow_w=min(rail_w, px(720)), rail_shadow_h=rail_y - rail_caption_y, category_x=category_x, category_panel_x=category_panel_x, category_panel_w=category_panel_w, category_y=category_y, category_w=category_w, category_h=category_h, line_h=px(4), category_caption_x=category_x + px(24), category_caption_y=category_y + px(8), category_caption_w=category_w - px(48), category_caption_h=px(40), category_rows=''.join(category_rows), category_scroll_x=category_x + category_w - px(14), category_scroll_y=category_list_y, category_scroll_w=px(8), category_scroll_h=category_scroll_h, message_x=category_x + px(14), message_y=category_list_y + category_scroll_h + px(4), message_w=category_w - px(28), message_h=max(px(24), category_y + category_h - category_list_y - category_scroll_h - px(4)), message_font=px(17), rail_x=rail_x, rail_w=rail_w, rail_caption_y=rail_caption_y, rail_caption_h=px(36), poster_tiles=''.join(poster_tiles), scroll_y=_cinematic_scroll_geometries(width, height, px)[1][1], scroll_h=px(6))
-    footer_y = height - px(82)
-    category_x = px(42)
-    category_y = px(118)
-    category_w = px(340)
-    category_row_h = px(72)
-    category_h = footer_y - category_y - px(28)
-    category_scroll_y = category_y + px(48)
-    category_scroll_h = MOVIE_CATEGORY_PAGE_SIZE * category_row_h - px(8)
-    category_message_y = category_scroll_y + category_scroll_h + px(10)
-    poster_x = px(430)
-    poster_y = px(122)
-    poster_w = px(330)
-    poster_h = px(470)
-    detail_x = px(805)
-    detail_y = px(122)
-    detail_w = width - detail_x - px(42)
-    rail_y = px(640)
-    rail_x = poster_x
-    rail_w = width - rail_x - px(42)
-    gap = px(18)
-    tile_w = int((rail_w - gap * 4) / 5)
-    tile_h = px(255)
-    cinematic_base_widget = ''
-    cinematic_widgets = ''
-    detail_panel_color = '#0D1729'
-    if cinematic:
-        cinematic_scrim = CINEMATIC_SCRIM_PATH.replace('&', '&amp;').replace('"', '&quot;')
-        cinematic_x = poster_x - px(5)
-        cinematic_y = poster_y - px(5)
-        cinematic_w = width - cinematic_x - px(42)
-        cinematic_h = px(490)
-        cinematic_base_widget = '\n    <widget name="movie_video_guard" position="0,0"\n            size="{w},{h}" font="Regular;1"\n            backgroundColor="#020617" transparent="0"\n            zPosition="0" />'.format(w=width, h=height)
-        cinematic_widgets = '\n    <widget name="movie_backdrop" position="{x},{y}"\n            size="{w},{h}" alphatest="blend" scale="1"\n            zPosition="0" />\n    <widget name="movie_backdrop_scrim" position="{x},{y}"\n            size="{w},{h}" pixmap="{scrim}" alphatest="blend" scale="1"\n            zPosition="0" />'.format(x=cinematic_x, y=cinematic_y, w=cinematic_w, h=cinematic_h, scrim=cinematic_scrim)
-    category_rows = []
-    for index in range(MOVIE_CATEGORY_PAGE_SIZE):
-        y = category_y + px(48) + index * category_row_h
-        category_rows.append('\n    <widget name="movie_category_focus_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#172A45"\n            transparent="0" zPosition="2" />\n    <widget name="movie_category_marker_{index}" position="{x},{y}"\n            size="{marker_w},{h}" font="Regular;1" backgroundColor="#22D3EE"\n            transparent="0" zPosition="3" />\n    <widget name="movie_category_{index}" position="{text_x},{y}"\n            size="{text_w},{h}" font="Regular;{font}"\n            foregroundColor="#F8FAFC" transparent="1" zPosition="4"\n            valign="center" halign="left" noWrap="1" />'.format(index=index, x=category_x + px(14), y=y, w=category_w - px(28), h=category_row_h - px(8), marker_w=px(5), text_x=category_x + px(34), text_w=category_w - px(54), font=px(21)))
-    poster_tiles = []
-    for index in range(5):
-        x = rail_x + index * (tile_w + gap)
-        poster_tiles.append('\n    <widget name="movie_tile_bg_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#111D31"\n            transparent="0" zPosition="1" />\n    <widget name="movie_tile_focus_{index}" position="{focus_x},{focus_y}"\n            size="{focus_w},{focus_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="2" />\n    <widget name="movie_tile_inner_{index}" position="{inner_x},{inner_y}"\n            size="{inner_w},{inner_h}" font="Regular;1"\n            backgroundColor="#081321" transparent="0" zPosition="3" />\n    <widget name="movie_tile_placeholder_{index}" position="{image_x},{image_y}"\n            size="{image_w},{image_h}" font="Regular;{placeholder_font}"\n            foregroundColor="#22D3EE" backgroundColor="#101B2D"\n            transparent="0" valign="center" halign="center" zPosition="4" />\n    <widget name="movie_tile_poster_{index}" position="{image_x},{image_y}"\n            size="{image_w},{image_h}" alphatest="blend" scale="1"\n            zPosition="5" />\n    <widget name="movie_tile_favorite_{index}"\n            position="{favorite_x},{favorite_y}"\n            size="{favorite_size},{favorite_size}"\n            pixmap="{favorite_star}" alphatest="blend" scale="1"\n            zPosition="7" />\n    <widget name="movie_tile_title_{index}" position="{title_x},{title_y}"\n            size="{title_w},{title_h}" font="Regular;{title_font}"\n            foregroundColor="#F8FAFC" transparent="1" zPosition="6"\n            valign="center" halign="center" noWrap="0" />'.format(index=index, x=x, y=rail_y, w=tile_w, h=tile_h + px(58), focus_x=x, focus_y=rail_y, focus_w=tile_w, focus_h=tile_h + px(58), inner_x=x + px(4), inner_y=rail_y + px(4), inner_w=tile_w - px(8), inner_h=tile_h + px(50), image_x=x + px(10), image_y=rail_y + px(10), image_w=tile_w - px(20), image_h=tile_h - px(18), favorite_x=x + tile_w - px(45), favorite_y=rail_y + px(16), favorite_size=px(31), favorite_star=favorite_star, placeholder_font=px(30), title_x=x + px(8), title_y=rail_y + tile_h, title_w=tile_w - px(16), title_h=px(53), title_font=px(18)))
-    return '\n<screen name="GTContentBrowserScreen" position="0,0" size="{width},{height}"\n        flags="wfNoBorder" backgroundColor="#020617">\n    {cinematic_base_widget}\n    <widget name="app_bg" position="0,0" size="{width},{height}" zPosition="0" />\n    <widget name="top_accent" position="0,0" size="{width},{accent_h}"\n            font="Regular;1" backgroundColor="#8B5CF6" transparent="0" />\n    <widget name="header" position="{header_x},{header_y}" size="{header_w},{header_h}"\n            font="Regular;{header_font}" foregroundColor="#FFFFFF"\n            transparent="1" valign="center" halign="left" />\n    <widget name="movie_server" position="{server_x},{header_y}"\n            size="{server_w},{header_h}" font="Regular;{server_font}"\n            foregroundColor="#94A3B8" transparent="1"\n            valign="center" halign="right" />\n    {cinematic_widgets}\n    <widget name="movie_category_panel" position="{category_x},{category_y}"\n            size="{category_w},{category_h}" font="Regular;1"\n            backgroundColor="#0D1729" transparent="0" />\n    <widget name="movie_category_accent" position="{category_x},{category_y}"\n            size="{category_w},{line_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="2" />\n    <widget name="movie_category_caption" position="{category_caption_x},{category_caption_y}"\n            size="{category_caption_w},{category_caption_h}"\n            font="Regular;{caption_font}" foregroundColor="#22D3EE"\n            transparent="1" valign="center" halign="left" />\n    {category_rows}\n    <widget name="list_scroll_track" position="{category_scroll_x},{category_scroll_y}"\n            size="{category_scroll_w},{category_scroll_h}" font="Regular;1"\n            backgroundColor="#26344E" transparent="0" zPosition="5" />\n    <widget name="list_scroll_thumb" position="{category_scroll_x},{category_scroll_y}"\n            size="{category_scroll_w},{category_scroll_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="6" />\n    <widget name="movie_poster_frame" position="{poster_frame_x},{poster_frame_y}"\n            size="{poster_frame_w},{poster_frame_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="1" />\n    <widget name="movie_poster_placeholder" position="{poster_x},{poster_y}"\n            size="{poster_w},{poster_h}" font="Regular;{poster_placeholder_font}"\n            foregroundColor="#22D3EE" backgroundColor="#0D1729"\n            transparent="0" valign="center" halign="center" zPosition="2" />\n    <widget name="movie_poster" position="{poster_x},{poster_y}"\n            size="{poster_w},{poster_h}" alphatest="blend" scale="1"\n            zPosition="3" />\n    <widget name="movie_detail_panel" position="{detail_x},{detail_y}"\n            size="{detail_w},{detail_h}" font="Regular;1"\n            backgroundColor="{detail_panel_color}" transparent="0" />\n    <widget name="movie_detail_accent" position="{detail_x},{detail_y}"\n            size="{detail_w},{line_h}" font="Regular;1"\n            backgroundColor="#D946EF" transparent="0" zPosition="2" />\n    <widget name="movie_title" position="{title_x},{title_y}"\n            size="{title_w},{title_h}" font="Regular;{title_font}"\n            foregroundColor="#FFFFFF" transparent="1" noWrap="0"\n            valign="center" halign="left" />\n    <widget name="movie_rating" position="{title_x},{rating_y}"\n            size="{rating_w},{rating_h}" font="Regular;{rating_font}"\n            foregroundColor="#FACC15" transparent="1"\n            valign="center" halign="left" />\n    <widget name="movie_meta" position="{meta_x},{rating_y}"\n            size="{meta_w},{rating_h}" font="Regular;{meta_font}"\n            foregroundColor="#CBD5E1" transparent="1"\n            valign="center" halign="left" />\n    <widget name="movie_genre" position="{title_x},{genre_y}"\n            size="{title_w},{genre_h}" font="Regular;{genre_font}"\n            foregroundColor="#22D3EE" transparent="1"\n            valign="center" halign="left" />\n    <widget name="movie_plot_caption" position="{title_x},{plot_caption_y}"\n            size="{title_w},{plot_caption_h}" font="Regular;{caption_font}"\n            foregroundColor="#A855F7" transparent="1"\n            valign="center" halign="left" />\n    <widget name="movie_plot" position="{title_x},{plot_y}"\n            size="{title_w},{plot_h}" font="Regular;{plot_font}"\n            foregroundColor="#E2E8F0" transparent="1" noWrap="0"\n            valign="top" halign="left" />\n    <widget name="movie_people" position="{title_x},{people_y}"\n            size="{title_w},{people_h}" font="Regular;{people_font}"\n            foregroundColor="#94A3B8" transparent="1" noWrap="0"\n            valign="top" halign="left" />\n    <widget name="movie_rail_caption" position="{rail_x},{rail_caption_y}"\n            size="{rail_w},{rail_caption_h}" font="Regular;{caption_font}"\n            foregroundColor="#22D3EE" transparent="1"\n            valign="center" halign="left" />\n    {poster_tiles}\n    <widget name="poster_scroll_track" position="{rail_scroll_x},{rail_scroll_y}"\n            size="{rail_scroll_w},{rail_scroll_h}" font="Regular;1"\n            backgroundColor="#26344E" transparent="0" zPosition="7" />\n    <widget name="poster_scroll_thumb" position="{rail_scroll_x},{rail_scroll_y}"\n            size="{rail_scroll_w},{rail_scroll_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="8" />\n    <widget name="message" position="{category_x},{message_y}"\n            size="{category_w},{message_h}" font="Regular;{message_font}"\n            foregroundColor="#94A3B8" transparent="1"\n            valign="center" halign="center" />\n    <widget name="footer" position="0,{footer_y}" size="{width},{footer_h}"\n            font="Regular;{footer_font}" foregroundColor="#C8D2E3"\n            backgroundColor="#080E1A" transparent="0"\n            valign="center" halign="center" />\n    <widget name="screen_label" position="0,0" size="1,1" font="Regular;1" transparent="1" />\n    <widget name="content_panel" position="0,0" size="1,1" font="Regular;1" transparent="1" />\n    <widget name="list_accent" position="0,0" size="1,1" font="Regular;1" transparent="1" />\n    <widget name="breadcrumb" position="0,0" size="1,1" font="Regular;1" transparent="1" />\n    <widget name="items" position="0,0" size="1,1" font="Regular;1" transparent="1" />\n</screen>\n'.format(width=width, height=height, accent_h=px(5), header_x=px(50), header_y=px(22), header_w=px(600), header_h=px(72), header_font=px(38), server_x=px(700), server_w=width - px(750), server_font=px(19), cinematic_base_widget=cinematic_base_widget, cinematic_widgets=cinematic_widgets, category_x=category_x, category_y=category_y, category_w=category_w, category_h=category_h, line_h=px(4), category_caption_x=category_x + px(24), category_caption_y=category_y + px(8), category_caption_w=category_w - px(48), category_caption_h=px(40), caption_font=px(21), category_rows=''.join(category_rows), category_scroll_x=category_x + category_w - px(14), category_scroll_y=category_scroll_y, category_scroll_w=px(8), category_scroll_h=category_scroll_h, poster_frame_x=poster_x - px(5), poster_frame_y=poster_y - px(5), poster_frame_w=poster_w + px(10), poster_frame_h=poster_h + px(10), poster_x=poster_x, poster_y=poster_y, poster_w=poster_w, poster_h=poster_h, poster_placeholder_font=px(36), detail_x=detail_x, detail_y=detail_y, detail_w=detail_w, detail_h=px(480), detail_panel_color=detail_panel_color, title_x=detail_x + px(32), title_y=detail_y + px(22), title_w=detail_w - px(64), title_h=px(102), title_font=px(38), rating_y=detail_y + px(132), rating_w=px(220), rating_h=px(40), rating_font=px(25), meta_x=detail_x + px(255), meta_w=detail_w - px(290), meta_font=px(21), genre_y=detail_y + px(176), genre_h=px(38), genre_font=px(20), plot_caption_y=detail_y + px(222), plot_caption_h=px(34), plot_y=detail_y + px(260), plot_h=px(125), plot_font=px(28), people_y=detail_y + px(394), people_h=px(66), people_font=px(18), rail_x=rail_x, rail_w=rail_w, rail_caption_y=px(603), rail_caption_h=px(34), poster_tiles=''.join(poster_tiles), rail_scroll_x=rail_x, rail_scroll_y=footer_y - px(25), rail_scroll_w=rail_w, rail_scroll_h=px(6), message_y=category_message_y, message_h=px(52), message_font=px(17), footer_y=footer_y, footer_h=height - footer_y, footer_font=px(18))
 
 @search_file_skin_after('search')
 def _all_movies_search_skin():
@@ -170,108 +82,9 @@ def _series_browser_skin(cinematic=False):
         return discovery_vod_skin('series', width, height, px, FAVORITE_STAR_PATH)
     if not cinematic:
         return poster_grid_skin('series', width, height, px, FAVORITE_STAR_PATH, _series_browser_skin(True))
-    favorite_star = FAVORITE_STAR_PATH.replace('&', '&amp;').replace('"', '&quot;')
-    if cinematic:
-        footer_y = height - px(90)
-        category_x = px(8)
-        category_y = px(4)
-        category_w = px(348)
-        hero_x = px(365)
-        category_panel_x = 0
-        category_panel_w = hero_x
-        category_h = footer_y - category_y - px(30)
-        category_row_h = px(CINEMATIC_CATEGORY_ROW_HEIGHT)
-        category_list_y = category_y + px(54)
-        category_scroll_h = CINEMATIC_CATEGORY_PAGE_SIZE * category_row_h - px(8)
-        hero_y = 0
-        hero_w = width - hero_x
-        hero_h = px(616)
-        detail_x = hero_x
-        detail_y = 0
-        detail_w = px(530)
-        detail_h = hero_h
-        shadow_offset = 0
-        artwork_x = hero_x
-        artwork_y = hero_y
-        artwork_w = hero_w
-        artwork_h = hero_h
-        people_x = hero_x
-        people_y = px(500)
-        people_w = hero_w
-        people_h = px(54)
-        rail_x = hero_x
-        rail_w = hero_w
-        rail_caption_y = px(574)
-        rail_y = px(616)
-        gap = px(18)
-        poster_geometry = cinematic_poster_geometry(width, height, px)
-        cinematic_scrim = CINEMATIC_SCRIM_PATH.replace('&', '&amp;').replace('"', '&quot;')
-        cinematic_fallback_shadow = CINEMATIC_FALLBACK_SHADOW_PATH.replace('&', '&amp;').replace('"', '&quot;')
-        category_rows = []
-        for index in range(CINEMATIC_CATEGORY_PAGE_SIZE):
-            row_y = category_list_y + index * category_row_h
-            category_rows.append('\n    <widget name="series_category_focus_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#172A45"\n            transparent="0" zPosition="2" />\n    <widget name="series_category_marker_{index}" position="{x},{y}"\n            size="{marker_w},{h}" font="Regular;1" backgroundColor="#22D3EE"\n            transparent="0" zPosition="3" />\n    <widget name="series_category_{index}" position="{text_x},{y}"\n            size="{text_w},{h}" font="Regular;{font}"\n            foregroundColor="#F8FAFC" transparent="1" zPosition="4"\n            valign="center" halign="left" noWrap="1" />'.format(index=index, x=category_x + px(14), y=row_y, w=category_w - px(28), h=category_row_h - px(8), marker_w=px(5), text_x=category_x + px(34), text_w=category_w - px(54), font=px(21)))
-        series_tiles = []
-        for index in range(SERIES_GRID_PAGE_SIZE):
-            if index >= CINEMATIC_POSTER_COLUMNS:
-                series_tiles.append('\n    <widget name="series_tile_bg_{index}" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_tile_focus_{index}" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_tile_inner_{index}" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_tile_placeholder_{index}" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_tile_poster_{index}" position="0,0" size="1,1"\n            alphatest="blend" scale="1" />\n    <widget name="series_tile_favorite_{index}" position="0,0" size="1,1"\n            pixmap="{favorite_star}" alphatest="blend" scale="1" />\n    <widget name="series_tile_title_{index}" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />'.format(index=index, favorite_star=favorite_star))
-                continue
-            tile = poster_geometry['tiles'][index]
-            tile_x, tile_y, tile_w, tile_h = tile['card']
-            image_x, image_y, image_w, image_h = tile['image']
-            title_x, title_y, title_w, title_h = tile['title']
-            series_tiles.append('\n    <widget name="series_tile_bg_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#111D31"\n            transparent="0" zPosition="1" />\n    <widget name="series_tile_focus_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#22D3EE"\n            transparent="0" zPosition="2" />\n    <widget name="series_tile_inner_{index}" position="{inner_x},{inner_y}"\n            size="{inner_w},{inner_h}" font="Regular;1"\n            backgroundColor="#081321" transparent="0" zPosition="3" />\n    <widget name="series_tile_placeholder_{index}"\n            position="{image_x},{image_y}" size="{image_w},{image_h}"\n            font="Regular;{placeholder_font}" foregroundColor="#22D3EE"\n            backgroundColor="#101B2D" transparent="0" zPosition="4"\n            valign="center" halign="center" />\n    <widget name="series_tile_poster_{index}"\n            position="{image_x},{image_y}" size="{image_w},{image_h}"\n            alphatest="blend" scale="1" zPosition="5" />\n    <widget name="series_tile_favorite_{index}"\n            position="{favorite_x},{favorite_y}"\n            size="{favorite_size},{favorite_size}"\n            pixmap="{favorite_star}" alphatest="blend" scale="1"\n            zPosition="7" />\n    <widget name="series_tile_title_{index}"\n            position="{title_x},{title_y}" size="{title_w},{title_h}"\n            font="Regular;{title_font}" foregroundColor="#F8FAFC"\n            transparent="1" zPosition="6" valign="center"\n            halign="center" noWrap="0" />'.format(index=index, x=tile_x, y=tile_y, w=tile_w, h=tile_h, inner_x=tile_x + px(4), inner_y=tile_y + px(4), inner_w=tile_w - px(8), inner_h=tile_h - px(8), image_x=image_x, image_y=image_y, image_w=image_w, image_h=image_h, placeholder_font=px(29), favorite_x=tile_x + tile_w - px(45), favorite_y=tile_y + px(16), favorite_size=px(31), favorite_star=favorite_star, title_x=title_x, title_y=title_y, title_w=title_w, title_h=title_h, title_font=px(18)))
-        return '\n<screen name="GTContentBrowserScreen" position="0,0" size="{width},{height}"\n        flags="wfNoBorder" backgroundColor="#020617">\n    <widget name="series_video_guard" position="0,0"\n            size="{width},{height}" font="Regular;1"\n            backgroundColor="#020617" transparent="0" zPosition="-30" />\n    <widget name="app_bg" position="0,0" size="{width},{height}"\n            zPosition="-20" />\n    <widget name="top_accent" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="header" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_server" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n\n    <widget name="series_hero_panel" position="{hero_x},{hero_y}"\n            size="{hero_w},{hero_h}" font="Regular;1"\n            transparent="1" zPosition="-12" />\n    <widget name="series_backdrop" position="{hero_x},{hero_y}"\n            size="{hero_w},{hero_h}" alphatest="blend" scale="1"\n            zPosition="-10" />\n    <widget name="series_backdrop_scrim" position="{hero_x},{hero_y}"\n            size="{hero_w},{hero_h}" pixmap="{cinematic_scrim}"\n            alphatest="blend" scale="1" zPosition="-9" />\n    <widget name="series_detail_shadow"\n            position="{detail_shadow_x},{detail_shadow_y}"\n            size="{detail_shadow_w},{detail_shadow_h}"\n            pixmap="{cinematic_fallback_shadow}" alphatest="blend"\n            scale="1" zPosition="-8" />\n    <widget name="series_grid_panel" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_detail_panel" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_grid_accent" position="{text_x},{divider_y}"\n            size="{text_w},{divider_h}" font="Regular;1"\n            backgroundColor="#164E63" transparent="0" zPosition="1" />\n    <widget name="series_detail_accent" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_meta_divider"\n            position="{meta_divider_x},{meta_divider_y}"\n            size="{meta_divider_w},{meta_divider_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="1" />\n    <widget name="series_people_shadow"\n            position="{people_shadow_x},{people_shadow_y}"\n            size="{people_shadow_w},{people_shadow_h}"\n            pixmap="{cinematic_fallback_shadow}" alphatest="blend"\n            scale="1" zPosition="-8" />\n    <widget name="series_rail_shadow"\n            position="{rail_shadow_x},{rail_shadow_y}"\n            size="{rail_shadow_w},{rail_shadow_h}"\n            pixmap="{cinematic_fallback_shadow}" alphatest="blend"\n            scale="1" zPosition="-8" />\n    <widget name="series_people_panel" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_poster_frame" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_poster_placeholder" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="series_poster" position="0,0" size="1,1"\n            alphatest="blend" scale="1" />\n\n    <widget name="series_title" position="{text_x},{title_y}"\n            size="{text_w},{title_h}" font="Regular;{title_font}"\n            foregroundColor="#FFFFFF" transparent="1" noWrap="0"\n            valign="center" halign="left" zPosition="2" />\n    <widget name="series_rating" position="{text_x},{rating_y}"\n            size="{rating_w},{rating_h}" font="Regular;{rating_font}"\n            foregroundColor="#FACC15" transparent="1"\n            valign="center" halign="left" noWrap="1" zPosition="2" />\n    <widget name="series_meta" position="{meta_x},{rating_y}"\n            size="{meta_w},{rating_h}" font="Regular;{meta_font}"\n            foregroundColor="#FFFFFF" transparent="1"\n            valign="center" halign="left" noWrap="1" zPosition="2" />\n    <widget name="series_plot_caption" position="{text_x},{caption_y}"\n            size="{text_w},{caption_h}" font="Regular;{caption_font}"\n            foregroundColor="#FACC15" transparent="1"\n            valign="center" halign="left" zPosition="2" />\n    <widget name="series_plot" position="{text_x},{plot_y}"\n            size="{text_w},{plot_h}" font="Regular;{plot_font}"\n            foregroundColor="#FFFFFF" transparent="1" noWrap="0"\n            scrollbarMode="showNever" valign="top" halign="left"\n            zPosition="2" />\n    <widget name="series_people" position="{people_text_x},{people_y}"\n            size="{people_text_w},{people_h}" font="Regular;{people_font}"\n            foregroundColor="#FFFFFF" transparent="1" noWrap="0"\n            valign="center" halign="left" zPosition="2" />\n\n    <widget name="series_category_panel" position="{category_panel_x},{category_y}"\n            size="{category_panel_w},{category_h}" font="Regular;1"\n            transparent="1" />\n    <widget name="series_category_accent"\n            position="{category_panel_x},{category_y}"\n            size="{category_panel_w},{line_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="2" />\n    <widget name="series_category_caption"\n            position="{category_caption_x},{category_caption_y}"\n            size="{category_caption_w},{category_caption_h}"\n            font="Regular;{caption_font}" foregroundColor="#22D3EE"\n            transparent="1" zPosition="4" valign="center" halign="left" />\n    {category_rows}\n    <widget name="list_scroll_track"\n            position="{category_scroll_x},{category_scroll_y}"\n            size="{category_scroll_w},{category_scroll_h}" font="Regular;1"\n            backgroundColor="#26344E" transparent="0" zPosition="5" />\n    <widget name="list_scroll_thumb"\n            position="{category_scroll_x},{category_scroll_y}"\n            size="{category_scroll_w},{category_scroll_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="6" />\n    <widget name="message" position="{message_x},{message_y}"\n            size="{message_w},{message_h}" font="Regular;{message_font}"\n            foregroundColor="#94A3B8" transparent="1"\n            valign="center" halign="center" />\n\n    <widget name="series_rail_caption" position="{rail_x},{rail_caption_y}"\n            size="{rail_w},{rail_caption_h}" font="Regular;{caption_font}"\n            foregroundColor="#22D3EE" transparent="1"\n            valign="center" halign="left" />\n    <widget name="series_grid_position" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    {series_tiles}\n    <widget name="poster_scroll_track"\n            position="{rail_x},{scroll_y}" size="{rail_w},{scroll_h}"\n            font="Regular;1" backgroundColor="#26344E"\n            transparent="0" zPosition="7" />\n    <widget name="poster_scroll_thumb"\n            position="{rail_x},{scroll_y}" size="{rail_w},{scroll_h}"\n            font="Regular;1" backgroundColor="#22D3EE"\n            transparent="0" zPosition="8" />\n\n    <widget name="footer" position="0,{footer_y}"\n            size="{width},{footer_h}" font="Regular;{footer_font}"\n            foregroundColor="#C8D2E3" backgroundColor="#080E1A"\n            transparent="0" valign="center" halign="center" />\n    <widget name="screen_label" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="content_panel" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="list_accent" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="breadcrumb" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="items" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n</screen>\n'.format(width=width, height=height, footer_y=footer_y, footer_h=height - footer_y, footer_font=px(18), hero_x=hero_x, hero_y=hero_y, hero_w=hero_w, hero_h=hero_h, artwork_x=artwork_x, artwork_y=artwork_y, artwork_w=artwork_w, artwork_h=artwork_h, cinematic_scrim=cinematic_scrim, cinematic_fallback_shadow=cinematic_fallback_shadow, detail_x=detail_x, detail_y=detail_y, detail_w=detail_w, detail_h=detail_h, detail_shadow_x=detail_x + shadow_offset, detail_shadow_y=detail_y + shadow_offset, detail_shadow_w=min(hero_w, detail_w + px(120)), detail_shadow_h=people_y, text_x=detail_x + px(38), text_w=detail_w - px(76), title_y=px(50), title_h=px(72), title_font=px(38), rating_y=px(132), rating_w=px(145), rating_h=px(42), rating_font=px(25), meta_divider_x=detail_x + px(188), meta_divider_y=px(140), meta_divider_w=px(3), meta_divider_h=px(26), meta_x=detail_x + px(213), meta_w=detail_w - px(251), meta_font=px(22), divider_y=px(214), divider_h=px(3), caption_y=px(222), caption_h=px(38), caption_font=px(21), plot_y=px(266), plot_h=px(220), plot_font=px(28), people_x=people_x, people_y=people_y, people_w=people_w, people_h=people_h, people_shadow_x=people_x + px(7), people_shadow_y=people_y + px(7), people_shadow_w=max(px(1), people_w - px(14)), people_shadow_h=max(px(1), people_h - px(14)), people_text_x=people_x + px(32), people_text_w=people_w - px(64), people_font=px(18), rail_shadow_x=rail_x, rail_shadow_y=rail_caption_y, rail_shadow_w=min(rail_w, px(720)), rail_shadow_h=rail_y - rail_caption_y, category_x=category_x, category_panel_x=category_panel_x, category_panel_w=category_panel_w, category_y=category_y, category_w=category_w, category_h=category_h, line_h=px(4), category_caption_x=category_x + px(24), category_caption_y=category_y + px(8), category_caption_w=category_w - px(48), category_caption_h=px(40), category_rows=''.join(category_rows), category_scroll_x=category_x + category_w - px(14), category_scroll_y=category_list_y, category_scroll_w=px(8), category_scroll_h=category_scroll_h, message_x=category_x + px(14), message_y=category_list_y + category_scroll_h + px(4), message_w=category_w - px(28), message_h=max(px(24), category_y + category_h - category_list_y - category_scroll_h - px(4)), message_font=px(17), rail_x=rail_x, rail_w=rail_w, rail_caption_y=rail_caption_y, rail_caption_h=px(36), series_tiles=''.join(series_tiles), scroll_y=_cinematic_scroll_geometries(width, height, px)[1][1], scroll_h=px(6))
-    footer_y = height - px(85)
-    content_y = px(112)
-    content_h = px(844)
-    category_x = px(42)
-    category_w = px(300)
-    category_row_h = px(88)
-    category_list_y = content_y + px(68)
-    category_scroll_h = SERIES_CATEGORY_PAGE_SIZE * category_row_h - px(8)
-    category_message_y = category_list_y + SERIES_CATEGORY_PAGE_SIZE * category_row_h + px(4)
-    grid_panel_x = px(366)
-    grid_panel_w = px(972)
-    grid_x = grid_panel_x
-    grid_w = grid_panel_w
-    tile_gap_x = px(12)
-    tile_gap_y = px(16)
-    tile_w = int((grid_w - tile_gap_x * (SERIES_GRID_COLUMNS - 1)) / SERIES_GRID_COLUMNS)
-    tile_h = px(340)
-    tile_y = px(174)
-    tile_poster_h = px(285)
-    series_tiles = []
-    for index in range(SERIES_GRID_PAGE_SIZE):
-        row, column = divmod(index, SERIES_GRID_COLUMNS)
-        x = grid_x + column * (tile_w + tile_gap_x)
-        y = tile_y + row * (tile_h + tile_gap_y)
-        series_tiles.append('\n    <widget name="series_tile_bg_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#111D31"\n            transparent="0" zPosition="2" />\n    <widget name="series_tile_focus_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#22D3EE"\n            transparent="0" zPosition="3" />\n    <widget name="series_tile_inner_{index}" position="{inner_x},{inner_y}"\n            size="{inner_w},{inner_h}" font="Regular;1"\n            backgroundColor="#081321" transparent="0" zPosition="4" />\n    <widget name="series_tile_placeholder_{index}"\n            position="{image_x},{image_y}" size="{image_w},{image_h}"\n            font="Regular;{placeholder_font}" foregroundColor="#22D3EE"\n            backgroundColor="#101B2D" transparent="0" zPosition="5"\n            valign="center" halign="center" />\n    <widget name="series_tile_poster_{index}"\n            position="{image_x},{image_y}" size="{image_w},{image_h}"\n            alphatest="blend" scale="1" zPosition="6" />\n    <widget name="series_tile_favorite_{index}"\n            position="{favorite_x},{favorite_y}"\n            size="{favorite_size},{favorite_size}"\n            pixmap="{favorite_star}" alphatest="blend" scale="1"\n            zPosition="8" />\n    <widget name="series_tile_title_{index}"\n            position="{title_x},{title_y}" size="{title_w},{title_h}"\n            font="Regular;{title_font}" foregroundColor="#F8FAFC"\n            transparent="1" zPosition="7" valign="center"\n            halign="center" noWrap="1" />'.format(index=index, x=x, y=y, w=tile_w, h=tile_h, inner_x=x + px(4), inner_y=y + px(4), inner_w=tile_w - px(8), inner_h=tile_h - px(8), image_x=x + px(22), image_y=y + px(8), image_w=tile_w - px(44), image_h=tile_poster_h, placeholder_font=px(27), favorite_x=x + tile_w - px(42), favorite_y=y + px(14), favorite_size=px(30), favorite_star=favorite_star, title_x=x + px(7), title_y=y + px(298), title_w=tile_w - px(14), title_h=px(36), title_font=max(8, px(19))))
-    category_rows = []
-    for index in range(SERIES_CATEGORY_PAGE_SIZE):
-        y = category_list_y + index * category_row_h
-        category_rows.append('\n    <widget name="series_category_focus_{index}" position="{x},{y}"\n            size="{w},{h}" font="Regular;1" backgroundColor="#172A45"\n            transparent="0" zPosition="2" />\n    <widget name="series_category_marker_{index}" position="{x},{y}"\n            size="{marker_w},{h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="3" />\n    <widget name="series_category_{index}" position="{text_x},{y}"\n            size="{text_w},{h}" font="Regular;{font}"\n            foregroundColor="#F8FAFC" transparent="1" zPosition="4"\n            valign="center" halign="left" noWrap="1" />'.format(index=index, x=category_x + px(12), y=y, w=category_w - px(24), h=category_row_h - px(8), marker_w=px(5), text_x=category_x + px(33), text_w=category_w - px(52), font=px(20)))
-    detail_x = px(1362)
-    detail_w = width - detail_x - px(42)
-    preview_w = px(168)
-    preview_h = px(252)
-    preview_x = detail_x + px(34)
-    preview_y = px(152)
-    detail_inner_x = detail_x + px(28)
-    detail_inner_w = detail_w - px(56)
-    cinematic_base_widget = ''
-    cinematic_widgets = ''
-    grid_panel_color = '#0A1323'
-    detail_panel_color = '#0D1729'
-    if cinematic:
-        cinematic_scrim = CINEMATIC_SCRIM_PATH.replace('&', '&amp;').replace('"', '&quot;')
-        cinematic_w = width - grid_panel_x - px(42)
-        cinematic_base_widget = '\n    <widget name="series_video_guard" position="0,0"\n            size="{w},{h}" font="Regular;1"\n            backgroundColor="#020617" transparent="0"\n            zPosition="0" />'.format(w=width, h=height)
-        cinematic_widgets = '\n    <widget name="series_backdrop" position="{x},{y}"\n            size="{w},{h}" alphatest="blend" scale="1"\n            zPosition="0" />\n    <widget name="series_backdrop_scrim" position="{x},{y}"\n            size="{w},{h}" pixmap="{scrim}" alphatest="blend" scale="1"\n            zPosition="0" />'.format(x=grid_panel_x, y=content_y, w=cinematic_w, h=content_h, scrim=cinematic_scrim)
-    return '\n<screen name="GTContentBrowserScreen" position="0,0" size="{width},{height}"\n        flags="wfNoBorder" backgroundColor="#020617">\n    {cinematic_base_widget}\n    <widget name="app_bg" position="0,0" size="{width},{height}"\n            zPosition="0" />\n    <widget name="top_accent" position="0,0" size="{width},{accent_h}"\n            font="Regular;1" backgroundColor="#8B5CF6" transparent="0" />\n    <widget name="header" position="{header_x},{header_y}"\n            size="{header_w},{header_h}" font="Regular;{header_font}"\n            foregroundColor="#FFFFFF" transparent="1"\n            valign="center" halign="left" />\n    <widget name="series_server" position="{server_x},{header_y}"\n            size="{server_w},{header_h}" font="Regular;{server_font}"\n            foregroundColor="#94A3B8" transparent="1"\n            valign="center" halign="right" noWrap="1" />\n    {cinematic_widgets}\n\n    <widget name="series_category_panel"\n            position="{category_x},{content_y}"\n            size="{category_w},{content_h}" font="Regular;1"\n            backgroundColor="#0D1729" transparent="0" />\n    <widget name="series_category_accent"\n            position="{category_x},{content_y}"\n            size="{category_w},{line_h}" font="Regular;1"\n            backgroundColor="#8B5CF6" transparent="0" zPosition="2" />\n    <widget name="series_category_caption"\n            position="{category_caption_x},{category_caption_y}"\n            size="{category_caption_w},{category_caption_h}"\n            font="Regular;{caption_font}" foregroundColor="#C084FC"\n            transparent="1" zPosition="4" valign="center" halign="left" />\n    {category_rows}\n    <widget name="list_scroll_track"\n            position="{category_scroll_x},{category_scroll_y}"\n            size="{category_scroll_w},{category_scroll_h}" font="Regular;1"\n            backgroundColor="#26344E" transparent="0" zPosition="5" />\n    <widget name="list_scroll_thumb"\n            position="{category_scroll_x},{category_scroll_y}"\n            size="{category_scroll_w},{category_scroll_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="6" />\n    <widget name="message" position="{message_x},{message_y}"\n            size="{message_w},{message_h}" font="Regular;{message_font}"\n            foregroundColor="#94A3B8" transparent="1"\n            valign="center" halign="center" />\n\n    <widget name="series_grid_panel"\n            position="{grid_panel_x},{content_y}"\n            size="{grid_panel_w},{content_h}" font="Regular;1"\n            backgroundColor="{grid_panel_color}" transparent="0" />\n    <widget name="series_grid_accent"\n            position="{grid_panel_x},{content_y}"\n            size="{grid_panel_w},{line_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="2" />\n    <widget name="series_rail_caption"\n            position="{grid_caption_x},{grid_caption_y}"\n            size="{grid_caption_w},{grid_caption_h}"\n            font="Regular;{caption_font}" foregroundColor="#22D3EE"\n            transparent="1" valign="center" halign="left" />\n    <widget name="series_grid_position"\n            position="{position_x},{position_y}"\n            size="{position_w},{position_h}"\n            font="Regular;{position_font}" foregroundColor="#CBD5E1"\n            transparent="1" valign="center" halign="center" />\n    {series_tiles}\n    <widget name="poster_scroll_track"\n            position="{poster_scroll_x},{poster_scroll_y}"\n            size="{poster_scroll_w},{poster_scroll_h}" font="Regular;1"\n            backgroundColor="#26344E" transparent="0" zPosition="7" />\n    <widget name="poster_scroll_thumb"\n            position="{poster_scroll_x},{poster_scroll_y}"\n            size="{poster_scroll_w},{poster_scroll_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="8" />\n\n    <widget name="series_detail_panel" position="{detail_x},{content_y}"\n            size="{detail_w},{content_h}" font="Regular;1"\n            backgroundColor="{detail_panel_color}" transparent="0" />\n    <widget name="series_detail_accent" position="{detail_x},{content_y}"\n            size="{detail_w},{line_h}" font="Regular;1"\n            backgroundColor="#D946EF" transparent="0" zPosition="2" />\n    <widget name="series_poster_frame"\n            position="{poster_frame_x},{poster_frame_y}"\n            size="{poster_frame_w},{poster_frame_h}" font="Regular;1"\n            backgroundColor="#22D3EE" transparent="0" zPosition="2" />\n    <widget name="series_poster_placeholder"\n            position="{preview_x},{preview_y}" size="{preview_w},{preview_h}"\n            font="Regular;{poster_placeholder_font}"\n            foregroundColor="#22D3EE" backgroundColor="#101B2D"\n            transparent="0" valign="center" halign="center" zPosition="3" />\n    <widget name="series_poster"\n            position="{preview_x},{preview_y}" size="{preview_w},{preview_h}"\n            alphatest="blend" scale="1" zPosition="4" />\n    <widget name="series_title"\n            position="{title_x},{title_y}"\n            size="{title_w},{title_h}" font="Regular;{title_font}"\n            foregroundColor="#FFFFFF" transparent="1" noWrap="0"\n            valign="center" halign="left" />\n    <widget name="series_rating"\n            position="{title_x},{rating_y}"\n            size="{rating_w},{rating_h}" font="Regular;{rating_font}"\n            foregroundColor="#FACC15" transparent="1"\n            valign="center" halign="left" />\n    <widget name="series_meta" position="{title_x},{meta_y}"\n            size="{title_w},{meta_h}" font="Regular;{meta_font}"\n            foregroundColor="#CBD5E1" transparent="1"\n            valign="top" halign="left" noWrap="0" />\n    <widget name="series_plot"\n            position="{detail_inner_x},{plot_y}"\n            size="{detail_inner_w},{plot_h}" font="Regular;{plot_font}"\n            foregroundColor="#E2E8F0" transparent="1" noWrap="0"\n            valign="top" halign="left" />\n\n    <widget name="footer" position="0,{footer_y}"\n            size="{width},{footer_h}" font="Regular;{footer_font}"\n            foregroundColor="#C8D2E3" backgroundColor="#080E1A"\n            transparent="0" valign="center" halign="center" />\n    <widget name="screen_label" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="content_panel" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="list_accent" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="breadcrumb" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n    <widget name="items" position="0,0" size="1,1"\n            font="Regular;1" transparent="1" />\n</screen>\n'.format(width=width, height=height, accent_h=px(5), line_h=px(4), header_x=px(50), header_y=px(22), header_w=px(720), header_h=px(72), header_font=px(38), server_x=px(820), server_w=width - px(870), server_font=px(18), cinematic_base_widget=cinematic_base_widget, cinematic_widgets=cinematic_widgets, content_y=content_y, content_h=content_h, category_x=category_x, category_w=category_w, category_caption_x=category_x + px(24), category_caption_y=content_y + px(10), category_caption_w=category_w - px(48), category_caption_h=px(40), caption_font=px(21), category_rows=''.join(category_rows), category_scroll_x=category_x + category_w - px(14), category_scroll_y=category_list_y, category_scroll_w=px(8), category_scroll_h=category_scroll_h, message_x=category_x + px(14), message_y=category_message_y, message_w=category_w - px(28), message_h=max(px(24), content_y + content_h - category_message_y - px(6)), message_font=px(17), grid_panel_x=grid_panel_x, grid_panel_w=grid_panel_w, grid_panel_color=grid_panel_color, grid_caption_x=grid_x, grid_caption_y=content_y + px(8), grid_caption_w=grid_w, grid_caption_h=px(40), position_x=grid_x, position_y=px(890), position_w=grid_w, position_h=px(32), position_font=max(8, px(19)), series_tiles=''.join(series_tiles), poster_scroll_x=grid_x, poster_scroll_y=px(936), poster_scroll_w=grid_w, poster_scroll_h=px(8), detail_x=detail_x, detail_w=detail_w, detail_panel_color=detail_panel_color, preview_x=preview_x, preview_y=preview_y, preview_w=preview_w, preview_h=preview_h, poster_frame_x=preview_x - px(6), poster_frame_y=preview_y - px(6), poster_frame_w=preview_w + px(12), poster_frame_h=preview_h + px(12), poster_placeholder_font=px(31), detail_inner_x=detail_inner_x, detail_inner_w=detail_inner_w, title_x=detail_x + px(226), title_w=detail_w - px(254), title_y=px(146), title_h=px(88), title_font=max(8, px(30)), rating_y=px(240), rating_w=detail_w - px(254), rating_h=px(34), rating_font=max(8, px(22)), meta_y=px(282), meta_h=px(124), meta_font=max(8, px(18)), plot_y=px(430), plot_h=px(482), plot_font=max(8, px(25)), footer_y=footer_y, footer_h=height - footer_y, footer_font=px(18))
 
 class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
-    """Search persistent metadata, or the portal's native bounded page API."""
+    """Search complete shared RAM rows, or a separate account-wide catalogue."""
     page_size = ALL_MOVIES_SEARCH_PAGE_SIZE
     provider_page_size = 14
     page_cache_limit = 5
@@ -286,7 +99,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
     _no_match_message = N_('No movies matched this search.')
     _item_noun_message = N_('Movie')
 
-    def __init__(self, session, account, client=None, favorite_store=None, hidden_category_ids=None, initial_query=None):
+    def __init__(self, session, account, client=None, favorite_store=None, hidden_category_ids=None, initial_query=None, shared_catalog=None):
         search_footer = ALL_SERIES_SEARCH_FOOTER_ITEMS if self.content_type == 'series' else ALL_MOVIES_SEARCH_FOOTER_ITEMS
         self.skin = decorate_remote_footer(prepared_skin(_all_movies_search_skin), search_footer, transparent_panel=True, show_dividers=False, stacked=True)
         Screen.__init__(self, session)
@@ -316,10 +129,12 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._event_lock = threading.Lock()
         self._events = deque()
         self._catalog_mode = self.content_type == 'series' or str(getattr(self.client, 'source_type', '')).lower() in ('xtream', 'stalker') or isinstance(self.client, XtreamContentClient)
-        self._catalog_index = None
-        self._catalog_started = False
+        self._catalog_index = shared_catalog
+        self._shared_catalog = shared_catalog is not None
+        self._owns_search_client = not self._shared_catalog
+        self._catalog_started = self._shared_catalog
         self._catalog_preparing = False
-        self._catalog_state = {'complete': False, 'movies': 0}
+        self._catalog_state = shared_catalog.state() if self._shared_catalog else {'complete': False, 'movies': 0}
         self._catalog_page_complete = False
         self._catalog_token = None
         self._catalog_generation = 0
@@ -434,14 +249,29 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._loading = False
         self._requested_page = 0
         with self._event_lock:
+            discarded = tuple(self._events)
             self._events.clear()
+        for event in discarded:
+            if event[0] in ('page', 'preview'):
+                self._release_search_page(event[3])
         try:
             self._poll_timer.stop()
         except Exception:
             pass
 
-    def _reset_search_results(self):
+    @staticmethod
+    def _release_search_page(result):
+        items = getattr(result, 'items', None)
+        if getattr(items, 'full_search', False):
+            items.close()
+
+    def _release_search_results(self):
+        if getattr(self._results, 'full_search', False):
+            self._results.close()
         self._results = []
+
+    def _reset_search_results(self):
+        self._release_search_results()
         self.selected_index = 0
         self._current_page = 1
         self._result_page_size = self.provider_page_size
@@ -476,8 +306,17 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
     def _start_catalog(self, force=False):
         if self._closed or self._catalog_preparing:
             return
+        if self._shared_catalog:
+            if not force:
+                return
+            self._catalog_index.close()
+            self._catalog_index = None
+            self._shared_catalog = False
+            self._catalog_page_complete = False
         if self._catalog_index is None:
             self._catalog_index = SeriesCatalogIndex(self.client) if self.content_type == 'series' else MovieCatalogIndex(self.client)
+            self._catalog_index.category_list = True
+            self._catalog_index.scope += ':plain-search'
         self._catalog_started = True
         self._catalog_preparing = True
         self._catalog_state = dict(self._catalog_state, complete=False, reason='')
@@ -522,6 +361,10 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         return result
 
     def _cache_page(self, result, page):
+        if getattr(result, 'progress_preview', False):
+            return
+        if getattr(getattr(result, 'items', None), 'full_search', False):
+            return
         key = self._cache_key(page)
         self._page_cache[key] = result
         self._page_cache.move_to_end(key)
@@ -540,6 +383,8 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         try:
             page = max(1, int(page))
         except (TypeError, ValueError, OverflowError):
+            page = 1
+        if self._catalog_mode:
             page = 1
         if self._known_last_page is not None and page > self._known_last_page:
             self._has_more = False
@@ -588,9 +433,11 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
 
     def _queue_search_event(self, event):
         with self._event_lock:
-            if self._closed or event[1] != self._search_generation:
+            if not self._closed and event[1] == self._search_generation:
+                self._events.append(event)
                 return
-            self._events.append(event)
+        if event[0] in ('page', 'preview'):
+            self._release_search_page(event[3])
 
     def _provider_worker_started(self):
         with self._provider_worker_lock:
@@ -604,12 +451,20 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                 self._provider_workers_idle.set()
 
     def _search_page_worker(self, generation, query, page, token):
+        pending_result = None
         try:
             try:
                 token.check()
                 if getattr(self, '_catalog_mode', False):
-                    result = self._catalog_index.search(query, page=page, page_size=self.provider_page_size, hidden_category_ids=self._hidden_category_ids, token=token)
+                    if not self._catalog_preparing:
+                        pending_result = self._catalog_index.search_all(query,
+                            hidden_category_ids=self._hidden_category_ids, token=token)
+                    else:
+                        pending_result = self._catalog_index.search(query, page=page, page_size=self.provider_page_size, hidden_category_ids=self._hidden_category_ids, token=token)
+                        pending_result.has_more = False
+                        pending_result.progress_preview = True
                     token.check()
+                    result, pending_result = pending_result, None
                     self._queue_search_event(('page', generation, page, result))
                     if not result.items and (not result.catalog_state.get('complete')) and (self.content_type == 'movie') and (page == 1) and (str(getattr(self.client, 'source_type', '')) == 'stalker') and (not self._hidden_category_ids):
                         try:
@@ -646,8 +501,11 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                 self._queue_search_event(('fallback' if fallback else 'page', generation, page, result))
             except _WorkerCancelled:
                 return
-            except (CatalogStorageError, CatalogLimitError):
-                self._queue_search_event(('error', generation, page, 'storage'))
+            except (CatalogStorageError, CatalogLimitError, MemoryError) as error:
+                reason = ('available-memory' if isinstance(error, MemoryError)
+                          or getattr(error, 'limit_kind', '') == 'available-memory'
+                          else 'limit' if isinstance(error, CatalogLimitError) else 'storage')
+                self._queue_search_event(('error', generation, page, reason))
             except ContentError as error:
                 if error.reason == ContentError.UNSUPPORTED_TYPE and callable(getattr(self.client, 'load_vod_catalog_step', None)):
                     self._queue_search_event(('fallback', generation, page, None))
@@ -656,6 +514,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             except Exception:
                 self._queue_search_event(('error', generation, page, 'search_error'))
         finally:
+            self._release_search_page(pending_result)
             self._provider_worker_finished()
 
     def _apply_search_page(self, result, requested_page, pending_index=0):
@@ -697,8 +556,14 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._cache_page(result, page)
         self._supported = True
         self._search_reason = ''
-        raw_result_items = list(self._page_value(result, 'items', ()) or ())
-        result_items = filter_hidden_category_items(raw_result_items, self._hidden_category_ids)
+        raw_result_items = self._page_value(result, 'items', ())
+        if getattr(raw_result_items, 'full_search', False):
+            # Hidden categories were filtered in the worker. Preserve the RAM
+            # view rather than hydrating/copying all matching items here.
+            result_items = raw_result_items
+        else:
+            raw_result_items = list(raw_result_items or ())
+            result_items = filter_hidden_category_items(raw_result_items, self._hidden_category_ids)
         result_has_more = bool(self._page_value(result, 'has_more', False))
         try:
             result_total = max(0, int(self._page_value(result, 'total_items', 0) or 0))
@@ -722,6 +587,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             return
         self._current_page = page
         self._result_page_size = result_page_size
+        self._release_search_results()
         self._results = result_items
         self._total_items = result_total
         if not result_has_more and (not (getattr(self, '_catalog_mode', False) and (not self._catalog_state.get('complete', False)))):
@@ -749,8 +615,12 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         changed = False
         for event in events:
             if event[1] != self._search_generation:
+                if event[0] in ('page', 'preview'):
+                    self._release_search_page(event[3])
                 continue
             if event[2] != self._requested_page and (not (event[0] == 'preview' and (not self._loading) and (event[2] == self._current_page))):
+                if event[0] in ('page', 'preview'):
+                    self._release_search_page(event[3])
                 continue
             self._loading = False
             self._search_token = None
@@ -821,13 +691,15 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             return _('This source does not support the selected content type.')
         if self._catalog_mode:
             state = self._catalog_state
+            if self._search_reason == 'available-memory' or state.get('limit_kind') == 'available-memory':
+                return _(RAM_UNAVAILABLE)
             if self._search_reason == 'storage' or state.get('reason') == 'storage':
                 return _('Search cache is unavailable. Check receiver storage.')
             if self._catalog_preparing:
                 if self.content_type == 'series':
                     return _('Preparing series catalogue: {count} series').format(count=state.get('movies', 0))
                 return _('Preparing search catalogue: {movies} movies').format(movies=state.get('movies', 0))
-            if state.get('reason') == 'limit':
+            if self._search_reason == 'limit' or state.get('reason') == 'limit':
                 return _('Catalogue limit reached. Results may be incomplete.')
             if not state.get('complete'):
                 if self.content_type == 'series':
@@ -849,6 +721,10 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self.selected_index = min(len(self._results) - 1, max(0, self.selected_index))
         else:
             self.selected_index = 0
+        if hasattr(self, '_r102_kind') and self._results:
+            set_text_if_changed(self['status'], self._status_text())
+            update_scrollbar(self, 'results_scroll', len(self._results), self.selected_index, self.page_size, self._scroll_geometry)
+            return
         visual_start = int(self.selected_index / self.page_size) * self.page_size
         visible = self._results[visual_start:visual_start + self.page_size]
         global_start = (self._current_page - 1) * self._result_page_size
@@ -863,36 +739,36 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                 ellipsize_dynamic_text(self['catalog_result_{}'.format(row)], '{:05d}.  {}{}{}'.format(global_start + local_index + 1, str(getattr(item, 'name', '') or _(self._item_noun_message)), suffix, favorite), fallback_chars=64)
                 selected = local_index == self.selected_index
             else:
-                self['catalog_result_{}'.format(row)].setText('')
+                set_text_if_changed(self['catalog_result_{}'.format(row)], '')
             for name in ('catalog_result_focus_{}'.format(row), 'catalog_result_marker_{}'.format(row)):
                 if selected:
-                    self[name].show()
+                    set_visible(self[name], True)
                 else:
-                    self[name].hide()
+                    set_visible(self[name], False)
         if self._results:
             update_scrollbar(self, 'results_scroll', len(self._results), self.selected_index, self.page_size, self._scroll_geometry)
             global_position = global_start + self.selected_index + 1
             total = self._total_items or global_start + len(self._results)
-            self['message'].setText('{}/{}'.format(global_position, total))
+            set_text_if_changed(self['message'], '{}/{}'.format(global_position, total))
         else:
             hide_scrollbar(self, 'results_scroll')
             if not self._supported:
-                self['message'].setText(_('This source does not support the selected content type.'))
+                set_text_if_changed(self['message'], _('This source does not support the selected content type.'))
             elif self._search_reason:
-                self['message'].setText(_(self._load_error_message))
+                set_text_if_changed(self['message'], _(self._load_error_message))
             elif self._query_key and (not self._loading):
-                self['message'].setText(_('Search incomplete.') if self._catalog_mode and (not (self._catalog_state.get('complete') and self._catalog_page_complete)) else _(self._no_match_message))
+                set_text_if_changed(self['message'], _('Search incomplete.') if self._catalog_mode and (not (self._catalog_state.get('complete') and self._catalog_page_complete)) else _(self._no_match_message))
             else:
-                self['message'].setText('')
-        self['status'].setText(self._status_text())
+                set_text_if_changed(self['message'], '')
+        set_text_if_changed(self['status'], self._status_text())
         self._render_detail()
 
     def _render_detail(self):
         if not self._results:
             set_static_text(self['detail_title'], _(self._selecting_title_message), preferred_size=self._search_title_preferred_font)
-            self['detail_rating'].setText('')
-            self['detail_meta'].setText('')
-            self['detail_category'].setText('')
+            set_text_if_changed(self['detail_rating'], '')
+            set_text_if_changed(self['detail_meta'], '')
+            set_text_if_changed(self['detail_category'], '')
             if not self._supported:
                 text = _('This source does not support the selected content type.')
             elif self._search_reason:
@@ -901,7 +777,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                 text = _('Search incomplete.') if self._catalog_mode and (not (self._catalog_state.get('complete') and self._catalog_page_complete)) else _(self._no_match_message)
             else:
                 text = _(self._query_hint_message)
-            self['detail_plot'].setText(text)
+            set_text_if_changed(self['detail_plot'], text)
             return
         item = self._results[self.selected_index]
         item_name = str(getattr(item, 'name', '') or '')
@@ -909,7 +785,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             fit_dynamic_text(self['detail_title'], item_name, max_lines=2, preferred_size=self._search_title_preferred_font, min_size=self._search_title_min_font, fallback_chars=30)
         else:
             set_static_text(self['detail_title'], _(self._item_noun_message), preferred_size=self._search_title_preferred_font)
-        self['detail_rating'].setText(_rating_label(getattr(item, 'rating', '')))
+        set_text_if_changed(self['detail_rating'], _rating_label(getattr(item, 'rating', '')))
         meta = [value for value in (_year_not_in_title(item_name, getattr(item, 'year', '')), str(getattr(item, 'duration', '') or '')) if value]
         ellipsize_dynamic_text(self['detail_meta'], '  •  '.join(meta) or _('Information unavailable.'), fallback_chars=34)
         ellipsize_dynamic_text(self['detail_category'], str(getattr(item, 'catalog_category_name', '') or getattr(item, 'group_title', '') or ''), fallback_chars=45)
@@ -987,6 +863,8 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         fit_dynamic_text(self['status'], self._favorite_message(item, added), max_lines=4, fallback_chars=48)
 
     def _release_xtream_search_cache(self):
+        if not getattr(self, '_owns_search_client', True):
+            return
         source_type = str(getattr(self.client, 'source_type', '') or '').lower()
         if not (source_type == 'xtream' or isinstance(self.client, XtreamContentClient)):
             return
@@ -1008,7 +886,8 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self._open_series_episodes()
             return
         from .browser_player import open_extplayer
-        open_extplayer(self.session, self.client, self._results[self.selected_index], list(self._results), self.selected_index, owner=self)
+        entries = self._results if getattr(self._results, 'full_category', False) else list(self._results)
+        open_extplayer(self.session, self.client, self._results[self.selected_index], entries, self.selected_index, owner=self)
 
     def _stop(self):
         if self._closed:
@@ -1021,6 +900,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         with self._event_lock:
             self._catalog_mailbox = None
         self._cancel_search_request(invalidate_generation=True)
+        self._release_search_results()
         if self._catalog_index is not None:
             self._catalog_index.close()
         self._results = []
@@ -1228,6 +1108,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
             getattr(self, '_render_movie_posters' if kind == 'movie' else '_render_series_tiles')()
 
     def _release_grid_pixmaps(self, kind):
+        setattr(self, '_' + kind + '_paint_signature', None)
+        setattr(self, '_' + kind + '_poster_page_key', None)
         loaders = getattr(self, '_gt_pixmap_loaders', {})
         for slot in range(self._poster_slot_count):
             getattr(self, '_vod_tile_requests', {}).pop((kind, slot), None)
@@ -1272,91 +1154,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 self._series_pending_clamp_to_end = direction == 'down'
             getattr(self, '_select_' + kind)(target)
 
-    def _setup_movie_widgets(self):
-        if self._poster_grid_enabled:
-            self['grid_clean_guard'] = Label('')
-            width, height, unused_px = _scale()
-            attach_background_window(self, 'grid_clean_background', APP_BACKGROUND_PATH, (width, height))
-            self['movie_grid_info_panel'] = Pixmap()
-            self['hint'] = Label('')
-            self[self.content_type + '_video_guard'] = Label('')
-            self['poster_scroll_more'] = Label('⌄')
-            self['poster_scroll_more'].hide()
-        unused_width, unused_height, px = _scale()
-        self._poster_image_width = grid_geometry(unused_width, unused_height, px)['tiles'][0]['image'][2] if self._poster_grid_enabled else (discovery_poster_geometry if getattr(self, '_vod_discovery_layout', False) else cinematic_poster_geometry)(unused_width, unused_height, px)['tiles'][0]['image'][2]
-        del unused_width, unused_height
-        self._movie_title_preferred_font = font_px(px, 38, role='title')
-        self._movie_title_min_font = font_px(px, 28 if self._cinematic_enabled else 38, role='title', value='standard')
-        if self._poster_grid_enabled:
-            self._movie_title_preferred_font = font_px(px, 34, role='title')
-            self._movie_title_min_font = font_px(px, 24, role='title', value='standard')
-            self._grid_rating_font = font_px(px, 22)
-            self._grid_rating_min_font = font_px(px, 16, value='standard')
-            self._grid_plot_font = font_px(px, 29)
-            self._grid_plot_min_font = font_px(px, 24, value='standard')
-            self._grid_people_font = font_px(px, 20)
-            self._grid_people_min_font = font_px(px, 18, value='standard')
-        self['movie_server'] = Label('')
-        self._dynamic_server_widget = 'movie_server'
-        self._dynamic_server_text = self.account.host or self.account.display_name
-        ellipsize_dynamic_text(self['movie_server'], self._dynamic_server_text, fallback_chars=80)
-        if self._cinematic_enabled:
-            self['movie_video_guard'] = Label('')
-            self['movie_hero_panel'] = Label('')
-            self['movie_backdrop'] = Pixmap()
-            self['movie_backdrop_scrim'] = Pixmap()
-            self['movie_detail_shadow'] = Pixmap()
-            self['movie_meta_divider'] = Label('')
-            self['movie_people_shadow'] = Pixmap()
-            self['movie_rail_shadow'] = Pixmap()
-            self['movie_people_panel'] = Label('')
-            self['movie_hero_panel'].hide()
-            self['movie_backdrop'].hide()
-            self['movie_backdrop_scrim'].hide()
-            self['movie_detail_shadow'].show()
-            self['movie_people_shadow'].show()
-            self['movie_rail_shadow'].show()
-        self['movie_category_panel'] = Label('')
-        self['movie_category_accent'] = Label('')
-        self['movie_category_caption'] = Label(_('MOVIE CATEGORIES'))
-        for index in range(self.page_size):
-            self['movie_category_{}'.format(index)] = Label('')
-            self['movie_category_focus_{}'.format(index)] = Label('')
-            self['movie_category_marker_{}'.format(index)] = Label('')
-        self['movie_poster_frame'] = Label('')
-        self['movie_poster_placeholder'] = Label(_('GT\nMOVIE'))
-        self['movie_poster'] = Pixmap()
-        self['movie_detail_panel'] = Label('')
-        self['movie_detail_accent'] = Label('')
-        self['movie_title'] = Label(_('Selecting movie...'))
-        self['movie_rating'] = Label('')
-        self['movie_meta'] = Label('')
-        self['movie_genre'] = Label('')
-        self['movie_plot_caption'] = Label(_('MOVIE SUMMARY'))
-        movie_plot_text = _("The selected movie's details will be loaded from the server.")
-        self['movie_plot'] = GTSmoothScrollLabel(movie_plot_text, lightweight=True) if self._cinematic_enabled else Label(movie_plot_text)
-        self['movie_people'] = Label('')
-        self['movie_rail_caption'] = Label(_('MOVIES IN THE SELECTED CATEGORY'))
-        if self._poster_grid_enabled:
-            self['movie_grid_position'] = Label('')
-        self['poster_scroll_track'] = Label('')
-        self['poster_scroll_thumb'] = Label('')
-        hide_scrollbar(self, 'poster_scroll')
-        for index in range(getattr(self, '_poster_slot_count', CINEMATIC_POSTER_COLUMNS)):
-            self['movie_tile_bg_{}'.format(index)] = Pixmap() if self._poster_grid_enabled else Label('')
-            self['movie_tile_focus_{}'.format(index)] = Pixmap() if self._poster_grid_enabled else Label('')
-            self['movie_tile_inner_{}'.format(index)] = Label('')
-            self['movie_tile_placeholder_{}'.format(index)] = Label('GT')
-            self['movie_tile_poster_{}'.format(index)] = Pixmap()
-            self['movie_tile_favorite_{}'.format(index)] = Pixmap()
-            self['movie_tile_title_{}'.format(index)] = Label('')
-        self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions', 'MoviePlayerActions', 'MenuActions'], {'ok': self.open_selected, 'menu': self.download_selected, 'cancel': self.close, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'channelUp': self.channel_page_up, 'channelDown': self.channel_page_down, 'green': self.refresh_movies, 'yellow': self.open_content_edit, 'blue': self.open_movie_search, 'red': self.toggle_selected_favorite}, -1)
-        if getattr(self, '_vod_discovery_layout', False):
-            self._setup_discovery_widgets()
-        self._clear_movie_posters()
-        self['movie_poster'].hide()
-        if hasattr(self, 'onClose'):
-            self.onClose.append(self._stop_movie)
 
     def _set_movie_title(self, value):
         return fit_dynamic_text(self['movie_title'], value, max_lines=1 if getattr(self, '_poster_grid_enabled', False) else 2, preferred_size=self._movie_title_preferred_font, min_size=self._movie_title_min_font, fallback_chars=42)
@@ -1364,80 +1161,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
     def _set_static_movie_title(self, value):
         return set_static_text(self['movie_title'], value, preferred_size=self._movie_title_preferred_font)
 
-    def _set_movie_plot(self, value):
-        if getattr(self, '_poster_grid_enabled', False):
-            self['hint'].setText(value if not self._movie_entries else '')
-            return fit_dynamic_text(self['movie_plot'], value, max_lines=2, preferred_size=getattr(self, '_grid_plot_font', None), min_size=getattr(self, '_grid_plot_min_font', None), fallback_chars=150)
-        if getattr(self, '_cinematic_enabled', False):
-            rendered = clean_dynamic_text(value)
-            self['movie_plot'].setText(rendered)
-            return rendered
-        return fit_dynamic_text(self['movie_plot'], value, max_lines=4, fallback_chars=70)
 
-    def _refresh_movie_categories(self, schedule_load=True):
-        if getattr(self, '_vod_discovery_layout', False):
-            return self._refresh_discovery_categories()
-        hint = getattr(self, '_movie_trailer_hint', None)
-        if hint is not None:
-            hint.refresh_hint()
-        try:
-            set_visible = _set_component_visible
-        except NameError:
 
-            def set_visible(component, visible):
-                if visible:
-                    component.show()
-                else:
-                    component.hide()
-        try:
-            update_text = set_text_if_changed
-        except NameError:
-
-            def update_text(component, value):
-                text = '' if value is None else str(value)
-                current = getattr(component, 'message', None)
-                if current is None or str(current) != text:
-                    component.setText(text)
-        if self._error:
-            ellipsize_dynamic_text(self['message'], _(self._error), fallback_chars=24)
-            self._clear_movie_categories()
-            hide_scrollbar(self, 'list_scroll')
-            return
-        if not self._entries:
-            update_text(self['message'], _('Movie category not found'))
-            self._clear_movie_categories()
-            hide_scrollbar(self, 'list_scroll')
-            return
-        self.selected_index %= len(self._entries)
-        if self._movie_category_list_generation != self._load_generation:
-            self._movie_category_list_generation = self._load_generation
-            pending_category_id = self._movie_pending_category_id
-            pending_index = next((index for index, entry in enumerate(self._entries) if str(getattr(entry, 'category_id', '') or '') == pending_category_id), None) if pending_category_id is not None else None
-            if pending_index is not None:
-                self.selected_index = pending_index
-        page_start = int(self.selected_index / self.page_size) * self.page_size
-        page_items = self._entries[page_start:page_start + self.page_size]
-        for row in range(self.page_size):
-            name = ''
-            selected = False
-            if row < len(page_items):
-                absolute = page_start + row
-                name = page_items[row].name
-                selected = self._movie_focus == 'categories' and absolute == self.selected_index
-            ellipsize_dynamic_text(self['movie_category_{}'.format(row)], name, fallback_chars=20)
-            for widget_name in ('movie_category_focus_{}'.format(row), 'movie_category_marker_{}'.format(row)):
-                set_visible(self[widget_name], selected)
-        category = self._entries[self.selected_index]
-        update_text(self['message'], '{}: {} • {}/{}'.format(_('Categories'), len(self._entries), self.selected_index + 1, len(self._entries)))
-        update_scrollbar(self, 'list_scroll', len(self._entries), self.selected_index, self.page_size, self._list_scroll_geometry)
-        if schedule_load and self._movie_loaded_category_id != category.category_id:
-            self._schedule_movie_load(category, immediate=not self._movie_category_load_started)
-
-    def _clear_movie_categories(self):
-        for row in range(self.page_size):
-            self['movie_category_{}'.format(row)].setText('')
-            self['movie_category_focus_{}'.format(row)].hide()
-            self['movie_category_marker_{}'.format(row)].hide()
 
     def _open_movie_trailer(self, item, info):
         if self._closed or self._movie_search_child_open or self._movie_search_keyboard_open:
@@ -1516,21 +1241,28 @@ class VODBrowserMethods(DiscoveryVODMethods):
         if not callable(opener):
             self['message'].setText(_('Could not open the content list.'))
             return
+        shared_catalog = None
         try:
-            search_client = content_client_for(self.account)
+            catalog = getattr(self, '_movie_browser_catalog', None)
+            shared_catalog = catalog.borrow_search() if catalog is not None else None
+            search_client = shared_catalog.client if shared_catalog is not None else content_client_for(self.account)
         except Exception as error:
+            if shared_catalog is not None:
+                shared_catalog.close()
             log_event('movies', 'Could not create movie search client', error=error)
             self['message'].setText(_('Could not open the content list.'))
             return
-        self._pause_movie_work_for_search()
         self._movie_search_child_open = True
         self._movie_search_child = None
         try:
-            self._movie_search_child = opener(self._movie_search_closed, GTAllMoviesSearchScreen, self.account, search_client, self.favorite_store, self._hidden_category_ids, initial_query=query)
+            self._pause_movie_work_for_search()
+            self._movie_search_child = opener(self._movie_search_closed, GTAllMoviesSearchScreen, self.account, search_client, self.favorite_store, self._hidden_category_ids, initial_query=query, shared_catalog=shared_catalog)
         except Exception:
+            if shared_catalog is not None:
+                shared_catalog.close()
             self._movie_search_closed()
             source_type = str(getattr(search_client, 'source_type', '') or '').lower()
-            if source_type == 'xtream' or isinstance(search_client, XtreamContentClient):
+            if shared_catalog is None and (source_type == 'xtream' or isinstance(search_client, XtreamContentClient)):
                 releaser = getattr(search_client, 'release_movie_search', None)
                 if callable(releaser):
                     try:
@@ -1541,6 +1273,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 self['message'].setText(_('Could not open the content list.'))
 
     def _pause_movie_work_for_search(self):
+        content_sort_ui.cancel_loading(self, 'movie')
         reset_cinematic = getattr(self, '_reset_cinematic_backdrop', None)
         if callable(reset_cinematic):
             reset_cinematic()
@@ -1775,8 +1508,10 @@ class VODBrowserMethods(DiscoveryVODMethods):
         browse_catalog = getattr(self, '_movie_browser_catalog', None)
         if browse_catalog is not None:
             browse_catalog.start(preferred_category=category.category_id)
-        token = _WorkerToken(120 if browse_catalog is not None and browse_catalog.sort_mode != 'provider' else MOVIE_CATEGORY_TIMEOUT_SECONDS)
+        token = _WorkerToken(browse_catalog.load_timeout if browse_catalog is not None else MOVIE_CATEGORY_TIMEOUT_SECONDS)
         self._movie_load_token = token
+        begin_delivery = getattr(self, '_light_begin_list', None)
+        if callable(begin_delivery): begin_delivery('movie', generation)
         worker = threading.Thread(target=self._load_movie_worker, args=(generation, category.category_id, token))
         worker.daemon = True
         worker.start()
@@ -1787,23 +1522,23 @@ class VODBrowserMethods(DiscoveryVODMethods):
         native_window = getattr(self, '_movie_native_window', None)
         try:
             if browse_catalog is not None:
-                page = browse_catalog.read(category_id, hidden_category_ids=self._hidden_category_ids, token=token)
+                page = content_sort_ui.initial_page(browse_catalog, category_id, self._hidden_category_ids, token)
                 page = content_sort_ui.restore_page(self, browse_catalog, page, 'movie', category_id, generation, token)
-                entries = list(page.items)
+                entries = page.items
                 error = '' if entries or page.catalog_state.get('complete') else N_('Search incomplete.')
             else:
                 entries = list(_bounded_client_call(self.client, token, lambda: self.client.load_items('movie', category_id)) or [])
                 error = ''
-            if not str(category_id or '').strip() or category_filter_active(getattr(self, '_hidden_category_ids', ())):
+            if browse_catalog is None and (not str(category_id or '').strip() or category_filter_active(getattr(self, '_hidden_category_ids', ()))):
                 entries = filter_hidden_category_items(entries, self._hidden_category_ids, category_id)
         except _WorkerCancelled:
             return
         except ContentError as caught:
             entries = []
             error = str(caught)
-        except (CatalogStorageError, CatalogLimitError):
+        except (CatalogStorageError, CatalogLimitError, MemoryError) as caught:
             entries = []
-            error = N_('Search cache is unavailable. Check receiver storage.')
+            error = catalog_failure_message(caught)
         except Exception:
             entries = []
             error = N_('Could not load movies')
@@ -1817,7 +1552,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 error = N_('Search incomplete.')
         self._movie_window_base = getattr(page, 'sort_base', 0) if browse_catalog is not None and (not error) else 0
         self._movie_selected_index = getattr(page, 'sort_selected', 0) if browse_catalog is not None and (not error) else 0
-        self._movie_known_ids = {str(item.stream_id) for item in entries}
+        self._movie_known_ids = set() if getattr(entries, 'full_category', False) else {str(item.stream_id) for item in entries}
         self._movie_entries = self._movie_catalog_entries = entries
         self._movie_error = error
         if browse_catalog is not None and (not error):
@@ -1828,6 +1563,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
         if native_window is not None and (not error):
             self._movie_has_more = native_window.has_more or native_window.count > len(entries)
         self._movie_ready = True
+        publish = getattr(self, '_light_publish_list', None)
+        if callable(publish): publish('movie', generation)
 
     def _start_movie_more_load(self):
         loader = getattr(self.client, 'load_more_items', None)
@@ -1867,9 +1604,9 @@ class VODBrowserMethods(DiscoveryVODMethods):
         except ContentError as caught:
             entries = []
             error = str(caught)
-        except (CatalogStorageError, CatalogLimitError):
+        except (CatalogStorageError, CatalogLimitError, MemoryError) as caught:
             entries = []
-            error = N_('Search cache is unavailable. Check receiver storage.')
+            error = catalog_failure_message(caught)
         except Exception:
             entries = []
             error = N_('Could not load movies')
@@ -1898,6 +1635,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
 
     def _trim_vod_window(self, kind):
         prefix = '_' + kind + '_'
+        if getattr(getattr(self, prefix + 'entries', None), 'full_category', False):
+            return
         if getattr(self, prefix + 'browser_catalog', None) is None and getattr(self, prefix + 'native_window', None) is None:
             return
         entries = getattr(self, prefix + 'entries')
@@ -1984,11 +1723,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
             return False
         return self._start_movie_more_load()
 
-    def _update_movie_rail_caption(self):
-        if not self._entries:
-            return
-        category = self._entries[self.selected_index]
-        ellipsize_dynamic_text(self['movie_rail_caption'], _('{} • {} MOVIES').format(localized_upper(category.name), self._vod_window_base('movie') + len(self._movie_entries)), fallback_chars=90)
 
     def _apply_movie_more_result(self):
         result = self._movie_more_result
@@ -2051,22 +1785,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._trim_vod_window('movie')
         self._render_movie_posters()
 
-    def _update_movie_catalog_message(self):
-        catalog = getattr(self, '_movie_browser_catalog', None)
-        if catalog is None:
-            return
-        state = catalog.state
-        if state.get('preparing'):
-            text = ''
-        elif state.get('reason') == 'storage':
-            text = _('Search cache is unavailable. Check receiver storage.')
-        elif state.get('reason') == 'limit':
-            text = _('Catalogue limit reached. Results may be incomplete.')
-        elif not state.get('complete'):
-            text = _('Catalogue incomplete: {movies} movies. Press GREEN to continue.').format(movies=state.get('movies', 0))
-        else:
-            text = ''
-        ellipsize_dynamic_text(self['message'], text, fallback_chars=90)
 
     def _poll_movie_result(self):
         if self._closed:
@@ -2074,6 +1792,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
         browse_catalog = getattr(self, '_movie_browser_catalog', None)
         if browse_catalog is not None:
             self._update_movie_catalog_message()
+            if getattr(self, '_light_vod_enabled', False):
+                self._light_refresh_count()
             if self._movie_index_reload_when_done and (not browse_catalog.state.get('preparing')):
                 self._movie_index_reload_when_done = False
                 self._start_movie_load()
@@ -2092,10 +1812,14 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 return
             self._movie_loading = False
             self._movie_load_token = None
+            content_sort_ui.refresh_initial(self, 'movie')
             self._render_movie_results()
-            if browse_catalog is not None and browse_catalog.state.get('preparing'):
+            if browse_catalog is not None and (browse_catalog.state.get('preparing') or getattr(self._movie_entries, 'progressive', False)):
                 self._movie_timer.start(120, True)
             return
+        growing_pending = content_sort_ui.poll_loading(self, 'movie')
+        if growing_pending:
+            self._movie_timer.start(120, True)
         if self._movie_more_loading and self._movie_more_token is not None and self._movie_more_token.expired():
             _cancel_worker_token(self._movie_more_token)
             self._movie_more_loading = False
@@ -2741,40 +2465,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
             return False
         return bool(getattr(self, '_cinematic_pending', False))
 
-    def _render_movie_waiting(self, item=None):
-        if getattr(self, '_poster_grid_enabled', False):
-            self._render_grid_detail('movie', None, loading=True)
-            return
-        getattr(self, '_detail_poster_signatures', {}).pop('movie', None)
-        try:
-            set_visible = _set_component_visible
-        except NameError:
-
-            def set_visible(component, visible):
-                if visible:
-                    component.show()
-                else:
-                    component.hide()
-        reset_cinematic = getattr(self, '_reset_cinematic_backdrop', None)
-        if callable(reset_cinematic):
-            reset_cinematic(keep_visible=item is not None and
-                getattr(self, '_cinematic_applied_identity', None) == ('movie', str(item.stream_id)))
-        if item is not None and getattr(self, '_cinematic_enabled', False):
-            self._cinematic_surface_prepared = ('movie', str(getattr(item, 'stream_id', '') or ''), getattr(self, '_movie_generation', None))
-        if item is None:
-            self._set_static_movie_title(_('Selecting movie...'))
-            set_text_if_changed(self['movie_rating'], '')
-            set_text_if_changed(self['movie_meta'], '')
-        else:
-            self._set_movie_title(item.name)
-            set_text_if_changed(self['movie_rating'], _rating_label(item.rating))
-            ellipsize_dynamic_text(self['movie_meta'], _year_not_in_title(item.name, item.year), fallback_chars=34)
-        set_text_if_changed(self['movie_genre'], '')
-        self._set_movie_plot(_('Loading...'))
-        set_text_if_changed(self['movie_people'], '')
-        set_visible(self['movie_poster'], False)
-        set_visible(self['movie_poster_placeholder'], True)
-        self._apply_detail_poster('movie', item)
 
     def _render_movie_results(self):
         if getattr(self, '_poster_grid_enabled', False):
@@ -2801,99 +2491,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._render_movie_posters()
         self._maybe_load_more_movies()
 
-    def _render_movie_posters(self):
-        hint = getattr(self, '_movie_trailer_hint', None)
-        if hint is not None:
-            hint.refresh_hint()
-        if self._movie_search_child_open:
-            return
-        try:
-            set_visible = _set_component_visible
-        except NameError:
-
-            def set_visible(component, visible):
-                if visible:
-                    component.show()
-                else:
-                    component.hide()
-        try:
-            update_text = set_text_if_changed
-        except NameError:
-
-            def update_text(component, value):
-                text = '' if value is None else str(value)
-                current = getattr(component, 'message', None)
-                if current is None or str(current) != text:
-                    component.setText(text)
-        page_size = getattr(self, '_poster_page_size', CINEMATIC_POSTER_COLUMNS)
-        page_start = self._movie_selected_index // page_size * page_size
-        page = self._movie_entries[page_start:page_start + page_size]
-        page_key = (page_start, tuple((str(getattr(item, 'stream_id', '')) for item in page)))
-        page_changed = page_key != self._movie_poster_page_key
-        if page_changed:
-            self._release_grid_pixmaps('movie')
-            self._movie_poster_generation = getattr(self, '_movie_poster_generation', self._movie_generation) + 1
-            _cancel_worker_token(self._movie_poster_token)
-            self._movie_poster_token = None
-            self._movie_poster_pending = False
-            self._movie_poster_state = None
-            self._movie_deferred_poster_jobs = None
-            self._movie_poster_page_key = page_key
-            self._movie_poster_urls = {}
-            self._reset_vod_poster_retries('movie')
-        poster_urls = getattr(self, '_movie_poster_urls', None)
-        if poster_urls is None:
-            poster_urls = self._movie_poster_urls = {}
-        jobs, cached_cards = [], []
-        for slot in range(getattr(self, '_poster_page_size', CINEMATIC_POSTER_COLUMNS)):
-            selected = False
-            if slot < len(page):
-                absolute = page_start + slot
-                item = page[slot]
-                selected = self._movie_focus == 'posters' and absolute == self._movie_selected_index
-                fit_dynamic_text(self['movie_tile_title_{}'.format(slot)], item.name, max_lines=2, fallback_chars=24)
-                set_visible(self['movie_tile_favorite_{}'.format(slot)], self._is_favorite(item))
-                for family in ('bg', 'inner', 'title'):
-                    set_visible(self['movie_tile_{}_{}'.format(family, slot)], True)
-                url = self._vod_card_url(getattr(item, 'icon', ''))
-                cover_changed = slot not in poster_urls or poster_urls[slot] != url
-                if page_changed or cover_changed:
-                    poster_urls[slot] = url
-                    if page_changed:
-                        set_visible(self['movie_tile_placeholder_{}'.format(slot)], True)
-                    if url:
-                        cached = _cached_picon_path(url)
-                        preparation = getattr(self, '_vod_preparation', None)
-                        if cached and getattr(self, '_poster_grid_enabled', False) and (not (preparation is not None and preparation.card_ready('movie', slot, cached))):
-                            cached_cards.append((slot, item.stream_id, cached, url, url, False))
-                        elif cached:
-                            self._apply_movie_tile_poster(slot, cached, stream_id=item.stream_id, generation=getattr(self, '_movie_poster_generation', self._movie_generation))
-                        else:
-                            jobs.append((slot, item, url))
-                    else:
-                        jobs.append((slot, item, ''))
-            else:
-                for family in ('bg', 'inner', 'title'):
-                    set_visible(self['movie_tile_{}_{}'.format(family, slot)], False)
-                update_text(self['movie_tile_title_{}'.format(slot)], '')
-                set_visible(self['movie_tile_placeholder_{}'.format(slot)], False)
-                set_visible(self['movie_tile_poster_{}'.format(slot)], False)
-                set_visible(self['movie_tile_favorite_{}'.format(slot)], False)
-            set_visible(self['movie_tile_focus_{}'.format(slot)], selected)
-        if getattr(self, '_poster_grid_enabled', False):
-            self._update_grid_position('movie')
-        else:
-            update_horizontal_scrollbar(self, 'poster_scroll', self._vod_window_base('movie') + len(self._movie_entries), self._vod_window_base('movie') + self._movie_selected_index, page_size, self._poster_scroll_geometry)
-        if jobs:
-            self._queue_vod_poster_jobs('movie', page_key, jobs)
-        if cached_cards:
-            self._publish_cached_vod_cards('movie', page_key, cached_cards)
-        self._prioritize_vod_posters('movie', page_key)
-        preparation = getattr(self, '_vod_preparation', None)
-        if preparation is not None:
-            preparation.update('movie')
-        if getattr(self, '_vod_discovery_layout', False):
-            self._render_discovery_navigation()
 
     def _prioritize_vod_posters(self, kind, page_key):
         """Promote the current selection without restarting in-flight work."""
@@ -3111,13 +2708,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
         pool.replace(tasks)
         self._movie_timer.start(50, True)
 
-    def _start_deferred_movie_posters(self):
-        deferred = self._movie_deferred_poster_jobs
-        if deferred is not None and self._movie_poster_state is None:
-            wait_for_detail = len(deferred) > 2 and bool(deferred[2])
-            if wait_for_detail and (self._movie_detail_pending or self._movie_pending_detail_generation is not None):
-                return
-            self._start_movie_poster_jobs(deferred[0], deferred[1])
 
     def _vod_card_url(self, url):
         url = tmdb_poster_url(_safe_picon_url(url), getattr(self, '_poster_image_width', 342))
@@ -3148,6 +2738,9 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 if info is not None:
                     poster_cache.move_to_end(key)
                     return info
+        info = catalogue_info(self.client, kind, item)
+        if info is not None:
+            return info
         name = 'load_vod_info' if kind == 'movie' else 'load_series_summary'
         loader = getattr(self.client, name, None)
         if not callable(loader):
@@ -3358,43 +2951,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._start_deferred_movie_posters()
         self._movie_timer.start(80, True)
 
-    def _schedule_movie_detail(self, immediate=False):
-        if self._closed:
-            return
-        defer_scroll = getattr(self['movie_plot'], 'defer_scroll', None)
-        if callable(defer_scroll):
-            defer_scroll()
-        preparation = getattr(self, '_vod_preparation', None)
-        if preparation is not None:
-            preparation.selection('movie')
-        if getattr(self, '_poster_grid_enabled', False):
-            self._schedule_grid_detail('movie', immediate)
-            return
-        if not self._movie_entries or self._closed:
-            return
-        self._movie_pending_detail_generation = self._movie_generation
-        _cancel_worker_token(self._movie_detail_token)
-        self._movie_detail_token = None
-        try:
-            self._movie_detail_timer.stop()
-        except Exception:
-            pass
-        item = self._movie_entries[self._movie_selected_index]
-        if preparation is not None and preparation.show_ready('movie'):
-            return
-        self._render_movie_waiting(item)
-        if getattr(self, '_cinematic_enabled', False):
-            self._schedule_hero_start('movie', item, immediate=immediate)
-        if immediate:
-            self._commit_movie_detail()
-        else:
-            self._movie_detail_timer.start(NAVIGATION_DEBOUNCE_MS, True)
 
-    def _commit_movie_detail(self):
-        if self._closed or self._movie_pending_detail_generation != self._movie_generation:
-            return
-        self._movie_pending_detail_generation = None
-        self._start_movie_detail()
 
     def _catalogue_detail_preview(self, kind, generation, item, token):
         previewer = getattr(self._metadata_client, 'catalogue_preview', None)
@@ -3414,9 +2971,17 @@ class VODBrowserMethods(DiscoveryVODMethods):
         catalogue_poster_url = _safe_picon_url(getattr(item, 'icon', ''))
         info = _detail_cache_get(self._movie_info_cache, self._movie_info_cache_lock, item.stream_id) if hasattr(self, '_movie_info_cache_lock') else self._movie_info_cache.get(item.stream_id)
         metadata_status = ''
-        early_info = None
+        early_info = catalogue_info(self.client, 'movie', item) if info is None else None
+        if info is None and early_info is not None and early_info.plot:
+            info = early_info
         if info is None:
-            early_info = self._catalogue_detail_preview('movie', generation, item, token)
+            localized = self._catalogue_detail_preview('movie', generation, item, token)
+            if localized is not None:
+                info = localized
+                early_info = localized
+        if early_info is not None and generation == self._movie_generation and (token is None or token.active()):
+            preview_url = _safe_picon_url(getattr(early_info, 'cover', '') or getattr(item, 'icon', ''))
+            self._movie_detail_preview = (generation, early_info, _cached_picon_path(preview_url) if preview_url else '', '', preview_url, catalogue_poster_url)
         loader = getattr(self.client, 'load_vod_info', None)
         if info is None and loader is not None:
             try:
@@ -3453,85 +3018,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         if generation == self._movie_generation and (token is None or token.active()):
             self._movie_detail_result = (generation, info, poster_path, metadata_status, poster_url, catalogue_poster_url)
 
-    def _apply_movie_detail(self, info, poster_path, metadata_status='', poster_url='', catalogue_poster_url=''):
-        if getattr(self, '_poster_grid_enabled', False):
-            self._render_grid_detail('movie', info)
-            self._apply_grid_cover('movie', poster_path, poster_url, catalogue_poster_url)
-            return
-        cinematic = bool(getattr(self, '_cinematic_enabled', False))
-        try:
-            update_text = set_text_if_changed
-        except NameError:
 
-            def update_text(component, value):
-                text = '' if value is None else str(value)
-                getter = getattr(component, 'getText', None)
-                current = getter() if callable(getter) else getattr(component, 'message', getattr(component, 'text', None))
-                if current is None or str(current) != text:
-                    component.setText(text)
-        item = self._movie_entries[self._movie_selected_index]
-        _attach_subtitle_detail_metadata(item, info)
-        poster_url = _safe_picon_url(poster_url)
-        catalogue_poster_url = _safe_picon_url(catalogue_poster_url)
-        current_poster_url = _safe_picon_url(getattr(item, 'icon', ''))
-        poster_identity_changed = False
-        if poster_url and (not current_poster_url or current_poster_url == catalogue_poster_url):
-            if current_poster_url != poster_url:
-                item.icon = poster_url
-                current_poster_url = poster_url
-                poster_identity_changed = True
-        if poster_path and poster_url and (current_poster_url != poster_url):
-            poster_path = ''
-        metadata_status = str(metadata_status or '').strip()[:180]
-        if info is None:
-            self._set_movie_title(item.name)
-            update_text(self['movie_rating'], _rating_label(item.rating))
-            ellipsize_dynamic_text(self['movie_meta'], _year_not_in_title(item.name, item.year) or _('Information unavailable.'), fallback_chars=34)
-            self._set_movie_plot(_('Movie information unavailable.'))
-            update_text(self['movie_genre'], '')
-            update_text(self['movie_people'], '')
-        else:
-            display_title = info.title or item.name
-            self._set_movie_title(display_title)
-            update_text(self['movie_rating'], _rating_label(info.rating))
-            meta = [value for value in (_year_not_in_title(display_title, info.year), info.duration) if value]
-            ellipsize_dynamic_text(self['movie_meta'], ('  |  ' if cinematic else '  •  ').join(meta) or _('Information unavailable.'), fallback_chars=34)
-            ellipsize_dynamic_text(self['movie_genre'], info.genre or _('Genre unavailable'), fallback_chars=55)
-            self._set_movie_plot(info.plot or _('Movie summary unavailable.'))
-            people = []
-            if info.director:
-                people.append(_('Director: {}').format(info.director))
-            if info.cast:
-                people.append(_('Cast: {}').format(info.cast))
-            fit_dynamic_text(self['movie_people'], ('  |  ' if cinematic else ' • ').join(people), max_lines=2, fallback_chars=80)
-        start_cinematic = getattr(self, '_start_cinematic_backdrop', None)
-        if getattr(self, '_cinematic_enabled', False) and callable(start_cinematic):
-            start_cinematic('movie', item, info, catalogue_poster_url)
-        if self._apply_detail_poster('movie', item, poster_path):
-            stream_id = item.stream_id
-            slot = self._movie_selected_index % getattr(self, '_poster_page_size', CINEMATIC_POSTER_COLUMNS)
-            self._apply_movie_tile_poster(slot, poster_path, stream_id=stream_id, generation=getattr(self, '_movie_poster_generation', self._movie_generation))
-        if poster_identity_changed:
-            self._render_movie_posters()
-
-    def _clear_movie_posters(self):
-        self._reset_vod_poster_retries()
-        self._release_grid_pixmaps('movie')
-        if getattr(self, '_poster_grid_enabled', False):
-            self['movie_grid_position'].setText('')
-            self['poster_scroll_more'].hide()
-        for slot in range(getattr(self, '_poster_slot_count', CINEMATIC_POSTER_COLUMNS)):
-            self['movie_tile_title_{}'.format(slot)].setText('')
-            self['movie_tile_poster_{}'.format(slot)].hide()
-            self['movie_tile_placeholder_{}'.format(slot)].hide()
-            self['movie_tile_favorite_{}'.format(slot)].hide()
-            self['movie_tile_focus_{}'.format(slot)].hide()
-            if getattr(self, '_poster_grid_enabled', False):
-                for family in ('bg', 'inner', 'title'):
-                    self['movie_tile_{}_{}'.format(family, slot)].hide()
-        hide_scrollbar(self, 'poster_scroll')
-        if getattr(self, '_vod_discovery_layout', False):
-            self._render_discovery_navigation()
 
     def refresh_movies(self):
         if self.content_type != 'movie':
@@ -3549,11 +3036,12 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._movie_more_result = self._movie_detail_preview = self._movie_detail_result = None
         self._movie_poster_state = self._movie_deferred_poster_jobs = None
         self._movie_ready = self._movie_detail_pending = self._movie_poster_pending = False
+        retry_entries = self._movie_entries.cached_items() if getattr(self._movie_entries, 'full_category', False) else self._movie_entries
         browse_catalog = getattr(self, '_movie_browser_catalog', None)
         if browse_catalog is not None:
             browse_catalog.invalidate()
             self._movie_index_reload_when_done = False
-        for current in self._movie_entries:
+        for current in retry_entries:
             url = _safe_picon_url(getattr(current, 'icon', ''))
             if url:
                 _clear_picon_failure(url)
@@ -3570,49 +3058,10 @@ class VODBrowserMethods(DiscoveryVODMethods):
         else:
             self._start_movie_load()
 
-    def _select_movie_category(self, index):
-        preparation = getattr(self, '_vod_preparation', None)
-        if preparation is not None:
-            preparation.invalidate()
-        if not self._entries or self._loading:
-            return
-        self._movie_focus = 'categories'
-        self._movie_pending_advance = False
-        self._movie_pending_selection_index = None
-        selected_index = index % len(self._entries)
-        self.selected_index = selected_index
-        self._movie_loaded_category_id = None
-        self._refresh_movie_categories()
-        self._render_movie_posters()
 
-    def _select_movie(self, index):
-        if not self._movie_entries or self._movie_loading:
-            return
-        focus_changed = self._movie_focus != 'posters'
-        self._movie_focus = 'posters'
-        index = int(index)
-        if index < 0 and self._vod_window_base('movie'):
-            self._request_vod_window('movie', index)
-            return
-        if index >= len(self._movie_entries) and self._movie_has_more:
-            self._movie_pending_advance = True
-            self._movie_pending_selection_index = index
-            self._start_movie_more_load()
-            return
-        self._movie_pending_advance = False
-        self._movie_pending_selection_index = None
-        self._movie_selected_index = max(0, min(index, len(self._movie_entries) - 1)) if getattr(self, '_poster_grid_enabled', False) else index % len(self._movie_entries)
-        self._trim_vod_window('movie')
-        _cancel_worker_token(self._movie_detail_token)
-        self._movie_detail_token = None
-        self._movie_generation += 1
-        self._schedule_movie_detail()
-        self._render_movie_posters()
-        if focus_changed:
-            self._refresh_movie_categories()
-        self._maybe_load_more_movies()
 
     def _stop_movie(self):
+        content_sort_ui.cancel_loading(self, 'movie')
         preparation = getattr(self, '_vod_preparation', None)
         if preparation is not None:
             preparation.invalidate()
@@ -3669,91 +3118,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
             except Exception:
                 pass
 
-    def _setup_series_widgets(self):
-        if self._poster_grid_enabled:
-            self['grid_clean_guard'] = Label('')
-            width, height, unused_px = _scale()
-            attach_background_window(self, 'grid_clean_background', APP_BACKGROUND_PATH, (width, height))
-            self['series_grid_info_panel'] = Pixmap()
-            self['hint'] = Label('')
-            self[self.content_type + '_video_guard'] = Label('')
-            self['poster_scroll_more'] = Label('⌄')
-            self['poster_scroll_more'].hide()
-        unused_width, unused_height, px = _scale()
-        self._poster_image_width = grid_geometry(unused_width, unused_height, px)['tiles'][0]['image'][2] if self._poster_grid_enabled else (discovery_poster_geometry if getattr(self, '_vod_discovery_layout', False) else cinematic_poster_geometry)(unused_width, unused_height, px)['tiles'][0]['image'][2]
-        del unused_width, unused_height
-        self._series_title_preferred_font = font_px(px, 38 if self._cinematic_enabled else 30, role='title')
-        self._series_title_min_font = font_px(px, 28 if self._cinematic_enabled else 30, role='title', value='standard')
-        if self._poster_grid_enabled:
-            self._series_title_preferred_font = font_px(px, 34, role='title')
-            self._series_title_min_font = font_px(px, 24, role='title', value='standard')
-            self._grid_rating_font = font_px(px, 22)
-            self._grid_rating_min_font = font_px(px, 16, value='standard')
-            self._grid_plot_font = font_px(px, 29)
-            self._grid_plot_min_font = font_px(px, 24, value='standard')
-            self._grid_people_font = font_px(px, 20)
-            self._grid_people_min_font = font_px(px, 18, value='standard')
-        self['series_server'] = Label('')
-        self._dynamic_server_widget = 'series_server'
-        self._dynamic_server_text = _('{}   |   CONTENT BROWSER').format(self.account.host or self.account.display_name)
-        ellipsize_dynamic_text(self['series_server'], self._dynamic_server_text, fallback_chars=80)
-        if self._cinematic_enabled:
-            self['series_video_guard'] = Label('')
-            self['series_hero_panel'] = Label('')
-            self['series_backdrop'] = Pixmap()
-            self['series_backdrop_scrim'] = Pixmap()
-            self['series_detail_shadow'] = Pixmap()
-            self['series_meta_divider'] = Label('')
-            self['series_people_shadow'] = Pixmap()
-            self['series_rail_shadow'] = Pixmap()
-            self['series_people_panel'] = Label('')
-            self['series_hero_panel'].hide()
-            self['series_backdrop'].hide()
-            self['series_backdrop_scrim'].hide()
-            self['series_detail_shadow'].show()
-            self['series_people_shadow'].show()
-            self['series_rail_shadow'].show()
-        self['series_category_panel'] = Label('')
-        self['series_category_accent'] = Label('')
-        self['series_category_caption'] = Label(_('CATEGORIES'))
-        for index in range(self.page_size):
-            self['series_category_{}'.format(index)] = Label('')
-            self['series_category_focus_{}'.format(index)] = Label('')
-            self['series_category_marker_{}'.format(index)] = Label('')
-        self['series_grid_panel'] = Label('')
-        self['series_grid_accent'] = Label('')
-        self['series_poster_frame'] = Label('')
-        self['series_poster_placeholder'] = Label(_('GT\nSERIES'))
-        self['series_poster'] = Pixmap()
-        self['series_rail_caption'] = Label(_('SERIES'))
-        self['series_grid_position'] = Label('')
-        self['poster_scroll_track'] = Label('')
-        self['poster_scroll_thumb'] = Label('')
-        hide_scrollbar(self, 'poster_scroll')
-        for index in range(getattr(self, '_poster_slot_count', SERIES_GRID_PAGE_SIZE)):
-            self['series_tile_bg_{}'.format(index)] = Pixmap() if self._poster_grid_enabled else Label('')
-            self['series_tile_focus_{}'.format(index)] = Pixmap() if self._poster_grid_enabled else Label('')
-            self['series_tile_inner_{}'.format(index)] = Label('')
-            self['series_tile_placeholder_{}'.format(index)] = Label('GT')
-            self['series_tile_poster_{}'.format(index)] = Pixmap()
-            self['series_tile_favorite_{}'.format(index)] = Pixmap()
-            self['series_tile_title_{}'.format(index)] = Label('')
-        self['series_detail_panel'] = Label('')
-        self['series_detail_accent'] = Label('')
-        self['series_title'] = Label(_('Selecting series...'))
-        self['series_rating'] = Label('')
-        self['series_meta'] = Label('')
-        self['series_plot_caption'] = Label(_('SERIES SUMMARY'))
-        series_plot_text = _('Loading...')
-        self['series_plot'] = GTSmoothScrollLabel(series_plot_text, lightweight=True) if self._cinematic_enabled else Label(series_plot_text)
-        self['series_people'] = Label('')
-        self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions', 'MoviePlayerActions', 'MenuActions'], {'ok': self.open_selected, 'menu': self.download_selected, 'cancel': self.close, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'channelUp': self.channel_page_up, 'channelDown': self.channel_page_down, 'green': self.open_series_continue, 'yellow': self.open_content_edit, 'blue': self.open_series_search, 'red': self.toggle_selected_favorite}, -1)
-        if getattr(self, '_vod_discovery_layout', False):
-            self._setup_discovery_widgets()
-        self._clear_series_tiles()
-        self['series_poster'].hide()
-        if hasattr(self, 'onClose'):
-            self.onClose.append(self._stop_series)
 
     def _set_series_title(self, value):
         return fit_dynamic_text(self['series_title'], value, max_lines=1 if getattr(self, '_poster_grid_enabled', False) else 2, preferred_size=self._series_title_preferred_font, min_size=self._series_title_min_font, fallback_chars=18)
@@ -3761,77 +3125,11 @@ class VODBrowserMethods(DiscoveryVODMethods):
     def _set_static_series_title(self, value):
         return set_static_text(self['series_title'], value, preferred_size=self._series_title_preferred_font)
 
-    def _set_series_plot(self, value):
-        if getattr(self, '_poster_grid_enabled', False):
-            self['hint'].setText(value if not self._series_entries else '')
-            return fit_dynamic_text(self['series_plot'], value, max_lines=2, preferred_size=getattr(self, '_grid_plot_font', None), min_size=getattr(self, '_grid_plot_min_font', None), fallback_chars=150)
-        if getattr(self, '_cinematic_enabled', False):
-            rendered = clean_dynamic_text(value)
-            self['series_plot'].setText(rendered)
-            return rendered
-        return fit_dynamic_text(self['series_plot'], value, max_lines=17, fallback_chars=36)
 
     def _series_rail_page_size(self):
         return getattr(self, '_poster_page_size', CINEMATIC_POSTER_COLUMNS if getattr(self, '_cinematic_enabled', False) else SERIES_GRID_PAGE_SIZE)
 
-    def _refresh_series_categories(self):
-        if getattr(self, '_vod_discovery_layout', False):
-            return self._refresh_discovery_categories()
-        hint = getattr(self, '_series_trailer_hint', None)
-        if hint is not None:
-            hint.refresh_hint()
-        try:
-            set_visible = _set_component_visible
-        except NameError:
 
-            def set_visible(component, visible):
-                if visible:
-                    component.show()
-                else:
-                    component.hide()
-        try:
-            update_text = set_text_if_changed
-        except NameError:
-
-            def update_text(component, value):
-                text = '' if value is None else str(value)
-                current = getattr(component, 'message', None)
-                if current is None or str(current) != text:
-                    component.setText(text)
-        if self._error:
-            ellipsize_dynamic_text(self['message'], _(self._error), fallback_chars=20)
-            self._clear_series_categories()
-            hide_scrollbar(self, 'list_scroll')
-            return
-        if not self._entries:
-            update_text(self['message'], _('Series category not found'))
-            self._clear_series_categories()
-            hide_scrollbar(self, 'list_scroll')
-            return
-        self.selected_index %= len(self._entries)
-        page_start = int(self.selected_index / self.page_size) * self.page_size
-        page_items = self._entries[page_start:page_start + self.page_size]
-        for row in range(self.page_size):
-            name = ''
-            selected = False
-            if row < len(page_items):
-                absolute = page_start + row
-                name = page_items[row].name
-                selected = self._series_focus == 'categories' and absolute == self.selected_index
-            ellipsize_dynamic_text(self['series_category_{}'.format(row)], name, fallback_chars=18)
-            for widget_name in ('series_category_focus_{}'.format(row), 'series_category_marker_{}'.format(row)):
-                set_visible(self[widget_name], selected)
-        category = self._entries[self.selected_index]
-        update_text(self['message'], '{}: {} • {}/{}'.format(_('Categories'), len(self._entries), self.selected_index + 1, len(self._entries)))
-        update_scrollbar(self, 'list_scroll', len(self._entries), self.selected_index, self.page_size, self._list_scroll_geometry)
-        if self._series_loaded_category_id != category.category_id:
-            self._schedule_series_load(category, immediate=not self._series_category_load_started)
-
-    def _clear_series_categories(self):
-        for row in range(self.page_size):
-            self['series_category_{}'.format(row)].setText('')
-            self['series_category_focus_{}'.format(row)].hide()
-            self['series_category_marker_{}'.format(row)].hide()
 
     def _loaded_series_category(self):
         category_id = str(self._series_loaded_category_id or '')
@@ -3846,13 +3144,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
         category = self._entries[self.selected_index]
         return str(self._series_loaded_category_id or '') == str(getattr(category, 'category_id', '') or '')
 
-    def _remember_series_selection(self):
-        if not self._series_entries:
-            return
-        category_id = str(self._series_loaded_category_id or '')
-        index = max(0, min(self._series_selected_index, len(self._series_entries) - 1))
-        item = self._series_entries[index]
-        self._series_selection_by_category[category_id] = (index + self._vod_window_base('series'), str(getattr(item, 'stream_id', '') or ''))
 
     def _restore_series_selection(self):
         """Restore a category's grid position without wrapping partial pages."""
@@ -3867,10 +3158,20 @@ class VODBrowserMethods(DiscoveryVODMethods):
         saved_index, saved_stream_id = saved
         saved_stream_id = str(saved_stream_id or '')
         if saved_stream_id:
-            for index, item in enumerate(self._series_entries):
-                if str(getattr(item, 'stream_id', '') or '') == saved_stream_id:
+            if getattr(self._series_entries, 'full_category', False):
+                index = self._series_entries.position(saved_stream_id)
+                if index is not None:
                     self._series_selected_index = index
                     return
+                if getattr(self._series_entries, 'progressive', False):
+                    self._series_entries.restore_identity = (saved_stream_id, self._series_generation)
+                    self._series_selected_index = 0
+                    return
+            else:
+                for index, item in enumerate(self._series_entries):
+                    if str(getattr(item, 'stream_id', '') or '') == saved_stream_id:
+                        self._series_selected_index = index
+                        return
         try:
             saved_index = max(0, int(saved_index))
         except (TypeError, ValueError, OverflowError):
@@ -3910,6 +3211,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._start_series_load(category)
 
     def _start_series_load(self, category=None):
+        self._remember_series_selection()
         if category is None and self._entries:
             category = self._entries[self.selected_index]
         if category is not None:
@@ -3920,7 +3222,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
         if not self._entries or self._closed or getattr(self, '_series_search_child_open', False):
             return
         category = category or self._entries[self.selected_index]
-        self._remember_series_selection()
         for timer in (self._series_category_timer, self._series_detail_timer, self._series_scan_timer):
             try:
                 timer.stop()
@@ -3975,8 +3276,10 @@ class VODBrowserMethods(DiscoveryVODMethods):
         browse_catalog = getattr(self, '_series_browser_catalog', None)
         if browse_catalog is not None:
             browse_catalog.start(preferred_category=category.category_id)
-        token = _WorkerToken(120 if browse_catalog is not None and browse_catalog.sort_mode != 'provider' else WORKER_LIST_TIMEOUT_SECONDS)
+        token = _WorkerToken(browse_catalog.load_timeout if browse_catalog is not None else WORKER_LIST_TIMEOUT_SECONDS)
         self._series_load_token = token
+        begin_delivery = getattr(self, '_light_begin_list', None)
+        if callable(begin_delivery): begin_delivery('series', generation)
         worker = threading.Thread(target=self._load_series_worker, args=(generation, category.category_id, token))
         worker.daemon = True
         worker.start()
@@ -3987,23 +3290,23 @@ class VODBrowserMethods(DiscoveryVODMethods):
         native_window = getattr(self, '_series_native_window', None)
         try:
             if browse_catalog is not None:
-                page = browse_catalog.read(category_id, hidden_category_ids=self._hidden_category_ids, token=token)
+                page = content_sort_ui.initial_page(browse_catalog, category_id, self._hidden_category_ids, token)
                 page = content_sort_ui.restore_page(self, browse_catalog, page, 'series', category_id, generation, token)
-                entries = list(page.items)
+                entries = page.items
                 error = '' if entries or page.catalog_state.get('complete') else N_('Could not load series')
             else:
                 entries = list(_bounded_client_call(self.client, token, lambda: self.client.load_items('series', category_id)) or [])
                 error = ''
-            if not str(category_id or '').strip() or category_filter_active(getattr(self, '_hidden_category_ids', ())):
+            if browse_catalog is None and (not str(category_id or '').strip() or category_filter_active(getattr(self, '_hidden_category_ids', ()))):
                 entries = filter_hidden_category_items(entries, self._hidden_category_ids, category_id)
         except _WorkerCancelled:
             return
         except ContentError as caught:
             entries = []
             error = str(caught)
-        except (CatalogStorageError, CatalogLimitError):
+        except (CatalogStorageError, CatalogLimitError, MemoryError) as caught:
             entries = []
-            error = N_('Search cache is unavailable. Check receiver storage.')
+            error = catalog_failure_message(caught)
         except Exception:
             entries = []
             error = N_('Could not load series')
@@ -4017,7 +3320,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 error = N_('Search incomplete.')
         self._series_window_base = getattr(page, 'sort_base', 0) if browse_catalog is not None and (not error) else 0
         self._series_selected_index = getattr(page, 'sort_selected', 0) if browse_catalog is not None and (not error) else 0
-        self._series_known_ids = {str(item.stream_id) for item in entries}
+        self._series_known_ids = set() if getattr(entries, 'full_category', False) else {str(item.stream_id) for item in entries}
         self._series_entries = entries
         self._series_error = error
         if browse_catalog is not None:
@@ -4029,6 +3332,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
         if native_window is not None and (not error):
             self._series_has_more = native_window.has_more or native_window.count > len(entries)
         self._series_ready = True
+        publish = getattr(self, '_light_publish_list', None)
+        if callable(publish): publish('series', generation)
 
     def _start_series_more_load(self):
         loader = getattr(self.client, 'load_more_items', None)
@@ -4072,9 +3377,9 @@ class VODBrowserMethods(DiscoveryVODMethods):
         except ContentError as caught:
             entries = []
             error = str(caught)
-        except (CatalogStorageError, CatalogLimitError):
+        except (CatalogStorageError, CatalogLimitError, MemoryError) as caught:
             entries = []
-            error = N_('Search cache is unavailable. Check receiver storage.')
+            error = catalog_failure_message(caught)
         except Exception:
             entries = []
             error = N_('Could not load series')
@@ -4134,13 +3439,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
             return
         self._start_series_more_load()
 
-    def _update_series_rail_caption(self):
-        if not self._entries or not self._series_entries:
-            return
-        category = self._loaded_series_category()
-        if category is None:
-            return
-        ellipsize_dynamic_text(self['series_rail_caption'], _('{} • {} SERIES').format(localized_upper(category.name), self._vod_window_base('series') + len(self._series_entries)), fallback_chars=65)
 
     def _apply_series_more_result(self):
         result = self._series_more_result
@@ -4222,22 +3520,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._render_series_tiles()
         self._schedule_series_scan()
 
-    def _update_series_catalog_message(self):
-        catalog = getattr(self, '_series_browser_catalog', None)
-        if catalog is None:
-            return
-        state = catalog.state
-        if state.get('preparing'):
-            text = ''
-        elif state.get('reason') == 'storage':
-            text = _('Search cache is unavailable. Check receiver storage.')
-        elif state.get('reason') == 'limit':
-            text = _('Catalogue limit reached. Results may be incomplete.')
-        elif not state.get('complete'):
-            text = _('Series catalogue incomplete: {count} series. Press GREEN to continue.').format(count=state.get('movies', 0))
-        else:
-            text = ''
-        ellipsize_dynamic_text(self['message'], text, fallback_chars=90)
 
     def _poll_series_result(self):
         if self._closed or getattr(self, '_series_search_child_open', False):
@@ -4245,6 +3527,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
         browse_catalog = getattr(self, '_series_browser_catalog', None)
         if browse_catalog is not None:
             self._update_series_catalog_message()
+            if getattr(self, '_light_vod_enabled', False):
+                self._light_refresh_count()
             if self._series_index_reload_when_done and (not browse_catalog.state.get('preparing')):
                 self._series_index_reload_when_done = False
                 self._start_series_load()
@@ -4263,10 +3547,14 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 return
             self._series_loading = False
             self._series_load_token = None
+            content_sort_ui.refresh_initial(self, 'series')
             self._render_series_results()
-            if browse_catalog is not None and browse_catalog.state.get('preparing'):
+            if browse_catalog is not None and (browse_catalog.state.get('preparing') or getattr(self._series_entries, 'progressive', False)):
                 self._series_timer.start(120, True)
             return
+        growing_pending = content_sort_ui.poll_loading(self, 'series')
+        if growing_pending:
+            self._series_timer.start(120, True)
         if self._series_more_loading and self._series_more_token is not None and self._series_more_token.expired():
             _cancel_worker_token(self._series_more_token)
             self._series_more_loading = False
@@ -4363,39 +3651,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
         if self._series_detail_pending or self._series_poster_pending or self._series_more_loading or cinematic_pending or (browse_catalog is not None and browse_catalog.state.get('preparing')):
             self._series_timer.start(self._vod_poster_poll_delay('series'), True)
 
-    def _render_series_waiting(self, item=None):
-        if getattr(self, '_poster_grid_enabled', False):
-            self._render_grid_detail('series', None, loading=True)
-            return
-        getattr(self, '_detail_poster_signatures', {}).pop('series', None)
-        try:
-            set_visible = _set_component_visible
-        except NameError:
-
-            def set_visible(component, visible):
-                if visible:
-                    component.show()
-                else:
-                    component.hide()
-        reset_cinematic = getattr(self, '_reset_cinematic_backdrop', None)
-        if callable(reset_cinematic):
-            reset_cinematic(keep_visible=item is not None and
-                getattr(self, '_cinematic_applied_identity', None) == ('series', str(item.stream_id)))
-        if item is not None and getattr(self, '_cinematic_enabled', False):
-            self._cinematic_surface_prepared = ('series', str(getattr(item, 'stream_id', '') or ''), getattr(self, '_series_generation', None))
-        if item is None:
-            self._set_static_series_title(_('Selecting series...'))
-            set_text_if_changed(self['series_rating'], '')
-            set_text_if_changed(self['series_meta'], '')
-        else:
-            self._set_series_title(item.name)
-            set_text_if_changed(self['series_rating'], _rating_label(item.rating))
-            fit_dynamic_text(self['series_meta'], _year_not_in_title(item.name, item.year), max_lines=4, fallback_chars=18)
-        self._set_series_plot(_('Loading...'))
-        set_text_if_changed(self['series_people'], '')
-        set_visible(self['series_poster'], False)
-        set_visible(self['series_poster_placeholder'], True)
-        self._apply_detail_poster('series', item)
 
     def _series_catalog_outcome(self):
         result = self._series_catalog_diagnostic()
@@ -4437,102 +3692,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._maybe_load_more_series()
         self._schedule_series_scan()
 
-    def _render_series_tiles(self):
-        hint = getattr(self, '_series_trailer_hint', None)
-        if hint is not None:
-            hint.refresh_hint()
-        try:
-            set_visible = _set_component_visible
-        except NameError:
-
-            def set_visible(component, visible):
-                if visible:
-                    component.show()
-                else:
-                    component.hide()
-        try:
-            update_text = set_text_if_changed
-        except NameError:
-
-            def update_text(component, value):
-                text = '' if value is None else str(value)
-                current = getattr(component, 'message', None)
-                if current is None or str(current) != text:
-                    component.setText(text)
-        page_size = getattr(self, '_poster_page_size', CINEMATIC_POSTER_COLUMNS if getattr(self, '_cinematic_enabled', False) else SERIES_GRID_PAGE_SIZE)
-        page_start = int(self._series_selected_index / page_size) * page_size
-        page = self._series_entries[page_start:page_start + page_size]
-        page_key = (page_start, tuple((str(getattr(item, 'stream_id', '')) for item in page)))
-        page_changed = page_key != self._series_poster_page_key
-        if page_changed:
-            self._release_grid_pixmaps('series')
-            self._series_poster_generation = getattr(self, '_series_poster_generation', self._series_generation) + 1
-            _cancel_worker_token(self._series_poster_token)
-            self._series_poster_token = None
-            self._series_poster_pending = False
-            self._series_poster_state = None
-            self._series_deferred_poster_jobs = None
-            self._series_poster_page_key = page_key
-            self._series_poster_urls = {}
-            self._reset_vod_poster_retries('series')
-        poster_urls = getattr(self, '_series_poster_urls', None)
-        if poster_urls is None:
-            poster_urls = self._series_poster_urls = {}
-        jobs, cached_cards = [], []
-        for slot in range(page_size):
-            selected = False
-            if slot < len(page):
-                absolute = page_start + slot
-                item = page[slot]
-                selected = self._series_focus == 'series' and absolute == self._series_selected_index
-                fit_dynamic_text(self['series_tile_title_{}'.format(slot)], item.name, max_lines=2, fallback_chars=24)
-                set_visible(self['series_tile_bg_{}'.format(slot)], True)
-                set_visible(self['series_tile_inner_{}'.format(slot)], True)
-                set_visible(self['series_tile_title_{}'.format(slot)], True)
-                set_visible(self['series_tile_favorite_{}'.format(slot)], self._is_favorite(item))
-                url = self._vod_card_url(getattr(item, 'icon', ''))
-                cover_changed = slot not in poster_urls or poster_urls[slot] != url
-                if page_changed or cover_changed:
-                    poster_urls[slot] = url
-                    if page_changed:
-                        set_visible(self['series_tile_placeholder_{}'.format(slot)], True)
-                    if page_changed:
-                        set_visible(self['series_tile_poster_{}'.format(slot)], False)
-                    if url:
-                        cached = _cached_picon_path(url)
-                        preparation = getattr(self, '_vod_preparation', None)
-                        if cached and getattr(self, '_poster_grid_enabled', False) and (not (preparation is not None and preparation.card_ready('series', slot, cached))):
-                            cached_cards.append((slot, item.stream_id, cached, url, url, False))
-                        elif cached:
-                            self._apply_series_tile_poster(slot, cached, stream_id=item.stream_id, generation=getattr(self, '_series_poster_generation', self._series_generation))
-                        else:
-                            jobs.append((slot, item, url))
-                    else:
-                        jobs.append((slot, item, ''))
-            else:
-                update_text(self['series_tile_title_{}'.format(slot)], '')
-                for family in ('bg', 'inner', 'title', 'placeholder', 'poster', 'favorite'):
-                    set_visible(self['series_tile_{}_{}'.format(family, slot)], False)
-            set_visible(self['series_tile_focus_{}'.format(slot)], selected)
-        for slot in range(page_size, getattr(self, '_poster_slot_count', SERIES_GRID_PAGE_SIZE)):
-            update_text(self['series_tile_title_{}'.format(slot)], '')
-            for family in ('bg', 'inner', 'title', 'placeholder', 'poster', 'favorite', 'focus'):
-                set_visible(self['series_tile_{}_{}'.format(family, slot)], False)
-        if getattr(self, '_poster_grid_enabled', False):
-            self._update_grid_position('series')
-        else:
-            update_horizontal_scrollbar(self, 'poster_scroll', self._vod_window_base('series') + len(self._series_entries), self._vod_window_base('series') + self._series_selected_index, page_size, self._poster_scroll_geometry)
-        update_text(self['series_grid_position'], self._series_grid_position_text())
-        if jobs:
-            self._queue_vod_poster_jobs('series', page_key, jobs)
-        if cached_cards:
-            self._publish_cached_vod_cards('series', page_key, cached_cards)
-        self._prioritize_vod_posters('series', page_key)
-        preparation = getattr(self, '_vod_preparation', None)
-        if preparation is not None:
-            preparation.update('series')
-        if getattr(self, '_vod_discovery_layout', False):
-            self._render_discovery_navigation()
 
     def _series_grid_position_text(self):
         if getattr(self, '_poster_grid_enabled', False):
@@ -4578,13 +3737,6 @@ class VODBrowserMethods(DiscoveryVODMethods):
         pool.replace(tasks)
         self._series_timer.start(50, True)
 
-    def _start_deferred_series_posters(self):
-        deferred = self._series_deferred_poster_jobs
-        if deferred is not None and self._series_poster_state is None:
-            wait_for_detail = len(deferred) > 2 and bool(deferred[2])
-            if wait_for_detail and (self._series_detail_pending or self._series_pending_detail_generation is not None):
-                return
-            self._start_series_poster_jobs(deferred[0], deferred[1])
 
     def _load_series_posters_worker(self, jobs, state, token=None):
         self._load_vod_posters_worker('series', jobs, state, token)
@@ -4666,43 +3818,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._start_deferred_series_posters()
         self._series_timer.start(80, True)
 
-    def _schedule_series_detail(self, immediate=False):
-        if self._closed:
-            return
-        defer_scroll = getattr(self['series_plot'], 'defer_scroll', None)
-        if callable(defer_scroll):
-            defer_scroll()
-        preparation = getattr(self, '_vod_preparation', None)
-        if preparation is not None:
-            preparation.selection('series')
-        if getattr(self, '_poster_grid_enabled', False):
-            self._schedule_grid_detail('series', immediate)
-            return
-        if not self._series_entries or self._closed:
-            return
-        self._series_pending_detail_generation = self._series_generation
-        _cancel_worker_token(self._series_detail_token)
-        self._series_detail_token = None
-        try:
-            self._series_detail_timer.stop()
-        except Exception:
-            pass
-        item = self._series_entries[self._series_selected_index]
-        if preparation is not None and preparation.show_ready('series'):
-            return
-        self._render_series_waiting(item)
-        if getattr(self, '_cinematic_enabled', False):
-            self._schedule_hero_start('series', item, immediate=immediate)
-        if immediate:
-            self._commit_series_detail()
-        else:
-            self._series_detail_timer.start(NAVIGATION_DEBOUNCE_MS, True)
 
-    def _commit_series_detail(self):
-        if self._closed or self._series_pending_detail_generation != self._series_generation:
-            return
-        self._series_pending_detail_generation = None
-        self._start_series_detail()
 
     def _load_series_detail_worker(self, generation, item, token=None):
         if token is not None:
@@ -4710,9 +3826,18 @@ class VODBrowserMethods(DiscoveryVODMethods):
         catalogue_poster_url = _safe_picon_url(getattr(item, 'icon', ''))
         info = _detail_cache_get(self._series_info_cache, self._series_info_cache_lock, item.stream_id) if hasattr(self, '_series_info_cache_lock') else self._series_info_cache.get(item.stream_id)
         metadata_status = ''
-        early_info = None
+        early_info = catalogue_info(self.client, 'series', item) if info is None else None
+        if info is None and early_info is not None:
+            # Episodes are fetched only when entering the selected series.
+            info = early_info
         if info is None:
-            early_info = self._catalogue_detail_preview('series', generation, item, token)
+            localized = self._catalogue_detail_preview('series', generation, item, token)
+            if localized is not None:
+                info = localized
+                early_info = localized
+        if early_info is not None and generation == self._series_generation and (token is None or token.active()):
+            preview_url = _safe_picon_url(getattr(early_info, 'cover', '') or getattr(item, 'icon', ''))
+            self._series_detail_preview = (generation, early_info, _cached_picon_path(preview_url) if preview_url else '', '', preview_url, catalogue_poster_url)
         loader = getattr(self.client, 'load_series_summary', None)
         if loader is None:
             loader = getattr(self.client, 'load_series_info', None)
@@ -4751,104 +3876,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         if generation == self._series_generation and (token is None or token.active()):
             self._series_detail_result = (generation, info, poster_path, metadata_status, poster_url, catalogue_poster_url)
 
-    def _apply_series_detail(self, info, poster_path, metadata_status='', poster_url='', catalogue_poster_url=''):
-        if not self._series_entries:
-            return
-        if getattr(self, '_poster_grid_enabled', False):
-            self._render_grid_detail('series', info)
-            self._apply_grid_cover('series', poster_path, poster_url, catalogue_poster_url)
-            return
-        cinematic = bool(getattr(self, '_cinematic_enabled', False))
-        try:
-            update_text = set_text_if_changed
-        except NameError:
 
-            def update_text(component, value):
-                text = '' if value is None else str(value)
-                getter = getattr(component, 'getText', None)
-                current = getter() if callable(getter) else getattr(component, 'message', getattr(component, 'text', None))
-                if current is None or str(current) != text:
-                    component.setText(text)
-
-        def set_plot(value):
-            setter = getattr(self, '_set_series_plot', None)
-            if callable(setter):
-                return setter(value)
-            return fit_dynamic_text(self['series_plot'], value, max_lines=17, fallback_chars=36)
-        item = self._series_entries[self._series_selected_index]
-        _attach_subtitle_detail_metadata(item, info)
-        poster_url = _safe_picon_url(poster_url)
-        catalogue_poster_url = _safe_picon_url(catalogue_poster_url)
-        current_poster_url = _safe_picon_url(getattr(item, 'icon', ''))
-        poster_identity_changed = False
-        if poster_url and (not current_poster_url or current_poster_url == catalogue_poster_url):
-            if current_poster_url != poster_url:
-                item.icon = poster_url
-                current_poster_url = poster_url
-                poster_identity_changed = True
-        if poster_path and poster_url and (current_poster_url != poster_url):
-            poster_path = ''
-        metadata_status = str(metadata_status or '').strip()[:180]
-        self._series_info = info
-        self._series_info_stream_id = str(item.stream_id)
-        if info is None:
-            self._set_series_title(item.name)
-            update_text(self['series_rating'], _rating_label(item.rating))
-            fit_dynamic_text(self['series_meta'], _year_not_in_title(item.name, item.year) or _('Information unavailable.'), max_lines=4, fallback_chars=18)
-            set_plot(_('Series summary unavailable.'))
-            if cinematic:
-                update_text(self['series_people'], '')
-        else:
-            display_title = info.title or item.name
-            self._set_series_title(display_title)
-            rating = info.rating or item.rating
-            update_text(self['series_rating'], _rating_label(rating))
-            seasons = list(getattr(info, 'seasons', []) or [])
-            meta = [_year_not_in_title(display_title, info.year or item.year)]
-            if not cinematic and info.genre:
-                meta.append(info.genre)
-            meta = [value for value in meta if value]
-            if seasons:
-                meta.append('{}: {}'.format(localized_upper(_('Seasons')) if cinematic else _('Seasons'), len(seasons)))
-            fit_dynamic_text(self['series_meta'], ('  |  ' if cinematic else ' • ').join(meta) or _('Information unavailable.'), max_lines=4, fallback_chars=18)
-            set_plot(info.plot or _('Series summary unavailable.'))
-            if cinematic:
-                people = []
-                director = getattr(info, 'director', '')
-                cast = getattr(info, 'cast', '')
-                if director:
-                    people.append(_('Director: {}').format(director))
-                if cast:
-                    people.append(_('Cast: {}').format(cast))
-                fit_dynamic_text(self['series_people'], '  |  '.join(people), max_lines=2, fallback_chars=100)
-        start_cinematic = getattr(self, '_start_cinematic_backdrop', None)
-        if getattr(self, '_cinematic_enabled', False) and callable(start_cinematic):
-            start_cinematic('series', item, info, catalogue_poster_url)
-        if self._apply_detail_poster('series', item, poster_path):
-            stream_id = item.stream_id
-            self._apply_series_tile_poster(self._series_selected_index % (CINEMATIC_POSTER_COLUMNS if cinematic else SERIES_GRID_PAGE_SIZE), poster_path, stream_id=stream_id, generation=getattr(self, '_series_poster_generation', self._series_generation))
-        if poster_identity_changed:
-            self._render_series_tiles()
-
-    def _clear_series_tiles(self):
-        self._reset_vod_poster_retries()
-        self._release_grid_pixmaps('series')
-        if getattr(self, '_poster_grid_enabled', False):
-            self['series_grid_position'].setText('')
-            self['poster_scroll_more'].hide()
-        for slot in range(getattr(self, '_poster_slot_count', SERIES_GRID_PAGE_SIZE)):
-            self['series_tile_title_{}'.format(slot)].setText('')
-            self['series_tile_bg_{}'.format(slot)].hide()
-            self['series_tile_inner_{}'.format(slot)].hide()
-            self['series_tile_title_{}'.format(slot)].hide()
-            self['series_tile_poster_{}'.format(slot)].hide()
-            self['series_tile_placeholder_{}'.format(slot)].hide()
-            self['series_tile_favorite_{}'.format(slot)].hide()
-            self['series_tile_focus_{}'.format(slot)].hide()
-        self['series_grid_position'].setText('')
-        hide_scrollbar(self, 'poster_scroll')
-        if getattr(self, '_vod_discovery_layout', False):
-            self._render_discovery_navigation()
 
     def refresh_series(self):
         if self.content_type != 'series':
@@ -4864,11 +3892,12 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._series_more_result = self._series_detail_preview = self._series_detail_result = None
         self._series_poster_state = self._series_deferred_poster_jobs = None
         self._series_ready = self._series_detail_pending = self._series_poster_pending = False
+        retry_entries = self._series_entries.cached_items() if getattr(self._series_entries, 'full_category', False) else self._series_entries
         browse_catalog = getattr(self, '_series_browser_catalog', None)
         if browse_catalog is not None:
             browse_catalog.invalidate()
             self._series_index_reload_when_done = False
-        for current in self._series_entries:
+        for current in retry_entries:
             url = _safe_picon_url(getattr(current, 'icon', ''))
             if url:
                 _clear_picon_failure(url)
@@ -4885,57 +3914,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         else:
             self._start_series_load()
 
-    def _select_series_category(self, index):
-        preparation = getattr(self, '_vod_preparation', None)
-        if preparation is not None:
-            preparation.invalidate()
-        if not self._entries or self._loading:
-            return
-        self._remember_series_selection()
-        self._series_focus = 'categories'
-        self._series_pending_advance = False
-        self._series_pending_selection_index = None
-        self._series_pending_clamp_to_end = False
-        self.selected_index = index % len(self._entries)
-        self._series_loaded_category_id = None
-        self._refresh_series_categories()
-        self._render_series_tiles()
 
-    def _select_series(self, index):
-        if not self._series_entries or self._series_loading:
-            return
-        focus_changed = self._series_focus != 'series'
-        self._series_focus = 'series'
-        index = int(index)
-        if index < 0 and self._vod_window_base('series'):
-            self._request_vod_window('series', index)
-            return
-        if index < 0:
-            return
-        if index >= len(self._series_entries) and self._series_has_more:
-            self._series_pending_advance = True
-            self._series_pending_selection_index = index
-            self._start_series_more_load()
-            return
-        if index >= len(self._series_entries):
-            self._series_pending_clamp_to_end = False
-            return
-        self._series_pending_advance = False
-        self._series_pending_selection_index = None
-        self._series_pending_clamp_to_end = False
-        self._series_selected_index = index
-        self._trim_vod_window('series')
-        _cancel_worker_token(self._series_detail_token)
-        self._series_detail_token = None
-        self._series_generation += 1
-        self._series_info = None
-        self._series_info_stream_id = ''
-        self._remember_series_selection()
-        self._schedule_series_detail()
-        self._render_series_tiles()
-        if focus_changed:
-            self._refresh_series_categories()
-        self._maybe_load_more_series()
 
     def _series_move_up(self):
         if getattr(self, '_poster_grid_enabled', False) and self.content_type == 'series' and (self._series_focus == 'series'):
@@ -5146,16 +4125,23 @@ class VODBrowserMethods(DiscoveryVODMethods):
         if callable(getattr(self.client, 'iter_series_catalog_items', None)):
             if getattr(self, '_series_search_child_open', False):
                 return
+            shared_catalog = None
             try:
-                search_client = self.client if _is_stalker_client(self.client) else content_client_for(self.account)
+                catalog = getattr(self, '_series_browser_catalog', None)
+                shared_catalog = catalog.borrow_search() if catalog is not None else None
+                search_client = shared_catalog.client if shared_catalog is not None else self.client if _is_stalker_client(self.client) else content_client_for(self.account)
             except Exception:
+                if shared_catalog is not None:
+                    shared_catalog.close()
                 self['message'].setText(_('Could not open the content list.'))
                 return
             self._series_search_child_open = True
-            self._pause_series_for_search()
             try:
-                self._series_search_child = self.session.openWithCallback(self._series_search_closed, GTAllSeriesSearchScreen, self.account, search_client, self.favorite_store, self._hidden_category_ids, initial_query=self._series_search_query)
+                self._pause_series_for_search()
+                self._series_search_child = self.session.openWithCallback(self._series_search_closed, GTAllSeriesSearchScreen, self.account, search_client, self.favorite_store, self._hidden_category_ids, initial_query=self._series_search_query, shared_catalog=shared_catalog)
             except Exception:
+                if shared_catalog is not None:
+                    shared_catalog.close()
                 self._series_search_closed()
                 self['message'].setText(_('Could not open the content list.'))
             return
@@ -5198,6 +4184,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             self._select_series(index)
 
     def _pause_series_for_search(self):
+        content_sort_ui.cancel_loading(self, 'series')
         self._reset_vod_poster_retries()
         self._remember_series_selection()
         catalog = getattr(self, '_series_browser_catalog', None)
@@ -5255,6 +4242,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             self._start_series_load()
 
     def _stop_series(self):
+        content_sort_ui.cancel_loading(self, 'series')
         preparation = getattr(self, '_vod_preparation', None)
         if preparation is not None:
             preparation.invalidate()
@@ -5312,7 +4300,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
 def install_vod_methods(target):
     if target.__dict__.get('_vod_methods_installed', False):
         return
-    for cls in (DiscoveryVODMethods, VODBrowserMethods):
+    from .vod_light import LightVODMethods
+    for cls in (DiscoveryVODMethods, VODBrowserMethods, LightVODMethods):
         for name, method in vars(cls).items():
             if not name.startswith('__'):
                 setattr(target, name, method)

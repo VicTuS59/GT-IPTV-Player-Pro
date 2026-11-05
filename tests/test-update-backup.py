@@ -8,7 +8,7 @@ pkg=importlib.util.module_from_spec(spec);sys.modules[NAME]=pkg;spec.loader.exec
 protocol=__import__(NAME+'.update_protocol',fromlist=['*'])
 service=__import__(NAME+'.update_service',fromlist=['*'])
 backup=__import__(NAME+'.backup',fromlist=['*'])
-FIXTURE=json.loads((ROOT/'tests/update-fixtures.json').read_text());TRUST=FIXTURE['test_trust']
+FIXTURE=json.loads((ROOT/'tests/update-fixtures.json').read_text(encoding='utf-8'));TRUST=FIXTURE['test_trust']
 original_verify=protocol.verify_signature;protocol.KEY_ID=TRUST['key_id']
 protocol.verify_signature=lambda body,signature:original_verify(body,signature,n=TRUST['n'],e=TRUST['e'])
 

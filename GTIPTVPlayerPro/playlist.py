@@ -848,6 +848,16 @@ def delete_account(account, paths=None):
         return _delete_account_locked(account, paths)
 
 
+def _purge_deleted_category_titles(account):
+    """Optional cache cleanup cannot undo a committed account deletion."""
+    try:
+        from .category_titles import purge_account_titles
+
+        purge_account_titles(account)
+    except Exception as error:
+        log_event('categories', 'deleted-account-title-cache-cleanup-skipped', error)
+
+
 def _check_playlist_mutation_limits(cancel_event=None, deadline=None):
     if cancel_event is not None and cancel_event.is_set():
         raise OSError(N_("Request cancelled"))
@@ -926,10 +936,12 @@ def delete_accounts(
                 continue
             output_lines = []
             removed_here = 0
+            removed_identities = set()
             for line in content.decode("utf-8-sig", "replace").splitlines():
                 parsed = parse_playlist_line(line)
                 if parsed is not None and parsed.identity in target_identities:
                     found.add(parsed.identity)
+                    removed_identities.add(parsed.identity)
                     removed_here += 1
                     continue
                 output_lines.append(line)
@@ -939,7 +951,7 @@ def delete_accounts(
                     if output_lines
                     else b""
                 )
-                updates.append((path, payload, existing_status))
+                updates.append((path, payload, existing_status, removed_identities))
                 removed_count += removed_here
 
         if found != identities:
@@ -949,7 +961,7 @@ def delete_accounts(
         _check_playlist_mutation_limits(cancel_event, deadline)
         stages = []
         try:
-            for path, payload, existing_status in updates:
+            for path, payload, existing_status, unused_identities in updates:
                 stages.append(
                     _prepare_playlist_write(path, payload, existing_status)
                 )
@@ -957,8 +969,10 @@ def delete_accounts(
             # Once the first replace starts, finish every prepared commit. A
             # late cancellation must not report failure after durable data has
             # already changed.
-            for stage in stages:
+            for stage, update in zip(stages, updates):
                 _commit_playlist_stage(stage)
+                for identity in update[3]:
+                    _purge_deleted_category_titles(identity)
         finally:
             for stage in stages:
                 _discard_playlist_stage(stage)
@@ -1023,6 +1037,7 @@ def _delete_account_locked(account, paths):
             )
         for stage in stages:
             _commit_playlist_stage(stage)
+            _purge_deleted_category_titles(account)
     finally:
         for stage in stages:
             _discard_playlist_stage(stage)

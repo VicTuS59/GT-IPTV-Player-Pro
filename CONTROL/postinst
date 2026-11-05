@@ -386,6 +386,179 @@ if [ ! -L "$PLUGIN_DIR" ] && [ ! -L "$PLUGIN_DIR/skin" ] && [ ! -L "$PLUGIN_DIR/
     done
 fi
 
+# Live recording was removed in 1.8.6-r23. Manual installations may leave
+# unowned source files behind. Remove only these retired plugin modules;
+# retain the former folder preference and every user's media file.
+if [ ! -L "$PLUGIN_DIR" ] && [ -d "$PLUGIN_DIR" ]; then
+    for OLD_RECORDING_MODULE in live_recording live_recording_proxy live_recording_hls live_recording_ui; do
+        for OLD_RECORDING_SUFFIX in py pyc pyo; do
+            OLD_RECORDING_FILE="$PLUGIN_DIR/$OLD_RECORDING_MODULE.$OLD_RECORDING_SUFFIX"
+            if [ -L "$OLD_RECORDING_FILE" ] || [ -f "$OLD_RECORDING_FILE" ]; then
+                rm -f "$OLD_RECORDING_FILE" || true
+            fi
+        done
+    done
+fi
+
+# r30 removes only verified retired, package-owned helpers/catalogue domains
+# and exact artwork names. User settings, downloads and other files stay intact.
+if [ ! -L "$PLUGIN_DIR" ] && [ -d "$PLUGIN_DIR" ]; then
+    for RETIRED_MODULE in category_recency dvb_background stream_media; do
+        for RETIRED_SUFFIX in py pyc pyo; do
+            RETIRED_FILE="$PLUGIN_DIR/$RETIRED_MODULE.$RETIRED_SUFFIX"
+            if [ -L "$RETIRED_FILE" ] || [ -f "$RETIRED_FILE" ]; then rm -f "$RETIRED_FILE" || true; fi
+        done
+    done
+    if [ ! -L "$PLUGIN_DIR/locale" ]; then
+        for RETIRED_LANGUAGE in "$PLUGIN_DIR/locale"/*; do
+            if [ -L "$RETIRED_LANGUAGE" ] || [ -L "$RETIRED_LANGUAGE/LC_MESSAGES" ]; then continue; fi
+            for RETIRED_DOMAIN in episodes-r46.mo plurals-r49.mo; do
+                RETIRED_FILE="$RETIRED_LANGUAGE/LC_MESSAGES/$RETIRED_DOMAIN"
+                if [ -L "$RETIRED_FILE" ] || [ -f "$RETIRED_FILE" ]; then rm -f "$RETIRED_FILE" || true; fi
+            done
+        done
+    fi
+    if [ ! -L "$PLUGIN_DIR/skin" ] && [ ! -L "$PLUGIN_DIR/skin/images" ]; then
+        while IFS= read -r RETIRED_ART; do
+            RETIRED_FILE="$PLUGIN_DIR/skin/images/$RETIRED_ART"
+            if [ -L "$RETIRED_FILE" ] || [ -f "$RETIRED_FILE" ]; then rm -f "$RETIRED_FILE" || true; fi
+        done <<'R30_RETIRED_ART'
+matches-r20-empty-1080.png
+matches-r20-empty-2160.png
+matches-r20-empty-720.png
+matches-r20-empty-sd480.png
+matches-r20-empty-sd576.png
+matches-r20-empty-sd640.png
+matches-r20-live-1080.png
+matches-r20-live-2160.png
+matches-r20-live-720.png
+matches-r20-live-sd480.png
+matches-r20-live-sd576.png
+matches-r20-live-sd640.png
+matches-r20-row-1080-5.png
+matches-r20-row-1080-6.png
+matches-r20-row-2160-5.png
+matches-r20-row-2160-6.png
+matches-r20-row-720-5.png
+matches-r20-row-720-6.png
+matches-r20-row-sd480-5.png
+matches-r20-row-sd480-6.png
+matches-r20-row-sd576-5.png
+matches-r20-row-sd576-6.png
+matches-r20-row-sd640-5.png
+matches-r20-row-sd640-6.png
+matches-r20-tab-1080.png
+matches-r20-tab-2160.png
+matches-r20-tab-720.png
+matches-r20-tab-sd480.png
+matches-r20-tab-sd576.png
+matches-r20-tab-sd640.png
+welcome-matches-r19-1080.png
+welcome-matches-r19-2160.png
+welcome-matches-r19-720.png
+yt-focus-amber-r44-1080.png
+yt-focus-amber-r44-2160.png
+yt-focus-amber-r44-720.png
+yt-focus-amber-r44-sd.png
+yt-focus-classic-r44-1080.png
+yt-focus-classic-r44-2160.png
+yt-focus-classic-r44-720.png
+yt-focus-classic-r44-sd.png
+yt-focus-copper-r44-1080.png
+yt-focus-copper-r44-2160.png
+yt-focus-copper-r44-720.png
+yt-focus-copper-r44-sd.png
+yt-focus-emerald-r44-1080.png
+yt-focus-emerald-r44-2160.png
+yt-focus-emerald-r44-720.png
+yt-focus-emerald-r44-sd.png
+yt-focus-forest-r44-1080.png
+yt-focus-forest-r44-2160.png
+yt-focus-forest-r44-720.png
+yt-focus-forest-r44-sd.png
+yt-focus-indigo-r44-1080.png
+yt-focus-indigo-r44-2160.png
+yt-focus-indigo-r44-720.png
+yt-focus-indigo-r44-sd.png
+yt-focus-lagoon-r44-1080.png
+yt-focus-lagoon-r44-2160.png
+yt-focus-lagoon-r44-720.png
+yt-focus-lagoon-r44-sd.png
+yt-focus-midnight-r44-1080.png
+yt-focus-midnight-r44-2160.png
+yt-focus-midnight-r44-720.png
+yt-focus-midnight-r44-sd.png
+yt-focus-navy-r44-1080.png
+yt-focus-navy-r44-2160.png
+yt-focus-navy-r44-720.png
+yt-focus-navy-r44-sd.png
+yt-focus-olive-r44-1080.png
+yt-focus-olive-r44-2160.png
+yt-focus-olive-r44-720.png
+yt-focus-olive-r44-sd.png
+yt-focus-plum-r44-1080.png
+yt-focus-plum-r44-2160.png
+yt-focus-plum-r44-720.png
+yt-focus-plum-r44-sd.png
+yt-focus-royal-r44-1080.png
+yt-focus-royal-r44-2160.png
+yt-focus-royal-r44-720.png
+yt-focus-royal-r44-sd.png
+yt-focus-ruby-r44-1080.png
+yt-focus-ruby-r44-2160.png
+yt-focus-ruby-r44-720.png
+yt-focus-ruby-r44-sd.png
+yt-focus-sapphire-r44-1080.png
+yt-focus-sapphire-r44-2160.png
+yt-focus-sapphire-r44-720.png
+yt-focus-sapphire-r44-sd.png
+yt-focus-slate-r44-1080.png
+yt-focus-slate-r44-2160.png
+yt-focus-slate-r44-720.png
+yt-focus-slate-r44-sd.png
+yt-focus-teal-r44-1080.png
+yt-focus-teal-r44-2160.png
+yt-focus-teal-r44-720.png
+yt-focus-teal-r44-sd.png
+yt-focus-violet-r44-1080.png
+yt-focus-violet-r44-2160.png
+yt-focus-violet-r44-720.png
+yt-focus-violet-r44-sd.png
+yt-footer-r44-1080.png
+yt-footer-r44-2160.png
+yt-footer-r44-720.png
+yt-footer-r44-sd.png
+yt-live-r44-1080.png
+yt-live-r44-2160.png
+yt-live-r44-720.png
+yt-live-r44-sd.png
+yt-logo-r44-2160.png
+yt-logo-r44-720.png
+yt-logo-r44-sd.png
+yt-panel-r44-1080.png
+yt-panel-r44-2160.png
+yt-panel-r44-720.png
+yt-panel-r44-sd.png
+yt-quality-r44-1080.png
+yt-quality-r44-2160.png
+yt-quality-r44-720.png
+yt-quality-r44-sd.png
+yt-row-r44-1080.png
+yt-row-r44-2160.png
+yt-row-r44-720.png
+yt-row-r44-sd.png
+yt-search-icon-r44-1080.png
+yt-search-icon-r44-2160.png
+yt-search-icon-r44-720.png
+yt-search-icon-r44-sd.png
+yt-search-r44-1080.png
+yt-search-r44-2160.png
+yt-search-r44-720.png
+yt-search-r44-sd.png
+R30_RETIRED_ART
+    fi
+fi
+
 # R95 and the first R96 build installed main.py with the same timestamp and
 # byte size.  Timestamp-based Python caches can therefore retain R95's removed
 # dashboard filename even after an upgrade.  Remove only generated bytecode

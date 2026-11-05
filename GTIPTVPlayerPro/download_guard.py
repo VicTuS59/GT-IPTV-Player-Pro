@@ -329,8 +329,6 @@ def play_service(navigation, reference):
         _STATE.playing_scope, _STATE.reference_key = scope, key
         _STATE.handoffs.update(leases)
     try:
-        from .live_recording import reference_starting
-        reference_starting(_reference_url(reference))
         result = navigation.playService(reference)
         if isinstance(result, int) and result != 0:
             raise RuntimeError("playService returned {}".format(result))
@@ -341,8 +339,6 @@ def play_service(navigation, reference):
         raise
     with _STATE.condition:
         _STATE.wake()
-    from .live_recording import reference_started
-    reference_started(_reference_url(reference))
     return result
 
 
@@ -387,9 +383,6 @@ class SessionGuard(object):
                 _STATE.wake(poll=True)
                 active = bool(_STATE.playing_scope or _STATE.busy or _STATE.leases
                               or _STATE.releases or _STATE.handoffs or conflict)
-            if reference is not None or getattr(self, 'empty_ticks', 0) >= 4:
-                from .live_recording import reference_started
-                reference_started(url)
             if conflict and navigation:
                 navigation.stopService()
         except Exception:

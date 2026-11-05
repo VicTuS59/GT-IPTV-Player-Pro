@@ -30,6 +30,21 @@ def hero_plan(width, height):
                                             'hero-r82', name), (tuple(size), fingerprint))
 
 
+def vod_hero_plan(width, height):
+    """Cap UHD hero decoding at the FHD card's dimensions."""
+    size = (min(width, 932), min(height, 503))
+    return HeroPlan(size, None, (size, 'vod-list-shadow-v1'))
+
+
+def _vod_shadow(Image, size):
+    from PIL import ImageChops
+    with Image.new('L', (256, 1)) as horizontal, Image.new('L', (1, 256)) as vertical:
+        horizontal.putdata([round(215 * (1 - offset / 255) ** 2) for offset in range(256)])
+        vertical.putdata([round(232 * (offset / 255) ** 4) for offset in range(256)])
+        with horizontal.resize(size) as left, vertical.resize(size) as bottom:
+            return ImageChops.screen(left, bottom)
+
+
 def strip_overlay_skin(skin, plan):
     if plan is None:
         return skin
@@ -212,12 +227,15 @@ def prepare_hero(source, plan, token, allowance):
         rgba = cropped.convert('RGBA')
         cropped.close(); cropped = None
         token.check()
-        mask = Image.open(plan.mask)
-        if mask.mode != 'P' or mask.size != plan.size:
-            return source
-        # Generated palette index == alpha, with the existing RGB tint.
-        alpha = mask.point(list(range(256)), 'L')
-        mask.close(); mask = None
+        if plan.mask is None:
+            alpha = _vod_shadow(Image, plan.size)
+        else:
+            mask = Image.open(plan.mask)
+            if mask.mode != 'P' or mask.size != plan.size:
+                return source
+            # Generated palette index == alpha, with the existing RGB tint.
+            alpha = mask.point(list(range(256)), 'L')
+            mask.close(); mask = None
         rgba.paste((2, 6, 23, 255), (0, 0, width, height), alpha)
         alpha.close(); alpha = None
         token.check()

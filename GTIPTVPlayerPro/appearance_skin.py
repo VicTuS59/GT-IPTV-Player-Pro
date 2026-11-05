@@ -110,13 +110,13 @@ def appearance_geometry(width, height):
         "header": rect(70, 35, 900, 75),
         "brand": rect(1340, 35, 510, 75),
         "message": rect(105, 844, 1700, 62),
-        "rows": tuple(rect(100, 268 + i * 94, 1720, 78) for i in range(6)),
-        "labels": tuple(rect(144, 268 + i * 94, 930, 78) for i in range(6)),
-        "values": tuple(rect(1125, 277 + i * 94, 680, 60) for i in range(6)),
-        "value_text": tuple(rect(1285 if i in (3, 4) else 1125,
-                                  277 + i * 94, 520 if i in (3, 4) else 680, 60)
-                            for i in range(6)),
-        "swatches": tuple(rect(1145, 285 + i * 94, 112, 44) for i in (3, 4)),
+        "rows": tuple(rect(100, 268 + i * 94, 1720, 78) for i in range(5)),
+        "labels": tuple(rect(144, 268 + i * 94, 930, 78) for i in range(5)),
+        "values": tuple(rect(1125, 277 + i * 94, 680, 60) for i in range(5)),
+        "value_text": tuple(rect(1285 if i in (2, 3) else 1125,
+                                  277 + i * 94, 520 if i in (2, 3) else 680, 60)
+                            for i in range(5)),
+        "swatches": tuple(rect(1145, 285 + i * 94, 112, 44) for i in (2, 3)),
     }
 
 
@@ -165,7 +165,7 @@ def glass_appearance_skin(width, height, fill=DEFAULT_CHANNEL_HIGHLIGHT, border=
     label("header", geo["header"], 40, role="title")
     label("brand", geo["brand"], 24, align="right", color="#16C9F4", role="title")
     label("section", geo["section"], 32, align="center", role="title")
-    for i in range(6):
+    for i in range(5):
         picture("row_bg_{}".format(i), geo["rows"][i], appearance_art("row", width, height), 2)
         picture("row_focus_{}".format(i), geo["rows"][i], appearance_art("fill", width, height, fill), 3)
         picture("value_bg_{}".format(i), geo["values"][i], appearance_art("value", width, height), 4)
@@ -188,7 +188,7 @@ def refresh_appearance_palette(screen, width, height, fill, border):
     border = normalize_selection_border(border, fill)
     instances = []
     jobs = []
-    for i in range(6):
+    for i in range(5):
         for prefix, kind, color in (("row_focus_", "fill", fill), ("row_marker_", "frame", border)):
             component = screen[prefix + str(i)]
             instance = getattr(component, "instance", None)
@@ -214,10 +214,10 @@ def refresh_appearance_palette(screen, width, height, fill, border):
     return True
 
 
-def fit_appearance_text(screen, width, height):
+def fit_appearance_text(screen, width, height, rows=True):
     fonts = {size: appearance_font(width, height, size) for size in (28, 27, 22)}
     minimums = {size: appearance_font(width, height, size, value="standard") for size in (18, 16)}
-    for i in range(6):
+    for i in range(5 if rows else 0):
         for prefix, preferred, minimum, fallback in (
                 ("row_label_", 28, 18, 72), ("row_value_", 27, 18, 28)):
             component = screen[prefix + str(i)]

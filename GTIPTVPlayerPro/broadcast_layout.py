@@ -6,6 +6,12 @@ from .paths import plugin_path
 from .utility_design import NativeSkin
 
 INK='#EDF2F8';MUTED='#AFC1D8';CYAN='#20D5ED'
+CATEGORY_PAGE_SIZE = 8
+CATEGORY_ROW_HEIGHT = 84
+CATEGORY_LIST_BOX = (54, 186, 900, CATEGORY_PAGE_SIZE * CATEGORY_ROW_HEIGHT)
+CATEGORY_ROW_ART_BOX = (54, 186, 900, 78)
+CATEGORY_PANEL_BOX = (38, 108, 933, 816)
+CATEGORY_ICON_BOX = (161, 199, 52, 52)
 def art(n):return plugin_path('skin','images','broadcast-r101',n+'.png')
 def panel(s,n,box,narrow=False):s.pic(n,box,art('narrow-panel' if narrow else 'wide-panel'),z=1)
 def line(s,n,box):s.label(n,box,background='#225477',z=3)
@@ -43,15 +49,22 @@ def playlists(s):
     s.label('message',(64,917,1290,44),24,MUTED)
 
 def categories(s):
-    panel(s,'r101_categories_panel',(38,108,933,816));panel(s,'r101_weather_panel',(989,108,895,816))
+    panel(s,'r101_categories_panel',CATEGORY_PANEL_BOX);panel(s,'r101_weather_panel',(989,108,895,816))
     s.label('categories_caption',(68,124,862,58),38,CYAN)
-    for i in range(8):
-        y=186+i*84
-        s.pic('category_row_art_'+str(i),(54,y,900,78),art('category-row'))
-        s.pic('category_focus_art_'+str(i),(54,y,900,78),art('category-focus'),z=3)
-        s.label('r101_category_no_'+str(i),(78,y+10,68,58),30,MUTED)
-        s.pic('r101_category_icon_'+str(i),(161,y+13,52,52),art('tv'),z=5)
-        s.label('category_row_'+str(i),(252,y+5,666,68),33)
+    row_x, row_y, row_width, art_height = CATEGORY_ROW_ART_BOX
+    for i in range(CATEGORY_PAGE_SIZE):
+        box = (row_x, row_y + i*CATEGORY_ROW_HEIGHT, row_width, art_height)
+        s.pic('category_row_art_'+str(i),box,art('category-row'))
+        s.pic('category_focus_art_'+str(i),box,art('category-focus'),z=3)
+    # Keep the existing text boxes available for fitting names once per catalogue.
+    s.label('r101_category_measure_number',(78,196,68,58),30,MUTED)
+    s.label('r101_category_measure_name',(252,191,666,68),33)
+    x, y, width, _height = s.rect(CATEGORY_LIST_BOX)
+    row_height = s.rect((0,0,1,CATEGORY_ROW_HEIGHT))[3]
+    s.parts.append('<widget name="r101_category_list" position="{},{}" size="{},{}" '
+                   'zPosition="5" transparent="1" selectionDisabled="1" '
+                   'scrollbarMode="showNever" scrollbarScroll="byPage" />'.format(
+                       x, y, width, CATEGORY_PAGE_SIZE * row_height))
     s.label('message',(70,872,864,42),25,MUTED,align='right')
     s.label('items',(72,202,830,100),28,MUTED,lines=3)
     s.label('list_scroll_track',(959,190,5,665),background='#214663');s.label('list_scroll_thumb',(959,190,5,100),background=CYAN,z=6)
@@ -107,9 +120,6 @@ def live(s):
         s.label('stream_number_'+str(i),(526,y+6,78,60),26,MUTED)
         s.pic('stream_picon_'+str(i),(612,y+5,106,62),z=5)
         s.label('stream_name_'+str(i),(740,y+5,348,62),30,lines=2)
-        s.label('stream_program_'+str(i),(1100,y+7,183,58),25,MUTED)
-        s.label('stream_progress_bg_'+str(i),(1300,y+31,80,14),background='#243D59',z=4)
-        s.label('stream_progress_fill_'+str(i),(1300,y+31,80,14),background=CYAN,z=5)
         s.pic('stream_favorite_'+str(i),(1068,y+7,25,25),plugin_path('skin','images','favorite-star-v15.png'),z=7)
     s.label('list_scroll_track',(1398,184,5,740),background='#243D59');s.label('list_scroll_thumb',(1398,184,5,100),background=CYAN,z=6)
     s.pic('preview_frame',(1430,122,456,262),art('file-row'),z=3)
@@ -178,6 +188,10 @@ def restyle(markup,kind):
     for n in old:
         name=n.get('name','')
         if name in names:continue
+        if kind == 'live' and name and not name.startswith('remote_'):
+            # These legacy components remain available to the controller.
+            # The live skin only needs native instances for its visible widgets.
+            continue
         if not name.startswith('remote_'):
             n.set('position','0,0');n.set('size','1,1');n.set('zPosition','-40');n.set('transparent','1')
             for attr in ('pixmap','pixmaps','backgroundColor'):n.attrib.pop(attr,None)

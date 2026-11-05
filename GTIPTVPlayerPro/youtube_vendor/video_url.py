@@ -147,6 +147,10 @@ class YouTubeVideoUrl():
 		self.use_dash_mp4 = ()
 		self.exact_quality = 0
 		self.preferred_quality = 0
+		self.allowed_codecs = frozenset(('h264',))
+		self.allow_separate_audio = None
+		self.response_received = False
+		self.requires_native_audio = False
 		self._probe_deadline = 0
 		self.selected_quality = 0
 		self.selected_video_itag = ''
@@ -376,7 +380,7 @@ class YouTubeVideoUrl():
 	def _extract_from_m3u8(self, manifest_url, limit=None, allow_separate=True):
 		"""Read the manifest's real resolution and codecs for VOD and live video."""
 		url_map = []
-		allow_separate = allow_separate and native_audio_player_available()
+		allow_separate = allow_separate and self._separate_audio_available()
 		if limit is None:
 			limit = RESOLUTION_LIMIT.get(str(config.plugins.YouTube.maxResolution.value), 1440)
 		manifest = self._download_webpage(manifest_url)
@@ -408,12 +412,13 @@ class YouTubeVideoUrl():
 				continue
 			else:
 				codec = 'h264'
-			if not 0 < height <= limit:
+			if codec not in self.allowed_codecs or not 0 < height <= limit:
 				continue
 			audio_id = info.get('AUDIO')
 			audio_key = audio_sort_key({}, config.plugins.YouTube.audioPreference.value)
 			if audio_id:
 				if not allow_separate or audio_id not in audio_tracks:
+					self.requires_native_audio |= not allow_separate
 					continue
 				audio_info = audio_tracks[audio_id]
 				audio_url = urljoin(manifest_url, audio_info['URI'])
@@ -423,6 +428,10 @@ class YouTubeVideoUrl():
 				audio_key = audio_sort_key(hls_audio_format(audio_info), config.plugins.YouTube.audioPreference.value)
 			url_map.append({'url': url, 'itag': itag, 'height': height, 'codec': codec, 'audio_key': audio_key})
 		return sorted(url_map, key=lambda fmt: (-fmt['height'], fmt['codec'] != 'h264', fmt['audio_key']))
+
+	def _separate_audio_available(self):
+		return (native_audio_player_available() if self.allow_separate_audio is None
+			else bool(self.allow_separate_audio))
 
 	def _skip_fmt(self, fmt, itag):
 		return (
@@ -469,8 +478,8 @@ class YouTubeVideoUrl():
 	def _extract_fmt_video_format(self, streaming_formats, player_id, stream_mode='auto', audio_preference='original'):
 		print('[YouTubeVideoUrl] Try fmt url')
 		formats = self._sort_formats(PRIORITY_VIDEO_FORMAT, streaming_formats)
-		limit = 2160 if self.preferred_quality else RESOLUTION_LIMIT.get(str(config.plugins.YouTube.maxResolution.value), 720)
-		allow_separate = stream_mode != 'compatible' and native_audio_player_available()
+		limit = self.preferred_quality or RESOLUTION_LIMIT.get(str(config.plugins.YouTube.maxResolution.value), 720)
+		allow_separate = stream_mode != 'compatible' and self._separate_audio_available()
 		# At the same resolution/codec, use the independently ranked audio
 		# when the native backend is available, including 360p/720p playback.
 		formats.sort(key=lambda fmt: (bool(self.preferred_quality and _format_height(fmt) != self.preferred_quality),
@@ -483,10 +492,11 @@ class YouTubeVideoUrl():
 				continue
 			mime = (fmt.get('mimeType') or '').lower()
 			codec = _native_video_codec(fmt)
-			if not codec:
+			if not codec or codec not in self.allowed_codecs:
 				continue
 			separate = _video_uses_separate_audio(fmt)
 			if separate and not allow_separate:
+				self.requires_native_audio = True
 				continue
 			if not separate and mime and 'codecs=' in mime and 'mp4a' not in mime:
 				continue
@@ -884,7 +894,7 @@ class YouTubeVideoUrl():
 		return 0
 
 	def _preferred_extract(self, video_id, yt_auth, lang, stream_mode, audio_preference):
-		"""Prefer the chosen height; otherwise keep the highest native input.
+		"""Use the chosen height as a ceiling, falling back only downwards.
 
 		Each candidate retains its own original video/audio URLs and player
 		context. No streams are joined, converted or fetched during search.
@@ -899,6 +909,7 @@ class YouTubeVideoUrl():
 			nonlocal duration, age_restricted
 			if not isinstance(response, dict) or self.try_get(response, ('videoDetails', 'videoId')) != video_id:
 				return
+			self.response_received = True
 			status = response.get('playabilityStatus') or {}
 			age_restricted |= status.get('status') == 'LOGIN_REQUIRED'
 			if status.get('status', 'OK') != 'OK':
@@ -916,7 +927,7 @@ class YouTubeVideoUrl():
 			if (streaming.get('hlsManifestUrl')
 					and not any(choice['height'] == self.preferred_quality for choice in choices)):
 				try:
-					for fmt in self._extract_from_m3u8(streaming['hlsManifestUrl'], 2160, stream_mode != 'compatible'):
+					for fmt in self._extract_from_m3u8(streaming['hlsManifestUrl'], self.preferred_quality, stream_mode != 'compatible'):
 						try:
 							youtube_stream_parts(fmt['url'])
 						except ValueError:

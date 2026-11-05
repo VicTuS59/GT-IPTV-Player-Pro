@@ -6,6 +6,7 @@ Controllers own all account, network, download and archive operations. This
 module only lays out their existing components and reflects their current data.
 """
 from functools import wraps
+from .ui_update import set_visible
 from types import MethodType
 import re
 from xml.etree import ElementTree as ET
@@ -16,6 +17,7 @@ from .episode_design import episode_focus_assets
 from .i18n import _
 from .paths import plugin_path
 from .remote_footer import remote_action_text
+from .remote_footer import prepared_skin, skin_metadata, _cached_skin
 from .typography import fit_dynamic_text, font_px
 from .utility_design import NativeSkin, bind_missing, plain_footer
 from .vod_discovery import style_footer
@@ -55,7 +57,7 @@ def _panel(s, icon='settings', title='r97_help_title'):
 
 
 def _settings(s, kind):
-    count = {'epg': 6, 'weather': 4, 'appearance': 6, 'youtube': 3, 'account': 4}[kind]
+    count = {'epg': 6, 'weather': 4, 'appearance': 5, 'youtube': 3, 'account': 4}[kind]
     top = 212
     step = 108 if kind in ('epg', 'appearance') else 132
     h = step - 16
@@ -78,7 +80,7 @@ def _settings(s, kind):
     s.label('message', (66, 892, 1780, 76), 25, MUTED, lines=2)
     _panel(s, {'weather': 'location', 'youtube': 'youtube', 'account': 'globe', 'epg': 'browser'}.get(kind, 'settings'))
     if kind == 'appearance':
-        for name, row in (('channel_color_swatch', 3), ('selection_border_swatch', 4)):
+        for name, row in (('channel_color_swatch', 2), ('selection_border_swatch', 3)):
             s.pic(name, (728, top + row * step + 25, 88, 40), z=6)
         s.pic('r97_preview_fill', (1316, 593, 496, 64), asset('card'), z=2)
         s.pic('r97_preview_border', (1316, 593, 496, 64), asset('focus'), z=3)
@@ -286,33 +288,40 @@ def skin_after(kind):
             if kind == 'epg' and ET.fromstring(markup).get('name') != 'GTDVBEPGSettingsScreen':
                 return markup
             return restyle(markup, kind)
-        return skin
+        return _cached_skin(skin)
     return decorated
 
 
-def setup(screen, kind, items):
-    screen._r97_kind = kind
-    screen._r97_items = tuple(items)
-    width, height = map(int, ET.fromstring(screen.skin).get('size').split(','))
-    screen._r97_px = lambda n: max(1, round(n * min(width / 1920.0, height / 1080.0)))
-    screen._r97_palette = None
-    bind_missing(screen)
-    screen.skin = style_footer(screen.skin, 'movie', screen._r97_px, items,
-                              tuple(remote_action_text(item[1]) for item in items))
+def _ready_skin(markup, kind, items):
+    width, height = skin_metadata(markup).size
+    px = lambda n: max(1, round(n * min(width / 1920.0, height / 1080.0)))
+    markup = style_footer(markup, 'movie', px, items,
+                          tuple(remote_action_text(item[1]) for item in items))
     if kind == 'accounts':
         from .accounts_design import style_footer as style_account_footer
-        screen.skin = style_account_footer(screen.skin, items)
-    root = ET.fromstring(screen.skin)
+        markup = style_account_footer(markup, items)
+    root = ET.fromstring(markup)
     for node in root:
         if node.get('name', '').startswith('remote_key_') and node.get('font'):
             node.set('noWrap', '1')
-    screen.skin = ET.tostring(root, encoding='unicode')
+    return ET.tostring(root, encoding='unicode')
+
+
+def setup(screen, kind, items, *, auto_refresh=True):
+    screen._r97_kind = kind
+    screen._r97_items = tuple(items)
+    width, height = skin_metadata(screen.skin).size
+    screen._r97_px = lambda n: max(1, round(n * min(width / 1920.0, height / 1080.0)))
+    screen._r97_palette = None
+    bind_missing(screen)
+    screen.skin = prepared_skin(_ready_skin, screen.skin, kind, tuple(items))
     # OpenPLi dispatches only bound methods as Python callbacks here; plain
     # functions/lambdas are passed to exec() as legacy skin code strings.
-    screen._utility_refresh_callback = MethodType(refresh, screen)
-    screen.onLayoutFinish.append(screen._utility_refresh_callback)
-    if hasattr(screen, 'onShown'):
-        screen.onShown.append(screen._utility_refresh_callback)
+    if auto_refresh:
+        screen._utility_refresh_callback = MethodType(refresh, screen)
+        screen.onLayoutFinish.append(screen._utility_refresh_callback)
+        if hasattr(screen, 'onShown'):
+            screen.onShown.append(screen._utility_refresh_callback)
 
 
 def refresh_after(method):
@@ -336,7 +345,7 @@ def _text(screen, name, value, lines=1, size=None):
 
 def _show(screen, name, visible):
     if name in screen:
-        (screen[name].show if visible else screen[name].hide)()
+        set_visible(screen[name], visible)
 
 
 def refresh(screen):
@@ -349,7 +358,11 @@ def refresh(screen):
         title = _('Download history')
     acronyms = dict(dvb='DVB', epg='EPG', iptv='IPTV', xtream='Xtream', codes='Codes', youtube='YouTube', api='API', m3u='M3U', mac='MAC')
     title = re.sub(r'\b(?:dvb|epg|iptv|xtream|codes|youtube|api|m3u|mac)\b', lambda m: acronyms[m[0].lower()], sentence_caption(title), flags=re.I)
-    _text(screen, 'r97_title', title, size=48)
+    if kind == 'accounts':
+        from .accounts_design import _fit as fit_account_text
+        fit_account_text(screen, 'r97_title', title, 52)
+    else:
+        _text(screen, 'r97_title', title, size=48)
     _text(screen, 'r97_brand', 'GT IPTV PLAYER PRO', size=28)
     _text(screen, 'r97_web_hint', _('Hold MENU for 3 seconds: Web interface'), size=19)
     index = getattr(screen, 'selected_field', 0) if kind == 'account' else getattr(screen, 'selected_index', 0)
@@ -369,7 +382,7 @@ def refresh(screen):
             chosen = (screen._start + slot == screen.index and screen._start + slot < len(screen._entries)) if kind == 'downloads' else slot == index
             _show(screen, name, chosen)
         if name.startswith('remote_web_hint'):
-            screen[name].hide()
+            set_visible(screen[name], False)
     if kind in ('epg', 'weather', 'appearance', 'youtube', 'account'):
         _refresh_settings(screen, kind, index)
     elif kind == 'playlist':
@@ -395,14 +408,11 @@ def refresh(screen):
     items = tuple(getattr(screen, '_remote_footer_items', screen._r97_items))
     if len(items) != len(screen._r97_items):
         items = screen._r97_items
-    plain_footer(screen, items, px)
-    for i, item in enumerate(items):
-        key = item[0]
-        if key in ('arrows', 'channel'):
-            _text(screen, 'remote_key_' + str(i), '▲▼◀▶' if key == 'arrows' else 'CH±', size=22)
     if kind == 'accounts':
         from .accounts_design import paint_footer
         paint_footer(screen, items)
+    else:
+        plain_footer(screen, items, px)
     # State changes use the standard footer controller; the native renderer is
     # restyled after those updates so MENU and Details/Play stay in sync.
 
@@ -429,7 +439,7 @@ def _refresh_settings(screen, kind, index):
             _text(screen, lp + str(i), screen[lp + str(i)].getText(), lines=2, size=30)
             _text(screen, vp + str(i), screen[vp + str(i)].getText(), lines=2, size=28)
             enabled = (screen.settings.enabled if i == 0 else None) if kind in ('weather', 'epg') else (
-                screen.cinematic_view if i == 1 else screen.show_in_main_menu if i == 2 else None) if kind == 'appearance' else (
+                screen.show_in_main_menu if i == 1 else None) if kind == 'appearance' else (
                 screen.settings.youtube_autoplay if i == 1 else None)
             for state in ('on', 'off'):
                 _show(screen, 'r97_state_{}_{}'.format(state, i), enabled is not None and (state == 'on') == bool(enabled))

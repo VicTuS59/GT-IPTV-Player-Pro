@@ -4,6 +4,7 @@
 
 from collections import OrderedDict
 import os
+import re
 import threading
 import time
 import weakref
@@ -360,8 +361,6 @@ class AsyncBackgroundLoader(object):
         if self.closed:
             return
         self._loaded = False
-        self._reuse_signature = self._request_signature(
-            self.path, self.cover_ratio, self.cover_alignment)
         widget = self.screen[self.widget_name]
         instance = getattr(widget, "instance", None)
         if instance is None:
@@ -378,6 +377,14 @@ class AsyncBackgroundLoader(object):
             except Exception:
                 width, height = 1280, 720
         wallpaper = self.stretch_to_widget or self.window_size is not None
+        # Restyled pages retain compatibility widgets parked at 1x1. Decoding
+        # a full wallpaper for that invisible target also blocked first show.
+        if wallpaper and width == 1 and height == 1:
+            self._detach_decode()
+            self._notify(False)
+            return
+        self._reuse_signature = self._request_signature(
+            self.path, self.cover_ratio, self.cover_alignment)
         if self.decode_size is not None and not wallpaper:
             width,height = [max(1,int(value)) for value in self.decode_size]
             if width*height > 1920*1080:
@@ -778,6 +785,12 @@ class NativeAlphaPixmapLoader(object):
             instance = getattr(widget, "instance", None)
             if instance is None:
                 return
+            size = instance.size()
+            if int(size.width()) == 1 and int(size.height()) == 1:
+                if _ALPHA_PREPARER is not None and self._cache_key is not None:
+                    _ALPHA_PREPARER.cancel(self)
+                self._notify(False)
+                return
             if _ALPHA_PREPARER is not None and self._cache_key is not None:
                 _ALPHA_PREPARER.cancel(self)
             for release in (self._cache_release, self._prepared_release):
@@ -885,6 +898,17 @@ class NativeAlphaPixmapLoader(object):
         if _ALPHA_PREPARER is not None and self._cache_key is not None:
             _ALPHA_PREPARER.cancel(self)
         self._notify(False)
+
+
+def _opaque_page_base(screen):
+    """Only expose a loading page when its existing native base is opaque."""
+    try:
+        from .remote_footer import skin_metadata
+        color = skin_metadata(screen.skin).background.strip()
+        return bool(re.fullmatch(r'#[0-9a-fA-F]{6}', color)
+                    or re.fullmatch(r'#00[0-9a-fA-F]{6}', color))
+    except (AttributeError, TypeError, ValueError, SyntaxError):
+        return False
 
 
 class _PageBackgroundTransition(object):
@@ -1053,6 +1077,8 @@ class _PageBackgroundTransition(object):
         if self.closed or self.pending:
             return
         self._stop_timer()
+        if self.presented:
+            return
         if self.show_requested and self._foreground():
             self.show()
 
@@ -1072,6 +1098,7 @@ class _PageBackgroundTransition(object):
             return self.original_show()
         self.show_requested = True
         if (self.pending and not self.presented and not self.expired
+                and not _opaque_page_base(self.screen)
                 and self._foreground()):
             self._hold_previous()
             if not self.timer_running:

@@ -32,9 +32,10 @@ class _Rows:
 
 
 class NativeBrowseWindow:
-    def __init__(self, content_type, max_bytes=32 * 1024 * 1024):
+    def __init__(self, content_type, max_bytes=32 * 1024 * 1024, check_available=False):
         self.content_type = content_type
         self.max_bytes = max_bytes
+        self.check_available = check_available
         self._rows = _Rows()
         self._finalizer = weakref.finalize(self, self._rows.clear)
         self._lock = threading.Lock()
@@ -69,7 +70,8 @@ class NativeBrowseWindow:
         accepted = []
         with self._access():
             try:
-                budget.check(force=True)
+                if self.check_available:
+                    budget.check(force=True)
             except (CatalogLimitError, OSError):
                 raise ContentError(reason=ContentError.CATALOG_ITEM_LIMIT)
             for item in entries:
@@ -93,7 +95,7 @@ class NativeBrowseWindow:
                 if self._rows.weight + weight > self.max_bytes:
                     raise ContentError(reason=ContentError.CATALOG_ITEM_LIMIT)
                 try:
-                    budget.reserve(weight)
+                    budget.reserve(weight, check_available=self.check_available)
                 except (CatalogLimitError, OSError):
                     raise ContentError(reason=ContentError.CATALOG_ITEM_LIMIT)
                 try:

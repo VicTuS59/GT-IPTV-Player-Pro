@@ -2,10 +2,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Native presentation only; existing controllers own data, actions and jobs."""
 from functools import wraps
-from types import MethodType
+from types import MethodType, SimpleNamespace
 from xml.etree import ElementTree as ET
 from .i18n import _, localized_upper, localized_language_name
 from .remote_footer import remote_action_text, set_remote_footer
+from .remote_footer import prepared_skin, skin_metadata, layout_needs_fit, _cached_skin
 from .seven_presentation import text as fit_text, show, rect, _footer_style
 from .scrollbar import update_scrollbar, hide_scrollbar
 from .utility_design import bind_missing
@@ -21,11 +22,11 @@ def skin_after(kind, screen_name=None):
             if screen_name and ET.fromstring(markup).get('name') != screen_name:
                 return markup
             return restyle(markup, kind)
-        return built
+        return _cached_skin(built)
     return decorate
 
 
-def refresh_after(method):
+def refresh_after(method, *, render=None):
     @wraps(method)
     def refreshed(s, *a, **kw):
         depth = getattr(s, '_aux_refresh_depth', 0)
@@ -35,19 +36,23 @@ def refresh_after(method):
         finally:
             s._aux_refresh_depth = depth
         if not depth and hasattr(s, '_aux_kind'):
-            refresh(s)
+            (render or refresh)(s)
         return result
     return refreshed
 
 
-def text(s, name, value, size=30, lines=1):
+def youtube_preview_after(method):
+    return refresh_after(method, render=_youtube_preview)
+
+
+def text(s, name, value, size=30, lines=1, *, cached_only=False):
     if name not in s:
         return
     value = str(value or '')
-    key = (value, size, lines)
+    key = (value, size, lines, cached_only)
     cached = s._aux_text.get(name)
     if s._aux_force_fit or cached is None or cached[0] != key or s[name].getText() != cached[1]:
-        fit_text(s, name, value, size, lines)
+        fit_text(s, name, value, size, lines, cached_only=cached_only)
         s._aux_text[name] = (key, s[name].getText())
 
 
@@ -61,8 +66,10 @@ def _ordered_items(items, kind):
     return tuple(sorted(items, key=lambda item: order.index(item[0]) if item[0] in order else len(order))) if order else tuple(items)
 
 
-def _footer_skin(s, items):
-    root = ET.fromstring(_footer_style(s.skin, items))
+def _footer_markup(markup, items):
+    w,h = skin_metadata(markup).size
+    s = SimpleNamespace(_seven_size=(w,h))
+    root = ET.fromstring(_footer_style(markup, items))
     # Allocate space to the actual translated captions, including long history actions.
     weights = []
     for key, action, *unused in items:
@@ -88,10 +95,14 @@ def _footer_skin(s, items):
     return ET.tostring(root, encoding='unicode')
 
 
-def setup(s, kind, items):
+def _footer_skin(s, items):
+    return prepared_skin(_footer_markup, s.skin, tuple(items))
+
+
+def setup(s, kind, items, *, artwork_cache=None):
     s._aux_kind = kind; s._aux_text = {}; s._aux_force_fit = False
     s._seven_items = _ordered_items(items, kind)
-    w,h = map(int, ET.fromstring(s.skin).get('size').split(','))
+    w,h = skin_metadata(s.skin).size
     s._seven_size = (w,h); s._seven_px = lambda n:max(1,round(n*min(w/1920.,h/1080.)))
     s._seven_rects = {}; s._aux_flag_key = None
     bind_missing(s)
@@ -100,15 +111,70 @@ def setup(s, kind, items):
     s._aux_footer_keys = tuple(item[0] for item in s._seven_items)
     if kind in ('channels','categories'):
         s._list_scroll_geometry = box(s,(1856,254,6,640) if kind=='channels' else (1194,214,6,620))
+    if kind == 'categories':
+        from .opaque_row_art import prepare_opaque_panels, prepare_opaque_rows
+        s._opaque_category_panels = prepare_opaque_panels(s.skin, ('aux_categories_panel', 'aux_category_side'))
+        s._opaque_category_focus = prepare_opaque_rows(s.skin, 'aux_categories_panel', 'aux_category_focus_',
+                                                      s.page_size, ((),))
+    if kind in ('history','youtube'):
+        # These row roles use identical font and text geometry in every slot.
+        for role in ('title_','detail_','duration_'):
+            for index in range(7 if kind=='history' else 5):
+                widget=s[role+str(index)]
+                key=getattr(widget,'_gt_layout_text_key',None)
+                if key is not None:
+                    widget._gt_layout_text_key=(key[0],role)
+        if w*h <= 1920*1080:
+            _setup_youtube_art(s,kind,artwork_cache)
     s._aux_layout_callback = MethodType(layout_ready, s)
     s.onLayoutFinish.append(s._aux_layout_callback)
     if hasattr(s,'onShown'): s.onShown.append(s._aux_layout_callback)
     refresh(s)
 
 
+def _setup_youtube_art(s,kind,artwork_cache):
+    from .opaque_row_art import DeferredOpaqueArt, install_opaque_panels
+
+    if kind=='history':
+        prepared=artwork_cache.get(s._seven_size) if artwork_cache is not None else None
+        if prepared is not None:
+            s._aux_youtube_rows,s._aux_youtube_panels=prepared
+            return
+        panels=('aux_history_panel','aux_history_side')
+        group=('aux_history_panel','aux_history_row_',7,((),('aux_history_focus_',)))
+    else:
+        panels=('preview_panel',)
+        group=(None,'row_',5,((),('focus_',)))
+
+    def ready(native_panels, rows):
+        s._aux_youtube_rows, = rows
+        s._aux_youtube_panels = native_panels
+        install_opaque_panels(s,native_panels)
+        if artwork_cache is not None:
+            artwork_cache.clear()
+            artwork_cache[s._seven_size] = (rows[0], native_panels)
+        if kind=='history':
+            refresh_history(s)
+        else:
+            visible=s._visible()
+            for slot in range(5):
+                paint_youtube_row(s,slot,slot<len(visible),s._top+slot==s._selected)
+
+    s._aux_youtube_art = DeferredOpaqueArt(s,panels,(group,),ready,start=kind=='history')
+
+
+def prepare_youtube_results(s):
+    art=getattr(s,'_aux_youtube_art',None)
+    if art is not None:
+        art.enable()
+
+
 def layout_ready(s):
-    s._aux_force_fit = True
+    s._aux_force_fit = layout_needs_fit(s, '_r28_aux_layout')
     try:
+        if getattr(s,'_aux_youtube_panels',None):
+            from .opaque_row_art import install_opaque_panels
+            install_opaque_panels(s,s._aux_youtube_panels)
         if s._aux_kind == 'about':
             # Use the full original legal/privacy message and the actual font profile.
             width = box(s,(0,0,1160,770))[2]
@@ -158,8 +224,10 @@ def refresh(s):
     text(s,'aux_web_hint',_('Hold MENU for 3 seconds: Web interface'),20)
     titles={'source':'Add M3U source','history':getattr(s,'HISTORY_TITLE','Search history'),'youtube':'YouTube','online':'Subtitles','local':'Choose a subtitle file','categories':'Category Management','channels':'Search All Channels','weather':'Weather','about':'About'}
     text(s,'aux_title',_(titles[s._aux_kind]),46)
-    {'source':_source,'history':_history,'youtube':_youtube,'online':_online,'local':_local,'categories':_categories,'channels':_channels,'weather':_weather,'about':_about}[s._aux_kind](s)
+    {'source':_source,'history':refresh_history,'youtube':_youtube,'online':_online,'local':_local,'categories':_categories,'channels':_channels,'weather':_weather,'about':_about}[s._aux_kind](s)
     _footer(s)
+    if s._aux_kind=='youtube':
+        s._aux_youtube_footer=getattr(s,'_remote_footer_items',())
 
 
 def _source(s):
@@ -182,18 +250,36 @@ def _source(s):
     text(s,'aux_save_hint',_('Press GREEN to save the source.'),26,2)
 
 
-def _history(s):
+def paint_youtube_row(s,slot,present,selected):
+    artwork=getattr(s,'_aux_youtube_rows',None)
+    if artwork is not None and artwork.paint(s,slot,present,int(selected)):
+        return
+    row,focus=('aux_history_row_','aux_history_focus_') if getattr(s,'_aux_kind',None)=='history' else ('row_','focus_')
+    show(s,row+str(slot),present)
+    show(s,focus+str(slot),present and selected)
+
+
+def refresh_history(s):
     total=len(s._entries)
     for i in range(7):
         pos=s._top+i;entry=s._entries[pos] if pos<total else None
         value=entry.get('title','') if isinstance(entry,dict) else entry or ''
         text(s,'title_'+str(i),value,34)
-        show(s,'aux_history_row_'+str(i),entry is not None);show(s,'aux_history_focus_'+str(i),entry is not None and pos==s._selected)
+        paint_youtube_row(s,i,entry is not None,pos==s._selected)
     selected=s._entries[s._selected] if total else ''
     video=isinstance(selected,dict)
     text(s,'aux_side_caption',localized_upper(_('Selected video') if video else _('Selected search')),38)
-    text(s,'aux_history_value',selected.get('title','') if video else selected or '—',45,3)
     text(s,'aux_history_help',_('Press OK to play the selected video.') if video else _('Press OK to search again.'),30,3)
+    refresh_history_selection(s)
+
+
+def refresh_history_selection(s,previous=None):
+    total=len(s._entries)
+    if previous is not None:
+        paint_youtube_row(s,previous-s._top,True,False)
+        paint_youtube_row(s,s._selected-s._top,True,True)
+    selected=s._entries[s._selected] if total else ''
+    text(s,'aux_history_value',selected.get('title','') if isinstance(selected,dict) else selected or '—',45,3)
     if total:update_scrollbar(s,'aux_history_scroll',total,s._selected,7,box(s,(1200,210,7,596)))
     else:hide_scrollbar(s,'aux_history_scroll')
 
@@ -201,10 +287,16 @@ def _history(s):
 def _youtube(s):
     rows=s._visible()
     text(s,'aux_title',_('Match highlights') if type(s).__name__=='GTMatchHighlightsScreen' else 'YouTube',46)
-    for i,entry in enumerate(rows[:5]):
-        text(s,'title_'+str(i),entry.get('title',''),31,2)
-        text(s,'detail_'+str(i),s['detail_'+str(i)].getText(),24)
-        text(s,'duration_'+str(i),s['duration_'+str(i)].getText(),25,2)
+    if s._aux_force_fit:
+        for i,entry in enumerate(rows[:5]):
+            s._render_result_row(i,entry,cached_only=s._result_refit_slot is not None)
+    if not s._result_preview_pending:
+        _youtube_preview(s,footer=False)
+
+
+def _youtube_preview(s,footer=True):
+    if getattr(s,'_closed',False):
+        return
     response=s._pages.get(s._page) or {}
     entries=response.get('results') or []
     selected=entries[s._selected] if entries and 0<=s._selected<len(entries) else None
@@ -212,8 +304,16 @@ def _youtube(s):
     video=s._preview_records.get(s.current_item.stream_id,{'title':s.current_item.name}) if playing else selected
     if video:
         text(s,'preview_title',video.get('title',''),36,3)
-        text(s,'preview_detail',s['preview_detail'].getText(),27,2)
+        detail=' · '.join(str(video.get(field,'')) for field in ('channel','published') if video.get(field))
+        text(s,'preview_detail',detail,27,2)
+    else:
+        text(s,'preview_title','',36,3)
+        text(s,'preview_detail','',27,2)
     text(s,'preview_action',s['preview_action'].getText(),27)
+    items=getattr(s,'_remote_footer_items',())
+    if footer and items!=getattr(s,'_aux_youtube_footer',None):
+        _footer(s)
+        s._aux_youtube_footer=items
 
 
 def _online(s):
@@ -278,12 +378,17 @@ def _local(s):
 
 
 def _categories(s):
+    from .opaque_row_art import install_opaque_panels
+    install_opaque_panels(s, s._opaque_category_panels)
+    artwork = s._opaque_category_focus
     entries=s._entries if not s._loading else []
     start=s.selected_index//s.page_size*s.page_size
     selected=entries[s.selected_index] if entries else None
     for i in range(8):
         entry=entries[start+i] if start+i<len(entries) else None
-        show(s,'aux_category_focus_'+str(i),entry is not None and start+i==s.selected_index)
+        focused = entry is not None and start+i==s.selected_index
+        if artwork is None or not artwork.paint(s, i, focused, 0):
+            show(s,'aux_category_focus_'+str(i),focused)
         show(s,'aux_category_line_'+str(i),entry is not None)
         if entry:
             text(s,'category_row_'+str(i),'{:02d}.  {}'.format(start+i+1,entry.name),33)

@@ -8,14 +8,9 @@ from Components.Label import Label
 from Screens.Screen import Screen
 from enigma import eTimer, getDesktop
 
-try:
-    from skin import parseColor
-except ImportError:
-    parseColor = None
-
-from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
-from .background import attach_background
-from .i18n import N_, _
+from .ui_update import set_foreground
+from .utility_pages import skin_after, refresh as refresh_utility, setup as setup_utility_pages
+from .i18n import N_, _, device_language
 from .remote_footer import (
     decorate_remote_footer,
     footer_item,
@@ -209,6 +204,7 @@ class GTWebInterfaceScreen(Screen):
         Screen.__init__(self, session)
         self.runtime = runtime or get_runtime()
         self._text_values = {}
+        self._painted_status = None
         self["header"] = Label(_("Web Interface"))
         self["brand"] = Label("GT IPTV PLAYER PRO")
         self["status"] = Label("")
@@ -246,13 +242,13 @@ class GTWebInterfaceScreen(Screen):
         if hasattr(self, "onClose"):
             self.onClose.append(self._closed)
         self.setTitle("GT IPTV Player Pro - {}".format(_("Web Interface")))
-        setup_utility_pages(self, 'web', WEB_INTERFACE_FOOTER_ITEMS)
+        setup_utility_pages(self, 'web', WEB_INTERFACE_FOOTER_ITEMS, auto_refresh=False)
         self.refresh()
 
     def _layout_ready(self):
         # Native sizes/font metrics become available only after applySkin.
         self._text_values.clear()
-        self.refresh()
+        self.refresh(force=True)
 
     def _set_text(self, name, value):
         value = str(value or "")
@@ -266,16 +262,8 @@ class GTWebInterfaceScreen(Screen):
             min_size=self._web_layout["minimums"][name],
         )
 
-    def _set_status_color(self, color):
-        instance = getattr(self["status"], "instance", None)
-        if instance is not None and parseColor is not None:
-            try:
-                instance.setForegroundColor(parseColor(color))
-            except (AttributeError, TypeError, ValueError):
-                pass
-
     def _shown(self):
-        self._layout_ready()
+        self.refresh()
         self._timer.start(500, False)
 
     def _closed(self):
@@ -289,13 +277,20 @@ class GTWebInterfaceScreen(Screen):
         value = str(value or "")
         return "{} {}".format(value[:3], value[3:]) if len(value) == 6 else "— —"
 
-    @refresh_after
-    def refresh(self):
+    def refresh(self, force=False):
         state = self.runtime.status()
         pending = state.get("pending")
         active = bool(state.get("active"))
         sessions = int(state.get("session_count") or 0)
-        urls = list(state.get("urls") or ())
+        urls = state.get("urls") or ()
+        address = urls[0] if urls else "—"
+        code = self._formatted_code(state.get("code") if urls else "")
+        signature = (device_language(), current_text_size(), active, sessions,
+                     address, code, state.get("starting"), state.get("error"),
+                     state.get("encrypted"), bool(pending),
+                     (pending.get("device"), pending.get("client_ip")) if pending else None)
+        if not force and self._painted_status == signature:
+            return
         self._set_text("header", _("Web Interface"))
         self._set_text("brand", "GT IPTV PLAYER PRO")
         self._set_text("address_title", _("Web URL"))
@@ -347,9 +342,12 @@ class GTWebInterfaceScreen(Screen):
                 _("Press GREEN to start a temporary local web session.")
             )
 
-        self._set_status_color(color)
-        self._set_text("address", urls[0] if urls else "—")
-        self._set_text("code", self._formatted_code(state.get("code") if urls else ""))
+        try:
+            set_foreground(self["status"], color)
+        except (ImportError, AttributeError, TypeError, ValueError):
+            pass
+        self._set_text("address", address)
+        self._set_text("code", code)
         if active and not state.get("encrypted"):
             self._set_text("security",
                 _("LAN only • HTTP • Do not expose port 9999 to the internet")
@@ -358,6 +356,8 @@ class GTWebInterfaceScreen(Screen):
             self._set_text("security", _("LAN • HTTPS"))
         else:
             self._set_text("security", "")
+        refresh_utility(self)
+        self._painted_status = signature
 
     def green(self):
         state = self.runtime.status()
@@ -369,6 +369,7 @@ class GTWebInterfaceScreen(Screen):
             else:
                 self.runtime.request_start()
         except Exception as error:
+            self._painted_status = None
             self._set_text("detail", str(error)[:180])
         self.refresh()
 
@@ -380,6 +381,7 @@ class GTWebInterfaceScreen(Screen):
             else:
                 self.runtime.stop()
         except Exception as error:
+            self._painted_status = None
             self._set_text("detail", str(error)[:180])
         self.refresh()
 
@@ -387,8 +389,9 @@ class GTWebInterfaceScreen(Screen):
         try:
             self.runtime.request_start()
         except Exception as error:
+            self._painted_status = None
             self._set_text("detail", str(error)[:180])
         self.refresh()
 
     def yellow(self):
-        self.refresh()
+        self.refresh(force=True)

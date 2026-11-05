@@ -6,10 +6,13 @@ import datetime
 import os
 import platform
 import threading
+from .utility_pages import _text as utility_text
 from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 from .search_file_presentation import skin_after as search_file_skin_after, refresh_after as search_file_refresh_after, setup as setup_search_file
 from .broadcast_presentation import skin_after as broadcast_skin_after, refresh_after as broadcast_refresh_after, setup as setup_broadcast
-from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven, poster_after
+from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven
 from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from .source_loader import SourceLoader
 import textwrap
@@ -42,34 +45,19 @@ from .appearance_skin import (
 )
 from .account_test_cache import account_test_fingerprint
 from .auto_login import automatic_account, source_identity_key, toggle_auto_login as toggle_auto_login_selection
-from .auto_login_ui import (
-    auto_login_overlay_skin,
-    install_auto_login_overlay,
-    show_auto_login_overlay,
-    advance_auto_login_spinner,
-)
-from .channel_highlight import (
-    CHANNEL_HIGHLIGHT_KEYS,
-    DEFAULT_CHANNEL_HIGHLIGHT,
-    channel_highlight_art,
-    dashboard_selection_art,
-    normalize_channel_highlight,
-    normalize_selection_border,
-    refresh_screen_selection,
-    selection_border_art,
-    welcome_selection_art,
-)
+from .auto_login_ui import install_auto_login_overlay, show_auto_login_overlay, advance_auto_login_spinner
+from .channel_highlight import CHANNEL_HIGHLIGHT_KEYS, DEFAULT_CHANNEL_HIGHLIGHT, channel_highlight_art, normalize_channel_highlight, normalize_selection_border, refresh_screen_selection, selection_border_art
 from .dashboard_design import DashboardPresentation, dashboard_skin
-from .welcome_design import WelcomePresentation, welcome_skin
+from .welcome_design import WelcomePresentation, welcome_skin, sentence_caption
 from .utility_design import SourcePresentation, SettingsPresentation, source_skin, settings_skin, settings_geometry
 from .live_patch import deactivate as _deactivate_live_patch
-from .live_recording import release_session as _release_recording_session
 from .category_lock import CategoryEditLockStore
 from .category_lock_ui import (
     GTCategoryCodeInputScreen,
     RECOVERY_REQUEST,
 )
 from .content import ContentError
+from .diagnostics import log_event
 from .i18n import (
     N_,
     _,
@@ -117,6 +105,8 @@ from .settings import (
 )
 from .settings_order import DEFAULT_SETTINGS_ORDER, SettingsOrderStore, normalize_settings_order
 from .typography import (
+    _component_geometry,
+    _skin_font,
     clean_dynamic_text,
     ellipsize_dynamic_text,
     fit_dynamic_text,
@@ -136,13 +126,7 @@ from .playlist import (
     localized_connection_usage_line,
     save_account_credentials,
 )
-from .playlist_files import (
-    MAX_PLAYLIST_FILES_PER_TYPE,
-    PLAYLIST_FILE_PAGE_SIZE,
-    PLAYLIST_FILES_CONNECTED,
-    PlaylistFileRegistry,
-    default_registry,
-)
+from .playlist_files import MAX_PLAYLIST_FILES_PER_TYPE, PLAYLIST_FILE_PAGE_SIZE, PLAYLIST_FILES_CONNECTED, default_registry
 from .m3u import (
     LOCAL_M3U_ROOTS,
     MAX_M3U_SOURCES,
@@ -154,18 +138,7 @@ from .stalker import (
     MAX_PORTAL_ACCOUNTS,
     load_portal_accounts,
 )
-from .weather import (
-    OpenMeteoClient,
-    WeatherError,
-    WeatherLocation,
-    WeatherService,
-    WeatherSettings,
-    last_weather_update,
-    load_weather_settings,
-    prefetch_weather,
-    save_weather_settings,
-    shared_weather_service,
-)
+from .weather import OpenMeteoClient, WeatherError, WeatherLocation, WeatherSettings, last_weather_update, load_weather_settings, prefetch_weather, save_weather_settings, shared_weather_service
 try:
     from boxbranding import (
         getImageDistro,
@@ -439,18 +412,30 @@ def _set_signal_label(
         HEALTH_SIGNAL_YELLOW: "{}_yellow".format(prefix),
         HEALTH_SIGNAL_RED: "{}_red".format(prefix),
     }
-    fitted = ellipsize_dynamic_text(
-        screen[widgets[HEALTH_SIGNAL_NEUTRAL]],
-        str(text or ""),
-        fallback_chars=fallback_chars,
-    )
+    modern_row = getattr(screen, '_r97_kind', '') == 'accounts' and prefix.startswith(('row_detail_', 'row_status_'))
+    batch_row = getattr(screen, '_seven_kind', '') == 'batch' and prefix.startswith('result_status_')
+    if modern_row:
+        from .accounts_design import _fit
+        fitted = _fit(screen, widgets[signal_name], text, 28)
+    elif batch_row:
+        from .seven_presentation import text as fit
+        selected = widgets[signal_name]
+        fit(screen, selected, text, 30, 2)
+        fitted = screen[selected].getText()
+    else:
+        fitted = ellipsize_dynamic_text(
+            screen[widgets[HEALTH_SIGNAL_NEUTRAL]],
+            str(text or ""),
+            fallback_chars=fallback_chars,
+        )
     for current_signal, widget_name in widgets.items():
         widget = screen[widget_name]
-        widget.setText(fitted)
+        if not (modern_row or batch_row):
+            set_text_if_changed(widget, fitted)
         if current_signal == signal_name:
-            widget.show()
+            set_visible(widget, True)
         else:
-            widget.hide()
+            set_visible(widget, False)
     return fitted
 
 
@@ -2771,7 +2756,7 @@ class GTFeatureScreen(Screen):
         window = self._message_lines[
             self._message_offset : self._message_offset + visible
         ]
-        self["message"].setText("\n".join(window))
+        set_text_if_changed(self['message'], '\n'.join(window))
         if maximum <= 0:
             hide_scrollbar(self, "message_scroll")
             return
@@ -2935,7 +2920,7 @@ class GTWeatherLocationSearchScreen(Screen):
             error_text = str(error)
         except Exception:
             error_text = N_("Weather data unavailable.")
-        if self._closed or (job is not None and not job.active()):
+        if (job is not None and not job.active()) or getattr(self, "_closed", True):
             return
         self._search_result = result
         self._search_error = error_text
@@ -2967,6 +2952,16 @@ class GTWeatherLocationSearchScreen(Screen):
             "  {}".format(query),
             fallback_chars=96,
         )
+        if getattr(self, '_aux_kind', None) == 'weather':
+            if self._loading:
+                set_text_if_changed(self['message'], _('Loading...'))
+            elif self._search_error:
+                fit_dynamic_text(self['message'], clean_dynamic_text(_(self._search_error)), max_lines=3, fallback_chars=96)
+            elif not self.entries:
+                set_text_if_changed(self['message'], _('No items found.'))
+            else:
+                set_text_if_changed(self['message'], '{} / {}'.format(self.selected_index + 1, len(self.entries)))
+            return
         count = len(self.entries)
         if count:
             page_start = int(self.selected_index / self.page_size) * self.page_size
@@ -2980,26 +2975,26 @@ class GTWeatherLocationSearchScreen(Screen):
             marker = self["marker_{}".format(offset)]
             label = self["result_{}".format(offset)]
             if offset >= len(page_entries):
-                label.setText("")
-                row_bg.hide()
-                focus.hide()
-                marker.hide()
+                set_text_if_changed(label, '')
+                set_visible(row_bg, False)
+                set_visible(focus, False)
+                set_visible(marker, False)
                 continue
             index = page_start + offset
-            row_bg.show()
+            set_visible(row_bg, True)
             ellipsize_dynamic_text(
                 label,
                 page_entries[offset].display_name,
                 fallback_chars=88,
             )
             if index == self.selected_index:
-                focus.show()
-                marker.show()
+                set_visible(focus, True)
+                set_visible(marker, True)
             else:
-                focus.hide()
-                marker.hide()
+                set_visible(focus, False)
+                set_visible(marker, False)
         if self._loading:
-            self["message"].setText(_("Loading..."))
+            set_text_if_changed(self["message"], _("Loading..."))
         elif self._search_error:
             fit_dynamic_text(
                 self["message"],
@@ -3008,11 +3003,9 @@ class GTWeatherLocationSearchScreen(Screen):
                 fallback_chars=96,
             )
         elif not count:
-            self["message"].setText(_("No items found."))
+            set_text_if_changed(self["message"], _("No items found."))
         else:
-            self["message"].setText(
-                "{} / {}".format(self.selected_index + 1, count)
-            )
+            set_text_if_changed(self["message"], "{} / {}".format(self.selected_index + 1, count))
         width, height, px = _scale()
         update_scrollbar(
             self,
@@ -3066,10 +3059,10 @@ class GTWeatherLocationSearchScreen(Screen):
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
         except ImportError:
-            self["message"].setText(_("The virtual keyboard is unavailable on this image."))
+            set_text_if_changed(self["message"], _("The virtual keyboard is unavailable on this image."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("Could not open the virtual keyboard."))
+            set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
             return
         self.session.openWithCallback(
             self._query_entered,
@@ -3081,7 +3074,7 @@ class GTWeatherLocationSearchScreen(Screen):
     def _query_entered(self, value):
         query = str(value or "").strip()
         if not query:
-            self["message"].setText(_("Cancel"))
+            set_text_if_changed(self["message"], _("Cancel"))
             return
         self._start_search(query)
 
@@ -3197,18 +3190,20 @@ class GTWeatherSettingsScreen(Screen):
         )
         for index, value in enumerate(values):
             widget = self["value_{}".format(index)]
-            if index == 1:
+            if getattr(self, '_r97_kind', None) in ('weather', 'epg'):
+                utility_text(self, 'value_{}'.format(index), str(value), lines=2, size=28)
+            elif index == 1:
                 ellipsize_dynamic_text(
                     widget,
                     value,
                     fallback_chars=44,
                 )
             else:
-                widget.setText(str(value))
+                set_text_if_changed(widget, str(value))
             if index == self.selected_index:
-                self["focus_{}".format(index)].show()
+                set_visible(self["focus_{}".format(index)], True)
             else:
-                self["focus_{}".format(index)].hide()
+                set_visible(self["focus_{}".format(index)], False)
 
     def move_up(self):
         if self._city_checking:
@@ -3241,11 +3236,11 @@ class GTWeatherSettingsScreen(Screen):
         if self.selected_index == 0:
             self.settings.enabled = not self.settings.enabled
             if self._save():
-                self["message"].setText(_("Weather display updated."))
+                set_text_if_changed(self["message"], _("Weather display updated."))
         elif self.selected_index == 2:
             self.settings.unit = "F" if self.settings.unit == "C" else "C"
             if self._save():
-                self["message"].setText(_("Temperature unit updated."))
+                set_text_if_changed(self["message"], _("Temperature unit updated."))
         elif self.selected_index == 1:
             self.edit_city()
             return
@@ -3257,9 +3252,7 @@ class GTWeatherSettingsScreen(Screen):
         elif self.selected_index == 1:
             self.edit_city()
         else:
-            self["message"].setText(
-                _("The last-update time refreshes when weather data is received.")
-            )
+            set_text_if_changed(self["message"], _("The last-update time refreshes when weather data is received."))
 
     def edit_city(self):
         if self._city_checking:
@@ -3267,10 +3260,10 @@ class GTWeatherSettingsScreen(Screen):
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
         except ImportError:
-            self["message"].setText(_("The virtual keyboard is unavailable on this image."))
+            set_text_if_changed(self["message"], _("The virtual keyboard is unavailable on this image."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("Could not open the virtual keyboard."))
+            set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
             return
         self.session.openWithCallback(
             self._city_entered,
@@ -3282,7 +3275,7 @@ class GTWeatherSettingsScreen(Screen):
     def _city_entered(self, value):
         city = str(value or "").strip()
         if not city:
-            self["message"].setText(_("City change cancelled."))
+            set_text_if_changed(self["message"], _("City change cancelled."))
             return
         self.session.openWithCallback(
             self._location_selected,
@@ -3298,7 +3291,7 @@ class GTWeatherSettingsScreen(Screen):
             try:
                 location = WeatherLocation.from_dict(location)
             except (TypeError, ValueError):
-                self["message"].setText(_("Weather data unavailable."))
+                set_text_if_changed(self["message"], _("Weather data unavailable."))
                 return
         self._pending_location = location
         self._begin_city_check(location.name)
@@ -3350,7 +3343,7 @@ class GTWeatherSettingsScreen(Screen):
             error_text = str(error)
         except Exception:
             error_text = "Weather data unavailable."
-        if self._closed or (job is not None and not job.active()):
+        if (job is not None and not job.active()) or getattr(self, "_closed", True):
             return
         self._city_result = result
         self._city_error = error_text
@@ -3364,7 +3357,7 @@ class GTWeatherSettingsScreen(Screen):
                 self._city_checking = False
                 self._city_job = None
                 self._pending_location = None
-                self["message"].setText(_("Weather data unavailable."))
+                set_text_if_changed(self["message"], _("Weather data unavailable."))
                 return
             self._timer.start(150, True)
             return
@@ -3425,7 +3418,6 @@ class GTAppearanceSettingsScreen(Screen):
     }
     LABELS = (
         N_("Text size"),
-        N_("Movies and Series Cinematic View"),
         N_("Show in device main menu"),
         N_("Selection color"),
         N_("Selection border color"),
@@ -3458,7 +3450,6 @@ class GTAppearanceSettingsScreen(Screen):
         )
         Screen.__init__(self, session)
         self.value = normalize_text_size(value)
-        self.cinematic_view = bool(cinematic_view)
         self.show_in_main_menu = bool(show_in_main_menu)
         self.infobar_timeout = normalize_infobar_timeout(infobar_timeout)
         self.channel_highlight = normalize_channel_highlight(channel_highlight)
@@ -3531,46 +3522,34 @@ class GTAppearanceSettingsScreen(Screen):
         )
 
     def _fit_appearance_labels(self):
-        fit_appearance_text(self, *self._appearance_desktop)
+        fit_appearance_text(self, *self._appearance_desktop,
+                            rows=getattr(self, '_r97_kind', None) != 'appearance')
 
     @refresh_after
     def _refresh(self):
-        self["row_value_0"].setText(_(self.VALUE_LABELS[self.value]))
-        self["row_value_1"].setText(
-            _("On") if self.cinematic_view else _("Off")
-        )
-        self["row_value_2"].setText(
-            _("On") if self.show_in_main_menu else _("Off")
-        )
-        self["row_value_3"].setText(
-            "{:02d} / {:02d}".format(
+        set_text_if_changed(self["row_value_0"], _(self.VALUE_LABELS[self.value]))
+        set_text_if_changed(self["row_value_1"], _("On") if self.show_in_main_menu else _("Off"))
+        set_text_if_changed(self["row_value_2"], "{:02d} / {:02d}".format(
                 CHANNEL_HIGHLIGHT_KEYS.index(self.channel_highlight) + 1,
                 len(CHANNEL_HIGHLIGHT_KEYS),
-            )
-        )
-        self["row_value_4"].setText(
-            "{:02d} / {:02d}".format(
+            ))
+        set_text_if_changed(self["row_value_3"], "{:02d} / {:02d}".format(
                 CHANNEL_HIGHLIGHT_KEYS.index(self.selection_border) + 1,
                 len(CHANNEL_HIGHLIGHT_KEYS),
-            )
-        )
-        self["row_value_5"].setText(
-            _("{} s").format(self.infobar_timeout)
-            if self.infobar_timeout else _("Off")
-        )
-        self["message"].setText(
-            _("Off: keep the infobar visible until you press OK.")
-            if self.selected_index == 5 else _("Select")
-        )
+            ))
+        set_text_if_changed(self["row_value_4"], _("{} s").format(self.infobar_timeout)
+            if self.infobar_timeout else _("Off"))
+        set_text_if_changed(self["message"], _("Off: keep the infobar visible until you press OK.")
+            if self.selected_index == 4 else _("Select"))
         self._refresh_swatches()
         self._preview_selection_palette()
         for index in range(len(self.LABELS)):
             selected = index == self.selected_index
             for name in ("row_focus_{}", "row_marker_{}"):
                 if selected:
-                    self[name.format(index)].show()
+                    set_visible(self[name.format(index)], True)
                 else:
-                    self[name.format(index)].hide()
+                    set_visible(self[name.format(index)], False)
         self._fit_appearance_labels()
 
     def move_up(self):
@@ -3587,20 +3566,18 @@ class GTAppearanceSettingsScreen(Screen):
 
     def _change(self, step):
         if self.selected_index == 1:
-            self.cinematic_view = not self.cinematic_view
-        elif self.selected_index == 2:
             self.show_in_main_menu = not self.show_in_main_menu
-        elif self.selected_index == 3:
+        elif self.selected_index == 2:
             index = CHANNEL_HIGHLIGHT_KEYS.index(self.channel_highlight)
             self.channel_highlight = CHANNEL_HIGHLIGHT_KEYS[
                 (index + int(step)) % len(CHANNEL_HIGHLIGHT_KEYS)
             ]
-        elif self.selected_index == 4:
+        elif self.selected_index == 3:
             index = CHANNEL_HIGHLIGHT_KEYS.index(self.selection_border)
             self.selection_border = CHANNEL_HIGHLIGHT_KEYS[
                 (index + int(step)) % len(CHANNEL_HIGHLIGHT_KEYS)
             ]
-        elif self.selected_index == 5:
+        elif self.selected_index == 4:
             index = INFOBAR_TIMEOUT_CHOICES.index(self.infobar_timeout)
             self.infobar_timeout = INFOBAR_TIMEOUT_CHOICES[
                 (index + int(step)) % len(INFOBAR_TIMEOUT_CHOICES)
@@ -3625,7 +3602,6 @@ class GTAppearanceSettingsScreen(Screen):
         self.close(
             {
                 "ui_text_size": self.value,
-                "cinematic_view": self.cinematic_view,
                 "show_in_main_menu": self.show_in_main_menu,
                 "channel_highlight": self.channel_highlight,
                 "selection_border": self.selection_border,
@@ -3657,7 +3633,6 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         N_("YouTube"),
         N_("Backup"),
         N_("Restore backup"),
-        N_("Live TV recording"),
         N_("Software update"),
     )
 
@@ -3796,10 +3771,10 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         language = device_language()
         if language == getattr(self, "_settings_language_code", None):
             return
-        self["header"].setText(_("Settings"))
-        self["player_tab"].setText(_("Player / Codec"))
-        self["language_tab"].setText(_("LANGUAGE"))
-        self["language_soon"].setText(device_language_label())
+        set_text_if_changed(self["header"], _("Settings"))
+        set_text_if_changed(self["player_tab"], _("Player / Codec"))
+        set_text_if_changed(self["language_tab"], _("LANGUAGE"))
+        set_text_if_changed(self["language_soon"], device_language_label())
         self.setTitle(_("Settings - Player / Codec"))
         self._settings_language_code = language
 
@@ -3827,7 +3802,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         return []
 
     def _value_text(self, index):
-        if index in (5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17):
+        if index in (5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16):
             return _("Open")
         if index == 6:
             status = getattr(self, "_category_lock_status", None)
@@ -3855,25 +3830,22 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             )
         return str(value)
 
-    def _refresh(self):
+    def _refresh(self, previous_position=None):
+        language_changed = device_language() != getattr(self, "_settings_language_code", None)
         self._refresh_settings_language()
         position = self._settings_order.index(self.selected_index)
+        previous_window = self._settings_window
         if position < self._settings_window:
             self._settings_window = position
         elif position >= self._settings_window + 9:
             self._settings_window = position - 8
-        self["settings_up"].show() if self._settings_window else self["settings_up"].hide()
-        self["settings_down"].show() if self._settings_window + 9 < len(self.LABELS) else self["settings_down"].hide()
-        for slot in range(9):
-            index = self._settings_order[self._settings_window + slot]
-            label = _(self.LABELS[index])
-            if self._settings_move_backup is not None and index == self.selected_index:
-                label = "↕ " + label
-            self["row_label_{}".format(slot)].setText(label)
-            self["row_value_{}".format(slot)].setText(self._value_text(index))
-            for name in ("row_focus_{}", "row_marker_{}"):
-                widget = self[name.format(slot)]
-                widget.show() if index == self.selected_index else widget.hide()
+        previous_slot = None
+        if (previous_position is not None and previous_window == self._settings_window
+                and not language_changed):
+            previous_slot = previous_position - self._settings_window
+        if previous_slot is None:
+            set_visible(self["settings_up"], self._settings_window > 0)
+            set_visible(self["settings_down"], self._settings_window + 9 < len(self.LABELS))
         width, height, px = _scale()
         # A short thumb follows the selected setting; the existing arrows
         # continue to show when more rows lie above or below the window.
@@ -3885,8 +3857,8 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             message = (_("Settings could not be saved. Check the receiver storage.")
                        if self._settings_move_error else
                        _("Move") + " — " + _(self.LABELS[self.selected_index]))
-            self["message"].setText(message)
-        self._refresh_settings_presentation()
+            set_text_if_changed(self["message"], message)
+        self._refresh_settings_presentation(previous_slot)
 
     def _load_settings_order(self):
         try:
@@ -3903,9 +3875,10 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             self._settings_order.pop(position)
             self._settings_order.insert(target, self.selected_index)
             self._settings_move_error = False
+            self._refresh()
         else:
             self.selected_index = self._settings_order[(position + step) % len(self._settings_order)]
-        self._refresh()
+            self._refresh(previous_position=position)
 
     def toggle_settings_move(self):
         if self._settings_move_backup is not None:
@@ -3937,7 +3910,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         baseline = getattr(self, "_settings_baseline", None)
         pending = (not isinstance(baseline, PlayerSettings)
                    or self.settings.as_dict() != baseline.as_dict())
-        self["message"].setText(_("Press GREEN to save the changes.") if pending
+        set_text_if_changed(self["message"], _("Press GREEN to save the changes.") if pending
                                 else _("Settings saved"))
         self._refresh()
         return True
@@ -3955,44 +3928,38 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         self._navigate_settings(1)
 
     def _change(self, step):
-        if self.selected_index in (14, 15, 16, 17):
-            self["message"].setText(_(self.LABELS[self.selected_index]))
+        if self.selected_index in (14, 15, 16):
+            set_text_if_changed(self["message"], _(self.LABELS[self.selected_index]))
             return
         if self.selected_index == 13:
-            self["message"].setText(_("YouTube settings"))
+            set_text_if_changed(self["message"], _("YouTube settings"))
             return
         if self.selected_index == 12:
-            self["message"].setText(_("Web Interface"))
+            set_text_if_changed(self["message"], _("Web Interface"))
             return
         if self.selected_index == 11:
-            self["message"].setText(_("Weather"))
+            set_text_if_changed(self["message"], _("Weather"))
             return
         if self.selected_index == 10:
-            self["message"].setText(_("Downloads"))
+            set_text_if_changed(self["message"], _("Downloads"))
             return
         if self.selected_index == 5:
-            self["message"].setText(
-                _("Press OK to open the DVB EPG settings.")
-            )
+            set_text_if_changed(self["message"], _("Press OK to open the DVB EPG settings."))
             return
         if self.selected_index == 6:
-            self["message"].setText(
-                _("Press OK to turn the category edit lock on or off.")
-            )
+            set_text_if_changed(self["message"], _("Press OK to turn the category edit lock on or off."))
             return
         if self.selected_index == 7:
-            self["message"].setText(_("Select"))
+            set_text_if_changed(self["message"], _("Select"))
             return
         if self.selected_index == 8:
-            self["message"].setText(_("Open independent subtitle settings."))
+            set_text_if_changed(self["message"], _("Open independent subtitle settings."))
             return
         if self.selected_index == 9:
-            self["message"].setText(_("Select"))
+            set_text_if_changed(self["message"], _("Select"))
             return
         if self.selected_index == 4:
-            self["message"].setText(
-                _("Press OK to enter or change the TMDb key.")
-            )
+            set_text_if_changed(self["message"], _("Press OK to enter or change the TMDb key."))
             return
         field = self._field_name(self.selected_index)
         options = self._options(self.selected_index)
@@ -4002,9 +3969,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         except ValueError:
             index = 0
         setattr(self.settings, field, options[(index + step) % len(options)])
-        self["message"].setText(
-            _("Press GREEN to save the changes.")
-        )
+        set_text_if_changed(self["message"], _("Press GREEN to save the changes."))
         self._refresh()
 
     def change_left(self):
@@ -4016,7 +3981,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             self._change(1)
 
     def activate_selected(self):
-        if self.selected_index == 17:
+        if self.selected_index == 16:
             from .update_ui import GTSoftwareUpdateScreen
             self.session.open(GTSoftwareUpdateScreen)
         elif self.selected_index == 5:
@@ -4046,9 +4011,6 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
                 self._youtube_settings_closed, GTYouTubeSettingsScreen,
                 self.settings.copy(),
             )
-        elif self.selected_index == 16:
-            from .live_recording_ui import GTLiveRecordingFolderScreen
-            self.session.open(GTLiveRecordingFolderScreen)
         elif self.selected_index in (14, 15):
             self.open_backup("restore" if self.selected_index == 15 else "backup")
         elif self.selected_index == 4:
@@ -4064,7 +4026,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         except Exception:
             saved = False
         if not saved:
-            self["message"].setText(_("Settings could not be saved. Check the receiver storage."))
+            set_text_if_changed(self["message"], _("Settings could not be saved. Check the receiver storage."))
             return
         from .backup_ui import GTBackupScreen
         self.session.openWithCallback(self._backup_closed, GTBackupScreen, mode)
@@ -4088,7 +4050,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             self.settings.youtube_dash = True
             self.settings.youtube_stream_mode = "auto"
             self.settings.youtube_audio_preference = "original"
-            self["message"].setText(_("Settings saved"))
+            set_text_if_changed(self["message"], _("Settings saved"))
             self._refresh()
 
     def _refresh_youtube_settings(self):
@@ -4136,9 +4098,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             return False
         opener = getattr(self.session, "openWithCallback", None)
         if not callable(opener):
-            self["message"].setText(
-                _("The PIN entry screen is unavailable on this image.")
-            )
+            set_text_if_changed(self["message"], _("The PIN entry screen is unavailable on this image."))
             return False
         self._category_lock_prompt_open = True
 
@@ -4157,9 +4117,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             )
         except Exception:
             self._category_lock_prompt_open = False
-            self["message"].setText(
-                _("The PIN entry screen is unavailable on this image.")
-            )
+            set_text_if_changed(self["message"], _("The PIN entry screen is unavailable on this image."))
             return False
         return True
 
@@ -4191,9 +4149,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
                 return
             opener = getattr(self.session, "openWithCallback", None)
             if not callable(opener):
-                self["message"].setText(
-                    _("The confirmation screen is unavailable on this image.")
-                )
+                set_text_if_changed(self["message"], _("The confirmation screen is unavailable on this image."))
                 return
             self._category_lock_prompt_open = True
 
@@ -4211,9 +4167,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
                 )
             except Exception:
                 self._category_lock_prompt_open = False
-                self["message"].setText(
-                    _("The confirmation screen is unavailable on this image.")
-                )
+                set_text_if_changed(self["message"], _("The confirmation screen is unavailable on this image."))
             return
         self._open_category_code(
             self._category_lock_pin_created,
@@ -4239,9 +4193,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         if confirmation is None:
             return
         if str(confirmation) != pin:
-            self["message"].setText(
-                _("The PIN entries do not match. Nothing was changed.")
-            )
+            set_text_if_changed(self["message"], _("The PIN entries do not match. Nothing was changed."))
             return
         try:
             recovery_code = self.category_lock_store.configure(
@@ -4251,17 +4203,15 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         except Exception:
             recovery_code = ""
         if not recovery_code:
-            self["message"].setText(
-                _(
+            set_text_if_changed(self["message"], _(
                     "Category edit lock could not be saved. "
                     "Check the receiver storage."
-                )
-            )
+                ))
             self._refresh()
             return
         self._category_lock_status = "enabled"
         self._refresh()
-        self["message"].setText(_("Category edit lock enabled."))
+        set_text_if_changed(self["message"], _("Category edit lock enabled."))
         self._show_category_lock_message(
             _(
                 "Write down this recovery code. It is shown only once:\n\n"
@@ -4296,7 +4246,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         except Exception:
             valid = False
         if not valid:
-            self["message"].setText(_("Incorrect PIN. Lock unchanged."))
+            set_text_if_changed(self["message"], _("Incorrect PIN. Lock unchanged."))
             return
         self._disable_category_lock()
 
@@ -4308,9 +4258,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         except Exception:
             valid = False
         if not valid:
-            self["message"].setText(
-                _("Incorrect recovery code. Lock unchanged.")
-            )
+            set_text_if_changed(self["message"], _("Incorrect recovery code. Lock unchanged."))
             return
         self._disable_category_lock()
 
@@ -4321,25 +4269,19 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             disabled = False
         if disabled:
             self._category_lock_status = "disabled"
-            self["message"].setText(
-                _("Category edit lock disabled.")
-            )
+            set_text_if_changed(self["message"], _("Category edit lock disabled."))
         else:
-            self["message"].setText(
-                _(
+            set_text_if_changed(self["message"], _(
                     "Category edit lock could not be removed. "
                     "Check the receiver storage."
-                )
-            )
+                ))
         self._refresh()
 
     def open_dvb_epg(self):
         try:
             from .dvb_epg_ui import GTDVBEPGSettingsScreen
         except ImportError:
-            self["message"].setText(
-                _("DVB EPG settings are unavailable on this image.")
-            )
+            set_text_if_changed(self["message"], _("DVB EPG settings are unavailable on this image."))
             return
         if hasattr(self.session, "openWithCallback"):
             self.session.openWithCallback(
@@ -4402,7 +4344,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         if result == PLAYLIST_FILES_CONNECTED:
             self.close(PLAYLIST_FILES_CONNECTED)
             return
-        self["message"].setText(_("Select"))
+        set_text_if_changed(self["message"], _("Select"))
         self._refresh()
 
     def _appearance_closed(self, value=None):
@@ -4459,23 +4401,21 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             self.settings.channel_highlight,
             self.settings.selection_border,
         )
-        self["message"].setText(_("Press GREEN to save the changes."))
+        set_text_if_changed(self["message"], _("Press GREEN to save the changes."))
         self._refresh()
 
     def _dvb_epg_closed(self, *args):
-        self["message"].setText(
-            _("DVB EPG settings closed.")
-        )
+        set_text_if_changed(self["message"], _("DVB EPG settings closed."))
         self._refresh()
 
     def edit_tmdb_key(self):
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
         except ImportError:
-            self["message"].setText(_("The virtual keyboard is unavailable on this image."))
+            set_text_if_changed(self["message"], _("The virtual keyboard is unavailable on this image."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("Could not open the virtual keyboard."))
+            set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
             return
         self.session.openWithCallback(
             self._tmdb_key_entered,
@@ -4488,32 +4428,28 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
 
     def _tmdb_key_entered(self, value):
         if value is None:
-            self["message"].setText(_("TMDb key change cancelled."))
+            set_text_if_changed(self["message"], _("TMDb key change cancelled."))
             return
         key = "".join(str(value or "").split())[:512]
         self.settings.tmdb_api_key = key
         self._tmdb_test_result = None
-        self["message"].setText(
-            _("TMDb key saved; press BLUE to test and GREEN to save.")
+        set_text_if_changed(self["message"], _("TMDb key saved; press BLUE to test and GREEN to save.")
             if key
-            else _("TMDb key cleared; press GREEN to save.")
-        )
+            else _("TMDb key cleared; press GREEN to save."))
         self._refresh()
 
     def test_tmdb(self):
         if self._settings_move_backup is not None:
             return
         if self._tmdb_test_pending:
-            self["message"].setText(_("The TMDb connection test is still running..."))
+            set_text_if_changed(self["message"], _("The TMDb connection test is still running..."))
             return
         if not str(self.settings.tmdb_api_key or "").strip():
-            self["message"].setText(
-                _("No TMDb key is configured. Press OK on the key row.")
-            )
+            set_text_if_changed(self["message"], _("No TMDb key is configured. Press OK on the key row."))
             return
         self._tmdb_test_pending = True
         self._tmdb_test_result = None
-        self["message"].setText(_("Testing the TMDb connection and API key..."))
+        set_text_if_changed(self["message"], _("Testing the TMDb connection and API key..."))
         _cancel_ui_job(self._tmdb_test_job)
         job = _UIJobToken(15)
         self._tmdb_test_job = job
@@ -4557,8 +4493,8 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         except Exception:
             result = (False, _("TMDb test failed: could not connect."))
         if (
-            self._tmdb_test_pending
-            and (job is None or job.active())
+            (job is None or job.active())
+            and getattr(self, "_tmdb_test_pending", False)
         ):
             self._tmdb_test_result = result
 
@@ -4572,16 +4508,14 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             ):
                 self._tmdb_test_pending = False
                 self._tmdb_test_job = None
-                self["message"].setText(
-                    _("TMDb test failed: could not connect.")
-                )
+                set_text_if_changed(self["message"], _("TMDb test failed: could not connect."))
                 return
             self._tmdb_test_timer.start(80, True)
             return
         message = self._tmdb_test_result[1]
         self._tmdb_test_pending = False
         self._tmdb_test_job = None
-        self["message"].setText(message)
+        set_text_if_changed(self["message"], message)
 
     def _stop_tmdb_test(self):
         self._tmdb_test_pending = False
@@ -4600,9 +4534,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         except Exception:
             result = False
         if result is False:
-            self["message"].setText(
-                _("Settings could not be saved. Check the receiver storage.")
-            )
+            set_text_if_changed(self["message"], _("Settings could not be saved. Check the receiver storage."))
             return
         if self._metadata_signature() != self._original_metadata_signature:
             try:
@@ -4617,7 +4549,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
             self._settings_move_backup = None
             self._settings_move_error = False
             set_remote_footer(self, PLAYER_SETTINGS_FOOTER_ITEMS)
-            self["message"].setText(_("Move cancelled."))
+            set_text_if_changed(self["message"], _("Move cancelled."))
             self._refresh()
             return
         self.close(False)
@@ -4692,7 +4624,7 @@ class _DirectAccountConnection(object):
                 "ERROR",
                 detail=N_("The health check could not be completed."),
             )
-        if self._closed or (job is not None and not job.active()):
+        if (job is not None and not job.active()) or getattr(self, "_closed", True):
             return
         self._result = result
         self._result_ready = True
@@ -4874,35 +4806,41 @@ class GTAccountBatchTestScreen(Screen):
             self.onClose.append(self._stop)
         self.setTitle(_("Information"))
 
-    def _queue_event(self, *event):
-        with self._event_lock:
-            if not self._closed:
-                self._events.append(event)
-
     def _drain_events(self):
         with self._event_lock:
-            events = self._events
-            self._events = []
+            events = list(self._events)
+            self._events.clear()
         return events
 
     def start(self):
         if self._started or self._closed:
             return False
         self._started = True
-        worker = threading.Thread(target=self._run_tests)
+        worker = threading.Thread(
+            target=self._run_tests,
+            args=(self.accounts, self.account_checker, self._cancel_event,
+                  self._event_lock, self._events),
+        )
         worker.daemon = True
         worker.start()
         self._timer.start(ACCOUNT_BATCH_QUERY_POLL_MS, True)
         return True
 
-    def _run_tests(self):
-        for index, account in enumerate(self.accounts):
-            if self._cancel_event.is_set():
+    @staticmethod
+    def _run_tests(accounts, account_checker, cancel_event, event_lock, events):
+        # Workers own their inputs and queue; Enigma2 can clear the Screen.
+        def queue_event(*event):
+            with event_lock:
+                if not cancel_event.is_set():
+                    events.append(event)
+
+        for index, account in enumerate(accounts):
+            if cancel_event.is_set():
                 return
-            self._queue_event("started", index, account)
+            queue_event("started", index, account)
             try:
                 result = _run_account_health_check(
-                    account, self.account_checker, cancel_event=self._cancel_event,
+                    account, account_checker, cancel_event=cancel_event,
                 )
             except Exception:
                 result = ServerHealth(
@@ -4910,16 +4848,15 @@ class GTAccountBatchTestScreen(Screen):
                     detail=N_("The health check could not be completed."),
                     source_type=_source_type(account),
                 )
-            if self._cancel_event.is_set():
+            if cancel_event.is_set():
                 return
             result = _sanitized_account_preview(result, _source_type(account))
-            self._queue_event("result", index, account, result)
-        if not self._cancel_event.is_set():
-            self._queue_event("complete")
+            queue_event("result", index, account, result)
+        queue_event("complete")
 
     @seven_refresh_after
     def _poll_events(self):
-        if self._closed:
+        if getattr(self, "_closed", True):
             return
         terminal = False
         for event in self._drain_events():
@@ -4953,10 +4890,14 @@ class GTAccountBatchTestScreen(Screen):
             self._timer.start(ACCOUNT_BATCH_QUERY_POLL_MS, True)
 
     def _render_entries(self, entries):
+        batch = getattr(self, '_seven_kind', None) == 'batch'
+        if batch:
+            from .seven_presentation import text as fit
         for offset in range(self.page_size):
-            name_widget = self["result_name_{}".format(offset)]
+            name = "result_name_{}".format(offset)
+            name_widget = self[name]
             if offset >= len(entries):
-                name_widget.setText("")
+                set_text_if_changed(name_widget, '')
                 _set_signal_label(
                     self,
                     "result_status_{}".format(offset),
@@ -4966,15 +4907,15 @@ class GTAccountBatchTestScreen(Screen):
                 )
                 continue
             account, status_text, signal_name = entries[offset]
-            ellipsize_dynamic_text(
-                name_widget,
-                _account_test_display_name(account),
-                fallback_chars=44,
-            )
+            display_name = _account_test_display_name(account)
+            if batch:
+                fit(self, name, display_name, 36)
+            else:
+                ellipsize_dynamic_text(name_widget, display_name, fallback_chars=44)
             _set_signal_label(
                 self,
                 "result_status_{}".format(offset),
-                localized_upper(status_text),
+                sentence_caption(status_text) if batch else localized_upper(status_text),
                 signal_name,
                 fallback_chars=28,
             )
@@ -4985,9 +4926,9 @@ class GTAccountBatchTestScreen(Screen):
             return
         total = len(self.accounts)
         percent = int((self._completed * 100) / total) if total else 100
-        self["header"].setText(localized_upper(_("Accounts")))
-        self["subtitle"].setText(_("TESTING..."))
-        self["review_page"].setText("")
+        set_text_if_changed(self['header'], localized_upper(_('Accounts')))
+        set_text_if_changed(self['subtitle'], _('TESTING...'))
+        set_text_if_changed(self['review_page'], '')
         available = self.page_size - (1 if self._current_pending else 0)
         entries = []
         for account, result in self._history[-available:]:
@@ -5002,11 +4943,9 @@ class GTAccountBatchTestScreen(Screen):
                 )
             )
         self._render_entries(entries)
-        self["progress_text"].setText(
-            "{} / {}  •  {}%".format(self._completed, total, percent)
-        )
+        set_text_if_changed(self['progress_text'], '{} / {}  •  {}%'.format(self._completed, total, percent))
         if self._current_account is None:
-            self["current_account"].setText("")
+            set_text_if_changed(self['current_account'], '')
         else:
             ellipsize_dynamic_text(
                 self["current_account"],
@@ -5043,7 +4982,7 @@ class GTAccountBatchTestScreen(Screen):
             pass
 
     def _finish_testing(self):
-        if self._closed or self._state != "testing":
+        if getattr(self, "_closed", True) or self._state != "testing":
             return
         self._tests_complete = (
             not self._cancel_event.is_set()
@@ -5085,29 +5024,21 @@ class GTAccountBatchTestScreen(Screen):
         self._review_page = max(0, min(self._review_page, page_count - 1))
         start = self._review_page * self.page_size
         page_accounts = self._inactive_accounts[start : start + self.page_size]
-        self["header"].setText(localized_upper(_("Accounts")))
-        self["subtitle"].setText(_account_test_review_summary(*self._review_counts()))
-        self["review_page"].setText(
-            "{} / {} {}".format(
-                self._review_page + 1,
-                page_count,
-                localized_upper(_("Page")),
-            )
-        )
+        set_text_if_changed(self['header'], localized_upper(_('Accounts')))
+        set_text_if_changed(self['subtitle'], _account_test_review_summary(*self._review_counts()))
+        set_text_if_changed(self['review_page'], '{} / {} {}'.format(self._review_page + 1, page_count, localized_upper(_('Page'))))
         self._render_entries(
             [
                 (account,) + _account_test_status_text(self._results.get(_source_result_key(account)))
                 for account in page_accounts
             ]
         )
-        self["progress_text"].setText(
-            "{}: {}  •  100%".format(_("Accounts"), count)
-        )
-        self["current_account"].setText("")
+        set_text_if_changed(self['progress_text'], '{}: {}  •  100%'.format(_('Accounts'), count))
+        set_text_if_changed(self['current_account'], '')
 
     def _arm_inactive_confirmation(self):
         if (
-            self._closed
+            getattr(self, "_closed", True)
             or self._state != "confirming"
             or not self._inactive_accounts
             or self._confirmation_armed
@@ -5127,6 +5058,8 @@ class GTAccountBatchTestScreen(Screen):
         return True
 
     def _open_inactive_confirmation(self):
+        if getattr(self, "_closed", True):
+            return False
         self._confirmation_armed = False
         try:
             self._confirmation_timer.stop()
@@ -5170,6 +5103,8 @@ class GTAccountBatchTestScreen(Screen):
         return True
 
     def _inactive_confirmation_closed(self, confirmed):
+        if getattr(self, "_closed", True):
+            return
         self._confirmation_open = False
         if self._closed or self._state != "confirming":
             return
@@ -5179,7 +5114,7 @@ class GTAccountBatchTestScreen(Screen):
         self.close(self._result_payload())
 
     def _show_inline_review(self):
-        if self._closed or not self._inactive_accounts:
+        if getattr(self, "_closed", True) or not self._inactive_accounts:
             return
         self._confirmation_armed = False
         self._confirmation_open = False
@@ -5221,30 +5156,40 @@ class GTAccountBatchTestScreen(Screen):
         self["subtitle"].setText(_("Please wait"))
         self["review_page"].setText("")
         set_remote_footer(self, ACCOUNT_BATCH_RUNNING_FOOTER_ITEMS)
-        worker = threading.Thread(target=self._run_delete)
+        worker = threading.Thread(
+            target=self._run_delete,
+            args=(tuple(self._inactive_accounts), self.batch_deleter,
+                  self._batch_deleter_supports_limits, self._cancel_event,
+                  self._event_lock, self._events),
+        )
         worker.daemon = True
         worker.start()
         self._timer.start(ACCOUNT_BATCH_QUERY_POLL_MS, True)
 
-    def _run_delete(self):
+    @staticmethod
+    def _run_delete(accounts, batch_deleter, supports_limits, cancel_event,
+                    event_lock, events):
         try:
             deadline = time.monotonic() + ACCOUNT_BATCH_DELETE_TIMEOUT_SECONDS
-            if self._batch_deleter_supports_limits:
-                removed = self.batch_deleter(
-                    self._inactive_accounts,
-                    cancel_event=self._cancel_event,
+            if cancel_event.is_set():
+                removed = 0
+            elif supports_limits:
+                removed = batch_deleter(
+                    accounts,
+                    cancel_event=cancel_event,
                     deadline=deadline,
                 )
             else:
-                removed = self.batch_deleter(self._inactive_accounts)
+                removed = batch_deleter(accounts)
             error = ""
         except Exception as caught:
             removed = 0
             error = str(caught)
-        self._queue_event("delete_done", removed, error)
+        with event_lock:
+            events.append(("delete_done", removed, error))
 
     def _finish_delete(self, removed, error):
-        if self._closed or self._state != "deleting":
+        if getattr(self, "_closed", True) or self._state != "deleting":
             return
         if error:
             if self._close_after_delete_cancel:
@@ -5295,6 +5240,8 @@ class GTAccountBatchTestScreen(Screen):
         self.close(self._result_payload(cancelled=True))
 
     def _stop(self):
+        if getattr(self, "_closed", True):
+            return
         self._closed = True
         self._cancel_event.set()
         self._confirmation_armed = False
@@ -5425,16 +5372,16 @@ class GTAccountsScreen(Screen):
             self["detail_{}".format(edge)] = Label("")
         for index in range(self.page_size):
             self["account_row_art_{}".format(index)] = Pixmap()
-            self["account_row_art_{}".format(index)].hide()
+            set_visible(self["account_row_art_{}".format(index)], False)
             self["account_focus_art_{}".format(index)] = Pixmap()
-            self["account_focus_art_{}".format(index)].hide()
+            set_visible(self["account_focus_art_{}".format(index)], False)
             self["row_number_{}".format(index)] = Label("")
             self["row_{}".format(index)] = Label("")
             self["row_detail_{}".format(index)] = Label("")
             self["row_status_{}".format(index)] = Label("")
             for signal in ("neutral", "green", "yellow", "red"):
                 self["row_status_art_{}_{}".format(index, signal)] = Pixmap()
-                self["row_status_art_{}_{}".format(index, signal)].hide()
+                set_visible(self["row_status_art_{}_{}".format(index, signal)], False)
             for suffix in ("_green", "_yellow", "_red"):
                 self["row_detail_{}{}".format(index, suffix)] = Label("")
                 self["row_status_{}{}".format(index, suffix)] = Label("")
@@ -5482,6 +5429,10 @@ class GTAccountsScreen(Screen):
             -1,
         )
         setup_utility_pages(self, 'accounts', footer_items)
+        from .opaque_row_art import DeferredOpaqueArt
+        DeferredOpaqueArt(self, (), (
+            ('r99_list_panel', 'account_row_art_', self.page_size, ((), ('account_focus_art_',))),
+        ), self._install_account_art)
         self.reload_accounts()
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._refresh)
@@ -5492,6 +5443,11 @@ class GTAccountsScreen(Screen):
             self.onClose.append(self._stop_direct_connection)
             self.onClose.append(self._stop_delete_job)
         self.setTitle(self._heading())
+
+    def _install_account_art(self, unused_panels, rows):
+        from .accounts_design import refresh
+        self._opaque_account_rows, = rows
+        refresh(self, selection_only=True)
 
     def _heading(self):
         return {
@@ -5690,9 +5646,9 @@ class GTAccountsScreen(Screen):
             return
         self._refresh()
         if bool(payload.get("cancelled")):
-            self["message"].setText(_("Request cancelled"))
+            set_text_if_changed(self["message"], _("Request cancelled"))
         elif inactive_count or error_count:
-            self["message"].setText(_account_test_review_summary(error_count, inactive_count))
+            set_text_if_changed(self["message"], _account_test_review_summary(error_count, inactive_count))
 
     def _stop_automatic_test_timer(self):
         self._account_screen_closed = True
@@ -5704,8 +5660,12 @@ class GTAccountsScreen(Screen):
 
     @refresh_after
     def _refresh(self):
+        modern = getattr(self, '_r97_kind', '') == 'accounts'
+        if modern:
+            from .accounts_design import _fit as fit_account_text
+        from .welcome_design import sentence_caption
         heading = self._heading()
-        self["header"].setText(localized_upper(heading))
+        set_text_if_changed(self["header"], localized_upper(heading))
         self.setTitle(heading)
         count = len(self.accounts)
         page_count = int((count + self.page_size - 1) / self.page_size) if count else 0
@@ -5713,22 +5673,16 @@ class GTAccountsScreen(Screen):
         source_limit = SOURCE_LIMITS.get(self.source_type, MAX_ACCOUNTS)
         count_label = _("Sources") if self.source_type == "m3u" else _("Accounts")
         badge_label = _("Source") if self.source_type == "m3u" else _("Account")
-        self["count_badge"].setText(
-            "{} / {} {}".format(
-                count, source_limit, localized_upper(badge_label)
-            )
-        )
-        self["source_badge"].setText(
-            "{} / {} {}".format(
-                current_page, page_count, localized_upper(_("Page"))
-            )
-        )
-        self["summary"].setText(
-            "{}: {} / {}  |  {}: {} / {}".format(
+        set_text_if_changed(self["count_badge"], "{} / {} {}".format(
+                count, source_limit, badge_label.lower() if modern else localized_upper(badge_label)
+            ))
+        set_text_if_changed(self["source_badge"], "{} / {} {}".format(
+                current_page, page_count, _("Page").lower() if modern else localized_upper(_("Page"))
+            ))
+        set_text_if_changed(self["summary"], "{}: {} / {}  |  {}: {} / {}".format(
                 count_label, count, source_limit,
                 _("Page"), current_page, page_count,
-            )
-        )
+            ))
         if not count:
             loading = bool(getattr(self, "_sources_loading", False))
             source_error = getattr(self.load_result, "error", "") or ""
@@ -5736,12 +5690,12 @@ class GTAccountsScreen(Screen):
                 "No source was found.\n\n"
                 "Create one from the ADD SOURCE panel on the home screen."
             )
-            self["accounts"].setText(empty_text)
+            set_text_if_changed(self["accounts"], empty_text)
             for offset in range(self.page_size):
-                self["account_row_art_{}".format(offset)].hide()
-                self["account_focus_art_{}".format(offset)].hide()
-                self["row_number_{}".format(offset)].setText("")
-                self["row_{}".format(offset)].setText("")
+                set_visible(self["account_row_art_{}".format(offset)], False)
+                set_visible(self["account_focus_art_{}".format(offset)], False)
+                set_text_if_changed(self["row_number_{}".format(offset)], "")
+                set_text_if_changed(self["row_{}".format(offset)], "")
                 _set_signal_label(
                     self,
                     "row_detail_{}".format(offset),
@@ -5754,12 +5708,10 @@ class GTAccountsScreen(Screen):
                     HEALTH_SIGNAL_NEUTRAL,
                 )
                 for signal in ("neutral", "green", "yellow", "red"):
-                    self["row_status_art_{}_{}".format(offset, signal)].hide()
+                    set_visible(self["row_status_art_{}_{}".format(offset, signal)], False)
                 for edge in ("top", "bottom", "left", "right"):
-                    self["focus_{}_{}".format(offset, edge)].hide()
-            self["selected_account"].setText(
-                "{}: 0".format(count_label)
-            )
+                    set_visible(self["focus_{}_{}".format(offset, edge)], False)
+            set_text_if_changed(self["selected_account"], "{}: 0".format(count_label))
             _set_signal_label(
                 self,
                 "selected_status",
@@ -5781,9 +5733,7 @@ class GTAccountsScreen(Screen):
                 HEALTH_SIGNAL_NEUTRAL,
                 fallback_chars=30,
             )
-            self["detail_action"].setText(
-                localized_upper(_("Please wait") if loading else _("Add Source"))
-            )
+            set_text_if_changed(self["detail_action"], localized_upper(_("Please wait") if loading else _("Add Source")))
             ellipsize_dynamic_text(
                 self["message"],
                 clean_dynamic_text(_(source_error))
@@ -5815,19 +5765,27 @@ class GTAccountsScreen(Screen):
                 row_signal = HEALTH_SIGNAL_NEUTRAL
                 status_text = _("Ready to connect")
             marker = ">" if index == self.selected_index else " "
-            self["row_number_{}".format(offset)].setText(
-                "{:02d}".format(index + 1)
-            )
-            self["account_row_art_{}".format(offset)].show()
-            if index == self.selected_index:
-                self["account_focus_art_{}".format(offset)].show()
+            row_number = "row_number_{}".format(offset)
+            number = "{:02d}".format(index + 1)
+            if modern:
+                fit_account_text(self, row_number, number, 40)
             else:
-                self["account_focus_art_{}".format(offset)].hide()
-            rendered_primary = ellipsize_dynamic_text(
-                self["row_{}".format(offset)],
-                primary,
-                fallback_chars=50,
-            )
+                set_text_if_changed(self[row_number], number)
+            set_visible(self["account_row_art_{}".format(offset)], True)
+            if index == self.selected_index:
+                set_visible(self["account_focus_art_{}".format(offset)], True)
+            else:
+                set_visible(self["account_focus_art_{}".format(offset)], False)
+            if modern:
+                rendered_primary = fit_account_text(self, "row_{}".format(offset), primary, 38)
+            else:
+                rendered_primary = ellipsize_dynamic_text(
+                    self["row_{}".format(offset)],
+                    primary,
+                    fallback_chars=50,
+                )
+            if modern:
+                secondary = secondary.replace('  |  ', ' · ').replace(' • ', ' · ')
             rendered_secondary = _set_signal_label(
                 self,
                 "row_detail_{}".format(offset),
@@ -5838,7 +5796,7 @@ class GTAccountsScreen(Screen):
             _set_signal_label(
                 self,
                 "row_status_{}".format(offset),
-                localized_upper(status_text),
+                sentence_caption(status_text) if modern else localized_upper(status_text),
                 row_signal,
                 fallback_chars=29,
             )
@@ -5850,9 +5808,9 @@ class GTAccountsScreen(Screen):
             for signal in ("neutral", "green", "yellow", "red"):
                 artwork = self["row_status_art_{}_{}".format(offset, signal)]
                 if signal == active_status:
-                    artwork.show()
+                    set_visible(artwork, True)
                 else:
-                    artwork.hide()
+                    set_visible(artwork, False)
             # This legacy compatibility label is visually hidden, but it must
             # not receive unbounded provider values either.
             lines.append(
@@ -5866,14 +5824,14 @@ class GTAccountsScreen(Screen):
             for edge in ("top", "bottom", "left", "right"):
                 focus = self["focus_{}_{}".format(offset, edge)]
                 if index == self.selected_index:
-                    focus.show()
+                    set_visible(focus, True)
                 else:
-                    focus.hide()
+                    set_visible(focus, False)
         for offset in range(len(page_accounts), self.page_size):
-            self["account_row_art_{}".format(offset)].hide()
-            self["account_focus_art_{}".format(offset)].hide()
-            self["row_number_{}".format(offset)].setText("")
-            self["row_{}".format(offset)].setText("")
+            set_visible(self["account_row_art_{}".format(offset)], False)
+            set_visible(self["account_focus_art_{}".format(offset)], False)
+            set_text_if_changed(self["row_number_{}".format(offset)], "")
+            set_text_if_changed(self["row_{}".format(offset)], "")
             _set_signal_label(
                 self,
                 "row_detail_{}".format(offset),
@@ -5886,10 +5844,10 @@ class GTAccountsScreen(Screen):
                 HEALTH_SIGNAL_NEUTRAL,
             )
             for signal in ("neutral", "green", "yellow", "red"):
-                self["row_status_art_{}_{}".format(offset, signal)].hide()
+                set_visible(self["row_status_art_{}_{}".format(offset, signal)], False)
             for edge in ("top", "bottom", "left", "right"):
-                self["focus_{}_{}".format(offset, edge)].hide()
-        self["accounts"].setText("\n\n".join(lines))
+                set_visible(self["focus_{}_{}".format(offset, edge)], False)
+        set_text_if_changed(self["accounts"], "\n\n".join(lines))
         selected = self.accounts[self.selected_index]
         selected_primary, selected_secondary = _source_list_labels(selected)
         ellipsize_dynamic_text(
@@ -5936,7 +5894,7 @@ class GTAccountsScreen(Screen):
                 "selected_status",
                 "{}\n{}".format(
                     localized_upper(_("Status")),
-                    localized_upper(status_text),
+                    sentence_caption(status_text) if modern else localized_upper(status_text),
                 ),
                 result_signal,
                 fallback_chars=25,
@@ -5962,12 +5920,10 @@ class GTAccountsScreen(Screen):
                 result_signal,
                 fallback_chars=30,
             )
-        self["detail_action"].setText(
-            "OK  •  {}".format(localized_upper(_("Connect")))
-        )
+        set_text_if_changed(self["detail_action"], "OK  •  {}".format(localized_upper(_("Connect"))))
         # The full-width rows already carry the source metadata. Reserve the
         # line below them for loading and action feedback.
-        self["message"].setText("")
+        set_text_if_changed(self["message"], "")
         width, height, px = _scale()
         update_scrollbar(
             self,
@@ -5975,13 +5931,23 @@ class GTAccountsScreen(Screen):
             count,
             self.selected_index,
             self.page_size,
-            (round(1867*width/1920.), round(208*height/1080.), max(2,round(5*width/1920.)), round(706*height/1080.)),
+            (round(1322*width/1920.), round(184*height/1080.), max(2,round(5*width/1920.)), round(780*height/1080.)) if modern else (round(1867*width/1920.), round(208*height/1080.), max(2,round(5*width/1920.)), round(706*height/1080.)),
         )
 
     def _select(self, index):
         if not self.accounts:
             return
+        previous = self.selected_index
         self.selected_index = max(0, min(int(index), len(self.accounts) - 1))
+        if (getattr(self, '_r97_kind', None) == 'accounts'
+                and previous // self.page_size == self.selected_index // self.page_size):
+            if previous != self.selected_index:
+                from .accounts_design import refresh as refresh_accounts
+                set_visible(self['account_focus_art_{}'.format(previous % self.page_size)], False)
+                set_visible(self['account_focus_art_{}'.format(self.selected_index % self.page_size)], True)
+                refresh_accounts(self, selection_only=True)
+            set_text_if_changed(self["message"], "")
+            return
         self._refresh()
 
     def move_up(self):
@@ -6017,7 +5983,7 @@ class GTAccountsScreen(Screen):
             "stalker": GTAddStalkerSourceScreen,
         }.get(self.source_type)
         if screen is None:
-            self["message"].setText(_("Choose a source type first."))
+            set_text_if_changed(self["message"], _("Choose a source type first."))
             return
         if hasattr(self.session, "openWithCallback"):
             self.session.openWithCallback(
@@ -6029,14 +5995,14 @@ class GTAccountsScreen(Screen):
 
     def delete_selected(self):
         if self._delete_job is not None:
-            self["message"].setText(_("Please wait"))
+            set_text_if_changed(self["message"], _("Please wait"))
             return
         if not self.accounts:
-            self["message"].setText(_("No source is selected for deletion."))
+            set_text_if_changed(self["message"], _("No source is selected for deletion."))
             return
         self._pending_delete = self.accounts[self.selected_index]
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("Could not open the deletion confirmation."))
+            set_text_if_changed(self["message"], _("Could not open the deletion confirmation."))
             self._pending_delete = None
             return
         self.session.openWithCallback(
@@ -6053,47 +6019,53 @@ class GTAccountsScreen(Screen):
         account = self._pending_delete
         self._pending_delete = None
         if not confirmed or account is None:
-            self["message"].setText(_("Source deletion cancelled."))
+            set_text_if_changed(self["message"], _("Source deletion cancelled."))
             return
         job = _UIJobToken(UI_SOURCE_DELETE_TIMEOUT_SECONDS)
         with self._delete_state_lock:
             if self._delete_closed or self._delete_job is not None:
                 job.cancel()
-                self["message"].setText(_("Please wait"))
+                set_text_if_changed(self["message"], _("Please wait"))
                 return
             self._delete_job = job
             self._delete_account = account
             self._delete_result = None
             self._delete_result_ready = False
-        self["message"].setText(_("Please wait"))
+        set_text_if_changed(self["message"], _("Please wait"))
         worker = threading.Thread(
-            target=lambda: self._run_delete(account, job),
+            target=self._run_delete,
+            args=(account, job, self.account_deleter,
+                  self._account_deleter_supports_limits, self.__dict__,
+                  self._delete_state_lock),
         )
         worker.daemon = True
         worker.start()
         self._delete_timer.start(100, True)
 
-    def _run_delete(self, account, job):
+    @staticmethod
+    def _run_delete(account, job, account_deleter, supports_limits, state, state_lock):
         try:
             job.check()
-            if self._account_deleter_supports_limits:
-                removed = self.account_deleter(
+            if supports_limits:
+                removed = account_deleter(
                     account,
                     cancel_event=job.cancel_event,
                     deadline=job.deadline,
                 )
             else:
-                removed = self.account_deleter(account)
+                removed = account_deleter(account)
             result = (True, removed, "")
         except Exception as error:
             result = (False, 0, str(error))
-        with self._delete_state_lock:
-            if self._delete_closed or self._delete_job is not job:
+        with state_lock:
+            if state.get("_delete_closed", True) or state.get("_delete_job") is not job:
                 return
-            self._delete_result = result
-            self._delete_result_ready = True
+            state["_delete_result"] = result
+            state["_delete_result_ready"] = True
 
     def _poll_delete_result(self):
+        if getattr(self, "_delete_closed", True):
+            return
         with self._delete_state_lock:
             job = self._delete_job
             ready = self._delete_result_ready
@@ -6179,10 +6151,10 @@ class GTAccountsScreen(Screen):
         if not self.accounts or not 0 <= self.selected_index < len(self.accounts):
             return None
         if self._delete_job is not None:
-            self["message"].setText(_("Please wait"))
+            set_text_if_changed(self["message"], _("Please wait"))
             return None
         if self._direct_connector is not None and self._direct_connector.active:
-            self["message"].setText(_("A source connection is already in progress."))
+            set_text_if_changed(self["message"], _("A source connection is already in progress."))
             return None
         account = self.accounts[self.selected_index]
         return account if _source_type(account) in SOURCE_TYPES else None
@@ -6230,19 +6202,17 @@ class GTAccountsScreen(Screen):
         try:
             from .m3u_epg_ui import GTM3UXMLTVSettingsScreen
         except Exception:
-            self["message"].setText(_("XMLTV EPG settings could not be opened."))
+            set_text_if_changed(self["message"], _("XMLTV EPG settings could not be opened."))
             return
         self.session.open(GTM3UXMLTVSettingsScreen, account)
 
     def connect_selected(self):
         if not self.accounts:
-            self["message"].setText(
-                _("Please wait") if getattr(self, "_sources_loading", False)
-                else _("No source is available to connect.")
-            )
+            set_text_if_changed(self["message"], _("Please wait") if getattr(self, "_sources_loading", False)
+                else _("No source is available to connect."))
             return
         if self._direct_connector is not None and self._direct_connector.active:
-            self["message"].setText(_("A source connection is already in progress."))
+            set_text_if_changed(self["message"], _("A source connection is already in progress."))
             return
         account = self.accounts[self.selected_index]
         self._start_connection(account)
@@ -6299,7 +6269,7 @@ class GTAccountsScreen(Screen):
             HEALTH_SIGNAL_GREEN,
             fallback_chars=25,
         )
-        self["detail_action"].setText(_("OPENING MAIN PANEL"))
+        set_text_if_changed(self["detail_action"], _("OPENING MAIN PANEL"))
         ellipsize_dynamic_text(
             self["message"],
             _("Connected to {}.").format(account.display_name),
@@ -6317,9 +6287,7 @@ class GTAccountsScreen(Screen):
             ),
             fallback_chars=25,
         )
-        self["detail_action"].setText(
-            "OK  •  {}".format(localized_upper(_("Retry")))
-        )
+        set_text_if_changed(self["detail_action"], "OK  •  {}".format(localized_upper(_("Retry"))))
         ellipsize_dynamic_text(
             self["message"],
             _("Could not connect to {}: {}").format(
@@ -6336,8 +6304,6 @@ class GTAccountsScreen(Screen):
 
 class GTManageSourcesScreen(SourcePresentation, Screen):
     """Local-only source type chooser used by Manage Sources."""
-
-    FOCUS_EDGES = ("top", "bottom", "left", "right")
 
     def __init__(self, session):
         self.skin = decorate_remote_footer(
@@ -6364,8 +6330,6 @@ class GTManageSourcesScreen(SourcePresentation, Screen):
         for index in range(3):
             self["card_{}".format(index)] = Label("")
             self["count_{}".format(index)] = Label("")
-            for edge in self.FOCUS_EDGES:
-                self["focus_{}_{}".format(index, edge)] = Label("")
         self["icon_0"] = Label("XC")
         self["icon_1"] = Label("M3U")
         self["icon_2"] = Label("MAC")
@@ -6434,28 +6398,15 @@ class GTManageSourcesScreen(SourcePresentation, Screen):
         self._refresh()
 
     def _refresh(self):
-        self["step"].setText(
-            "{} / {} | {}".format(
-                self.selected_index + 1,
-                len(SOURCE_TYPES),
-                localized_upper(_("Source type")),
-            )
-        )
         for index, result in enumerate(self.results):
-            count = len(result.accounts)
             unit = _("Source") if index == 1 else _("Account")
             source_type = SOURCE_TYPES[index]
-            self["count_{}".format(index)].setText(
-                "{} / {} {}".format(
-                    count, SOURCE_LIMITS[source_type], localized_upper(unit)
-                )
-            )
-            for edge in self.FOCUS_EDGES:
-                focus = self["focus_{}_{}".format(index, edge)]
-                if index == self.selected_index:
-                    focus.show()
-                else:
-                    focus.hide()
+            value = "{} / {} {}".format(len(result.accounts), SOURCE_LIMITS[source_type], localized_upper(unit))
+            set_text_if_changed(self["count_{}".format(index)], sentence_caption(value))
+        self._refresh_source_message()
+        self._refresh_source_presentation()
+
+    def _refresh_source_message(self):
         selected = self.results[self.selected_index]
         if selected.error:
             fit_dynamic_text(
@@ -6465,18 +6416,21 @@ class GTManageSourcesScreen(SourcePresentation, Screen):
                 fallback_chars=74,
             )
         else:
-            self["message"].setText(
-                _("Each source type is listed separately. Each section can contain up to 500 sources.")
-            )
-        self._refresh_source_presentation()
+            set_text_if_changed(self["message"], _("Each source type is listed separately. Each section can contain up to 500 sources."))
+
+    def _move_source(self, step):
+        previous = self.selected_index
+        self.selected_index = min(len(SOURCE_TYPES) - 1, max(0, previous + step))
+        if previous == self.selected_index:
+            return
+        self._refresh_source_selection(previous)
+        self._refresh_source_message()
 
     def move_up(self):
-        self.selected_index = max(0, self.selected_index - 1)
-        self._refresh()
+        self._move_source(-1)
 
     def move_down(self):
-        self.selected_index = min(len(SOURCE_TYPES) - 1, self.selected_index + 1)
-        self._refresh()
+        self._move_source(1)
 
     def open_selected(self):
         source_type = SOURCE_TYPES[self.selected_index]
@@ -6597,22 +6551,21 @@ class GTAddSourceTypeScreen(SourcePresentation, Screen):
         self.setTitle(_("Add Source"))
 
     def _refresh(self):
-        self["step"].setText(
-            "{} / {} | {}".format(
+        if not hasattr(self, "_r96_source_manage"):
+            set_text_if_changed(self["step"], "{} / {} | {}".format(
                 self.selected_index + 1,
                 len(self.SOURCE_TYPES),
                 localized_upper(_("Source type")),
-            )
-        )
-        self["message"].setText(_(self.SOURCE_MESSAGES[self.selected_index]))
+            ))
+        set_text_if_changed(self["message"], _(self.SOURCE_MESSAGES[self.selected_index]))
         for index in range(len(self.SOURCE_TYPES)):
             selected = index == self.selected_index
             for edge in self.FOCUS_EDGES:
                 focus = self["focus_{}_{}".format(index, edge)]
                 if selected:
-                    focus.show()
+                    set_visible(focus, True)
                 else:
-                    focus.hide()
+                    set_visible(focus, False)
         self._refresh_source_presentation()
 
     def move_up(self):
@@ -6733,9 +6686,9 @@ class GTAddStalkerSourceScreen(Screen):
         for index in range(self.FIELD_COUNT):
             focus = self["focus_{}".format(index)]
             if index == self.selected_field:
-                focus.show()
+                set_visible(focus, True)
             else:
-                focus.hide()
+                set_visible(focus, False)
 
     def move_up(self):
         self.selected_field = (
@@ -6753,12 +6706,10 @@ class GTAddStalkerSourceScreen(Screen):
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
         except ImportError:
-            self["message"].setText(
-                _("The virtual keyboard is unavailable on this image.")
-            )
+            set_text_if_changed(self["message"], _("The virtual keyboard is unavailable on this image."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("Could not open the virtual keyboard."))
+            set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
             return
         self._editing_field = self.selected_field
         self.session.openWithCallback(
@@ -6770,7 +6721,7 @@ class GTAddStalkerSourceScreen(Screen):
 
     def _value_entered(self, value):
         if value is None:
-            self["message"].setText(_("Field entry cancelled."))
+            set_text_if_changed(self["message"], _("Field entry cancelled."))
             return
         entered = str(value).strip()
         if self._editing_field == 1:
@@ -6779,9 +6730,7 @@ class GTAddStalkerSourceScreen(Screen):
         self.selected_field = (
             self._editing_field + 1
         ) % self.FIELD_COUNT
-        self["message"].setText(
-            _("Information received. Edit the next field or press GREEN to save.")
-        )
+        set_text_if_changed(self["message"], _("Information received. Edit the next field or press GREEN to save."))
         self._refresh()
 
     def save(self):
@@ -7111,19 +7060,14 @@ class GTPlaylistTypeScreen(Screen):
 
     @refresh_after
     def _refresh(self):
-        self["step"].setText(
-            "{} / 2  •  {}".format(
-                self.selected_index + 1,
-                _("Source type"),
-            )
-        )
+        set_text_if_changed(self['step'], '{} / 2  •  {}'.format(self.selected_index + 1, _('Source type')))
         for index in range(2):
             for edge in self.FOCUS_EDGES:
                 widget = self["focus_{}_{}".format(index, edge)]
                 if index == self.selected_index:
-                    widget.show()
+                    set_visible(widget, True)
                 else:
-                    widget.hide()
+                    set_visible(widget, False)
 
     def previous(self):
         self.selected_index = (self.selected_index - 1) % 2
@@ -7258,23 +7202,28 @@ class GTPlaylistManagerScreen(Screen):
         ):
             widget = self["{}{}".format(prefix, row)]
             if visible:
-                widget.show()
+                set_visible(widget, True)
             else:
-                widget.hide()
+                set_visible(widget, False)
 
     @broadcast_refresh_after
     def _refresh(self):
+        if getattr(self, '_broadcast_kind', None) == 'playlists':
+            start = self.page_index * self.page_size
+            for row in range(self.page_size):
+                index = start + row
+                status = _('Active') if index == self._active_index else ''
+                set_text_if_changed(self['row_status_{}'.format(row)], status)
+            return
         start = self.page_index * self.page_size
         end = min(start + self.page_size, MAX_PLAYLIST_FILES_PER_TYPE)
-        self["page"].setText(
-            "{} / {}  •  {}–{} / {}".format(
+        set_text_if_changed(self["page"], "{} / {}  •  {}–{} / {}".format(
                 self.page_index + 1,
                 self.page_count,
                 start + 1,
                 end,
                 MAX_PLAYLIST_FILES_PER_TYPE,
-            )
-        )
+            ))
         for row in range(self.page_size):
             index = start + row
             visible = index < MAX_PLAYLIST_FILES_PER_TYPE
@@ -7283,10 +7232,8 @@ class GTPlaylistManagerScreen(Screen):
                 continue
             selected = index == self.selected_index
             path = self._slots[index]
-            self["row_number_{}".format(row)].setText(str(index + 1))
-            self["row_name_{}".format(row)].setText(
-                os.path.basename(path) if path else "+ {}".format(_("Add playlist"))
-            )
+            set_text_if_changed(self["row_number_{}".format(row)], str(index + 1))
+            set_text_if_changed(self["row_name_{}".format(row)], os.path.basename(path) if path else "+ {}".format(_("Add playlist")))
             ellipsize_dynamic_text(
                 self["row_path_{}".format(row)],
                 os.path.dirname(path) if path else "TXT / txt",
@@ -7297,13 +7244,13 @@ class GTPlaylistManagerScreen(Screen):
                 status = _("Active")
                 if path and not os.path.isfile(path):
                     status = "{}  •  {}".format(status, _("Error"))
-            self["row_status_{}".format(row)].setText(status)
+            set_text_if_changed(self["row_status_{}".format(row)], status)
             for prefix in ("row_focus_", "row_marker_"):
                 widget = self["{}{}".format(prefix, row)]
                 if selected:
-                    widget.show()
+                    set_visible(widget, True)
                 else:
-                    widget.hide()
+                    set_visible(widget, False)
 
     def _move(self, step):
         self.selected_index = (
@@ -7602,7 +7549,7 @@ class GTTXTFileBrowserScreen(Screen):
         if current:
             ellipsize_dynamic_text(self["path"], current, fallback_chars=104)
         else:
-            self["path"].setText(_("Storage"))
+            set_text_if_changed(self["path"], _("Storage"))
 
     def _move(self, method):
         method()
@@ -7657,16 +7604,16 @@ class GTTXTFileBrowserScreen(Screen):
     def _select_file(self):
         path = _m3u_file_list_selection(self["filelist"])
         if not _txt_file_extension(path):
-            self["message"].setText(_("Invalid"))
+            set_text_if_changed(self["message"], _("Invalid"))
             return
         try:
             details = os.lstat(path)
         except OSError:
-            self["message"].setText(_("Invalid"))
+            set_text_if_changed(self["message"], _("Invalid"))
             return
         if not os.path.isfile(path) or os.path.islink(path):
             del details
-            self["message"].setText(_("Invalid"))
+            set_text_if_changed(self["message"], _("Invalid"))
             return
         self.close(os.path.abspath(path))
 
@@ -7783,43 +7730,39 @@ class GTAddM3USourceScreen(Screen):
                 fallback_chars=50,
             )
         else:
-            self["name_value"].setText(_("Enter a source name"))
-        self["location_caption"].setText(
-            localized_upper(_("File path") if local_kind else _("Web URL"))
-        )
+            set_text_if_changed(self["name_value"], _("Enter a source name"))
+        set_text_if_changed(self["location_caption"], localized_upper(_("File path") if local_kind else _("Web URL")))
         ellipsize_dynamic_text(
             self["location_value"],
             location,
             fallback_chars=44,
         )
-        self["location_action"].setText(
-            "OK  {}".format(
+        set_text_if_changed(self["location_action"], "OK  {}".format(
                 localized_upper(_("Select") if local_kind else _("Edit"))
-            )
-        )
+            ))
         if message is not None:
-            self["message"].setText(message)
+            set_text_if_changed(self["message"], message)
 
         for index in range(2):
             selected = index == selected_kind
             for edge in self.SELECTION_EDGES:
                 marker = self["selected_{}_{}".format(index, edge)]
                 if selected:
-                    marker.show()
+                    set_visible(marker, True)
                 else:
-                    marker.hide()
+                    set_visible(marker, False)
             kind_focus = self["kind_focus_{}".format(index)]
             if self.selected_field == 1 and selected:
-                kind_focus.show()
+                set_visible(kind_focus, True)
             else:
-                kind_focus.hide()
+                set_visible(kind_focus, False)
 
         for index in (0, 2):
             focus = self["focus_{}".format(index)]
             if index == self.selected_field:
-                focus.show()
+                set_visible(focus, True)
             else:
-                focus.hide()
+                set_visible(focus, False)
 
     def move_up(self):
         self.selected_field = (self.selected_field - 1) % self.FIELD_COUNT
@@ -7864,7 +7807,7 @@ class GTAddM3USourceScreen(Screen):
             and FileList is not None
         ):
             if not hasattr(self.session, "openWithCallback"):
-                self["message"].setText(_("M3U file path is invalid."))
+                set_text_if_changed(self["message"], _("M3U file path is invalid."))
                 return
             self.session.openWithCallback(
                 self._file_selected,
@@ -7875,12 +7818,10 @@ class GTAddM3USourceScreen(Screen):
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
         except ImportError:
-            self["message"].setText(
-                _("The virtual keyboard is unavailable on this image.")
-            )
+            set_text_if_changed(self["message"], _("The virtual keyboard is unavailable on this image."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("Could not open the virtual keyboard."))
+            set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
             return
         self._editing_field = self.selected_field
         self.session.openWithCallback(
@@ -7896,7 +7837,7 @@ class GTAddM3USourceScreen(Screen):
             return
         path = str(value or "").strip()
         if not _m3u_file_extension(path):
-            self["message"].setText(_("M3U file path is invalid."))
+            set_text_if_changed(self["message"], _("M3U file path is invalid."))
             return
         try:
             path = validate_local_m3u_path(path)
@@ -7919,7 +7860,7 @@ class GTAddM3USourceScreen(Screen):
 
     def _value_entered(self, value):
         if value is None:
-            self["message"].setText(_("Field entry cancelled."))
+            set_text_if_changed(self["message"], _("Field entry cancelled."))
             return
         self._field_values[self._editing_field] = str(value).strip()
         self.selected_field = (self._editing_field + 1) % self.FIELD_COUNT
@@ -8049,11 +7990,9 @@ class GTAddAccountScreen(Screen):
 
     @refresh_after
     def _refresh(self):
-        self["header"].setText(_("ADD NEW ACCOUNT"))
+        set_text_if_changed(self["header"], _("ADD NEW ACCOUNT"))
         self.setTitle(_("Add New Account"))
-        self["instruction"].setText(
-            _("Press OK in a text field; use LEFT / RIGHT on the output row.")
-        )
+        set_text_if_changed(self["instruction"], _("Press OK in a text field; use LEFT / RIGHT on the output row."))
         url_value = (
             clean_dynamic_text(self._field_values[0])
             if self._field_values[0]
@@ -8077,19 +8016,15 @@ class GTAddAccountScreen(Screen):
             _("  USERNAME          {}").format(username_value),
             fallback_chars=52,
         )
-        self["password_field"].setText(
-            _("  PASSWORD          {}").format(password_value)
-        )
-        self["output_field"].setText(
-            _("  OUTPUT FORMAT     {}     Change with LEFT / RIGHT").format(
+        set_text_if_changed(self["password_field"], _("  PASSWORD          {}").format(password_value))
+        set_text_if_changed(self["output_field"], _("  OUTPUT FORMAT     {}     Change with LEFT / RIGHT").format(
                 self._field_values[3].upper()
-            )
-        )
+            ))
         for index in range(self.FIELD_COUNT):
             if index == self.selected_field:
-                self["focus_{}".format(index)].show()
+                set_visible(self["focus_{}".format(index)], True)
             else:
-                self["focus_{}".format(index)].hide()
+                set_visible(self["focus_{}".format(index)], False)
 
     def move_up(self):
         self.selected_field = (
@@ -8117,7 +8052,7 @@ class GTAddAccountScreen(Screen):
         message = _("Live TV output selected: {}.").format(
             self._field_values[3].upper()
         )
-        self["message"].setText(message)
+        set_text_if_changed(self["message"], message)
         self._refresh()
 
     def previous_output(self):
@@ -8133,10 +8068,10 @@ class GTAddAccountScreen(Screen):
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
         except ImportError:
-            self["message"].setText(_("The virtual keyboard is unavailable on this image."))
+            set_text_if_changed(self["message"], _("The virtual keyboard is unavailable on this image."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("Could not open the virtual keyboard."))
+            set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
             return
         self._editing_field = self.selected_field
         keyboard_title = _(
@@ -8151,15 +8086,13 @@ class GTAddAccountScreen(Screen):
 
     def _value_entered(self, value):
         if value is None:
-            self["message"].setText(_("Field entry cancelled."))
+            set_text_if_changed(self["message"], _("Field entry cancelled."))
             return
         self._field_values[self._editing_field] = str(value).strip()
         self.selected_field = (
             self._editing_field + 1
         ) % self.FIELD_COUNT
-        self["message"].setText(
-            _("Information received. Edit the next field or press GREEN to save.")
-        )
+        set_text_if_changed(self["message"], _("Information received. Edit the next field or press GREEN to save."))
         self._refresh()
 
     def save(self):
@@ -8342,9 +8275,9 @@ class GTServerHealthScreen(Screen):
         ):
             widget = self["traffic_{}".format(signal_name)]
             if signal_name == self._health_signal:
-                widget.show()
+                set_visible(widget, True)
             else:
-                widget.hide()
+                set_visible(widget, False)
 
     @seven_refresh_after
     def _set_health_visual(self, status_text, signal_name, badge_text):
@@ -8372,9 +8305,9 @@ class GTServerHealthScreen(Screen):
                 fallback_chars=18,
             )
             if widget_name == status_widgets[signal_name]:
-                widget.show()
+                set_visible(widget, True)
             else:
-                widget.hide()
+                set_visible(widget, False)
         ellipsize_dynamic_text(
             self["status_badge"],
             localized_upper(str(badge_text or _("Unknown"))),
@@ -8507,7 +8440,7 @@ class GTServerHealthScreen(Screen):
                 "ERROR",
                 detail="The health check could not be completed.",
             )
-        if self._closed or (job is not None and not job.active()):
+        if (job is not None and not job.active()) or getattr(self, "_closed", True):
             return
         self._result = result
         self._result_ready = True
@@ -8684,7 +8617,7 @@ class GTServerHealthScreen(Screen):
 
     def _publish_result(self, result):
         callback = getattr(self, "_on_result", None)
-        if self._closed or not callable(callback):
+        if getattr(self, "_closed", True) or not callable(callback):
             return
         try:
             callback(result)
@@ -8717,6 +8650,7 @@ class GTDashboardScreen(DashboardPresentation, Screen):
             account,
             health,
         )
+        self._archive_client = None
         self._menu_default_order = tuple(item[2] for item in CONTENT_ITEMS)
         items_by_action = {item[2]: item for item in CONTENT_ITEMS}
         self._menu_items = [
@@ -8842,6 +8776,7 @@ class GTDashboardScreen(DashboardPresentation, Screen):
         self._dashboard_closed = True
         self._stop_clock()
         self._content_client = None
+        self._archive_client = None
 
     def _dashboard_shown(self):
         if self._dashboard_closed:
@@ -8987,10 +8922,13 @@ class GTDashboardScreen(DashboardPresentation, Screen):
                 self._dashboard_content_client(),
             )
         elif item[2] == "catchup":
+            from .catchup import ArchiveClient
             from .catchup_ui import GTArchiveScreen
 
+            if self._archive_client is None:
+                self._archive_client = ArchiveClient(self.account, self._dashboard_content_client())
             self._open_dashboard_child(
-                GTArchiveScreen, self.account, self._dashboard_content_client(),
+                GTArchiveScreen, self.account, None, self._archive_client,
             )
         elif item[2] == "discover":
             from .discovery_ui import GTMovieDiscoveryScreen
@@ -9189,7 +9127,6 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
             self.onShown.append(self._schedule_auto_login)
         if hasattr(self, "onClose"):
             self.onClose.append(_deactivate_live_patch)
-            self.onClose.append(_release_recording_session)
             self.onClose.append(self._stop_auto_login)
             self.onClose.append(self._stop_direct_connection)
             self.onClose.append(self._stop_account_preview)
@@ -9264,7 +9201,7 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
         if not self.accounts or self._child_screen_open or self._auto_login_connecting:
             return
         if self._direct_connector is not None and self._direct_connector.active:
-            self["hint"].setText(_("A source connection is already in progress."))
+            set_text_if_changed(self["hint"], _("A source connection is already in progress."))
             return
         self._auto_login_timer.stop()
         self._auto_login_attempted = True
@@ -9277,7 +9214,7 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
             self._open_child_screen(MessageBox, None, message, MessageBox.TYPE_INFO)
             return
         if status == "error":
-            self["hint"].setText(_("Settings could not be saved. Check the receiver storage."))
+            set_text_if_changed(self["hint"], _("Settings could not be saved. Check the receiver storage."))
             return
         self._auto_login_source = key
         self._refresh()
@@ -9294,7 +9231,7 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
 
     def _cover_live_video(self):
         # Draw the full desktop before the asynchronously decoded artwork arrives.
-        self["video_guard"].show()
+        set_visible(self["video_guard"], True)
 
     @property
     def accounts(self):
@@ -9340,26 +9277,19 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
         if count:
             account = self.accounts[self.selected_account_index]
             account_widget = self["account_card"]
-            account_label = ellipsize_dynamic_text(
-                account_widget,
-                account.display_name,
-                fallback_chars=32,
-            )
-            if (
-                account.host
-                and account.host != account.display_name
-            ):
-                endpoint = ellipsize_dynamic_text(
-                    account_widget,
-                    account.host,
-                    fallback_chars=32,
-                )
-                account_label = "{}\n{}".format(account_label, endpoint)
-            account_widget.setText(account_label)
+            instance, width, height = _component_geometry(account_widget)
+            name, host = account.display_name, account.host
+            card_key = (name, host, id(instance), width, height, _skin_font(account_widget))
+            rendered_card = getattr(self, '_welcome_account_card', None)
+            if rendered_card != (card_key, account_widget.getText()):
+                label = ellipsize_dynamic_text(account_widget, name, fallback_chars=32)
+                if host and host != name:
+                    endpoint = ellipsize_dynamic_text(account_widget, host, fallback_chars=32)
+                    label = "{}\n{}".format(label, endpoint)
+                set_text_if_changed(account_widget, label)
+                self._welcome_account_card = (card_key, label)
             automatic = bool(self._auto_login_source) and source_identity_key(account) == self._auto_login_source
-            self["account_status"].setText(
-                _("Automatic login: On") if automatic else _("Ready to connect")
-            )
+            set_text_if_changed(self["account_status"], _("Automatic login: On") if automatic else _("Ready to connect"))
             cached = self._account_preview_cache.get(id(account))
             if cached is not None:
                 self._show_account_preview(cached)
@@ -9377,46 +9307,41 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
                 account_meta,
                 fallback_chars=32,
             )
-            self["hint"].setText(
-                _("Source status is checked automatically when connecting.")
-            )
+            set_text_if_changed(self["hint"], _("Source status is checked automatically when connecting."))
         else:
-            self["account_card"].setText(
-                _("No saved source found")
-            )
-            self["account_status"].setText(
-                _("Create a new source from the ADD SOURCE panel.")
-            )
+            self._welcome_account_card = None
+            set_text_if_changed(self["account_card"], _("No saved source found"))
+            set_text_if_changed(self["account_status"], _("Create a new source from the ADD SOURCE panel."))
             self._set_account_preview_line(
                 "account_expiry", "", HEALTH_SIGNAL_NEUTRAL
             )
             self._set_account_preview_line(
                 "account_connection", "", HEALTH_SIGNAL_NEUTRAL
             )
-            self["account_meta"].setText("{}: 0".format(_("Sources")))
-            self["hint"].setText(
-                _("No saved source. Create one from the ADD SOURCE panel.")
-            )
+            set_text_if_changed(self["account_meta"], "{}: 0".format(_("Sources")))
+            set_text_if_changed(self["hint"], _("No saved source. Create one from the ADD SOURCE panel."))
 
-        self["connect_button"].setText(_("CONNECT SOURCE"))
-        self["accounts_button"].setText(_("MANAGE SOURCES"))
-        self["add_button"].setText(_("ADD SOURCE"))
-        self["youtube_button"].setText("YouTube")
-        from .matches_text import tr as match_tr
-        self["matches_button"].setText(localized_upper(match_tr("Matches")))
-        from .welcome_text import fit_action_caption
-        unused_w, unused_h, button_px = _scale()
-        for name in ("connect_button", "accounts_button", "add_button", "youtube_button", "matches_button"):
-            value = self[name].getText()
-            self[name].setText(fit_action_caption(self[name], value,
-                preferred_size=font_px(button_px,24), min_size=button_px(20)))
+        if not hasattr(self, '_welcome_px'):
+            set_text_if_changed(self["connect_button"], _("CONNECT SOURCE"))
+            set_text_if_changed(self["accounts_button"], _("MANAGE SOURCES"))
+            set_text_if_changed(self["add_button"], _("ADD SOURCE"))
+            set_text_if_changed(self["youtube_button"], "YouTube")
+            from .matches_text import tr as match_tr
+            set_text_if_changed(self["matches_button"], localized_upper(match_tr("Matches")))
+            from .welcome_text import fit_action_caption
+            unused_w, unused_h, button_px = _scale()
+            for name in ("connect_button", "accounts_button", "add_button", "youtube_button", "matches_button"):
+                value = self[name].getText()
+                set_text_if_changed(self[name], fit_action_caption(self[name], value,
+                    preferred_size=font_px(button_px,24), min_size=button_px(20)))
 
         for index in range(5):
             if self.selected_action == index:
-                self["focus_{}".format(index)].show()
+                set_visible(self["focus_{}".format(index)], True)
             else:
-                self["focus_{}".format(index)].hide()
+                set_visible(self["focus_{}".format(index)], False)
         self._refresh_welcome_chrome()
+        self._welcome_account_rendered = True
 
     def previous_account(self):
         if self.accounts:
@@ -9436,11 +9361,17 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
 
     def previous_action(self):
         self.selected_action = (self.selected_action - 1) % 5
-        self._refresh()
+        if hasattr(self, '_welcome_px') and getattr(self, '_welcome_account_rendered', False):
+            self._refresh_welcome_action_focus()
+        else:
+            self._refresh()
 
     def next_action(self):
         self.selected_action = (self.selected_action + 1) % 5
-        self._refresh()
+        if hasattr(self, '_welcome_px') and getattr(self, '_welcome_account_rendered', False):
+            self._refresh_welcome_action_focus()
+        else:
+            self._refresh()
 
     def _set_account_preview_line(self, prefix, text, signal_name):
         signal_name = (
@@ -9467,9 +9398,9 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
             widget = self[widget_name]
             widget.setText(fitted)
             if current_signal == signal_name:
-                widget.show()
+                set_visible(widget, True)
             else:
-                widget.hide()
+                set_visible(widget, False)
 
     def _show_pending_account_preview(self):
         pending = _("TESTING...")
@@ -9696,7 +9627,7 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
             self.open_accounts()
             return
         if self._direct_connector is not None and self._direct_connector.active:
-            self["hint"].setText(_("A source connection is already in progress."))
+            set_text_if_changed(self["hint"], _("A source connection is already in progress."))
             return
         account = self.accounts[self.selected_account_index]
         self._start_connection(account)
@@ -9725,7 +9656,7 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
             ))
 
     def _connection_started(self, account):
-        self["account_status"].setText(_("CONNECTING..."))
+        set_text_if_changed(self["account_status"], _("CONNECTING..."))
         ellipsize_dynamic_text(
             self["hint"],
             _("Checking {}, please wait.").format(
@@ -9738,7 +9669,7 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
         del result
         if self._auto_login_connecting:
             self._set_auto_login_connecting(False)
-        self["account_status"].setText(_("CONNECTED"))
+        set_text_if_changed(self["account_status"], _("CONNECTED"))
         ellipsize_dynamic_text(
             self["hint"],
             _("Connected to {}; opening the dashboard.").format(
@@ -9776,7 +9707,7 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
 
     def _begin_child_screen(self):
         if self._child_screen_open:
-            self["hint"].setText(_("Close the open screen before opening another one."))
+            set_text_if_changed(self["hint"], _("Close the open screen before opening another one."))
             return False
         self._auto_login_timer.stop()
         self._auto_login_attempted = True

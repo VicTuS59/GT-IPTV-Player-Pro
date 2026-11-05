@@ -12,7 +12,7 @@ from collections import namedtuple
 from html.parser import HTMLParser
 from urllib.request import Request
 
-from .matches import Budget, Cancelled, REFRESH_SECONDS, ScoresError, text
+from .matches import ScoresError, text
 
 URL = 'https://www.liveonsat.com/2day.php'
 COUNTRY_PATH = '/etc/enigma2/gtiptvplayer/matches-country.json'

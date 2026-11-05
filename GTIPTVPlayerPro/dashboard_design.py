@@ -2,15 +2,17 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Native dashboard presentation; navigation and provider routing stay in main."""
 from xml.sax.saxutils import escape
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from .background import attach_native_alpha_pixmap, attach_pixmap
 from .channel_highlight import saved_selection_palette
 from .episode_design import episode_focus_assets
-from .i18n import _, localized_upper
+from .i18n import _, device_language, localized_upper
 from .paths import plugin_path
 from .remote_footer import remote_action_text
-from .typography import fit_dynamic_text, font_px
+from .typography import current_text_size, fit_dynamic_text, font_px
 from .vod_discovery import style_footer, refresh_plain_footer
 
 DEFAULT_ACTIONS=('live','catchup','movie','series','discover','continue','favorites','settings')
@@ -98,6 +100,7 @@ class DashboardPresentation(object):
         self._dashboard_move_footer=move_items
         self._dashboard_icon_actions={}
         self._dashboard_focus_palette=None
+        self._dashboard_selection_key=None
         self._dashboard_hero_path=''
         self._dashboard_hero_generation=0
         self._dashboard_hero_loaded=False
@@ -106,28 +109,36 @@ class DashboardPresentation(object):
         for i in range(len(self._menu_items)):
             self['card_'+str(i)]=Label('')
             for prefix in ('menu_row_','menu_fill_','focus_','menu_icon_'):self[prefix+str(i)]=Pixmap()
-        self['brand_gt'].setText('GT')
-        self['header'].setText('IPTV PLAYER PRO')
-        self['dashboard_selected_caption'].setText('')
-        self['dashboard_open_key'].setText('OK')
-        self['dashboard_open_text'].setText(remote_action_text('open'))
-        for name in ('account_bar','status_label','server_url','dashboard_hero'):self[name].hide()
+        set_text_if_changed(self['brand_gt'], 'GT')
+        set_text_if_changed(self['header'], 'IPTV PLAYER PRO')
+        set_text_if_changed(self['dashboard_selected_caption'], '')
+        set_text_if_changed(self['dashboard_open_key'], 'OK')
+        set_text_if_changed(self['dashboard_open_text'], remote_action_text('open'))
+        for name in ('account_bar','status_label','server_url','dashboard_hero'):set_visible(self[name], False)
         self.skin=style_footer(self.skin,'movie',px,normal_items,
                                tuple(remote_action_text(item[1]) for item in normal_items))
 
     def _refresh_dashboard_footer(self):
         items=self._dashboard_move_footer if self._menu_move_backup is not None else self._dashboard_normal_footer
-        refresh_plain_footer(self,items,self._dashboard_px,tuple(remote_action_text(item[1]) for item in items))
-        self['remote_key_0'].setText('▲▼')
+        refresh_plain_footer(self, items, self._dashboard_px,
+                             tuple(remote_action_text(item[1]) for item in items),
+                             keys={'up_down': '▲▼'})
         for i,item in enumerate(items):
             if not item[0]:
-                self['remote_key_'+str(i)].hide()
-                self['remote_key_bg_'+str(i)].hide()
+                set_visible(self['remote_key_'+str(i)], False)
+                set_visible(self['remote_key_bg_'+str(i)], False)
 
     def _refresh_selection(self):
         if self._dashboard_closed:return
         px=self._dashboard_px;g=self._dashboard_geometry
         palette=saved_selection_palette()
+        key = (id(getattr(self['preview_title'], 'instance', None)), palette,
+               device_language(), current_text_size(), self.selected_index,
+               tuple(item[2] for item in self._menu_items),
+               self._menu_move_backup is not None, self._menu_move_error)
+        if key == self._dashboard_selection_key:
+            return
+        self._dashboard_selection_key = key
         palette_changed=palette!=self._dashboard_focus_palette
         if palette_changed:self._dashboard_focus_palette=palette
         fill,border=episode_focus_assets(*palette)
@@ -140,7 +151,7 @@ class DashboardPresentation(object):
             for prefix,path in (('menu_fill_',fill),('focus_',border)):
                 name=prefix+str(i)
                 if palette_changed:attach_native_alpha_pixmap(self,name,path,key=name,show_on_load=False)
-                (self[name].show if selected else self[name].hide)()
+                set_visible(self[name], selected)
             if self._dashboard_icon_actions.get(i)!=action:
                 self._dashboard_icon_actions[i]=action
                 name='menu_icon_'+str(i)
@@ -155,7 +166,7 @@ class DashboardPresentation(object):
         fit_dynamic_text(self['preview_description'],description,max_lines=2,fallback_chars=90,
                          preferred_size=font_px(px,35),min_size=max(12,int(px(25))))
         for name in ('dashboard_open_frame','dashboard_open_key','dashboard_open_text'):
-            (self[name].hide if moving else self[name].show)()
+            set_visible(self[name], not (moving))
         self._refresh_dashboard_footer()
         path=hero_path(item[2])
         if path==self._dashboard_hero_path:return
@@ -163,14 +174,15 @@ class DashboardPresentation(object):
         self._dashboard_hero_generation+=1
         generation=self._dashboard_hero_generation
         self._dashboard_hero_loaded=False
-        self['dashboard_hero'].hide()
+        set_visible(self['dashboard_hero'], False)
         def loaded(success):
             if self._dashboard_closed or generation!=self._dashboard_hero_generation or path!=self._dashboard_hero_path:return
             self._dashboard_hero_loaded=bool(success)
-            if success:self['dashboard_hero'].show()
+            if success:set_visible(self['dashboard_hero'], True)
             else:
-                self['dashboard_hero'].hide()
+                set_visible(self['dashboard_hero'], False)
                 self._dashboard_hero_path=''
+                self._dashboard_selection_key=None
         attach_pixmap(self,'dashboard_hero',path,key='dashboard-selected-hero',on_loaded=loaded,
                       cover_ratio=(16,9),cover_alignment='right',
                       decode_size=(min(1920,g['hero'][2]),min(1080,g['hero'][3])),show_on_load=False)

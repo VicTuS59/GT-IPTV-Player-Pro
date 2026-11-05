@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-FileCopyrightText: 2026 VicTuS59
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Account-scoped TV archives, loaded only from the archive browser."""
+"""Account-scoped TV archives shared by visits from the same dashboard."""
 
 import calendar
 import datetime
@@ -14,6 +14,7 @@ from contextlib import contextmanager
 from urllib.parse import quote, urlunsplit
 
 from .category_preferences import LiveCategoryPreferenceStore, content_item_category_ids
+from .category_titles import load_category_titles
 from .category_visibility import category_ids_visible, category_visibility_ids
 from .content import ContentError, ContentItem, XtreamContentClient, _decode_epg_description, _decode_epg_text
 from .i18n import N_, _
@@ -144,6 +145,8 @@ class ArchiveClient(object):
         self._category_store = category_store or LiveCategoryPreferenceStore()
         self._context = threading.local()
         self._lock = threading.RLock()
+        self._catalogue = None
+        self._catalogue_revision = 0
         self._channels = {}
         self._channel_generation = 0
         self._programmes = OrderedDict()
@@ -206,7 +209,7 @@ class ArchiveClient(object):
         preferences = self._category_store.load(resume_account_scope(self))
         if not (preferences.hidden or preferences.include_terms or preferences.exclude_terms):
             return channels
-        categories = self.client.load_categories("live")
+        categories = load_category_titles(self.client, "live")
         self._check()
         visibility = category_visibility_ids(categories, preferences)
         return [channel for channel in channels if category_ids_visible(
@@ -215,24 +218,35 @@ class ArchiveClient(object):
 
     def load_channels(self, cancel_event=None, deadline=None):
         with self.request_scope(cancel_event, deadline):
-            adapter = self._adapter()
-            channels = adapter.load_channels(self.client) if adapter else self._xtream_channels()
-            self._check()
-            valid = []
-            seen = set()
-            for channel in channels[:MAX_ARCHIVE_CHANNELS]:
-                self._check()
-                if channel.days <= 0 or not channel.stream_id or channel.stream_id in seen:
-                    continue
-                seen.add(channel.stream_id)
-                valid.append(channel)
-            valid = self._visible_channels(valid)
-            self._check()
             with self._lock:
-                self._channels = {channel.stream_id: channel for channel in valid}
-                self._channel_generation += 1
-                self._programme_cache_generation += 1
-                self._programmes.clear()
+                self._catalogue_revision += 1
+                revision = self._catalogue_revision
+                entry = self._catalogue
+            cached = entry is not None and time.monotonic() - entry[0] < ARCHIVE_CACHE_SECONDS
+            if cached:
+                channels = entry[1]
+            else:
+                adapter = self._adapter()
+                raw = adapter.load_channels(self.client) if adapter else self._xtream_channels()
+                known = {}
+                for channel in raw[:MAX_ARCHIVE_CHANNELS]:
+                    self._check()
+                    if channel.days > 0 and channel.stream_id:
+                        known.setdefault(channel.stream_id, channel)
+                channels = tuple(known.values())
+            valid = self._visible_channels(list(channels))
+            current = {channel.stream_id: channel for channel in valid}
+            with self._lock:
+                self._check()
+                if revision != self._catalogue_revision:
+                    raise ContentError(N_("Request cancelled"), ContentError.CANCELLED)
+                if not cached:
+                    self._catalogue = (time.monotonic(), channels) if channels else None
+                if current != self._channels:
+                    self._channels = current
+                    self._channel_generation += 1
+                    self._programme_cache_generation += 1
+                    self._programmes.clear()
             return valid
 
     def _known_channel(self, channel):

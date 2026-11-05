@@ -7,9 +7,11 @@ The core module deliberately has no Enigma2 dependency.  This module keeps
 all network/XML work on daemon workers and applies the already validated
 event tuples to ``eEPGCache`` only from the GUI timer callback.
 """
+from .typography import set_text_if_changed
+from .utility_pages import _text as utility_text
+from .ui_update import set_visible
 
 import datetime
-import os
 import threading
 import time
 
@@ -18,22 +20,10 @@ from Components.Label import Label
 from Screens.Screen import Screen
 from enigma import eTimer, getDesktop
 
-from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven, poster_after
+from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven
 from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from .background import attach_background
-from .dvb_epg import (
-    DEFAULT_IMPORT_PAST_SECONDS,
-    DvbEpgError,
-    MappingStoreError,
-    OperationCancelled,
-    block_automatic_mapping,
-    list_dvb_bouquets,
-    load_dvb_services,
-    load_manual_mappings,
-    normalise_channel_name,
-    remove_manual_mapping,
-    set_manual_mapping,
-)
+from .dvb_epg import DvbEpgError, MappingStoreError, OperationCancelled, block_automatic_mapping, list_dvb_bouquets, load_dvb_services, load_manual_mappings, normalise_channel_name, remove_manual_mapping, set_manual_mapping
 from .dvb_epg_settings import (
     ALL_BOUQUETS,
     DVBEPGSettings,
@@ -53,7 +43,7 @@ from .remote_footer import (
     install_remote_footer,
 )
 from .scrollbar import hide_scrollbar, update_scrollbar
-from .typography import clean_dynamic_text, ellipsize_dynamic_text, fit_dynamic_text
+from .typography import clean_dynamic_text, ellipsize_dynamic_text, fit_dynamic_text, set_text_if_changed
 
 
 APP_BACKGROUND = plugin_path("skin", "images", "global-neon-v0912.png")
@@ -683,11 +673,11 @@ class GTDVBEPGAutomationScreen(Screen):
     @seven_refresh_after
     def _refresh(self):
         for index, value in enumerate(self._values()):
-            self["value_{}".format(index)].setText(str(value))
+            set_text_if_changed(self["value_{}".format(index)], str(value))
             if index == self.selected_index:
-                self["focus_{}".format(index)].show()
+                set_visible(self["focus_{}".format(index)], True)
             else:
-                self["focus_{}".format(index)].hide()
+                set_visible(self["focus_{}".format(index)], False)
 
     def move_up(self):
         self.selected_index = (self.selected_index - 1) % len(self.LABELS)
@@ -703,9 +693,7 @@ class GTDVBEPGAutomationScreen(Screen):
                 "manual" if self._automatic() else "automatic"
             )
         elif self.selected_index in (1, 2, 3) and not self._automatic():
-            self["message"].setText(
-                _("Switch Update mode to Automatic to change this option.")
-            )
+            set_text_if_changed(self["message"], _("Switch Update mode to Automatic to change this option."))
             return
         elif self.selected_index == 1:
             options = (6, 12, 24)
@@ -722,7 +710,7 @@ class GTDVBEPGAutomationScreen(Screen):
                 getattr(self.settings, "update_in_standby", True)
             )
         elif self.selected_index in (4, 5):
-            self["message"].setText(_("Status information is read-only."))
+            set_text_if_changed(self["message"], _("Status information is read-only."))
             return
         else:
             if (
@@ -739,9 +727,9 @@ class GTDVBEPGAutomationScreen(Screen):
                     _("Deep standby wake"),
                     _("Always off"),
                 )
-            self["message"].setText(message)
+            set_text_if_changed(self["message"], message)
             return
-        self["message"].setText(_("Press GREEN to save the changes."))
+        set_text_if_changed(self["message"], _("Press GREEN to save the changes."))
         self._refresh()
 
     def change_left(self):
@@ -760,14 +748,12 @@ class GTDVBEPGAutomationScreen(Screen):
             self.settings,
         )
         if not saved:
-            self["message"].setText(
-                _("DVB EPG settings could not be saved. Check the receiver storage.")
-            )
+            set_text_if_changed(self["message"], _("DVB EPG settings could not be saved. Check the receiver storage."))
             return
         self.settings = merged
         self._saved_settings = self.settings.copy()
         _notify_scheduler_settings_changed()
-        self["message"].setText(_("Automatic update settings saved."))
+        set_text_if_changed(self["message"], _("Automatic update settings saved."))
 
     def close_screen(self):
         self.close(self._saved_settings.copy())
@@ -904,26 +890,30 @@ class GTDVBEPGSettingsScreen(Screen):
         self._bouquet_ready = False
         self._bouquet_result = None
         worker = threading.Thread(
-            target=lambda: self._run_bouquet_scan(job),
+            target=self._run_bouquet_scan,
+            args=(job, self.__dict__, self._state_lock),
             name="GTDVBBouquetScan",
         )
         worker.daemon = True
         worker.start()
         self._timer.start(120, True)
 
-    def _run_bouquet_scan(self, job):
+    @staticmethod
+    def _run_bouquet_scan(job, state, state_lock):
         try:
+            job.check()
             result = list_dvb_bouquets(
                 cancel_event=job.cancel_event,
                 deadline=job.deadline,
             )
         except Exception:
             result = None
-        if self._closed or not job.active():
-            return
-        with self._state_lock:
-            self._bouquet_result = result
-            self._bouquet_ready = True
+        with state_lock:
+            if (not job.active() or state.get("_closed", True)
+                    or state.get("_bouquet_job") is not job):
+                return
+            state["_bouquet_result"] = result
+            state["_bouquet_ready"] = True
 
     def _apply_bouquet_result(self):
         with self._state_lock:
@@ -988,18 +978,20 @@ class GTDVBEPGSettingsScreen(Screen):
             dynamic_indexes.add(2)
         for index, value in enumerate(self._values()):
             widget = self["value_{}".format(index)]
-            if index in dynamic_indexes:
+            if getattr(self, '_r97_kind', None) in ('weather', 'epg'):
+                utility_text(self, 'value_{}'.format(index), str(value), lines=2, size=28)
+            elif index in dynamic_indexes:
                 ellipsize_dynamic_text(
                     widget,
                     value,
                     fallback_chars=52,
                 )
             else:
-                widget.setText(str(value))
+                set_text_if_changed(widget, str(value))
             if index == self.selected_index:
-                self["focus_{}".format(index)].show()
+                set_visible(self["focus_{}".format(index)], True)
             else:
-                self["focus_{}".format(index)].hide()
+                set_visible(self["focus_{}".format(index)], False)
 
     def move_up(self):
         if self._updating:
@@ -1020,7 +1012,7 @@ class GTDVBEPGSettingsScreen(Screen):
             self.settings.enabled = not self.settings.enabled
         elif self.selected_index == 1:
             if not self._source_keys:
-                self["message"].setText(epg_tr("No EPG source is available."))
+                set_text_if_changed(self["message"], epg_tr("No EPG source is available."))
                 return
             index = self._selected_source_index()
             self.settings.source_key = self._source_keys[
@@ -1028,7 +1020,7 @@ class GTDVBEPGSettingsScreen(Screen):
             ]
         elif self.selected_index == 2:
             if self._bouquet_job is not None:
-                self["message"].setText(_("Scanning DVB bouquets..."))
+                set_text_if_changed(self["message"], _("Scanning DVB bouquets..."))
                 return
             options = [ALL_BOUQUETS] + [item.filename for item in self._bouquets]
             try:
@@ -1049,7 +1041,7 @@ class GTDVBEPGSettingsScreen(Screen):
         else:
             self.open_automation()
             return
-        self["message"].setText(_("Press GREEN to save the changes."))
+        set_text_if_changed(self["message"], _("Press GREEN to save the changes."))
         self._refresh()
 
     def change_left(self):
@@ -1082,9 +1074,7 @@ class GTDVBEPGSettingsScreen(Screen):
         except Exception:
             updated = None
         if updated is None:
-            self["message"].setText(
-                _("DVB EPG settings could not be saved. Check the receiver storage.")
-            )
+            set_text_if_changed(self["message"], _("DVB EPG settings could not be saved. Check the receiver storage."))
             return False
         self.settings = updated
         return True
@@ -1096,9 +1086,7 @@ class GTDVBEPGSettingsScreen(Screen):
             self.settings,
         )
         if not saved:
-            self["message"].setText(
-                _("DVB EPG settings could not be saved. Check the receiver storage.")
-            )
+            set_text_if_changed(self["message"], _("DVB EPG settings could not be saved. Check the receiver storage."))
             return False
         self.settings = merged
         return True
@@ -1123,42 +1111,38 @@ class GTDVBEPGSettingsScreen(Screen):
 
     def save(self):
         if self._updating:
-            self["message"].setText(_("DVB EPG update is still running..."))
+            set_text_if_changed(self["message"], _("DVB EPG update is still running..."))
             return
         if self._save_preferences():
             _notify_scheduler_settings_changed()
-            self["message"].setText(_("DVB EPG settings saved."))
+            set_text_if_changed(self["message"], _("DVB EPG settings saved."))
 
     def begin_update(self):
         if self._updating:
-            self["message"].setText(_("DVB EPG update is still running..."))
+            set_text_if_changed(self["message"], _("DVB EPG update is still running..."))
             return
         if self._bouquet_job is not None:
-            self["message"].setText(_("Scanning DVB bouquets..."))
+            set_text_if_changed(self["message"], _("Scanning DVB bouquets..."))
             return
         if not self.settings.enabled:
-            self["message"].setText(_("Enable DVB EPG before starting an update."))
+            set_text_if_changed(self["message"], _("Enable DVB EPG before starting an update."))
             return
         source = self._selected_source()
         if source is None:
-            self["message"].setText(epg_tr("Select an EPG source."))
+            set_text_if_changed(self["message"], epg_tr("Select an EPG source."))
             return
         if not _clock_is_sane():
-            self["message"].setText(
-                _("The receiver clock is not ready. Check network time and try again.")
-            )
+            set_text_if_changed(self["message"], _("The receiver clock is not ready. Check network time and try again."))
             return
         if not self._save_preferences():
             return
         _notify_scheduler_settings_changed()
         runtime_status = self._claim_runtime()
         if runtime_status == "owned":
-            self["message"].setText(_("DVB EPG update is still running..."))
+            set_text_if_changed(self["message"], _("DVB EPG update is still running..."))
             return
         if runtime_status != "acquired":
-            self["message"].setText(
-                _("An automatic DVB EPG update is already running.")
-            )
+            set_text_if_changed(self["message"], _("An automatic DVB EPG update is already running."))
             return
         _cancel_job(self._update_job)
         job = _UIJobToken(UI_JOB_TIMEOUT_SECONDS)
@@ -1170,10 +1154,12 @@ class GTDVBEPGSettingsScreen(Screen):
         self._update_worker_active = True
         generation = self._update_generation
         snapshot = self.settings.copy()
-        self["message"].setText(epg_tr("Downloading DVB EPG sources..."))
+        set_text_if_changed(self["message"], epg_tr("Downloading DVB EPG sources..."))
         try:
             worker = threading.Thread(
-                target=lambda: self._run_update(job, generation, source, snapshot),
+                target=self._run_update,
+                args=(job, generation, source, snapshot, self.__dict__,
+                      self._state_lock, self._runtime_lock, self._runtime_owner),
                 name="GTDVBEPGUpdate",
             )
             worker.daemon = True
@@ -1183,15 +1169,16 @@ class GTDVBEPGSettingsScreen(Screen):
             self._update_job = None
             self._updating = False
             self._release_runtime()
-            self["message"].setText(
-                _("DVB EPG update failed. No existing EPG data was removed.")
-            )
+            set_text_if_changed(self["message"], _("DVB EPG update failed. No existing EPG data was removed."))
             return
         self._timer.start(120, True)
 
-    def _run_update(self, job, generation, source, settings):
+    @staticmethod
+    def _run_update(job, generation, source, settings, state, state_lock,
+                    runtime_lock, runtime_owner):
         payload = None
         try:
+            job.check()
             bouquet_files = (
                 None
                 if settings.bouquet_file == ALL_BOUQUETS
@@ -1215,19 +1202,23 @@ class GTDVBEPGSettingsScreen(Screen):
         except Exception:
             payload = (False, "failed")
         published = False
-        with self._state_lock:
-            self._update_worker_active = False
+        with state_lock:
+            if not state.get("_closed", True):
+                state["_update_worker_active"] = False
             if (
-                not self._closed
+                not state.get("_closed", True)
                 and job.active()
-                and self._update_job is job
-                and self._update_generation == generation
+                and state.get("_update_job") is job
+                and state.get("_update_generation") == generation
             ):
-                self._update_result = payload
-                self._update_ready = True
+                state["_update_result"] = payload
+                state["_update_ready"] = True
                 published = True
         if not published:
-            self._release_runtime()
+            with runtime_lock:
+                _release_update_runtime(runtime_owner)
+                if state.get("_runtime_owner") is runtime_owner:
+                    state["_runtime_acquired"] = False
 
     def _apply_update_result(self):
         with self._state_lock:
@@ -1238,7 +1229,7 @@ class GTDVBEPGSettingsScreen(Screen):
         if not result or not result[0]:
             self._updating = False
             self._release_runtime()
-            self["message"].setText(_("DVB EPG update failed. No existing EPG data was removed."))
+            set_text_if_changed(self["message"], _("DVB EPG update failed. No existing EPG data was removed."))
             return
         matched, imported = result[1], result[2]
         try:
@@ -1250,7 +1241,7 @@ class GTDVBEPGSettingsScreen(Screen):
         except Exception:
             self._updating = False
             self._release_runtime()
-            self["message"].setText(_("The native Enigma2 EPG cache rejected the update."))
+            set_text_if_changed(self["message"], _("The native Enigma2 EPG cache rejected the update."))
             return
         self._native_cache = cache
         self._native_groups = tuple(imported.groups or ())
@@ -1258,7 +1249,7 @@ class GTDVBEPGSettingsScreen(Screen):
         self._native_event_offset = 0
         self._native_import_count = 0
         self._native_mapping_count = len(matched.mappings)
-        self["message"].setText(_("Please wait"))
+        set_text_if_changed(self["message"], _("Please wait"))
 
     def _next_native_batch(self, maximum_events=2000, maximum_groups=8):
         if self._native_groups is None:
@@ -1306,9 +1297,7 @@ class GTDVBEPGSettingsScreen(Screen):
             self._clear_native_import()
             self._updating = False
             self._release_runtime()
-            self["message"].setText(
-                _("DVB EPG update failed. No existing EPG data was removed.")
-            )
+            set_text_if_changed(self["message"], _("DVB EPG update failed. No existing EPG data was removed."))
             return
         imported_count = self._native_import_count
         mapping_count = self._native_mapping_count
@@ -1323,12 +1312,10 @@ class GTDVBEPGSettingsScreen(Screen):
         if not saved:
             return
         _notify_scheduler_settings_changed()
-        self["message"].setText(
-            _("DVB EPG updated: {} channels and {} events imported.").format(
+        set_text_if_changed(self["message"], _("DVB EPG updated: {} channels and {} events imported.").format(
                 mapping_count,
                 imported_count,
-            )
-        )
+            ))
         self._refresh()
 
     def _clear_native_import(self):
@@ -1340,14 +1327,14 @@ class GTDVBEPGSettingsScreen(Screen):
         self._native_mapping_count = 0
 
     def _poll_jobs(self):
-        if self._closed:
+        if getattr(self, "_closed", True):
             return
         if self._bouquet_ready:
             self._apply_bouquet_result()
         elif self._bouquet_job is not None and self._bouquet_job.expired():
             _cancel_job(self._bouquet_job)
             self._bouquet_job = None
-            self["message"].setText(_("DVB bouquets could not be scanned."))
+            set_text_if_changed(self["message"], _("DVB bouquets could not be scanned."))
             self._refresh()
         if self._update_ready:
             self._apply_update_result()
@@ -1362,7 +1349,7 @@ class GTDVBEPGSettingsScreen(Screen):
             self._updating = False
             if not worker_active:
                 self._release_runtime()
-            self["message"].setText(_("DVB EPG update timed out."))
+            set_text_if_changed(self["message"], _("DVB EPG update timed out."))
         if self._native_groups is not None:
             self._poll_native_import()
         if self._bouquet_job is not None or self._updating:
@@ -1370,14 +1357,14 @@ class GTDVBEPGSettingsScreen(Screen):
 
     def open_mapping(self):
         if self._updating:
-            self["message"].setText(_("DVB EPG update is still running..."))
+            set_text_if_changed(self["message"], _("DVB EPG update is still running..."))
             return
         source = self._selected_source()
         if source is None:
-            self["message"].setText(epg_tr("Select an EPG source."))
+            set_text_if_changed(self["message"], epg_tr("Select an EPG source."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("Manual channel mapping could not be opened."))
+            set_text_if_changed(self["message"], _("Manual channel mapping could not be opened."))
             return
         self.session.openWithCallback(
             self._mapping_closed,
@@ -1394,17 +1381,15 @@ class GTDVBEPGSettingsScreen(Screen):
             )
         except Exception:
             pass
-        self["message"].setText(self._summary_text())
+        set_text_if_changed(self["message"], self._summary_text())
         self._refresh()
 
     def open_automation(self):
         if self._updating:
-            self["message"].setText(_("DVB EPG update is still running..."))
+            set_text_if_changed(self["message"], _("DVB EPG update is still running..."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(
-                _("Automatic update settings could not be opened.")
-            )
+            set_text_if_changed(self["message"], _("Automatic update settings could not be opened."))
             return
         # Keep unsaved choices from this screen, but refresh the read-only
         # scheduler status so Last/Next update never opens with stale data.
@@ -1429,14 +1414,12 @@ class GTDVBEPGSettingsScreen(Screen):
             self.settings = settings.copy()
         elif isinstance(settings, dict):
             self.settings = DVBEPGSettings.from_dict(settings)
-        self["message"].setText(
-            _("XMLTV offsets are converted to UTC automatically; no manual timezone is used.")
-        )
+        set_text_if_changed(self["message"], _("XMLTV offsets are converted to UTC automatically; no manual timezone is used."))
         self._refresh()
 
     def cancel_or_close(self):
         if self._native_groups is not None:
-            self["message"].setText(_("DVB EPG update is still running..."))
+            set_text_if_changed(self["message"], _("DVB EPG update is still running..."))
             return
         if self._updating:
             _cancel_job(self._update_job)
@@ -1450,11 +1433,13 @@ class GTDVBEPGSettingsScreen(Screen):
             self._updating = False
             if not worker_active:
                 self._release_runtime()
-            self["message"].setText(_("DVB EPG update cancelled."))
+            set_text_if_changed(self["message"], _("DVB EPG update cancelled."))
             return
         self.close(False)
 
     def _stop(self):
+        if getattr(self, "_closed", True):
+            return
         self._closed = True
         _cancel_job(self._bouquet_job)
         _cancel_job(self._update_job)
@@ -1552,7 +1537,6 @@ class GTDVBEPGMappingScreen(Screen):
             self.onClose.append(self._stop)
         if hasattr(self, "onLayoutFinish"):
             self.onLayoutFinish.append(self._fit_source_subtitle)
-            self.onLayoutFinish.append(self._refresh_rows)
         setup_seven(self, 'mapping', DVB_MAPPING_FOOTER_ITEMS)
         self._refresh_rows()
         self._start_load(download=False)
@@ -1571,9 +1555,7 @@ class GTDVBEPGMappingScreen(Screen):
         _cancel_job(self._job)
         job = _UIJobToken(UI_JOB_TIMEOUT_SECONDS)
         if download and not self._claim_download_runtime(job):
-            self["message"].setText(
-                _("An automatic DVB EPG update is already running.")
-            )
+            set_text_if_changed(self["message"], _("An automatic DVB EPG update is already running."))
             return
         self._job = job
         self._job_generation += 1
@@ -1585,19 +1567,24 @@ class GTDVBEPGMappingScreen(Screen):
         self._result = None
         service_snapshot = tuple(self._services) if reuse else None
         channel_snapshot = tuple(self._channels) if reuse else None
-        self["message"].setText(
-            epg_tr("Downloading DVB EPG sources...")
+        set_text_if_changed(self["message"], epg_tr("Downloading DVB EPG sources...")
             if download
-            else _("Loading DVB services and cached XMLTV channels...")
-        )
+            else _("Loading DVB services and cached XMLTV channels..."))
         try:
             worker = threading.Thread(
-                target=lambda: self._run_load(
+                target=self._run_load,
+                args=(
                     job,
                     generation,
                     download,
                     service_snapshot,
                     channel_snapshot,
+                    self.source,
+                    self.bouquet_file,
+                    self.__dict__,
+                    self._state_lock,
+                    self._runtime_lock,
+                    self._download_runtime_owner,
                 ),
                 name="GTDVBMappingLoad",
             )
@@ -1609,24 +1596,31 @@ class GTDVBEPGMappingScreen(Screen):
             self._job = None
             self._loading = False
             self._release_download_runtime(job)
-            self["message"].setText(_("Channel mapping data could not be loaded."))
+            set_text_if_changed(self["message"], _("Channel mapping data could not be loaded."))
             return
         self._timer.start(120, True)
 
+    @staticmethod
     def _run_load(
-        self,
         job,
         generation,
         download,
         service_snapshot,
         channel_snapshot,
+        source,
+        bouquet_file,
+        state,
+        state_lock,
+        runtime_lock,
+        runtime_owner,
     ):
         payload = None
         try:
-            bouquet_files = None if self.bouquet_file == ALL_BOUQUETS else (self.bouquet_file,)
+            job.check()
+            bouquet_files = None if bouquet_file == ALL_BOUQUETS else (bouquet_file,)
             services = load_dvb_services(bouquet_files=bouquet_files,
                                          cancel_event=job.cancel_event, deadline=job.deadline)
-            snapshot = load_guide(self.source, services, download=download,
+            snapshot = load_guide(source, services, download=download,
                                   cancel_event=job.cancel_event, deadline=job.deadline)
             channels = snapshot.channels
             manual = load_manual_mappings()
@@ -1638,22 +1632,29 @@ class GTDVBEPGMappingScreen(Screen):
         except Exception:
             payload = (False, "failed")
         published = False
-        with self._state_lock:
-            self._active_load_jobs.discard(job)
+        with state_lock:
+            active_jobs = state.get("_active_load_jobs")
+            if active_jobs is not None:
+                active_jobs.discard(job)
             if (
-                not self._closed
+                not state.get("_closed", True)
                 and job.active()
-                and self._job is job
-                and self._job_generation == generation
+                and state.get("_job") is job
+                and state.get("_job_generation") == generation
             ):
-                self._result = payload
-                self._result_ready = True
+                state["_result"] = payload
+                state["_result_ready"] = True
                 published = True
         if download and not published:
-            self._release_download_runtime(job)
+            with runtime_lock:
+                if not state or state.get("_download_job") is job:
+                    _release_update_runtime(runtime_owner)
+                    if state.get("_download_job") is job:
+                        state["_download_job"] = None
+                        state["_download_runtime_acquired"] = False
 
     def _poll_job(self):
-        if self._closed:
+        if getattr(self, "_closed", True):
             return
         if self._job is None:
             return
@@ -1670,7 +1671,7 @@ class GTDVBEPGMappingScreen(Screen):
                 self._loading = False
                 if not worker_active:
                     self._release_download_runtime(expired_job)
-                self["message"].setText(_("Channel mapping data could not be loaded."))
+                set_text_if_changed(self["message"], _("Channel mapping data could not be loaded."))
                 return
             self._timer.start(120, True)
             return
@@ -1683,7 +1684,7 @@ class GTDVBEPGMappingScreen(Screen):
         self._loading = False
         self._release_download_runtime(completed_job)
         if not result or not result[0]:
-            self["message"].setText(_("Channel mapping data could not be loaded."))
+            set_text_if_changed(self["message"], _("Channel mapping data could not be loaded."))
             return
         self._services = result[1]
         self._channels = result[2]
@@ -1692,13 +1693,11 @@ class GTDVBEPGMappingScreen(Screen):
         self._rebuild_lookup_indexes()
         self.selected_index = min(self.selected_index, max(0, len(self._services) - 1))
         if not self._services:
-            self["message"].setText(_("No real DVB service was found in the selected bouquet."))
+            set_text_if_changed(self["message"], _("No real DVB service was found in the selected bouquet."))
         elif not self._channels:
-            self["message"].setText(_("No cached XMLTV guide was found. Press YELLOW to download it."))
+            set_text_if_changed(self["message"], _("No cached XMLTV guide was found. Press YELLOW to download it."))
         else:
-            self["message"].setText(
-                _("Press OK to choose an XMLTV channel; RED blocks or restores automatic matching.")
-            )
+            set_text_if_changed(self["message"], _("Press OK to choose an XMLTV channel; RED blocks or restores automatic matching."))
         self._refresh_rows()
 
     def _rebuild_lookup_indexes(self):
@@ -1762,9 +1761,7 @@ class GTDVBEPGMappingScreen(Screen):
             if self._mapping_runtime_acquired:
                 return False
             if not _acquire_update_runtime(self._mapping_runtime_owner):
-                self["message"].setText(
-                    _("An automatic DVB EPG update is already running.")
-                )
+                set_text_if_changed(self["message"], _("An automatic DVB EPG update is already running."))
                 return False
             self._mapping_runtime_acquired = True
             return True
@@ -1780,13 +1777,13 @@ class GTDVBEPGMappingScreen(Screen):
     def _refresh_rows(self):
         count = len(self._services)
         mapped_count = len(self._match.mappings) if self._match is not None else 0
-        self["summary"].setText(
-            _("{} DVB services  •  {} XMLTV channels  •  {} mapped").format(
+        set_text_if_changed(self["summary"], _("{} DVB services  •  {} XMLTV channels  •  {} mapped").format(
                 count,
                 len(self._channels),
                 mapped_count,
-            )
-        )
+            ))
+        if getattr(self, '_seven_kind', None) == 'mapping':
+            return
         page_start = int(self.selected_index / self.page_size) * self.page_size
         page = self._services[page_start : page_start + self.page_size]
         for offset in range(self.page_size):
@@ -1794,9 +1791,9 @@ class GTDVBEPGMappingScreen(Screen):
             focus = self["focus_{}".format(offset)]
             marker = self["marker_{}".format(offset)]
             if offset >= len(page):
-                row.setText("")
-                focus.hide()
-                marker.hide()
+                set_text_if_changed(row, '')
+                set_visible(focus, False)
+                set_visible(marker, False)
                 continue
             service = page[offset]
             ellipsize_dynamic_text(
@@ -1809,11 +1806,11 @@ class GTDVBEPGMappingScreen(Screen):
             )
             selected = page_start + offset == self.selected_index
             if selected:
-                focus.show()
-                marker.show()
+                set_visible(focus, True)
+                set_visible(marker, True)
             else:
-                focus.hide()
-                marker.hide()
+                set_visible(focus, False)
+                set_visible(marker, False)
         width, height, px = _scale()
         update_scrollbar(
             self,
@@ -1824,17 +1821,24 @@ class GTDVBEPGMappingScreen(Screen):
             (width - px(80), px(190), px(8), px(644)),
         )
 
-    def move_up(self):
+    def _move_row(self, step):
         if self._loading or not self._services:
             return
-        self.selected_index = (self.selected_index - 1) % len(self._services)
+        previous = self.selected_index
+        self.selected_index = (previous + step) % len(self._services)
+        if (getattr(self, '_seven_kind', None) == 'mapping'
+                and previous // self.page_size == self.selected_index // self.page_size):
+            if previous != self.selected_index:
+                from .seven_presentation import refresh_mapping
+                refresh_mapping(self, previous)
+            return
         self._refresh_rows()
 
+    def move_up(self):
+        self._move_row(-1)
+
     def move_down(self):
-        if self._loading or not self._services:
-            return
-        self.selected_index = (self.selected_index + 1) % len(self._services)
-        self._refresh_rows()
+        self._move_row(1)
 
     def page_up(self):
         if self._loading or not self._services:
@@ -1853,7 +1857,7 @@ class GTDVBEPGMappingScreen(Screen):
 
     def refresh_xmltv(self):
         if self._loading:
-            self["message"].setText(_("Please wait"))
+            set_text_if_changed(self["message"], _("Please wait"))
             return
         self._start_load(download=True)
 
@@ -1861,13 +1865,13 @@ class GTDVBEPGMappingScreen(Screen):
         if self._loading:
             return
         if not self._services:
-            self["message"].setText(_("No real DVB service is available for mapping."))
+            set_text_if_changed(self["message"], _("No real DVB service is available for mapping."))
             return
         if not self._channels:
-            self["message"].setText(_("Press YELLOW to download the XMLTV channel list first."))
+            set_text_if_changed(self["message"], _("Press YELLOW to download the XMLTV channel list first."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("The XMLTV channel list could not be opened."))
+            set_text_if_changed(self["message"], _("The XMLTV channel list could not be opened."))
             return
         service = self._services[self.selected_index]
         self.session.openWithCallback(
@@ -1895,20 +1899,16 @@ class GTDVBEPGMappingScreen(Screen):
             )
             status_saved = _reset_persisted_epg_status()
         except MappingStoreError:
-            self["message"].setText(
-                _("That XMLTV channel is already assigned to another DVB service.")
-            )
+            set_text_if_changed(self["message"], _("That XMLTV channel is already assigned to another DVB service."))
             return
         except Exception:
-            self["message"].setText(_("The manual channel mapping could not be saved."))
+            set_text_if_changed(self["message"], _("The manual channel mapping could not be saved."))
             return
         finally:
             self._release_mapping_runtime()
         self._refresh_match()
         if not status_saved:
-            self["message"].setText(
-                _("DVB EPG settings could not be saved. Check the receiver storage.")
-            )
+            set_text_if_changed(self["message"], _("DVB EPG settings could not be saved. Check the receiver storage."))
             self._refresh_rows()
             return
         _notify_scheduler_settings_changed()
@@ -1947,15 +1947,13 @@ class GTDVBEPGMappingScreen(Screen):
                 )
             status_saved = _reset_persisted_epg_status()
         except Exception:
-            self["message"].setText(_("The manual channel mapping could not be saved."))
+            set_text_if_changed(self["message"], _("The manual channel mapping could not be saved."))
             return
         finally:
             self._release_mapping_runtime()
         self._refresh_match()
         if not status_saved:
-            self["message"].setText(
-                _("DVB EPG settings could not be saved. Check the receiver storage.")
-            )
+            set_text_if_changed(self["message"], _("DVB EPG settings could not be saved. Check the receiver storage."))
             self._refresh_rows()
             return
         _notify_scheduler_settings_changed()
@@ -1980,12 +1978,14 @@ class GTDVBEPGMappingScreen(Screen):
             self._loading = False
             if not worker_active:
                 self._release_download_runtime(cancelled_job)
-            self["message"].setText(_("Channel mapping refresh cancelled."))
+            set_text_if_changed(self["message"], _("Channel mapping refresh cancelled."))
             return
         count = len(self._match.mappings) if self._match is not None else 0
         self.close(count)
 
     def _stop(self):
+        if getattr(self, "_closed", True):
+            return
         self._closed = True
         stopped_job = self._job
         _cancel_job(stopped_job)
@@ -2087,7 +2087,7 @@ class GTXMLTVChannelSelectScreen(Screen):
                 fallback_chars=108,
             )
         else:
-            self["summary"].setText(summary)
+            set_text_if_changed(self["summary"], summary)
         page_start = int(self.selected_index / self.page_size) * self.page_size
         page = self._entries[page_start : page_start + self.page_size]
         for offset in range(self.page_size):
@@ -2095,9 +2095,9 @@ class GTXMLTVChannelSelectScreen(Screen):
             focus = self["focus_{}".format(offset)]
             marker = self["marker_{}".format(offset)]
             if offset >= len(page):
-                row.setText("")
-                focus.hide()
-                marker.hide()
+                set_text_if_changed(row, '')
+                set_visible(focus, False)
+                set_visible(marker, False)
                 continue
             channel = page[offset]
             ellipsize_dynamic_text(
@@ -2110,11 +2110,11 @@ class GTXMLTVChannelSelectScreen(Screen):
             )
             selected = page_start + offset == self.selected_index
             if selected:
-                focus.show()
-                marker.show()
+                set_visible(focus, True)
+                set_visible(marker, True)
             else:
-                focus.hide()
-                marker.hide()
+                set_visible(focus, False)
+                set_visible(marker, False)
         width, height, px = _scale()
         update_scrollbar(
             self,
@@ -2154,7 +2154,7 @@ class GTXMLTVChannelSelectScreen(Screen):
 
     def select_current(self):
         if not self._entries:
-            self["message"].setText(_("No XMLTV channel matches the current filter."))
+            set_text_if_changed(self["message"], _("No XMLTV channel matches the current filter."))
             return
         self.close(self._entries[self.selected_index])
 
@@ -2162,10 +2162,10 @@ class GTXMLTVChannelSelectScreen(Screen):
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
         except ImportError:
-            self["message"].setText(_("The virtual keyboard is unavailable on this image."))
+            set_text_if_changed(self["message"], _("The virtual keyboard is unavailable on this image."))
             return
         if not hasattr(self.session, "openWithCallback"):
-            self["message"].setText(_("Could not open the virtual keyboard."))
+            set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
             return
         self.session.openWithCallback(
             self._search_entered,
@@ -2196,7 +2196,7 @@ class GTXMLTVChannelSelectScreen(Screen):
         self.query = ""
         self._entries = list(self._all_channels)
         self.selected_index = 0
-        self["message"].setText(_("XMLTV channel filter cleared."))
+        set_text_if_changed(self["message"], _("XMLTV channel filter cleared."))
         self._refresh_rows()
 
 

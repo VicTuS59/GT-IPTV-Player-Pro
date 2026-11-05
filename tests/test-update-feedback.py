@@ -61,18 +61,19 @@ class RestartHandoffTests(unittest.TestCase):
   # The native session model refuses modal opens during confirmation handoff.
   source=UI_SOURCE if 'UI_SOURCE' in globals() else (PLUGIN_ROOT/'update_ui.py').read_text(encoding='utf-8')
   tree=ast.parse(source);controller=next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=='GTSoftwareUpdateScreen')
-  names={'_ask_restart','_resumed','_restart_ready','_restart'}
+  names={'_ask_restart','_resumed','_restart_ready','_restart','_read_display_state'}
   methods=[n for n in controller.body if isinstance(n,ast.FunctionDef) and n.name in names]
-  namespace=dict(__package__=PACKAGE_NAME,PLUGIN_VERSION='1.0.0-r0',effective_version=lambda state:state['installed'],receiver_busy=lambda session:False,message=lambda key:key,MessageBox=types.SimpleNamespace(TYPE_YESNO=1))
+  namespace=dict(__package__=PACKAGE_NAME,PLUGIN_VERSION='1.0.0-r0',effective_version=lambda state:state['installed'],receiver_busy=lambda session:False,message=lambda key:key,MessageBox=types.SimpleNamespace(TYPE_YESNO=1),UpdateError=service.UpdateError)
   exec(compile(ast.fix_missing_locations(ast.Module(body=methods,type_ignores=[])),'actual-update-restart-methods','exec'),namespace)
   cls=type('ActualRestartController',(),{n.name:namespace[n.name] for n in methods});self.s=s=cls()
   s._closed=False;s._busy='';s._restart_open=False;s._restart_pending=False;s._restart_confirmed=False;s._restart_attempts=0;s.execing=False;s._restart_timer=Mock();s._render=Mock()
-  s.service=types.SimpleNamespace(state=types.SimpleNamespace(read=lambda:dict(installed='2.0.0-r0')))
+  s.service=types.SimpleNamespace(state=types.SimpleNamespace(read=lambda:dict(auto=True,installed='2.0.0-r0')))
   s.session=types.SimpleNamespace(in_exec=False,current_dialog=s,open=Mock(),openWithCallback=Mock())
   self.diag=__import__(PACKAGE_NAME+'.diagnostics',fromlist=['*']);self.logging=patch.object(self.diag,'log_event');self.logging.start();self.addCleanup(self.logging.stop)
  def test_automatic_question_survives_native_handoff_without_remote_key(self):
   s=self.s;s._ask_restart();s._restart_ready();s.session.openWithCallback.assert_not_called()
   s.execing=True;s.session.in_exec=True;s._resumed();s._restart_ready();s.session.openWithCallback.assert_called_once()
+  self.assertEqual(s._display_state,dict(auto=True,installed='2.0.0-r0'))
   self.assertFalse(s.session.openWithCallback.call_args.kwargs['default']);s.session.open.assert_not_called()
  def test_modal_open_race_retries_once_and_decline_never_restarts(self):
   s=self.s;s.execing=True;s.session.in_exec=True;s.session.openWithCallback.side_effect=[RuntimeError('modal open are allowed only from a screen which is modal!'),None]

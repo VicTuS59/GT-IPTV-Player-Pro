@@ -1,15 +1,19 @@
 """Playback quality must never occupy YouTube result titles or mini-TV."""
-import ast,importlib.util,sys,threading,types,unittest
+import ast,importlib.util,sys,threading,time,types,unittest
 from pathlib import Path
 from unittest.mock import Mock
 P=Path(__file__).resolve().parents[1]/'GTIPTVPlayerPro';NAME='_youtube_status_checks'
 spec=importlib.util.spec_from_file_location(NAME,P/'__init__.py',submodule_search_locations=[str(P)])
 pkg=importlib.util.module_from_spec(spec);sys.modules[NAME]=pkg;spec.loader.exec_module(pkg)
 typography=__import__(NAME+'.typography',fromlist=['*'])
+startup=__import__(NAME+'.youtube_startup',fromlist=['*'])
 source=ast.parse((P/'youtube_ui.py').read_bytes())
 klass=next(n for n in source.body if isinstance(n,ast.ClassDef) and n.name=='GTYouTubeSearchScreen')
 methods=[n for n in klass.body if isinstance(n,ast.FunctionDef) and n.name in ('_poll','_set_status')]
+settle_ms=next(ast.literal_eval(n.value) for n in source.body if isinstance(n,ast.Assign)
+               and any(isinstance(target,ast.Name) and target.id=='ARTWORK_SETTLE_MS' for target in n.targets))
 ns=dict(_=lambda text:text,ellipsize_dynamic_text=typography.ellipsize_dynamic_text,
+        time=time,ARTWORK_SETTLE_MS=settle_ms,youtube_error_message=startup.youtube_error_message,
         load_player_settings=lambda:types.SimpleNamespace(youtube_resolution='1080'))
 exec(compile(ast.fix_missing_locations(ast.Module(body=methods,type_ignores=[])),'actual-youtube-poll-status','exec'),ns)
 
@@ -25,6 +29,7 @@ class PollController(dict):
         super().__init__();self['status']=Label();self['status'].setText('Please wait')
         self._closed=False;self.execing=True;self._sync_quality=Mock();self._search_token=''
         self._poll_prefetch=Mock();self._event_lock=threading.Lock();self._events=[]
+        self._last_navigation=0.0
         self._play_token='offline-fixture';self._pending_play_id='fixture';self._service=Mock()
         self._service.status.return_value={'job':dict(state=state,**job)}
         self._history_fullscreen_id='';self._busy=False;self._thumb_active=False;self._prefetch=None;self._poll_timer=Mock()

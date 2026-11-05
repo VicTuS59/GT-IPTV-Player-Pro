@@ -69,6 +69,7 @@ _DYNAMIC_TEXT_MEASURE_CACHE_LIMIT = 512
 _DYNAMIC_TEXT_MAX_CHARS = 2048
 _DYNAMIC_TEXT_CACHE = OrderedDict()
 _DYNAMIC_TEXT_MEASURE_CACHE = OrderedDict()
+_FIT_GENERATION = 0
 _ELLIPSIS = "…"
 _BIDI_FORMAT_CONTROLS = frozenset(
     "\u061c\u200e\u200f"
@@ -179,6 +180,8 @@ def _bounded_cache_put(cache, key, value, limit):
 
 def clear_dynamic_text_cache():
     """Forget cached measurements, mainly for tests and skin reloads."""
+    global _FIT_GENERATION
+    _FIT_GENERATION += 1
     _DYNAMIC_TEXT_CACHE.clear()
     _DYNAMIC_TEXT_MEASURE_CACHE.clear()
 
@@ -296,6 +299,46 @@ def _safe_set_text(component, value):
     return set_text_if_changed(component, value) is not None
 
 
+def _fit_cache_identity(component, instance):
+    layout = getattr(component, '_gt_layout_text_key', None)
+    if instance is not None and isinstance(layout, tuple) and len(layout) == 2:
+        # Only explicitly bound, exact-layout slots share results. Geometry,
+        # family, text and all fitting parameters remain in the caller's key.
+        return ('layout', layout, id(gFont))
+    return id(instance) if instance is not None else id(component)
+
+
+def _fit_request(geometry, skin_font, value, options):
+    instance, width, height = geometry
+    if instance is None or not width or not height or len(value) > _DYNAMIC_TEXT_MAX_CHARS:
+        return None
+    return (_FIT_GENERATION, id(gFont), id(instance), width, height, skin_font, value, options)
+
+
+def _current_fit(component, request):
+    previous = getattr(component, '_gt_last_fit', None)
+    if (request is not None and previous is not None and previous[0] == request
+            and previous[1] == getattr(component, '_gt_typography_font_key', None)):
+        try:
+            if component.getText() == previous[2]:
+                return previous[2]
+        except Exception:
+            pass
+    return None
+
+
+def _remember_fit(component, request, rendered):
+    # One bounded entry lives with each label. The existing shared cache
+    # still handles fitting when a different value or layout is requested.
+    try:
+        if request is not None:
+            component._gt_last_fit = (request, getattr(component, '_gt_typography_font_key', None), rendered)
+        elif hasattr(component, '_gt_last_fit'):
+            del component._gt_last_fit
+    except (AttributeError, TypeError):
+        pass
+
+
 def _apply_font(component, family, size):
     if gFont is None or not size:
         return False
@@ -352,12 +395,16 @@ def _fallback_capacity(width, font_size, fallback_chars):
 
 
 def _measure_text(component, value, font_size=0, nowrap=False):
-    instance, unused_width, unused_height = _component_geometry(component)
-    del unused_width, unused_height
+    instance, width, height = _component_geometry(component)
     if instance is None:
         return None
+    applied = getattr(component, '_gt_typography_font_key', None)
+    family = applied[1] if applied and applied[0] == id(instance) else _skin_font(component)[0]
     key = (
         id(instance),
+        width,
+        height,
+        family,
         int(font_size or 0),
         bool(nowrap),
         "" if value is None else str(value),
@@ -636,7 +683,34 @@ def fit_dynamic_text(
     font_name=None,
     fallback_chars=None,
     prefix="",
+    *,
+    reuse_current=True,
+    cached_only=False,
 ):
+    """Update a label, optionally leaving new pixel measurements for a later pass."""
+    value = "" if value is None else str(value)
+    prefix = "" if prefix is None else str(prefix)[:64]
+    geometry = _component_geometry(component)
+    skin_font = _skin_font(component) if geometry[1:] != (1, 1) else ("", 0)
+    options = (max_lines, preferred_size, min_size, font_name, fallback_chars, prefix)
+    if not reuse_current:
+        # Broadcast presentation already tracks the current value for its labels.
+        return _fit_dynamic_text(component, value, *options, geometry=geometry,
+                                 skin_font=skin_font, cached_only=cached_only)[0]
+    request = _fit_request(geometry, skin_font, value, options)
+    rendered = _current_fit(component, request)
+    if rendered is not None:
+        return rendered
+    rendered, applied = _fit_dynamic_text(component, value, *options,
+                                          geometry=geometry, skin_font=skin_font,
+                                          cached_only=cached_only)
+    _remember_fit(component, request if applied else None, rendered)
+    return rendered
+
+
+def _fit_dynamic_text(component, value, max_lines, preferred_size, min_size,
+                      font_name, fallback_chars, prefix, *, geometry, skin_font,
+                      cached_only=False):
     """Fit server/user text into one visible Label without animation.
 
     Enigma2's own ``calculateSize`` provides the primary pixel measurement.
@@ -651,20 +725,18 @@ def fit_dynamic_text(
     # ``prefix`` is reserved for small trusted UI adornments such as a list
     # selection marker and row number.  Provider text is still normalised on
     # its own, so intentional leading padding in the prefix is not stripped.
-    trusted_prefix = "" if prefix is None else str(prefix)[:64]
-    text = trusted_prefix + clean_dynamic_text(value)
+    text = prefix + clean_dynamic_text(value)
     try:
         max_lines = max(1, min(24, int(max_lines)))
     except (TypeError, ValueError, OverflowError):
         max_lines = 1
-    instance, width, height = _component_geometry(component)
+    instance, width, height = geometry
     # Several legacy compatibility labels are intentionally parked at 1x1.
     # Keep their value available to external skins, but do not spend any
     # measurement work on a widget that is not visible in the active skin.
     if width == 1 and height == 1:
-        _safe_set_text(component, text)
-        return text
-    skin_family, skin_font_size = _skin_font(component)
+        return text, _safe_set_text(component, text)
+    skin_family, skin_font_size = skin_font
     family = str(font_name or skin_family or "Regular")
     try:
         preferred = int(preferred_size) if preferred_size is not None else 0
@@ -687,7 +759,7 @@ def fit_dynamic_text(
     else:
         minimum = preferred
 
-    identity = id(instance) if instance is not None else id(component)
+    identity = _fit_cache_identity(component, instance)
     try:
         fallback_key = int(fallback_chars) if fallback_chars is not None else 0
     except (TypeError, ValueError, OverflowError):
@@ -706,10 +778,17 @@ def fit_dynamic_text(
     cached = _bounded_cache_get(_DYNAMIC_TEXT_CACHE, cache_key)
     if cached is not None:
         rendered, chosen_size = cached
-        if chosen_size:
-            _apply_font(component, family, chosen_size)
-        _safe_set_text(component, rendered)
-        return rendered
+        font_ready = not chosen_size or gFont is None or _apply_font(component, family, chosen_size)
+        text_ready = _safe_set_text(component, rendered)
+        return rendered, font_ready and text_ready
+
+    if cached_only:
+        # Keep the native wrap and clipping rules while the viewport is moving.
+        # An idle pass can replace this value with the exact measured fit.
+        if preferred:
+            _apply_font(component, family, preferred)
+        _safe_set_text(component, text)
+        return text, False
 
     chosen_size = preferred
     sizes = [preferred]
@@ -773,16 +852,15 @@ def fit_dynamic_text(
             ):
                 break
 
-    if chosen_size:
-        _apply_font(component, family, chosen_size)
-    _safe_set_text(component, rendered)
+    font_ready = not chosen_size or gFont is None or _apply_font(component, family, chosen_size)
+    text_ready = _safe_set_text(component, rendered)
     _bounded_cache_put(
         _DYNAMIC_TEXT_CACHE,
         cache_key,
         (rendered, chosen_size),
         _DYNAMIC_TEXT_CACHE_LIMIT,
     )
-    return rendered
+    return rendered, font_ready and text_ready
 
 
 def ellipsize_dynamic_text(

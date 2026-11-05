@@ -165,7 +165,7 @@ def infobar_skin(width, height, px, live=True):
         width, bar_h, infobar_panel_path(width, live=live)))
     for name in ("top_line", "bottom_line", "picon_frame", "picon_inner", "picon_placeholder",
                  "number_badge_frame", "number_badge_inner", "number_divider", "epg_separator",
-                 "epg_bottom_separator", "weather_card", "shortcut_audio_dot", "shortcut_aspect_dot",
+                 "epg_bottom_separator", "weather_card",
                  "shortcut_web_key", "web_shortcut_hint"):
         label(name, 0, 0, 1, 1, font=1, z=1)
     pixmap("picon", 30, 53, 170, 170)
@@ -236,19 +236,18 @@ def infobar_skin(width, height, px, live=True):
     label("date", 1665, 163, 233, 35, font=18, align="center")
     label("engine", 1665, 207, 233, 29, font=17, align="center")
     label("shortcut_separator", 15, 260, 1890, 1, font=1, z=2, background="#0E7490")
-    label("shortcut_epg_key", 35, 267, 80, 27, font=19, color="#FFFFFF", align="center")
-    label("shortcut_epg", 132, 266, 365, 29, font=20)
-    label("shortcut_audio", 607, 266, 377, 29, font=20)
-    label("shortcut_aspect", 1042, 266, 380, 29, font=20)
-    # Cover the unused MENU badge painted into the existing panel artwork.
-    # Keep the old text components as empty compatibility widgets above.
-    label("web_shortcut_background", 1478, 264, 164, 34, font=1, z=2,
+    # Cover the old painted shortcut row before laying out the remaining
+    # native controls. Live TV uses three columns; VOD keeps its audio action.
+    label("web_shortcut_background", 15, 263, 1890, 37, font=1, z=2,
           background=INFOBAR_BACKGROUND)
-    label("shortcut_record_dot", 1504, 266, 28, 29, font=23, color="#FF3030", align="center")
-    label("shortcut_record_frame", 1540, 266, 86, 29, font=1, background="#0E7490", z=3)
-    label("shortcut_record_key", 1542, 268, 82, 25, font=19, color="#FFFFFF", align="center",
-          background=INFOBAR_BACKGROUND, z=4)
-    label("shortcut_record", 1642, 266, 250, 29, font=20)
+    label("shortcut_epg_key", 35, 267, 80, 27, font=19, color="#FFFFFF", align="center",
+          background="#0E7490")
+    label("shortcut_epg", 132, 266, 470, 29, font=20)
+    label("shortcut_audio_dot", 662 if live else 570, 266, 28, 29, font=23,
+          color="#FFD400", align="center")
+    label("shortcut_audio", 707 if live else 607, 266, 525 if live else 1265, 29, font=20)
+    label("shortcut_aspect_dot", 1302, 266, 28, 29, font=23, color="#22C55E", align="center")
+    label("shortcut_aspect", 1347, 266, 540, 29, font=20)
     # Seeking remains an independent high-z overlay over every normal field.
     full_width = max(1, width - px(160))
     widgets.append('<widget name="seek_panel" position="0,0" size="{},{}" font="Regular;1" backgroundColor="{}" transparent="0" zPosition="20" />'.format(width, bar_h, INFOBAR_BACKGROUND))

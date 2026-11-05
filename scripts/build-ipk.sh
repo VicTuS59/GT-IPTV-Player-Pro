@@ -11,7 +11,7 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 PROJECT_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd -P)
 PLUGIN_ROOT="$PROJECT_ROOT/GTIPTVPlayerPro"
 CONTROL_ROOT="$PROJECT_ROOT/CONTROL"
-DEFAULT_OUTPUT="$PROJECT_ROOT/dist/enigma2-plugin-extensions-gtiptvplayerpro_1.8.6-r0_all.ipk"
+DEFAULT_OUTPUT="$PROJECT_ROOT/dist/enigma2-plugin-extensions-gtiptvplayerpro_1.9.0-r0_all.ipk"
 
 if [ "$#" -gt 1 ]; then
     die 'usage: build-ipk.sh [output.ipk]'
@@ -95,7 +95,7 @@ cp "$CONTROL_ROOT/postrm" "$CONTROL_STAGE/postrm"
     find . -xdev \
         \( -type d -name __pycache__ -o -type f \( \
             -name '*.pyc' -o -name '*.pyo' -o -name '*.bak' \
-            -o -name '*.orig' -o -name '*.rej' \
+            -o -name '*.orig' -o -name '*.rej' -o -name '*.po' \
         \) \) -prune -o \
         \( -type d -o -type f \) -print0 > "$BUILD_DIR/payload.unsorted"
 )

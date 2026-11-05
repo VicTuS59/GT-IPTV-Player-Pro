@@ -12,7 +12,7 @@ import struct
 import threading
 import time
 import unicodedata
-from collections import OrderedDict, deque
+from collections import OrderedDict
 from copy import copy
 from urllib.parse import urlsplit
 from Components.ActionMap import ActionMap
@@ -20,27 +20,28 @@ from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Screens.Screen import Screen
 from enigma import ePoint, eSize, eTimer, getDesktop, iServiceInformation
-from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
+from .auxiliary_presentation import skin_after as aux_skin_after
 from . import PLUGIN_VERSION
 from . import sorting_ui as content_sort_ui
 from .artwork_cache import PICON_CACHE as _PICON_CACHE_BUDGET
-from .artwork_file import ArtworkPath, artwork_path
-from .artwork import RETRY_DELAY_SECONDS, artwork_failure_ttl, artwork_request_profile, is_tmdb_artwork_url, poster_batch_timeout, prepare_webp, retryable_artwork_error, tmdb_poster_url, webp_dimensions
-from .content import ContentCategory, ContentItem, CONTENT_LABELS, ContentError, XtreamContentClient
+from .artwork_file import ArtworkPath
+from .artwork import RETRY_DELAY_SECONDS, artwork_failure_ttl, artwork_request_profile, is_tmdb_artwork_url, prepare_webp, retryable_artwork_error, webp_dimensions
+from .content import ContentItem, ContentError, XtreamContentClient
 from .diagnostics import log_event, redact
-from .i18n import N_, _, ngettext, localized_date_text, localized_short_weekday, localized_language_name, localized_upper, metadata_language
-from .background import attach_background, attach_background_window, attach_native_alpha_pixmap, attach_pixmap
-from .vod_grid import CINEMATIC_POSTER_COLUMNS, GRID_COLUMNS, GRID_PAGE_SIZE, LatestPosterWorkers, PosterRetryQueue, cinematic_poster_geometry, grid_geometry, grid_move, page_position, poster_grid_skin
+from .movie_catalog import RAM_UNAVAILABLE
+from .i18n import N_, _, metadata_language
+from .background import attach_background
+from .vod_grid import CINEMATIC_POSTER_COLUMNS
 from .artwork_priority import ArtworkSlots
 from .favorites import FavoriteStore, favorite_key
 from .network_security import NetworkSecurityError, fetch_public_url, validate_public_url_syntax
-from .playback import PlaybackResumeStore, resume_account_scope, resume_key, should_save_resume
-from .episode_design import EPISODE_ROWS, EPISODE_LABEL_NAMES, EPISODE_PIXMAP_NAMES, episode_geometry, episode_skin, episode_focus_assets
+from .playback import resume_account_scope
+from .episode_design import EPISODE_ROWS
 from .paths import plugin_path
 from .portal_identity import safe_composite_id
-from .remote_footer import web_shortcut_hint_text, decorate_remote_footer, prepared_skin, footer_item, install_remote_footer, set_remote_footer
-from .scrollbar import hide_scrollbar, update_horizontal_scrollbar, update_scrollbar
-from .typography import _grapheme_boundaries, _line_fits, _text_units, clean_dynamic_text, current_text_size, ellipsize_dynamic_text, fit_dynamic_text, font_px, scale_skin_fonts, set_static_text, set_text_if_changed, visible_count
+from .remote_footer import decorate_remote_footer, prepared_skin, footer_item, install_remote_footer
+from .scrollbar import hide_scrollbar, update_scrollbar
+from .typography import _grapheme_boundaries, _text_units, ellipsize_dynamic_text, visible_count
 from .download_guard import protect_client as _protect_download_client
 
 def content_client_for(account):
@@ -130,10 +131,12 @@ LIVE_DETAIL_PREFETCH_CHANNELS = 4
 LIVE_DETAIL_EPG_TIMEOUT_SECONDS = 10
 LIVE_DETAIL_PREFETCH_TIMEOUT_SECONDS = 12
 LIVE_DETAIL_PROGRESS_INTERVAL_MS = 10000
-LIVE_PAGE_EPG_DWELL_MS = 180
-STALKER_LIVE_PAGE_EPG_DWELL_MS = 450
-LIVE_PAGE_EPG_POLL_MS = 100
+LIVE_PAGE_EPG_DWELL_MS = 40
+STALKER_LIVE_PAGE_EPG_DWELL_MS = 100
+LIVE_PAGE_EPG_POLL_MS = 40
 LIVE_PAGE_EPG_REQUEST_PAUSE_MS = 100
+LIVE_PAGE_EPG_TIMEOUT_SECONDS = 3
+LIVE_PAGE_EPG_RETRY_TIMEOUT_SECONDS = 5
 LIVE_METADATA_INITIAL_DELAY_MS = 550
 LIVE_INFO_METADATA_INITIAL_DELAY_MS = 450
 LIVE_METADATA_RETRY_DELAY_MS = 250
@@ -816,7 +819,8 @@ class GTAsyncListScreen(Screen):
         footer_stacked = bool(getattr(self, '_footer_layout_stacked', False))
         footer_transparent_panel = bool(getattr(self, '_footer_transparent_panel', bool(frameless_footer)))
         footer_show_dividers = bool(getattr(self, '_footer_show_dividers', not bool(frameless_footer)))
-        self.skin = decorate_remote_footer(self.skin, footer_items, alternate_items=footer_alternate_items, transparent_panel=footer_transparent_panel, show_dividers=footer_show_dividers, skin_fonts_scaled=bool(getattr(self, '_seven_pending_kind', '')) or screen_name == 'GTStreamListScreen' or (screen_name == 'GTContentBrowserScreen' and getattr(self, 'content_type', None) == 'live'), stacked=footer_stacked, panel_height=getattr(self, '_footer_panel_height', None), bottom_padding=getattr(self, '_footer_bottom_padding', None), side_padding=getattr(self, '_footer_side_padding', None), content_y_offset=getattr(self, '_footer_content_y_offset', 0), show_web_hint=getattr(self, '_footer_show_web_hint', True))
+        if not getattr(self, '_light_vod_enabled', False):
+            self.skin = decorate_remote_footer(self.skin, footer_items, alternate_items=footer_alternate_items, transparent_panel=footer_transparent_panel, show_dividers=footer_show_dividers, skin_fonts_scaled=bool(getattr(self, '_seven_pending_kind', '')) or screen_name == 'GTStreamListScreen' or (screen_name == 'GTContentBrowserScreen' and getattr(self, 'content_type', None) == 'live'), stacked=footer_stacked, panel_height=getattr(self, '_footer_panel_height', None), bottom_padding=getattr(self, '_footer_bottom_padding', None), side_padding=getattr(self, '_footer_side_padding', None), content_y_offset=getattr(self, '_footer_content_y_offset', 0), show_web_hint=getattr(self, '_footer_show_web_hint', True))
         if not getattr(self, '_list_scroll_geometry', None):
             width, height, px = _scale()
             margin = px(64)
@@ -855,7 +859,8 @@ class GTAsyncListScreen(Screen):
         hide_scrollbar(self, 'list_scroll')
         self['message'] = Label('')
         self['footer'] = Label('')
-        install_remote_footer(self, footer_items, slot_count=max(len(footer_items), len(footer_alternate_items)), stacked=footer_stacked)
+        if not getattr(self, '_light_vod_enabled', False):
+            install_remote_footer(self, footer_items, slot_count=max(len(footer_items), len(footer_alternate_items)), stacked=footer_stacked)
         self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions'], {'ok': self.open_selected, 'cancel': self.close, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'green': self.start_load, 'red': self.close}, -1)
         if hasattr(self, 'onShown'):
             self.onShown.append(self._start_initial_load)
@@ -870,6 +875,8 @@ class GTAsyncListScreen(Screen):
         self._refit_dynamic_breadcrumb()
 
     def _refit_dynamic_breadcrumb(self):
+        if getattr(self, '_light_vod_enabled', False):
+            return
         if not hasattr(self, '__getitem__'):
             return
         try:
@@ -933,6 +940,8 @@ class GTAsyncListScreen(Screen):
             error = N_('Request timed out') if token is not None and token.past_deadline() else N_('Request cancelled')
         except ContentError as caught:
             error = str(caught)
+        except MemoryError:
+            error = RAM_UNAVAILABLE
         except Exception:
             error = N_('Could not load content')
         if self._closed or generation != self._load_generation or (token is not None and (not token.active())):

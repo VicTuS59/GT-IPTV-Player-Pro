@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Welcome-screen presentation only; source and connection state stay in main."""
 from xml.sax.saxutils import escape
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from .background import attach_native_alpha_pixmap
@@ -104,6 +106,11 @@ def sentence_caption(text):
     return localized_upper(text[:1])+text[1:]
 
 class WelcomePresentation(object):
+    def _refresh_welcome_action_focus(self):
+        for index in range(5):
+            set_visible(self['focus_'+str(index)], self.selected_action == index)
+        self._refresh_welcome_chrome()
+
     def _setup_welcome(self,scale,items,version):
         width,height,px=scale;self._welcome_px=px;self._welcome_footer_items=items
         self._welcome_geometry=welcome_geometry(width,height,px);self._welcome_palette=None
@@ -111,11 +118,11 @@ class WelcomePresentation(object):
         for name in EXTRA_PIXMAPS:self[name]=Pixmap()
         for i in range(5):
             for prefix in ('welcome_action_bg_','welcome_action_icon_','welcome_fill_'):self[prefix+str(i)]=Pixmap()
-        self['welcome_brand_gt'].setText('GT');self['header'].setText('IPTV PLAYER PRO')
-        self['welcome_version'].setText('v'+str(version))
-        self['eyebrow'].setText(localized_upper(_('Welcome')))
+        set_text_if_changed(self['welcome_brand_gt'], 'GT');set_text_if_changed(self['header'], 'IPTV PLAYER PRO')
+        set_text_if_changed(self['welcome_version'], 'v'+str(version))
+        set_text_if_changed(self['eyebrow'], localized_upper(_('Welcome')))
         fit_welcome_title(self['welcome_title'],_('Ready to watch?'),preferred_size=font_px(px,60,role='title'),min_size=max(12,int(px(36))))
-        self['welcome_status_dot'].setText('●')
+        set_text_if_changed(self['welcome_status_dot'], '●')
         self.skin=style_footer(self.skin,'movie',px,items,tuple(remote_action_text(item[1]) for item in items))
         self.onShown.append(self._refresh_welcome_chrome)
 
@@ -126,13 +133,16 @@ class WelcomePresentation(object):
         palette=saved_selection_palette();changed=palette!=self._welcome_palette
         if changed:self._welcome_palette=palette
         fill,border=episode_focus_assets(*palette)
+        from .matches_text import tr as match_tr
+        captions=(_('CONNECT SOURCE'),_('MANAGE SOURCES'),_('ADD SOURCE'),'YouTube',match_tr('Matches'))
         for i,name in enumerate(BUTTONS):
-            text=self[name].getText()
+            text=captions[i]
             if name!='youtube_button':text=sentence_caption(text.replace('\n',' '))
             fit_action_caption(self[name],text,preferred_size=font_px(px,32),min_size=max(11,int(px(24))))
             component='welcome_fill_'+str(i)
             if changed:attach_native_alpha_pixmap(self,component,fill,key=component,show_on_load=False)
-            (self[component].show if self.selected_action==i else self[component].hide)()
-        (self['welcome_status_dot'].show if self.accounts else self['welcome_status_dot'].hide)()
-        refresh_plain_footer(self,self._welcome_footer_items,px,tuple(remote_action_text(item[1]) for item in self._welcome_footer_items))
-        self['remote_key_0'].setText('▲▼');self['remote_key_1'].setText('◀▶')
+            set_visible(self[component], self.selected_action==i)
+        set_visible(self['welcome_status_dot'], self.accounts)
+        refresh_plain_footer(self, self._welcome_footer_items, px,
+                             tuple(remote_action_text(item[1]) for item in self._welcome_footer_items),
+                             keys={'up_down': '▲▼'})

@@ -4,7 +4,6 @@
 import hashlib
 import os
 import re
-import shutil
 import stat
 import subprocess
 import tempfile
@@ -283,12 +282,9 @@ def receiver_activity(session):
         if callable(getattr(nav,'getRecordings',None)) and nav.getRecordings():return 'recording'
         timer=getattr(nav,'RecordTimer',None)
         if callable(getattr(timer,'isRecording',None)) and timer.isRecording():return 'recording'
-        from . import downloads,live_recording
+        from . import downloads
         with downloads.transaction(read_only=True) as state:
             if any(job.get('status') in downloads.ACTIVE for job in state.get('jobs',())):return 'downloading'
-        job=live_recording.current()
-        if job is not None and job.snapshot().get('state') in ('recording','stopping'):return 'recording'
-        if getattr(live_recording,'_preparing',None) is not None:return 'recording'
     except Exception:
         # An unreadable activity state is not permission to replace running code.
         return 'activity'

@@ -3,7 +3,6 @@
 """Native component geometry measured from the seven approved PNG previews."""
 from xml.etree import ElementTree as ET
 from .paths import plugin_path
-from .typography import font_px
 from .utility_design import NativeSkin
 
 INK='#EDF2F8';MUTED='#AFC1D8';CYAN='#20D5ED'

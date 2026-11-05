@@ -6,6 +6,8 @@ import datetime as dt
 import os
 import time
 from collections import OrderedDict
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 
 from Components.ActionMap import ActionMap
 from Components.Label import Label
@@ -15,17 +17,18 @@ from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from enigma import eTimer
 
-from .background import attach_background, attach_native_alpha_pixmap
-from .i18n import _, localized_short_weekday, localized_upper
+from .background import attach_native_alpha_pixmap
+from .i18n import _, localized_upper
 from .main import _connect_timer, _scale
 from .matches import LEAGUE_NAMES, MatchesLoader, REFRESH_SECONDS, leagues_for_matches
 from .matches_text import tr
 from .liveonsat import COUNTRIES, filter_broadcasts, load_country, save_country
 from .match_highlights import available as highlights_available, search_query as highlights_query
-from .matches_skin import rows as theme_rows, skin as theme_skin, artwork, scroll_geometry
+from .matches_skin import rows as theme_rows, skin as theme_skin, scroll_geometry
 from .welcome_text import fit_action_caption
 from .scrollbar import update_scrollbar
-from .typography import ellipsize_dynamic_text, fit_dynamic_text, font_px, visible_count
+from .remote_footer import prepared_skin, skin_metadata, bind_layout_text
+from .typography import fit_dynamic_text
 
 TABS = (("live", "Live"), ("finished", "Finished"), ("upcoming", "Upcoming"), ("broadcasts", "LiveOnSat"))
 
@@ -40,8 +43,10 @@ def matches_skin():
 
 class GTMatchesScreen(Screen):
     def __init__(self,session,loader=None,today=None):
-        self.skin=matches_skin()
+        self.skin=prepared_skin(matches_skin)
         Screen.__init__(self,session)
+        from .skin_artwork import install as install_skin_artwork
+        install_skin_artwork(self)
         self.loader=loader or MatchesLoader()
         self.day=today or dt.date.today()
         self.tab=0;self.league='';self.selected=0;self.window=0
@@ -54,30 +59,38 @@ class GTMatchesScreen(Screen):
         self._logo_paths=OrderedDict();self._logo_attempts=OrderedDict()
         self._logo_job=None;self._image_paths={};self._image_valid={}
         # Build only native labels/pixmaps; never import a portal or player.
-        import xml.etree.ElementTree as ET
-        self._font_sizes={}
-        for widget in ET.fromstring(self.skin).findall('widget'):
-            name=widget.attrib['name']
-            self[name]=Label('') if 'font' in widget.attrib else Pixmap()
-            if 'font' in widget.attrib:self._font_sizes[name]=int(widget.attrib['font'].split(';')[1])
-        width,height,unused=_scale()
-        self['title'].setText(localized_upper(tr('Matches')))
-        self['r96_brand_gt'].setText('GT');self['brand'].setText('IPTV PLAYER PRO')
-        self['r96_key_lr'].setText('◀▶');self['r96_action_lr'].setText(_('Change'))
-        self['r96_key_ud'].setText('▲▼');self['r96_action_ud'].setText(_('Select'))
-        for i,unused in enumerate(TABS):self['tab_'+str(i)].setText(tr(TABS[i][1]))
+        metadata=skin_metadata(self.skin)
+        self._font_sizes={name:int(font.split(';')[1]) for name,font in metadata.fonts}
+        for name,is_label in metadata.widgets:
+            self[name]=Label('') if is_label else Pixmap()
+        width,height,px=_scale()
+        self._row_count=_rows()
+        self._scroll_geometry=scroll_geometry(width,height)
+        self._font_minimum=px(20)
+        self._row_art=None
+        self._panel_art={}
+        if width*height <= 1920*1080:
+            from .opaque_row_art import DeferredOpaqueArt
+            DeferredOpaqueArt(self, ('r96_list_panel','r96_detail_panel'), (
+                ('r96_list_panel','r96_match_row_',self._row_count,((),('row_focus_',))),
+            ), self._install_table_art)
+        set_text_if_changed(self['title'], localized_upper(tr('Matches')))
+        set_text_if_changed(self['r96_brand_gt'], 'GT');set_text_if_changed(self['brand'], 'IPTV PLAYER PRO')
+        set_text_if_changed(self['r96_key_lr'], '◀▶');set_text_if_changed(self['r96_action_lr'], _('Change'))
+        set_text_if_changed(self['r96_key_ud'], '▲▼');set_text_if_changed(self['r96_action_ud'], _('Select'))
+        for i,unused in enumerate(TABS):set_text_if_changed(self['tab_'+str(i)], tr(TABS[i][1]))
         for name,message in (('league','League'),('match','Match'),('score','Score'),('status','Status')):
-            self['column_'+name].setText(tr(message))
+            set_text_if_changed(self['column_'+name], tr(message))
         for name,message in (('detail_header','Match information'),('detail_half_label','First half'),('detail_state_label','Status')):
-            self[name].setText(localized_upper(tr(message)) if name=='detail_header' else tr(message))
-        self['action_red'].setText(_('Back'));self['action_green'].setText(_('Refresh'))
-        self['action_yellow'].setText(tr('Date'));self['action_blue'].setText(tr('League filter'))
-        self['source'].setText(tr('Source: ESPN'))
-        self['navigation'].setText('')
-        self['tv_action_red'].setText(_('Back'));self['tv_action_green'].setText(_('Refresh'))
-        self['tv_action_yellow'].setText(tr('Select country'))
-        self['tv_source'].setText(tr('Source: LiveOnSat'))
-        self['tv_column_channels'].setText(_('Channels'))
+            set_text_if_changed(self[name], localized_upper(tr(message)) if name=='detail_header' else tr(message))
+        set_text_if_changed(self['action_red'], _('Back'));set_text_if_changed(self['action_green'], _('Refresh'))
+        set_text_if_changed(self['action_yellow'], tr('Date'));set_text_if_changed(self['action_blue'], tr('League filter'))
+        set_text_if_changed(self['source'], tr('Source: ESPN'))
+        set_text_if_changed(self['navigation'], '')
+        set_text_if_changed(self['tv_action_red'], _('Back'));set_text_if_changed(self['tv_action_green'], _('Refresh'))
+        set_text_if_changed(self['tv_action_yellow'], tr('Select country'))
+        set_text_if_changed(self['tv_source'], tr('Source: LiveOnSat'))
+        set_text_if_changed(self['tv_column_channels'], _('Channels'))
         self._static_values={name:self[name].getText() for name in self._font_sizes}
         self['actions']=ActionMap(['OkCancelActions','DirectionActions','ColorActions','MenuActions','ChannelSelectBaseActions'],
             {'ok':self.open_highlights,'cancel':self.close,'back':self.close,'red':self.close,
@@ -93,7 +106,19 @@ class GTMatchesScreen(Screen):
         self.setTitle(tr('Matches'))
         self._render()
 
+    def _install_table_art(self, panels, rows):
+        from .opaque_row_art import install_opaque_panels
+        self._row_art, = rows
+        self._panel_art = panels
+        install_opaque_panels(self, panels)
+        for slot in range(self._row_count):
+            index = self.window + slot
+            self._paint_row(slot, index < len(self.matches), index == self.selected)
+
     def _fit_static(self):
+        from .opaque_row_art import install_opaque_panels
+        bind_layout_text(self)
+        install_opaque_panels(self,self._panel_art)
         for name in ('title','brand','filter','count','detail_header','detail_half_label','detail_state_label',
                      'column_league','column_match','column_score','column_status','source','navigation',
                      'action_red','action_green','action_yellow','action_blue','tab_0','tab_1','tab_2','tab_3',
@@ -107,11 +132,18 @@ class GTMatchesScreen(Screen):
 
     def refresh(self):
         if self._closed or self._loading or self._dialog_open:return
+        cached = getattr(self.loader, 'cached', None)
         if self._is_broadcast():
             self._tv_restore_id=self.matches[self.selected].id if self.matches else None
-            self._broadcast_snapshot=None;self._broadcast_rows=();self.matches=[]
+            if self._broadcast_snapshot is None and callable(cached):
+                self._broadcast_snapshot=cached('broadcasts',None)
+                if self._broadcast_snapshot is not None:self._filter(self._tv_restore_id)
             self._request=self.loader.request('broadcasts',None)
-        else:self._request=self.loader.request('scores',self.day)
+        else:
+            if self.snapshot is None and callable(cached):
+                self.snapshot=cached('scores',self.day)
+                if self.snapshot is not None:self._filter()
+            self._request=self.loader.request('scores',self.day)
         self._loading=True;self._error=False;self._logo_requested=None;self._logo_job=None
         self._render()
 
@@ -122,17 +154,19 @@ class GTMatchesScreen(Screen):
             generation,kind,payload,error=result
             if generation==self._request:
                 if kind=='scores':
-                    self._loading=False;self._error=error
-                    if not error and payload is not None:
+                    self._loading=False;self._error=error or (payload is not None and payload.updated_at is None)
+                    if payload is not None and (not self._error or self.snapshot is None):
                         selected_id=self.matches[self.selected].id if self.matches else None
                         self.snapshot=payload
                         self._filter(selected_id)
                         self._logo_due=time.monotonic()+0.6 if self.matches else 0
                     self._next_refresh=time.monotonic()+REFRESH_SECONDS
                 elif kind=='broadcasts':
-                    self._loading=False;self._error=error
-                    self._broadcast_snapshot=payload if not error else None
-                    self._filter(self._tv_restore_id)
+                    self._loading=False;self._error=error or bool(payload and payload.failed)
+                    if payload is not None and (not self._error or self._broadcast_snapshot is None):
+                        selected_id=self.matches[self.selected].id if self.matches else self._tv_restore_id
+                        self._broadcast_snapshot=payload
+                        self._filter(selected_id)
                     self._logo_due=time.monotonic()+0.6 if self.matches else 0
                     self._next_refresh=time.monotonic()+REFRESH_SECONDS
                 elif kind=='logos':
@@ -145,7 +179,10 @@ class GTMatchesScreen(Screen):
                                 self._logo_paths.move_to_end(identifier)
                                 while len(self._logo_paths)>32:self._logo_paths.popitem(last=False)
                     self._logo_due=time.monotonic()+0.15
-                self._render()
+                if kind=='logos':
+                    self._render_logos()
+                else:
+                    self._render()
         now=time.monotonic()
         if not self._dialog_open:
             # Score refresh always takes priority over decorative logo work.
@@ -153,7 +190,7 @@ class GTMatchesScreen(Screen):
             elif not self._loading and self.matches and self._logo_due and now>=self._logo_due and self._logo_job is None:
                 self._logo_due=0
                 self._request_visible_logos(now)
-        self['clock'].setText(time.strftime('%H:%M'))
+        set_text_if_changed(self['clock'], time.strftime('%H:%M'))
         self._timer.start(250,True)
 
     def _league_options(self):
@@ -183,8 +220,21 @@ class GTMatchesScreen(Screen):
 
     def move(self,step):
         if not self.matches:return
-        self.selected=(self.selected+step)%len(self.matches)
-        self._render()
+        previous=self.selected
+        selected=(previous+step)%len(self.matches)
+        if selected==previous:return
+        self.selected=selected
+        old_window=self.window
+        self._update_window()
+        if self.window!=old_window:
+            self._render_rows()
+            self._render_row_logos()
+        else:
+            self._paint_row(previous-self.window,True,False)
+            self._paint_row(selected-self.window,True,True)
+        self._render_position()
+        self._render_selection()
+        if not self._is_broadcast():self._render_message()
 
     def change_tab(self,step):
         before=self._is_broadcast()
@@ -196,18 +246,19 @@ class GTMatchesScreen(Screen):
         else:self._filter();self._render()
 
     def page(self,step):
-        if not self._is_broadcast():return self.move(step*_rows())
+        if not self._is_broadcast():return self.move(step*self._row_count)
         if not self.matches:return
         count=len(self._broadcast_rows[self.selected].channels)
         pages=max(1,(count+9)//10)
-        self._channel_window=((self._channel_window//10+step)%pages)*10
-        self._render()
+        window=((self._channel_window//10+step)%pages)*10
+        if window!=self._channel_window:
+            self._channel_window=window
+            self._render_channel_rows(self._broadcast_rows[self.selected].channels)
 
 
     def _set(self,name,value,capacity=40):
         preferred=self._font_sizes.get(name)
-        unused_w,unused_h,px=_scale()
-        minimum=min(preferred or px(20),px(20))
+        minimum=min(preferred or self._font_minimum,self._font_minimum)
         two_lines=(name.startswith('tab_') or name.startswith('action_') or
                    name.startswith('column_') or name.startswith('tv_row_channels_') or name in ('detail_home','detail_away','detail_phase',
                    'detail_header','detail_league','detail_state','detail_half_label','detail_state_label','empty_message') or
@@ -216,37 +267,78 @@ class GTMatchesScreen(Screen):
             rendered=fit_action_caption(self[name],value,preferred_size=preferred,min_size=minimum)
         else:
             rendered=fit_dynamic_text(self[name],value,max_lines=1,preferred_size=preferred,min_size=minimum)
-        self[name].setText(rendered)
+        set_text_if_changed(self[name], rendered)
 
     def _render(self):
         self._mode_visibility()
         for i in range(4):
-            self['tab_focus_'+str(i)].show() if i==self.tab else self['tab_focus_'+str(i)].hide()
-        if self._is_broadcast():return self._render_broadcasts()
-        relative={-1:'Yesterday',0:'Today',1:'Tomorrow'}.get((self.day-dt.date.today()).days)
-        date_label=tr(relative) if relative else self.day.strftime('%d/%m/%Y')
-        self._set('filter',date_label+' • '+(self._league_label(self.league) if self.league else tr('All leagues')),70)
+            set_visible(self['tab_focus_'+str(i)], i==self.tab)
+        if self._is_broadcast():
+            self._set('filter',self._country_label()+' • '+tr('Live broadcasts'),70)
+            updated=self._broadcast_snapshot.updated_at if self._broadcast_snapshot else None
+            date_format='%H:%M:%S'
+            self._render_detail_logos(None)
+        else:
+            relative={-1:'Yesterday',0:'Today',1:'Tomorrow'}.get((self.day-dt.date.today()).days)
+            date_label=tr(relative) if relative else self.day.strftime('%d/%m/%Y')
+            self._set('filter',date_label+' • '+(self._league_label(self.league) if self.league else tr('All leagues')),70)
+            updated=self.snapshot.updated_at if self.snapshot else None
+            date_format='%d/%m %H:%M:%S'
         self._set('count',tr('{count} matches').format(count=len(self.matches)),40)
-        if self.selected<self.window:self.window=self.selected
-        if self.selected>=self.window+_rows():self.window=self.selected-_rows()+1
-        for i in range(_rows()):
+        self._update_window()
+        self._render_rows()
+        self._render_row_logos()
+        self._render_position()
+        self._render_selection()
+        self._set('updated',tr('Last update: {time}').format(time=time.strftime(date_format,time.localtime(updated))) if updated else tr('No update yet'),60)
+        self._render_message()
+
+    def _update_window(self):
+        self.window=max(self.selected-self._row_count+1,min(self.window,self.selected))
+
+    def _paint_row(self,slot,present,selected):
+        if self._row_art is not None and self._row_art.paint(self,slot,present,int(selected)):
+            return
+        set_visible(self['row_focus_'+str(slot)], bool(present and selected and self._row_art is None))
+
+    def _render_rows(self):
+        television=self._is_broadcast()
+        for i in range(self._row_count):
             index=self.window+i;match=self.matches[index] if index<len(self.matches) else None
-            self['row_focus_'+str(i)].show() if match and index==self.selected else self['row_focus_'+str(i)].hide()
-            live=match and match.category=='live' and match.phase not in ('Suspended','Half-time')
-            self['row_{}_live'.format(i)].show() if live else self['row_{}_live'.format(i)].hide()
+            self._paint_row(i,match is not None,index==self.selected)
+            live=not television and match and match.category=='live' and match.phase not in ('Suspended','Half-time')
+            set_visible(self['row_{}_live'.format(i)], bool(live))
+            values=('', '', '', '') if match is None else (self._league_label(match.league),match.home,'–',match.away)
+            for name,value in zip(('league','home','separator','away'),values):
+                self._set('row_{}_{}'.format(i,name),value)
+            if television:
+                row=self._broadcast_rows[index] if match else None
+                self._set('tv_row_channels_'+str(i),row.channels[0].name if row else '')
+                set_visible(self['row_{}_warning_status'.format(i)],False)
+                continue
             status=('' if match is None else match.clock if live and match.clock else
                     dt.datetime.fromtimestamp(match.kickoff).strftime('%H:%M') if match.category=='upcoming' and match.phase=='Scheduled' else tr(match.phase))
-            values=('', '', '', '', '', '') if match is None else (self._league_label(match.league),match.home,'–',match.away,match.score,status)
-            for name,value in zip(('league','home','separator','away','score','status'),values):self._set('row_{}_{}'.format(i,name),value)
-        self['position'].setText('{} / {}'.format(self.selected+1 if self.matches else 0,len(self.matches)))
-        width,height,unused=_scale()
-        update_scrollbar(self,'scroll',len(self.matches),self.selected,_rows(),scroll_geometry(width,height))
+            self._set('row_{}_score'.format(i),match.score if match else '')
+            self._set('row_{}_status'.format(i),status)
+            warning=bool(match and match.phase=='Suspended')
+            name='row_{}_warning_status'.format(i)
+            self._set(name,tr(match.phase) if warning else '')
+            set_visible(self[name],warning)
+            set_visible(self['row_{}_status'.format(i)],not warning)
+
+    def _render_position(self):
+        set_text_if_changed(self['position'], '{} / {}'.format(self.selected+1 if self.matches else 0,len(self.matches)))
+        update_scrollbar(self,'scroll',len(self.matches),self.selected,self._row_count,self._scroll_geometry)
+
+    def _render_selection(self):
         match=self.matches[self.selected] if self.matches else None
         current_id=match.id if match else None
         if current_id!=self._logo_for:
             self._logo_for=current_id
             self._logo_due=time.monotonic()+0.6 if match else 0
-        self._render_logos()
+        if self._is_broadcast():
+            return self._render_broadcast_details()
+        self._render_detail_logos(match)
         self._set('detail_league',self._league_label(match.league) if match else '',40)
         self._set('detail_home',match.home if match else '',22)
         self._set('detail_away',match.away if match else '',22)
@@ -255,11 +347,17 @@ class GTMatchesScreen(Screen):
         if match and match.category=='live' and match.clock and match.phase not in ('Half-time','Suspended'):phase+=' • '+match.clock
         if match and match.category=='upcoming':phase+=' • '+dt.datetime.fromtimestamp(match.kickoff).strftime('%d/%m %H:%M')
         self._set('detail_phase',phase,35)
-        self['detail_half_score'].setText(match.half_score if match else '—')
+        set_text_if_changed(self['detail_half_score'], match.half_score if match else '—')
         self._set('detail_state',tr(match.phase) if match else '—',22)
-        updated=self.snapshot.updated_at if self.snapshot else None
-        self._set('updated',tr('Last update: {time}').format(time=time.strftime('%d/%m %H:%M:%S',time.localtime(updated))) if updated else tr('No update yet'),60)
+
+    def _render_message(self):
+        match=self.matches[self.selected] if self.matches else None
         if self._loading:message=tr('Loading matches...')
+        elif self._is_broadcast():
+            if self._error or (self._broadcast_snapshot and self._broadcast_snapshot.failed):message=tr('Broadcasts could not be updated.')
+            elif self._broadcast_snapshot and self._broadcast_snapshot.partial:message=tr('Broadcast information may be incomplete.')
+            elif not self.matches:message=tr('No live broadcasts found.')
+            else:message=''
         elif self._error or (self.snapshot and self.snapshot.failed_leagues and self.snapshot.updated_at is None):
             message=tr('Scores could not be updated.')
             if self.snapshot and self.snapshot.updated_at:message+=' '+tr('Showing saved scores.')
@@ -270,8 +368,7 @@ class GTMatchesScreen(Screen):
         self._set('message',message if self.matches else '',85)
         self._set('empty_message',message if not self.matches else '')
         for name in ('empty_icon','empty_message'):
-            self[name].hide() if self.matches else self[name].show()
-        self._render_status_colors()
+            set_visible(self[name], not self.matches)
 
     def _mode_visibility(self):
         television=self._is_broadcast()
@@ -281,74 +378,36 @@ class GTMatchesScreen(Screen):
               'detail_half_label','detail_half_score','detail_state_label','detail_state','source',
               'column_score','column_status','action_red','action_green','action_yellow','action_blue',
               'key_red','key_green','key_yellow','key_blue')
-        for name in core:self[name].hide() if television else self[name].show()
+        for name in core:set_visible(self[name], False) if television else set_visible(self[name], True)
         for name in self._font_sizes:
-            if name.startswith('tv_'):self[name].show() if television else self[name].hide()
+            if name.startswith('tv_'):set_visible(self[name], True) if television else set_visible(self[name], False)
         for key in ('red','green','yellow'):
-            self['tv_key_'+key].show() if television else self['tv_key_'+key].hide()
-        for i in range(_rows()):
+            set_visible(self['tv_key_'+key], True) if television else set_visible(self['tv_key_'+key], False)
+        for i in range(self._row_count):
             for suffix in ('score','status'):
-                self['row_{}_{}'.format(i,suffix)].hide() if television else self['row_{}_{}'.format(i,suffix)].show()
+                set_visible(self['row_{}_{}'.format(i,suffix)], False) if television else set_visible(self['row_{}_{}'.format(i,suffix)], True)
         self._set('detail_header',localized_upper(tr('Broadcaster channels') if television else tr('Match information')))
-        self['navigation'].setText(('◀ ▶ '+_('Change')+'    ▲ ▼ '+_('Select')+
-                                    ('    OK / CH± '+_('Channels') if television else '')))
+        self._set('navigation','OK / CH± '+_('Channels') if television else '')
+        set_visible(self['r96_detail_rule'],not television)
 
-    def _render_broadcasts(self):
-        country=tr(dict(COUNTRIES).get(self.country,'All'))
-        self._set('filter',country+' • '+tr('Live broadcasts'),70)
-        self._set('count',tr('{count} matches').format(count=len(self.matches)))
-        if self.selected<self.window:self.window=self.selected
-        if self.selected>=self.window+_rows():self.window=self.selected-_rows()+1
-        for i in range(_rows()):
-            index=self.window+i;row=self._broadcast_rows[index] if index<len(self._broadcast_rows) else None
-            match=row.match if row else None
-            self['row_focus_'+str(i)].show() if match and index==self.selected else self['row_focus_'+str(i)].hide()
-            self['row_{}_live'.format(i)].hide()
-            values=('', '', '', '') if match is None else (self._league_label(match.league),match.home,'–',match.away)
-            for name,value in zip(('league','home','separator','away'),values):self._set('row_{}_{}'.format(i,name),value)
-            self._set('tv_row_channels_'+str(i),row.channels[0].name if row else '')
-        self['position'].setText('{} / {}'.format(self.selected+1 if self.matches else 0,len(self.matches)))
-        width,height,unused=_scale()
-        update_scrollbar(self,'scroll',len(self.matches),self.selected,_rows(),scroll_geometry(width,height))
-        self._render_logos()
+    def _country_label(self):
+        return tr(dict(COUNTRIES).get(self.country,'All'))
+
+    def _render_broadcast_details(self):
         row=self._broadcast_rows[self.selected] if self.matches else None
-        current_id=row.match.id if row else None
-        if current_id!=self._logo_for:
-            self._logo_for=current_id;self._logo_due=time.monotonic()+0.6 if row else 0
         if (row.match.id if row else None)!=self._channel_match:
             self._channel_match=row.match.id if row else None;self._channel_window=0
         channels=row.channels if row else ()
-        self._set('tv_country',country)
+        self._set('tv_country',self._country_label())
         self._set('tv_count',_('Channels')+': '+str(len(channels)))
+        self._render_channel_rows(channels)
+
+    def _render_channel_rows(self,channels):
         for i in range(10):
             index=self._channel_window+i;channel=channels[index] if index<len(channels) else None
             self._set('tv_number_'+str(i),'{:02d}'.format(index+1) if channel else '')
             self._set('tv_channel_'+str(i),channel.name if channel else '')
         self._set('tv_page',('{}–{} / {}'.format(self._channel_window+1,min(self._channel_window+10,len(channels)),len(channels))) if channels else '')
-        updated=self._broadcast_snapshot.updated_at if self._broadcast_snapshot else None
-        self._set('updated',tr('Last update: {time}').format(time=time.strftime('%H:%M:%S',time.localtime(updated))) if updated else tr('No update yet'))
-        if self._loading:message=tr('Loading matches...')
-        elif self._error or (self._broadcast_snapshot and self._broadcast_snapshot.failed):message=tr('Broadcasts could not be updated.')
-        elif self._broadcast_snapshot and self._broadcast_snapshot.partial:message=tr('Broadcast information may be incomplete.')
-        elif not self.matches:message=tr('No live broadcasts found.')
-        else:message=''
-        self._set('message',message if self.matches else '')
-        self._set('empty_message',message if not self.matches else '')
-        for name in ('empty_icon','empty_message'):
-            self[name].hide() if self.matches else self[name].show()
-        self._render_status_colors()
-
-    def _render_status_colors(self):
-        self._set('navigation','OK / CH± '+_('Channels') if self._is_broadcast() else '')
-        self['r96_detail_rule'].hide() if self._is_broadcast() else self['r96_detail_rule'].show()
-        for i in range(_rows()):
-            index=self.window+i
-            match=self.matches[index] if index<len(self.matches) else None
-            warning=bool(match and not self._is_broadcast() and match.phase=='Suspended')
-            name='row_{}_warning_status'.format(i)
-            self._set(name,tr(match.phase) if warning else '')
-            self[name].show() if warning else self[name].hide()
-            self['row_{}_status'.format(i)].hide() if warning or self._is_broadcast() else self['row_{}_status'.format(i)].show()
 
     def choose_country(self):
         if self._closed or self._dialog_open:return
@@ -369,7 +428,7 @@ class GTMatchesScreen(Screen):
     def _request_visible_logos(self,now):
         if not self.matches:return
         chosen=self.matches[self.selected]
-        visible=self.matches[self.window:self.window+_rows()]
+        visible=self.matches[self.window:self.window+self._row_count]
         wanted=[]
         for match in [chosen]+visible:
             for identifier in (match.home_id,match.away_id):
@@ -387,9 +446,9 @@ class GTMatchesScreen(Screen):
     def _logo_loaded(self,name,path,loaded):
         if self._closed or self._image_paths.get(name)!=path:return
         self._image_valid[name]=bool(loaded)
-        self[name].show() if loaded else self[name].hide()
+        set_visible(self[name], True) if loaded else set_visible(self[name], False)
         placeholder=name.replace('_logo','_placeholder')
-        self[placeholder].hide() if loaded else self[placeholder].show()
+        set_visible(self[placeholder], False) if loaded else set_visible(self[placeholder], True)
 
     def _team_logo(self,name,identifier,present=False):
         path=self._logo_paths.get(identifier) if identifier else None
@@ -402,21 +461,27 @@ class GTMatchesScreen(Screen):
                 attach_native_alpha_pixmap(self,name,path,key=name,
                     on_loaded=lambda loaded:self._logo_loaded(name,path,loaded))
             loaded=self._image_valid.get(name)
-            self[name].show() if loaded else self[name].hide()
-            self[name.replace('_logo','_placeholder')].hide() if loaded else self[name.replace('_logo','_placeholder')].show()
+            set_visible(self[name], True) if loaded else set_visible(self[name], False)
+            set_visible(self[name.replace('_logo','_placeholder')], False) if loaded else set_visible(self[name.replace('_logo','_placeholder')], True)
         else:
             self._image_paths.pop(name,None)
             self._image_valid.pop(name,None)
             loader=getattr(self,'_gt_pixmap_loaders',{}).pop(name,None)
             if loader:loader.close()
-            self[name].hide()
-            self[name.replace('_logo','_placeholder')].show() if present else self[name.replace('_logo','_placeholder')].hide()
+            set_visible(self[name], False)
+            set_visible(self[name.replace('_logo','_placeholder')], True) if present else set_visible(self[name.replace('_logo','_placeholder')], False)
 
     def _render_logos(self):
         match=self.matches[self.selected] if self.matches and not self._is_broadcast() else None
+        self._render_detail_logos(match)
+        self._render_row_logos()
+
+    def _render_detail_logos(self,match):
         for name,identifier in (('home_logo',match.home_id if match else ''),('away_logo',match.away_id if match else '')):
             self._team_logo(name,identifier,match is not None)
-        for i in range(_rows()):
+
+    def _render_row_logos(self):
+        for i in range(self._row_count):
             index=self.window+i;match=self.matches[index] if index<len(self.matches) else None
             self._team_logo('row_{}_home_logo'.format(i),match.home_id if match else '',match is not None)
             self._team_logo('row_{}_away_logo'.format(i),match.away_id if match else '',match is not None)

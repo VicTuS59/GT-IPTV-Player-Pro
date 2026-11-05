@@ -5,26 +5,28 @@
 
 import threading
 import time
-from collections import OrderedDict, deque
+from collections import deque
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 from Components.ActionMap import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from enigma import ePoint, eSize, eTimer, getDesktop, iServiceInformation
-from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven, poster_after
-from .content import ContentCategory, ContentItem, CONTENT_LABELS, ContentError, XtreamContentClient
-from .diagnostics import log_event, redact
-from .i18n import N_, _, ngettext, localized_date_text, localized_short_weekday, localized_language_name, localized_upper, metadata_language
-from .background import attach_background, attach_background_window, attach_native_alpha_pixmap, attach_pixmap
-from .metadata import MetadataError, TMDbMetadataClient, complete_movie_for_device_language, movie_metadata_ready, media_metadata_ready, complete_media_for_device_language
-from .vod_grid import CINEMATIC_POSTER_COLUMNS, GRID_COLUMNS, GRID_PAGE_SIZE, LatestPosterWorkers, PosterRetryQueue, cinematic_poster_geometry, grid_geometry, grid_move, page_position, poster_grid_skin
+from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven, poster_after, refresh_media
+from .content import ContentItem, ContentError
+from .diagnostics import log_event
+from .i18n import N_, _, localized_upper, metadata_language
+from .background import attach_pixmap
+from .metadata import MetadataError, TMDbMetadataClient
+from .vod_grid import LatestPosterWorkers
 from .favorites import FavoriteStore, favorite_key
-from .playback import PlaybackResumeStore, resume_account_scope, resume_key, should_save_resume
-from .persistence import queue_playback_save, queue_playback_clear
-from .remote_footer import web_shortcut_hint_text, decorate_remote_footer, prepared_skin, footer_item, install_remote_footer, set_remote_footer
-from .scrollbar import hide_scrollbar, update_horizontal_scrollbar, update_scrollbar
-from .settings import DEFAULT_INFOBAR_TIMEOUT, available_service_types, load_player_settings, normalize_infobar_timeout, serviceapp_uses_async_seek, service_engine_label
-from .typography import _grapheme_boundaries, _line_fits, _text_units, clean_dynamic_text, current_text_size, ellipsize_dynamic_text, fit_dynamic_text, font_px, scale_skin_fonts, set_static_text, set_text_if_changed, visible_count
-from .browser_common import APP_BACKGROUND_PATH, CONTINUE_FOOTER_ITEMS, CONTINUE_GLASS_BACKGROUND_PATH, CONTINUE_POSTER_WORKERS, FAVORITES_FOOTER_ITEMS, FAVORITES_GLASS_BACKGROUND_PATH, FAVORITES_MOVE_FOOTER_ITEMS, FAVORITE_STAR_PATH, GTAsyncListScreen, PICON_DOWNLOAD_TIMEOUT, WORKER_POSTER_TIMEOUT_SECONDS, _DownloadSupport, _WorkerToken, _attach_subtitle_detail_metadata, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _connect_timer, _debug, _debug_identifier, _download_client_image, _is_m3u_client, _is_stalker_client, _picon_cache_path, _safe_picon_url, _scale, _series_provider_id, content_client_for
+from .playback import PlaybackResumeStore, resume_account_scope, resume_key
+from .persistence import queue_playback_clear
+from .remote_footer import prepared_skin, set_remote_footer
+from .scrollbar import hide_scrollbar, update_scrollbar
+from .settings import load_player_settings
+from .typography import ellipsize_dynamic_text, set_text_if_changed
+from .browser_common import APP_BACKGROUND_PATH, CONTINUE_FOOTER_ITEMS, CONTINUE_POSTER_WORKERS, FAVORITES_FOOTER_ITEMS, FAVORITES_MOVE_FOOTER_ITEMS, FAVORITE_STAR_PATH, GTAsyncListScreen, PICON_DOWNLOAD_TIMEOUT, WORKER_POSTER_TIMEOUT_SECONDS, _DownloadSupport, _WorkerToken, _attach_subtitle_detail_metadata, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _connect_timer, _debug, _debug_identifier, _download_client_image, _is_m3u_client, _is_stalker_client, _picon_cache_path, _safe_picon_url, _scale, _series_provider_id, content_client_for
 
 @seven_skin_after('continue')
 def _continue_watching_skin(screen_name='GTContinueWatchingScreen'):
@@ -130,7 +132,7 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
         self._list_scroll_geometry = grid_scroll_geometry or (width - px(82), px(215), px(8), px(635))
         title = grid_title or N_('Continue Watching')
         GTAsyncListScreen.__init__(self, session, grid_screen_name, title, '{}  >  {}'.format(account.display_name, _(title)))
-        self['screen_label'].setText(_(title))
+        set_text_if_changed(self['screen_label'], _(title))
         self['subtitle'] = Label(_(grid_subtitle or N_('Unfinished movies and series episodes')))
         for slot in range(self.page_size):
             self['continue_card_{}'.format(slot)] = Pixmap()
@@ -161,6 +163,7 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
             self._initial_show = False
             return
         if not self._loading:
+            self._continue_poster_page_key = None
             self.start_load()
 
     def load_items(self):
@@ -193,69 +196,75 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
     def empty_message(self):
         return N_('No content found.')
 
-    def _clear_continue_cards(self):
-        for slot in range(self.page_size):
+    def _clear_continue_cards(self, first=0):
+        for slot in range(first, self.page_size):
+            getattr(self, '_r27_card_content', {}).pop(slot, None)
             for name in ('continue_card_{}', 'continue_poster_placeholder_{}', 'continue_poster_{}', 'continue_favorite_{}', 'continue_type_{}', 'continue_title_{}', 'continue_meta_{}', 'continue_progress_bg_{}', 'continue_progress_fill_{}', 'continue_progress_text_{}'):
-                self[name.format(slot)].hide()
+                set_visible(self[name.format(slot)], False)
             for edge in ('top', 'bottom', 'left', 'right'):
-                self['continue_focus_{}_{}'.format(slot, edge)].hide()
+                set_visible(self['continue_focus_{}_{}'.format(slot, edge)], False)
 
     @seven_refresh_after
     def _refresh(self):
-        self._clear_continue_cards()
         if self._error:
+            self._clear_continue_cards()
             ellipsize_dynamic_text(self['message'], _(self._error), fallback_chars=80)
             hide_scrollbar(self, 'list_scroll')
             return
         if not self._entries:
-            self['message'].setText(_(self.empty_message()))
+            self._clear_continue_cards()
+            set_text_if_changed(self['message'], _(self.empty_message()))
             hide_scrollbar(self, 'list_scroll')
             return
         self.selected_index %= len(self._entries)
         page_start = int(self.selected_index / self.page_size) * self.page_size
         page_items = self._entries[page_start:page_start + self.page_size]
+        self._clear_continue_cards(len(page_items))
         for slot, item in enumerate(page_items):
             self._render_continue_card(slot, item, page_start + slot == self.selected_index)
-        self['message'].setText('{} | {}/{}'.format(len(self._entries), self.selected_index + 1, len(self._entries)))
-        update_scrollbar(self, 'list_scroll', len(self._entries), self.selected_index, self.page_size, self._list_scroll_geometry)
+        if getattr(self, '_seven_kind', '') not in ('continue', 'favorites'):
+            set_text_if_changed(self['message'], '{} | {}/{}'.format(len(self._entries), self.selected_index + 1, len(self._entries)))
+            update_scrollbar(self, 'list_scroll', len(self._entries), self.selected_index, self.page_size, self._list_scroll_geometry)
         self._render_continue_posters(page_items, page_start)
 
     def _render_continue_card(self, slot, item, selected):
-        position = int(getattr(item, 'resume_position', 0) or 0)
-        length = int(getattr(item, 'resume_length', 0) or 0)
-        progress = 0 if length <= 0 else int(min(100, max(0, round(float(position) * 100.0 / float(length)))))
-        remaining_minutes = max(1, int(round(max(0, length - position) / 60.0)))
-        content_key = N_('Movies') if item.content_type == 'movie' else N_('Series')
-        content_label = localized_upper(_(content_key))
-        meta = ''
-        if item.content_type == 'series':
-            season = str(getattr(item, 'season', '') or '').strip()
-            episode = str(getattr(item, 'episode', '') or '').strip()
-            if season or episode:
-                meta = _('S{}  •  E{}').format(season or '-', episode or '-')
-        elif str(getattr(item, 'year', '') or '').strip():
-            meta = str(item.year)
-        placeholder = self['continue_poster_placeholder_{}'.format(slot)]
-        placeholder.setText('GT\n{}'.format(content_label))
-        placeholder.show()
-        self['continue_poster_{}'.format(slot)].hide()
-        self['continue_favorite_{}'.format(slot)].hide()
-        self['continue_type_{}'.format(slot)].setText(content_label)
-        ellipsize_dynamic_text(self['continue_title_{}'.format(slot)], item.name, fallback_chars=22)
-        self['continue_meta_{}'.format(slot)].setText(meta)
-        self['continue_progress_text_{}'.format(slot)].setText(_('%{} • {} min remaining').format(progress, remaining_minutes))
-        try:
-            self['continue_progress_fill_{}'.format(slot)].instance.resize(eSize(max(1, int(round(self._continue_progress_width * progress / 100.0))), self._continue_progress_height))
-        except Exception:
-            pass
-        for name in ('continue_card_{}', 'continue_type_{}', 'continue_title_{}', 'continue_meta_{}', 'continue_progress_bg_{}', 'continue_progress_fill_{}', 'continue_progress_text_{}'):
-            self[name.format(slot)].show()
+        from .ui_update import card_content_changed
+        if card_content_changed(self, slot, item):
+            position = int(getattr(item, 'resume_position', 0) or 0)
+            length = int(getattr(item, 'resume_length', 0) or 0)
+            progress = 0 if length <= 0 else int(min(100, max(0, round(float(position) * 100.0 / float(length)))))
+            remaining_minutes = max(1, int(round(max(0, length - position) / 60.0)))
+            content_key = N_('Movies') if item.content_type == 'movie' else N_('Series')
+            content_label = localized_upper(_(content_key))
+            meta = ''
+            if item.content_type == 'series':
+                season = str(getattr(item, 'season', '') or '').strip()
+                episode = str(getattr(item, 'episode', '') or '').strip()
+                if season or episode:
+                    meta = _('S{}  •  E{}').format(season or '-', episode or '-')
+            elif str(getattr(item, 'year', '') or '').strip():
+                meta = str(item.year)
+            placeholder = self['continue_poster_placeholder_{}'.format(slot)]
+            placeholder.setText('GT\n{}'.format(content_label))
+            set_visible(placeholder, True)
+            set_visible(self['continue_poster_{}'.format(slot)], False)
+            set_visible(self['continue_favorite_{}'.format(slot)], False)
+            set_text_if_changed(self['continue_type_{}'.format(slot)], content_label)
+            ellipsize_dynamic_text(self['continue_title_{}'.format(slot)], item.name, fallback_chars=22)
+            set_text_if_changed(self['continue_meta_{}'.format(slot)], meta)
+            set_text_if_changed(self['continue_progress_text_{}'.format(slot)], _('%{} • {} min remaining').format(progress, remaining_minutes))
+            try:
+                self['continue_progress_fill_{}'.format(slot)].instance.resize(eSize(max(1, int(round(self._continue_progress_width * progress / 100.0))), self._continue_progress_height))
+            except Exception:
+                pass
+            for name in ('continue_card_{}', 'continue_type_{}', 'continue_title_{}', 'continue_meta_{}', 'continue_progress_bg_{}', 'continue_progress_fill_{}', 'continue_progress_text_{}'):
+                set_visible(self[name.format(slot)], True)
         for edge in ('top', 'bottom', 'left', 'right'):
             widget = self['continue_focus_{}_{}'.format(slot, edge)]
             if selected:
-                widget.show()
+                set_visible(widget, True)
             else:
-                widget.hide()
+                set_visible(widget, False)
 
     @staticmethod
     def _continue_candidate(candidates, value):
@@ -328,22 +337,17 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
 
     def _render_continue_posters(self, page_items, page_start):
         page_key = tuple(((str(item.stream_id), str(getattr(item, 'icon', '') or '')) for item in page_items))
-        page_changed = page_key != self._continue_poster_page_key
-        if page_changed:
-            self._cancel_continue_poster_work()
-            self._continue_generation += 1
-            self._continue_poster_page_key = page_key
+        if page_key == self._continue_poster_page_key:
+            return
+        self._cancel_continue_poster_work()
+        self._continue_generation += 1
+        self._continue_poster_page_key = page_key
         generation = self._continue_generation
         jobs = []
         for slot, item in enumerate(page_items):
             url = _safe_picon_url(getattr(item, 'icon', ''))
-            cached = _cached_picon_path(url) if url else ''
-            if cached:
-                self._apply_continue_poster(slot, cached, item.stream_id, generation, page_start)
-            elif page_changed and self._poster_job_allowed(item, url):
+            if url or self._poster_job_allowed(item, url):
                 jobs.append((slot, item, url, page_start))
-        if not page_changed:
-            return
         if not jobs:
             self._continue_poster_state = None
             return
@@ -355,7 +359,7 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
             pool = self._continue_poster_workers = LatestPosterWorkers(worker_count=CONTINUE_POSTER_WORKERS)
             self.onClose.append(pool.close)
         pool.replace([lambda: self._load_continue_poster_worker(state) for unused in range(min(CONTINUE_POSTER_WORKERS, len(jobs)))])
-        self._poster_timer.start(120, True)
+        self._poster_timer.start(55, True)
 
     def _poster_job_allowed(self, item, stored_url):
         del stored_url
@@ -380,12 +384,13 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
         self._continue_candidate(candidates, stored_url)
         try:
             token.check()
-            for candidate in candidates:
-                path = self._download_continue_candidate(candidate, token)
+            path = _cached_picon_path(stored_url) if stored_url else ''
+            allow_lookup = not path and self._poster_job_allowed(item, stored_url)
+            if allow_lookup and stored_url:
+                path = self._download_continue_candidate(stored_url, token)
                 if path:
-                    selected_url = candidate
-                    break
-            if not path:
+                    selected_url = stored_url
+            if not path and allow_lookup:
                 provider_candidates, info = _bounded_client_call(self.client, token, lambda: self._continue_provider_candidates(item))
                 for candidate in provider_candidates:
                     if candidate in candidates:
@@ -395,7 +400,7 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
                     if path:
                         selected_url = candidate
                         break
-            if not path:
+            if not path and allow_lookup:
                 token.check()
                 for candidate in self._continue_metadata_candidates(item, info, token):
                     if candidate in candidates:
@@ -465,10 +470,10 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
                 current = self._entries[page_start + slot]
                 valid = generation == self._continue_generation and current_page == page_start and (str(current.stream_id) == str(stream_id))
                 if success and valid:
-                    self['continue_poster_{}'.format(slot)].show()
-                    self['continue_poster_placeholder_{}'.format(slot)].hide()
+                    set_visible(self['continue_poster_{}'.format(slot)], True)
+                    set_visible(self['continue_poster_placeholder_{}'.format(slot)], False)
                 else:
-                    self['continue_poster_{}'.format(slot)].hide()
+                    set_visible(self['continue_poster_{}'.format(slot)], False)
             except Exception:
                 pass
         attach_pixmap(self, 'continue_poster_{}'.format(slot), path, key='continue-poster-{}'.format(slot), on_loaded=loaded)
@@ -493,7 +498,13 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
     def _select_continue(self, index):
         if not self._entries or self._loading:
             return
+        previous = self.selected_index
         self.selected_index = min(max(0, int(index)), len(self._entries) - 1)
+        if (getattr(self, '_seven_kind', None) in ('continue', 'favorites') and not self._error
+                and previous // self.page_size == self.selected_index // self.page_size):
+            if previous != self.selected_index:
+                refresh_media(self, previous)
+            return
         self._refresh()
 
     def move_left(self):
@@ -666,79 +677,87 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
         return localized_upper(_(labels.get(item.content_type, N_('Favorite'))))
 
     def _render_continue_card(self, slot, item, selected):
-        content_label = self._favorite_content_label(item)
-        placeholder = self['continue_poster_placeholder_{}'.format(slot)]
-        placeholder.setText('GT\n{}'.format(content_label))
-        placeholder.show()
-        self['continue_poster_{}'.format(slot)].hide()
-        self['continue_type_{}'.format(slot)].setText(content_label)
-        ellipsize_dynamic_text(self['continue_title_{}'.format(slot)], item.name, fallback_chars=25)
-        for name in ('continue_card_{}', 'continue_type_{}', 'continue_title_{}'):
-            self[name.format(slot)].show()
-        self['continue_meta_{}'.format(slot)].hide()
-        self['continue_progress_bg_{}'.format(slot)].hide()
-        self['continue_progress_fill_{}'.format(slot)].hide()
-        self['continue_progress_text_{}'.format(slot)].hide()
-        self['continue_favorite_{}'.format(slot)].hide()
+        from .ui_update import card_content_changed
+        if card_content_changed(self, slot, item):
+            content_label = self._favorite_content_label(item)
+            placeholder = self['continue_poster_placeholder_{}'.format(slot)]
+            placeholder.setText('GT\n{}'.format(content_label))
+            set_visible(placeholder, True)
+            set_visible(self['continue_poster_{}'.format(slot)], False)
+            set_text_if_changed(self['continue_type_{}'.format(slot)], content_label)
+            ellipsize_dynamic_text(self['continue_title_{}'.format(slot)], item.name, fallback_chars=25)
+            for name in ('continue_card_{}', 'continue_type_{}', 'continue_title_{}'):
+                set_visible(self[name.format(slot)], True)
+            set_visible(self['continue_meta_{}'.format(slot)], False)
+            set_visible(self['continue_progress_bg_{}'.format(slot)], False)
+            set_visible(self['continue_progress_fill_{}'.format(slot)], False)
+            set_visible(self['continue_progress_text_{}'.format(slot)], False)
+            set_visible(self['continue_favorite_{}'.format(slot)], False)
         for edge in ('top', 'bottom', 'left', 'right'):
             widget = self['continue_focus_{}_{}'.format(slot, edge)]
             move_widget = self['continue_move_{}_{}'.format(slot, edge)]
             if selected and (not self._move_active):
-                widget.show()
+                set_visible(widget, True)
             else:
-                widget.hide()
+                set_visible(widget, False)
             if selected and self._move_active:
-                move_widget.show()
+                set_visible(move_widget, True)
             else:
-                move_widget.hide()
+                set_visible(move_widget, False)
 
     def start_load(self):
         return GTContinueWatchingScreen.start_load(self)
 
-    def _hide_move_frames(self):
-        for slot in range(self.page_size):
+    def _hide_move_frames(self, first=0):
+        for slot in range(first, self.page_size):
             for edge in ('top', 'bottom', 'left', 'right'):
-                self['continue_move_{}_{}'.format(slot, edge)].hide()
+                set_visible(self['continue_move_{}_{}'.format(slot, edge)], False)
 
     def _update_filter_tabs(self):
         for index, (content_type, label) in enumerate(self.FILTERS):
             count = int(self._favorite_counts.get(content_type, 0) or 0)
-            self['favorite_filter_{}'.format(index)].setText('{}  {}'.format(localized_upper(_(label)), count))
+            if getattr(self, '_seven_kind', '') != 'favorites':
+                set_text_if_changed(self['favorite_filter_{}'.format(index)], '{}  {}'.format(localized_upper(_(label)), count))
             focus = self['favorite_filter_focus_{}'.format(index)]
             if index == self._favorite_filter_index:
-                focus.show()
+                set_visible(focus, True)
             else:
-                focus.hide()
+                set_visible(focus, False)
 
     @seven_refresh_after
     def _refresh(self):
-        self._clear_continue_cards()
-        self._hide_move_frames()
         self._update_filter_tabs()
         total = int(self._favorite_counts.get('', 0) or 0)
         if self._error:
-            self['screen_label'].setText('{} {}  •  {} 0 / 0'.format(total, localized_upper(_('Favorites')), localized_upper(_('Page'))))
+            self._clear_continue_cards()
+            self._hide_move_frames()
+            set_text_if_changed(self['screen_label'], '{} {}  •  {} 0 / 0'.format(total, localized_upper(_('Favorites')), localized_upper(_('Page'))))
             ellipsize_dynamic_text(self['favorite_info'], _(self._error), fallback_chars=110)
             hide_scrollbar(self, 'list_scroll')
             return
         if not self._entries:
+            self._clear_continue_cards()
+            self._hide_move_frames()
             self.selected_index = 0
-            self['screen_label'].setText('{} {}  •  {} 0 / 0'.format(total, localized_upper(_('Favorites')), localized_upper(_('Page'))))
-            self['favorite_info'].setText(_(self.empty_message()))
+            set_text_if_changed(self['screen_label'], '{} {}  •  {} 0 / 0'.format(total, localized_upper(_('Favorites')), localized_upper(_('Page'))))
+            set_text_if_changed(self['favorite_info'], _(self.empty_message()))
             hide_scrollbar(self, 'list_scroll')
             return
         self.selected_index = min(max(0, int(self.selected_index)), len(self._entries) - 1)
         page_start = int(self.selected_index / self.page_size) * self.page_size
         page_items = self._entries[page_start:page_start + self.page_size]
+        self._clear_continue_cards(len(page_items))
+        self._hide_move_frames(len(page_items))
         for slot, item in enumerate(page_items):
             self._render_continue_card(slot, item, page_start + slot == self.selected_index)
         page_count = int((len(self._entries) + self.page_size - 1) / self.page_size)
         page = int(page_start / self.page_size) + 1
-        self['screen_label'].setText('{} {}  •  {} {} / {}'.format(total, localized_upper(_('Favorites')), localized_upper(_('Page')), page, page_count))
+        set_text_if_changed(self['screen_label'], '{} {}  •  {} {} / {}'.format(total, localized_upper(_('Favorites')), localized_upper(_('Page')), page, page_count))
         selected = self._entries[self.selected_index]
         ellipsize_dynamic_text(self['favorite_info'], '{}  •  {}  •  {}'.format(selected.name, self._favorite_content_label(selected), self._safe_source_name()), fallback_chars=110)
-        self['message'].setText('{} | {}/{}'.format(len(self._entries), self.selected_index + 1, len(self._entries)))
-        update_scrollbar(self, 'list_scroll', len(self._entries), self.selected_index, self.page_size, self._list_scroll_geometry)
+        if getattr(self, '_seven_kind', '') not in ('continue', 'favorites'):
+            set_text_if_changed(self['message'], '{} | {}/{}'.format(len(self._entries), self.selected_index + 1, len(self._entries)))
+            update_scrollbar(self, 'list_scroll', len(self._entries), self.selected_index, self.page_size, self._list_scroll_geometry)
         self._render_continue_posters(page_items, page_start)
 
     def cycle_filter(self):
@@ -751,10 +770,7 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
         self.start_load()
 
     def _select_favorite(self, index):
-        if not self._entries or self._loading:
-            return
-        self.selected_index = min(max(0, int(index)), len(self._entries) - 1)
-        self._refresh()
+        self._select_continue(index)
 
     def _move_reordered_item(self, delta):
         if not self._entries or not self._move_active:
@@ -850,9 +866,9 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
                 pending.append((result, failure, success))
             elif not result['ok']:
                 self.start_load()
-                self['favorite_info'].setText(failure)
+                set_text_if_changed(self['favorite_info'], failure)
             elif success:
-                self['favorite_info'].setText(success)
+                set_text_if_changed(self['favorite_info'], success)
         self._favorite_operations = pending
         if pending:
             self._favorite_operation_timer.start(80, True)
@@ -865,11 +881,11 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
         result = self.favorite_store.reorder_async(self.favorite_scope, keys, content_type=content_type)
         if result is None:
             self.cancel_move()
-            self['favorite_info'].setText(_('Could not save the favorite order.'))
+            set_text_if_changed(self['favorite_info'], _('Could not save the favorite order.'))
             return
         self._leave_move_mode()
         self._refresh()
-        self['favorite_info'].setText(_('Please wait'))
+        set_text_if_changed(self['favorite_info'], _('Please wait'))
         self._watch_favorite_operation(result, _('Could not save the favorite order.'), _('Favorite order saved.'))
 
     def cancel_move(self):
@@ -879,7 +895,7 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
         self.selected_index = min(self._move_snapshot_index, max(0, len(self._entries) - 1))
         self._leave_move_mode()
         self._refresh()
-        self['favorite_info'].setText(_('Move cancelled.'))
+        set_text_if_changed(self['favorite_info'], _('Move cancelled.'))
 
     def ok_action(self):
         if self._move_active:
@@ -904,7 +920,7 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
         key = str(getattr(item, 'favorite_key', '') or '')
         desired, result = self.favorite_store.toggle_async(self.favorite_scope, item, desired=False) if key else (None, None)
         if desired is not False:
-            self['message'].setText(_('Could not update favorites.'))
+            set_text_if_changed(self['message'], _('Could not update favorites.'))
             return
         self._watch_favorite_operation(result, _('Could not update favorites.'))
         self._entries.pop(self.selected_index)
@@ -923,7 +939,7 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
         item = self._entries[self.selected_index]
         if _is_m3u_client(self.client):
             if bool(getattr(item, 'm3u_stale', False)):
-                self['message'].setText(_('This channel is no longer present in the M3U source.'))
+                set_text_if_changed(self['message'], _('This channel is no longer present in the M3U source.'))
                 return
             playable = [entry for entry in self._entries if not bool(getattr(entry, 'm3u_stale', False))]
             try:
@@ -931,7 +947,7 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
                 from .browser_player import open_extplayer
                 open_extplayer(self.session, self.client, item, playable, selected_index, owner=self)
             except (ContentError, TypeError, ValueError):
-                self['message'].setText(_('This channel is no longer present in the M3U source.'))
+                set_text_if_changed(self['message'], _('This channel is no longer present in the M3U source.'))
             return
         if item.content_type == 'series':
             parent_id = str(getattr(item, 'parent_id', '') or '').strip()
@@ -949,7 +965,7 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
                 self.session.open(GTEpisodeListScreen, self.account, series, episode_client, favorite_store=self.favorite_store)
             except Exception as error:
                 log_event('favorites', 'Could not open favorite series id={}'.format(_debug_identifier(getattr(series, 'stream_id', ''))), error=error)
-                self['message'].setText(_('Could not open the content list.'))
+                set_text_if_changed(self['message'], _('Could not open the content list.'))
             return
         playable = self._entries_for_type(item.content_type)
         selected_index = 0

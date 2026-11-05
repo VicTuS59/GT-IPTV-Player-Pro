@@ -2,9 +2,13 @@
 # SPDX-FileCopyrightText: 2026 VicTuS59
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Word-preserving two-line text for the welcome screen."""
+from functools import wraps
 from .typography import (
     _apply_font, _component_geometry, _measure_text, _skin_font,
-    _text_units, clean_dynamic_text, fit_dynamic_text,
+    _text_units, clean_dynamic_text, fit_dynamic_text, _safe_set_text,
+    _bounded_cache_get, _bounded_cache_put, _DYNAMIC_TEXT_CACHE,
+    _DYNAMIC_TEXT_CACHE_LIMIT,
+    _fit_cache_identity, _fit_request, _current_fit, _remember_fit,
 )
 
 
@@ -17,6 +21,43 @@ _TITLE_PHRASES = {
 }
 
 
+def _remember_caption(method):
+    @wraps(method)
+    def fitted(component, value, preferred_size, min_size):
+        value = '' if value is None else str(value)
+        geometry = _component_geometry(component)
+        skin_font = _skin_font(component)
+        request = _fit_request(geometry, skin_font, value, (method.__name__, preferred_size, min_size))
+        rendered = _current_fit(component, request)
+        if rendered is not None:
+            return rendered
+        text = clean_dynamic_text(value)
+        if not text:
+            if _safe_set_text(component, ''):
+                _remember_fit(component, request, '')
+            return ''
+        instance, width, height = geometry
+        family, skin_size = skin_font
+        key = (method.__name__, _fit_cache_identity(component, instance),
+               text, width, height, family, skin_size, int(preferred_size), int(min_size))
+        cached = _bounded_cache_get(_DYNAMIC_TEXT_CACHE, key)
+        if cached is not None:
+            rendered, size = cached
+            font_ready = not size or _apply_font(component, family, size)
+            if _safe_set_text(component, rendered) and font_ready:
+                _remember_fit(component, request, rendered)
+            return rendered
+        rendered = method(component, text, preferred_size, min_size)
+        font = getattr(component, '_gt_typography_font_key', None)
+        size = font[2] if font and instance is not None and font[0] == id(instance) else 0
+        _bounded_cache_put(_DYNAMIC_TEXT_CACHE, key, (rendered, size), _DYNAMIC_TEXT_CACHE_LIMIT)
+        if size:
+            _remember_fit(component, request, rendered)
+        return rendered
+    return fitted
+
+
+@_remember_caption
 def fit_welcome_title(component, value, preferred_size, min_size):
     """Show the whole localized heading on two lines, never splitting a word.
 
@@ -65,6 +106,7 @@ def fit_welcome_title(component, value, preferred_size, min_size):
     return rendered
 
 
+@_remember_caption
 def fit_action_caption(component, value, preferred_size, min_size):
     text = clean_dynamic_text(value)
     instance, width, height = _component_geometry(component)

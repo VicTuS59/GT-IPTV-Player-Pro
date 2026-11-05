@@ -16,6 +16,14 @@ Quality inspection follows both VOD and live HLS variants, reads their actual
 resolution/codecs, and distinguishes incomplete requests from absent quality.
 YouTube may change its player format and require an extractor update.
 
+Revision 1.8.6-r19 treats the selected quality as a maximum for both direct
+formats and HLS. Playback defaults to AVC; VP9 requires explicit receiver
+capability information instead of the existence of a player executable.
+The web/native playback coordinator verifies the registered service and the
+ExtEplayer3 version response, then requires video geometry and advancing
+decoder/service PTS before reporting success. One failed start may try a lower
+combined AVC stream; signed input URLs and the user's saved settings are kept.
+
 Search availability reads video resolution metadata across codecs separately
 from native AVC/VP9/AAC playback capability and signed URL extraction.
 

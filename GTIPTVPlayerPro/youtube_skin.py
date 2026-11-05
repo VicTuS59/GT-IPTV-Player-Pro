@@ -5,7 +5,7 @@
 
 import os
 
-from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
+from .auxiliary_presentation import skin_after as aux_skin_after
 from .channel_highlight import saved_selection_border
 from .main import _scale
 from .remote_footer import decorate_remote_footer, footer_item

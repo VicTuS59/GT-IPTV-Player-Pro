@@ -9,6 +9,7 @@ import re
 import threading
 import time
 import uuid
+from .typography import set_text_if_changed
 from collections import OrderedDict, deque
 from Components.ActionMap import ActionMap
 from Components.Label import Label
@@ -25,31 +26,37 @@ try:
 except ImportError:
     _PlayableServiceEvents = None
 from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
-from .broadcast_presentation import skin_after as broadcast_skin_after, refresh_after as broadcast_refresh_after, setup as setup_broadcast
+from .broadcast_presentation import skin_after as broadcast_skin_after, refresh_after as broadcast_refresh_after, setup as setup_broadcast, text as broadcast_text
+from .broadcast_presentation import install_ready_live_art, refresh_live_selection
+from .auxiliary_presentation import text as aux_text
 from . import sorting_ui as content_sort_ui
-from .artwork_file import ArtworkPath, artwork_path
-from .content import ContentCategory, ContentItem, CONTENT_LABELS, ContentError, XtreamContentClient
-from .diagnostics import log_event, redact
-from .i18n import N_, _, ngettext, localized_date_text, localized_short_weekday, localized_language_name, localized_upper, metadata_language
+from .artwork_file import artwork_path
+from .content import CONTENT_LABELS, ContentError
+from .diagnostics import log_event
+from .i18n import N_, _, localized_date_text, localized_short_weekday, localized_upper
 from .live_recovery import media_snapshot as _decoder_media_snapshot
-from .live_history import LiveChannelListContext, clear_live_channel_history, current_live_channel_context, live_channel_key, previous_live_channel_selection, remember_live_channel
+from .live_history import LiveChannelListContext, live_channel_key, remember_live_channel
 from .live_channel_order import ChannelMove, LiveChannelOrderStore, arrange_channels, channel_order_scope
-from .background import attach_background, attach_background_window, attach_native_alpha_pixmap, attach_pixmap
-from .channel_highlight import DEFAULT_CHANNEL_HIGHLIGHT, channel_highlight_art, channel_highlight_colors, normalize_channel_highlight
+from .background import attach_native_alpha_pixmap
+from .channel_highlight import DEFAULT_CHANNEL_HIGHLIGHT, channel_highlight_colors, normalize_channel_highlight
 from .category_filters import category_filter_ids
 from .category_preferences import MAX_CATEGORIES_PER_SOURCE, CategoryPreferences, LiveCategoryPreferenceStore, arrange_categories, category_preferences_path
-from .category_visibility import category_filter_active, category_visibility_ids, filter_hidden_category_items, hidden_category_match_ids
+from .category_visibility import category_filter_active, filter_hidden_category_items, hidden_category_match_ids
 from .live_programme_art_ui import LiveProgrammePosterMixin
 from .broadcast_layout import live_geometry as live_guide_side_geometry
-from .playback import PlaybackResumeStore, resume_account_scope, resume_key, should_save_resume
+from .playback import resume_account_scope
 from .paths import plugin_path
-from .remote_footer import web_shortcut_hint_text, decorate_remote_footer, prepared_skin, footer_item, install_remote_footer, set_remote_footer
-from .scrollbar import hide_scrollbar, update_horizontal_scrollbar, update_scrollbar
-from .settings import DEFAULT_INFOBAR_TIMEOUT, available_service_types, load_player_settings, normalize_infobar_timeout, serviceapp_uses_async_seek, service_engine_label
-from .typography import _grapheme_boundaries, _line_fits, _text_units, clean_dynamic_text, current_text_size, ellipsize_dynamic_text, fit_dynamic_text, font_px, scale_skin_fonts, set_static_text, set_text_if_changed, visible_count
+from .remote_footer import prepared_skin, set_remote_footer
+from .scrollbar import hide_scrollbar, update_scrollbar
+from .settings import load_player_settings, service_engine_label
+from .seven_presentation import progress as set_broadcast_progress
+from .typography import _line_fits, clean_dynamic_text, current_text_size, ellipsize_dynamic_text, fit_dynamic_text, font_px, set_static_text, set_text_if_changed, visible_count
+from .ui_update import set_size, set_visible
 from .download_guard import allow as _allow_account_playback
 from .download_guard import cancel_pending as _cancel_download_pending
-from .browser_common import CATEGORY_MANAGER_FOOTER_ITEMS, CATEGORY_MANAGER_MOVE_FOOTER_ITEMS, FAVORITE_STAR_PATH, GTAsyncListScreen, LIVE_CHANNEL_MOVE_FOOTER_ITEMS, LIVE_CHANNEL_ORDER_FOOTER_ITEMS, LIVE_DETAIL_CACHE_TTL_SECONDS, LIVE_DETAIL_EMPTY_RETRY_SECONDS, LIVE_DETAIL_EPG_RETRY_LIMIT, LIVE_DETAIL_EPG_TIMEOUT_SECONDS, LIVE_DETAIL_PROGRESS_INTERVAL_MS, LIVE_EPG_CACHE_MAX_ENTRIES, LIVE_EPG_CACHE_TTL_SECONDS, LIVE_EPG_FETCH_LIMIT, LIVE_FULLSCREEN_RESULT_KIND, LIVE_GUIDE_BACKGROUND_PATH, LIVE_PAGE_EPG_DWELL_MS, LIVE_PAGE_EPG_POLL_MS, LIVE_PAGE_EPG_REQUEST_PAUSE_MS, LIVE_PICON_DOWNLOAD_TIMEOUT, LIVE_PICON_PREFETCH_POLL_MS, LIVE_PICON_PREFETCH_WORKERS, LIVE_PREVIEW_FRAME_PATH, LIVE_PREVIEW_LINK_POLL_MS, LIVE_PREVIEW_VIDEO_ERROR_CHECKS, LIVE_PREVIEW_VIDEO_INITIAL_MS, LIVE_PREVIEW_VIDEO_MAX_CHECKS, LIVE_PREVIEW_VIDEO_RETRY_MS, LIVE_STREAM_FOOTER_ITEMS, LIVE_STREAM_PAGE_SIZE, M3U_SEARCH_FOOTER_ITEMS, M3U_SEARCH_RESULT_LIMIT, STALKER_LIVE_EPG_QUIET_MS, STALKER_LIVE_PAGE_EPG_DWELL_MS, STALKER_LIVE_PICON_QUIET_MS, WORKER_LIST_TIMEOUT_SECONDS, WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _client_epg_state, _client_supports, _connect_timer, _debug, _debug_identifier, _desktop_size, _disable_live_window_animation, _epg_event_starts_in_future, _is_m3u_client, _is_stalker_client, _live_detail_dwell_ms, _load_live_picon_path, _load_shared_live_epg, _mark_picon_failure, _picon_failure_active, _picon_failure_remaining, _read_proc_number, _safe_picon_url, _scale, _stream_diag_pts_progress, _trace_fullscreen_osd, _valid_live_picon_file, _validated_content_type, _wrap_live_summary, content_client_for
+from .browser_common import CATEGORY_MANAGER_FOOTER_ITEMS, CATEGORY_MANAGER_MOVE_FOOTER_ITEMS, FAVORITE_STAR_PATH, GTAsyncListScreen, LIVE_CHANNEL_MOVE_FOOTER_ITEMS, LIVE_CHANNEL_ORDER_FOOTER_ITEMS, LIVE_DETAIL_CACHE_TTL_SECONDS, LIVE_DETAIL_EMPTY_RETRY_SECONDS, LIVE_DETAIL_EPG_RETRY_LIMIT, LIVE_DETAIL_EPG_TIMEOUT_SECONDS, LIVE_DETAIL_PROGRESS_INTERVAL_MS, LIVE_EPG_CACHE_MAX_ENTRIES, LIVE_EPG_CACHE_TTL_SECONDS, LIVE_EPG_FETCH_LIMIT, LIVE_FULLSCREEN_RESULT_KIND, LIVE_PICON_DOWNLOAD_TIMEOUT, LIVE_PICON_PREFETCH_POLL_MS, LIVE_PICON_PREFETCH_WORKERS, LIVE_PREVIEW_FRAME_PATH, LIVE_PREVIEW_LINK_POLL_MS, LIVE_PREVIEW_VIDEO_ERROR_CHECKS, LIVE_PREVIEW_VIDEO_INITIAL_MS, LIVE_PREVIEW_VIDEO_MAX_CHECKS, LIVE_PREVIEW_VIDEO_RETRY_MS, LIVE_STREAM_FOOTER_ITEMS, LIVE_STREAM_PAGE_SIZE, M3U_SEARCH_FOOTER_ITEMS, M3U_SEARCH_RESULT_LIMIT, STALKER_LIVE_EPG_QUIET_MS, STALKER_LIVE_PICON_QUIET_MS, WORKER_LIST_TIMEOUT_SECONDS, WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _client_epg_state, _client_supports, _connect_timer, _debug, _debug_identifier, _desktop_size, _disable_live_window_animation, _epg_event_starts_in_future, _is_m3u_client, _is_stalker_client, _live_detail_dwell_ms, _load_live_picon_path, _load_shared_live_epg, _mark_picon_failure, _picon_failure_active, _picon_failure_remaining, _read_proc_number, _safe_picon_url, _scale, _stream_diag_pts_progress, _trace_fullscreen_osd, _valid_live_picon_file, _validated_content_type, _wrap_live_summary, content_client_for
+
+LIVE_INITIAL_RESULT_POLL_MS = 45
 
 @broadcast_skin_after('categories')
 def _live_category_skin():
@@ -120,14 +127,12 @@ def _live_stream_skin(channel_highlight=DEFAULT_CHANNEL_HIGHLIGHT):
     row_h = px(72)
     row_step = px(78)
     row_first_y = px(166)
-    progress_x = row_x + row_w - px(112)
-    program_x = progress_x - px(192)
     name_x = row_x + px(239)
-    name_w = program_x - px(11) - name_x
+    name_w = row_x + row_w - px(20) - name_x
     rows = []
     for index in range(LIVE_STREAM_PAGE_SIZE):
         y = row_first_y + index * row_step
-        rows.append('\n    <widget name="stream_row_bg_{index}" position="{row_x},{row_y}"\n            size="{row_w},{row_h}" font="Regular;1"\n            backgroundColor="#FF000000" transparent="1" zPosition="2" />\n    <widget name="stream_row_art_{index}" position="0,0" size="1,1"\n            transparent="1" zPosition="1" />\n    <widget name="stream_focus_art_{index}" position="0,0" size="1,1"\n            transparent="1" zPosition="1" />\n    <widget name="stream_focus_{index}_fill" position="{row_x},{row_y}"\n            size="{row_w},{row_h}" font="Regular;1"\n            backgroundColor="{focus_fill}" transparent="0" zPosition="3" />\n    <widget name="stream_focus_{index}_top" position="{row_x},{row_y}"\n            size="{row_w},{edge_h}" font="Regular;1"\n            backgroundColor="{focus_edge}" transparent="0" zPosition="7" />\n    <widget name="stream_focus_{index}_bottom" position="{row_x},{bottom_y}"\n            size="{row_w},{edge_h}" font="Regular;1"\n            backgroundColor="{focus_edge}" transparent="0" zPosition="7" />\n    <widget name="stream_focus_{index}_left" position="{row_x},{row_y}"\n            size="{marker_w},{row_h}" font="Regular;1"\n            backgroundColor="{focus_edge}" transparent="0" zPosition="8" />\n    <widget name="stream_focus_{index}_right" position="{right_edge_x},{row_y}"\n            size="{edge_h},{row_h}" font="Regular;1"\n            backgroundColor="{focus_edge}" transparent="0" zPosition="7" />\n    <widget name="stream_separator_{index}" position="{row_x},{separator_y}"\n            size="{row_w},{separator_h}" font="Regular;1"\n            backgroundColor="#8A48B9ED" transparent="0" zPosition="4" />\n    <widget name="stream_number_{index}" position="{number_x},{row_y}"\n            size="{number_w},{row_h}" font="Regular;{number_font}"\n            foregroundColor="#D7DEE8" transparent="1" zPosition="9"\n            valign="center" halign="left" noWrap="1" />\n    <widget name="stream_picon_{index}" position="{picon_x},{picon_y}"\n            size="{picon_w},{picon_h}" backgroundColor="transparent"\n            transparent="1" alphatest="blend" scale="1" zPosition="9" />\n    <widget name="stream_name_{index}" position="{name_x},{name_y}"\n            size="{name_w},{name_h}" font="Regular;{name_font}"\n            foregroundColor="#F8FAFC" transparent="1" zPosition="9"\n            valign="center" halign="left" noWrap="0" />\n    <widget name="stream_program_{index}" position="{program_x},{row_y}"\n            size="{program_w},{row_h}" font="Regular;{program_font}"\n            foregroundColor="#CCD3DD" transparent="1" zPosition="9"\n            valign="center" halign="left" noWrap="1" />\n    <widget name="stream_progress_bg_{index}" position="{progress_x},{progress_y}"\n            size="{progress_w},{progress_h}" font="Regular;1"\n            backgroundColor="#222B35" transparent="0" zPosition="8" />\n    <widget name="stream_progress_fill_{index}" position="{progress_x},{progress_y}"\n            size="{progress_w},{progress_h}" font="Regular;1"\n            backgroundColor="#25A9F2" transparent="0" zPosition="9" />\n    <widget name="stream_favorite_{index}" position="{favorite_x},{favorite_y}"\n            size="{favorite_size},{favorite_size}" pixmap="{favorite_star}"\n            alphatest="blend" scale="1" zPosition="10" />'.format(index=index, row_x=row_x, row_y=y, row_w=row_w, row_h=row_h, focus_fill=focus_fill, focus_edge=focus_edge, edge_h=max(1, px(2)), bottom_y=y + row_h - max(1, px(2)), marker_w=px(7), right_edge_x=row_x + row_w - max(1, px(2)), separator_y=y + row_h - max(1, px(1)), separator_h=max(1, px(1)), number_x=row_x + px(12), number_w=px(102), number_font=font_px(px, 27, max_height=72, vertical_padding=12), picon_x=row_x + px(118), picon_y=y + px(6), picon_w=px(110), picon_h=px(60), name_x=name_x, name_y=y + px(4), name_w=name_w, name_h=row_h - px(8), name_font=name_font, program_x=program_x, program_w=px(178), program_font=font_px(px, 22, max_height=72, vertical_padding=14), progress_x=progress_x, progress_y=y + px(31), progress_w=px(96), progress_h=px(10), favorite_x=row_x + px(207), favorite_y=y + px(5), favorite_size=px(22), favorite_star=favorite_star))
+        rows.append('\n    <widget name="stream_row_bg_{index}" position="{row_x},{row_y}"\n            size="{row_w},{row_h}" font="Regular;1"\n            backgroundColor="#FF000000" transparent="1" zPosition="2" />\n    <widget name="stream_row_art_{index}" position="0,0" size="1,1"\n            transparent="1" zPosition="1" />\n    <widget name="stream_focus_art_{index}" position="0,0" size="1,1"\n            transparent="1" zPosition="1" />\n    <widget name="stream_focus_{index}_fill" position="{row_x},{row_y}"\n            size="{row_w},{row_h}" font="Regular;1"\n            backgroundColor="{focus_fill}" transparent="0" zPosition="3" />\n    <widget name="stream_focus_{index}_top" position="{row_x},{row_y}"\n            size="{row_w},{edge_h}" font="Regular;1"\n            backgroundColor="{focus_edge}" transparent="0" zPosition="7" />\n    <widget name="stream_focus_{index}_bottom" position="{row_x},{bottom_y}"\n            size="{row_w},{edge_h}" font="Regular;1"\n            backgroundColor="{focus_edge}" transparent="0" zPosition="7" />\n    <widget name="stream_focus_{index}_left" position="{row_x},{row_y}"\n            size="{marker_w},{row_h}" font="Regular;1"\n            backgroundColor="{focus_edge}" transparent="0" zPosition="8" />\n    <widget name="stream_focus_{index}_right" position="{right_edge_x},{row_y}"\n            size="{edge_h},{row_h}" font="Regular;1"\n            backgroundColor="{focus_edge}" transparent="0" zPosition="7" />\n    <widget name="stream_separator_{index}" position="{row_x},{separator_y}"\n            size="{row_w},{separator_h}" font="Regular;1"\n            backgroundColor="#8A48B9ED" transparent="0" zPosition="4" />\n    <widget name="stream_number_{index}" position="{number_x},{row_y}"\n            size="{number_w},{row_h}" font="Regular;{number_font}"\n            foregroundColor="#D7DEE8" transparent="1" zPosition="9"\n            valign="center" halign="left" noWrap="1" />\n    <widget name="stream_picon_{index}" position="{picon_x},{picon_y}"\n            size="{picon_w},{picon_h}" backgroundColor="transparent"\n            transparent="1" alphatest="blend" scale="1" zPosition="9" />\n    <widget name="stream_name_{index}" position="{name_x},{name_y}"\n            size="{name_w},{name_h}" font="Regular;{name_font}"\n            foregroundColor="#F8FAFC" transparent="1" zPosition="9"\n            valign="center" halign="left" noWrap="0" />\n    <widget name="stream_favorite_{index}" position="{favorite_x},{favorite_y}"\n            size="{favorite_size},{favorite_size}" pixmap="{favorite_star}"\n            alphatest="blend" scale="1" zPosition="10" />'.format(index=index, row_x=row_x, row_y=y, row_w=row_w, row_h=row_h, focus_fill=focus_fill, focus_edge=focus_edge, edge_h=max(1, px(2)), bottom_y=y + row_h - max(1, px(2)), marker_w=px(7), right_edge_x=row_x + row_w - max(1, px(2)), separator_y=y + row_h - max(1, px(1)), separator_h=max(1, px(1)), number_x=row_x + px(12), number_w=px(102), number_font=font_px(px, 27, max_height=72, vertical_padding=12), picon_x=row_x + px(118), picon_y=y + px(6), picon_w=px(110), picon_h=px(60), name_x=name_x, name_y=y + px(4), name_w=name_w, name_h=row_h - px(8), name_font=name_font, favorite_x=row_x + px(207), favorite_y=y + px(5), favorite_size=px(22), favorite_star=favorite_star))
     preview_x, preview_y, preview_w, preview_h = side_geometry['preview']
     frame_x, frame_y, frame_w, frame_h = side_geometry['preview_frame']
     poster_x, poster_y, poster_w, poster_h = side_geometry['poster']
@@ -264,13 +269,13 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
     def _refresh(self):
         if self._loading:
             self._clear_category_rows()
-            self['items'].setText(_('Loading content...'))
-            self['message'].setText(_('Please wait'))
+            set_text_if_changed(self['items'], _('Loading content...'))
+            set_text_if_changed(self['message'], _('Please wait'))
             return
         if not self._entries:
             self._clear_category_rows()
-            self['items'].setText(_(self.empty_message()))
-            self['message'].setText('')
+            set_text_if_changed(self['items'], _(self.empty_message()))
+            set_text_if_changed(self['message'], '')
             hide_scrollbar(self, 'list_scroll')
             return
         self.selected_index = min(len(self._entries) - 1, max(0, int(self.selected_index)))
@@ -286,57 +291,63 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
                 row_text = '{:02d}.  {}'.format(index + 1, name)
                 hidden = bool(category_id and category_id in self._hidden)
                 state_text = localized_upper(_('Hidden')) if hidden else ''
-                rendered_row = ellipsize_dynamic_text(self['category_row_{}'.format(row_index)], row_text, fallback_chars=34)
-                self['category_state_{}'.format(row_index)].setText(state_text)
+                if getattr(self, '_aux_kind', None) == 'categories':
+                    aux_text(self, 'category_row_{}'.format(row_index), row_text, 33)
+                    aux_text(self, 'category_state_{}'.format(row_index), _('Hidden') if hidden else '', 24)
+                    rendered_row = self['category_row_{}'.format(row_index)].getText()
+                else:
+                    rendered_row = ellipsize_dynamic_text(self['category_row_{}'.format(row_index)], row_text, fallback_chars=34)
+                    set_text_if_changed(self['category_state_{}'.format(row_index)], state_text)
                 plain_lines.append(rendered_row)
                 selected = index == self.selected_index
             else:
-                self['category_row_{}'.format(row_index)].setText('')
-                self['category_state_{}'.format(row_index)].setText('')
+                set_text_if_changed(self['category_row_{}'.format(row_index)], '')
+                set_text_if_changed(self['category_state_{}'.format(row_index)], '')
                 category_id = ''
                 selected = False
             marked = bool(category_id and category_id in self._marked)
             for check_state, visible in (('empty', bool(category_id) and (not marked)), ('tick', marked)):
                 checkbox = self['category_check_{}_{}'.format(row_index, check_state)]
                 if visible:
-                    checkbox.show()
+                    set_visible(checkbox, True)
                 else:
-                    checkbox.hide()
+                    set_visible(checkbox, False)
             insertion_line = self['category_insert_{}'.format(row_index)]
             if self._move_mode and selected:
-                insertion_line.show()
+                set_visible(insertion_line, True)
             else:
-                insertion_line.hide()
+                set_visible(insertion_line, False)
             for edge in ('fill', 'top', 'bottom', 'left', 'right'):
                 focus = self['category_focus_{}_{}'.format(row_index, edge)]
                 if selected:
-                    focus.show()
+                    set_visible(focus, True)
                 else:
-                    focus.hide()
-        self['items'].setText('\n'.join(plain_lines))
+                    set_visible(focus, False)
+        set_text_if_changed(self['items'], '\n'.join(plain_lines))
         hidden_count = len(self._hidden)
         visible_count = len(self._entries) - hidden_count
         status = '{}: {}  |  {}: {}  |  {}/{}'.format(_('Visible'), visible_count, _('Hidden'), hidden_count, self.selected_index + 1, len(self._entries))
         if self._marked:
             status = '{}: {}  |  {}'.format(_('Marked'), len(self._marked), status)
-        self['manager_selection_count'].setText('{}: {}'.format(_('Marked'), len(self._marked)) if self._marked else '')
-        self['manager_move_help'].setText(self._move_guidance() if self._move_mode else '')
+        set_text_if_changed(self['manager_selection_count'], '{}: {}'.format(_('Marked'), len(self._marked)) if self._marked else '')
+        if getattr(self, '_aux_kind', None) != 'categories':
+            set_text_if_changed(self['manager_move_help'], self._move_guidance() if self._move_mode else '')
         if self._notice and (not self._move_mode):
             status = '{}  |  {}'.format(status, self._notice)
         ellipsize_dynamic_text(self['message'], status, fallback_chars=70)
         update_scrollbar(self, 'list_scroll', len(self._entries), self.selected_index, self.page_size, self._list_scroll_geometry)
 
     def _clear_category_rows(self):
-        self['manager_selection_count'].setText('')
-        self['manager_move_help'].setText('')
+        set_text_if_changed(self['manager_selection_count'], '')
+        set_text_if_changed(self['manager_move_help'], '')
         for row_index in range(self.page_size):
-            self['category_row_{}'.format(row_index)].setText('')
-            self['category_state_{}'.format(row_index)].setText('')
-            self['category_check_{}_empty'.format(row_index)].hide()
-            self['category_check_{}_tick'.format(row_index)].hide()
-            self['category_insert_{}'.format(row_index)].hide()
+            set_text_if_changed(self['category_row_{}'.format(row_index)], '')
+            set_text_if_changed(self['category_state_{}'.format(row_index)], '')
+            set_visible(self['category_check_{}_empty'.format(row_index)], False)
+            set_visible(self['category_check_{}_tick'.format(row_index)], False)
+            set_visible(self['category_insert_{}'.format(row_index)], False)
             for edge in ('fill', 'top', 'bottom', 'left', 'right'):
-                self['category_focus_{}_{}'.format(row_index, edge)].hide()
+                set_visible(self['category_focus_{}_{}'.format(row_index, edge)], False)
 
     def _select_move_destination(self, distance):
         if not self._move_mode or not self._entries:
@@ -660,13 +671,17 @@ class GTM3UChannelSearchScreen(_FavoriteSupport, GTAsyncListScreen):
 
     @aux_refresh_after
     def _refresh(self):
-        GTAsyncListScreen._refresh(self)
+        if getattr(self, '_aux_kind', None) == 'channels':
+            if self._entries and not self._error:
+                self.selected_index %= len(self._entries)
+        else:
+            GTAsyncListScreen._refresh(self)
         if self._entries and (not self._error):
             if len(self._entries) >= M3U_SEARCH_RESULT_LIMIT:
                 message = _('First {} matching channels').format(M3U_SEARCH_RESULT_LIMIT)
             else:
                 message = _('{} channels found').format(len(self._entries))
-            self['message'].setText(message)
+            set_text_if_changed(self['message'], message)
 
     def toggle_favorite(self):
         if not self._entries or self._loading:
@@ -718,6 +733,8 @@ class _GTStreamListBase(GTAsyncListScreen):
             self._live_pending_target_index = None
             self._live_empty_more_batches = 0
         GTAsyncListScreen.start_load(self)
+        if self.content_type == 'live' and self._loading:
+            self._timer.start(LIVE_INITIAL_RESULT_POLL_MS, True)
 
     def load_items(self):
         entries = self.client.load_items(self.content_type, self.category.category_id)
@@ -745,7 +762,7 @@ class _GTStreamListBase(GTAsyncListScreen):
                 self._error = N_('Request timed out')
                 self._ready = True
             else:
-                self._timer.start(150, True)
+                self._timer.start(LIVE_INITIAL_RESULT_POLL_MS, True)
                 return
         if not self._live_initial_applied:
             self._live_initial_applied = True
@@ -1048,7 +1065,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
     """One live-list implementation for Xtream, Stalker and M3U sources."""
     _startup_preview = True
 
-    def __init__(self, session, account, content_type, category, client=None, weather_forecast=None, favorite_store=None, hidden_category_ids=None, live_source_categories=None):
+    def __init__(self, session, account, content_type, category, client=None, weather_forecast=None, favorite_store=None, hidden_category_ids=None, live_source_categories=None, *, defer_preview_exit=False):
         self.account = account
         self.category = category
         self._source_categories = list(live_source_categories or [category])
@@ -1109,6 +1126,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._live_picon_prefetch_priority = None
         self._live_picon_prefetch_completed = set()
         self._live_picon_prefetch_tokens = set()
+        self._live_picon_prefetch_active = set()
         self._live_picon_prefetch_worker_counts = {}
         self._init_programme_poster(eTimer, _connect_timer, settings)
         self._preview_item = None
@@ -1129,19 +1147,16 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._detail_store = {}
         self._detail_store_lock = threading.Lock()
         self._detail_store_epoch = 0
-        self._live_page_epg_generation = 0
-        self._live_page_epg_signature = None
-        self._live_page_epg_pending = ()
-        self._live_page_epg_state = None
-        self._live_page_epg_worker_lock = threading.Lock()
+        self._live_row_picon_revision = 0
+        self._live_row_picon_painted_revision = -1
         self._detail_foreground_state = None
-        self._detail_prefetch_state = None
-        self._detail_prefetch_deadline = 0.0
         self._live_more_worker_tokens = set()
         self._live_more_worker_events_lock = threading.Lock()
         self._pre_list_reference = None
         self._pre_list_reference_captured = False
         self._pre_list_restored = False
+        self._defer_preview_exit = defer_preview_exit
+        self._preview_restore_deferred = False
         self._playing_preview_item = None
         self._playing_preview_key = ''
         self._playing_preview_index = -1
@@ -1169,7 +1184,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._detail_dwell_timer = eTimer()
         self._detail_epg_retry_timer = eTimer()
         self._detail_poll_timer = eTimer()
-        self._detail_prefetch_timer = eTimer()
         self._detail_progress_timer = eTimer()
         self._summary_scroll_timer = eTimer()
         self._summary_text = ''
@@ -1178,8 +1192,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._summary_line_offset = 0
         self._live_clock_minute = ''
         self._epg_clock_timer = eTimer()
-        self._live_page_epg_dwell_timer = eTimer()
-        self._live_page_epg_poll_timer = eTimer()
         self._preview_dwell_timer = eTimer()
         self._preview_link_timer = eTimer()
         self._preview_video_timer = eTimer()
@@ -1189,12 +1201,9 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         _connect_timer(self._detail_dwell_timer, self._detail_dwell_fired)
         _connect_timer(self._detail_epg_retry_timer, self._selected_epg_retry_fired)
         _connect_timer(self._detail_poll_timer, self._detail_poll)
-        _connect_timer(self._detail_prefetch_timer, self._detail_prefetch_fired)
         _connect_timer(self._detail_progress_timer, self._detail_progress_tick)
         _connect_timer(self._summary_scroll_timer, self._summary_scroll_tick)
         _connect_timer(self._epg_clock_timer, self._epg_clock_tick)
-        _connect_timer(self._live_page_epg_dwell_timer, self._live_page_epg_start)
-        _connect_timer(self._live_page_epg_poll_timer, self._live_page_epg_poll)
         _connect_timer(self._preview_dwell_timer, self._preview_dwell_fired)
         _connect_timer(self._preview_link_timer, self._preview_link_tick)
         _connect_timer(self._preview_video_timer, self._preview_video_tick)
@@ -1243,8 +1252,15 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self.onLayoutFinish.append(self._preview_layout_ready)
             self.onLayoutFinish.append(self._refresh_summary_scroll_indicator)
             self.onLayoutFinish.append(self._refit_live_summary)
-            self.onLayoutFinish.append(self._refit_live_channel_names)
         setup_broadcast(self, 'live', self._footer_layout_items)
+        self.onLayoutFinish.append(self._apply_initial_live_rows)
+        # Let the provider worker run while Enigma2 instantiates the skin.
+        self._start_initial_load()
+
+    def _apply_initial_live_rows(self):
+        if self._loading and self._ready and not self._live_initial_applied:
+            self._timer.stop()
+            self._poll_result()
 
     def show(self):
         if getattr(self, '_closed', False) or getattr(self, '_preview_fullscreen_surface_hidden', False):
@@ -1288,7 +1304,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
     def _show_preview_fullscreen_list(self):
         if not self._preview_fullscreen_surface_hidden or self._closed or self._fullscreen_active or (getattr(self.session, 'current_dialog', None) is not self):
             return
-        if self._preview_service_active:
+        if self._preview_service_active and not self._preview_video_timer.isActive():
             self._resume_preview_pig()
         self._preview_fullscreen_surface_hidden = False
         self.show()
@@ -1416,11 +1432,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self['stream_picon_{}'.format(index)].hide()
             self['stream_number_{}'.format(index)] = Label('')
             self['stream_name_{}'.format(index)] = Label('')
-            self['stream_program_{}'.format(index)] = Label('')
-            self['stream_progress_bg_{}'.format(index)] = Label('')
-            self['stream_progress_fill_{}'.format(index)] = Label('')
-            self['stream_progress_bg_{}'.format(index)].hide()
-            self['stream_progress_fill_{}'.format(index)].hide()
             self['stream_separator_{}'.format(index)] = Label('')
             self['stream_separator_{}'.format(index)].hide()
             self['stream_favorite_{}'.format(index)] = Pixmap()
@@ -1469,8 +1480,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self['engine_badge'] = Label(service_engine_label(self._active_live_service_type))
         self._progress_width = max(1, px(362))
         self._progress_height = max(1, px(10))
-        self._row_progress_width = max(1, px(96))
-        self._row_progress_height = max(1, px(10))
         self._clear_epg_progress()
         self._clear_live_active_picon()
         self._show_preview_fallback(_('SELECT A CHANNEL'))
@@ -1491,8 +1500,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 pass
         return False
 
-    def _current_navigation_reference(self):
-        navigation = getattr(self.session, 'nav', None)
+    @staticmethod
+    def _navigation_reference(navigation):
         getter = getattr(navigation, 'getCurrentlyPlayingServiceReference', None)
         if getter is None:
             return None
@@ -1500,6 +1509,9 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             return getter()
         except Exception:
             return None
+
+    def _current_navigation_reference(self):
+        return self._navigation_reference(getattr(self.session, 'nav', None))
 
     def _capture_pre_list_service(self):
         if self._pre_list_reference_captured:
@@ -1531,17 +1543,17 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
     def _show_preview_fallback(self, message=None):
         self._preview_fallback_visible = True
         try:
-            self['preview_mask'].show()
-            self['preview_hint'].setText(str(message or ''))
-            self['preview_hint'].show()
+            set_visible(self['preview_mask'], True)
+            set_text_if_changed(self['preview_hint'], str(message or ''))
+            set_visible(self['preview_hint'], True)
         except Exception:
             pass
 
     def _hide_preview_fallback(self):
         self._preview_fallback_visible = False
         try:
-            self['preview_mask'].hide()
-            self['preview_hint'].hide()
+            set_visible(self['preview_mask'], False)
+            set_visible(self['preview_hint'], False)
         except Exception:
             pass
 
@@ -1682,7 +1694,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._preview_generation += 1
         self._cancel_preview_resolution(clear_target=True)
         self._live_modal_active = True
-        self._cancel_live_page_epg()
         cancel_prefetch = getattr(self, '_cancel_live_picon_prefetch', None)
         if callable(cancel_prefetch):
             cancel_prefetch(clear_render=True)
@@ -1744,7 +1755,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         cancel_prefetch = getattr(self, '_cancel_live_picon_prefetch', None)
         if callable(cancel_prefetch):
             cancel_prefetch(clear_render=True)
-        self._cancel_live_page_epg()
         self._cancel_selected_detail(clear_selection=True)
         with self._live_more_worker_events_lock:
             tokens = tuple(self._live_more_worker_tokens)
@@ -1752,23 +1762,20 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             _cancel_worker_token(token)
         return _GTStreamListBase.start_load(self)
 
-    def _refresh(self):
-        self._refresh_live_streams()
+    def _refresh(self, *, selection_only=False):
+        self._refresh_live_streams(selection_only=selection_only)
         if self._live_active_picon_reload_pending:
             self._live_active_picon_reload_pending = not bool(self._ensure_live_active_picon())
 
     def _set_live_channel_name(self, row_index, value):
+        if getattr(self, '_broadcast_kind', None) == 'live':
+            name = 'stream_name_{}'.format(row_index)
+            broadcast_text(self, name, value, 30, 2)
+            return self[name].getText()
         return fit_dynamic_text(self['stream_name_{}'.format(row_index)], value, max_lines=2, preferred_size=self._live_channel_name_font, min_size=self._live_channel_name_min_font)
 
-    def _refit_live_channel_names(self):
-        if self._closed or not self._entries:
-            return
-        page_start = int(self.selected_index / self.page_size) * self.page_size
-        for row_index, item in enumerate(self._entries[page_start:page_start + self.page_size]):
-            self._set_live_channel_name(row_index, str(item.name or ''))
-
     @broadcast_refresh_after
-    def _refresh_live_streams(self):
+    def _refresh_live_streams(self, *, selection_only=False):
         if self._closed or self._fullscreen_active:
             self._live_render_page_key = None
             return
@@ -1779,7 +1786,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             hide_scrollbar(self, 'list_scroll')
             return
         if not self._entries:
-            self['message'].setText(_('No channels found; press GREEN to try again.'))
+            set_text_if_changed(self['message'], _('No channels found; press GREEN to try again.'))
             self._clear_live_stream_rows()
             hide_scrollbar(self, 'list_scroll')
             self._maybe_load_more_live()
@@ -1789,6 +1796,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         page_items = self._entries[page_start:page_start + self.page_size]
         page_key = (page_start, tuple(((self._selection_key(item), str(getattr(item, 'name', '') or ''), self._is_favorite(item)) for item in page_items)))
         selected_row = self.selected_index - page_start
+        previous_row = self._live_render_selected_row
         page_changed = page_key != self._live_render_page_key
         if page_changed:
             plain_lines = []
@@ -1797,52 +1805,51 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 if present:
                     item = page_items[row_index]
                     absolute_index = page_start + row_index
-                    self['stream_row_bg_{}'.format(row_index)].show()
-                    self['stream_separator_{}'.format(row_index)].show()
-                    self['stream_number_{}'.format(row_index)].setText('{:04d}'.format(absolute_index + 1))
+                    set_visible(self['stream_row_bg_{}'.format(row_index)], True)
+                    set_visible(self['stream_separator_{}'.format(row_index)], True)
+                    set_text_if_changed(self['stream_number_{}'.format(row_index)], '{:04d}'.format(absolute_index + 1))
                     rendered_name = self._set_live_channel_name(row_index, str(item.name or ''))
                     plain_lines.append(rendered_name)
                     if self._is_favorite(item):
-                        self['stream_favorite_{}'.format(row_index)].show()
+                        set_visible(self['stream_favorite_{}'.format(row_index)], True)
                     else:
-                        self['stream_favorite_{}'.format(row_index)].hide()
+                        set_visible(self['stream_favorite_{}'.format(row_index)], False)
                 else:
-                    self['stream_row_bg_{}'.format(row_index)].hide()
-                    self['stream_separator_{}'.format(row_index)].hide()
-                    self['stream_number_{}'.format(row_index)].setText('')
-                    self['stream_name_{}'.format(row_index)].setText('')
-                    self['stream_program_{}'.format(row_index)].setText('')
-                    self['stream_progress_bg_{}'.format(row_index)].hide()
-                    self['stream_progress_fill_{}'.format(row_index)].hide()
-                    self['stream_row_art_{}'.format(row_index)].hide()
-                    self['stream_favorite_{}'.format(row_index)].hide()
-            self['items'].setText('\n'.join(plain_lines))
+                    set_visible(self['stream_row_bg_{}'.format(row_index)], False)
+                    set_visible(self['stream_separator_{}'.format(row_index)], False)
+                    set_text_if_changed(self['stream_number_{}'.format(row_index)], '')
+                    set_text_if_changed(self['stream_name_{}'.format(row_index)], '')
+                    set_visible(self['stream_row_art_{}'.format(row_index)], False)
+                    set_visible(self['stream_favorite_{}'.format(row_index)], False)
+            set_text_if_changed(self['items'], '\n'.join(plain_lines))
         if page_changed or selected_row != self._live_render_selected_row:
             affected_rows = range(self.page_size) if page_changed else (self._live_render_selected_row, selected_row)
             for row_index in affected_rows:
                 if row_index < 0 or row_index >= self.page_size:
                     continue
                 selected = row_index == selected_row
-                self['stream_focus_art_{}'.format(row_index)].hide()
+                set_visible(self['stream_focus_art_{}'.format(row_index)], False)
                 for edge in ('fill', 'top', 'bottom', 'left', 'right'):
                     focus = self['stream_focus_{}_{}'.format(row_index, edge)]
                     if selected and row_index < len(page_items):
-                        focus.show()
+                        set_visible(focus, True)
                     else:
-                        focus.hide()
+                        set_visible(focus, False)
         self._live_render_page_key = page_key
         self._live_render_selected_row = selected_row
-        self._refresh_live_row_epg(page_start, page_items)
-        self._schedule_live_page_epg(page_start, page_items)
-        self._queue_live_category_picons(page_start, page_items)
-        self._refresh_live_active_picon(page_start=page_start, page_items=page_items)
-        self._refresh_selected_picon()
-        self['message'].setText('{} / {}'.format(self.selected_index + 1, len(self._entries)))
+        if getattr(self, '_broadcast_kind', None) != 'live':
+            set_text_if_changed(self['message'], '{} / {}'.format(self.selected_index + 1, len(self._entries)))
         update_scrollbar(self, 'list_scroll', len(self._entries), self.selected_index, self.page_size, self._list_scroll_geometry)
         self._schedule_selected_detail()
+        if page_changed or not selection_only:
+            self._queue_live_category_picons(page_start, page_items)
+        elif self._live_row_picon_painted_revision != self._live_row_picon_revision:
+            self._refresh_live_visible_picons(page_start=page_start, page_items=page_items)
         self._schedule_preview_for_selection()
         self._maybe_load_more_live()
         self._prefetch_remaining_live_catalog()
+        if selection_only:
+            refresh_live_selection(self, page_changed, previous_row)
 
     def _prefetch_remaining_live_catalog(self):
         """Read only enough catalogue rows for the visible and next page."""
@@ -1860,19 +1867,16 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._live_render_page_key = None
         self._live_render_selected_row = -1
         for row_index in range(LIVE_STREAM_PAGE_SIZE):
-            self['stream_number_{}'.format(row_index)].setText('')
-            self['stream_name_{}'.format(row_index)].setText('')
-            self['stream_program_{}'.format(row_index)].setText('')
-            self['stream_row_bg_{}'.format(row_index)].hide()
-            self['stream_separator_{}'.format(row_index)].hide()
-            self['stream_progress_bg_{}'.format(row_index)].hide()
-            self['stream_progress_fill_{}'.format(row_index)].hide()
-            self['stream_row_art_{}'.format(row_index)].hide()
-            self['stream_focus_art_{}'.format(row_index)].hide()
-            self['stream_picon_{}'.format(row_index)].hide()
-            self['stream_favorite_{}'.format(row_index)].hide()
+            set_text_if_changed(self['stream_number_{}'.format(row_index)], '')
+            set_text_if_changed(self['stream_name_{}'.format(row_index)], '')
+            set_visible(self['stream_row_bg_{}'.format(row_index)], False)
+            set_visible(self['stream_separator_{}'.format(row_index)], False)
+            set_visible(self['stream_row_art_{}'.format(row_index)], False)
+            set_visible(self['stream_focus_art_{}'.format(row_index)], False)
+            set_visible(self['stream_picon_{}'.format(row_index)], False)
+            set_visible(self['stream_favorite_{}'.format(row_index)], False)
             for edge in ('fill', 'top', 'bottom', 'left', 'right'):
-                self['stream_focus_{}_{}'.format(row_index, edge)].hide()
+                set_visible(self['stream_focus_{}_{}'.format(row_index, edge)], False)
 
     def _select(self, index):
         if self._channel_move is not None:
@@ -1892,6 +1896,10 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if index >= len(self._entries) and self._live_has_more:
             self._live_pending_target_index = max(int(index), int(self._live_pending_target_index or 0))
             self._start_live_more(force=True)
+            return
+        if getattr(self, '_broadcast_kind', None) == 'live' and not self._error:
+            self.selected_index = index % len(self._entries)
+            self._refresh(selection_only=True)
             return
         GTAsyncListScreen._select(self, index)
 
@@ -1979,7 +1987,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         key = self._selection_key(item)
         if not key:
             return
-        self._cancel_live_page_epg()
         try:
             timeout = max(3, min(15, int(getattr(self.client, 'timeout', 12))))
         except (TypeError, ValueError, OverflowError):
@@ -2004,6 +2011,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             if _is_stalker_client(self.client):
                 self._stream_diag_play_id = uuid.uuid4().hex[:10]
                 self._stream_diag_started_at = time.monotonic()
+        self._cancel_selected_detail(clear_selection=True)
         if _is_stalker_client(self.client):
             self._stop_preview_stream_diag()
             self._preview_stream_diag('link-request', 'outcome=started')
@@ -2139,14 +2147,13 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             return
         self._schedule_selected_detail()
         self._resume_preview_pig()
-        self._schedule_live_page_epg()
 
     def _preview_link_failed(self, reason='unavailable', error=None):
         self._preview_stream_diag('start-failed', 'reason={} error_type={}'.format(reason, error.__class__.__name__ if error is not None else 'none'))
         requested = self._preview_fullscreen_requested
         self._cancel_preview_resolution(clear_target=False)
         self._show_preview_fallback(_('Could not open the stream.'))
-        self._schedule_live_page_epg()
+        self._schedule_selected_detail()
         if requested:
             self['message'].setText(_('Could not open the stream.'))
 
@@ -2245,8 +2252,14 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                     entry.pop('epg_captured_at', None)
                     entry['epg_retry_after'] = now_mono + LIVE_DETAIL_EMPTY_RETRY_SECONDS
             elif component == 'picon_path':
-                path = str(value or '').strip()
-                if path and _valid_live_picon_file(path):
+                path = artwork_path(value)
+                if not path or not _valid_live_picon_file(path):
+                    path = ''
+                previous = entry.get('picon_path', '')
+                if (path != previous
+                        or getattr(path, 'file_identity', None) != getattr(previous, 'file_identity', None)):
+                    self._live_row_picon_revision = getattr(self, '_live_row_picon_revision', 0) + 1
+                if path:
                     entry['picon_path'] = path
                     entry['picon_cached_at'] = now_mono
                     entry['picon_captured_at'] = now_wall
@@ -2260,25 +2273,17 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             if len(self._detail_store) > LIVE_EPG_CACHE_MAX_ENTRIES:
                 oldest = sorted(self._detail_store, key=lambda key: self._detail_store[key].get('updated_at', 0.0))
                 for key in oldest[:len(self._detail_store) - LIVE_EPG_CACHE_MAX_ENTRIES]:
-                    self._detail_store.pop(key, None)
+                    removed = self._detail_store.pop(key)
+                    if removed.get('picon_path'):
+                        self._live_row_picon_revision = getattr(self, '_live_row_picon_revision', 0) + 1
         return True
 
-    def _detail_store_snapshot(self, stream_id, item=None):
-        """Return fresh local EPG/logo data; this method never uses HTTP."""
+    def _detail_store_snapshot(self, stream_id, item=None, *, picon_only=False):
+        """Read screen-local details without consulting the provider EPG cache."""
         stream_id = str(stream_id or '')
         now = time.monotonic()
         with self._detail_store_lock:
             entry = dict(self._detail_store.get(stream_id, {}))
-        events = []
-        epg_cached_at = float(entry.get('epg_cached_at', 0.0) or 0.0)
-        if entry.get('events') and now - epg_cached_at < LIVE_DETAIL_CACHE_TTL_SECONDS:
-            events = list(entry['events'])
-        if not events:
-            events = self._cached_epg_snapshot(stream_id)
-            if events:
-                self._store_detail_component(stream_id, 'events', events)
-        epg_retry_after = float(entry.get('epg_retry_after', 0.0) or 0.0)
-        epg_checked = bool(events) or now < epg_retry_after
         path = artwork_path(entry.get('picon_path', '') or '')
         picon_cached_at = float(entry.get('picon_cached_at', 0.0) or 0.0)
         if not path or not _valid_live_picon_file(path) or now - picon_cached_at >= LIVE_DETAIL_CACHE_TTL_SECONDS:
@@ -2292,6 +2297,14 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         else:
             url = ''
         picon_checked = bool(path or not url or _picon_failure_active(url))
+        if picon_only:
+            return {'picon_path': path, 'picon_checked': picon_checked}
+        events = []
+        epg_cached_at = float(entry.get('epg_cached_at', 0.0) or 0.0)
+        if entry.get('events') and now - epg_cached_at < LIVE_DETAIL_CACHE_TTL_SECONDS:
+            events = list(entry['events'])
+        epg_retry_after = float(entry.get('epg_retry_after', 0.0) or 0.0)
+        epg_checked = bool(events) or now < epg_retry_after
         with self._detail_store_lock:
             stored = dict(self._detail_store.get(stream_id, {}))
         captured_at = max(float(stored.get('epg_captured_at', 0.0) or 0.0), float(stored.get('picon_captured_at', 0.0) or 0.0))
@@ -2314,7 +2327,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         page_key = (page_start, tuple((self._selection_key(item) for item in items)))
         return (page_key, items)
 
-    def _show_selected_local_detail(self, item, key):
+    def _show_selected_local_detail(self, item, key, cached=None):
         if key != self._detail_selection_key or not self._detail_selection_started_at:
             self._detail_selection_started_at = time.monotonic()
         ellipsize_dynamic_text(self['ribbon_channel'], localized_upper(item.name), fallback_chars=58)
@@ -2325,22 +2338,22 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 pass
         self._detail_selection_key = key
         self._preview_item = item
-        cached = self._detail_store_snapshot(key, item=item)
+        if cached is None:
+            cached = self._detail_store_snapshot(key, item=item)
         self._preview_epg_events = list(cached.get('events', ()))
         self._preview_epg_loaded_at = time.time() if self._preview_epg_events else 0.0
         self._detail_picon_path = artwork_path(cached.get('picon_path', '') or '')
         self._detail_picon_loaded_at = time.monotonic() if self._detail_picon_path else 0.0
-        self._refresh_live_active_picon()
         if self._preview_epg_events:
             self._render_selected_epg(self._preview_epg_events)
             self._detail_progress_timer.start(LIVE_DETAIL_PROGRESS_INTERVAL_MS, True)
         elif cached.get('epg_checked') or self._provider_epg_loader() is None:
             self._render_selected_epg([])
         else:
-            self._render_detail_waiting(item)
+            self._render_detail_waiting()
 
     def _schedule_selected_detail(self):
-        if self._closed or self._fullscreen_active or (not self._entries):
+        if self._closed or self._fullscreen_active or self._loading or self._live_modal_active or not self._entries:
             return
         item = self._entries[self.selected_index]
         key = self._selection_key(item)
@@ -2353,23 +2366,19 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._cancel_selected_detail(clear_selection=False)
         if page_changed:
             self._detail_page_key = page_key
-        if selection_changed or page_changed:
-            self._show_selected_local_detail(item, key)
         cached = self._detail_store_snapshot(key, item=item)
-        epg_complete = bool(cached.get('epg_checked') or self._selected_epg_loader() is None)
-        selected_complete = epg_complete
-        preview_ready = self._selected_detail_preview_ready(key)
-        if selected_complete:
-            if preview_ready:
-                if not cached.get('events') and self._provider_epg_loader() is not None:
-                    self._schedule_selected_epg_retry(key)
-                self._schedule_detail_prefetch()
+        if selection_changed or page_changed:
+            self._show_selected_local_detail(item, key, cached)
+        if self._provider_epg_loader() is None:
             return
-        if not preview_ready:
+        if cached.get('epg_checked'):
+            if not cached.get('events'):
+                self._schedule_selected_epg_retry(key)
             return
         if self._detail_state_active(self._detail_foreground_state):
             return
-        detail_dwell_ms = _live_detail_dwell_ms(self.client)
+        # Load the side guide only after the highlight settles on one channel.
+        detail_dwell_ms = 550
         self._detail_deadline = time.monotonic() + detail_dwell_ms / 1000.0
         self._detail_dwell_timer.start(detail_dwell_ms, True)
         _debug('page detail dwell scheduled page={} selected={} delay_ms={}'.format(page_key[0], key, detail_dwell_ms))
@@ -2398,21 +2407,18 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._cancel_programme_poster()
         self._detail_epg_retry_key = ''
         self._detail_epg_retry_deadline = 0.0
-        for timer in (self._detail_dwell_timer, self._detail_epg_retry_timer, self._detail_poll_timer, self._detail_prefetch_timer, self._detail_progress_timer, self._summary_scroll_timer):
+        for timer in (self._detail_dwell_timer, self._detail_epg_retry_timer, self._detail_poll_timer, self._detail_progress_timer, self._summary_scroll_timer):
             try:
                 timer.stop()
             except Exception:
                 pass
         self._summary_selection_key = None
         hide_scrollbar(self, 'summary_scrollbar')
-        self['summary_scroll'].setText('')
+        set_text_if_changed(self['summary_scroll'], '')
         self._detail_generation += 1
         self._cancel_detail_state(self._detail_foreground_state)
-        self._cancel_detail_state(self._detail_prefetch_state)
         self._detail_foreground_state = None
-        self._detail_prefetch_state = None
         self._detail_deadline = 0.0
-        self._detail_prefetch_deadline = 0.0
         with self._detail_results_lock:
             self._detail_results = {}
         if clear_selection:
@@ -2448,7 +2454,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._schedule_selected_detail()
 
     def _detail_dwell_fired(self):
-        if self._closed or self._fullscreen_active or (not self._entries):
+        if self._closed or self._fullscreen_active or self._loading or self._live_modal_active or self._preview_link_pending or not self._entries:
             return
         remaining = self._detail_deadline - time.monotonic()
         if remaining > 0.01:
@@ -2463,9 +2469,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         stream_id = self._selection_key(selected)
         if not stream_id or stream_id != self._detail_selection_key:
             return
-        if not self._selected_detail_preview_ready(stream_id):
-            return
-        if _is_stalker_client(self.client):
+        if _is_stalker_client(self.client) and self._preview_service_active:
             now = time.monotonic()
             started_at = float(self._preview_service_started_at or 0.0)
             elapsed_ms = max(0, int(round((now - started_at) * 1000))) if started_at > 0.0 else 0
@@ -2475,28 +2479,22 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 self._detail_deadline = now + delay_ms / 1000.0
                 self._detail_dwell_timer.start(delay_ms, True)
                 return
-        epg_loader = self._selected_epg_loader()
         cached = self._detail_store_snapshot(stream_id, item=selected)
-        needs_epg = bool(epg_loader is not None and (not cached.get('epg_checked')))
-        if not needs_epg:
-            self._schedule_detail_prefetch()
+        if cached.get('epg_checked') or self._provider_epg_loader() is None:
             return
         generation = self._detail_generation
         store_epoch = self._detail_store_epoch
-        state = {'generation': generation, 'stream_id': stream_id, 'events': {}, 'tokens': {}}
-        workers = []
-        if needs_epg:
-            event = threading.Event()
-            token = _WorkerToken(LIVE_DETAIL_EPG_TIMEOUT_SECONDS)
-            state['events']['events'] = event
-            state['tokens']['events'] = token
-            workers.append(threading.Thread(target=self._load_selected_epg_worker, args=(generation, stream_id, event, store_epoch, token)))
-        self._detail_foreground_state = state
-        for worker in workers:
-            worker.daemon = True
-            worker.start()
+        event = threading.Event()
+        token = _WorkerToken(LIVE_DETAIL_EPG_TIMEOUT_SECONDS)
+        self._detail_foreground_state = {
+            'generation': generation, 'stream_id': stream_id,
+            'events': {'events': event}, 'tokens': {'events': token},
+        }
+        worker = threading.Thread(target=self._load_selected_epg_worker, args=(generation, stream_id, event, store_epoch, token))
+        worker.daemon = True
+        worker.start()
         self._detail_poll_timer.start(75, True)
-        _debug('selected detail started page={} selected={} epg={}'.format(page_key[0], stream_id, needs_epg))
+        _debug('selected EPG started page={} selected={}'.format(page_key[0], stream_id))
 
     def _provider_epg_loader(self):
         loader = getattr(self.client, 'load_epg', None)
@@ -2510,11 +2508,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             return False
         return self._same_service_reference(self._current_navigation_reference(), self._playing_preview_reference)
 
-    def _selected_epg_loader(self):
-        if not self._selected_detail_preview_ready(self._detail_selection_key):
-            return None
-        return self._provider_epg_loader()
-
     def _load_selected_epg_worker(self, generation, stream_id, worker_event, store_epoch=None, worker_token=None):
         started = time.monotonic()
         outcome = 'empty'
@@ -2522,8 +2515,9 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         try:
             if worker_token is not None:
                 worker_token.check()
+            events = self._cached_epg_snapshot(stream_id)
             loader = self._provider_epg_loader()
-            if loader is not None:
+            if not events and loader is not None:
                 events = _bounded_client_call(self.client, worker_token, lambda: _load_shared_live_epg(self.client, stream_id, LIVE_EPG_FETCH_LIMIT, loader, token=worker_token))
             if worker_token is not None:
                 worker_token.check()
@@ -2543,191 +2537,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         return _load_live_picon_path(self.client, item, worker_token=worker_token)
 
     @staticmethod
-    def _current_live_row_event(events, now=None):
-        """Return the programme airing now without starting provider work."""
-        now = int(time.time() if now is None else now)
-        fallback = None
-        for event in tuple(events or ()):
-            try:
-                start = int(getattr(event, 'start_timestamp', 0) or 0)
-                end = int(getattr(event, 'end_timestamp', 0) or 0)
-            except (TypeError, ValueError, OverflowError):
-                start, end = (0, 0)
-            if start and end and (start <= now < end):
-                return event
-            if fallback is None and (not start or start <= now) and (not (end and end <= now)):
-                fallback = event
-        return fallback
-
-    @broadcast_refresh_after
-    def _refresh_live_row_epg(self, page_start=None, page_items=None):
-        """Paint current titles/progress from RAM only for visible rows."""
-        if self._closed or self._fullscreen_active or getattr(self, '_live_modal_active', False):
-            return
-        if page_start is None:
-            page_start = int(self.selected_index / self.page_size) * self.page_size
-        if page_items is None:
-            page_items = self._entries[page_start:page_start + self.page_size]
-        now = int(time.time())
-        for row_index in range(self.page_size):
-            program = self['stream_program_{}'.format(row_index)]
-            progress_bg = self['stream_progress_bg_{}'.format(row_index)]
-            progress_fill = self['stream_progress_fill_{}'.format(row_index)]
-            if row_index >= len(page_items):
-                program.setText('')
-                progress_bg.hide()
-                progress_fill.hide()
-                continue
-            item = page_items[row_index]
-            key = self._selection_key(item)
-            cached = self._detail_store_snapshot(key, item=item)
-            event = self._current_live_row_event(cached.get('events'), now=now)
-            if event is None:
-                program.setText('')
-                progress_bg.hide()
-                progress_fill.hide()
-                continue
-            ellipsize_dynamic_text(program, str(getattr(event, 'title', '') or ''), fallback_chars=21)
-            ratio, unused_label = self._progress_details(event)
-            if ratio <= 0.0:
-                progress_bg.hide()
-                progress_fill.hide()
-                continue
-            try:
-                progress_fill.instance.resize(eSize(max(1, int(round(self._row_progress_width * ratio))), self._row_progress_height))
-            except Exception:
-                pass
-            progress_bg.show()
-            progress_fill.show()
-
-    def _cancel_live_page_epg(self):
-        self._live_page_epg_generation += 1
-        self._live_page_epg_signature = None
-        self._live_page_epg_pending = ()
-        for timer in (self._live_page_epg_dwell_timer, self._live_page_epg_poll_timer):
-            try:
-                timer.stop()
-            except Exception:
-                pass
-        state = self._live_page_epg_state
-        self._live_page_epg_state = None
-        if state is not None:
-            with state['lock']:
-                state['cancelled'].set()
-                _cancel_worker_token(state.get('token'))
-                state['results'].clear()
-
-    def _schedule_live_page_epg(self, page_start=None, page_items=None):
-        """Queue missing EPG for the visible page, keeping navigation local."""
-        if self._closed or self._fullscreen_active or self._loading or self._live_modal_active or self._preview_link_pending:
-            return
-        if page_start is None:
-            page_start = int(self.selected_index / self.page_size) * self.page_size
-        if page_items is None:
-            page_items = self._entries[page_start:page_start + self.page_size]
-        signature = (page_start, tuple((self._selection_key(item) for item in page_items)))
-        if signature == self._live_page_epg_signature:
-            return
-        self._cancel_live_page_epg()
-        self._live_page_epg_signature = signature
-        if not page_items or self._provider_epg_loader() is None:
-            return
-        missing = []
-        seen = set()
-        for item in page_items:
-            key = self._selection_key(item)
-            if not key or key in seen:
-                continue
-            seen.add(key)
-            if not self._detail_store_snapshot(key, item=item).get('epg_checked'):
-                missing.append(key)
-        if not missing:
-            return
-        selected_key = self._selection_key(self._entries[self.selected_index])
-        if selected_key in missing and missing[0] != selected_key:
-            missing.remove(selected_key)
-            missing.insert(0, selected_key)
-        self._live_page_epg_pending = tuple(missing)
-        dwell = STALKER_LIVE_PAGE_EPG_DWELL_MS if _is_stalker_client(self.client) else LIVE_PAGE_EPG_DWELL_MS
-        self._live_page_epg_dwell_timer.start(dwell, True)
-
-    def _live_page_epg_start(self):
-        if self._closed or self._fullscreen_active or self._loading:
-            return
-        if self._live_modal_active or self._preview_link_pending:
-            self._live_page_epg_dwell_timer.start(500, True)
-            return
-        pending = self._live_page_epg_pending
-        if not pending or self._provider_epg_loader() is None:
-            return
-        if _is_stalker_client(self.client) and self._preview_service_active:
-            elapsed_ms = int(1000 * max(0.0, time.monotonic() - self._preview_service_started_at))
-            remaining = STALKER_LIVE_EPG_QUIET_MS - elapsed_ms
-            if remaining > 0:
-                self._live_page_epg_dwell_timer.start(remaining, True)
-                return
-        with self._detail_store_lock:
-            store_epoch = self._detail_store_epoch
-        state = {'generation': self._live_page_epg_generation, 'signature': self._live_page_epg_signature, 'keys': pending, 'epoch': store_epoch, 'cancelled': threading.Event(), 'done': threading.Event(), 'lock': threading.Lock(), 'token': None, 'results': deque()}
-        self._live_page_epg_pending = ()
-        self._live_page_epg_state = state
-        worker = threading.Thread(target=self._load_live_page_epg_worker, args=(state,))
-        worker.daemon = True
-        worker.start()
-        self._live_page_epg_poll_timer.start(LIVE_PAGE_EPG_POLL_MS, True)
-
-    def _load_live_page_epg_worker(self, state):
-        try:
-            with self._live_page_epg_worker_lock:
-                for key in state['keys']:
-                    if state['cancelled'].is_set():
-                        break
-                    token = _WorkerToken(LIVE_DETAIL_EPG_TIMEOUT_SECONDS)
-                    with state['lock']:
-                        if state['cancelled'].is_set():
-                            break
-                        state['token'] = token
-                    try:
-                        loader = self._provider_epg_loader()
-                        events = _bounded_client_call(self.client, token, lambda sid=key, fetch=loader: _load_shared_live_epg(self.client, sid, LIVE_EPG_FETCH_LIMIT, fetch, token=token)) if loader is not None else []
-                    except Exception:
-                        events = []
-                    finally:
-                        with state['lock']:
-                            if state['token'] is token:
-                                state['token'] = None
-                    if state['cancelled'].is_set():
-                        break
-                    with state['lock']:
-                        state['results'].append((key, list(events or [])))
-                    if state['cancelled'].wait(LIVE_PAGE_EPG_REQUEST_PAUSE_MS / 1000.0):
-                        break
-        finally:
-            state['done'].set()
-
-    def _live_page_epg_poll(self):
-        state = self._live_page_epg_state
-        if state is None or self._closed or self._fullscreen_active or (state['generation'] != self._live_page_epg_generation) or (state['signature'] != self._live_page_epg_signature):
-            return
-        with state['lock']:
-            results = list(state['results'])
-            state['results'].clear()
-            finished = state['done'].is_set()
-        changed = False
-        for key, events in results:
-            if not self._store_detail_component(key, 'events', events, expected_epoch=state['epoch']):
-                continue
-            changed = True
-            if self._entries and key == self._detail_selection_key and (key == self._selection_key(self._entries[self.selected_index])):
-                self._show_selected_local_detail(self._entries[self.selected_index], key)
-        if changed:
-            self._refresh_live_row_epg()
-        if finished:
-            self._live_page_epg_state = None
-        else:
-            self._live_page_epg_poll_timer.start(LIVE_PAGE_EPG_POLL_MS, True)
-
-    @staticmethod
     def _close_live_pixmap_loader(screen, key):
         try:
             loader = getattr(screen, '_gt_pixmap_loaders', {}).pop(key, None)
@@ -2736,9 +2545,15 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         except Exception:
             pass
 
-    def _clear_live_visible_picons(self, reset_signature=True):
+    def _clear_live_visible_picons(self, reset_signature=True, *, keep_ready=False):
         self._live_row_picon_generation += 1
+        self._live_row_picon_slots = {
+            row: slot for row, slot in self._live_row_picon_slots.items()
+            if slot['state'] == 'ready'
+        } if keep_ready else {}
         for row_index in range(int(getattr(self, 'page_size', LIVE_STREAM_PAGE_SIZE))):
+            if row_index in self._live_row_picon_slots:
+                continue
             self._close_live_pixmap_loader(self, 'live-row-picon-{}'.format(row_index))
             try:
                 self['stream_picon_{}'.format(row_index)].hide()
@@ -2759,7 +2574,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._live_selected_picon_signature = None
             self._cancel_programme_poster()
 
-    @broadcast_refresh_after
     def _refresh_live_visible_picons(self, force=False, page_start=None, page_items=None):
         """Decode only the picons currently visible on the ten-row page."""
         if self._closed or self._fullscreen_active or getattr(self, '_live_modal_active', False) or (not self._entries):
@@ -2770,39 +2584,63 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if page_items is None:
             page_items = self._entries[page_start:page_start + self.page_size]
         page_items = tuple(page_items or ())
+        revision = getattr(self, '_live_row_picon_revision', 0)
         paths = []
         for item in page_items:
             key = self._selection_key(item)
-            cached = self._detail_store_snapshot(key, item=item)
-            path = artwork_path(cached.get('picon_path', '') or '')
-            if not path or not _valid_live_picon_file(path):
-                path = ''
-            paths.append((key, path))
+            cached = self._detail_store_snapshot(key, item=item, picon_only=True)
+            path = artwork_path(cached.get('picon_path', ''))
+            paths.append((key, path if path and _valid_live_picon_file(path) else ''))
         signature = (int(page_start), tuple(paths))
-        if not force and signature == self._live_row_picon_signature:
-            return
-        self._clear_live_visible_picons(reset_signature=False)
+        # A single completed/failed logo must not blank every other row.
+        # Row ownership also permits unfinished decodes to survive a refresh.
         self._live_row_picon_signature = signature
+        slots = getattr(self, '_live_row_picon_slots', None)
+        if slots is None:
+            slots = self._live_row_picon_slots = {}
         generation = self._live_row_picon_generation
-        for row_index, unused_pair in enumerate(paths):
-            unused_key, path = unused_pair
-            if not path:
-                continue
+        for row_index in range(self.page_size):
+            key, path = paths[row_index] if row_index < len(paths) else ('', '')
             widget_name = 'stream_picon_{}'.format(row_index)
             loader_key = 'live-row-picon-{}'.format(row_index)
+            instance = getattr(self[widget_name], 'instance', None)
+            try:
+                size = instance.size()
+                geometry = (int(size.width()), int(size.height()))
+            except (AttributeError, TypeError, ValueError):
+                geometry = None
+            expected = (key, path, getattr(path, 'file_identity', None), id(instance), geometry)
+            previous = slots.get(row_index)
+            if previous is not None and previous['signature'] == expected:
+                if previous['state'] == 'ready':
+                    set_visible(self[widget_name], True)
+                    continue
+                if previous['state'] in ('pending', 'empty') or time.monotonic() < previous.get('retry_at', 0):
+                    continue
+            # Invalidate the old callback before close() can notify it.
+            slot = slots[row_index] = {'signature': expected, 'state': 'pending'}
+            self._close_live_pixmap_loader(self, loader_key)
+            self[widget_name].hide()
+            if not path:
+                slot['state'] = 'empty'
+                continue
 
-            def loaded(success, row=row_index, expected=signature, owner=generation):
+            def loaded(success, row=row_index, current=slot, owner=generation):
                 widget = 'stream_picon_{}'.format(row)
-                if owner != self._live_row_picon_generation or expected != self._live_row_picon_signature or self._closed or self._fullscreen_active:
+                if (owner != self._live_row_picon_generation or slots.get(row) is not current
+                        or self._closed or self._fullscreen_active):
                     return
+                current['state'] = 'ready' if success else 'failed'
+                current['retry_at'] = 0 if success else time.monotonic() + 1
                 try:
-                    if success:
+                    if success and not getattr(self, '_live_modal_active', False):
                         self[widget].show()
                     else:
                         self[widget].hide()
                 except Exception:
                     pass
-            attach_native_alpha_pixmap(self, widget_name, path, key=loader_key, on_loaded=loaded)
+            attach_native_alpha_pixmap(self, widget_name, path, key=loader_key, on_loaded=loaded, show_on_load=False)
+        self._live_row_picon_painted_revision = revision
 
     def _refresh_selected_picon(self, force=False):
         """Refresh only the right poster; large channel logos were removed."""
@@ -2856,11 +2694,19 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._live_picon_prefetch_queue = deque((key for key in self._live_picon_prefetch_queue if key in jobs))
             for item in ordered_items:
                 key = self._selection_key(item)
-                if not key or key in self._live_picon_prefetch_known:
+                if not key:
                     continue
                 url = _safe_picon_url(getattr(item, 'icon', ''))
                 if not url:
                     continue
+                if key in self._live_picon_prefetch_known:
+                    if key in jobs or (generation, key) in self._live_picon_prefetch_active:
+                        continue
+                    # The disk cache or GUI path hint may have expired since
+                    # this key completed. A worker can recover/download it.
+                    if self._detail_store_snapshot(key, item=item, picon_only=True).get('picon_checked'):
+                        continue
+                    self._live_picon_prefetch_known.discard(key)
                 self._live_picon_prefetch_known.add(key)
                 jobs[key] = (item, self._detail_store_epoch)
                 self._live_picon_prefetch_queue.append(key)
@@ -2903,6 +2749,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                         self._live_picon_prefetch_worker_counts[generation] = active - 1
 
     def _live_picon_prefetch_worker(self, generation):
+        key = None
         try:
             while True:
                 with self._live_picon_prefetch_lock:
@@ -2910,12 +2757,15 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                         return
                     key = self._live_picon_prefetch_queue.popleft()
                     job = self._live_picon_prefetch_jobs.pop(key, None)
+                    if job is not None:
+                        self._live_picon_prefetch_active.add((generation, key))
                 if job is None:
                     continue
                 item, store_epoch = job
                 token = _WorkerToken(max(3, LIVE_PICON_DOWNLOAD_TIMEOUT + 2))
                 with self._live_picon_prefetch_lock:
                     if generation != self._live_picon_prefetch_generation:
+                        self._live_picon_prefetch_active.discard((generation, key))
                         token.cancel()
                         return
                     self._live_picon_prefetch_tokens.add(token)
@@ -2934,13 +2784,18 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 with self._live_picon_prefetch_lock:
                     current = bool(generation == self._live_picon_prefetch_generation and (not self._closed) and (not self._fullscreen_active) and (not getattr(self, '_live_modal_active', False)))
                 if not current:
+                    with self._live_picon_prefetch_lock:
+                        self._live_picon_prefetch_active.discard((generation, key))
                     return
                 self._store_detail_component(key, 'picon_path', path, expected_epoch=store_epoch)
                 with self._live_picon_prefetch_lock:
+                    self._live_picon_prefetch_active.discard((generation, key))
                     if generation == self._live_picon_prefetch_generation:
                         self._live_picon_prefetch_completed.add(key)
         finally:
             with self._live_picon_prefetch_lock:
+                if key is not None:
+                    self._live_picon_prefetch_active.discard((generation, key))
                 active = int(self._live_picon_prefetch_worker_counts.get(generation, 0))
                 if active <= 1:
                     self._live_picon_prefetch_worker_counts.pop(generation, None)
@@ -2998,7 +2853,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._live_active_picon_fetch_item = item
         self._live_active_picon_fetch_key = key
         self._refresh_live_active_picon(force=True)
-        cached = self._detail_store_snapshot(key, item=item)
+        cached = self._detail_store_snapshot(key, item=item, picon_only=True)
         if cached.get('picon_checked'):
             if not cached.get('picon_path'):
                 self._defer_live_active_picon_failure(item)
@@ -3025,15 +2880,17 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if not key:
             return False
         item = getattr(self, '_playing_preview_item', None)
-        for candidate in tuple(getattr(self, '_entries', ()) or ()):
-            if self._selection_key(candidate) == key:
-                item = candidate
-                break
+        entries = getattr(self, '_entries', ()) or ()
+        index = getattr(self, '_playing_preview_index', -1)
+        if 0 <= index < len(entries) and self._selection_key(entries[index]) == key:
+            item = entries[index]
+        else:
+            item = next((candidate for candidate in entries if self._selection_key(candidate) == key), item)
         if key == self._live_active_picon_fetch_key:
             self._refresh_live_active_picon()
             if not self._selected_detail_preview_ready(key) or item is None:
                 return True
-            cached = self._detail_store_snapshot(key, item=item)
+            cached = self._detail_store_snapshot(key, item=item, picon_only=True)
             cached_path = artwork_path(cached.get('picon_path', '') or '')
             if cached_path and _valid_live_picon_file(cached_path):
                 return True
@@ -3072,7 +2929,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if remaining > 0.01:
             self._live_active_picon_timer.start(max(10, int(round(remaining * 1000))), True)
             return
-        cached = self._detail_store_snapshot(key, item=item)
+        cached = self._detail_store_snapshot(key, item=item, picon_only=True)
         if cached.get('picon_checked'):
             if not cached.get('picon_path'):
                 self._defer_live_active_picon_failure(item)
@@ -3145,7 +3002,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             url = _safe_picon_url(getattr(item, 'icon', ''))
             if url:
                 _mark_picon_failure(url)
-        cached = self._detail_store_snapshot(key, item=item)
+        cached = self._detail_store_snapshot(key, item=item, picon_only=True)
         if not cached.get('picon_path') and item is not None:
             self._defer_live_active_picon_failure(item)
         self._refresh_live_active_picon(force=True)
@@ -3154,35 +3011,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         try:
             path = self._load_detail_picon_path(item, worker_token)
             self._publish_detail_component(generation, stream_id, 'picon_path', path, store_epoch=store_epoch)
-        except _WorkerCancelled:
-            pass
-        finally:
-            worker_event.set()
-
-    def _schedule_detail_prefetch(self):
-        return
-
-    def _detail_prefetch_fired(self):
-        return
-
-    def _load_detail_prefetch_worker(self, generation, jobs, worker_event, store_epoch=None, worker_token=None):
-        try:
-            for stream_id, item, needs_epg, needs_picon in jobs:
-                if worker_token is not None:
-                    worker_token.check()
-                if generation != self._detail_generation:
-                    return
-                if needs_epg:
-                    events = []
-                    loader = self._selected_epg_loader()
-                    if loader is not None:
-                        events = _bounded_client_call(self.client, worker_token, lambda sid=stream_id, selected_loader=loader: _load_shared_live_epg(self.client, sid, LIVE_EPG_FETCH_LIMIT, selected_loader, token=worker_token))
-                    if worker_token is not None:
-                        worker_token.check()
-                    self._store_detail_component(stream_id, 'events', list(events or []), expected_epoch=store_epoch)
-                if needs_picon:
-                    path = self._load_detail_picon_path(item, worker_token)
-                    self._store_detail_component(stream_id, 'picon_path', path, expected_epoch=store_epoch)
         except _WorkerCancelled:
             pass
         finally:
@@ -3219,13 +3047,12 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 self._preview_epg_events = list(value or [])
                 self._preview_epg_loaded_at = time.time()
                 self._render_selected_epg(self._preview_epg_events)
-                self._refresh_live_row_epg()
                 if self._preview_epg_events:
                     self._detail_progress_timer.start(LIVE_DETAIL_PROGRESS_INTERVAL_MS, True)
                 else:
                     self._schedule_selected_epg_retry(stream_id)
             elif component == 'picon_path':
-                path = str(value or '').strip()
+                path = artwork_path(value)
                 self._detail_picon_path = path if path and _valid_live_picon_file(path) else ''
                 self._detail_picon_loaded_at = time.monotonic() if self._detail_picon_path else 0.0
                 self._refresh_live_active_picon(force=True)
@@ -3233,7 +3060,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._detail_poll_timer.start(75, True)
         elif worker_finished:
             self._detail_foreground_state = None
-            self._schedule_detail_prefetch()
 
     def _detail_window(self, now=None):
         events = list(self._preview_epg_events or [])
@@ -3267,19 +3093,18 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._set_epg_progress(window[0])
         self._detail_progress_timer.start(LIVE_DETAIL_PROGRESS_INTERVAL_MS, True)
 
-    def _render_detail_waiting(self, item):
+    def _render_detail_waiting(self):
         self._schedule_programme_poster()
-        ellipsize_dynamic_text(self['ribbon_channel'], localized_upper(item.name), fallback_chars=58)
-        self['ribbon_now_time'].setText('--:--')
+        set_text_if_changed(self['ribbon_now_time'], '--:--')
         self._set_static_now_title(_('Waiting for programme information'))
-        self['ribbon_next_caption'].setText(_('NEXT'))
-        self['ribbon_next_time'].setText('')
+        set_text_if_changed(self['ribbon_next_caption'], _('NEXT'))
+        set_text_if_changed(self['ribbon_next_time'], '')
         self._set_static_next_title('')
         for row in ('now', 'next', 'third', 'fourth', 'fifth'):
             try:
-                self['epg_{}_time'.format(row)].setText('')
-                self['epg_{}_title'.format(row)].setText('')
-                self['epg_{}_status'.format(row)].setText('')
+                set_text_if_changed(self['epg_{}_time'.format(row)], '')
+                set_text_if_changed(self['epg_{}_title'.format(row)], '')
+                set_text_if_changed(self['epg_{}_status'.format(row)], '')
             except KeyError:
                 pass
         self._clear_epg_progress()
@@ -3291,19 +3116,19 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         unused_width, unused_height, px = _scale()
         events = self._detail_window() if events else []
         if not events:
-            self['ribbon_now_time'].setText('--:--')
+            set_text_if_changed(self['ribbon_now_time'], '--:--')
             self._set_static_now_title(_('EPG information unavailable.'))
-            self['ribbon_next_caption'].setText(_('NEXT'))
-            self['ribbon_next_time'].setText('')
+            set_text_if_changed(self['ribbon_next_caption'], _('NEXT'))
+            set_text_if_changed(self['ribbon_next_time'], '')
             self._set_static_next_title(_('EPG information unavailable.'))
-            self['epg_now_time'].setText('')
-            self['epg_now_title'].setText('')
-            self['epg_now_status'].setText('')
+            set_text_if_changed(self['epg_now_time'], '')
+            set_text_if_changed(self['epg_now_title'], '')
+            set_text_if_changed(self['epg_now_status'], '')
             for row in ('next', 'third', 'fourth', 'fifth'):
                 try:
-                    self['epg_{}_time'.format(row)].setText('')
-                    self['epg_{}_title'.format(row)].setText('')
-                    self['epg_{}_status'.format(row)].setText('')
+                    set_text_if_changed(self['epg_{}_time'.format(row)], '')
+                    set_text_if_changed(self['epg_{}_title'.format(row)], '')
+                    set_text_if_changed(self['epg_{}_status'.format(row)], '')
                 except KeyError:
                     pass
             self._clear_epg_progress()
@@ -3312,18 +3137,18 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         future_only = _epg_event_starts_in_future(events[0])
         current = None if future_only else events[0]
         if current is None:
-            self['ribbon_now_time'].setText('--:--')
+            set_text_if_changed(self['ribbon_now_time'], '--:--')
             self._set_static_now_title(_('EPG information unavailable.'))
-            self['epg_now_time'].setText('')
-            self['epg_now_title'].setText('')
-            self['epg_now_status'].setText('')
+            set_text_if_changed(self['epg_now_time'], '')
+            set_text_if_changed(self['epg_now_title'], '')
+            set_text_if_changed(self['epg_now_status'], '')
             self._clear_epg_progress()
         else:
-            self['ribbon_now_time'].setText(current.time_text() or '--:--')
+            set_text_if_changed(self['ribbon_now_time'], current.time_text() or '--:--')
             self._set_now_title(current.title)
-            self['epg_now_time'].setText(current.start or current.time_text() or '--:--')
+            set_text_if_changed(self['epg_now_time'], current.start or current.time_text() or '--:--')
             ellipsize_dynamic_text(self['epg_now_title'], current.title, fallback_chars=54)
-            self['epg_now_status'].setText(_('NOW'))
+            set_text_if_changed(self['epg_now_status'], _('NOW'))
             self._set_epg_progress(current)
         rows = ('next', 'third', 'fourth', 'fifth')
         statuses = (_('NEXT'), _('LATER'), _('LATER'), _('LATER'))
@@ -3337,15 +3162,15 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 continue
             offset = first_upcoming + row_offset
             event = events[offset] if offset < len(events) else None
-            time_label.setText(event.start or event.time_text() if event is not None else '')
+            set_text_if_changed(time_label, event.start or event.time_text() if event is not None else '')
             if event is None:
-                title_label.setText('')
+                set_text_if_changed(title_label, '')
             else:
                 fit_dynamic_text(title_label, event.title, max_lines=2, preferred_size=font_px(px, 22, max_height=64, vertical_padding=8), min_size=font_px(px, 18, max_height=64, vertical_padding=8), fallback_chars=54)
-            status_label.setText(statuses[row_offset] if event is not None else '')
+            set_text_if_changed(status_label, statuses[row_offset] if event is not None else '')
         upcoming = events[first_upcoming] if first_upcoming < len(events) else None
-        self['ribbon_next_caption'].setText(_('NEXT'))
-        self['ribbon_next_time'].setText(upcoming.start or upcoming.time_text() if upcoming is not None else '')
+        set_text_if_changed(self['ribbon_next_caption'], _('NEXT'))
+        set_text_if_changed(self['ribbon_next_time'], upcoming.start or upcoming.time_text() if upcoming is not None else '')
         if upcoming is None:
             self._set_static_next_title(_('EPG information unavailable.'))
         else:
@@ -3357,9 +3182,15 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._set_summary(_('No summary is available for this programme.'))
 
     def _set_now_title(self, value):
+        if getattr(self, '_broadcast_kind', None) == 'live':
+            self._r101_now_title = str(value or '')
+            broadcast_text(self, 'ribbon_now_title', self._r101_now_title, 36, 2)
+            return self['ribbon_now_title'].getText()
         return fit_dynamic_text(self['ribbon_now_title'], value, max_lines=2, preferred_size=self._ribbon_now_preferred_font, min_size=self._ribbon_now_min_font, fallback_chars=36)
 
     def _set_static_now_title(self, value):
+        if getattr(self, '_broadcast_kind', None) == 'live':
+            return self._set_now_title(value)
         return set_static_text(self['ribbon_now_title'], value, preferred_size=self._ribbon_now_preferred_font)
 
     def _set_static_next_title(self, value):
@@ -3386,19 +3217,18 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
 
     def _live_active_picon_target(self, page_start=None, page_items=None):
         """Return the visible exact-service row and its local picon path."""
-        entries = list(getattr(self, '_entries', ()) or ())
         if page_start is None:
             selected_index = int(getattr(self, 'selected_index', 0) or 0)
             page_size = max(1, int(getattr(self, 'page_size', 1) or 1))
             page_start = int(selected_index / page_size) * page_size
         page_start = int(page_start)
-        if page_items is None:
-            page_size = max(1, int(getattr(self, 'page_size', 1) or 1))
-            page_items = entries[page_start:page_start + page_size]
-        page_items = tuple(page_items or ())
         key = str(getattr(self, '_playing_preview_key', '') or '')
         if not key or not getattr(self, '_preview_service_active', False) or getattr(self, '_fullscreen_active', False) or (not self._same_service_reference(self._current_navigation_reference(), getattr(self, '_playing_preview_reference', None))):
             return (page_start, -1, '', '')
+        if page_items is None:
+            page_size = max(1, int(getattr(self, 'page_size', 1) or 1))
+            entries = getattr(self, '_entries', ()) or ()
+            page_items = entries[page_start:page_start + page_size]
         row_index = -1
         try:
             active_index = int(getattr(self, '_playing_preview_index', -1))
@@ -3416,13 +3246,12 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if row_index < 0:
             return (page_start, -1, key, '')
         item = page_items[row_index]
-        cached = self._detail_store_snapshot(key, item=item)
+        cached = self._detail_store_snapshot(key, item=item, picon_only=True)
         path = artwork_path(cached.get('picon_path', '') or '')
         if not path or not _valid_live_picon_file(path):
             path = ''
         return (page_start, row_index, key, path)
 
-    @broadcast_refresh_after
     def _refresh_live_active_picon(self, force=False, page_start=None, page_items=None):
         signature = self._live_active_picon_target(page_start=page_start, page_items=page_items)
         visible_refresh = getattr(self, '_refresh_live_visible_picons', None)
@@ -3464,12 +3293,18 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if callable(selected_refresh):
             selected_refresh(force=force)
 
-    @broadcast_refresh_after
-    def _update_epg_clock(self):
+    def _update_epg_clock(self, force=False):
         now = datetime.datetime.now()
+        broadcast = getattr(self, '_broadcast_kind', None) == 'live'
+        minute = now.strftime('%Y%m%d%H%M')
+        changed = minute != self._live_clock_minute
+        if not (changed or force):
+            if not broadcast:
+                set_text_if_changed(self['clock_time'], now.strftime('%H:%M:%S'))
+            return False
         try:
-            self['ribbon_clock'].setText(now.strftime('%H:%M'))
-            self['clock_time'].setText(now.strftime('%H:%M:%S'))
+            clock = now.strftime('%H:%M')
+            set_text_if_changed(self['ribbon_clock'], clock)
             localized = localized_date_text(now)
             year = str(now.year)
             if year not in localized:
@@ -3483,44 +3318,64 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             else:
                 weekday = localized_short_weekday(now.date().isoformat())
                 date_line = localized
-            self['clock_date'].setText('{}\n{}'.format(weekday, date_line))
+            if broadcast:
+                broadcast_text(self, 'clock_time', clock, 35)
+                broadcast_text(self, 'clock_date', ' · '.join((weekday, date_line)), 24)
+            else:
+                set_text_if_changed(self['clock_time'], now.strftime('%H:%M:%S'))
+                set_text_if_changed(self['clock_date'], '\n'.join((weekday, date_line)))
         except Exception:
             pass
-        minute = now.strftime('%Y%m%d%H%M')
-        if minute != self._live_clock_minute:
+        if changed:
             self._live_clock_minute = minute
-            self._refresh_live_row_epg()
+        return changed
 
     def start_epg_clock(self):
         if self._closed or self._fullscreen_active:
             return
-        self._update_epg_clock()
+        self._update_epg_clock(force=True)
         self._epg_clock_timer.start(1000, True)
 
     def _epg_clock_tick(self):
         if self._closed or self._fullscreen_active:
             return
-        self._update_epg_clock()
+        install_ready_live_art(self)
+        if self._update_epg_clock():
+            # Retry missing artwork when the current page stays open.
+            self._queue_live_category_picons()
+        else:
+            now = time.monotonic()
+            if any(slot['state'] == 'failed' and now >= slot.get('retry_at', 0)
+                   for slot in getattr(self, '_live_row_picon_slots', {}).values()):
+                self._refresh_live_visible_picons()
         self._schedule_programme_poster()
         self._epg_clock_timer.start(1000, True)
 
     def _clear_epg_progress(self):
-        self['epg_progress'].setText('')
-        self['epg_progress_fill'].hide()
+        set_text_if_changed(self['epg_progress'], '')
+        set_visible(self['epg_progress_fill'], False)
 
     def _set_epg_progress(self, event):
         ratio, value = self._progress_details(event)
         percent = value.split('•', 1)[0].strip() if value else ''
-        self['epg_progress'].setText(percent)
+        broadcast = getattr(self, '_broadcast_kind', None) == 'live'
+        if broadcast and percent.startswith('%'):
+            percent = percent[1:] + '%'
+        set_text_if_changed(self['epg_progress'], percent)
         fill = self['epg_progress_fill']
         if not value:
-            fill.hide()
+            set_visible(fill, False)
+            return
+        if broadcast:
+            # Use the presentation's scaling and integer-percent geometry so
+            # its next refresh does not undo a second, differently sized bar.
+            set_broadcast_progress(self, 'epg_progress_fill', round(ratio * 100), (56, 380, 398, 12))
             return
         try:
-            fill.instance.resize(eSize(max(1, int(round(self._progress_width * ratio))), self._progress_height))
+            set_size(fill, max(1, int(round(self._progress_width * ratio))), self._progress_height)
         except Exception:
             pass
-        fill.show()
+        set_visible(fill, True)
 
     def _refit_live_summary(self):
         if not self._closed and self._summary_text:
@@ -3537,7 +3392,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._summary_scroll_timer.stop()
         self._summary_text = rendered
         self._summary_selection_key = selection_key
-        self._summary_lines = _wrap_live_summary(rendered, self._summary_line_capacity, fits=lambda value: _line_fits(self['summary'], value, self._summary_text_width, self._summary_font_size, None))
+        if text_changed or force:
+            self._summary_lines = _wrap_live_summary(rendered, self._summary_line_capacity, fits=lambda value: _line_fits(self['summary'], value, self._summary_text_width, self._summary_font_size, None))
         self._summary_line_offset = 0
         self._render_summary_window()
         if len(self._summary_lines) > self._summary_visible_lines:
@@ -3548,7 +3404,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         lines = self._summary_lines
         offset = self._summary_line_offset
         visible = self._summary_visible_lines
-        self['summary'].setText('\n'.join(lines[offset:offset + visible]))
+        set_text_if_changed(self['summary'], '\n'.join(lines[offset:offset + visible]))
         self._refresh_summary_scroll_indicator()
 
     def _summary_scroll_tick(self):
@@ -3572,13 +3428,13 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         total = len(self._summary_lines)
         visible = self._summary_visible_lines
         if total <= visible:
-            self['summary_scroll'].setText('')
+            set_text_if_changed(self['summary_scroll'], '')
             hide_scrollbar(self, 'summary_scrollbar')
             return
         position = min(max(0, self._summary_line_offset), total - visible)
         pages = max(2, int(math.ceil(float(total) / visible)))
         current = 1 + int(round(float(position) * (pages - 1) / (total - visible)))
-        self['summary_scroll'].setText('{}/{}'.format(current, pages))
+        set_text_if_changed(self['summary_scroll'], '{}/{}'.format(current, pages))
         selected = int(round(float(position) * (total - 1) / (total - visible)))
         update_scrollbar(self, 'summary_scrollbar', total, selected, visible, self._summary_scrollbar_geometry)
 
@@ -3591,6 +3447,12 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         preview_picon_fresh = bool(self._detail_picon_path and _valid_live_picon_file(self._detail_picon_path) and (not self._detail_picon_loaded_at or now - self._detail_picon_loaded_at < LIVE_DETAIL_CACHE_TTL_SECONDS))
         if matches and (not selected.get('events')) and preview_epg_fresh:
             selected['events'] = list(self._preview_epg_events or [])
+        if not selected['events']:
+            cached_events = self._cached_epg_snapshot(stream_id)
+            if cached_events:
+                self._store_detail_component(stream_id, 'events', cached_events)
+                selected['events'] = cached_events
+                selected['captured_at'] = time.time()
         if matches and (not selected.get('picon_path')) and preview_picon_fresh:
             path = artwork_path(self._detail_picon_path or '')
             selected['picon_path'] = path
@@ -3667,12 +3529,13 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._begin_preview_link(item, index, request_fullscreen=False)
             return
         self._fullscreen_link_snapshot = self._snapshot_for_selected(item)
-        self._cancel_live_page_epg()
         self._cancel_preview_resolution(clear_target=True)
         self._cancel_selected_detail(clear_selection=False)
         cancel_prefetch = getattr(self, '_cancel_live_picon_prefetch', None)
         if callable(cancel_prefetch):
-            cancel_prefetch(clear_render=True)
+            cancel_prefetch(clear_render=False)
+        self._clear_live_visible_picons(keep_ready=True)
+        self._clear_live_selected_picon()
         self._cancel_live_active_picon_fetch(clear_target=True)
         self._clear_live_active_picon()
         with self._live_more_worker_events_lock:
@@ -3776,7 +3639,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         _cancel_worker_token(getattr(self, '_load_token', None))
         self._load_token = None
         self._load_generation += 1
-        self._cancel_live_page_epg()
         self._cancel_preview_resolution(clear_target=True)
         self._cancel_selected_detail(clear_selection=True)
         self._cancel_live_picon_prefetch(clear_render=True)
@@ -3878,23 +3740,28 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 self._clear_preview_service_state()
                 self._pre_list_restored = True
                 self._preview_auto_suspended_key = suspended_key
+        # Reuse the rendered page when the player returns to the same rows.
         self._detail_selection_key = None
         self._reload_favorite_keys()
-        self._live_render_page_key = None
         if self._live_more_loading:
             self._timer.start(100, True)
         self._refresh_live_streams()
+        self._show_preview_fullscreen_list()
         ensure_picon = getattr(self, '_ensure_live_active_picon', None)
         if callable(ensure_picon):
             ensure_picon()
         self.start_epg_clock()
-        self._show_preview_fullscreen_list()
 
     def close_list(self):
         if self._channel_move is not None:
             self.cancel_channel_move()
             return
-        if not self._release_preview_for_exit():
+        result = {'kind': 'live-list-category', 'category_id': str(getattr(self.category, 'category_id', '') or '')}
+        if (self._defer_preview_exit and self._preview_service_active
+                and self._playing_preview_reference is not None and not self._pre_list_restored):
+            result['preview_restore'] = (self._playing_preview_reference, self._pre_list_reference)
+            self._preview_restore_deferred = True
+        elif self._preview_service_active and not self._release_preview_for_exit():
             message = _('Keeping the current stream')
             self['message'].setText(message)
             if VideoWindow is None:
@@ -3902,7 +3769,33 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             elif self._preview_service_active:
                 self._resume_preview_pig()
             return
-        self.close({'kind': 'live-list-category', 'category_id': str(getattr(self.category, 'category_id', '') or '')})
+        self.close(result)
+
+    @staticmethod
+    def _restore_navigation(navigation, reference):
+        if navigation is None:
+            return False
+        try:
+            if reference is None:
+                navigation.stopService()
+            else:
+                from .browser_player import _play_service
+                _play_service(navigation, reference)
+        except Exception:
+            return False
+        return True
+
+    @classmethod
+    def restore_returned_preview(cls, navigation, preview_reference, previous_reference):
+        if not cls._same_service_reference(cls._navigation_reference(navigation), preview_reference):
+            return
+        restored = cls._restore_navigation(navigation, previous_reference)
+        if not restored and previous_reference is not None:
+            if cls._same_service_reference(cls._navigation_reference(navigation), preview_reference):
+                restored = cls._restore_navigation(navigation, None)
+        if restored:
+            from .browser_player import _m3u_navigation_changed
+            _m3u_navigation_changed(navigation)
 
     def _clear_preview_service_state(self):
         from .browser_player import _m3u_navigation_changed
@@ -3937,14 +3830,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if not self._preview_service_active:
             return True
         navigation = getattr(self.session, 'nav', None)
-        stopped = False
-        if navigation is not None:
-            try:
-                navigation.stopService()
-                stopped = True
-            except Exception:
-                pass
-        if stopped:
+        if self._restore_navigation(navigation, None):
             self._pre_list_restored = True
             self._clear_preview_service_state()
         return not self._preview_service_active
@@ -3969,22 +3855,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if self._pre_list_restored or not self._preview_service_active:
             return
         navigation = getattr(self.session, 'nav', None)
-        restored = False
-        if navigation is not None:
-            if self._pre_list_reference is None:
-                try:
-                    navigation.stopService()
-                    restored = True
-                except Exception:
-                    pass
-            else:
-                try:
-                    from .browser_player import _play_service
-                    _play_service(navigation, self._pre_list_reference)
-                    restored = True
-                except Exception:
-                    pass
-        if restored:
+        if self._restore_navigation(navigation, self._pre_list_reference):
             self._pre_list_restored = True
             self._clear_preview_service_state()
 
@@ -3994,7 +3865,11 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._preview_fullscreen_pending = None
         self._preview_fullscreen_surface_hidden = False
         self._stop_preview_stream_diag()
-        self._release_preview_for_exit()
+        if self._preview_restore_deferred:
+            self._cancel_live_startup()
+            self._suspend_preview_pig()
+        else:
+            self._release_preview_for_exit()
         GTAsyncListScreen._stop(self)
         with self._live_more_worker_events_lock:
             active_catalog_tokens = tuple(self._live_more_worker_tokens)
@@ -4004,7 +3879,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             _cancel_worker_token(token)
         self._live_catalog_generation += 1
         self._live_more_loading = False
-        self._cancel_live_page_epg()
         self._cancel_selected_detail(clear_selection=True)
         cancel_prefetch = getattr(self, '_cancel_live_picon_prefetch', None)
         if callable(cancel_prefetch):

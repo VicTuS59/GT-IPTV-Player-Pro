@@ -9,6 +9,9 @@ import time
 import xml.etree.ElementTree as ET
 
 from Components.ActionMap import ActionMap
+from .ui_update import set_visible
+from .ui_update import set_foreground, set_value
+from .typography import set_text_if_changed
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Components.ProgressBar import ProgressBar
@@ -26,6 +29,7 @@ except ImportError:
 from .epg_guide import clean_events, event_days, load_guide
 from .i18n import _, localized_date_text, localized_short_weekday, localized_upper
 from .paths import plugin_path
+from .remote_footer import prepared_skin
 from .remote_footer import decorate_remote_footer, footer_item, install_remote_footer
 from .scrollbar import hide_scrollbar, update_scrollbar
 from .smooth_scroll import GTSmoothScrollLabel
@@ -124,7 +128,7 @@ def _connect(timer, callback):
 
 class GTEPGGuideScreen(Screen):
     def __init__(self, session, client, item, reference, cached=None, seed_events=None):
-        self.skin = skin()
+        self.skin = prepared_skin(skin)
         Screen.__init__(self, session)
         self.client, self.item, self.reference = client, item, reference
         self._closed = False
@@ -243,7 +247,7 @@ class GTEPGGuideScreen(Screen):
         self._token = token
         self._pending = True
         self._requested_day = day
-        self["message"].setText(_("Loading EPG..."))
+        set_text_if_changed(self["message"], _("Loading EPG..."))
         worker = threading.Thread(target=self._worker, args=(generation, token, day))
         worker.daemon = True
         self._worker_thread = worker
@@ -271,7 +275,7 @@ class GTEPGGuideScreen(Screen):
             if self._token is not None and self._token.expired():
                 self._token.cancel()
                 self._pending = False
-                self["message"].setText(_("Could not load the programme guide."))
+                set_text_if_changed(self["message"], _("Could not load the programme guide."))
                 return
             self._timer.start(100, True)
             return
@@ -283,7 +287,7 @@ class GTEPGGuideScreen(Screen):
         self._token = None
         if error:
             self._render()
-            self["message"].setText(_("Could not load the programme guide."))
+            set_text_if_changed(self["message"], _("Could not load the programme guide."))
             return
         selected_day = self._selected_day()
         if self._requested_day is None:
@@ -354,8 +358,10 @@ class GTEPGGuideScreen(Screen):
     def change_programme(self, step):
         events = self._programmes()
         if events:
+            previous = self.programme_index
             self.programme_index = (self.programme_index + step) % len(events)
-            self._render()
+            same_page = previous // 8 == self.programme_index // 8
+            self._render(reuse_programme_rows=same_page)
 
     def today(self):
         self._select_now()
@@ -374,7 +380,6 @@ class GTEPGGuideScreen(Screen):
 
     def _text(self, name, value, lines=1):
         value = str(value or "")
-        self[name].setText(value)
         font = next((raw for key, raw in getattr(self[name], "skinAttributes", ()) if key == "font"), "")
         try:
             preferred = int(font.rsplit(";", 1)[-1])
@@ -383,7 +388,7 @@ class GTEPGGuideScreen(Screen):
         fit_dynamic_text(self[name], value, max_lines=lines,
             **({"preferred_size": preferred, "min_size": max(7, int(preferred * .72))} if preferred else {}))
 
-    def _render(self):
+    def _render(self, *, reuse_programme_rows=False):
         if self._closed:
             return
         today = datetime.date.today()
@@ -392,7 +397,7 @@ class GTEPGGuideScreen(Screen):
         for row in range(7):
             index = start + row
             focus = self["day_focus_{}".format(row)]
-            focus.show() if index == self.day_index and index < len(self._days) else focus.hide()
+            set_visible(focus, True) if index == self.day_index and index < len(self._days) else set_visible(focus, False)
             day = self._days[index] if index < len(self._days) else None
             primary = (_("Today") if day == today else _("Tomorrow") if day == today + datetime.timedelta(days=1)
                        else localized_short_weekday(day.isoformat()) if day is not None else "")
@@ -407,14 +412,15 @@ class GTEPGGuideScreen(Screen):
             index = page + row
             event = events[index] if index < len(events) else None
             focus = self["programme_focus_{}".format(row)]
-            focus.show() if event is not None and index == self.programme_index else focus.hide()
-            self._text("programme_time_{}".format(row), event.time_text().replace("-", " – ") if event else "")
-            self._text("programme_title_{}".format(row), event.title if event else "")
+            set_visible(focus, True) if event is not None and index == self.programme_index else set_visible(focus, False)
+            if not reuse_programme_rows:
+                self._text("programme_time_{}".format(row), event.time_text().replace("-", " – ") if event else "")
+                self._text("programme_title_{}".format(row), event.title if event else "")
             if parseColor is not None:
                 instance = getattr(self["programme_title_{}".format(row)], "instance", None)
                 if instance is not None:
-                    instance.setForegroundColor(parseColor("#8295AF" if event and event.end_timestamp <= moment and index != self.programme_index else "#FFFFFF"))
-        self["message"].setText(_("Loading EPG...") if self._pending and not events else
+                    set_foreground(self["programme_title_{}".format(row)], "#8295AF" if event and event.end_timestamp <= moment and index != self.programme_index else "#FFFFFF")
+        set_text_if_changed(self["message"], _("Loading EPG...") if self._pending and not events else
             _("No programmes for this day.") if self._days and not events else
             _("EPG information unavailable.") if not self._days else "")
         unused_w, unused_h, px, py = geometry()
@@ -426,15 +432,16 @@ class GTEPGGuideScreen(Screen):
         self._text("duration", _("Duration: {} min").format(max(1, int((event.end_timestamp - event.start_timestamp) / 60))) if event else "")
         description_key = (event.start_timestamp, event.title) if event else None
         if description_key != self._description_key:
-            self["description"].setText(event.description or _("Programme description unavailable.") if event else "")
+            set_text_if_changed(self["description"], event.description or _("Programme description unavailable.") if event else "")
             self._description_key = description_key
-        self._render_progress(event, moment)
+        if event is None:
+            self._render_progress(None, moment)
         self._tick()
 
     def _render_progress(self, event, moment):
         live = bool(event and event.start_timestamp <= moment < event.end_timestamp)
         progress = min(100, max(0, int((moment - event.start_timestamp) * 100 / (event.end_timestamp - event.start_timestamp)))) if event else 0
-        self["progress"].setValue(progress)
+        set_value(self["progress"], progress)
         self._text("programme_state", _("On air now") if live else _("Upcoming") if event and event.start_timestamp > moment else _("Finished") if event else "")
         self._text("remaining", _("{} min remaining").format(max(1, int((event.end_timestamp - moment + 59) // 60))) if live else "")
 
@@ -442,7 +449,7 @@ class GTEPGGuideScreen(Screen):
         if self._closed:
             return
         moment = time.time()
-        self["clock"].setText(time.strftime("%H:%M", time.localtime(moment)))
+        set_text_if_changed(self["clock"], time.strftime("%H:%M", time.localtime(moment)))
         self._text("date", localized_date_text(datetime.datetime.fromtimestamp(moment)))
         events = self._programmes()
         if events and self.programme_index < len(events):

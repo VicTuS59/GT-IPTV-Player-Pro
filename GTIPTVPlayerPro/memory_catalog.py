@@ -14,7 +14,7 @@ from .category_visibility import category_ids_visible
 from .content import ContentError, MovieSearchPage, _movie_search_text
 from .movie_catalog import CatalogLimitError, CATALOG_TTL, _check
 from .vod_catalog import _category_values
-from .packed_catalog import PackedRows
+from .packed_catalog import PackedRows, CategoryRows
 
 
 RAM_CATALOG_BYTES = 192 * 1024 * 1024
@@ -61,10 +61,11 @@ class _RamBudget:
                     raise limit("available-memory")
                 self.checked = now
 
-    def reserve(self, amount):
+    def reserve(self, amount, check_available=True):
         with self.lock:
             if amount > 0:
-                self.check()
+                if check_available:
+                    self.check()
                 if self.used + amount > self.maximum:
                     raise limit("catalog-memory")
             self.used = max(0, self.used + amount)
@@ -74,11 +75,20 @@ budget = _RamBudget()
 
 
 class _Generation:
-    def __init__(self, epoch, resize):
+    def __init__(self, epoch, resize, category_list=False, owner=None):
         self.epoch = epoch
         self.weight = 0
         self.updated = 0
-        self.rows = PackedRows(lambda delta: resize(self, delta))
+        rows_type = CategoryRows if category_list else PackedRows
+        if category_list and owner is not None:
+            if getattr(owner,'native_category',False):
+                from .native_rows import NativeRows
+                self.rows=NativeRows(lambda delta:resize(self,delta),owner)
+            else:
+                from .plain_catalog import PlainRows
+                self.rows=PlainRows(lambda delta:resize(self,delta),owner)
+        else:
+            self.rows = rows_type(lambda delta: resize(self, delta))
 
     def clear(self):
         budget.reserve(-self.weight)
@@ -160,15 +170,53 @@ def acquire_session(key):
 class MemoryCatalog:
     def __init__(self, owner):
         self.owner = weakref.proxy(owner)
+        self.check_available_memory = not getattr(owner, 'category_list', False)
+        self.max_bytes = owner.max_bytes
         self.session = acquire_session((owner.scope, owner.content_type))
         if owner._preference_set:
             self.session.preferred_category = owner.preferred_category
+
+    def borrow_complete(self, owner):
+        """Retain complete rows for a separate read-only search owner.
+
+        Do not block the GUI behind a producer/sort. Detach the registry entry
+        so a future category refresh gets a fresh session, rather than reusing
+        or mutating the retained search snapshot.
+        """
+        if not _registry_lock.acquire(False):
+            return None
+        try:
+            if not self.session.lock.acquire(False):
+                return None
+            try:
+                self.check()
+                if not self.session.state()['complete']:
+                    return None
+                clone = object.__new__(type(self))
+                clone.owner = weakref.proxy(owner)
+                clone.check_available_memory = self.check_available_memory
+                clone.max_bytes = self.max_bytes
+                clone.session = self.session
+                owner._snapshot_generation = self.session.active
+                self.session.owners += 1
+                key = (self.owner.scope, self.owner.content_type)
+                if _registry.get(key) is self.session:
+                    del _registry[key]
+                return clone
+            finally:
+                self.session.lock.release()
+        finally:
+            _registry_lock.release()
 
     def check(self, token=None, memory=False):
         _check(token)
         if self.owner._closed or self.session.closed:
             raise ContentError(reason=ContentError.CANCELLED)
-        if memory:
+        snapshot = getattr(self.owner, '_snapshot_generation', None)
+        if snapshot is not None and (self.session.active is not snapshot
+                or self.session.work is not None or self.session.reason):
+            raise ContentError(reason=ContentError.CANCELLED)
+        if memory and self.check_available_memory:
             budget.check(force=True)
 
     def state(self):
@@ -193,23 +241,39 @@ class MemoryCatalog:
         return record
 
     def resize(self, generation, delta):
+        try:
+            return self._resize(generation, delta)
+        except CatalogLimitError as error:
+            # Completed category caches are optional; discard them before
+            # allowing them to block the active category's admission.
+            try: ref = getattr(self.owner, '_category_cache_reclaimer', None)
+            except ReferenceError: raise error
+            reclaim = ref() if ref is not None else None
+            if delta <= 0 or reclaim is None or not reclaim(): raise
+            return self._resize(generation, delta)
+
+    def _resize(self, generation, delta):
         session = self.session
         with budget.lock:
             held = session.hold.weight if session.hold is not None and generation is session.work else 0
             if delta > 0:
-                budget.check()
-                if (session.weight() - held + delta > self.owner.max_bytes
+                if self.check_available_memory:
+                    budget.check()
+                try: maximum = self.owner.max_bytes
+                except ReferenceError: maximum = self.max_bytes
+                if (session.weight() - held + delta > maximum
                         or budget.used - held + delta > budget.maximum):
                     raise limit("catalog-memory")
                 if held:
                     session.hold.clear()
                     session.hold = None
-            budget.reserve(delta)
+            budget.reserve(delta, check_available=self.check_available_memory)
             generation.weight += delta
 
     def append(self, generation, record, token):
         self.check(token)
-        identity = record["i"]
+        identity = (generation.rows.raw_identity(record) if getattr(generation.rows, 'plain', False)
+                    else record["i"])
         if not self.owner._valid_id(identity):
             return
         session = self.session
@@ -222,6 +286,18 @@ class MemoryCatalog:
             session.revision += 1
             session.totals.clear()
             session.clear_queries()
+
+    def append_category_batch(self, generation, values, token, byte_size=None):
+        self.check(token)
+        options={'byte_size':byte_size} if getattr(generation.rows,'native',False) else {}
+        generation.rows.extend(values, lambda: self.check(token),
+                               self.owner._valid_id, self.owner.max_items,
+                               commit_lock=self.session.lock,**options)
+        with self.session.lock:
+            self.check(token)
+            self.session.revision += 1
+            self.session.totals.clear()
+            self.session.clear_queries()
 
     def prepare(self, token, callback, force):
         noticed = 0.0
@@ -248,7 +324,12 @@ class MemoryCatalog:
             return state
         with session.lock:
             self.check(token, memory=True)
-            if session.work is not None:
+            resume = (not force and not self.check_available_memory and session.active is None
+                      and session.work is not None and session.work.rows
+                      and getattr(session.work.rows, 'plain', False)
+                      and (not getattr(session.work.rows,'native',False)
+                           or str(getattr(self.owner.client,'source_type',''))=='stalker'))
+            if session.work is not None and not resume:
                 if session.active is None and session.work.rows:
                     if session.hold is not None:
                         session.hold.clear()
@@ -258,8 +339,16 @@ class MemoryCatalog:
             if session.active is not None and session.hold is not None:
                 session.hold.clear()
                 session.hold = None
-            session.epoch += 1
-            generation = session.work = _Generation(session.epoch, self.resize)
+            if resume:
+                # Playback/child screens may pause a partially visible list.
+                # Revisit native pages and deduplicate into that generation,
+                # so the GUI/player's existing prefix remains readable.
+                generation = session.work
+                if getattr(generation.rows,'native',False):generation.rows.begin_resume()
+            else:
+                session.epoch += 1
+                generation = session.work = _Generation(session.epoch, self.resize,
+                    category_list=not self.check_available_memory, owner=self.owner)
             session.preparing = True
             session.reason = session.limit_kind = ""
             session.done = session.total = 0
@@ -278,13 +367,50 @@ class MemoryCatalog:
 
         def collect(category_id="", category_name=""):
             self.check(token, memory=True)
-            iterator = getattr(self.owner.client, self.owner.stream_method)(category_id)
+            plain = getattr(generation.rows, 'plain', False)
+            native=getattr(generation.rows,'native',False)
+            suffix='native_batches' if native else 'category_batches'
+            batch_loader=(getattr(self.owner.client,'iter_'+self.owner.content_type+'_'+suffix,None) if plain else None)
+            if native and not callable(batch_loader):
+                loader=getattr(self.owner.client,'iter_'+self.owner.content_type+'_category_rows')
+                def batch_loader(category):
+                    from .category_response import CategoryBatch
+                    pending=[]
+                    for value in loader(category):
+                        pending.append(value)
+                        if len(pending)==512:
+                            yield CategoryBatch(pending,False);pending=[]
+                    if pending:yield CategoryBatch(pending,False)
+            if callable(batch_loader):
+                iterator = batch_loader(category_id)
+                try:
+                    with self.owner._request(token):
+                        for batch in iterator:
+                            self.owner.category_load_mode = 'atomic' if batch.atomic else 'progressive'
+                            self.append_category_batch(generation,batch.values,token,getattr(batch,'byte_size',None))
+                            processed[0] += len(batch.values)
+                            notify(final=True)
+                    return
+                finally:
+                    closer = getattr(iterator, 'close', None)
+                    if callable(closer): closer()
+            method = ('iter_series_category_rows' if self.owner.content_type=='series'
+                      else 'iter_movie_category_rows') if plain else self.owner.record_method
+            loader = (getattr(self.owner.client, method, None)
+                      if not self.check_available_memory else None)
+            direct = callable(loader)
+            iterator = (loader if direct else getattr(self.owner.client, self.owner.stream_method))(category_id)
             try:
                 with self.owner._request(token):
                     for item in iterator:
-                        self.append(generation, self.pack(item, category_id, category_name), token)
+                        if plain and category_id and getattr(self.owner, 'browse_category', None) is None:
+                            from .plain_catalog import SelectedRow
+                            item = SelectedRow(item, category_id, category_name)
+                        self.append(generation, item if direct or plain else self.pack(item, category_id, category_name), token)
                         processed[0] += 1
-                        if processed[0] % 250 == 0:
+                        if processed[0] == 1:
+                            notify(final=True)
+                        elif processed[0] % 250 == 0:
                             self.check(token, memory=True)
                             notify()
             finally:
@@ -363,7 +489,7 @@ class MemoryCatalog:
                 categories = categories or {"": ""}
                 with session.lock:
                     session.total = len(categories)
-                if str(getattr(self.owner.client, "source_type", "")) == "stalker":
+                if str(getattr(self.owner.client, "source_type", "")) == "stalker" and not getattr(generation.rows, 'plain', False):
                     collect_portal_categories(categories)
                 else:
                     for category_id, name in categories.items():
@@ -372,6 +498,8 @@ class MemoryCatalog:
                             session.done += 1
                         notify()
             self.check(token)
+            if getattr(generation.rows,'resume_pending',False):
+                raise ContentError(reason='incomplete')
             with session.lock:
                 self.check(token)
                 generation.rows.flush()
@@ -390,10 +518,11 @@ class MemoryCatalog:
                 if not session.closed:
                     session.preparing = False
                     session.reason = (getattr(error, "reason", "") or
-                                      ("limit" if isinstance(error, CatalogLimitError) else "incomplete"))
+                                      ("limit" if isinstance(error, (CatalogLimitError, MemoryError)) else "incomplete"))
                     if session.reason in (ContentError.CATALOG_ITEM_LIMIT, ContentError.RESPONSE_TOO_LARGE):
                         session.reason = "limit"
-                    session.limit_kind = getattr(error, "limit_kind", "")
+                    session.limit_kind = ('available-memory' if isinstance(error, MemoryError)
+                                          else getattr(error, "limit_kind", ""))
         state = session.state()
         if callable(callback):
             callback(state)
@@ -411,7 +540,9 @@ class MemoryCatalog:
         return item
 
     def search(self, query, page, page_size, hidden, token):
-        self.check(token, memory=True)
+        # Existing rows remain readable under pressure. Optional query/read
+        # caches may decline growth; only producers need the RAM reserve.
+        self.check(token)
         page, page_size = max(1, int(page)), max(1, min(100, int(page_size)))
         terms = tuple(term.encode("utf-8") for term in
                       _movie_search_text(query).replace("\x00", " ")[:240].split())[:30]
@@ -435,7 +566,7 @@ class MemoryCatalog:
                     try:
                         if self.session.weight() + cost > self.owner.max_bytes:
                             raise limit("catalog-memory")
-                        budget.reserve(cost)
+                        budget.reserve(cost, check_available=self.check_available_memory)
                     except (CatalogLimitError, OSError):
                         pass
                     else:
@@ -454,8 +585,35 @@ class MemoryCatalog:
             result.catalog_state = self.session.state()
             return result
 
+    def search_all(self, query, hidden, token):
+        """Expose every match, hydrating only the rows the screen reads."""
+        from .category_content import CategoryContentList
+        terms = tuple(term.encode('utf-8') for term in
+                      _movie_search_text(query).replace('\x00', ' ')[:240].split())[:30]
+        with self.session.lock:
+            self.check(token)
+            state = self.session.state()
+            # A producer may replace/clear its previous generation. Keep the
+            # bounded progress preview until it stops, then expose all matches
+            # from the completed or explicitly incomplete catalogue.
+            if state['preparing'] or self.session.visible() is None:
+                result = self.search(query, 1, 14, hidden, token)
+                result.has_more = False
+                result.progress_preview = True
+                return result
+            full = CategoryContentList(self, '', hidden, token=token, search_terms=terms)
+            try:
+                self.check(token)
+                result = MovieSearchPage(page_size=max(1, len(full)),
+                    total_items=len(full), source='catalog')
+                result.items, result.catalog_state = full, state
+                return result
+            except BaseException:
+                full.close()
+                raise
+
     def browse(self, category_id, after, page_size, hidden, token, include_total=True):
-        self.check(token, memory=True)
+        self.check(token)
         category_id = str(category_id or "")
         after, page_size = max(0, int(after)), max(1, min(250, int(page_size)))
         with self.session.lock:

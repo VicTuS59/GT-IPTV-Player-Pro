@@ -6,10 +6,13 @@
 import datetime
 import xml.etree.ElementTree as ET
 
+from .ui_update import set_visible
+from .typography import set_text_if_changed
+from .ui_update import set_pixmap_num
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 
-from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
+from .utility_pages import skin_after
 from . import backup_dashboard as base
 from .backup_scope import GROUPS
 from .i18n import N_, _
@@ -114,13 +117,12 @@ def refresh(screen, size_format):
     manifest = screen.manifest or {}
     for index, group in enumerate(GROUPS):
         available = group in screen.available_groups
-        screen["card_check_{}".format(index)].setPixmapNum(
-            1 if group in screen.selected_groups else 0 if available else 2)
+        set_pixmap_num(screen['card_check_{}'.format(index)], 1 if group in screen.selected_groups else 0 if available else 2)
         shade = screen["card_disabled_{}".format(index)]
-        shade.hide() if available else shade.show()
+        set_visible(shade, False) if available else set_visible(shade, True)
         if not available:
-            screen["card_focus_{}".format(index)].hide()
-            screen["card_size_{}".format(index)].setText("—")
+            set_visible(screen['card_focus_{}'.format(index)], False)
+            set_text_if_changed(screen['card_size_{}'.format(index)], '—')
         description = _(base.CATEGORIES[index][1]) if available else _("Not in this backup")
         fit_dynamic_text(screen["card_description_{}".format(index)], description, max_lines=3)
         for suffix, normal in (("title", "#FFFFFF"), ("description", "#B4C8E1"), ("size", "#40E9F1")):
@@ -132,13 +134,12 @@ def refresh(screen, size_format):
         created = datetime.datetime.fromisoformat(created).astimezone().strftime("%d.%m.%Y · %H:%M")
     except (ValueError, OverflowError):
         created = "—"
-    screen["archive_date"].setText(created)
-    screen["archive_version"].setText(_("Version") + ": " + manifest.get("package_version", "—"))
-    screen["archive_verified"].setText(("✓ " + _("Backup verified")) if manifest else
-        _("Checking backup...") if screen.state == "preflight" else _("Select a backup file first."))
-    screen["free_space"].setText(screen.safety_folder or _("Not configured"))
+    set_text_if_changed(screen['archive_date'], created)
+    set_text_if_changed(screen['archive_version'], _('Version') + ': ' + manifest.get('package_version', '—'))
+    set_text_if_changed(screen['archive_verified'], '✓ ' + _('Backup verified') if manifest else _('Checking backup...') if screen.state == 'preflight' else _('Select a backup file first.'))
+    set_text_if_changed(screen['free_space'], screen.safety_folder or _('Not configured'))
     fit_dynamic_text(screen["path"], screen.location or _("Select a backup file first."), max_lines=1)
     if screen.state in ("choose", "ready"):
-        screen["message"].setText(_(PRESERVE) if manifest else _("Select a backup file first."))
+        set_text_if_changed(screen['message'], _(PRESERVE) if manifest else _('Select a backup file first.'))
     for name in ("title", "archive_date", "archive_version", "archive_verified", "free_space", "safety_action"):
         fit_dynamic_text(screen[name], screen[name].getText(), max_lines=2)

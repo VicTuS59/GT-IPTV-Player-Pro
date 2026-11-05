@@ -255,9 +255,10 @@ class YouTubePreviewMixin(object):
         from .youtube_fullscreen import GTYouTubeFullscreenScreen
         self._save_resume_position()
         self._preview_timer.stop()
-        if self._youtube_end_watcher is not None:
-            self._preview_ended = self._youtube_end_watcher.ended
-            self._youtube_end_watcher.close()
+        watcher = self._youtube_end_watcher
+        if watcher is not None:
+            self._preview_ended = watcher.ended
+            watcher.close()
             self._youtube_end_watcher = None
         self._fullscreen_active = True
         self._suspend_youtube_window()
@@ -278,7 +279,8 @@ class YouTubePreviewMixin(object):
         except Exception:
             self._fullscreen_active = False
             self._fullscreen_dialog = None
-            self.set_youtube_end_callback(self._service._video_ended)
+            if watcher is not None:
+                self.set_youtube_end_callback(self._service._video_ended)
             self._resume_youtube_window()
             self._preview_timer.start(250, True)
             self["status"].setText(_("Could not start the player."))

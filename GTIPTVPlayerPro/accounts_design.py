@@ -10,6 +10,7 @@ from .scrollbar import update_scrollbar, hide_scrollbar
 from .typography import fit_dynamic_text, font_px
 from .utility_design import art as utility_art
 from .welcome_design import sentence_caption
+from .ui_update import set_visible
 
 STATES = ('neutral', 'green', 'yellow', 'red')
 COLORS = {'neutral': '#D0DCEE', 'green': '#62EF91', 'yellow': '#F6D15B', 'red': '#FF8497'}
@@ -120,60 +121,65 @@ def style_footer(markup, items):
 
 
 def _fit(screen, name, text, size=30, lines=1):
-    fit_dynamic_text(screen[name], str(text or ''), max_lines=lines,
-                     preferred_size=font_px(screen._r97_px, size), min_size=max(9, screen._r97_px(20)), fallback_chars=80)
+    return fit_dynamic_text(screen[name], str(text or ''), max_lines=lines,
+                            preferred_size=font_px(screen._r97_px, size), min_size=max(9, screen._r97_px(20)), fallback_chars=80)
 
 
 def _show(screen, name, value):
-    (screen[name].show if value else screen[name].hide)()
+    set_visible(screen[name], value)
 
 
-def refresh(screen):
+def refresh(screen, *, selection_only=False):
     from . import main
     count = len(screen.accounts);page_count = (count+screen.page_size-1)//screen.page_size if count else 0
     current = screen.selected_index//screen.page_size+1 if count else 0
+    if getattr(screen, '_opaque_account_rows', None) is not None:
+        start = screen.selected_index // screen.page_size * screen.page_size
+        for slot in range(screen.page_size):
+            index = start + slot
+            screen._opaque_account_rows.paint(screen, slot, index < count, int(index == screen.selected_index))
     source = screen.accounts[screen.selected_index] if count else None
     result = screen._health_results.get(main._source_result_key(source)) if source else None
     status, signal = main._account_test_status_text(result) if result is not None else (_('Ready to connect'), 'neutral')
     signal = signal if signal in STATES else 'neutral'
-    _fit(screen, 'r99_gt', 'GT', 60);_fit(screen, 'r99_brand', 'IPTV PLAYER PRO', 40)
-    _fit(screen, 'r97_title', screen['r97_title'].getText(), 52)
-    noun = _('Source') if screen.source_type == 'm3u' else _('Account')
-    _fit(screen, 'count_badge', '{} / {} {}'.format(count, main.SOURCE_LIMITS.get(screen.source_type, main.MAX_ACCOUNTS), noun.lower()), 31)
-    _fit(screen, 'source_badge', '{} / {} {}'.format(current, page_count, _('Page').lower()), 31)
-    _fit(screen, 'selected_caption', localized_upper(_('Selected source') if screen.source_type=='m3u' else _('Selected account')), 36)
+    if not selection_only:
+        _fit(screen, 'r99_gt', 'GT', 60)
+        _fit(screen, 'r99_brand', 'IPTV PLAYER PRO', 40)
+        noun = _('Source') if screen.source_type == 'm3u' else _('Account')
+        _fit(screen, 'count_badge', '{} / {} {}'.format(count, main.SOURCE_LIMITS.get(screen.source_type, main.MAX_ACCOUNTS), noun.lower()), 31)
+        _fit(screen, 'source_badge', '{} / {} {}'.format(current, page_count, _('Page').lower()), 31)
+        _fit(screen, 'selected_caption', localized_upper(_('Selected source') if screen.source_type=='m3u' else _('Selected account')), 36)
     name = main._source_list_labels(source)[0] if source else _('No account selected')
     _fit(screen, 'r99_selected_name', name, 39, 2)
     kind = main._source_type(source) if source else screen.source_type
     protocol = 'Stalker / MAC' if kind=='stalker' else main._source_badge(source) if source else '—'
     expiry = main._account_test_expiry_text(result) if result is not None and kind!='m3u' else _('Unknown') if source and kind!='m3u' else '—'
     connections = main._account_test_connection_text(result) if result is not None and kind!='m3u' else _('Unknown') if source and kind!='m3u' else '—'
-    for i, (caption, value) in enumerate(((_('Protocol'), protocol), (_('Expiry: {}').format('').rstrip(': '), expiry), (_('Active / Maximum'), connections))):
-        _fit(screen, 'r99_meta_caption_'+str(i), caption+':', 28)
+    if not selection_only:
+        captions = (_('Protocol'), _('Expiry: {}').format('').rstrip(': '), _('Active / Maximum'))
+        for i, caption in enumerate(captions):
+            _fit(screen, 'r99_meta_caption_'+str(i), caption+':', 28)
+    for i, value in enumerate((protocol, expiry, connections)):
         _fit(screen, 'r99_meta_value_'+str(i), value, 28, 2)
     for state in STATES:
         _show(screen, 'r99_selected_badge_'+state, state==signal)
         _show(screen, 'r99_selected_status_'+state, state==signal)
-        _fit(screen, 'r99_selected_status_'+state, sentence_caption(status) if source else '—', 32)
+    _fit(screen, 'r99_selected_status_'+signal, sentence_caption(status) if source else '—', 32)
     icon = plugin_path('skin','images','utility-r96','folder.png') if kind=='m3u' else plugin_path('skin','images','utility-r96','portal.png') if kind=='stalker' else art('server')
     if getattr(screen, '_r99_source_icon_path', None)!=icon:
         screen._r99_source_icon_path=icon
         attach_native_alpha_pixmap(screen,'r99_source_icon',icon,key='r99_source_icon')
-    start = screen.selected_index//screen.page_size*screen.page_size
-    for slot in range(screen.page_size):
-        account = screen.accounts[start+slot] if start+slot<count else None
-        _show(screen, 'r99_separator_'+str(slot), account is not None)
-        if account is None:continue
-        _fit(screen, 'row_'+str(slot), main._source_list_labels(account)[0], 38)
-        _fit(screen, 'row_number_'+str(slot), '{:02d}'.format(start+slot+1), 40)
-        for suffix in ('', '_green', '_yellow', '_red'):
-            detail='row_detail_'+str(slot)+suffix
-            _fit(screen, detail, screen[detail].getText().replace('  |  ',' · ').replace(' • ',' · '), 28)
-            item='row_status_'+str(slot)+suffix
-            _fit(screen,item,sentence_caption(screen[item].getText()),28)
-    _show(screen,'accounts',not count)
+    if not selection_only:
+        start = screen.selected_index//screen.page_size*screen.page_size
+        for slot in range(screen.page_size):
+            _show(screen, 'r99_separator_'+str(slot), start+slot<count)
+        _show(screen,'accounts',not count)
     if count:
-        root=ET.fromstring(screen.skin);w,h=map(int,root.get('size').split(','))
+        cached=getattr(screen,'_r27_account_dimensions',None)
+        if cached is None or cached[0] is not screen.skin:
+            root=ET.fromstring(screen.skin);dimensions=tuple(map(int,root.get('size').split(',')))
+            cached=screen._r27_account_dimensions=(screen.skin,dimensions)
+        w,h=cached[1]
         update_scrollbar(screen,'account_scroll',count,screen.selected_index,screen.page_size,
                          (round(1322*w/1920.),round(184*h/1080.),max(2,round(5*w/1920.)),round(780*h/1080.)))
     else:hide_scrollbar(screen,'account_scroll')

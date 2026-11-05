@@ -10,12 +10,14 @@ import weakref
 from .content import ContentError, ContentItem
 from .portal_identity import safe_series_id
 from .vod_catalog import VodCatalogCache, vod_catalog_account_scope
+from .i18n import N_
 
 
 CATALOG_TTL = 24 * 60 * 60
 CATALOG_MAX_ITEMS = 250000
 CATALOG_MAX_BYTES = 128 * 1024 * 1024
 CATALOG_FREE_BYTES = 64 * 1024 * 1024
+RAM_UNAVAILABLE = N_('Not enough available RAM. Please try again.')
 _locks_guard = threading.Lock()
 _locks = weakref.WeakValueDictionary()
 
@@ -33,9 +35,18 @@ class CatalogLimitError(Exception):
     pass
 
 
+def catalog_failure_message(error):
+    if isinstance(error, MemoryError) or getattr(error, 'limit_kind', '') == 'available-memory':
+        return RAM_UNAVAILABLE
+    if isinstance(error, CatalogLimitError):
+        return N_('Catalogue limit reached. Results may be incomplete.')
+    return N_('Search cache is unavailable. Check receiver storage.')
+
+
 class MovieCatalogIndex:
     content_type = "movie"
     stream_method = "iter_movie_catalog_items"
+    record_method = 'iter_movie_catalog_records'
     storage_namespace = ""
 
     def __init__(self, client, directory=None, clock=None, max_items=CATALOG_MAX_ITEMS,
@@ -50,10 +61,12 @@ class MovieCatalogIndex:
         self.max_items = max(1, min(CATALOG_MAX_ITEMS, int(max_items)))
         self.max_bytes = max(65536, min(CATALOG_MAX_BYTES, int(max_bytes)))
         self._memory = self._finalizer = None
+        self._snapshot_generation = None
         self._closed = False
         self._migrate_legacy = directory is None
         self._preferred_category = ""
         self._preference_set = False
+        self.category_list = False
         with _locks_guard:
             key = (self.scope, self.content_type)
             self.lock = _locks.setdefault(key, threading.RLock())
@@ -103,11 +116,37 @@ class MovieCatalogIndex:
                 self._finalizer()
             self._memory = None
 
+    def borrow_search(self):
+        """Independent close/ownership, with the same complete RAM rows."""
+        if not self.lock.acquire(False):
+            return None
+        try:
+            if self._closed or self._memory is None or not self.category_list:
+                return None
+            reader = type(self)(self.client, directory='shared-ram-reader',
+                clock=self.clock, max_items=self.max_items, max_bytes=self.max_bytes)
+            reader.category_list, reader.scope = self.category_list, self.scope
+            backend = self._memory.borrow_complete(reader)
+            if backend is None:
+                return None
+            try:
+                reader._memory = backend
+                reader._finalizer = weakref.finalize(reader, backend.session.release)
+            except BaseException:
+                backend.session.release()
+                raise
+            return reader
+        finally:
+            self.lock.release()
+
     def state(self):
         return self._select_backend().state()
 
     def search(self, query, page=1, page_size=14, hidden_category_ids=(), token=None):
         return self._select_backend(token).search(query, page, page_size, hidden_category_ids, token)
+
+    def search_all(self, query, hidden_category_ids=(), token=None):
+        return self._select_backend(token).search_all(query, hidden_category_ids, token)
 
     def browse(self, category_id="", after=0, page_size=80, hidden_category_ids=(), token=None, include_total=True):
         return self._select_backend(token).browse(category_id, after, page_size, hidden_category_ids, token, include_total)
@@ -116,16 +155,25 @@ class MovieCatalogIndex:
         backend = None
         try:
             _check(token)
+            if self._snapshot_generation is not None:
+                # A retained search reader can never refresh its parent's rows.
+                if force:
+                    raise ContentError(reason=ContentError.CANCELLED)
+                state = self.state()
+                if callable(callback):
+                    callback(state)
+                return state
             if self._migrate_legacy:
                 from .catalog_cleanup import clean_previous_catalogues
                 clean_previous_catalogues(self.codec)
             backend = self._select_backend(token)
             return backend.prepare(token, callback, force)
-        except (CatalogStorageError, CatalogLimitError, OSError) as error:
+        except (CatalogStorageError, CatalogLimitError, OSError, MemoryError) as error:
             state = backend.session.state() if backend is not None else dict(movies=0, done=0, total=0)
             state.update(complete=False, preparing=False, backend="memory",
-                         reason="limit" if isinstance(error, CatalogLimitError) else "storage",
-                         limit_kind=getattr(error, "limit_kind", ""))
+                         reason="limit" if isinstance(error, (CatalogLimitError, MemoryError)) else "storage",
+                         limit_kind='available-memory' if isinstance(error, MemoryError)
+                         else getattr(error, "limit_kind", ""))
             if callable(callback):
                 callback(state)
             return state
@@ -146,6 +194,8 @@ class MovieCatalogIndex:
             item.portal_series = "0"
         if item is not None:
             item.content_type = self.content_type
+            if '_provider_entry' in record:
+                item._catalogue_entry = record['_provider_entry']
             item.tmdb_id, item.imdb_id = record.get("t", ""), record.get("b", "")
             item.sort_added, item.sort_release = int(record.get("sa", 0) or 0), int(record.get("sr", 0) or 0)
             if "j" in record:
@@ -169,6 +219,7 @@ class SeriesCatalogIndex(MovieCatalogIndex):
     """Reuse the bounded engine without mixing series and movie identities."""
     content_type = "series"
     stream_method = "iter_series_catalog_items"
+    record_method = 'iter_series_catalog_records'
     storage_namespace = "series"
 
     def _valid_id(self, value):
@@ -202,6 +253,9 @@ class SeriesCatalogIndex(MovieCatalogIndex):
             tmdb_id=record.get("t", ""), imdb_id=record.get("b", ""))
         item.catalog_category_id = record.get("c", "")
         item.catalog_category_name = record.get("g", "")
+        if '_provider_entry' in record:
+            item._catalogue_entry = record['_provider_entry']
+        item.sort_added, item.sort_release = int(record.get("sa", 0) or 0), int(record.get("sr", 0) or 0)
         item.portal_command = ""
         item.portal_series = "0"
         item.portal_request_type = record.get("q") if record.get("q") in ("series", "vod") else "series"

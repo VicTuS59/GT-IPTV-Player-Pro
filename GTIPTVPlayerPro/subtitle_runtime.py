@@ -14,20 +14,7 @@ import time
 from .diagnostics import log_event
 from .i18n import N_, _
 from .subtitle_clock import SubtitlePlaybackClock
-from .online_subtitles import (
-    SubtitleError,
-    active_subtitle_text,
-    annotate_subtitle_results,
-    parse_subtitle,
-    POLISH_PROVIDERS,
-    polish_search_providers,
-    provider_display_name,
-    retime_subtitle_cues,
-    save_subtitle_file,
-    subtitle_client,
-    subtitle_result_sort_key,
-    subtitle_search_available,
-)
+from .online_subtitles import active_subtitle_text, annotate_subtitle_results, parse_subtitle, POLISH_PROVIDERS, polish_search_providers, provider_display_name, retime_subtitle_cues, save_subtitle_file, subtitle_client, subtitle_result_sort_key, subtitle_search_available
 from .subtitle_settings import PROVIDERS, load_subtitle_settings
 from .subtitle_language import normalize_subtitle_language
 from .subtitle_search_cache import subtitle_search_context

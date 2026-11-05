@@ -302,6 +302,9 @@ class TMDbMetadataClient(object):
         self._cache = None
         self._cache_batch_depth = 0
         self._cache_dirty = False
+        self._cache_revision = 0
+        self._cache_timer = None
+        self._cache_write_lock = threading.Lock()
         self._thread_status = threading.local()
         self._request_context = threading.local()
         self.last_error = ""
@@ -591,8 +594,7 @@ class TMDbMetadataClient(object):
                 raise RuntimeError("TMDb metadata cache batch is not active")
             self._cache_batch_depth -= 1
             if self._cache_batch_depth == 0 and self._cache_dirty:
-                if self._save_cache():
-                    self._cache_dirty = False
+                self._schedule_cache_save()
 
     @contextmanager
     def cache_batch(self):
@@ -603,84 +605,117 @@ class TMDbMetadataClient(object):
         finally:
             self.end_cache_batch()
 
+    def _schedule_cache_save(self, delay=0.5):
+        if self._cache_timer is None:
+            timer = self._cache_timer = threading.Timer(delay, self.flush_cache)
+            timer.daemon = True
+            timer.start()
+
     def _cache_changed(self):
-        """Persist immediately unless an explicit cache batch is active."""
-        self._cache_dirty = True
-        if self._cache_batch_depth == 0 and self._save_cache():
-            self._cache_dirty = False
+        """Publish to RAM immediately; coalesce optional JSON writes."""
+        with self._lock:
+            self._cache_dirty = True
+            self._cache_revision += 1
+            if self._cache_batch_depth == 0:
+                self._schedule_cache_save()
+
+    def flush_cache(self):
+        """Single writer; slow storage must not hold the lookup lock."""
+        with self._cache_write_lock:
+            with self._lock:
+                timer, self._cache_timer = self._cache_timer, None
+                if timer is not None:
+                    timer.cancel()
+                if not self._cache_dirty:
+                    return True
+                if self._cache_batch_depth:
+                    self._schedule_cache_save()
+                    return False
+                revision = self._cache_revision
+            success = self._save_cache()
+            with self._lock:
+                if success and revision == self._cache_revision:
+                    self._cache_dirty = False
+                elif self._cache_dirty:
+                    self._schedule_cache_save(0.5 if success else 5.0)
+            return success
 
     def _save_cache(self):
         temporary = None
         descriptor = None
         with self._lock:
-            try:
-                with _cache_path_guard(self.cache_path):
-                    directory = os.path.dirname(self.cache_path)
-                    if directory:
-                        os.makedirs(directory, exist_ok=True)
-                    entries = self._load_cache()
-                    merged = {}
-                    # A stale client must retain another client's committed
-                    # entries and must not overwrite a fresher copy of a key.
-                    for source in (_read_cache_entries(self.cache_path), entries):
-                        for key, entry in source.items():
-                            if not isinstance(entry, dict):
-                                continue
-                            try:
-                                stamp = float(entry.get("cached_at", 0))
-                            except (TypeError, ValueError, OverflowError):
-                                continue
-                            try:
-                                if int(entry.get("payload_version", 1)) < CACHE_PAYLOAD_VERSION:
-                                    continue
-                            except (TypeError, ValueError, OverflowError):
-                                continue
-                            previous = merged.get(key)
-                            if previous is None or stamp >= float(previous.get("cached_at", 0)):
-                                merged[key] = entry
-                    newest = sorted(merged.items(),
-                        key=lambda pair: float(pair[1].get("cached_at", 0)), reverse=True)
-                    metadata = [pair for pair in newest if not pair[1].get("poster_lookup")]
-                    artwork = [pair for pair in newest if pair[1].get("poster_lookup")]
-                    selected = metadata[:MAX_CACHE_ENTRIES]
-                    selected += artwork[:min(MAX_ARTWORK_CACHE_ENTRIES,
-                        MAX_CACHE_ENTRIES - len(selected))]
-                    merged = dict(selected)
-                    entries.clear()
-                    entries.update(merged)
-                    # mkstemp creates a private, exclusive inode for this
-                    # writer. No other client's descriptor can modify it.
-                    descriptor, temporary = tempfile.mkstemp(
-                        prefix=".{}-".format(os.path.basename(self.cache_path)),
-                        suffix=".tmp", dir=directory or ".")
-                    with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
-                        descriptor = None
-                        json.dump(
-                            {"version": CACHE_FILE_VERSION, "entries": entries},
-                            handle, ensure_ascii=False, separators=(",", ":"),
-                            sort_keys=True,
-                        )
-                        handle.flush()
+            entries = dict(self._load_cache())
+            revision = self._cache_revision
+        try:
+            with _cache_path_guard(self.cache_path):
+                directory = os.path.dirname(self.cache_path)
+                if directory:
+                    os.makedirs(directory, exist_ok=True)
+                merged = {}
+                # A stale client must retain another client's committed
+                # entries and must not overwrite a fresher copy of a key.
+                for source in (_read_cache_entries(self.cache_path), entries):
+                    for key, entry in source.items():
+                        if not isinstance(entry, dict):
+                            continue
                         try:
-                            os.fsync(handle.fileno())
-                        except (AttributeError, OSError):
-                            pass
-                    getattr(os, "replace", os.rename)(temporary, self.cache_path)
-                    temporary = None
-                    return True
-            except (IOError, OSError, TypeError, ValueError):
-                return False
-            finally:
-                if descriptor is not None:
+                            stamp = float(entry.get("cached_at", 0))
+                        except (TypeError, ValueError, OverflowError):
+                            continue
+                        try:
+                            if int(entry.get("payload_version", 1)) < CACHE_PAYLOAD_VERSION:
+                                continue
+                        except (TypeError, ValueError, OverflowError):
+                            continue
+                        previous = merged.get(key)
+                        if previous is None or stamp >= float(previous.get("cached_at", 0)):
+                            merged[key] = entry
+                newest = sorted(merged.items(),
+                    key=lambda pair: float(pair[1].get("cached_at", 0)), reverse=True)
+                metadata = [pair for pair in newest if not pair[1].get("poster_lookup")]
+                artwork = [pair for pair in newest if pair[1].get("poster_lookup")]
+                selected = metadata[:MAX_CACHE_ENTRIES]
+                selected += artwork[:min(MAX_ARTWORK_CACHE_ENTRIES,
+                    MAX_CACHE_ENTRIES - len(selected))]
+                merged = dict(selected)
+                entries.clear()
+                entries.update(merged)
+                # mkstemp creates a private, exclusive inode for this
+                # writer. No other client's descriptor can modify it.
+                descriptor, temporary = tempfile.mkstemp(
+                    prefix=".{}-".format(os.path.basename(self.cache_path)),
+                    suffix=".tmp", dir=directory or ".")
+                with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+                    descriptor = None
+                    json.dump(
+                        {"version": CACHE_FILE_VERSION, "entries": entries},
+                        handle, ensure_ascii=False, separators=(",", ":"),
+                        sort_keys=True,
+                    )
+                    handle.flush()
                     try:
-                        os.close(descriptor)
-                    except OSError:
+                        os.fsync(handle.fileno())
+                    except (AttributeError, OSError):
                         pass
-                if temporary is not None:
-                    try:
-                        os.unlink(temporary)
-                    except OSError:
-                        pass
+                getattr(os, "replace", os.rename)(temporary, self.cache_path)
+                temporary = None
+                with self._lock:
+                    if revision == self._cache_revision:
+                        self._cache = merged
+                return True
+        except (IOError, OSError, TypeError, ValueError):
+            return False
+        finally:
+            if descriptor is not None:
+                try:
+                    os.close(descriptor)
+                except OSError:
+                    pass
+            if temporary is not None:
+                try:
+                    os.unlink(temporary)
+                except OSError:
+                    pass
 
     def _cache_key(self, media_type, title, year):
         # Both exact-ID and title searches contain translated text. Old
@@ -931,37 +966,36 @@ class TMDbMetadataClient(object):
                         if provider_item and not self._provider_identity_matches(media_type, title, year, value):
                             continue
                         return value["backdrop"]
-            root = "/tv" if media_type == "series" else "/movie"
-            result = None
-            if tmdb_id:
-                try:
-                    payload = self._request_json(root + "/" + tmdb_id, language=self.language)
-                except MetadataError as error:
-                    if error.http_status != 404:
-                        raise
-                    payload = {}
-                identity = self._poster_identity(payload, media_type)
-                if payload.get("id") and (not provider_item
-                        or self._provider_identity_matches(media_type, title, year, identity)):
-                    result = self._backdrop_record(media_type, payload)
-            if result is None and imdb_id:
-                payload = self._request_json("/find/" + imdb_id, {"external_source": "imdb_id"}, self.language)
-                matches = payload.get("tv_results" if media_type == "series" else "movie_results") or []
-                if isinstance(matches, list):
-                    for match in matches[:20]:
-                        if not isinstance(match, dict):
-                            continue
-                        identity = self._poster_identity(match, media_type)
-                        if provider_item and not self._provider_identity_matches(media_type, title, year, identity):
-                            continue
-                        result = self._backdrop_record(media_type, match)
-                        if result:
-                            break
-            if result is None and title:
-                selected = self._search(media_type, title, year)
-                if selected and (not provider_item or self._provider_identity_matches(
-                        media_type, title, year, self._poster_identity(selected, media_type))):
-                    result = self._backdrop_record(media_type, selected)
+            # Artwork and synopsis share the exact-ID/title lookup lock and
+            # full localized result. Credits arrive in that same HTTP response.
+            outcome = {}
+            result, unused_id = self._lookup_for_completion(
+                media_type, item, title, year, tmdb_id, outcome=outcome)
+            if outcome.get('failed'):
+                raise MetadataError(self.last_error)
+            if not result and imdb_id:
+                payload = self._request_json('/find/' + imdb_id,
+                    {'external_source': 'imdb_id'}, self.language)
+                matches = payload.get('tv_results' if media_type == 'series' else 'movie_results') or []
+                for match in matches[:20] if isinstance(matches, list) else ():
+                    if not isinstance(match, dict):
+                        continue
+                    if provider_item and not self._provider_identity_matches(
+                            media_type, title, year, self._poster_identity(match, media_type)):
+                        continue
+                    identity = self._valid_tmdb_id(match.get('id'))
+                    if identity:
+                        result = self.lookup_by_id(media_type, identity) or {}
+                        break
+            if result and not result.get("backdrop"):
+                result = self._backdrop_record(media_type, {
+                    "id": result.get("tmdb_id"),
+                    "title": result.get("title"), "name": result.get("title"),
+                    "original_title": result.get("original_title"),
+                    "original_name": result.get("original_title"),
+                    "overview": result.get("localized_plot"),
+                    "_requested_language": self.language.replace("_", "-").lower(),
+                })
             self._check_request_limits()
             with self._lock:
                 self._load_cache()[key] = {

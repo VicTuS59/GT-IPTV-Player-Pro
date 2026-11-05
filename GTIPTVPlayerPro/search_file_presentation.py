@@ -6,6 +6,7 @@ from functools import wraps
 from types import MethodType
 from xml.etree import ElementTree as ET
 from .i18n import _,localized_upper
+from .remote_footer import prepared_skin, skin_metadata, layout_needs_fit, _cached_skin
 from .utility_design import bind_missing
 from .seven_presentation import text as fit_text,show,_footer_style,_paint_footer
 from .scrollbar import update_scrollbar,hide_scrollbar
@@ -16,7 +17,7 @@ def skin_after(kind):
     def decorate(factory):
         @wraps(factory)
         def built(*a,**kw):return restyle(factory(*a,**kw),kind)
-        return built
+        return _cached_skin(built)
     return decorate
 
 def refresh_after(method):
@@ -35,21 +36,28 @@ def text(s,name,value,size=30,lines=1):
         fit_text(s,name,value,size,lines)
         s._r102_text[name]=(key,s[name].getText())
 
-def setup(s,kind,items):
-    s._r102_kind=kind;s._r102_text={};s._r102_force_fit=False
-    s._seven_items=tuple(items)
-    w,h=map(int,ET.fromstring(s.skin).get('size').split(','))
-    s._seven_size=(w,h);s._seven_px=lambda n:max(1,round(n*min(w/1920.,h/1080.)));s._seven_rects={}
-    bind_missing(s);s.skin=_footer_style(s.skin,items)
+def _ready_markup(markup,kind,items):
+    w,h=skin_metadata(markup).size
+    markup=_footer_style(markup,items)
     if kind=='files':
-        root=ET.fromstring(s.skin)
+        root=ET.fromstring(markup)
         for prefix in ('remote_key_','remote_key_bg_'):
             n=root.find("widget[@name='"+prefix+"0']")
             n.set('size','{},{}'.format(round(150*w/1920.),round(54*h/1080.)))
         n=root.find("widget[@name='remote_action_0']")
         n.set('position','{},{}'.format(round(232*w/1920.),round(1005*h/1080.)))
         n.set('size','{},{}'.format(round(164*w/1920.),round(58*h/1080.)))
-        s.skin=ET.tostring(root,encoding='unicode')
+        markup=ET.tostring(root,encoding='unicode')
+    return markup
+
+
+def setup(s,kind,items):
+    s._r102_kind=kind;s._r102_text={};s._r102_force_fit=False
+    s._seven_items=tuple(items)
+    w,h=skin_metadata(s.skin).size
+    s._seven_size=(w,h);s._seven_px=lambda n:max(1,round(n*min(w/1920.,h/1080.)));s._seven_rects={}
+    bind_missing(s);s.skin=prepared_skin(_ready_markup,s.skin,kind,tuple(items))
+    if kind=='files':
         s._r102_file_callback=MethodType(refresh,s)
         callbacks=getattr(s['filelist'],'onSelectionChanged',None)
         if isinstance(callbacks,list):callbacks.append(s._r102_file_callback)
@@ -72,7 +80,7 @@ def layout_ready(s):
         unused_box,row=file_list_geometry(*s._seven_size)
         native=getattr(s['filelist'],'l',None)
         if native is not None and callable(getattr(native,'setItemHeight',None)):native.setItemHeight(row)
-    s._r102_force_fit=True
+    s._r102_force_fit=layout_needs_fit(s,'_r28_search_layout')
     try:refresh(s)
     finally:s._r102_force_fit=False
 
@@ -82,8 +90,8 @@ def refresh(s):
     text(s,'r102_web_hint',_('Hold MENU for 3 seconds: Web interface'),20)
     if s._r102_kind=='files':_files(s)
     else:_search(s)
-    _paint_footer(s)
-    if s._r102_kind=='files':text(s,'remote_key_0','▲▼◀▶',28)
+    _paint_footer(s,keys={'arrows':'▲▼◀▶'} if s._r102_kind=='files' else None,
+                  sizes={'arrows':28} if s._r102_kind=='files' else None)
 
 def close_files(s):
     s._r102_closed=True

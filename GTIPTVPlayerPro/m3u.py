@@ -1910,18 +1910,6 @@ def _catalog_cache_lines(source, catalog, deadline, check_limits):
         )
 
 
-def _catalog_cache_size(source, catalog, deadline, check_limits):
-    total = 0
-    for index, line in enumerate(
-        _catalog_cache_lines(source, catalog, deadline, check_limits)
-    ):
-        if index % 128 == 0:
-            check_limits(deadline)
-        total += len((str(line) + "\n").encode("utf-8"))
-        if total > MAX_CACHE_BYTES:
-            raise ValueError("cache is too large")
-    check_limits(deadline)
-    return total
 
 
 def _owned_cache_name(filename):
@@ -1990,12 +1978,6 @@ def _cache_budget_plan(
     return removals
 
 
-def _cache_stage_has_space(directory_descriptor, serialized_size):
-    filesystem = os.fstatvfs(directory_descriptor)
-    block_size = int(filesystem.f_frsize or filesystem.f_bsize or 1)
-    available = max(0, int(filesystem.f_bavail)) * block_size
-    if available < serialized_size + MIN_CACHE_FREE_BYTES:
-        raise OSError("cache free-space reserve would be exhausted")
 
 
 def _stage_catalog_cache_locked(
@@ -2504,64 +2486,6 @@ def _ensure_private_directory(path):
     os.chmod(path, 0o700)
 
 
-def _atomic_write_lines(
-    path,
-    lines,
-    mode,
-    maximum,
-    deadline=None,
-    check_limits=None,
-):
-    directory = os.path.dirname(path) or "."
-    _ensure_private_directory(directory)
-    if os.path.lexists(path):
-        details = os.lstat(path)
-        if stat.S_ISLNK(details.st_mode) or not stat.S_ISREG(details.st_mode):
-            raise OSError("unsafe target")
-    temporary = os.path.join(
-        directory,
-        ".{}.{}.{}.tmp".format(os.path.basename(path), os.getpid(), uuid.uuid4().hex),
-    )
-    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_CLOEXEC", 0)
-    descriptor = os.open(temporary, flags, mode)
-    total = 0
-    try:
-        for index, line in enumerate(lines):
-            if check_limits is not None and index % 128 == 0:
-                check_limits(deadline)
-            encoded = (str(line) + "\n").encode("utf-8")
-            total += len(encoded)
-            if total > maximum:
-                raise ValueError("cache is too large")
-            offset = 0
-            while offset < len(encoded):
-                written = os.write(descriptor, encoded[offset:])
-                if written <= 0:
-                    raise OSError("short write")
-                offset += written
-        os.fsync(descriptor)
-        os.fchmod(descriptor, mode)
-        if check_limits is not None:
-            check_limits(deadline)
-    except Exception:
-        os.close(descriptor)
-        try:
-            os.unlink(temporary)
-        except OSError:
-            pass
-        raise
-    else:
-        os.close(descriptor)
-    try:
-        os.replace(temporary, path)
-        os.chmod(path, mode)
-        _fsync_directory(directory)
-    except Exception:
-        try:
-            os.unlink(temporary)
-        except OSError:
-            pass
-        raise
 
 
 def _atomic_write(path, body, mode):

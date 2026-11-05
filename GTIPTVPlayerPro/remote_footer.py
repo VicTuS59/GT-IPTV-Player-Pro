@@ -3,12 +3,14 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import math
+import hashlib
 import os
 import re
 import sys
 import threading
 import unicodedata
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
+from xml.etree import ElementTree as ET
 from functools import wraps
 from types import MethodType
 
@@ -88,13 +90,86 @@ _FOOTER_WIDGET = re.compile(
 )
 _SCREEN_SIZE = re.compile(r'<screen\b[^>]*\bsize="(\d+),(\d+)"')
 
-# Store XML only, never native widgets or account/content data. This is much
+# Store layout XML/immutable metadata, never widgets or account/content data. This is much
 # smaller than the decoded artwork cache and is shared by page instances.
 _SKIN_CACHE = OrderedDict()
 _SKIN_CACHE_LOCK = threading.Lock()
 _SKIN_CACHE_BYTES = 0
 _SKIN_CACHE_MAX_BYTES = 2 * 1024 * 1024
 _SKIN_CACHE_MAX_ENTRIES = 32
+_SkinMetadata = namedtuple('_SkinMetadata', 'size widgets background fingerprint fonts')
+
+
+def _layout_get(key):
+    with _SKIN_CACHE_LOCK:
+        cached = _SKIN_CACHE.get(key)
+        if cached is not None:
+            _SKIN_CACHE.move_to_end(key)
+            return cached[0]
+    return None
+
+
+def _layout_keep(key, value, cost):
+    global _SKIN_CACHE_BYTES
+    if cost > _SKIN_CACHE_MAX_BYTES:
+        return value
+    with _SKIN_CACHE_LOCK:
+        previous = _SKIN_CACHE.pop(key, None)
+        if previous is not None:
+            _SKIN_CACHE_BYTES -= previous[1]
+        _SKIN_CACHE[key] = (value, cost)
+        _SKIN_CACHE_BYTES += cost
+        while (len(_SKIN_CACHE) > _SKIN_CACHE_MAX_ENTRIES
+               or _SKIN_CACHE_BYTES > _SKIN_CACHE_MAX_BYTES):
+            unused_key, removed = _SKIN_CACHE.popitem(last=False)
+            _SKIN_CACHE_BYTES -= removed[1]
+    return value
+
+
+def skin_metadata(markup):
+    """Parse each exact layout once, within the existing 2 MiB/32-entry pool."""
+    key = (skin_metadata, markup)
+    cached = _layout_get(key)
+    if cached is not None:
+        return cached
+    root = ET.fromstring(markup)
+    widgets = tuple((node.get('name'), bool(node.get('font')))
+                    for node in root.findall('widget') if node.get('name'))
+    fonts = tuple((node.get('name'), node.get('font')) for node in root.findall('widget')
+                  if node.get('name') and node.get('font'))
+    fingerprint = hashlib.sha256(markup.encode('utf-8')).digest()
+    value = _SkinMetadata(tuple(map(int, root.get('size').split(','))),
+                          widgets, root.get('backgroundColor', ''), fingerprint, fonts)
+    cost = (sys.getsizeof(markup) + sys.getsizeof(value) + sys.getsizeof(widgets)
+            + sum(sys.getsizeof(row) + sys.getsizeof(row[0]) for row in widgets)
+            + sys.getsizeof(value.size) + sys.getsizeof(value.background)
+            + sys.getsizeof(value.fingerprint) + sys.getsizeof(fonts)
+            + sum(sys.getsizeof(row) + sys.getsizeof(row[1]) for row in fonts))
+    return _layout_keep(key, value, cost)
+
+
+def bind_layout_text(screen):
+    """Share fits for an exact layout slot, without retaining screens/widgets."""
+    try:
+        metadata = skin_metadata(screen.skin)
+        for name, is_label in metadata.widgets:
+            if is_label and name in screen:
+                screen[name]._gt_layout_text_key = (metadata.fingerprint, name)
+    except (AttributeError, TypeError, ValueError, ET.ParseError):
+        # External/legacy skins retain their original per-widget fitting path.
+        return
+
+
+def layout_needs_fit(screen, attribute):
+    """Avoid repeating the same first-layout fit again on the first show."""
+    if not callable(getattr(screen, 'values', None)):
+        return True
+    signature = (_skin_context(), id(getattr(screen, 'instance', None)),
+                 id(getattr(screen, 'skin', None)),
+                 tuple(id(getattr(widget, 'instance', None)) for widget in screen.values()))
+    changed = getattr(screen, attribute, None) != signature
+    setattr(screen, attribute, signature)
+    return changed
 
 
 def _skin_context():
@@ -127,11 +202,9 @@ def prepared_skin(builder, *args, **kwargs):
             from .graphics_policy import rewrite_wallpaper_skin
             skin = rewrite_wallpaper_skin(skin)
         return skin
-    with _SKIN_CACHE_LOCK:
-        cached = _SKIN_CACHE.get(key)
-        if cached is not None:
-            _SKIN_CACHE.move_to_end(key)
-            return cached[0]
+    cached = _layout_get(key)
+    if cached is not None:
+        return cached
     skin = builder(*args, **kwargs)
     if not isinstance(skin, str):
         return skin
@@ -143,19 +216,7 @@ def prepared_skin(builder, *args, **kwargs):
         sys.getsizeof(value) for value in args + tuple(kwargs.values())
         if isinstance(value, str)
     )
-    if cost > _SKIN_CACHE_MAX_BYTES:
-        return skin
-    with _SKIN_CACHE_LOCK:
-        previous = _SKIN_CACHE.pop(key, None)
-        if previous is not None:
-            _SKIN_CACHE_BYTES -= previous[1]
-        _SKIN_CACHE[key] = (skin, cost)
-        _SKIN_CACHE_BYTES += cost
-        while (len(_SKIN_CACHE) > _SKIN_CACHE_MAX_ENTRIES
-               or _SKIN_CACHE_BYTES > _SKIN_CACHE_MAX_BYTES):
-            unused_key, removed = _SKIN_CACHE.popitem(last=False)
-            _SKIN_CACHE_BYTES -= removed[1]
-    return skin
+    return _layout_keep(key, skin, cost)
 
 
 def _cached_skin(builder):
@@ -862,6 +923,12 @@ def install_remote_footer(screen, items, slot_count=None, stacked=False, design_
                           fit_horizontal=False):
     if Label is None or Pixmap is None:
         raise RuntimeError("Enigma2 remote footer widgets are unavailable")
+    from .skin_artwork import install as install_skin_artwork
+    install_skin_artwork(screen)
+    callbacks = getattr(screen, 'onLayoutFinish', None)
+    if callbacks is not None and not hasattr(screen, '_gt_layout_text_callback'):
+        screen._gt_layout_text_callback = MethodType(bind_layout_text, screen)
+        callbacks.insert(0, screen._gt_layout_text_callback)
     items = tuple(items or ())
     slots = max(len(items), int(slot_count or 0))
     screen._remote_footer_slot_count = slots

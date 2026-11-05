@@ -2,14 +2,17 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Discovery-style provider VOD layout and GUI-only category navigation."""
 from xml.etree import ElementTree as ET
+import sys
+from .ui_update import set_visible
 from Components.ActionMap import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from .i18n import _, device_language, localized_upper
 from .paths import plugin_path
 from .remote_footer import footer_item, remote_action_text
+from .remote_footer import _layout_get, _layout_keep, _skin_context
 from .scrollbar import hide_scrollbar, update_scrollbar
-from .typography import ellipsize_dynamic_text, fit_dynamic_text, font_px, set_text_if_changed
+from .typography import current_text_size, ellipsize_dynamic_text, fit_dynamic_text, font_px, set_text_if_changed
 
 POSTERS = 6
 CATEGORY_ROWS = 8
@@ -52,11 +55,21 @@ def footer_geometry(width,height,px,captions,keys=None):
 
 def style_footer(markup,kind,px,items=None,captions=None):
     """Restyle only this screen's standard components, leaving shared guides intact."""
+    items=tuple(items or footer(kind));captions=tuple(captions or footer_captions(kind))
+    # Key every design-unit value used below, rather than a new px lambda's
+    # identity. Thus custom OSD scaling is preserved without per-open misses.
+    scale=tuple(px(n) for n in (1,14,18,22,24,26,28,32,38,42,46,62,64,72,80,84,94,128,150))
+    cache_key=(style_footer,_skin_context(),markup,kind,items,captions,scale)
+    try:
+        hash(cache_key);cacheable=True
+    except TypeError:
+        cacheable=False
+    cached=_layout_get(cache_key) if cacheable else None
+    if cached is not None:return cached
     root=ET.fromstring(markup)
     width,height=map(int,root.get('size').split(','))
-    items=tuple(items or footer(kind))
     keys=tuple(item[0] for item in items)
-    groups=footer_geometry(width,height,px,captions or footer_captions(kind),keys)
+    groups=footer_geometry(width,height,px,captions,keys)
     outline=plugin_path('skin','images','discovery-r48','key-outline-r48.png')
     colors={'red':'#FF334B','green':'#00CC78','yellow':'#FFD239','blue':'#008EFF'}
     for widget in root:
@@ -82,23 +95,35 @@ def style_footer(markup,kind,px,items=None,captions=None):
             widget.set('position','0,0');widget.set('size','1,1')
             widget.attrib.pop('pixmap',None);widget.attrib.pop('backgroundColor',None)
             widget.set('transparent','1')
-    return ET.tostring(root,encoding='unicode')
+    result=ET.tostring(root,encoding='unicode')
+    cost=(sys.getsizeof(markup)+sys.getsizeof(result)+sys.getsizeof(cache_key)
+          +sum(sys.getsizeof(value) for value in captions)+sys.getsizeof(scale))
+    return _layout_keep(cache_key,result,cost) if cacheable else result
 
 
-def refresh_plain_footer(screen,items,px,captions):
+def refresh_plain_footer(screen,items,px,captions,keys=None,sizes=None,minimums=None):
     key_text={'ok':'OK','exit':'EXIT','menu':'MENU','up_down':'↑↓','left_right':'◀▶','ok_long':_('Hold OK')}
+    if keys:key_text.update(keys)
+    profile=current_text_size()
+    caption_font=font_px(px,26 if len(items)<=7 else 24,value=profile)
+    key_font=font_px(px,24,value=profile)
+    caption_min=px(16)
+    key_min=px(14)
     for index,(item,text) in enumerate(zip(items,captions)):
         fit_dynamic_text(screen['remote_action_'+str(index)],text,max_lines=1,
-                         preferred_size=font_px(px,26 if len(items)<=7 else 24),min_size=px(16))
+                         preferred_size=caption_font,min_size=caption_min)
         key=item[0];colored=key in ('red','green','yellow','blue')
         widget=screen['remote_key_'+str(index)]
         if colored:
-            widget.setText('●');screen['remote_key_bg_'+str(index)].hide()
+            set_text_if_changed(widget,'●');set_visible(screen['remote_key_bg_'+str(index)], False)
         else:
+            size=(sizes or {}).get(key,22 if key=='ok_long' else 24)
+            preferred=key_font if size==24 else font_px(px,size,value=profile)
             fit_dynamic_text(widget,key_text.get(key,key),max_lines=1,
-                preferred_size=font_px(px,22 if key=='ok_long' else 24),min_size=px(14))
-    for name in ('remote_footer_stage','remote_footer_bg'):screen[name].hide()
-    for index in range(len(items)-1):screen['remote_divider_'+str(index)].hide()
+                             preferred_size=preferred,min_size=(minimums or {}).get(key,key_min))
+    for name in ('remote_footer_stage','remote_footer_bg'):set_visible(screen[name], False)
+    for index in range(len(items)-1):set_visible(screen['remote_divider_'+str(index)], False)
+
 
 
 def poster_geometry(width, height, px):
@@ -278,7 +303,19 @@ class DiscoveryVODMethods:
         cursor=max(0,min(getattr(self,'_discovery_category_cursor',0),len(entries)-1)) if entries else 0
         self._discovery_category_cursor=cursor
         active=max(0,min(getattr(self,'selected_index',0),len(entries)-1)) if entries else 0
+        content=getattr(self,'_'+kind+'_entries',())
+        position=getattr(self,'_'+kind+'_selected_index',0)
+        base=self._vod_window_base(kind)
+        set_text_if_changed(self['vod_counter'],'{} / {}{}'.format(base+position+1 if content else 0,base+len(content),'+' if getattr(self,'_'+kind+'_has_more',False) else ''))
         start=active//4*4
+        tabs=tuple((entry.category_id, entry.name) for entry in entries[start:start+4])
+        signature=(id(entries),len(entries),active,tabs,opened,
+            cursor if opened else None,getattr(self,'_discovery_tab_cursor',0),
+            getattr(self,'_discovery_tabs_focused',False),
+            getattr(self,'_error',''),getattr(self,'_loading',False),
+            tuple(entry.name for entry in entries[cursor//self.page_size*self.page_size:cursor//self.page_size*self.page_size+self.page_size]) if opened else ())
+        if signature==getattr(self,'_discovery_navigation_signature',None):return
+        self._discovery_navigation_signature=signature
         self._discovery_tab_indices=tuple(range(start,min(start+4,len(entries))))
         for i in range(5):
             index=self._discovery_tab_indices[i] if i<len(self._discovery_tab_indices) else None
@@ -293,10 +330,19 @@ class DiscoveryVODMethods:
             self[kind+'_rail_caption'].setText(_('Loading...'))
         elif not entries:
             self[kind+'_rail_caption'].setText(_('No category found.'))
-        content=getattr(self,'_'+kind+'_entries',())
-        position=getattr(self,'_'+kind+'_selected_index',0)
-        base=self._vod_window_base(kind)
-        set_text_if_changed(self['vod_counter'],'{} / {}{}'.format(base+position+1 if content else 0,base+len(content),'+' if getattr(self,'_'+kind+'_has_more',False) else ''))
+        if not opened:
+            for row in range(self.page_size):
+                for name in (kind+'_category_'+str(row),'vod_drawer_number_'+str(row),
+                    'vod_drawer_rule_'+str(row),'vod_drawer_row_line_'+str(row),
+                    'vod_drawer_focus_'+str(row),kind+'_category_focus_'+str(row),
+                    kind+'_category_marker_'+str(row)):
+                    self[name].hide()
+            for name in (kind+'_category_panel',kind+'_category_accent',kind+'_category_caption',
+                'vod_drawer_divider','vod_drawer_hint','vod_drawer_count','vod_drawer_surface',
+                'vod_drawer_subtitle','vod_drawer_help_line','vod_drawer_status')+tuple('vod_drawer_help_'+str(i) for i in range(3)):
+                self[name].hide()
+            hide_scrollbar(self,'list_scroll')
+            return
         page_start=cursor//self.page_size*self.page_size
         from .browser_common import _scale
         px=_scale()[2]

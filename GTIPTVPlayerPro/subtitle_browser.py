@@ -5,6 +5,8 @@
 
 import os
 from copy import deepcopy
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 
 from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
 from .i18n import _
@@ -324,9 +326,9 @@ class GTOnlineSubtitleBrowserScreen(Screen):
                 self["status_art_{}_{}".format(status, index)] = Pixmap()
             self["flag_{}".format(index)] = Pixmap()
 
-        self["header"].setText("GT IPTV PLAYER PRO • " + _("Subtitles"))
-        self["programme"].setText(self._programme_text())
-        self["provider_status"].setText(self._provider_status_text())
+        set_text_if_changed(self["header"], "GT IPTV PLAYER PRO • " + _("Subtitles"))
+        set_text_if_changed(self["programme"], self._programme_text())
+        set_text_if_changed(self["provider_status"], self._provider_status_text())
         install_remote_footer(
             self,
             SUBTITLE_BROWSER_FOOTER,
@@ -429,7 +431,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
                 if metadata is not None:
                     self.metadata = metadata
                     self._manual_title = True
-                    self["programme"].setText(self._programme_text())
+                    set_text_if_changed(self["programme"], self._programme_text())
             self.controller._browser_state = None
             return
         self.metadata = deepcopy(saved.get("metadata") or self.metadata)
@@ -443,8 +445,8 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         self.top = int(saved.get("top") or 0)
         self._result_message = str(saved.get("message") or "")
         self._refresh_playback_profile(force=True)
-        self["programme"].setText(self._programme_text())
-        self["message"].setText(self._result_message)
+        set_text_if_changed(self["programme"], self._programme_text())
+        set_text_if_changed(self["message"], self._result_message)
 
     def _remember_state(self):
         if not self._content_is_current():
@@ -535,12 +537,12 @@ class GTOnlineSubtitleBrowserScreen(Screen):
 
     def _layout_ready(self):
         """Reassert layers after image-specific Enigma2 skin construction."""
-        self["video_guard"].show()
+        set_visible(self["video_guard"], True)
         for name in (
             "content_glass", "header_art", "programme_art", "filter_art",
             "toolbar_art",
         ):
-            self[name].show()
+            set_visible(self[name], True)
         self._render()
         self._load_automatic_results()
 
@@ -570,9 +572,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             return False
         self._busy = True
         self._waiting_for_automatic = True
-        self["message"].setText(
-            "{}  {}".format(_("Loading..."), self._search_provider_names())
-        )
+        set_text_if_changed(self["message"], "{}  {}".format(_("Loading..."), self._search_provider_names()))
         return True
 
     def _cancel_automatic_wait(self):
@@ -648,7 +648,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         self._refresh_playback_profile()
         if self.provider_filter not in self._available_filters():
             self.provider_filter = "all"
-        self["provider_status"].setText(self._provider_status_text())
+        set_text_if_changed(self["provider_status"], self._provider_status_text())
         visible_results = self._filtered()
         if visible_results:
             self.selected = max(0, min(self.selected, len(visible_results) - 1))
@@ -660,17 +660,11 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             self.top = max(0, min(self.top, last_page))
         else:
             self.selected = self.top = 0
-        self["filter"].setText(
-            "{}: {}".format(_("Filter"), self._filter_name())
-        )
-        self["summary"].setText(
-            "{}: {}".format(_("Subtitles"), len(visible_results))
-        )
+        set_text_if_changed(self["filter"], "{}: {}".format(_("Filter"), self._filter_name()))
+        set_text_if_changed(self["summary"], "{}: {}".format(_("Subtitles"), len(visible_results)))
         page_count = max(1, (len(visible_results) + ROWS - 1) // ROWS)
         current_page = min(page_count, self.selected // ROWS + 1)
-        self["page"].setText(
-            "{}: {} / {}".format(_("Page"), current_page, page_count)
-        )
+        set_text_if_changed(self["page"], "{}: {} / {}".format(_("Page"), current_page, page_count))
         rows = visible_results[self.top:self.top + ROWS]
         for row in range(ROWS):
             labels = [
@@ -692,17 +686,15 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             row_art = self["row_art_{}".format(row)]
             if row >= len(rows):
                 for widget in labels + focus_widgets + status_art:
-                    widget.hide()
-                row_art.hide()
-                flag.hide()
+                    set_visible(widget, False)
+                set_visible(row_art, False)
+                set_visible(flag, False)
                 self._flag_keys[row] = None
                 continue
             result = rows[row]
-            row_art.show()
+            set_visible(row_art, True)
             for widget in labels:
-                widget.show()
-            for widget in status_art:
-                widget.hide()
+                set_visible(widget, True)
             language = str(result.get("language") or "--").upper()[:3]
             provider = str(result.get("provider") or "subdl").lower()
             release = " ".join(
@@ -732,8 +724,8 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             ).lower()
             if status not in COMPATIBILITY_STATUSES:
                 status = "unknown"
-            self["language_{}".format(row)].setText(language)
-            self["provider_{}".format(row)].setText(provider_display_name(provider))
+            set_text_if_changed(self["language_{}".format(row)], language)
+            set_text_if_changed(self["provider_{}".format(row)], provider_display_name(provider))
             fit_dynamic_text(
                 self["release_{}".format(row)], release, max_lines=1,
             )
@@ -742,11 +734,12 @@ class GTOnlineSubtitleBrowserScreen(Screen):
                 _(COMPATIBILITY_LABELS[status]),
                 max_lines=1,
             )
-            self["meta_{}".format(row)].setText(" • ".join(meta))
-            self["status_art_{}_{}".format(status, row)].show()
+            set_text_if_changed(self["meta_{}".format(row)], " • ".join(meta))
+            for state, widget in zip(COMPATIBILITY_STATUSES, status_art):
+                set_visible(widget, state == status)
             absolute = self.top + row
             for widget in focus_widgets:
-                widget.show() if absolute == self.selected else widget.hide()
+                set_visible(widget, True) if absolute == self.selected else set_visible(widget, False)
             self._set_flag(row, language)
 
     def _set_flag(self, row, language):
@@ -762,9 +755,9 @@ class GTOnlineSubtitleBrowserScreen(Screen):
                     key=("subtitle-flag", row),
                 )
             except Exception:
-                widget.hide()
+                set_visible(widget, False)
                 return
-        widget.show()
+        set_visible(widget, True)
 
     def move(self, step):
         entries = self._filtered()
@@ -792,13 +785,11 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         try:
             from Screens.VirtualKeyBoard import VirtualKeyBoard
         except ImportError:
-            self["message"].setText(
-                _("The virtual keyboard is unavailable on this image.")
-            )
+            set_text_if_changed(self["message"], _("The virtual keyboard is unavailable on this image."))
             return
         opener = getattr(self.session, "openWithCallback", None)
         if not callable(opener):
-            self["message"].setText(_("Could not open the virtual keyboard."))
+            set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
             return
         current = " ".join(str(self.metadata.get("title") or "").split())[:120]
         try:
@@ -809,14 +800,14 @@ class GTOnlineSubtitleBrowserScreen(Screen):
                 text=current,
             )
         except Exception:
-            self["message"].setText(_("Could not open the virtual keyboard."))
+            set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
 
     def _title_entered(self, value):
         if value is None or self._closed:
             return
         metadata = manual_subtitle_metadata(self.metadata, value)
         if metadata is None:
-            self["message"].setText(_("Error"))
+            set_text_if_changed(self["message"], _("Error"))
             return
         self.metadata = metadata
         self._manual_title = True
@@ -825,8 +816,8 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         self.provider_filter = "all"
         self.selected = self.top = 0
         self._result_message = ""
-        self["programme"].setText(self._programme_text())
-        self["message"].setText("")
+        set_text_if_changed(self["programme"], self._programme_text())
+        set_text_if_changed(self["message"], "")
         self._render()
         self._remember_state()
 
@@ -836,7 +827,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         self._refresh_playback_profile()
         searcher = getattr(self.controller, "search_combined", None)
         if not callable(searcher):
-            self["message"].setText(_("Error"))
+            set_text_if_changed(self["message"], _("Error"))
             return
         context = self._state_context()
         if context != self._cache_context:
@@ -846,9 +837,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             self._cache_context = context
         self._search_context = context
         self._busy = True
-        self["message"].setText(
-            "{}  {}".format(_("Loading..."), self._search_provider_names())
-        )
+        set_text_if_changed(self["message"], "{}  {}".format(_("Loading..."), self._search_provider_names()))
         opened = False
         try:
             opened = bool(searcher(
@@ -860,10 +849,8 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             opened = False
         if not opened:
             self._busy = False
-            self["message"].setText(
-                _("Loading...")
-                if getattr(self.controller, "busy", False) else _("Error")
-            )
+            set_text_if_changed(self["message"], _("Loading...")
+                if getattr(self.controller, "busy", False) else _("Error"))
 
     def _search_ready(self, results, notices):
         if self._closed:
@@ -871,7 +858,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         if self._search_context != self._state_context():
             self.results = []
             self._discard_state()
-            self["message"].setText(_("Error"))
+            set_text_if_changed(self["message"], _("Error"))
             self._render()
             return
         self.results = list(results or ())[:100]
@@ -879,11 +866,11 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         self.selected = self.top = 0
         self._refresh_playback_profile(force=True)
         if notices:
-            self["message"].setText("  |  ".join(notices)[:240])
+            set_text_if_changed(self["message"], "  |  ".join(notices)[:240])
         elif not self.results:
-            self["message"].setText("{}: 0".format(_("Subtitles")))
+            set_text_if_changed(self["message"], "{}: 0".format(_("Subtitles")))
         else:
-            self["message"].setText("")
+            set_text_if_changed(self["message"], "")
         self._cache_context = self._search_context
         self._result_message = self["message"].getText()
         self._render()
@@ -910,10 +897,10 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             return
         downloader = getattr(self.controller, "download_result", None)
         if not callable(downloader):
-            self["message"].setText(_("Error"))
+            set_text_if_changed(self["message"], _("Error"))
             return
         self._busy = True
-        self["message"].setText(_("Loading..."))
+        set_text_if_changed(self["message"], _("Loading..."))
         opened = False
         try:
             opened = bool(downloader(entries[self.selected], self._download_finished))
@@ -921,7 +908,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             opened = False
         if not opened:
             self._busy = False
-            self["message"].setText(_("Error"))
+            set_text_if_changed(self["message"], _("Error"))
 
     def _download_finished(self):
         if self._closed:
@@ -931,9 +918,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             self.close(True)
         else:
             status = getattr(self.controller, "last_download_status", "")
-            self["message"].setText(
-                _("Different version") if status == "different" else _("Error")
-            )
+            set_text_if_changed(self["message"], _("Different version") if status == "different" else _("Error"))
             self._render()
 
     def _stop(self):

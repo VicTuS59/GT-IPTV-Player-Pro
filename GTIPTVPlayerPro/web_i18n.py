@@ -10,6 +10,7 @@ from .i18n import (
     track_language_messages,
     translate_for_language,
 )
+from .youtube_startup import ERROR_MESSAGES as YOUTUBE_ERRORS, RETRY_MESSAGE as YOUTUBE_RETRY
 from .downloads import MESSAGES as DOWNLOAD_MESSAGES
 
 
@@ -846,6 +847,10 @@ def web_catalog(requested_language):
         for key, message in WEB_MESSAGES.items()
     }
     strings.update(OVERRIDES.get(code, {}))
+    # Receiver and web must report the same stage in the selected language.
+    strings.update({key: translate_for_language(message, code)
+                    for key, message in YOUTUBE_ERRORS.items()})
+    strings["youtube_retrying"] = translate_for_language(YOUTUBE_RETRY, code)
     strings["close_menu"] = MENU_CLOSE_LABELS.get(code, WEB_MESSAGES["close_menu"])
     strings["independent_subtitles_disabled"] = INDEPENDENT_SUBTITLES_DISABLED_LABELS.get(
         code, WEB_MESSAGES["independent_subtitles_disabled"]

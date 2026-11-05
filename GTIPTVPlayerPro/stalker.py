@@ -67,7 +67,7 @@ from .network_security import (
     resolve_public_addresses,
     validate_public_url_syntax,
 )
-from .playlist import PlaylistLoadResult, ServerHealth
+from .playlist import PlaylistLoadResult, ServerHealth, _purge_deleted_category_titles
 from .portal_expiry import portal_expiry
 from .portal_identity import (
     is_composite_id,
@@ -1819,6 +1819,7 @@ def delete_portal_account(
         # The account-file replacement has committed. Cleanup is best-effort
         # and cannot change the authoritative success result.
         pass
+    _purge_deleted_category_titles(account)
     return 1
 
 
@@ -1875,26 +1876,29 @@ def delete_portal_accounts(
             for account in path_accounts
         )
         remaining = []
+        removed_accounts = []
         for stored in stored_accounts:
             key = (stored.portal_url.lower(), stored.mac)
             if key in target_keys:
                 found.add(key)
+                removed_accounts.append(stored)
             else:
                 remaining.append(stored)
-        updates.append((source_path, remaining))
+        updates.append((source_path, remaining, removed_accounts))
 
     if found != requested_keys:
         raise ValueError(N_("The Stalker / MAC account was not found"))
     _check_portal_mutation_limits(cancel_event, deadline)
     # Once the first authoritative replacement starts, finish every prepared
     # rewrite. A late cancellation must not report failure after data changed.
-    for source_path, remaining in updates:
+    for source_path, remaining, removed_accounts in updates:
         _write_portal_accounts(remaining, source_path)
-    for account in requested:
-        try:
-            _purge_portal_session(account)
-        except Exception:
-            pass
+        for account in removed_accounts:
+            try:
+                _purge_portal_session(account)
+            except Exception:
+                pass
+            _purge_deleted_category_titles(account)
     return len(requested_keys)
 
 
@@ -3828,6 +3832,24 @@ class StalkerPortalClient(object):
                     self._session.category_cache.pop(kind, None)
                     self._session.category_cache_generations[kind] += 1
 
+    def category_title_cache_state(self, content_type):
+        """Only non-secret routing hints accompany persistent category titles."""
+        with self._cache_state_lock:
+            return dict(profile='mag' if self._session.mag_compat else 'standard',
+                        request_type=self._vod_category_sources.get(content_type, ''))
+
+    def restore_category_title_cache(self, content_type, categories, state):
+        if content_type not in ('movie', 'series') or not isinstance(state, dict):
+            return False
+        profile = 'mag' if self._session.mag_compat else 'standard'
+        allowed = ('', 'vod', 'movie') if content_type == 'movie' else ('', 'series', 'vod')
+        if state.get('profile') != profile or state.get('request_type') not in allowed:
+            return False
+        self._check_request_limits()
+        self._publish_categories(content_type, categories, state['request_type'],
+                                 self._category_generation(content_type))
+        return True
+
     def load_categories(self, content_type):
         content_type = self._validate_type(content_type)
         if content_type != "live":
@@ -4659,7 +4681,8 @@ class StalkerPortalClient(object):
                 identity = (state["content_type"], str(item.stream_id))
                 if identity in state["result_ids"]:
                     continue
-                item.icon = _normalise_media_url(item.icon, self.account)
+                if not getattr(self._request_context, 'catalog_records', False):
+                    item.icon = _normalise_media_url(item.icon, self.account)
                 if state.get("streaming_catalog"):
                     item.portal_catalog_page = source["last_page"]
                     item.portal_catalog_category_parameter = source.get("category_parameter", "category")
@@ -4855,6 +4878,15 @@ class StalkerPortalClient(object):
     ):
         if not isinstance(entry, dict):
             return None
+        if getattr(self._request_context, 'catalog_records', False):
+            if getattr(self._request_context, 'category_raw_rows', False):
+                from .plain_catalog import PortalRow
+                row = PortalRow(self, entry, content_type, request_type,
+                    allow_composite_series_id, self._request_context.catalog_record_category)
+                return row if row.stream_id else None
+            from .catalog_records import stalker_record
+            return stalker_record(self, entry, content_type, request_type,
+                allow_composite_series_id, self._request_context.catalog_record_category)
         stream_id = StalkerPortalClient._media_identifier(
             entry,
             content_type,
@@ -5817,7 +5849,10 @@ class StalkerPortalClient(object):
             fingerprints = OrderedDict()
             for request_number in range(PORTAL_CATALOG_MAX_PAGES):
                 self._check_request_limits()
-                if request_number:
+                # The raw category reader already issues one request at a
+                # time through the shared portal slot. Do not add the legacy
+                # search throttle to every page of a foreground full list.
+                if request_number and not getattr(self._request_context, 'category_raw_rows', False):
                     self._paced_catalog_wait()
                 parameters = (("category", category), ("genre", category),
                               ("fav", "0"), ("sortby", "name"),
@@ -5844,6 +5879,7 @@ class StalkerPortalClient(object):
                     empty_supported = empty_supported or not self._total_items(value)
                     break
                 digest = hashlib.sha256()
+                page_rows = [] if getattr(self._request_context, 'category_page_batches', False) else None
                 for entry in batch:
                     if isinstance(entry, dict):
                         digest.update(repr((self._media_identity(entry, "movie"),
@@ -5863,7 +5899,8 @@ class StalkerPortalClient(object):
                         continue
                     useful = True
                     item.portal_catalog_page = page
-                    item.icon = _normalise_media_url(item.icon, self.account)
+                    if not getattr(self._request_context, 'catalog_records', False):
+                        item.icon = _normalise_media_url(item.icon, self.account)
                     identity = ("movie", str(item.stream_id))
                     if not getattr(self._request_context, 'category_dates_only', False):
                         with self._vod_catalog_critical():
@@ -5871,7 +5908,13 @@ class StalkerPortalClient(object):
                             for evicted_identity in evicted:
                                 self._vod_entry_sources.pop(evicted_identity, None)
                             self._vod_entry_sources[identity] = request_type
-                    yield item
+                    if page_rows is None:
+                        yield item
+                    else:
+                        page_rows.append(item)
+                if page_rows:
+                    from .category_response import CategoryBatch
+                    yield CategoryBatch(page_rows, False)
                 if page == 0:
                     # Page one was already observed empty before the zero probe.
                     return
@@ -5888,13 +5931,17 @@ class StalkerPortalClient(object):
         state["diagnostic_logged"] = True
         while not state["complete"]:
             self._check_request_limits()
-            if state["request_count"]:
+            if state["request_count"] and not getattr(self._request_context, 'category_raw_rows', False):
                 self._paced_catalog_wait()
             with self._vod_catalog_critical():
                 batch = self._load_catalog_batch(state, 250, 1)
-            for item in batch:
-                self._check_request_limits()
-                yield item
+            if batch and getattr(self._request_context, 'category_page_batches', False):
+                from .category_response import CategoryBatch
+                yield CategoryBatch(batch, False)
+            else:
+                for item in batch:
+                    self._check_request_limits()
+                    yield item
             state["results"].clear()
             state["result_ids"].clear()
             if state["request_count"] >= PORTAL_CATALOG_MAX_PAGES and not state["complete"]:
@@ -5904,6 +5951,66 @@ class StalkerPortalClient(object):
             if isinstance(error, ContentError):
                 raise error
             raise ContentError(reason="incomplete")
+
+    def iter_movie_catalog_records(self, category_id=""):
+        return self._iter_direct_catalog('movie', category_id)
+
+    def iter_series_catalog_records(self, category_id=""):
+        return self._iter_direct_catalog('series', category_id)
+
+    def iter_movie_category_rows(self, category_id=''):
+        return self._iter_raw_category('movie', category_id)
+
+    def iter_series_category_rows(self, category_id=''):
+        return self._iter_raw_category('series', category_id)
+
+    def iter_movie_native_batches(self, category_id=''):
+        return self._iter_native_category_batches('movie', category_id)
+
+    def iter_series_native_batches(self, category_id=''):
+        return self._iter_native_category_batches('series', category_id)
+
+    def _iter_native_category_batches(self, kind, category_id):
+        """Publish each useful native page before opening the next request."""
+        previous=getattr(self._request_context,'category_page_batches',False)
+        self._request_context.category_page_batches=True
+        iterator=self._iter_raw_category(kind,category_id)
+        try:
+            yield from iterator
+        finally:
+            try:iterator.close()
+            finally:self._request_context.category_page_batches=previous
+
+    def _iter_raw_category(self, kind, category_id):
+        previous = getattr(self._request_context, 'category_raw_rows', False)
+        dates_only = getattr(self._request_context, 'category_dates_only', False)
+        self._request_context.category_raw_rows = True
+        self._request_context.category_dates_only = True
+        iterator = self._iter_direct_catalog(kind, category_id)
+        try:
+            yield from iterator
+        finally:
+            try: iterator.close()
+            finally:
+                self._request_context.category_raw_rows = previous
+                self._request_context.category_dates_only = dates_only
+
+    def _iter_direct_catalog(self, kind, category_id):
+        # Thread-local state cannot affect playback/detail/search requests.
+        previous = getattr(self._request_context, 'catalog_records', False)
+        category = getattr(self._request_context, 'catalog_record_category', '')
+        self._request_context.catalog_records = True
+        self._request_context.catalog_record_category = str(category_id or '')
+        iterator = (self.iter_movie_catalog_items(category_id) if kind == 'movie'
+                    else self.iter_series_catalog_items(category_id))
+        try:
+            yield from iterator
+        finally:
+            try:
+                iterator.close()
+            finally:
+                self._request_context.catalog_records = previous
+                self._request_context.catalog_record_category = category
 
     def restore_series_catalog_item(self, item):
         """Recover one cached series parent from its original authenticated page."""
@@ -5949,6 +6056,15 @@ class StalkerPortalClient(object):
                 getattr(item, "portal_catalog_series_flag", ""))
         with self._cache_state_lock:
             self._lru_store(self._catalog_item_hints, key, hint, VOD_PAGE_HINT_LIMIT)
+
+    def remember_category_row(self, row):
+        """Populate detail/playback recovery only for rows actually displayed."""
+        key = (row.content_type, str(row.stream_id))
+        with self._cache_state_lock:
+            from .provider_rows import expanded
+            evicted = self._lru_store(self._vod_entry_cache, key, expanded(row.entry), VOD_ENTRY_CACHE_LIMIT)
+            for old in evicted: self._vod_entry_sources.pop(old, None)
+            self._vod_entry_sources[key] = row.request_type
 
     def _restore_catalog_hint(self, key, hint):
         kind, identity = key

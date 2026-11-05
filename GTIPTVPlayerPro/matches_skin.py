@@ -3,11 +3,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Responsive native matches theme. All coordinates follow the OSD desktop."""
 from .paths import plugin_path
-from .typography import font_px, visible_count
+from .typography import visible_count
 from .utility_design import NativeSkin, art
 
-DESKTOPS = (('sd640',640,480),('sd480',720,480),('sd576',720,576),
-            ('720',1280,720),('1080',1920,1080),('2160',3840,2160))
 LIST_RECT = (48,264,1240,608)
 ROWS_RECT = (60,322,1216,552)
 SCROLL_RECT = (1291,322,5,552)
@@ -17,18 +15,8 @@ def rows():
     return max(4, visible_count(4))
 
 
-def variant(width,height):
-    for key,w,h in DESKTOPS:
-        if (width,height)==(w,h): return key
-    if width<=1280 and height<=720:return '720'
-    if width<=1920 and height<=1080:return '1080'
-    return '2160'
 
 
-def artwork(stem,width,height,count=None):
-    name='matches-r20-'+stem+'-'+variant(width,height)
-    if count is not None:name+='-'+str(count)
-    return plugin_path('skin','images',name+'.png')
 
 
 def scroll_geometry(width,height):
@@ -60,6 +48,7 @@ def skin(width,height,px):
     row_h=ROWS_RECT[3]/float(rows())
     for i in range(rows()):
         top=ROWS_RECT[1]+i*row_h
+        s.pic('r96_match_row_'+str(i),(60,top,1216,row_h-3),z=2)
         s.pic('row_focus_'+str(i),(60,top,1216,row_h-3),art('tab-active'),z=2)
         s.label('r96_row_line_'+str(i),(62,top+row_h-1,1212,1),background='#20364A',z=2)
         s.label('row_{}_league'.format(i),(84,top+6,216,row_h-13),27,'#B7C9E0',lines=2)

@@ -2,12 +2,12 @@
 # SPDX-FileCopyrightText: 2026 VicTuS59
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Match-scoped verified results, reusing the unchanged native YouTube player."""
-from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
+from .auxiliary_presentation import refresh_after as aux_refresh_after
 from .matches_text import tr
 from .youtube_ui import GTYouTubeSearchScreen
 from .web_youtube import WEB_YOUTUBE
 from .match_highlights_search import MatchHighlightsService
-from .remote_footer import footer_item,set_remote_footer
+from .remote_footer import footer_item
 
 FOOTER=tuple(footer_item(key,action) for key,action in (
     ('up_down','select'),('left_right','page'),('ok','play'),('blue','retry'),
@@ -15,24 +15,13 @@ FOOTER=tuple(footer_item(key,action) for key,action in (
 
 
 class GTMatchHighlightsScreen(GTYouTubeSearchScreen):
+    RESULTS_FOOTER=FOOTER
+
     def __init__(self,session,query,match=None,search_service=None):
         self._match_query=query;self._seed_query=query
         self._highlights_service=MatchHighlightsService(match,search_service if search_service is not None else WEB_YOUTUBE)
         GTYouTubeSearchScreen.__init__(self,session,search_service=self._highlights_service)
         self.setTitle(tr('Match highlights'))
-        self.onLayoutFinish.append(self._set_highlights_footer)
-
-    @aux_refresh_after
-    def _set_highlights_footer(self):
-        set_remote_footer(self,FOOTER)
-
-    @aux_refresh_after
-    def _render_preview(self):
-        GTYouTubeSearchScreen._render_preview(self)
-        items=list(FOOTER)
-        current=getattr(self,'_remote_footer_items',())
-        if len(current)>2:items[2]=current[2]
-        set_remote_footer(self,items)
 
     def _open_initial_search(self):
         if self._closed:return

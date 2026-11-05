@@ -3,7 +3,6 @@
 """Inspect a downloaded IPK without extracting or executing any member."""
 import ast
 import hashlib
-import io
 import os
 import stat
 import tarfile

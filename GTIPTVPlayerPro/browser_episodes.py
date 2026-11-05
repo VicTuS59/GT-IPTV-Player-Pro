@@ -7,26 +7,28 @@ import datetime
 import re
 import time
 from Components.ActionMap import ActionMap
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from enigma import ePoint, eSize, eTimer, getDesktop, iServiceInformation
 from .source_loader import SourceLoader
-from .diagnostics import log_event, redact
-from .i18n import N_, _, ngettext, localized_date_text, localized_short_weekday, localized_language_name, localized_upper, metadata_language
+from .diagnostics import log_event
+from .i18n import N_, _, ngettext, localized_upper, metadata_language
 from .live_zero import LiveZeroKey
-from .background import attach_background, attach_background_window, attach_native_alpha_pixmap, attach_pixmap
-from .metadata import MetadataError, TMDbMetadataClient, complete_movie_for_device_language, movie_metadata_ready, media_metadata_ready, complete_media_for_device_language
-from .playback import PlaybackResumeStore, resume_account_scope, resume_key, should_save_resume
-from .episode_history import EpisodeCompletionWatcher, WatchedEpisodeStore, episode_watch_key
+from .background import attach_native_alpha_pixmap, attach_pixmap
+from .metadata import TMDbMetadataClient
+from .playback import PlaybackResumeStore, resume_key
+from .episode_history import WatchedEpisodeStore, episode_watch_key
 from .episode_design import EPISODE_ROWS, EPISODE_LABEL_NAMES, EPISODE_PIXMAP_NAMES, episode_geometry, episode_skin, episode_focus_assets, episode_footer
-from .episode_model import group_episode_seasons, episode_number, episode_title, episode_code, episode_display_title, format_episode_time, progress_percent, preferred_resume_index
+from .episode_model import group_episode_seasons, episode_number, episode_code, episode_display_title, format_episode_time, progress_percent, preferred_resume_index
 from .vod_discovery import style_footer, refresh_plain_footer
 from .paths import plugin_path
-from .remote_footer import web_shortcut_hint_text, decorate_remote_footer, prepared_skin, footer_item, install_remote_footer, set_remote_footer, remote_action_text
-from .scrollbar import hide_scrollbar, update_horizontal_scrollbar, update_scrollbar
-from .settings import DEFAULT_INFOBAR_TIMEOUT, available_service_types, load_player_settings, normalize_infobar_timeout, serviceapp_uses_async_seek, service_engine_label
-from .typography import _grapheme_boundaries, _line_fits, _text_units, clean_dynamic_text, current_text_size, ellipsize_dynamic_text, fit_dynamic_text, font_px, scale_skin_fonts, set_static_text, set_text_if_changed, visible_count
-from .browser_common import APP_BACKGROUND_PATH, CINEMATIC_CANDIDATE_TIMEOUT_SECONDS, EPISODE_DOWNLOAD_FOOTER_ITEMS, EPISODE_FOOTER_ITEMS, GTAsyncListScreen, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _cinematic_cover_ratio, _connect_timer, _download_client_image, _picon_cache_path, _rating_label, _safe_picon_url, _scale, _valid_cinematic_fallback_file, content_client_for
+from .remote_footer import prepared_skin, remote_action_text
+from .scrollbar import hide_scrollbar, update_scrollbar
+from .settings import load_player_settings
+from .typography import ellipsize_dynamic_text, fit_dynamic_text, set_text_if_changed
+from .browser_common import CINEMATIC_CANDIDATE_TIMEOUT_SECONDS, GTAsyncListScreen, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _cinematic_cover_ratio, _connect_timer, _download_client_image, _picon_cache_path, _rating_label, _safe_picon_url, _scale, _valid_cinematic_fallback_file, content_client_for
 
 def _episode_list_skin():
     width, height, px = _scale()
@@ -99,9 +101,9 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
         self.onShown.append(self._episode_screen_shown)
         self.onLayoutFinish.append(self._episode_layout_ready)
         self.onClose.append(self._stop_episode_screen)
-        self['episode_backdrop'].hide()
-        self['episode_scrim'].hide()
-        self['season_tabs_focus'].hide()
+        set_visible(self['episode_backdrop'], False)
+        set_visible(self['episode_scrim'], False)
+        set_visible(self['season_tabs_focus'], False)
         self._clear_episode_rows()
         self._render_episode_details()
 
@@ -127,7 +129,7 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
     def _episode_clock_tick(self):
         if self._closed:
             return
-        self['episode_clock'].setText(time.strftime('%H:%M'))
+        set_text_if_changed(self['episode_clock'], time.strftime('%H:%M'))
         if bool(getattr(self, 'execing', True)):
             self._episode_clock_timer.start(30000, True)
 
@@ -187,7 +189,7 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
             self._episode_reload_selection = (self._season_groups[self._season_index][0], episode_watch_key(self.client, self._entries[self.selected_index]))
         self._clear_episode_rows()
         GTAsyncListScreen.start_load(self)
-        self['items'].setText('')
+        set_text_if_changed(self['items'], '')
 
     def load_items(self):
         restore = getattr(self.client, 'restore_series_catalog_item', None)
@@ -312,15 +314,16 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
     @staticmethod
     def _episode_show(widget, shown):
         if shown:
-            widget.show()
+            set_visible(widget, True)
         else:
-            widget.hide()
+            set_visible(widget, False)
 
     def _episode_progress(self, name, rect, percent):
         width = max(1, int(rect[2] * max(0, min(100, percent)) / 100.0))
         instance = getattr(self[name], 'instance', None)
         if instance is not None:
-            instance.resize(eSize(width, max(1, rect[3])))
+            from .ui_update import set_size
+            set_size(self[name], width, max(1, rect[3]))
         self._episode_show(self[name], percent > 0)
 
     def _resume_target(self):
@@ -344,15 +347,15 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
         self._episode_fit('series_genre', getattr(info, 'genre', ''), 1)
         self._episode_fit('series_plot', getattr(info, 'plot', '') or _('No information available.'), 3)
         cast = getattr(info, 'cast', '') or ''
-        self['series_cast_label'].setText(_('CAST') if cast else '')
+        set_text_if_changed(self['series_cast_label'], _('CAST') if cast else '')
         self._episode_fit('series_cast', str(cast), 2)
         self._episode_fit('episode_favorite_text', _('Remove from favorites') if self._is_series_favorite() else _('Add to favorites'))
         self._episode_fit('episode_download_text', _('Download episode'))
-        self['episode_download_key'].setText('MENU')
-        self['season_progress_label'].setText(_('SEASON PROGRESS'))
-        self['episode_selected_caption'].setText(localized_upper(_('Selected episode')))
-        self['episode_list_caption'].setText(localized_upper(_('Episodes')))
-        self['episode_page_hint'].setText('CH±  '+_('Page'))
+        set_text_if_changed(self['episode_download_key'], 'MENU')
+        set_text_if_changed(self['season_progress_label'], _('SEASON PROGRESS'))
+        set_text_if_changed(self['episode_selected_caption'], localized_upper(_('Selected episode')))
+        set_text_if_changed(self['episode_list_caption'], localized_upper(_('Episodes')))
+        set_text_if_changed(self['episode_page_hint'], 'CH±  '+_('Page'))
         self._set_dynamic_breadcrumb(_('Series') + '  /  ' + _('Episodes'))
         self._render_episode_resume()
 
@@ -369,7 +372,8 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
             number = episode_number(item, target + 1)
             season=getattr(item,'season','')
             label=(_('Season {}').format(season) if season else _('Unknown season'))+' · '+_('Episode {}').format(number)
-            if episode_watch_key(self.client,item) in self._watched_records:
+            from .episode_view import watched_view
+            if episode_watch_key(self.client,item) in watched_view(self):
                 detail=_('Watched')
             elif bookmark:
                 detail=_('Resume at {}').format(format_episode_time(bookmark['position']))
@@ -381,21 +385,22 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
     def _refresh(self):
         if not hasattr(self, '_episode_geometry'):
             return
-        self['items'].setText('')
+        set_text_if_changed(self['items'], '')
         self._episode_fit('episode_favorite_text', _('Remove from favorites') if self._is_series_favorite() else _('Add to favorites'))
-        self._clear_episode_rows()
         if self._error or not self._entries:
-            self['message'].setText(_(self._error or self.empty_message()))
+            self._clear_episode_rows()
+            set_text_if_changed(self['message'], _(self._error or self.empty_message()))
             hide_scrollbar(self, 'list_scroll')
             self._render_episode_resume()
             return
         self.selected_index %= len(self._entries)
         start = self.selected_index // self.page_size * self.page_size
-        current_watched = self._watched_store.get_many((episode_watch_key(self.client, item) for item in self._all_episode_entries), refresh=False)
-        self._watched_records = current_watched
+        from .episode_view import watched_view, season_completed
+        current_watched = watched_view(self)
+        self._clear_episode_rows(min(self.page_size, len(self._entries)-start))
         for row, item in enumerate(self._entries[start:start + self.page_size]):
             number = episode_number(item, start + row + 1)
-            self['episode_number_{}'.format(row)].setText(str(number).zfill(2))
+            set_text_if_changed(self['episode_number_{}'.format(row)], str(number).zfill(2))
             title = episode_display_title(item,self.series.name,_('Episode {}').format(number),start+row+1)
             ellipsize_dynamic_text(self['episode_name_{}'.format(row)], title, fallback_chars=55)
             key = episode_watch_key(self.client, item)
@@ -419,7 +424,7 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
             if code:status=code+' · '+status
             ellipsize_dynamic_text(self['episode_status_{}'.format(row)], status, fallback_chars=65)
             for part in ('row_bg', 'number', 'name', 'status'):
-                self['episode_{}_{}'.format(part, row)].show()
+                set_visible(self['episode_{}_{}'.format(part, row)], True)
             self._episode_show(self['episode_watched_{}'.format(row)], watched is not None)
             self._episode_show(self['episode_progress_track_{}'.format(row)], percent > 0)
             self._episode_progress('episode_progress_fill_{}'.format(row), self._episode_geometry['rows'][row]['progress'], percent)
@@ -440,27 +445,28 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
             self._episode_show(self['season_tab_line_{}'.format(slot)], exists and index == self._season_index)
         self._episode_show(self['season_tabs_focus'], self._episode_pane == 'seasons')
         episode_count = len(self._entries)
-        self['season_count'].setText(ngettext('{} episode', '{} episodes', episode_count).format(episode_count))
-        completed = sum((episode_watch_key(self.client, item) in current_watched for item in self._entries))
+        set_text_if_changed(self['season_count'], ngettext('{} episode', '{} episodes', episode_count).format(episode_count))
+        completed = season_completed(self, current_watched)
         percent = int(completed * 100 / episode_count)
         self._episode_fit('season_progress_text', ngettext('{} / {} episode completed', '{} / {} episodes completed', episode_count).format(completed, episode_count))
-        self['season_progress_percent'].setText('{}%'.format(percent))
+        set_text_if_changed(self['season_progress_percent'], '{}%'.format(percent))
         self._episode_progress('season_progress_fill', self._episode_geometry['season_progress'], percent)
-        self['episode_position'].setText('{}–{} / {}'.format(start + 1, min(start + self.page_size, len(self._entries)), len(self._entries)))
+        set_text_if_changed(self['episode_position'], '{}–{} / {}'.format(start + 1, min(start + self.page_size, len(self._entries)), len(self._entries)))
         for i in range(3):
             self._episode_show(self['episode_action_focus_{}'.format(i)], self._episode_pane == 'actions' and self._episode_action == i)
-        self['message'].setText('')
+        set_text_if_changed(self['message'], '')
         self._render_episode_resume()
         update_scrollbar(self, 'list_scroll', len(self._entries), self.selected_index, self.page_size, self._list_scroll_geometry)
 
-    def _clear_episode_rows(self):
-        for i in range(self.page_size):
+    def _clear_episode_rows(self, first=0):
+        for i in range(first, self.page_size):
             for part in ('row_bg', 'number', 'name', 'status', 'watched', 'progress_track', 'progress_fill'):
-                self['episode_{}_{}'.format(part, i)].hide()
-            self['episode_focus_{}'.format(i)].hide()
-            self['episode_focus_fill_{}'.format(i)].hide()
-        for i in range(3):
-            self['episode_action_focus_{}'.format(i)].hide()
+                set_visible(self['episode_{}_{}'.format(part, i)], False)
+            set_visible(self['episode_focus_{}'.format(i)], False)
+            set_visible(self['episode_focus_fill_{}'.format(i)], False)
+        if first == 0:
+            for i in range(3):
+                set_visible(self['episode_action_focus_{}'.format(i)], False)
 
     def toggle_selected_watched(self):
         if self._loading or not self._entries:
@@ -470,11 +476,11 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
         key = episode_watch_key(self.client, item)
         watched = key in self._watched_store.get_many((episode_watch_key(self.client, item) for item in self._all_episode_entries), refresh=False)
         if not key or not self._watched_store.set_watched_async(key, not watched):
-            self['message'].setText(_('Could not save watched status.'))
+            set_text_if_changed(self['message'], _('Could not save watched status.'))
             return
         self._episode_pending_watched = (key, not watched)
         self._refresh()
-        self['message'].setText(_('Please wait'))
+        set_text_if_changed(self['message'], _('Please wait'))
         self._request_episode_state()
 
     def _request_episode_state(self):
@@ -496,20 +502,24 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
         if error is not None or not value:
             if self._episode_pending_watched is not None:
                 self._episode_pending_watched = None
-                self['message'].setText(_('Could not save watched status.'))
+                self._refresh()
+                set_text_if_changed(self['message'], _('Could not save watched status.'))
             return
         generation, watched, bookmarks, mutation, confirmed = value
         if generation != self._episode_state_generation:
             return
         self._watched_records, self._resume_records = (watched, bookmarks)
+        matches_pending = mutation is not None and mutation == self._episode_pending_watched
+        if matches_pending and confirmed is not None:
+            self._episode_pending_watched = None
         self._refresh()
-        if mutation is not None and mutation == self._episode_pending_watched:
+        if matches_pending:
             if confirmed is None:
-                self['message'].setText(_('Please wait'))
+                set_text_if_changed(self['message'], _('Please wait'))
                 self._request_episode_state()
                 return
             self._episode_pending_watched = None
-            self['message'].setText((_('Marked as watched') if mutation[1] else _('Marked as not watched')) if confirmed else _('Could not save watched status.'))
+            set_text_if_changed(self['message'], (_('Marked as watched') if mutation[1] else _('Marked as not watched')) if confirmed else _('Could not save watched status.'))
 
     def _episode_playback_closed(self, *args):
         if not self._closed:
@@ -557,7 +567,7 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
     def toggle_series_favorite(self):
         added = self._toggle_favorite_item(self.series)
         self._render_episode_details()
-        self['message'].setText(self._favorite_message(self.series, added))
+        set_text_if_changed(self['message'], self._favorite_message(self.series, added))
 
     def _start_episode_artwork(self):
         token = _WorkerToken(40)

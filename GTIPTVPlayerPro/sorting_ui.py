@@ -5,9 +5,7 @@ import sys
 import threading
 
 from .i18n import _, N_
-from .content_sort import (SortStore, SortUnavailable, LABELS, SORT_TITLE, SORT_CONTENT,
-    SORT_CHANNELS, NO_DATES, INCOMPLETE, SAVE_ERROR, Lease, heap_order,
-    normalized_name, sort_live_rows, preference_scope, VOD_LABELS)
+from .content_sort import SortStore, SortUnavailable, LABELS, SORT_TITLE, SORT_CONTENT, SORT_CHANNELS, NO_DATES, INCOMPLETE, SAVE_ERROR, Lease, sort_live_rows, preference_scope, VOD_LABELS
 
 EDIT_CATEGORIES = N_('Edit categories')
 SORT_CATEGORIES = N_('Sort categories')
@@ -57,6 +55,30 @@ def _message(screen, text):
     screen.session.open(MessageBox, _(text), type=MessageBox.TYPE_INFO)
 
 
+def _refresh_vod_message(screen):
+    """Sort jobs temporarily own the shared status label, including its cache."""
+    if getattr(screen, '_light_vod_enabled', False) and not getattr(screen, '_closed', True):
+        screen._light_catalog_text = None
+        screen._light_catalog_message()
+
+
+def _failure(error, fallback=INCOMPLETE):
+    from .movie_catalog import CatalogLimitError, catalog_failure_message
+    if isinstance(error, SortUnavailable):
+        return str(error)
+    if isinstance(error, (CatalogLimitError, MemoryError)):
+        return catalog_failure_message(error)
+    return fallback
+
+
+def _start_job(job, work, name, failure=INCOMPLETE):
+    try:
+        threading.Thread(target=work, name=name, daemon=True).start()
+    except (RuntimeError, OSError):
+        job['error'], job['done'] = failure, True
+    job['timer'].start(100, True)
+
+
 def _choice(screen, title, options, callback):
     from Screens.ChoiceBox import ChoiceBox
     live = hasattr(screen, '_channel_order_scope')
@@ -98,10 +120,27 @@ def _date_support(screen, ctx, mode):
         if not channels or getattr(screen, '_live_has_more', True): return None
         return any(getattr(row, 'sort_added', 0) for row in screen._entries)
     catalog = getattr(screen, '_'+kind+'_browser_catalog', None)
-    backend = getattr(getattr(catalog, 'index', None), '_memory', None)
-    generation = backend.session.active if backend is not None else None
-    if generation is None: return None
-    return generation.rows.has_sort_added if mode == 'added' else generation.rows.has_sort_release
+    # An unloaded/different category is unknown, including the empty ID used
+    # for All Movies/All Series. Do not disable it using the previous list.
+    selected = getattr(catalog, '_category_id', None)
+    if selected is None or str(selected) != category: return None
+    index = getattr(catalog, 'index', None)
+    backend = getattr(index, '_memory', None)
+    if backend is None: return None
+    session = backend.session
+    generation = session.active
+    if (generation is None or session.preparing or session.work is not None
+            or session.reason): return None
+    # Avoid a blocking catalogue lock on the GUI thread, then reject a
+    # snapshot invalidated by a category switch or background completion.
+    if (index is not catalog.index or selected != catalog._category_id
+            or generation is not session.active): return None
+    rows = generation.rows
+    if getattr(rows, 'plain', False):
+        # These properties scan/parse every raw date on first access. The
+        # choice menu runs on the GUI; unknown support is checked by its worker.
+        return getattr(rows, '_has_added' if mode == 'added' else '_has_released', None)
+    return rows.has_sort_added if mode == 'added' else rows.has_sort_release
 
 
 def open_sort(screen):
@@ -117,6 +156,10 @@ def open_sort(screen):
         options.append((marker + _((LABELS if kind == 'live' else VOD_LABELS)[mode]), (mode, available)))
     def selected(value):
         mode, available = value
+        current = context(screen)
+        if current is None or current[:2] != ctx[:2]: return
+        # Loading may have completed while the choice menu was open.
+        available = _date_support(screen, ctx, mode)
         if available is False: _message(screen, NO_DATES)
         else: prepare_choice(screen, ctx, mode)
     _choice(screen, SORT_TITLE, options, selected)
@@ -130,6 +173,7 @@ def cancel(screen):
         job['cancelled'].set()
         with job['lock']:
             if job.get('done'): _dispose(job)
+        _refresh_vod_message(screen)
     if hasattr(screen, '_live_modal_active'): screen._live_modal_active = False
 
 
@@ -141,10 +185,45 @@ def _dispose(job):
 
 
 def category_started(screen, kind, category):
+    cancel_loading(screen, kind)
     job = getattr(screen, '_sorting_job', None)
     if job is not None and job['identity'] != (kind, str(category or '')): cancel(screen)
     catalog = getattr(screen, '_'+kind+'_browser_catalog', None)
     if catalog is not None: catalog.configure_sort(mode_for(screen, kind, category))
+
+
+def initial_page(catalog, category, hidden, token):
+    """Normal Xtream replies appear once, already in their saved order."""
+    reader = getattr(catalog, 'read_display', None) or getattr(catalog, 'read_ready', catalog.read_all)
+    return reader(category, hidden_category_ids=hidden, token=token)
+
+
+def refresh_initial(screen, kind):
+    from .content import ContentError
+    from .movie_catalog import CatalogLimitError, catalog_failure_message
+    items = getattr(screen, '_'+kind+'_entries', None)
+    if getattr(items, 'progressive', False):
+        try:
+            items.refresh(blocking=False)
+        except ContentError:
+            pass
+        except (MemoryError, CatalogLimitError) as caught:
+            items.sort_error = catalog_failure_message(caught)
+
+
+def poll_loading(screen, kind):
+    from .progressive_vod import poll
+    return poll(screen, kind)
+
+
+def cancel_loading(screen, kind):
+    from .progressive_vod import cancel
+    cancel(screen, kind)
+
+
+def defer_loading_selection(screen, kind, index):
+    from .progressive_vod import defer_selection
+    return defer_selection(screen, kind, index)
 
 
 def _full_live(screen, ctx, token, mode):
@@ -194,7 +273,8 @@ def prepare_choice(screen, ctx, mode):
         if hasattr(screen, 'onHide'):
             screen.onHide.append(lambda:cancel(screen) if getattr(screen, '_sorting_job', None) is not None else None)
     kind, category, channels, item = ctx
-    token = _WorkerToken(120)
+    catalog = getattr(screen, '_'+kind+'_browser_catalog', None) if kind != 'live' else None
+    token = _WorkerToken(getattr(catalog, 'load_timeout', 120))
     timer = eTimer()
     job = dict(token=token, timer=timer, identity=(kind,category), lock=threading.Lock(), cancelled=threading.Event(), done=False)
     screen._sorting_job = job
@@ -205,21 +285,25 @@ def prepare_choice(screen, ctx, mode):
         screen._live_catalog_generation += 1
         screen._live_more_loading = False
     screen['message'].setText(_('Loading...'))
+    _refresh_vod_message(screen)
     def work():
         try:
+            token.check()
             if kind == 'live':
                 entries, lease = _bounded_client_call(screen.client, token, lambda:_full_live(screen, ctx, token, mode))
                 job['entries'], job['lease'] = entries, lease
             else:
-                catalog = getattr(screen, '_'+kind+'_browser_catalog')
-                if str(getattr(catalog, '_category_id', '')) != category:
+                # Check cancellation under the category-switch lock before
+                # starting anything, so an old worker cannot reopen its category.
+                with catalog.condition:
+                    token.check()
                     catalog.start(preferred_category=category)
-                job['view'] = (catalog.prepare_sort(mode, category, screen._hidden_category_ids, token)
+                job['view'] = (catalog.prepare_sort(mode, category, screen._hidden_category_ids, token, _display=True)
                                if mode != 'provider' else None)
             token.check()
             if not SortStore().save(scope(screen, kind, category), mode): raise SortUnavailable(SAVE_ERROR)
         except Exception as error:
-            job['error'] = str(error) if isinstance(error, SortUnavailable) else INCOMPLETE
+            job['error'] = _failure(error)
         finally:
             with job['lock']:
                 job['done'] = True
@@ -238,6 +322,7 @@ def prepare_choice(screen, ctx, mode):
             timer.start(100, True);return
         screen._sorting_job = None
         timer.stop()
+        _refresh_vod_message(screen)
         if channels: screen._live_modal_active = False
         try:
             if job.get('error'):
@@ -257,17 +342,24 @@ def prepare_choice(screen, ctx, mode):
                 # An explicit new ordering must show its first result. Regular
                 # navigation/refresh still retain their own selection handling.
                 setattr(screen, '_sorting_restore_'+kind, None)
+                if kind == 'series':
+                    getattr(screen, '_series_selection_by_category', {}).pop(category, None)
                 getattr(screen, '_start_'+kind+'_load')(item)
         finally: _dispose(job)
     _connect_timer(timer, poll)
     job['poll'] = poll
-    threading.Thread(target=work, name='GT-ContentSorting', daemon=True).start()
-    timer.start(100, True)
+    _start_job(job, work, 'GT-ContentSorting')
 
 
 def restore_page(screen, catalog, page, kind, category, generation, token):
     request = getattr(screen, '_sorting_restore_'+kind, None)
     if request is not None and request[:2] == (generation, str(category or '')) and request[2]:
+        if getattr(page.items, 'full_category', False):
+            position = page.items.position(request[2])
+            if position is None and getattr(page.items, 'progressive', False):
+                page.items.restore_identity = (request[2], generation)
+            page.sort_base, page.sort_selected = 0, position if position is not None else 0
+            return page
         position = catalog.sort_position(request[2], category, screen._hidden_category_ids, token)
         base = max(0, ((position-70)//70)*70)
         page = catalog.read_window(category, offset=base, size=240, hidden_category_ids=screen._hidden_category_ids, token=token)
@@ -356,6 +448,7 @@ def prepare_category_choice(screen, mode):
                lock=threading.Lock(), cancelled=threading.Event(), done=False)
     screen._sorting_job = job
     screen['message'].setText(_('Loading...'))
+    _refresh_vod_message(screen)
     def work():
         try:
             preferences = store.load(key)
@@ -364,7 +457,7 @@ def prepare_category_choice(screen, mode):
             if not store.save_sort(key, mode):
                 raise SortUnavailable(SAVE_ERROR)
         except Exception as error:
-            job['error'] = str(error) if isinstance(error, SortUnavailable) else SAVE_ERROR
+            job['error'] = _failure(error, SAVE_ERROR)
         finally:
             with job['lock']:
                 job['done'] = True
@@ -387,6 +480,7 @@ def prepare_category_choice(screen, mode):
             return
         screen._sorting_job = None
         timer.stop()
+        _refresh_vod_message(screen)
         if job.get('error'):
             _dispose(job)
             _message(screen, job['error'])
@@ -403,5 +497,4 @@ def prepare_category_choice(screen, mode):
             screen._refresh_live_categories()
     _connect_timer(timer, poll)
     job['poll'] = poll
-    threading.Thread(target=work, name='GT-CategorySorting', daemon=True).start()
-    timer.start(100, True)
+    _start_job(job, work, 'GT-CategorySorting', SAVE_ERROR)

@@ -7,6 +7,8 @@ import os
 import threading
 
 from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 from .i18n import _, localized_language_name
 from .paths import plugin_path
 from .remote_footer import decorate_remote_footer, footer_item, install_remote_footer
@@ -282,17 +284,17 @@ class GTLocalSubtitleBrowserScreen(Screen):
         count = len(self.entries)
         self.selected = max(0, min(self.selected, count - 1)) if count else 0
         self.top = (self.selected // ROWS) * ROWS
-        self["page"].setText("{}: {} / {}".format(_("Page"), self.selected // ROWS + 1,
+        set_text_if_changed(self["page"], "{}: {} / {}".format(_("Page"), self.selected // ROWS + 1,
                                                  max(1, (count + ROWS - 1) // ROWS)))
         for row in range(ROWS):
             index = self.top + row
             exists = index < count
             for stem in ("row_art", "name", "detail"):
                 widget = self["{}_{}".format(stem, row)]
-                widget.show() if exists else widget.hide()
+                set_visible(widget, True) if exists else set_visible(widget, False)
             for side in ("top", "bottom", "left", "right"):
                 widget = self["focus_{}_{}".format(row, side)]
-                widget.show() if exists and index == self.selected else widget.hide()
+                set_visible(widget, True) if exists and index == self.selected else set_visible(widget, False)
             if not exists:
                 continue
             entry = self.entries[index]

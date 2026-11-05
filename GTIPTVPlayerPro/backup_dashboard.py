@@ -4,13 +4,16 @@
 """Receiver-native selective-backup dashboard, without a browser dependency."""
 
 import os
+from .ui_update import set_visible
+from .typography import set_text_if_changed
+from .ui_update import set_pixmap_num
 from xml.sax.saxutils import escape
 
 from Components.Label import Label
 from Components.Pixmap import MultiPixmap, Pixmap
 from enigma import getDesktop
 
-from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
+from .utility_pages import skin_after
 from .backup import BackupError
 from .backup_scope import GROUPS
 from .i18n import N_, _
@@ -133,18 +136,18 @@ def refresh(screen, size_format, records=None, update_storage=True):
     files = (screen.manifest or {}).get("files", []) if records is None else records
     for index, group in enumerate(GROUPS):
         checked = group in screen.selected_groups
-        screen["card_check_{}".format(index)].setPixmapNum(1 if checked else 0)
+        set_pixmap_num(screen['card_check_{}'.format(index)], 1 if checked else 0)
         focus = screen["card_focus_{}".format(index)]
-        focus.show() if index == screen.focus_index else focus.hide()
+        set_visible(focus, True) if index == screen.focus_index else set_visible(focus, False)
         if screen.manifest is not None:
             records = screen.manager.select_records(files, (group,))
-            screen["card_size_{}".format(index)].setText(size_format(sum(row["size"] for row in records)))
+            set_text_if_changed(screen['card_size_{}'.format(index)], size_format(sum((row['size'] for row in records))))
         for suffix, text, lines in (("title", _(CATEGORIES[index][0]), 2),
                                     ("description", _(CATEGORIES[index][1]), 3)):
             fit_dynamic_text(screen["card_{}_{}".format(suffix, index)], text, max_lines=lines)
     selected = screen.manager.select_records(files, screen.selected_groups) if screen.selected_groups else []
-    screen["selected_size"].setText(size_format(sum(row["size"] for row in selected)))
-    screen["selection_count"].setText(_("{} / {} sections selected").format(len(screen.selected_groups), len(GROUPS)))
+    set_text_if_changed(screen['selected_size'], size_format(sum((row['size'] for row in selected))))
+    set_text_if_changed(screen['selection_count'], _('{} / {} sections selected').format(len(screen.selected_groups), len(GROUPS)))
     if update_storage:
         try:
             screen.manager.destination(screen.location)
@@ -152,13 +155,13 @@ def refresh(screen, size_format, records=None, update_storage=True):
             free = size_format(info.f_bavail * (info.f_frsize or info.f_bsize))
         except (BackupError, OSError, ValueError, RuntimeError):
             free = _("Not available")
-        screen["free_space"].setText(free)
+        set_text_if_changed(screen['free_space'], free)
     fit_dynamic_text(screen["path"], screen.location, max_lines=1)
     overlay = screen.state in ("running", "error", "success")
     for name in ("operation_panel", "detail", "progress"):
-        screen[name].show() if overlay else screen[name].hide()
+        set_visible(screen[name], True) if overlay else set_visible(screen[name], False)
     if screen.state == "ready":
-        screen["message"].setText(_("Select sections with OK. The total updates automatically."))
+        set_text_if_changed(screen['message'], _('Select sections with OK. The total updates automatically.'))
     for name in ("intro", "path_action", "summary_title", "selection_count", "size_caption",
                  "free_caption", "free_space", "backup_hint", "backup_button"):
         widget = screen[name]

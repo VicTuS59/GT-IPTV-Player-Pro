@@ -1,5 +1,12 @@
 # Change log
 
+## 1.9.0-r0
+
+- Redesigned the Movies and Series pages for faster, more stable browsing.
+- Removed the Live TV recording feature to address buffering during live TV playback.
+- Made extensive performance improvements throughout the plugin.
+- Improved YouTube stability.
+
 ## 1.8.6-r0
 
 - Remove the mandatory pre-update backup while retaining manual backup/restore.

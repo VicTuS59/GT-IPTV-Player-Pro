@@ -5,8 +5,9 @@
 """Provider-backed TV archive browser; GUI updates stay on the timer thread."""
 
 from collections import OrderedDict
+from .ui_update import set_visible
+from .typography import set_text_if_changed
 import datetime
-import os
 import threading
 import time
 
@@ -17,15 +18,15 @@ from Screens.Screen import Screen
 from enigma import eTimer, getDesktop
 
 from .broadcast_presentation import skin_after as broadcast_skin_after, refresh_after as broadcast_refresh_after, setup as setup_broadcast
-from .background import attach_background
+from .broadcast_presentation import refresh_archive_programmes
 from .content import ContentError
 from .i18n import N_, _, localized_date_text, localized_short_weekday, localized_upper
-from .paths import plugin_path
 from .remote_footer import (
     _text_units, decorate_remote_footer, footer_item, install_remote_footer,
     remote_action_text, set_remote_footer,
 )
 from .typography import fit_dynamic_text
+from .remote_footer import prepared_skin, skin_metadata
 
 
 CHANNEL_ROWS = 12
@@ -181,7 +182,7 @@ class GTArchiveScreen(Screen):
         )
         widest_footer = ARCHIVE_FOOTER[:3]+(footer_item("ok", widest_action), ARCHIVE_FOOTER[4])
         self.skin = decorate_remote_footer(
-            _archive_skin(), ARCHIVE_FOOTER,
+            prepared_skin(_archive_skin), ARCHIVE_FOOTER,
             alternate_items=widest_footer,
             transparent_panel=True, show_dividers=False,
             skin_fonts_scaled=True, show_web_hint=False,
@@ -212,13 +213,12 @@ class GTArchiveScreen(Screen):
 
         # Layout is widget-native: no provider text or translations are baked
         # into artwork, and all text is refitted after the GUI is laid out.
-        import xml.etree.ElementTree as ElementTree
-        for widget in ElementTree.fromstring(_archive_skin()).findall("widget"):
-            if widget.attrib["name"] != "archive_bg":
-                self[widget.attrib["name"]] = Label("") if widget.get("font") else Pixmap()
+        for name,is_label in skin_metadata(self.skin).widgets:
+            if name != "archive_bg":
+                self[name] = Label("") if is_label else Pixmap()
         install_remote_footer(self, ARCHIVE_FOOTER)
-        self["brand_gt"].setText("GT")
-        self["brand"].setText("IPTV PLAYER PRO")
+        set_text_if_changed(self["brand_gt"], "GT")
+        set_text_if_changed(self["brand"], "IPTV PLAYER PRO")
         # The physical CH keys use MoviePlayerActions on both OpenATV and
         # OpenPLi.  Their Navigation/ChannelSelect aliases can fire again on
         # release, so binding those too would turn one press into two pages.
@@ -315,7 +315,7 @@ class GTArchiveScreen(Screen):
         if self._closed or self._suspended:
             return
         now = datetime.datetime.now()
-        self["clock"].setText(now.strftime("%H:%M"))
+        set_text_if_changed(self["clock"], now.strftime("%H:%M"))
         self._clock_timer.start(max(250, (60-now.second)*1000), True)
 
     def _queue(self, kind, channel=None, day=None):
@@ -458,7 +458,7 @@ class GTArchiveScreen(Screen):
             self._queue("programmes", self._channel(), self._day())
 
     def _set_visible(self, name, visible):
-        (self[name].show if visible else self[name].hide)()
+        set_visible(self[name], visible)
 
     def _show_focus(self, prefix, visible):
         for edge in ("top", "bottom", "left", "right"):
@@ -470,8 +470,8 @@ class GTArchiveScreen(Screen):
             ("down", "▼", first+rows < count),
         ):
             name = prefix+"_scroll_"+direction
-            self[name].setText(symbol)
-            self[name+"_disabled"].setText(symbol)
+            set_text_if_changed(self[name], symbol)
+            set_text_if_changed(self[name+"_disabled"], symbol)
             self._set_visible(name, available)
             self._set_visible(name+"_disabled", not available)
 
@@ -482,65 +482,40 @@ class GTArchiveScreen(Screen):
     def _refresh(self):
         if self._closed:
             return
+        themed = getattr(self, '_broadcast_kind', None) == 'archive'
         self._text("title", localized_upper(_("TV Archive")))
         self._text("channels_heading", localized_upper(_("Channels")), 24)
         # Account host is already the credential-free endpoint representation.
         self._text("account", str(getattr(self.account, "host", "") or ""), 55)
         first = (self.channel_index // CHANNEL_ROWS) * CHANNEL_ROWS
         self._show_scroll("channel", first, CHANNEL_ROWS, len(self.channels))
-        for row in range(CHANNEL_ROWS):
-            index = first+row
-            present = index < len(self.channels)
-            selected = present and index == self.channel_index
-            self._text("channel_{}".format(row), self.channels[index].name if present else "", 27)
-            self._set_visible("channel_bg_{}".format(row), present)
-            self._set_visible("channel_selected_{}".format(row), selected)
-            self._show_focus("channel_focus_{}".format(row), selected and self.focus == "channels")
+        if not themed:
+            for row in range(CHANNEL_ROWS):
+                index = first+row
+                present = index < len(self.channels)
+                selected = present and index == self.channel_index
+                self._text("channel_{}".format(row), self.channels[index].name if present else "", 27)
+                self._set_visible("channel_bg_{}".format(row), present)
+                self._set_visible("channel_selected_{}".format(row), selected)
+                self._show_focus("channel_focus_{}".format(row), selected and self.focus == "channels")
         self._text("channel_count", "{}/{}".format(self.channel_index+1, len(self.channels)) if self.channels else "")
         first_day = (self.day_index // DAY_TABS) * DAY_TABS
-        for tab in range(DAY_TABS):
-            index = first_day+tab
-            present = index < len(self.days)
-            selected = present and index == self.day_index
-            day = self.days[index] if present else None
-            text = "{}  {}".format(localized_short_weekday(day.isoformat()), day.strftime("%d.%m")) if day else ""
-            self._text("day_{}".format(tab), text, 20)
-            self._set_visible("day_bg_{}".format(tab), present)
-            self._set_visible("day_selected_{}".format(tab), selected)
-            self._show_focus("day_focus_{}".format(tab), selected and self.focus == "days")
+        if not themed:
+            for tab in range(DAY_TABS):
+                index = first_day+tab
+                present = index < len(self.days)
+                selected = present and index == self.day_index
+                day = self.days[index] if present else None
+                text = "{}  {}".format(localized_short_weekday(day.isoformat()), day.strftime("%d.%m")) if day else ""
+                self._text("day_{}".format(tab), text, 20)
+                self._set_visible("day_bg_{}".format(tab), present)
+                self._set_visible("day_selected_{}".format(tab), selected)
+                self._show_focus("day_focus_{}".format(tab), selected and self.focus == "days")
         channel, day = self._channel(), self._day()
         caption = "{}  ·  {}".format(channel.name, localized_date_text(day)) if channel and day else ""
         self._text("day_caption", caption, 72)
         self._text("day_count", "{}/{}".format(self.day_index+1, len(self.days)) if self.days else "", 10)
-        first = (self.programme_index // PROGRAMME_ROWS) * PROGRAMME_ROWS
-        self._show_scroll("programme", first, PROGRAMME_ROWS, len(self.programmes))
-        self._text("programme_count", "{}/{}".format(self.programme_index+1, len(self.programmes)) if self.programmes else "")
-        for row in range(PROGRAMME_ROWS):
-            index = first+row
-            present = index < len(self.programmes)
-            selected = present and index == self.programme_index
-            programme = self.programmes[index] if present else None
-            self._text("programme_{}".format(row), programme.title if programme else "", 65)
-            start = datetime.datetime.fromtimestamp(programme.start).strftime("%H:%M") if programme else ""
-            duration = _("{} min").format(max(1, int((programme.end-programme.start+59)//60))) if programme else ""
-            self._text("programme_time_{}".format(row), start, 8)
-            self._text("programme_duration_{}".format(row), duration, 15)
-            self["programme_play_{}".format(row)].setText("▶")
-            self._set_visible("programme_play_{}".format(row), selected and self.focus == "programmes")
-            self._set_visible("programme_bg_{}".format(row), present)
-            self._set_visible("programme_selected_{}".format(row), selected)
-            self._show_focus("programme_focus_{}".format(row), selected and self.focus == "programmes")
-        programme = self.programmes[self.programme_index] if self.programmes else None
-        self._text("detail_title", programme.title if programme else "", 85)
-        time_text = ""
-        if programme:
-            time_text = "{} – {}  ·  {}".format(
-                datetime.datetime.fromtimestamp(programme.start).strftime("%H:%M"),
-                datetime.datetime.fromtimestamp(programme.end).strftime("%H:%M"),
-                _("Watch from archive"),
-            )
-        self._text("detail_time", time_text, 95)
-        self._text("detail_description", programme.description if programme else "", 120)
+        self._refresh_programmes()
         message = ""
         if self._playback_error:
             message = _("Could not open the archived programme.")
@@ -559,6 +534,53 @@ class GTArchiveScreen(Screen):
         )
         action = "retry" if self._error or empty_selection else ("play" if self.focus == "programmes" else "select")
         set_remote_footer(self, ARCHIVE_FOOTER[:3]+(footer_item("ok", action), ARCHIVE_FOOTER[4]))
+
+    def _refresh_programmes(self, previous_index=None):
+        first = (self.programme_index // PROGRAMME_ROWS) * PROGRAMME_ROWS
+        if previous_index is None:
+            self._show_scroll("programme", first, PROGRAMME_ROWS, len(self.programmes))
+        if getattr(self, "_broadcast_kind", None) == "archive":
+            return
+        self._text("programme_count", "{}/{}".format(self.programme_index+1, len(self.programmes)) if self.programmes else "")
+        rows = range(PROGRAMME_ROWS) if previous_index is None else (previous_index - first, self.programme_index - first)
+        for row in rows:
+            index = first+row
+            present = index < len(self.programmes)
+            selected = present and index == self.programme_index
+            if previous_index is None:
+                programme = self.programmes[index] if present else None
+                self._text("programme_{}".format(row), programme.title if programme else "", 65)
+                start = datetime.datetime.fromtimestamp(programme.start).strftime("%H:%M") if programme else ""
+                duration = _("{} min").format(max(1, int((programme.end-programme.start+59)//60))) if programme else ""
+                self._text("programme_time_{}".format(row), start, 8)
+                self._text("programme_duration_{}".format(row), duration, 15)
+                set_text_if_changed(self["programme_play_{}".format(row)], "▶")
+            self._set_visible("programme_play_{}".format(row), selected and self.focus == "programmes")
+            self._set_visible("programme_bg_{}".format(row), present)
+            self._set_visible("programme_selected_{}".format(row), selected)
+            self._show_focus("programme_focus_{}".format(row), selected and self.focus == "programmes")
+        programme = self.programmes[self.programme_index] if self.programmes else None
+        time_text = ""
+        if programme:
+            time_text = "{} – {}  ·  {}".format(
+                datetime.datetime.fromtimestamp(programme.start).strftime("%H:%M"),
+                datetime.datetime.fromtimestamp(programme.end).strftime("%H:%M"),
+                _("Watch from archive"),
+            )
+        self._text("detail_time", time_text, 95)
+        self._text("detail_title", programme.title if programme else "", 85)
+        self._text("detail_description", programme.description if programme else "", 120)
+
+    def _move_programme(self, amount):
+        previous = self.programme_index
+        self.programme_index = max(0, min(len(self.programmes) - 1, previous + amount))
+        if (getattr(self, "_broadcast_kind", None) == "archive"
+                and previous // PROGRAMME_ROWS == self.programme_index // PROGRAMME_ROWS
+                and not (self._loading or self._error or self._playback_error)):
+            if previous != self.programme_index:
+                refresh_archive_programmes(self, previous)
+            return
+        self._refresh()
 
     def _can_navigate(self):
         return not self._closed and not self._suspended
@@ -591,7 +613,8 @@ class GTArchiveScreen(Screen):
             if not self.programmes or self.programme_index == 0:
                 self.focus = "days"
             else:
-                self.programme_index -= 1
+                self._move_programme(-1)
+                return
         self._refresh()
 
     def move_down(self):
@@ -602,7 +625,8 @@ class GTArchiveScreen(Screen):
         elif self.focus == "days":
             self.focus = "programmes"
         elif self.programmes:
-            self.programme_index = min(len(self.programmes)-1, self.programme_index+1)
+            self._move_programme(1)
+            return
         self._refresh()
 
     def move_left(self):

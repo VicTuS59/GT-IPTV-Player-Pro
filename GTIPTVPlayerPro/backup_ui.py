@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Receiver-local user-data backup and restore, controlled with the remote."""
 
-import datetime
 import os
 import threading
 
@@ -15,14 +14,14 @@ from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from enigma import eTimer, getDesktop
 
-from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
+from .utility_pages import refresh_after, setup as setup_utility_pages
 from .backup import BackupError, BackupManager, CONFIG_PREFIX, EXTENSION, SETTINGS_PATH
 from .background import attach_background
 from .diagnostics import log_event
 from .i18n import N_, _
 from .paths import plugin_path
+from .remote_footer import prepared_skin
 from .remote_footer import decorate_remote_footer, footer_item, install_remote_footer
-from .smooth_scroll import GTSmoothScrollLabel
 from .typography import font_px
 
 
@@ -116,7 +115,7 @@ def _skin(mode, picker=False):
 class GTBackupPickerScreen(Screen):
     def __init__(self, session, mode, current="", title=None):
         self.mode = mode
-        self.skin = _skin(mode, picker=True)
+        self.skin = prepared_skin(_skin, mode, picker=True)
         Screen.__init__(self, session)
         attach_background(self, "app_bg", plugin_path("skin", "images", "screen-settings-glass-r90.png"))
         title = title or (_("Backup file") if mode == "restore" else _("Backup folder"))
@@ -142,7 +141,8 @@ class GTBackupPickerScreen(Screen):
         self.setTitle(title)
 
     def draw(self):
-        self["path"].setText(self["filelist"].getCurrentDirectory() or _("Storage"))
+        from .typography import set_text_if_changed
+        set_text_if_changed(self["path"], self["filelist"].getCurrentDirectory() or _("Storage"))
 
     def move(self, method):
         getattr(self["filelist"], method)()

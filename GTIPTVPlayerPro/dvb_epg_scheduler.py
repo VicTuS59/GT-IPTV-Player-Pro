@@ -7,12 +7,7 @@ import threading
 import time
 
 from .diagnostics import log_event
-from .dvb_epg import (
-    DEFAULT_IMPORT_PAST_SECONDS,
-    DvbEpgError,
-    OperationCancelled,
-    load_dvb_services,
-)
+from .dvb_epg import DvbEpgError, OperationCancelled, load_dvb_services
 from .dvb_epg_runtime import (
     acquire_runtime,
     release_runtime,

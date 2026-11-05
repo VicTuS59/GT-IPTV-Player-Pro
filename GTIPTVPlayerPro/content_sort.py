@@ -30,7 +30,7 @@ EPOCH_OFFSET = 62135596800
 
 
 def date_value(value, year_only=False):
-    """UTC epoch; neither provider IDs nor modification dates imply additions."""
+    """Parse provider dates without synthesizing dates from content IDs."""
     if value is None or isinstance(value, bool):
         return 0
     text = str(value).strip()[:48]
@@ -50,12 +50,15 @@ def date_value(value, year_only=False):
 
 
 def assign_sort_metadata(item, entry):
+    """Prefer addition dates; VOD recency may fall back to modification dates."""
     def first(keys, year=False):
         for key in keys:
             value = date_value(entry.get(key), year)
             if value: return value
         return 0
     item.sort_added = first(('added', 'date_added', 'added_at', 'created_at', 'created'))
+    if not item.sort_added and getattr(item, 'content_type', '') in ('movie', 'series'):
+        item.sort_added = first(('last_modified', 'lastModified', 'modified_at', 'updated_at', 'last_updated'))
     item.sort_release = first(('release_date', 'releasedate', 'releaseDate', 'first_air_date', 'year', 'release_year'), True)
     return item
 
@@ -137,10 +140,11 @@ def heap_order(values, key, check):
 
 class Lease:
     """All extra indexes/held live rows debit the existing shared RAM budget."""
-    def __init__(self):
+    def __init__(self, check_available=True):
         from .memory_catalog import budget
         self.budget = budget
         self.amount = [0]
+        self.check_available = check_available
         self.finalizer = weakref.finalize(self, self._release, budget, self.amount)
 
     @staticmethod
@@ -148,9 +152,47 @@ class Lease:
         budget.reserve(-amount[0]);amount[0] = 0
 
     def reserve(self, amount):
-        self.budget.reserve(amount);self.amount[0] += amount
+        self.budget.reserve(amount, check_available=self.check_available);self.amount[0] += amount
 
     def close(self): self.finalizer()
+
+
+def category_fast_order(order, rows, key, backend, held_bytes, check):
+    """Use native list.sort only when its temporary keys fit both RAM budgets."""
+    from .memory_catalog import available_memory
+    from .movie_catalog import CatalogLimitError
+    # Search retains the allocation-minimal heap path. Category browsing may
+    # borrow a bounded temporary list of integer positions and sort keys.
+    if getattr(backend, 'check_available_memory', True):
+        return None
+    needed = len(order) * 320 + len(rows.names) + 65536
+    if needed > 16 * 1024 * 1024 or backend.session.weight() + held_bytes + needed > backend.owner.max_bytes:
+        return None
+    try:
+        if available_memory() < needed + 8 * 1024 * 1024:
+            return None
+    except (OSError, ValueError):
+        return None
+    temporary = Lease(check_available=False)
+    values = None
+    try:
+        temporary.reserve(needed)
+        check()
+        values = list(order)
+        count = [0]
+        def checked_key(position):
+            count[0] += 1
+            if count[0] % 512 == 0:
+                check()
+            return key(position)
+        values.sort(key=checked_key)
+        check()
+        return array('I', values)
+    except (MemoryError, CatalogLimitError):
+        return None
+    finally:
+        values = None
+        temporary.close()
 
 
 class SortedIndex:
@@ -160,9 +202,10 @@ class SortedIndex:
         self.mode = mode
         self.closed = threading.Event()
         self.lock = threading.Lock()
-        self.lease = Lease()
+        self.lease = Lease(check_available=getattr(backend, 'check_available_memory', True))
         self.order = array('I')
         self.generation = None
+        self.sort_method = 'provider'
         try:
             with self.lock, backend.session.lock:
                 backend.check(token, memory=True)
@@ -189,7 +232,14 @@ class SortedIndex:
                     def key(pos):
                         name = bytes(rows.names[rows.ends[pos]:rows.ends[pos+1]-1])
                         return sort_key(mode, name, rows.sort_added[pos], rows.sort_release[pos], pos)
-                    heap_order(self.order, key, lambda:self.check(token))
+                    check = lambda:self.check(token)
+                    fast = category_fast_order(self.order, rows, key, backend, self.lease.amount[0], check)
+                    if fast is None:
+                        self.sort_method = 'heap'
+                        heap_order(self.order, key, check)
+                    else:
+                        self.sort_method = 'builtin'
+                        self.order = fast
                     if mode == 'alpha_desc': self.order.reverse()
                 actual = sys.getsizeof(self.order) + 4096
                 self.lease.reserve(actual - self.lease.amount[0])

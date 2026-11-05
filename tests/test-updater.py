@@ -159,7 +159,7 @@ class UpdateServiceTests(unittest.TestCase):
   self.network.data=ipk();p=self.s.download(offer);Path(p).write_bytes(b'tamper');self.s.download(offer);self.assertEqual(Path(p).read_bytes(),ipk())
  def test_disk_space_and_channel_mismatch_block_download(self):
   offer=self.offer()
-  with patch.object(service.shutil,'disk_usage',return_value=types.SimpleNamespace(free=1)),self.assertRaises(UpdateError):self.s.download(offer)
+  with patch.object(shutil,'disk_usage',return_value=types.SimpleNamespace(free=1)),self.assertRaises(UpdateError):self.s.download(offer)
   invalid=dict(offer,body=vector('test'))
   with self.assertRaises(UpdateError):self.s.download(invalid)
  def install_call(self,**kw):
@@ -181,7 +181,7 @@ class UpdateServiceTests(unittest.TestCase):
   self.assertEqual(busy.call_count,2);runner.assert_not_called()
  def test_flash_space_is_rechecked_before_opkg_without_creating_a_backup(self):
   runner=Mock(return_value=0)
-  with patch.object(service.shutil,'disk_usage',side_effect=[types.SimpleNamespace(free=10**9),types.SimpleNamespace(free=10**9),types.SimpleNamespace(free=1)]),self.assertRaises(UpdateError) as error:
+  with patch.object(shutil,'disk_usage',side_effect=[types.SimpleNamespace(free=10**9),types.SimpleNamespace(free=10**9),types.SimpleNamespace(free=1)]),self.assertRaises(UpdateError) as error:
    self.install_call(runner=runner)
   self.assertEqual(error.exception.code,'space');runner.assert_not_called()
  def test_opkg_failure_is_visible_and_keeps_failed_state(self):
