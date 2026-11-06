@@ -1,5 +1,9 @@
 # Change log
 
+## 1.9.1-r0
+
+* Fixed compatibility-related crashes.
+
 ## 1.9.0-r0
 
 - Redesigned the Movies and Series pages for faster, more stable browsing.

@@ -1,8 +1,5 @@
-# GT IPTV Player Pro 1.9.0-r0
+# GT IPTV Player Pro 1.9.1-r0
 
-- Redesigned the Movies and Series pages for faster, more stable browsing.
-- Removed the Live TV recording feature to address buffering during live TV playback.
-- Made extensive performance improvements throughout the plugin.
-- Improved YouTube stability.
+* Fixed compatibility-related crashes.
 
 Signed stable updates: Settings > Software update. Publishing: [UPDATING.md](UPDATING.md).

@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Enigma2's native listbox owns row painting and selection movement."""
+import enigma
 from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryProgress
 from enigma import (eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT,
-                    RT_HALIGN_RIGHT, RT_VALIGN_CENTER, RT_ELLIPSIS)
+                    RT_HALIGN_RIGHT, RT_VALIGN_CENTER)
 from skin import parseColor
+
+RT_ELLIPSIS = getattr(enigma, "RT_ELLIPSIS", 0)
 
 
 class NativeVODList(MenuList):

@@ -37,6 +37,7 @@ _SERIES_RESPONSE_INIT_LOCK = threading.Lock()
 API_READ_CHUNK_BYTES = 64 * 1024
 MAX_PROVIDER_INTEGER_DIGITS = 128
 MAX_PROVIDER_JSON_NESTING = 128
+_SURROGATE_CODE_POINT = re.compile(r"[\ud800-\udfff]")
 LIVE_INITIAL_ITEMS = 36
 LIVE_MORE_ITEMS = 60
 
@@ -319,7 +320,8 @@ class EPGEvent(object):
 
 def _clean_text(value, fallback=""):
     text = str(value or "").replace("\r", " ").replace("\n", " ").strip()
-    return (text or fallback)[:180]
+    text = (text or fallback)[:180]
+    return text if text.isascii() else _SURROGATE_CODE_POINT.sub("\ufffd", text)
 
 
 def _movie_search_text(value):
@@ -388,7 +390,8 @@ def _normalise_media_url(value, account=None):
         parsed = urlsplit(raw)
     except Exception:
         return ""
-    if parsed.scheme.lower() not in ("http", "https") or not parsed.netloc:
+    if (parsed.scheme.lower() not in ("http", "https") or not parsed.netloc
+            or (not raw.isascii() and _SURROGATE_CODE_POINT.search(raw))):
         return ""
     path = quote(parsed.path, safe="/%:@!$&'()*+,;=-._~")
     query = quote(parsed.query, safe="=&?/:;+,%@[]!$'()*-._~")
