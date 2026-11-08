@@ -4345,3 +4345,65 @@ msgstr "{} • {} סרטים"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} סדרות"
+
+msgid "AC3 downmix is active"
+msgstr "המרת ערוצי AC3 פעילה"
+
+msgid "Bulk Move"
+msgstr "העברה מרובה"
+
+msgid "Channel order saved."
+msgstr "סדר הערוצים נשמר."
+
+msgid "Choose a TXT file."
+msgstr "בחר קובץ TXT."
+
+msgid "Choose an unmarked channel."
+msgstr "יש לבחור ערוץ שאינו מסומן."
+
+msgid "Digital audio passthrough"
+msgstr "העברה ישירה של שמע דיגיטלי"
+
+msgid "Import TXT"
+msgstr "ייבוא TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "בשורה {} יש להזין שם משתמש וסיסמה המופרדים ברווח."
+
+msgid "Mark channels with RED first."
+msgstr "יש לסמן תחילה ערוצים באמצעות הכפתור האדום."
+
+msgid "Not supported"
+msgstr "לא נתמך"
+
+msgid "PCM Multichannel Audio"
+msgstr "שמע PCM רב־ערוצי"
+
+msgid "Place above"
+msgstr "הצבה מעל"
+
+msgid "Place below"
+msgstr "הצבה מתחת"
+
+msgid "Place marked channels before saving."
+msgstr "יש להציב את הערוצים המסומנים לפני השמירה."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "הזן את כתובת השרת ב־HTTP או ב־HTTPS בשורה הראשונה."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "שמור את קובץ ה־TXT בקידוד UTF-8."
+
+msgid "Setting could not be changed"
+msgstr "לא ניתן לשנות את ההגדרה"
+
+msgid "Temporarily unavailable"
+msgstr "לא זמין זמנית"
+
+msgid "The TXT file could not be read."
+msgstr "לא ניתן לקרוא את קובץ ה־TXT."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "חשבונות Xtream שנוספו ({})\nכפילויות שדולגו ({})"

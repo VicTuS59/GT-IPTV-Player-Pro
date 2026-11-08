@@ -4333,3 +4333,65 @@ msgstr "{}  •  {} FİLM"
 
 msgid "{} • {} SERIES"
 msgstr "{}  •  {} DİZİ"
+
+msgid "AC3 downmix is active"
+msgstr "AC3 Downmix etkin"
+
+msgid "Bulk Move"
+msgstr "Toplu Taşı"
+
+msgid "Channel order saved."
+msgstr "Kanal sırası kaydedildi."
+
+msgid "Choose a TXT file."
+msgstr "Bir TXT dosyası seçin."
+
+msgid "Choose an unmarked channel."
+msgstr "İşaretsiz bir kanal seçin."
+
+msgid "Digital audio passthrough"
+msgstr "Doğrudan Ses Aktarımı"
+
+msgid "Import TXT"
+msgstr "TXT’den aktar"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "{}. satırda kullanıcı adı ile şifreyi bir boşlukla ayırın."
+
+msgid "Mark channels with RED first."
+msgstr "Önce kırmızı tuşla kanalları işaretleyin."
+
+msgid "Not supported"
+msgstr "Desteklenmiyor"
+
+msgid "PCM Multichannel Audio"
+msgstr "PCM Çok Kanallı Ses"
+
+msgid "Place above"
+msgstr "Üste yerleştir"
+
+msgid "Place below"
+msgstr "Alta yerleştir"
+
+msgid "Place marked channels before saving."
+msgstr "Kaydetmeden önce işaretli kanalları yerleştirin."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "İlk satıra HTTP veya HTTPS sunucu adresini yazın."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "TXT dosyasını UTF-8 kodlamasıyla kaydedin."
+
+msgid "Setting could not be changed"
+msgstr "Ayar değiştirilemedi"
+
+msgid "Temporarily unavailable"
+msgstr "Şu anda kullanılamıyor"
+
+msgid "The TXT file could not be read."
+msgstr "TXT dosyası okunamadı."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Eklenen Xtream hesabı ({})\nAtlanan yinelenen kayıt ({})"

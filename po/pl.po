@@ -4339,3 +4339,65 @@ msgstr "{} • {} FILMÓW"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SERIALI"
+
+msgid "AC3 downmix is active"
+msgstr "Redukcja kanałów AC3 jest aktywna"
+
+msgid "Bulk Move"
+msgstr "Przenieś grupowo"
+
+msgid "Channel order saved."
+msgstr "Zapisano kolejność kanałów."
+
+msgid "Choose a TXT file."
+msgstr "Wybierz plik TXT."
+
+msgid "Choose an unmarked channel."
+msgstr "Wybierz niezaznaczony kanał."
+
+msgid "Digital audio passthrough"
+msgstr "Bezpośrednie przesyłanie dźwięku cyfrowego"
+
+msgid "Import TXT"
+msgstr "Importuj TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "W wierszu {} oddziel nazwę użytkownika od hasła spacją."
+
+msgid "Mark channels with RED first."
+msgstr "Najpierw zaznacz kanały czerwonym przyciskiem."
+
+msgid "Not supported"
+msgstr "Nieobsługiwane"
+
+msgid "PCM Multichannel Audio"
+msgstr "Wielokanałowy dźwięk PCM"
+
+msgid "Place above"
+msgstr "Wstaw powyżej"
+
+msgid "Place below"
+msgstr "Wstaw poniżej"
+
+msgid "Place marked channels before saving."
+msgstr "Przed zapisaniem umieść zaznaczone kanały w wybranym miejscu."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "W pierwszym wierszu wpisz adres HTTP lub HTTPS serwera."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Zapisz plik TXT w kodowaniu UTF-8."
+
+msgid "Setting could not be changed"
+msgstr "Nie udało się zmienić ustawienia"
+
+msgid "Temporarily unavailable"
+msgstr "Tymczasowo niedostępne"
+
+msgid "The TXT file could not be read."
+msgstr "Nie udało się odczytać pliku TXT."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Dodane konta Xtream ({})\nPominięte duplikaty ({})"

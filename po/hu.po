@@ -4333,3 +4333,65 @@ msgstr "{} • {} FILM"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SOROZAT"
+
+msgid "AC3 downmix is active"
+msgstr "Az AC3 lekeverés aktív"
+
+msgid "Bulk Move"
+msgstr "Csoportos áthelyezés"
+
+msgid "Channel order saved."
+msgstr "A csatornasorrend mentve."
+
+msgid "Choose a TXT file."
+msgstr "Válasszon TXT-fájlt."
+
+msgid "Choose an unmarked channel."
+msgstr "Válasszon egy ki nem jelölt csatornát."
+
+msgid "Digital audio passthrough"
+msgstr "Digitális hang közvetlen továbbítása"
+
+msgid "Import TXT"
+msgstr "TXT importálása"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "A(z) {}. sorban a felhasználónevet és a jelszót szóközzel válassza el."
+
+msgid "Mark channels with RED first."
+msgstr "Először jelölje ki a csatornákat a piros gombbal."
+
+msgid "Not supported"
+msgstr "Nem támogatott"
+
+msgid "PCM Multichannel Audio"
+msgstr "Többcsatornás PCM-hang"
+
+msgid "Place above"
+msgstr "Elhelyezés fölé"
+
+msgid "Place below"
+msgstr "Elhelyezés alá"
+
+msgid "Place marked channels before saving."
+msgstr "Mentés előtt helyezze el a kijelölt csatornákat."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Az első sorba írja a kiszolgáló HTTP- vagy HTTPS-címét."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Mentse a TXT-fájlt UTF-8 kódolással."
+
+msgid "Setting could not be changed"
+msgstr "A beállítás nem módosítható"
+
+msgid "Temporarily unavailable"
+msgstr "Átmenetileg nem érhető el"
+
+msgid "The TXT file could not be read."
+msgstr "A TXT-fájl nem olvasható."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Hozzáadott Xtream-fiókok ({})\nKihagyott ismétlődések ({})"

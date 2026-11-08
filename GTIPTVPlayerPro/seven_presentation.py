@@ -136,7 +136,10 @@ def _batch(s):
     text(s,'r100_batch_percent','{}%'.format(percent),84)
     text(s,'r100_batch_done',_('{} / {} completed').format(s._completed,total),34)
     text(s,'r100_batch_account_caption',_('Account being tested') if testing else _('Information'),29)
-    text(s,'r100_batch_account',main._account_test_display_name(s._current_account) if testing and s._current_account is not None else s['subtitle'].getText(),34,3)
+    account_text = s['current_account'].getText() or s['subtitle'].getText()
+    if testing and s._current_account is not None:
+        account_text = main._account_test_display_name(s._current_account)
+    text(s,'r100_batch_account',account_text,34,3)
     text(s,'r100_batch_state',sentence_caption(_('TESTING...')) if testing else s['subtitle'].getText(),30,2)
     text(s,'r100_batch_state_caption',_('Status'),25)
     text(s,'r100_batch_hint',_('Accounts are checked in order.') if testing else s['review_page'].getText(),25)

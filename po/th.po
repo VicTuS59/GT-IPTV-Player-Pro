@@ -4327,3 +4327,65 @@ msgstr "{} • {} ภาพยนตร์"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} ซีรีส์"
+
+msgid "AC3 downmix is active"
+msgstr "การลดจำนวนช่องเสียง AC3 กำลังทำงาน"
+
+msgid "Bulk Move"
+msgstr "ย้ายหลายช่อง"
+
+msgid "Channel order saved."
+msgstr "บันทึกลำดับช่องแล้ว"
+
+msgid "Choose a TXT file."
+msgstr "เลือกไฟล์ TXT"
+
+msgid "Choose an unmarked channel."
+msgstr "เลือกช่องที่ไม่ได้ทำเครื่องหมาย"
+
+msgid "Digital audio passthrough"
+msgstr "ส่งผ่านเสียงดิจิทัลโดยตรง"
+
+msgid "Import TXT"
+msgstr "นำเข้า TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "ในบรรทัดที่ {} ให้คั่นชื่อผู้ใช้และรหัสผ่านด้วยช่องว่าง"
+
+msgid "Mark channels with RED first."
+msgstr "ใช้ปุ่มสีแดงทำเครื่องหมายช่องก่อน"
+
+msgid "Not supported"
+msgstr "ไม่รองรับ"
+
+msgid "PCM Multichannel Audio"
+msgstr "เสียง PCM หลายช่องสัญญาณ"
+
+msgid "Place above"
+msgstr "วางด้านบน"
+
+msgid "Place below"
+msgstr "วางด้านล่าง"
+
+msgid "Place marked channels before saving."
+msgstr "วางช่องที่ทำเครื่องหมายไว้ก่อนบันทึก"
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "ใส่ URL ของเซิร์ฟเวอร์แบบ HTTP หรือ HTTPS ในบรรทัดแรก"
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "บันทึกไฟล์ TXT ด้วยการเข้ารหัส UTF-8"
+
+msgid "Setting could not be changed"
+msgstr "ไม่สามารถเปลี่ยนการตั้งค่าได้"
+
+msgid "Temporarily unavailable"
+msgstr "ไม่พร้อมใช้งานชั่วคราว"
+
+msgid "The TXT file could not be read."
+msgstr "ไม่สามารถอ่านไฟล์ TXT ได้"
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "เพิ่มบัญชี Xtream แล้ว ({})\nข้ามรายการซ้ำ ({})"

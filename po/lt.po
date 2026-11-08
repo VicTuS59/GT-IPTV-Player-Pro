@@ -4345,3 +4345,65 @@ msgstr "{} • {} FILMAI"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SERIALAI"
+
+msgid "AC3 downmix is active"
+msgstr "AC3 kanalų sumažinimas įjungtas"
+
+msgid "Bulk Move"
+msgstr "Perkelti grupę"
+
+msgid "Channel order saved."
+msgstr "Kanalų tvarka išsaugota."
+
+msgid "Choose a TXT file."
+msgstr "Pasirinkite TXT failą."
+
+msgid "Choose an unmarked channel."
+msgstr "Pasirinkite nepažymėtą kanalą."
+
+msgid "Digital audio passthrough"
+msgstr "Tiesioginis skaitmeninio garso perdavimas"
+
+msgid "Import TXT"
+msgstr "Importuoti TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Eilutėje {} naudotojo vardą ir slaptažodį atskirkite tarpu."
+
+msgid "Mark channels with RED first."
+msgstr "Pirmiausia pažymėkite kanalus raudonu mygtuku."
+
+msgid "Not supported"
+msgstr "Nepalaikoma"
+
+msgid "PCM Multichannel Audio"
+msgstr "Daugiakanalis PCM garsas"
+
+msgid "Place above"
+msgstr "Įterpti aukščiau"
+
+msgid "Place below"
+msgstr "Įterpti žemiau"
+
+msgid "Place marked channels before saving."
+msgstr "Prieš išsaugodami įterpkite pažymėtus kanalus."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Pirmoje eilutėje įrašykite serverio HTTP arba HTTPS adresą."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Išsaugokite TXT failą UTF-8 koduote."
+
+msgid "Setting could not be changed"
+msgstr "Nepavyko pakeisti nuostatos"
+
+msgid "Temporarily unavailable"
+msgstr "Laikinai nepasiekiama"
+
+msgid "The TXT file could not be read."
+msgstr "Nepavyko perskaityti TXT failo."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Pridėtos Xtream paskyros ({})\nPraleisti pasikartojantys įrašai ({})"

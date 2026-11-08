@@ -4333,3 +4333,65 @@ msgstr "{} • {} KVIKMYNDIR"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} ÞÆTTIR"
+
+msgid "AC3 downmix is active"
+msgstr "Niðurblöndun AC3 er virk"
+
+msgid "Bulk Move"
+msgstr "Færa margar í einu"
+
+msgid "Channel order saved."
+msgstr "Rásaröðin hefur verið vistuð."
+
+msgid "Choose a TXT file."
+msgstr "Veldu TXT-skrá."
+
+msgid "Choose an unmarked channel."
+msgstr "Veldu ómerkta rás."
+
+msgid "Digital audio passthrough"
+msgstr "Bein sending stafræns hljóðs"
+
+msgid "Import TXT"
+msgstr "Flytja inn TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Í línu {} þarf notandanafn og lykilorð að vera aðskilið með bili."
+
+msgid "Mark channels with RED first."
+msgstr "Merktu fyrst rásir með rauða hnappinum."
+
+msgid "Not supported"
+msgstr "Ekki stutt"
+
+msgid "PCM Multichannel Audio"
+msgstr "Fjölrása PCM-hljóð"
+
+msgid "Place above"
+msgstr "Setja fyrir ofan"
+
+msgid "Place below"
+msgstr "Setja fyrir neðan"
+
+msgid "Place marked channels before saving."
+msgstr "Settu merktar rásir á sinn stað áður en þú vistar."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Settu HTTP- eða HTTPS-slóð þjónsins í fyrstu línu."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Vistaðu TXT-skrána með UTF-8 stafakóðun."
+
+msgid "Setting could not be changed"
+msgstr "Ekki tókst að breyta stillingunni"
+
+msgid "Temporarily unavailable"
+msgstr "Ekki tiltækt í bili"
+
+msgid "The TXT file could not be read."
+msgstr "Ekki tókst að lesa TXT-skrána."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Xtream-reikningum bætt við ({})\nTvíteknum færslum sleppt ({})"

@@ -54,6 +54,15 @@ class FailureTests(unittest.TestCase):
     message=errors.format_error(error,lambda s:s)
     self.assertNotIn('password',message);self.assertNotIn('secret',message)
     if reason=='dependency' and 'python3-example' in text:self.assertIn('python3-example',message)
+ def test_opkg_reports_the_filesystem_and_space_it_actually_checked(self):
+  with tempfile.TemporaryDirectory() as directory:
+   log = Path(directory) / 'install.log'
+   log.write_text('error: verify_pkg_installable: Only have 2048kb available on filesystem /usr, pkg enigma2-plugin-extensions-gtiptvplayerpro needs 6144\n')
+   error = errors.installation_error(str(log), 1)
+   self.assertEqual(error.code, 'space')
+   self.assertEqual(error.context, dict(log=str(log), exit_code=1, path='/usr', available=2 * 1024 ** 2, required=6 * 1024 ** 2))
+   log.write_text('No space left on device\n')
+   self.assertNotIn('path', errors.installation_error(str(log)).context)
  def test_bad_update_state_identifies_settings_instead_of_bad_server_metadata(self):
   with tempfile.TemporaryDirectory() as directory:
    path=Path(directory)/'update-settings.json';path.write_text('{bad json')

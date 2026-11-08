@@ -4,6 +4,7 @@
 
 import json
 import os
+import re
 import socket
 import stat
 import threading
@@ -38,6 +39,7 @@ _PLAYLIST_TRANSACTION_LOCK = threading.RLock()
 _PLAYLIST_STORAGE_ERROR = N_(
     "Settings could not be saved. Check the receiver storage."
 )
+_XTREAM_TXT_FIELD = re.compile(r"(user(?:name)?|pass(?:word)?)\s*[:=]\s*(.*)", re.IGNORECASE)
 SERVER_HEALTH_DETAILS_TEMPLATE = N_(
     "Latency: {} ms\n"
     "Account status: {}\n"
@@ -787,25 +789,7 @@ def _save_account_locked(url, name, path):
     return account
 
 
-@guarded_mutation(busy_error=True)
-def save_account_credentials(
-    server_url,
-    username,
-    password,
-    name="",
-    path=None,
-    output_format="ts",
-):
-    """Build and save an Xtream account from separate, keyboard-friendly fields."""
-    server_url = str(server_url or "").strip()
-    username = str(username or "").strip()
-    password = str(password or "").strip()
-    if not server_url or not username or not password:
-        raise ValueError(N_("Server URL, username and password are required"))
-    output_format = str(output_format or "").strip().lower()
-    if output_format not in SUPPORTED_OUTPUT_FORMATS:
-        raise ValueError(N_("Output format must be TS or M3U8"))
-
+def _xtream_server_parts(server_url):
     try:
         parsed = urlsplit(server_url)
     except Exception:
@@ -826,19 +810,193 @@ def save_account_credentials(
         base_path = base_path[:-8]
     elif base_path.lower().endswith("/player_api.php"):
         base_path = base_path[:-15]
-    path_value = (base_path.rstrip("/") + "/get.php").replace("//", "/")
-    query = urlencode(
-        (
-            ("username", username),
-            ("password", password),
-            ("type", "m3u_plus"),
-            ("output", output_format),
-        )
+    return parsed.scheme.lower(), parsed.netloc, base_path
+
+
+@guarded_mutation(busy_error=True)
+def save_account_credentials(
+    server_url,
+    username,
+    password,
+    name="",
+    path=None,
+    output_format="ts",
+):
+    """Build and save an Xtream account from separate, keyboard-friendly fields."""
+    server_url = str(server_url or "").strip()
+    username = str(username or "").strip()
+    password = str(password or "").strip()
+    if not server_url or not username or not password:
+        raise ValueError(N_("Server URL, username and password are required"))
+    output_format = str(output_format or "").strip().lower()
+    if output_format not in SUPPORTED_OUTPUT_FORMATS:
+        raise ValueError(N_("Output format must be TS or M3U8"))
+
+    scheme, netloc, base_path = _xtream_server_parts(server_url)
+    account = PlaylistAccount(
+        "", scheme, netloc, base_path, username, password, output_format
     )
-    playlist_url = urlunsplit(
-        (parsed.scheme.lower(), parsed.netloc, path_value, query, "")
+    return save_account(_playlist_url(account), name, path)
+
+
+def _xtream_txt_server(server_url, error_message):
+    try:
+        if any(char.isspace() or not char.isprintable() or char in "?#\\"
+               for char in server_url):
+            raise ValueError()
+        scheme, netloc, base_path = _xtream_server_parts(server_url)
+    except ValueError:
+        raise ValueError(error_message) from None
+    # A root /c/ portal suffix in shared login lists is an alias for the
+    # server root here. Keep any other explicitly supplied Xtream base path.
+    if base_path.lower() == "/c":
+        base_path = ""
+    return scheme, netloc, base_path
+
+
+def _plain_xtream_txt_entries(lines):
+    rows = ((number, line.strip()) for number, line in enumerate(lines, 1))
+    rows = ((number, line) for number, line in rows if line)
+    server = _xtream_txt_server(
+        next(rows, (0, ""))[1],
+        N_("Put the HTTP or HTTPS server URL on the first line."),
     )
-    return save_account(playlist_url, name, path)
+    for number, line in rows:
+        fields = line.split()
+        if len(fields) != 2 or not all(field.isprintable() for field in fields):
+            raise ValueError(_("Line {} needs a username and password separated by a space.").format(number))
+        username, password = fields
+        yield server, username, password
+
+
+def _xtream_txt_uses_labels(lines):
+    # A single two-token label-like row can still be a plain credential pair.
+    kinds = set()
+    for line in lines:
+        match = _XTREAM_TXT_FIELD.fullmatch(line.strip())
+        if match is not None:
+            kinds.add(match[1][0].lower())
+            if len(kinds) == 2 or len(line.split()) != 2:
+                return True
+    return False
+
+
+def _labeled_xtream_txt_entries(lines):
+    server = None
+    fields = {}
+    incomplete = False
+    missing = N_("Server URL, username and password are required")
+    for raw_line in lines:
+        line = raw_line.strip()
+        if line.lower().startswith(("http://", "https://")):
+            if incomplete:
+                raise ValueError(missing)
+            server = _xtream_txt_server(line, N_("Enter a valid server URL"))
+            incomplete = True
+            continue
+
+        match = _XTREAM_TXT_FIELD.fullmatch(line)
+        if match is None:
+            continue
+        key = "username" if match[1].lower().startswith("user") else "password"
+        value = match[2].strip()
+        if server is None or key in fields or not value.isprintable():
+            raise ValueError(missing)
+        fields[key] = value
+        incomplete = len(fields) < 2
+        if not incomplete:
+            yield server, fields["username"], fields["password"]
+            fields.clear()
+    if incomplete:
+        raise ValueError(missing)
+
+
+def _read_xtream_txt(path, output_format):
+    """Read a plain account list or a file of labeled server blocks."""
+    if not os.fspath(path).lower().endswith(".txt"):
+        raise ValueError(N_("Choose a TXT file."))
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0)
+    try:
+        with os.fdopen(os.open(path, flags), "rb") as handle:
+            if not stat.S_ISREG(os.fstat(handle.fileno()).st_mode):
+                raise OSError()
+            payload = handle.read(MAX_PLAYLIST_BYTES + 1)
+    except OSError:
+        raise ValueError(N_("The TXT file could not be read.")) from None
+    if len(payload) > MAX_PLAYLIST_BYTES:
+        raise ValueError(N_("Playlist file is too large"))
+    try:
+        lines = payload.decode("utf-8-sig").splitlines()
+    except UnicodeError:
+        raise ValueError(N_("Save the TXT file with UTF-8 encoding.")) from None
+
+    if _xtream_txt_uses_labels(lines):
+        entries = _labeled_xtream_txt_entries(lines)
+    else:
+        entries = _plain_xtream_txt_entries(lines)
+
+    accounts = {}
+    row_count = 0
+    for (scheme, netloc, base_path), username, password in entries:
+        account = PlaylistAccount("", scheme, netloc, base_path, username, password, output_format)
+        accounts.setdefault(account.identity, account)
+        row_count += 1
+        if len(accounts) > MAX_ACCOUNTS:
+            raise ValueError(N_("The Xtream account limit was reached"))
+    if not accounts:
+        raise ValueError(N_("No valid Xtream account was found"))
+    return accounts, row_count
+
+
+@guarded_mutation(busy_error=True)
+def import_xtream_txt(path, output_format="ts"):
+    """Add new Xtream identities to the active playlist with one atomic write."""
+    from .playlist_files import (
+        playlist_write_path, register_written_playlist, selected_playlist_path,
+    )
+
+    accounts, row_count = _read_xtream_txt(path, output_format)
+    with _PLAYLIST_TRANSACTION_LOCK:
+        destination = playlist_write_path("xtream", GT_PLAYLIST_PATH)
+        active_path = selected_playlist_path("xtream")
+        existing, status = (None, None)
+        if destination == active_path or os.path.lexists(destination):
+            existing, status = _read_playlist_payload(destination)
+        if destination == active_path and status is None:
+            raise OSError(_PLAYLIST_STORAGE_ERROR)
+        existing = existing or b""
+        identities = set()
+        names = set()
+        for line in existing.decode("utf-8-sig", "replace").splitlines():
+            account = parse_playlist_line(line)
+            if account is not None:
+                identities.add(account.identity)
+                names.add(account.display_name.casefold())
+
+        additions = []
+        number = 1
+        for identity, account in accounts.items():
+            if identity in identities:
+                continue
+            if len(identities) + len(additions) >= MAX_ACCOUNTS:
+                raise ValueError(N_("The Xtream account limit was reached"))
+            host = account.host[:70]
+            name = "{} ({})".format(host, number)
+            while name.casefold() in names:
+                number += 1
+                name = "{} ({})".format(host, number)
+            number += 1
+            additions.append("{} # {}\n".format(_playlist_url(account), name))
+
+        if additions:
+            separator = b"\n" if existing and not existing.endswith(b"\n") else b""
+            payload = existing + separator + "".join(additions).encode("utf-8")
+            if len(payload) > MAX_PLAYLIST_BYTES:
+                raise ValueError(N_("Playlist file is too large"))
+            _atomic_write_playlist(destination, payload, status)
+        if selected_playlist_path("xtream") is None:
+            register_written_playlist("xtream", destination)
+    return len(additions), row_count - len(additions)
 
 
 @guarded_mutation(busy_error=True)

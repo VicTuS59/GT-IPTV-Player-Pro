@@ -11,7 +11,7 @@ import threading
 import time
 from contextlib import contextmanager
 from . import PLUGIN_VERSION
-from .update_protocol import UpdateError,UpdateTransport,MAX_METADATA,canonical,json_document,source_url,verify_envelope,version_tuple
+from .update_protocol import UpdateError,UpdateTransport,MAX_METADATA,PREFIX,canonical,json_document,source_url,verify_envelope,version_tuple
 from .update_package import inspect_ipk
 from .update_feedback import emit,installer_phase
 from .update_errors import reported,storage_error,require_space,installation_error
@@ -29,6 +29,24 @@ def private_directory(path):
     if not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.geteuid():raise UpdateError('storage',path=path)
     if stat.S_IMODE(info.st_mode)!=0o700:os.chmod(path,0o700)
     return path
+
+
+def _payload_directory(root):
+    """Find the existing directory on the verified IPK payload's filesystem."""
+    root = os.path.abspath(root)
+    destination = os.path.normpath(os.path.join(root, PREFIX))
+    while True:
+        try:
+            info = os.stat(destination)
+        except FileNotFoundError:
+            if destination == root:
+                raise
+            destination = os.path.dirname(destination)
+            continue
+        if not stat.S_ISDIR(info.st_mode):
+            raise UpdateError('storage', path=destination)
+        return destination
+
 
 class UpdateState:
     def __init__(self,path=SETTINGS):self.path=path
@@ -130,7 +148,7 @@ class UpdateService:
                 if error.code=='cancelled':raise
                 # Only this updater's content-addressed cache entry is removed.
                 os.unlink(path)
-        require_space(self.cache,manifest['bytes']+8*1024*1024)
+        require_space(self.cache, manifest['bytes'])
         temporary=None;written=0;digest=hashlib.sha256()
         try:
             fd,temporary=tempfile.mkstemp(prefix='.update-',suffix='.part',dir=self.cache)
@@ -198,18 +216,17 @@ class UpdateService:
             if (os.geteuid() if uid is None else uid)!=0:raise UpdateError('install','root')
             if os.path.abspath(path)!=os.path.abspath(self.path_for(manifest)):raise UpdateError('package')
             emit(progress,'verify')
-            inspect_ipk(path,manifest)
+            required = inspect_ipk(path, manifest)['installed_bytes']
             self._check_activity(busy)
-            # Reserve one complete unpacked payload plus working space. There
-            # is no update backup and no second payload to budget on flash.
-            required=manifest['installed_bytes']+8*1024*1024
-            require_space(root,required)
+            # The payload can be on a separate filesystem, for example when
+            # Flash Expander mounts /usr on an external drive.
+            require_space(_payload_directory(root), required)
             # Revalidate after the native activity check, which may yield to
             # the UI, and immediately before the package-manager boundary.
             emit(progress,'verify')
             inspect_ipk(path,manifest)
             self._check_activity(busy)
-            require_space(root,required)
+            require_space(_payload_directory(root), required)
             log=os.path.join(self.cache,'install.log')
             self.state.write(result='installing')
             emit(progress,'install')

@@ -4333,3 +4333,65 @@ msgstr "{} • {} PEL·LÍCULES"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SÈRIES"
+
+msgid "AC3 downmix is active"
+msgstr "La mescla reductora AC3 està activa"
+
+msgid "Bulk Move"
+msgstr "Mou en bloc"
+
+msgid "Channel order saved."
+msgstr "S’ha desat l’ordre dels canals."
+
+msgid "Choose a TXT file."
+msgstr "Trieu un fitxer TXT."
+
+msgid "Choose an unmarked channel."
+msgstr "Tria un canal sense marcar."
+
+msgid "Digital audio passthrough"
+msgstr "Pas directe d’àudio digital"
+
+msgid "Import TXT"
+msgstr "Importa TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "A la línia {} hi ha d'haver un nom d'usuari i una contrasenya separats per un espai."
+
+msgid "Mark channels with RED first."
+msgstr "Primer marca els canals amb el botó vermell."
+
+msgid "Not supported"
+msgstr "No compatible"
+
+msgid "PCM Multichannel Audio"
+msgstr "Àudio PCM multicanal"
+
+msgid "Place above"
+msgstr "Col·loca a sobre"
+
+msgid "Place below"
+msgstr "Col·loca a sota"
+
+msgid "Place marked channels before saving."
+msgstr "Col·loca els canals marcats abans de desar."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Poseu l'URL HTTP o HTTPS del servidor a la primera línia."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Deseu el fitxer TXT amb codificació UTF-8."
+
+msgid "Setting could not be changed"
+msgstr "No s'ha pogut canviar la configuració"
+
+msgid "Temporarily unavailable"
+msgstr "Temporalment no disponible"
+
+msgid "The TXT file could not be read."
+msgstr "No s'ha pogut llegir el fitxer TXT."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Comptes Xtream afegits ({})\nDuplicats omesos ({})"

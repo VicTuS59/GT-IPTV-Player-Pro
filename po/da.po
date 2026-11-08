@@ -4333,3 +4333,65 @@ msgstr "{} • {} FILM"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SERIER"
+
+msgid "AC3 downmix is active"
+msgstr "AC3-downmix er aktivt"
+
+msgid "Bulk Move"
+msgstr "Flyt flere"
+
+msgid "Channel order saved."
+msgstr "Kanalrækkefølgen er gemt."
+
+msgid "Choose a TXT file."
+msgstr "Vælg en TXT-fil."
+
+msgid "Choose an unmarked channel."
+msgstr "Vælg en umarkeret kanal."
+
+msgid "Digital audio passthrough"
+msgstr "Direkte gennemgang af digital lyd"
+
+msgid "Import TXT"
+msgstr "Importér TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Linje {} skal indeholde brugernavn og adgangskode adskilt af et mellemrum."
+
+msgid "Mark channels with RED first."
+msgstr "Markér først kanaler med den røde knap."
+
+msgid "Not supported"
+msgstr "Understøttes ikke"
+
+msgid "PCM Multichannel Audio"
+msgstr "PCM-flerkanalslyd"
+
+msgid "Place above"
+msgstr "Placér ovenover"
+
+msgid "Place below"
+msgstr "Placér nedenunder"
+
+msgid "Place marked channels before saving."
+msgstr "Placér de markerede kanaler, før du gemmer."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Angiv serverens HTTP- eller HTTPS-URL på første linje."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Gem TXT-filen med UTF-8-kodning."
+
+msgid "Setting could not be changed"
+msgstr "Indstillingen kunne ikke ændres"
+
+msgid "Temporarily unavailable"
+msgstr "Midlertidigt utilgængelig"
+
+msgid "The TXT file could not be read."
+msgstr "TXT-filen kunne ikke læses."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Tilføjede Xtream-konti ({})\nSprungne dubletter ({})"

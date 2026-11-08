@@ -292,6 +292,8 @@ _ACTION_TEXT = {
     "reset": N_("Reset"),
     "visibility": N_("Show / Hide"),
     "mark": N_("Mark"),
+    "place_below": N_("Place below"),
+    "place_above": N_("Place above"),
     "hide_all": N_("Hide All"),
     "quality": N_("Quality"),
     "new_search": N_("New search"),

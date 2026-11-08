@@ -326,7 +326,18 @@ EPISODE_DOWNLOAD_FOOTER_ITEMS = tuple((footer_item(key, 'download' if key == 'ok
 LIVE_STREAM_FOOTER_ITEMS = (footer_item('up_down', 'select'), footer_item('left_right', 'page'), footer_item('ok', 'play', 1.05), footer_item('red', 'favorite', 0.95), footer_item('green', 'refresh'), footer_item('exit', 'back'))
 LIVE_CHANNEL_ORDER_FOOTER_ITEMS = LIVE_STREAM_FOOTER_ITEMS[:-1] + (footer_item('yellow', 'edit', 0.85), LIVE_STREAM_FOOTER_ITEMS[-1])
 LIVE_CHANNEL_MOVE_FOOTER_ITEMS = (footer_item('up_down', 'move'), footer_item('left_right', 'page'), footer_item('ok', 'save', 1.05), footer_item('', '', 0.95), footer_item('', ''), footer_item('', '', 0.85), footer_item('exit', 'cancel'))
-M3U_LIVE_STREAM_FOOTER_ITEMS = (footer_item('up_down', 'select'), footer_item('left_right', 'page'), footer_item('ok', 'play', 1.0), footer_item('red', 'favorite', 0.9), footer_item('green', 'refresh'), footer_item('blue', 'search', 0.85), footer_item('exit', 'back'))
+M3U_LIVE_STREAM_FOOTER_ITEMS = (
+    footer_item('up_down', 'select'), footer_item('left_right', 'page'),
+    footer_item('ok', 'play'), footer_item('red', 'favorite', 0.9),
+    footer_item('green', 'refresh'), footer_item('yellow', 'edit', 0.85),
+    footer_item('blue', 'search', 0.85), footer_item('exit', 'back'),
+)
+M3U_LIVE_CHANNEL_MOVE_FOOTER_ITEMS = (
+    footer_item('up_down', 'select'), footer_item('left_right', 'page'),
+    footer_item('ok', 'place_below', 1.3), footer_item('red', 'mark', 0.9),
+    footer_item('green', 'save'), footer_item('yellow', 'place_above', 1.3),
+    footer_item('', '', 0.85), footer_item('exit', 'cancel'),
+)
 M3U_SEARCH_FOOTER_ITEMS = (footer_item('up_down', 'select'), footer_item('left_right', 'page'), footer_item('ok', 'fullscreen', 1.2), footer_item('red', 'favorite', 0.9), footer_item('blue', 'search', 0.85), footer_item('exit', 'back'))
 CATEGORY_MANAGER_FOOTER_ITEMS = (footer_item('ok', 'visibility', 0.9), footer_item('red', 'mark', 0.8), footer_item('yellow', 'move', 0.85), footer_item('green', 'save', 0.85), footer_item('blue', 'reset', 0.82), footer_item('menu', 'hide_all', 1.3), footer_item('exit', 'cancel', 0.78))
 CATEGORY_MANAGER_MOVE_FOOTER_ITEMS = (footer_item('up_down', 'select', 1.0), footer_item('left_right', 'page', 0.9), footer_item('ok', 'confirm', 0.9), footer_item('', '', 0.85), footer_item('', '', 0.85), footer_item('', '', 0.82), footer_item('exit', 'cancel', 0.78))

@@ -4333,3 +4333,65 @@ msgstr "{} • {} ΤΑΙΝΙΕΣ"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} ΣΕΙΡΕΣ"
+
+msgid "AC3 downmix is active"
+msgstr "Η μίξη AC3 είναι ενεργή"
+
+msgid "Bulk Move"
+msgstr "Μαζική μετακίνηση"
+
+msgid "Channel order saved."
+msgstr "Η σειρά καναλιών αποθηκεύτηκε."
+
+msgid "Choose a TXT file."
+msgstr "Επιλέξτε αρχείο TXT."
+
+msgid "Choose an unmarked channel."
+msgstr "Επιλέξτε ένα κανάλι χωρίς επισήμανση."
+
+msgid "Digital audio passthrough"
+msgstr "Απευθείας διέλευση ψηφιακού ήχου"
+
+msgid "Import TXT"
+msgstr "Εισαγωγή TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Στη γραμμή {} απαιτούνται όνομα χρήστη και κωδικός πρόσβασης χωρισμένα με κενό."
+
+msgid "Mark channels with RED first."
+msgstr "Επισημάνετε πρώτα τα κανάλια με το κόκκινο κουμπί."
+
+msgid "Not supported"
+msgstr "Δεν υποστηρίζεται"
+
+msgid "PCM Multichannel Audio"
+msgstr "Πολυκάναλος ήχος PCM"
+
+msgid "Place above"
+msgstr "Τοποθέτηση από πάνω"
+
+msgid "Place below"
+msgstr "Τοποθέτηση από κάτω"
+
+msgid "Place marked channels before saving."
+msgstr "Τοποθετήστε τα επισημασμένα κανάλια πριν από την αποθήκευση."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Στην πρώτη γραμμή εισαγάγετε τη διεύθυνση HTTP ή HTTPS του διακομιστή."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Αποθηκεύστε το αρχείο TXT με κωδικοποίηση UTF-8."
+
+msgid "Setting could not be changed"
+msgstr "Δεν ήταν δυνατή η αλλαγή της ρύθμισης"
+
+msgid "Temporarily unavailable"
+msgstr "Προσωρινά μη διαθέσιμο"
+
+msgid "The TXT file could not be read."
+msgstr "Δεν ήταν δυνατή η ανάγνωση του αρχείου TXT."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Λογαριασμοί Xtream που προστέθηκαν ({})\nΔιπλότυπα που παραλείφθηκαν ({})"

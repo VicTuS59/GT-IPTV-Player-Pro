@@ -5,11 +5,13 @@ import time
 from types import SimpleNamespace
 
 from .i18n import _, localized_upper
+from .content import ContentError
 from .typography import (clean_dynamic_text, ellipsize_dynamic_text,
     fit_dynamic_text, font_px, set_text_if_changed)
 from .provider_preview import catalogue_info
 from .metadata import media_metadata_ready
 from .scrollbar import update_scrollbar, hide_scrollbar
+from .vod_artwork import backdrop_urls, cached_backdrop, download_backdrop, provider_backdrop_loader
 
 CATEGORY_ROWS = 11
 CONTENT_ROWS = 10
@@ -227,8 +229,11 @@ class LightVODMethods:
         self._light_cover_job=None
         self._light_visual_identity=None
         self._light_hero_request=None
+        self._light_hero_after_cache=None
         self._light_hero_token=None
         self._light_hero_ready=False
+        self._light_hero_decoding=False
+        self._light_hero_url=''
         self._light_navigation_held=False
         self._light_navigation_repeated=False
         self._light_visible=False
@@ -326,6 +331,8 @@ class LightVODMethods:
     def _light_cancel_hero(self):
         from .browser_common import _cancel_worker_token
         self._light_hero_request=None
+        self._light_hero_after_cache=None
+        self._light_hero_decoding=False
         if self._light_hero_token is not None:
             _cancel_worker_token(self._light_hero_token)
             self._light_hero_token=None
@@ -339,11 +346,15 @@ class LightVODMethods:
             decoder=loaders.pop(key,None)
             if decoder is not None:decoder.close()
 
-    def _light_reset_art(self,identity=None):
-        self._light_cancel_art()
+    def _light_reset_art(self,identity=None,*,keep_hero_job=False):
+        if keep_hero_job:
+            self._light_cancel_cover()
+        else:
+            self._light_cancel_art()
         self._light_visual_identity=identity
         self._light_cover_identity=None
         self._light_hero_ready=False
+        self._light_hero_url=''
         self._light_show('light_hero',False)
         self._light_show('light_hero_caption_back',True)
         self._light_show(self.content_type+'_poster',False)
@@ -406,7 +417,8 @@ class LightVODMethods:
     def _light_release(self, *, arm=True):
         from .browser_common import NAVIGATION_DEBOUNCE_MS
         held=self._light_navigation_held
-        if self._light_navigation_repeated:self._light_discard_deferred_step()
+        repeated=self._light_navigation_repeated
+        if repeated:self._light_discard_deferred_step()
         self._light_navigation_held=False
         self._light_navigation_repeated=False
         self._light_repeat_direction=0
@@ -414,6 +426,7 @@ class LightVODMethods:
         if (arm and held and self._light_visible
                 and self._light_field('pending_detail_generation')==self._light_field('generation')):
             self._light_field('detail_timer').start(NAVIGATION_DEBOUNCE_MS,True)
+            if repeated:self._light_preview_cached_hero()
 
     def _light_note_navigation(self,repeated):
         self._light_navigation_held=True
@@ -598,9 +611,17 @@ class LightVODMethods:
         self.session.openWithCallback(selected,ChoiceBox,title=_('Menu'),list=options)
 
     def _light_info(self):
-        if not self._light_plot_text:return
+        entries = self._light_field('entries', ())
+        if self._closed or not entries:
+            return
+        item = entries[self._light_field('selected_index', 0)]
         from .vod_light_info import LightSynopsisScreen
-        self.session.open(LightSynopsisScreen,self._light_plot_text)
+        identity = self._light_item_identity(item)
+        hero_url = self._light_hero_url if identity == self._light_visual_identity else ''
+        self.session.open(
+            LightSynopsisScreen, self.client, self._metadata_client, item,
+            self._cached_grid_detail(self.content_type), hero_url=hero_url,
+        )
 
     def _light_render_categories(self,schedule_load=True):
         kind=self.content_type
@@ -738,16 +759,24 @@ class LightVODMethods:
     def _set_movie_plot(self,value):self._light_set_plot(value)
     def _set_series_plot(self,value):self._light_set_plot(value)
 
-    def _light_apply_detail(self,info,poster_path='',metadata_status='',poster_url='',catalogue_poster_url=''):
+    def _light_item_identity(self, item):
+        return (self._light_field('loaded_category_id'), str(item.stream_id), self._light_field('generation'))
+
+    def _light_apply_detail(self,info,poster_path='',metadata_status='',poster_url='',catalogue_poster_url='',
+                            *, cache_only=False):
         from .browser_common import _rating_label,_attach_subtitle_detail_metadata
         kind=self.content_type;entries=self._light_field('entries',())
         if not entries:return
         item=entries[self._light_field('selected_index',0)]
-        identity=(self._light_field('loaded_category_id'),str(item.stream_id),self._light_field('generation'))
-        if identity!=self._light_visual_identity:self._light_reset_art(identity)
-        self._light_detail_identity=identity
-        _attach_subtitle_detail_metadata(item,info)
-        if kind=='series':self._series_info,self._series_info_stream_id=info,str(item.stream_id)
+        identity=self._light_item_identity(item)
+        if identity!=self._light_visual_identity:
+            request=self._light_hero_request
+            self._light_reset_art(identity,keep_hero_job=request is not None and request[0]==identity)
+        if not cache_only:
+            self._light_detail_identity=identity
+            _attach_subtitle_detail_metadata(item,info)
+            if kind=='series':self._series_info,self._series_info_stream_id=info,str(item.stream_id)
+        self._light_hero(item,info,cache_only=cache_only)
         fit_dynamic_text(self[kind+'_title'],getattr(info,'title','') or item.name,max_lines=2,
             preferred_size=font_px(self._light_geometry['font'],74,role='title'),min_size=self._light_geometry['font'](42),fallback_chars=46)
         duration=getattr(info,'duration','') if kind=='movie' else ''
@@ -756,11 +785,22 @@ class LightVODMethods:
         fit_dynamic_text(self[kind+'_meta'],meta,max_lines=1,fallback_chars=64)
         set_text_if_changed(self[kind+'_rating'],_rating_label(getattr(info,'tmdb_rating','') or getattr(info,'rating','') or getattr(item,'rating','')))
         self._light_set_plot(getattr(info,'plot','') or (_('Loading...') if info is None else _('Movie summary unavailable.') if kind=='movie' else _('Series summary unavailable.')))
-        self._light_cover(item,poster_path,poster_url or getattr(info,'cover','') or getattr(item,'icon',''))
-        self._light_hero(item,info)
+        if not cache_only:
+            self._light_cover(item,poster_path,poster_url or getattr(info,'cover','') or getattr(item,'icon',''))
 
     def _apply_movie_detail(self,*args):self._light_apply_detail(*args)
     def _apply_series_detail(self,*args):self._light_apply_detail(*args)
+
+    def _light_preview_cached_hero(self):
+        entries = self._light_field('entries', ())
+        if self._closed or not self._light_visible or not entries:
+            return
+        try:
+            item = entries[self._light_field('selected_index', 0)]
+            info = self._cached_grid_detail(self.content_type) or catalogue_info(self.client, self.content_type, item)
+        except (ContentError, IndexError):
+            return
+        self._light_hero(item, info, cache_only=True)
 
     def _light_schedule_detail(self,immediate=False):
         from .browser_common import _cancel_worker_token,NAVIGATION_DEBOUNCE_MS
@@ -778,7 +818,9 @@ class LightVODMethods:
         setattr(self,prefix+'pending_detail_generation',self._light_field('generation'))
         self._light_cancel_art()
         if immediate:getattr(self,'_commit_'+kind+'_detail')()
-        else:timer.start(KEY_RELEASE_TIMEOUT_MS if self._light_navigation_held else NAVIGATION_DEBOUNCE_MS,True)
+        else:
+            timer.start(KEY_RELEASE_TIMEOUT_MS if self._light_navigation_held else NAVIGATION_DEBOUNCE_MS,True)
+            if not self._light_navigation_repeated:self._light_preview_cached_hero()
 
     def _schedule_movie_detail(self,immediate=False):self._light_schedule_detail(immediate)
     def _schedule_series_detail(self,immediate=False):self._light_schedule_detail(immediate)
@@ -794,7 +836,7 @@ class LightVODMethods:
         item=entries[self._light_field('selected_index',0)]
         info=self._cached_grid_detail(kind) or catalogue_info(self.client,kind,item)
         self._light_apply_detail(info)
-        if media_metadata_ready(info):return
+        if media_metadata_ready(info) and provider_backdrop_loader(self.client, item, info) is None:return
         getattr(self,'_start_'+kind+'_detail')()
 
     def _commit_movie_detail(self):self._light_commit_detail()
@@ -844,38 +886,35 @@ class LightVODMethods:
         if str(item.stream_id)!=identity[1]:return
         if path:self._apply_detail_poster(self.content_type,item,path)
 
-    def _light_hero(self,item,info):
-        if not self._light_visible or self._light_hero_ready:return
-        from .browser_common import (_safe_picon_url,_WorkerToken,_WorkerCancelled,
-            _cached_picon_path,_picon_cache_path,_download_client_image,
-            _valid_cinematic_backdrop_file,_cinematic_cover_ratio)
+    def _light_hero(self,item,info,*,cache_only=False):
+        identity=self._light_item_identity(item)
+        if not self._light_visible or (self._light_visual_identity==identity and self._light_hero_ready):return
+        from .browser_common import _WorkerToken,_cinematic_cover_ratio
         from .hero_artwork import is_composite,preparation_allowance,prepare_hero,vod_hero_plan
-        urls=tuple(dict.fromkeys(filter(None,map(_safe_picon_url,(
-            getattr(info,'fallback_backdrop',''),getattr(info,'backdrop',''),getattr(item,'backdrop',''))))))
+        urls=backdrop_urls(item,info)
         if not urls:return
-        request=(self._light_visual_identity,urls)
-        if request==self._light_hero_request:return
+        request=(identity,urls,cache_only)
+        previous=self._light_hero_request
+        if request==previous:return
+        if (previous is not None and previous[:2]==request[:2]
+                and (self._light_hero_token is not None or self._light_hero_decoding)):
+            if not cache_only:self._light_hero_after_cache=(item,info)
+            return
         self._light_cancel_hero()
         self._light_hero_request=request
         token=self._light_hero_token=_WorkerToken(8)
         plan=vod_hero_plan(*self._light_geometry['hero'][2:])
 
         def load():
-            for url in urls:
-                token.check()
-                try:
-                    path=_cached_picon_path(url) or _download_client_image(
-                        self.client,url,_picon_cache_path(url),timeout=3,token=token,priority=True)
-                except _WorkerCancelled:
-                    raise
-                except Exception:
-                    continue
-                if path and _valid_cinematic_backdrop_file(path):
-                    path=prepare_hero(path,plan,token,preparation_allowance())
-                    token.check()
-                    composited=is_composite(path,plan)
-                    return request,path,plan.size,composited,None if composited else _cinematic_cover_ratio(path)
-            return None
+            found=cached_backdrop(urls,token)
+            if found is None and not cache_only:
+                found=download_backdrop(self.client,urls,token)
+            if found is None:return None
+            url,path=found
+            path=prepare_hero(path,plan,token,preparation_allowance())
+            token.check()
+            composited=is_composite(path,plan)
+            return request,url,path,plan.size,composited,None if composited else _cinematic_cover_ratio(path),info
 
         self._light_hero_loader.request(load)
 
@@ -883,26 +922,51 @@ class LightVODMethods:
         from .background import attach_pixmap
         from .hero_artwork import release_prepared
         self._light_hero_token=None
-        if error is not None or result is None:return
-        request,path,size,composited,ratio=result
-
-        def current():
-            return (not self._closed and self._light_visible and request==self._light_hero_request
-                    and request[0][2]==self._light_field('generation'))
+        if error is not None or result is None:
+            self._light_resume_hero_after_cache(self._light_hero_request)
+            return
+        request,url,path,size,composited,ratio,info=result
 
         def loaded(success):
-            if not current():return
+            if not self._light_hero_current(request):return
+            self._light_hero_decoding=False
             self._light_hero_ready=success
+            if success:
+                self._light_hero_url=url
+                self._light_hero_after_cache=None
             self._light_show('light_hero_caption_back',not (success and composited))
             self._light_show('light_hero',success)
+            if not success:self._light_resume_hero_after_cache(request)
 
         try:
-            if not current():return
+            if not self._light_hero_current(request):return
+            if request[0]!=self._light_visual_identity:
+                self._light_apply_detail(info,cache_only=True)
+            self._light_hero_decoding=True
             attach_pixmap(self,'light_hero',path,key='light-hero',on_loaded=loaded,
                 cover_ratio=ratio if size==self._light_geometry['hero'][2:] else None,
                 cover_alignment='top_right',decode_size=size,show_on_load=False)
+        except (AttributeError, ContentError, IndexError, OSError, RuntimeError, TypeError, ValueError):
+            loaded(False)
         finally:
             release_prepared(path)
+
+    def _light_hero_current(self,request):
+        if (request is None or self._closed or not self._light_visible or request!=self._light_hero_request
+                or request[0][0]!=self._light_field('loaded_category_id')
+                or request[0][2]!=self._light_field('generation')):
+            return False
+        index=self._light_field('selected_index',0)
+        try:
+            selected=self._light_labels(index,index+1)
+        except (ContentError, IndexError):
+            return False
+        return bool(selected and str(selected[0].stream_id)==request[0][1])
+
+    def _light_resume_hero_after_cache(self,request):
+        pending,self._light_hero_after_cache=self._light_hero_after_cache,None
+        if pending is not None and self._light_hero_current(request):
+            self._light_hero(*pending)
 
     # Only the settled selection requests artwork.
     def _start_deferred_movie_posters(self):pass

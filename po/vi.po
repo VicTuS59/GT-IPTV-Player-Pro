@@ -4327,3 +4327,65 @@ msgstr "{} • {} PHIM"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} PHIM BỘ"
+
+msgid "AC3 downmix is active"
+msgstr "Đang bật trộn giảm kênh AC3"
+
+msgid "Bulk Move"
+msgstr "Di chuyển hàng loạt"
+
+msgid "Channel order saved."
+msgstr "Đã lưu thứ tự kênh."
+
+msgid "Choose a TXT file."
+msgstr "Chọn tệp TXT."
+
+msgid "Choose an unmarked channel."
+msgstr "Chọn một kênh chưa được đánh dấu."
+
+msgid "Digital audio passthrough"
+msgstr "Truyền thẳng âm thanh số"
+
+msgid "Import TXT"
+msgstr "Nhập TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Ở dòng {}, hãy phân tách tên người dùng và mật khẩu bằng một dấu cách."
+
+msgid "Mark channels with RED first."
+msgstr "Hãy đánh dấu các kênh bằng nút đỏ trước."
+
+msgid "Not supported"
+msgstr "Không được hỗ trợ"
+
+msgid "PCM Multichannel Audio"
+msgstr "Âm thanh PCM đa kênh"
+
+msgid "Place above"
+msgstr "Đặt bên trên"
+
+msgid "Place below"
+msgstr "Đặt bên dưới"
+
+msgid "Place marked channels before saving."
+msgstr "Đặt các kênh đã đánh dấu vào vị trí trước khi lưu."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Nhập URL HTTP hoặc HTTPS của máy chủ ở dòng đầu tiên."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Lưu tệp TXT bằng mã hóa UTF-8."
+
+msgid "Setting could not be changed"
+msgstr "Không thể thay đổi cài đặt"
+
+msgid "Temporarily unavailable"
+msgstr "Tạm thời không khả dụng"
+
+msgid "The TXT file could not be read."
+msgstr "Không đọc được tệp TXT."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Đã thêm tài khoản Xtream ({})\nĐã bỏ qua mục trùng lặp ({})"

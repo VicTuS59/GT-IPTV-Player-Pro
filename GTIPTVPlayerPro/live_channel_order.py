@@ -6,6 +6,7 @@
 import hashlib
 import json
 import re
+from itertools import chain
 
 from .category_preferences import LiveCategoryPreferenceStore, MAX_CATEGORIES_PER_SOURCE
 from .live_history import live_channel_key
@@ -22,9 +23,12 @@ def channel_order_scope(account_scope, category_id):
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
+def channel_order_key_for_id(stream_id):
+    return hashlib.sha256(stream_id.encode("utf-8")).hexdigest() if stream_id else ""
+
+
 def channel_order_key(item):
-    value = live_channel_key(item)
-    return hashlib.sha256(value.encode("utf-8")).hexdigest() if value else ""
+    return channel_order_key_for_id(live_channel_key(item))
 
 
 def arrange_channels(entries, order):
@@ -46,9 +50,12 @@ class LiveChannelOrderStore:
         return tuple(key for key in self._store.load(scope).order if _DIGEST.fullmatch(key))
 
     def save(self, scope, entries, previous_order=()):
+        return self.save_keys(scope, (channel_order_key(item) for item in entries), previous_order)
+
+    def save_keys(self, scope, keys, previous_order=()):
         order = []
         seen = set()
-        for key in [channel_order_key(item) for item in entries] + list(previous_order):
+        for key in chain(keys, previous_order):
             if key and _DIGEST.fullmatch(key) and key not in seen:
                 order.append(key)
                 seen.add(key)
@@ -75,4 +82,54 @@ class ChannelMove:
         original_keys = {channel_order_key(item) for item in self.original}
         arrivals = [item for item in entries if channel_order_key(item) not in original_keys]
         entries[:] = self.original + arrivals
+        return self.original_index
+
+
+class BulkChannelMove:
+    """Keep the original paged order separate from the editable draft."""
+
+    def __init__(self, entries, index):
+        self.original = list(entries)
+        self.original_index = index
+        self.marked = set()
+
+    def include_page(self, entries):
+        self.original.extend(entries)
+
+    def toggle(self, item):
+        key = live_channel_key(item)
+        if key in self.marked:
+            self.marked.remove(key)
+        elif key:
+            self.marked.add(key)
+
+    def place_after(self, entries, target_index):
+        return self._place(entries, target_index, after=True)
+
+    def place_before(self, entries, target_index):
+        return self._place(entries, target_index, after=False)
+
+    def _place(self, entries, target_index, *, after):
+        if not self.marked or not 0 <= target_index < len(entries):
+            return None
+        target = entries[target_index]
+        if live_channel_key(target) in self.marked:
+            return None
+        block, remaining = [], []
+        insert_at = None
+        for item in entries:
+            if live_channel_key(item) in self.marked:
+                block.append(item)
+            else:
+                if item is target:
+                    insert_at = len(remaining) + (1 if after else 0)
+                remaining.append(item)
+        if not block or insert_at is None:
+            return None
+        entries[:] = remaining[:insert_at] + block + remaining[insert_at:]
+        self.marked.clear()
+        return insert_at
+
+    def cancel(self, entries):
+        entries[:] = self.original
         return self.original_index

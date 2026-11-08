@@ -6194,3 +6194,65 @@ msgstr ""
 #: catalog_messages.py:1222
 msgid "Unstable"
 msgstr ""
+
+msgid "AC3 downmix is active"
+msgstr ""
+
+msgid "Bulk Move"
+msgstr ""
+
+msgid "Channel order saved."
+msgstr ""
+
+msgid "Choose a TXT file."
+msgstr ""
+
+msgid "Choose an unmarked channel."
+msgstr ""
+
+msgid "Digital audio passthrough"
+msgstr ""
+
+msgid "Import TXT"
+msgstr ""
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr ""
+
+msgid "Mark channels with RED first."
+msgstr ""
+
+msgid "Not supported"
+msgstr ""
+
+msgid "PCM Multichannel Audio"
+msgstr ""
+
+msgid "Place above"
+msgstr ""
+
+msgid "Place below"
+msgstr ""
+
+msgid "Place marked channels before saving."
+msgstr ""
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr ""
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr ""
+
+msgid "Setting could not be changed"
+msgstr ""
+
+msgid "Temporarily unavailable"
+msgstr ""
+
+msgid "The TXT file could not be read."
+msgstr ""
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr ""

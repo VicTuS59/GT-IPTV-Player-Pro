@@ -1,5 +1,10 @@
-# GT IPTV Player Pro 1.9.1-r0
+# GT IPTV Player Pro 1.9.2-r0
 
-* Fixed compatibility-related crashes.
+* Added a movie and series Info/Summary screen with title artwork, synopsis, director, cast, and rating.
+* Improved **Discover Movies > Search in IPTV** to find the selected movie in the connected IPTV source and show matching results sooner.
+* Added a **PCM Multichannel Audio** toggle to the yellow-button audio menu on supported receivers.
+* Added **Dolby Digital and DTS passthrough** controls to the yellow-button audio menu on supported receivers.
+* Added bulk Xtream account import from TXT via the blue button. Supports single-server lists and labeled `User/Pass` blocks.
+* Added bulk channel reordering to M3U Live TV. Press Red to mark channels with a check mark, Yellow to place them above the target channel, or OK to place them below. Press Green to save the new order.
 
 Signed stable updates: Settings > Software update. Publishing: [UPDATING.md](UPDATING.md).

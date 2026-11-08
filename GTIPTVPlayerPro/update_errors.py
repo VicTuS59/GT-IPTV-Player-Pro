@@ -58,6 +58,11 @@ POST_INSTALL_WARNING = 'Update installed, but its status could not be saved. Res
 STAGE_TEXTS = {'check': 'Check for updates', 'download': 'Download and verify',
                'install': 'Install update'}
 _PACKAGE_NAME = re.compile(r'[A-Za-z0-9][A-Za-z0-9+_.-]{0,95}\Z')
+_OPKG_SPACE = re.compile(
+    r'only have (?P<available>[0-9]{1,15})\s*ki?b available on filesystem '
+    r'(?P<path>[^\r\n]{1,512}?), pkg [A-Za-z0-9+_.-]{1,96} needs '
+    r'(?P<required>[0-9]{1,15})(?:\s*ki?b)?\b', re.IGNORECASE,
+)
 
 
 def storage_error(error, path=''):
@@ -131,10 +136,17 @@ def installation_error(log, code=None):
     context = dict(log=log)
     if isinstance(code, int):
         context['exit_code'] = code
+    space = _OPKG_SPACE.search(text)
+    if space:
+        context['available'] = int(space['available']) * 1024
+        context['required'] = int(space['required']) * 1024
+        if re.fullmatch(r'/[A-Za-z0-9_./+ -]{0,255}', space['path']):
+            context['path'] = space['path']
+        return UpdateError('space', **context)
     if 'no space left' in lower or 'not enough space' in lower:
-        return UpdateError('space', path='/', **context)
+        return UpdateError('space', **context)
     if 'read-only file system' in lower:
-        return UpdateError('storage', 'readonly', path='/', **context)
+        return UpdateError('storage', 'readonly', **context)
     if 'permission denied' in lower:
         return UpdateError('storage', 'permission', **context)
     if any(part in lower for part in ('could not lock', 'cannot lock', 'resource temporarily unavailable')):

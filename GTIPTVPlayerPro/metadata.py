@@ -1294,7 +1294,8 @@ class TMDbMetadataClient(object):
             self.last_error = "" if value else N_("No TMDb match was found")
             return value
 
-    def _lookup_for_completion(self, media_type, item, title, year, tmdb_id, outcome=None):
+    def _lookup_for_completion(self, media_type, item, title, year, tmdb_id, outcome=None,
+                               verify_identity=False):
         """Fetch localized metadata while retaining provider details on failure."""
         external = None
         try:
@@ -1312,7 +1313,7 @@ class TMDbMetadataClient(object):
                     tmdb_id = ""
                 if (
                     external is not None
-                    and getattr(item, "portal_request_type", "")
+                    and (verify_identity or getattr(item, "portal_request_type", ""))
                     and not self._provider_identity_matches(
                         media_type, title, year, external,
                     )
@@ -1327,6 +1328,9 @@ class TMDbMetadataClient(object):
                     required_payload_version=CACHE_PAYLOAD_VERSION,
                     outcome=outcome,
                 )
+                if (verify_identity and external
+                        and not self._provider_identity_matches(media_type, title, year, external)):
+                    external = None
         except MetadataError as error:
             if outcome is not None:
                 outcome["failed"] = True
@@ -1335,6 +1339,48 @@ class TMDbMetadataClient(object):
             # provider's summary; cancellation/deadlines still stop the worker.
             self._check_request_limits()
         return external or {}, tmdb_id
+
+    def series_directors(self, tmdb_id):
+        """Load episode-level directing credits for one verified series."""
+        tmdb_id = self._valid_tmdb_id(tmdb_id)
+        if not self.available or not tmdb_id:
+            return ""
+        key = self._cache_key("series", "summary-directors-v1:" + tmdb_id, "")
+        with self._lookup_guard(key):
+            with self._lock:
+                found, cached = self._cached(key)
+                if found:
+                    return (cached or {}).get("director", "")
+            path = "/tv/" + tmdb_id
+            aggregate = self._request_json(path + "/aggregate_credits")
+            names = {}
+            for person in aggregate.get("crew") or ():
+                if not isinstance(person, dict):
+                    continue
+                if any(isinstance(job, dict) and job.get("job") == "Director"
+                       for job in person.get("jobs") or ()):
+                    name = _text(person.get("name"))
+                    if name:
+                        names.setdefault(name, None)
+            if not names:
+                season = self._request_json(path + "/season/1")
+                for episode in season.get("episodes") or ():
+                    if not isinstance(episode, dict):
+                        continue
+                    for person in episode.get("crew") or ():
+                        if isinstance(person, dict) and person.get("job") == "Director":
+                            name = _text(person.get("name"))
+                            if name:
+                                names.setdefault(name, None)
+            director = ", ".join(names)[:180]
+            self._check_request_limits()
+            with self._lock:
+                self._load_cache()[key] = {
+                    "cached_at": self.clock(), "found": bool(director),
+                    "data": {"director": director}, "payload_version": CACHE_PAYLOAD_VERSION,
+                }
+                self._cache_changed()
+            return director
 
     def _completion_state(self, completed, external, outcome):
         completed._metadata_localized_plot = _text(external.get("localized_plot"))
@@ -1401,6 +1447,7 @@ class TMDbMetadataClient(object):
         force_cover_fallback=False,
         require_backdrop=False,
         collect_backdrop_fallback=False,
+        verify_identity=False,
     ):
         title = getattr(info, "title", "")
         if not title or title == N_("Movie"):
@@ -1435,7 +1482,7 @@ class TMDbMetadataClient(object):
         if needs_lookup:
             external, tmdb_id = self._lookup_for_completion(
                 "movie", item, title or getattr(item, "name", ""), year, tmdb_id,
-                outcome=outcome,
+                outcome=outcome, verify_identity=verify_identity,
             )
         else:
             self.last_error = ""
@@ -1443,6 +1490,7 @@ class TMDbMetadataClient(object):
         completed_cover = cover or external.get("cover")
         if force_cover_fallback and external.get("cover"):
             completed_cover = external.get("cover")
+        preferred_credits = external if verify_identity else {}
         completed = MovieInfo(
             title=title or external.get("title"),
             plot=external.get("localized_plot") or plot or external.get("plot"),
@@ -1450,8 +1498,8 @@ class TMDbMetadataClient(object):
             year=year or external.get("year"),
             duration=getattr(info, "duration", "") or external.get("duration"),
             genre=getattr(info, "genre", "") or external.get("genre"),
-            director=getattr(info, "director", "") or external.get("director"),
-            cast=getattr(info, "cast", "") or external.get("cast"),
+            director=preferred_credits.get("director") or getattr(info, "director", "") or external.get("director"),
+            cast=preferred_credits.get("cast") or getattr(info, "cast", "") or external.get("cast"),
             cover=completed_cover,
             backdrop=backdrop or external.get("backdrop"),
             tmdb_id=tmdb_id or external.get("tmdb_id"),
@@ -1459,6 +1507,8 @@ class TMDbMetadataClient(object):
             cover_urls=getattr(info, "cover_urls", ()),
         )
         completed._provider_plot = plot
+        if verify_identity:
+            completed._summary_tmdb_id = external.get("tmdb_id", "")
         self._completion_state(completed, external, outcome)
         completed._movie_metadata_lookup_failed = completed._metadata_lookup_failed
         completed._movie_metadata_retry_at = completed._metadata_retry_at
@@ -1489,6 +1539,7 @@ class TMDbMetadataClient(object):
         force_cover_fallback=False,
         require_backdrop=False,
         collect_backdrop_fallback=False,
+        verify_identity=False,
     ):
         title = getattr(info, "title", "") or getattr(item, "name", "")
         plot = getattr(info, "_provider_plot", getattr(info, "plot", ""))
@@ -1518,7 +1569,7 @@ class TMDbMetadataClient(object):
         if needs_lookup:
             external, tmdb_id = self._lookup_for_completion(
                 "series", item, title or getattr(item, "name", ""), year, tmdb_id,
-                outcome=outcome,
+                outcome=outcome, verify_identity=verify_identity,
             )
         else:
             self.last_error = ""
@@ -1526,14 +1577,15 @@ class TMDbMetadataClient(object):
         completed_cover = cover or external.get("cover")
         if force_cover_fallback and external.get("cover"):
             completed_cover = external.get("cover")
+        preferred_credits = external if verify_identity else {}
         completed = SeriesInfo(
             title=title or external.get("title"),
             plot=external.get("localized_plot") or plot or external.get("plot"),
             rating=rating if _has_rating(rating) else external.get("rating"),
             year=year or external.get("year"),
             genre=getattr(info, "genre", "") or external.get("genre"),
-            director=getattr(info, "director", "") or external.get("director"),
-            cast=getattr(info, "cast", "") or external.get("cast"),
+            director=preferred_credits.get("director") or getattr(info, "director", "") or external.get("director"),
+            cast=preferred_credits.get("cast") or getattr(info, "cast", "") or external.get("cast"),
             cover=completed_cover,
             episodes=getattr(info, "episodes", []) or [],
             season_ids=getattr(info, "seasons", []) or [],
@@ -1543,6 +1595,8 @@ class TMDbMetadataClient(object):
             cover_urls=getattr(info, "cover_urls", ()),
         )
         completed._provider_plot = plot
+        if verify_identity:
+            completed._summary_tmdb_id = external.get("tmdb_id", "")
         self._completion_state(completed, external, outcome)
         completed.tmdb_rating = external.get("rating") or getattr(info, "tmdb_rating", "")
         completed.duration = getattr(info, "duration", "") or external.get("duration", "")

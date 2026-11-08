@@ -4333,3 +4333,65 @@ msgstr "{} • {} FÎLM"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} RÊZEFÎLM"
+
+msgid "AC3 downmix is active"
+msgstr "Downmix a AC3 çalak e"
+
+msgid "Bulk Move"
+msgstr "Bi hev re veguhezîne"
+
+msgid "Channel order saved."
+msgstr "Rêza kanalan hate tomarkirin."
+
+msgid "Choose a TXT file."
+msgstr "Peleke TXT hilbijêre."
+
+msgid "Choose an unmarked channel."
+msgstr "Kanaleke bê nîşan hilbijêre."
+
+msgid "Digital audio passthrough"
+msgstr "Derbaskirina dengê dîjîtal"
+
+msgid "Import TXT"
+msgstr "TXT bîne hundir"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Di rêza {} de navê bikarhêner û şîfreyê bi valahiyekê ji hev veqetîne."
+
+msgid "Mark channels with RED first."
+msgstr "Pêşî kanalan bi bişkoka sor nîşan bike."
+
+msgid "Not supported"
+msgstr "Nayê piştgirîkirin"
+
+msgid "PCM Multichannel Audio"
+msgstr "Dengê PCM yê pirkanalî"
+
+msgid "Place above"
+msgstr "Li jor bi cih bike"
+
+msgid "Place below"
+msgstr "Li jêr bi cih bike"
+
+msgid "Place marked channels before saving."
+msgstr "Berî tomarkirinê kanalên nîşankirî bi cih bike."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "URL-ya HTTP an HTTPS ya serverê di rêza yekem de binivîse."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Pelê TXT bi kodkirina UTF-8 tomar bike."
+
+msgid "Setting could not be changed"
+msgstr "Mîheng nehat guhertin"
+
+msgid "Temporarily unavailable"
+msgstr "Ji bo demekê ne berdest e"
+
+msgid "The TXT file could not be read."
+msgstr "Pelê TXT nehat xwendin."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Hesabên Xtream hatin zêdekirin ({})\nTomarên dubare hatin derbaskirin ({})"

@@ -4333,3 +4333,65 @@ msgstr "{} • {} ELOKUVAA"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SARJAA"
+
+msgid "AC3 downmix is active"
+msgstr "AC3-alasmiksaus on käytössä"
+
+msgid "Bulk Move"
+msgstr "Siirrä useita"
+
+msgid "Channel order saved."
+msgstr "Kanavajärjestys tallennettu."
+
+msgid "Choose a TXT file."
+msgstr "Valitse TXT-tiedosto."
+
+msgid "Choose an unmarked channel."
+msgstr "Valitse merkitsemätön kanava."
+
+msgid "Digital audio passthrough"
+msgstr "Digitaalisen äänen läpivienti"
+
+msgid "Import TXT"
+msgstr "Tuo TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Rivillä {} käyttäjätunnus ja salasana on erotettava välilyönnillä."
+
+msgid "Mark channels with RED first."
+msgstr "Merkitse ensin kanavat punaisella painikkeella."
+
+msgid "Not supported"
+msgstr "Ei tuettu"
+
+msgid "PCM Multichannel Audio"
+msgstr "Monikanavainen PCM-ääni"
+
+msgid "Place above"
+msgstr "Sijoita yläpuolelle"
+
+msgid "Place below"
+msgstr "Sijoita alle"
+
+msgid "Place marked channels before saving."
+msgstr "Sijoita merkityt kanavat ennen tallentamista."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Kirjoita palvelimen HTTP- tai HTTPS-osoite ensimmäiselle riville."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Tallenna TXT-tiedosto UTF-8-koodauksella."
+
+msgid "Setting could not be changed"
+msgstr "Asetusta ei voitu muuttaa"
+
+msgid "Temporarily unavailable"
+msgstr "Tilapäisesti poissa käytöstä"
+
+msgid "The TXT file could not be read."
+msgstr "TXT-tiedostoa ei voitu lukea."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Lisätyt Xtream-tilit ({})\nOhitetut kaksoiskappaleet ({})"

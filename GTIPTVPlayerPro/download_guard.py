@@ -350,13 +350,20 @@ class SessionGuard(object):
         self.closed = False
         self.polls = 0
         self.events = getattr(getattr(session, "nav", None), "event", None)
-        if self.events is not None and hasattr(self.events, "append"):
-            self.events.append(self._navigation_event)
         try:
-            self.connection = self.timer.timeout.connect(self.poll)
-        except AttributeError:
-            self.timer.callback.append(self.poll)
-        self.poll()
+            try:
+                self.connection = self.timer.timeout.connect(self.poll)
+            except AttributeError:
+                self.timer.callback.append(self.poll)
+            if self.events is not None and hasattr(self.events, "append"):
+                self.events.append(self._navigation_event)
+            self.poll()
+        except Exception:
+            try:
+                self.close()
+            except Exception:
+                pass
+            raise
 
     def poll(self):
         if self.closed:
@@ -401,12 +408,14 @@ class SessionGuard(object):
 
     def close(self):
         self.closed = True
-        self.timer.stop()
-        if self.events is not None:
-            try:
-                self.events.remove(self._navigation_event)
-            except (AttributeError, ValueError):
-                pass
+        try:
+            self.timer.stop()
+        finally:
+            if self.events is not None:
+                try:
+                    self.events.remove(self._navigation_event)
+                except (AttributeError, ValueError):
+                    pass
 
 
 def install(session):

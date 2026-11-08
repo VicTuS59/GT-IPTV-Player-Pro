@@ -36,7 +36,7 @@ from .diagnostics import log_event
 from .i18n import N_, _, localized_date_text, localized_short_weekday, localized_upper
 from .live_recovery import media_snapshot as _decoder_media_snapshot
 from .live_history import LiveChannelListContext, live_channel_key, remember_live_channel
-from .live_channel_order import ChannelMove, LiveChannelOrderStore, arrange_channels, channel_order_scope
+from .live_channel_order import BulkChannelMove, ChannelMove, LiveChannelOrderStore, arrange_channels, channel_order_scope
 from .background import attach_native_alpha_pixmap
 from .channel_highlight import DEFAULT_CHANNEL_HIGHLIGHT, channel_highlight_colors, normalize_channel_highlight
 from .category_filters import category_filter_ids
@@ -54,6 +54,7 @@ from .typography import _line_fits, clean_dynamic_text, current_text_size, ellip
 from .ui_update import set_size, set_visible
 from .download_guard import allow as _allow_account_playback
 from .download_guard import cancel_pending as _cancel_download_pending
+from .browser_common import M3U_LIVE_CHANNEL_MOVE_FOOTER_ITEMS, M3U_LIVE_STREAM_FOOTER_ITEMS
 from .browser_common import CATEGORY_MANAGER_FOOTER_ITEMS, CATEGORY_MANAGER_MOVE_FOOTER_ITEMS, FAVORITE_STAR_PATH, GTAsyncListScreen, LIVE_CHANNEL_MOVE_FOOTER_ITEMS, LIVE_CHANNEL_ORDER_FOOTER_ITEMS, LIVE_DETAIL_CACHE_TTL_SECONDS, LIVE_DETAIL_EMPTY_RETRY_SECONDS, LIVE_DETAIL_EPG_RETRY_LIMIT, LIVE_DETAIL_EPG_TIMEOUT_SECONDS, LIVE_DETAIL_PROGRESS_INTERVAL_MS, LIVE_EPG_CACHE_MAX_ENTRIES, LIVE_EPG_CACHE_TTL_SECONDS, LIVE_EPG_FETCH_LIMIT, LIVE_FULLSCREEN_RESULT_KIND, LIVE_PICON_DOWNLOAD_TIMEOUT, LIVE_PICON_PREFETCH_POLL_MS, LIVE_PICON_PREFETCH_WORKERS, LIVE_PREVIEW_FRAME_PATH, LIVE_PREVIEW_LINK_POLL_MS, LIVE_PREVIEW_VIDEO_ERROR_CHECKS, LIVE_PREVIEW_VIDEO_INITIAL_MS, LIVE_PREVIEW_VIDEO_MAX_CHECKS, LIVE_PREVIEW_VIDEO_RETRY_MS, LIVE_STREAM_FOOTER_ITEMS, LIVE_STREAM_PAGE_SIZE, M3U_SEARCH_FOOTER_ITEMS, M3U_SEARCH_RESULT_LIMIT, STALKER_LIVE_EPG_QUIET_MS, STALKER_LIVE_PICON_QUIET_MS, WORKER_LIST_TIMEOUT_SECONDS, WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _client_epg_state, _client_supports, _connect_timer, _debug, _debug_identifier, _desktop_size, _disable_live_window_animation, _epg_event_starts_in_future, _is_m3u_client, _is_stalker_client, _live_detail_dwell_ms, _load_live_picon_path, _load_shared_live_epg, _mark_picon_failure, _picon_failure_active, _picon_failure_remaining, _read_proc_number, _safe_picon_url, _scale, _stream_diag_pts_progress, _trace_fullscreen_osd, _valid_live_picon_file, _validated_content_type, _wrap_live_summary, content_client_for
 
 LIVE_INITIAL_RESULT_POLL_MS = 45
@@ -811,7 +812,7 @@ class _GTStreamListBase(GTAsyncListScreen):
             self._entries.extend(appended)
             apply_order = getattr(self, '_apply_live_channel_order', None)
             if callable(apply_order):
-                apply_order()
+                apply_order(appended)
             if appended:
                 self._live_empty_more_batches = 0
             else:
@@ -1072,6 +1073,9 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self.client = client or content_client_for(account)
         self.content_type = _validated_content_type(self.client, content_type)
         self._channel_move = None
+        self._bulk_channel_move_enabled = self.content_type == 'live' and _is_m3u_client(self.client)
+        self._bulk_move_save = None
+        self._bulk_move_notice = ''
         self._channel_order_store = LiveChannelOrderStore()
         self._sorting_live_lock = threading.RLock()
         self._bind_live_channel_order()
@@ -1210,8 +1214,14 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         _connect_timer(self._live_active_picon_timer, self._live_active_picon_fired)
         _connect_timer(self._live_active_picon_poll_timer, self._live_active_picon_poll)
         _connect_timer(self._live_picon_prefetch_poll_timer, self._live_picon_prefetch_poll)
-        self._footer_layout_items = LIVE_CHANNEL_ORDER_FOOTER_ITEMS if self._channel_move_enabled else LIVE_STREAM_FOOTER_ITEMS
-        self._footer_layout_alternate_items = LIVE_CHANNEL_MOVE_FOOTER_ITEMS if self._channel_move_enabled else ()
+        if self._bulk_channel_move_enabled:
+            self._footer_layout_items = M3U_LIVE_STREAM_FOOTER_ITEMS
+            self._footer_layout_alternate_items = M3U_LIVE_CHANNEL_MOVE_FOOTER_ITEMS
+            self._bulk_move_timer = eTimer()
+            _connect_timer(self._bulk_move_timer, self._poll_bulk_move_save)
+        else:
+            self._footer_layout_items = LIVE_CHANNEL_ORDER_FOOTER_ITEMS if self._channel_move_enabled else LIVE_STREAM_FOOTER_ITEMS
+            self._footer_layout_alternate_items = LIVE_CHANNEL_MOVE_FOOTER_ITEMS if self._channel_move_enabled else ()
         self._footer_transparent_panel = True
         self._footer_show_dividers = True
         self._footer_side_padding = 16
@@ -1253,6 +1263,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self.onLayoutFinish.append(self._refresh_summary_scroll_indicator)
             self.onLayoutFinish.append(self._refit_live_summary)
         setup_broadcast(self, 'live', self._footer_layout_items)
+        if self._bulk_channel_move_enabled:
+            self.onClose.append(self._close_bulk_channel_move)
         self.onLayoutFinish.append(self._apply_initial_live_rows)
         # Let the provider worker run while Enigma2 instantiates the skin.
         self._start_initial_load()
@@ -1284,6 +1296,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 self._cancel_preview_fullscreen()
                 if name in ('cancel', 'stop'):
                     return
+            if name == 'yellow' and self._bulk_channel_move_enabled and self._channel_move is not None:
+                return self._place_bulk_channels(before=True)
             return action()
         return dispatch
 
@@ -1336,7 +1350,31 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._show_preview_fullscreen_list()
 
     def open_content_edit(self):
-        return content_sort_ui.open_edit(self)
+        if not self._bulk_channel_move_enabled:
+            return content_sort_ui.open_edit(self)
+        if not self._can_start_channel_move():
+            return
+        generation = self._live_catalog_generation
+        with self._preview_link_lock:
+            self._preview_generation += 1
+        self._cancel_preview_resolution(clear_target=True)
+        self._live_modal_active = True
+
+        def selected(choice):
+            if self._closed:
+                return
+            self._live_modal_active = False
+            if (generation == self._live_catalog_generation
+                    and isinstance(choice, (tuple, list)) and len(choice) > 1
+                    and choice[1] == 'bulk'):
+                self.start_channel_move()
+
+        try:
+            from Screens.ChoiceBox import ChoiceBox
+            self.session.openWithCallback(selected, ChoiceBox, title=_('Edit'), list=[(_('Bulk Move'), 'bulk')])
+        except Exception:
+            self._live_modal_active = False
+            log_event('content', 'Could not open M3U channel edit menu')
 
     def _bind_live_channel_order(self):
         source = str(getattr(self.client, 'source_type', 'xtream') or 'xtream').lower()
@@ -1346,7 +1384,10 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._channel_order = self._channel_order_store.load(self._channel_order_scope) if self._channel_move_enabled else ()
 
     def load_items(self):
-        return content_sort_ui.load_live(self, _GTStreamListBase.load_items(self))
+        entries = _GTStreamListBase.load_items(self)
+        if self._bulk_channel_move_enabled:
+            return entries
+        return content_sort_ui.load_live(self, entries)
 
     def _reindex_live_preview(self):
         for key_name, index_name in (('_playing_preview_key', '_playing_preview_index'), ('_preview_target_key', '_preview_target_index')):
@@ -1354,7 +1395,11 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             if key:
                 setattr(self, index_name, next((i for i, item in enumerate(self._entries) if self._selection_key(item) == key), -1))
 
-    def _apply_live_channel_order(self):
+    def _apply_live_channel_order(self, appended=()):
+        if self._bulk_channel_move_enabled:
+            if self._channel_move is not None:
+                self._channel_move.include_page(appended)
+            return
         if self._channel_move is not None or not self._entries:
             return
         selected = self._selection_key(self._entries[self.selected_index])
@@ -1362,44 +1407,132 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self.selected_index = next((i for i, item in enumerate(self._entries) if self._selection_key(item) == selected), 0)
         self._reindex_live_preview()
 
-    @staticmethod
-    def _channel_move_guidance():
+    def _channel_move_guidance(self):
+        if self._bulk_channel_move_enabled:
+            if self._bulk_move_save is not None:
+                return _('Please wait')
+            if self._bulk_move_notice:
+                return self._bulk_move_notice
+            return '{}  ·  {} {}'.format(_('Bulk Move'), _('Marked'), len(self._channel_move.marked))
         return _('Move channel')
 
+    def _can_start_channel_move(self):
+        return (
+            (self._channel_move_enabled or self._bulk_channel_move_enabled)
+            and self._channel_move is None
+            and not (self._closed or self._loading or self._error or self._fullscreen_active or self._live_modal_active)
+            and 0 <= self.selected_index < len(self._entries)
+        )
+
     def start_channel_move(self):
-        if not self._channel_move_enabled or self._channel_move is not None or (not self._entries) or self._loading or self._fullscreen_active or self._live_modal_active:
+        if not self._can_start_channel_move():
             return
         with self._preview_link_lock:
             self._preview_generation += 1
         self._cancel_preview_resolution(clear_target=True)
         self._live_pending_target_index = None
-        self._channel_move = ChannelMove(self._entries, self.selected_index)
-        set_remote_footer(self, LIVE_CHANNEL_MOVE_FOOTER_ITEMS)
+        move_type = BulkChannelMove if self._bulk_channel_move_enabled else ChannelMove
+        self._channel_move = move_type(self._entries, self.selected_index)
+        self._bulk_move_notice = ''
+        set_remote_footer(self, self._footer_layout_alternate_items)
         self._refresh_live_streams()
 
     def finish_channel_move(self):
         if self._channel_move is None:
             return
+        if self._bulk_channel_move_enabled:
+            return self._save_bulk_channel_move()
         order = content_sort_ui.save_manual(self)
         if order is None:
             self.session.open(MessageBox, _('Could not save channel order.'), type=MessageBox.TYPE_ERROR)
             return
         self._channel_order = order
-        self._channel_move = None
-        self._reindex_live_preview()
-        set_remote_footer(self, self._footer_layout_items)
-        self._refresh_live_streams()
-        fit_dynamic_text(self['list_caption'], _('Channel moved.'), max_lines=1)
+        self._end_channel_move(_('Channel moved.'))
 
     def cancel_channel_move(self):
-        if self._channel_move is None:
+        if self._channel_move is None or self._bulk_move_save is not None:
             return
         self.selected_index = self._channel_move.cancel(self._entries)
+        self._live_pending_target_index = None
+        self._end_channel_move(_('Move cancelled.'))
+
+    def _end_channel_move(self, notice=''):
         self._channel_move = None
         self._reindex_live_preview()
         set_remote_footer(self, self._footer_layout_items)
         self._refresh_live_streams()
-        fit_dynamic_text(self['list_caption'], _('Move cancelled.'), max_lines=1)
+        if notice:
+            fit_dynamic_text(self['list_caption'], notice, max_lines=1)
+
+    def _place_bulk_channels(self, *, before=False):
+        if self._bulk_move_save is not None:
+            return
+        move = self._channel_move
+        if not move.marked:
+            self._bulk_move_notice = _('Mark channels with RED first.')
+        else:
+            place = move.place_before if before else move.place_after
+            index = place(self._entries, self.selected_index)
+            if index is None:
+                self._bulk_move_notice = _('Choose an unmarked channel.')
+            else:
+                self.selected_index = index
+                self._live_pending_target_index = None
+                self._reindex_live_preview()
+                self._bulk_move_notice = ''
+        self._refresh_live_streams()
+
+    def _save_bulk_channel_move(self):
+        if self._bulk_move_save is not None:
+            return
+        move = self._channel_move
+        if move.marked:
+            self._bulk_move_notice = _('Place marked channels before saving.')
+            self._refresh_live_streams()
+            return
+        if self._entries == move.original:
+            self._end_channel_move()
+            return
+
+        client, category_id = self.client, self.category.category_id
+        stream_ids = tuple(live_channel_key(item) for item in self._entries)
+        result = {'done': threading.Event(), 'saved': False}
+        self._bulk_move_save = result
+        self._live_pending_target_index = None
+
+        def save():
+            try:
+                result['saved'] = client.save_channel_order(category_id, stream_ids)
+            except Exception:
+                log_event('content', 'Could not save M3U channel order')
+            finally:
+                result['done'].set()
+
+        try:
+            threading.Thread(target=save, name='GT-M3U-Order', daemon=True).start()
+        except (RuntimeError, OSError, MemoryError):
+            result['done'].set()
+        self._refresh_live_streams()
+        self._poll_bulk_move_save()
+
+    def _poll_bulk_move_save(self):
+        result = self._bulk_move_save
+        if self._closed or result is None:
+            return
+        if not result['done'].is_set():
+            self._bulk_move_timer.start(100, True)
+            return
+        self._bulk_move_save = None
+        if result['saved']:
+            self._end_channel_move(_('Channel order saved.'))
+        else:
+            self._bulk_move_notice = _('Could not save channel order.')
+            self._refresh_live_streams()
+
+    def _close_bulk_channel_move(self):
+        self._bulk_move_timer.stop()
+        if self._channel_move is not None and not (self._bulk_move_save or {}).get('saved'):
+            self._channel_move.cancel(self._entries)
 
     def _setup_live_widgets(self, px):
         self['root_fill'] = Label('')
@@ -1431,6 +1564,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self['stream_picon_{}'.format(index)] = Pixmap()
             self['stream_picon_{}'.format(index)].hide()
             self['stream_number_{}'.format(index)] = Label('')
+            self['stream_move_mark_{}'.format(index)] = Pixmap()
+            self['stream_move_mark_{}'.format(index)].hide()
             self['stream_name_{}'.format(index)] = Label('')
             self['stream_separator_{}'.format(index)] = Label('')
             self['stream_separator_{}'.format(index)].hide()
@@ -1676,6 +1811,11 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
 
     def toggle_selected_favorite(self):
         if self._channel_move is not None:
+            if (self._bulk_channel_move_enabled and self._bulk_move_save is None
+                    and 0 <= self.selected_index < len(self._entries)):
+                self._channel_move.toggle(self._entries[self.selected_index])
+                self._bulk_move_notice = ''
+                self._refresh_live_streams()
             return
         if not self._entries or self._loading or self._fullscreen_active:
             return
@@ -1723,6 +1863,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
 
     def refresh_streams(self):
         if self._channel_move is not None:
+            if self._bulk_channel_move_enabled:
+                self.finish_channel_move()
             return
         if self._hidden_category_ids and (not str(getattr(self.category, 'category_id', '') or '').strip()) and (not self._entries) and self._live_has_more and (self._live_empty_more_batches >= 3) and _is_stalker_client(self.client):
             return self._start_live_more(force=True)
@@ -1794,7 +1936,13 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self.selected_index %= len(self._entries)
         page_start = int(self.selected_index / self.page_size) * self.page_size
         page_items = self._entries[page_start:page_start + self.page_size]
-        page_key = (page_start, tuple(((self._selection_key(item), str(getattr(item, 'name', '') or ''), self._is_favorite(item)) for item in page_items)))
+        move = self._channel_move
+        marked = move.marked if self._bulk_channel_move_enabled and move is not None else ()
+        page_key = (page_start, tuple(
+            (self._selection_key(item), str(getattr(item, 'name', '') or ''),
+             self._is_favorite(item), live_channel_key(item) in marked)
+            for item in page_items
+        ))
         selected_row = self.selected_index - page_start
         previous_row = self._live_render_selected_row
         page_changed = page_key != self._live_render_page_key
@@ -1802,12 +1950,15 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             plain_lines = []
             for row_index in range(self.page_size):
                 present = row_index < len(page_items)
+                marked_row = present and live_channel_key(page_items[row_index]) in marked
+                set_visible(self['stream_move_mark_{}'.format(row_index)], marked_row)
                 if present:
                     item = page_items[row_index]
                     absolute_index = page_start + row_index
                     set_visible(self['stream_row_bg_{}'.format(row_index)], True)
                     set_visible(self['stream_separator_{}'.format(row_index)], True)
-                    set_text_if_changed(self['stream_number_{}'.format(row_index)], '{:04d}'.format(absolute_index + 1))
+                    number = '' if marked_row else '{:04d}'.format(absolute_index + 1)
+                    set_text_if_changed(self['stream_number_{}'.format(row_index)], number)
                     rendered_name = self._set_live_channel_name(row_index, str(item.name or ''))
                     plain_lines.append(rendered_name)
                     if self._is_favorite(item):
@@ -1853,7 +2004,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
 
     def _prefetch_remaining_live_catalog(self):
         """Read only enough catalogue rows for the visible and next page."""
-        if self._channel_move is not None or self._closed or self._fullscreen_active or getattr(self, '_live_modal_active', False) or self._loading or self._live_more_loading or (not self._live_has_more) or (self._live_empty_more_batches >= 3):
+        single_move = self._channel_move is not None and not self._bulk_channel_move_enabled
+        if single_move or self._bulk_move_save is not None or self._closed or self._fullscreen_active or getattr(self, '_live_modal_active', False) or self._loading or self._live_more_loading or (not self._live_has_more) or (self._live_empty_more_batches >= 3):
             return False
         page_start = self.selected_index // self.page_size * self.page_size
         if len(self._entries) >= page_start + self.page_size * 2:
@@ -1868,6 +2020,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._live_render_selected_row = -1
         for row_index in range(LIVE_STREAM_PAGE_SIZE):
             set_text_if_changed(self['stream_number_{}'.format(row_index)], '')
+            set_visible(self['stream_move_mark_{}'.format(row_index)], False)
             set_text_if_changed(self['stream_name_{}'.format(row_index)], '')
             set_visible(self['stream_row_bg_{}'.format(row_index)], False)
             set_visible(self['stream_separator_{}'.format(row_index)], False)
@@ -1880,12 +2033,16 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
 
     def _select(self, index):
         if self._channel_move is not None:
-            if index >= len(self._entries) and self._live_has_more:
-                self._start_live_more(force=True)
-            self.selected_index = self._channel_move.move(self._entries, index)
-            self._reindex_live_preview()
-            self._refresh_live_streams()
-            return
+            if not self._bulk_channel_move_enabled:
+                if index >= len(self._entries) and self._live_has_more:
+                    self._start_live_more(force=True)
+                self.selected_index = self._channel_move.move(self._entries, index)
+                self._reindex_live_preview()
+                self._refresh_live_streams()
+                return
+            if self._bulk_move_save is not None:
+                return
+            self._bulk_move_notice = ''
         if self._loading or self._fullscreen_active:
             return
         if not self._entries:
@@ -2168,9 +2325,18 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._live_more_token = worker_token
         with self._live_more_worker_events_lock:
             self._live_more_worker_tokens.add(worker_token)
-        worker = threading.Thread(target=self._run_live_more, args=(generation, worker_token))
-        worker.daemon = True
-        worker.start()
+        try:
+            worker = threading.Thread(target=self._run_live_more, args=(generation, worker_token), daemon=True)
+            worker.start()
+        except (RuntimeError, OSError, MemoryError):
+            _cancel_worker_token(worker_token)
+            with self._live_more_worker_events_lock:
+                self._live_more_worker_tokens.discard(worker_token)
+            self._live_more_token = None
+            self._live_more_loading = False
+            self._live_pending_target_index = None
+            log_event('content', 'Could not start live channel page worker')
+            return False
         self._timer.start(100, True)
         return True
 
@@ -3474,7 +3640,10 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
 
     def open_selected(self):
         if self._channel_move is not None:
-            self.finish_channel_move()
+            if self._bulk_channel_move_enabled:
+                self._place_bulk_channels()
+            else:
+                self.finish_channel_move()
             return
         if not self._entries or self._loading or self._fullscreen_active:
             return

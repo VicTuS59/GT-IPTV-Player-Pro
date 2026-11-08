@@ -113,14 +113,25 @@ def live(s):
     s.label('list_caption',(522,124,600,54),36,CYAN)
     s.label('message',(1270,128,116,46),27,MUTED,align='right')
     line(s,'list_caption_accent',(520,182,864,2))
+    row_x, row_width = 510, 882
+    picon_x, picon_width = 612, 106
+    favorite_size, favorite_inset = 25, 3
+    favorite_x = picon_x + picon_width - favorite_size - favorite_inset
+    name_x = 740
+    name_width = row_x + row_width - name_x - 14
+    favorite_star = art('favorite-picon-star')
+    move_mark = plugin_path('skin', 'images', 'category-check-tick-r83.png')
     for i in range(10):
         y=184+i*74
-        s.pic('r101_live_row_'+str(i),(510,y,882,72),art('stream-row'))
-        s.pic('r101_live_focus_'+str(i),(510,y,882,72),art('stream-focus'),z=3)
+        picon_y = y + 5
+        s.pic('r101_live_row_'+str(i),(row_x,y,row_width,72),art('stream-row'))
+        s.pic('r101_live_focus_'+str(i),(row_x,y,row_width,72),art('stream-focus'),z=3)
         s.label('stream_number_'+str(i),(526,y+6,78,60),26,MUTED)
-        s.pic('stream_picon_'+str(i),(612,y+5,106,62),z=5)
-        s.label('stream_name_'+str(i),(740,y+5,348,62),30,lines=2)
-        s.pic('stream_favorite_'+str(i),(1068,y+7,25,25),plugin_path('skin','images','favorite-star-v15.png'),z=7)
+        s.pic('stream_move_mark_'+str(i),(526,y+18,36,36),move_mark,z=7)
+        s.pic('stream_picon_'+str(i),(picon_x,picon_y,picon_width,62),z=5)
+        s.label('stream_name_'+str(i),(name_x,y+5,name_width,62),30,lines=2)
+        s.pic('stream_favorite_'+str(i),
+              (favorite_x,picon_y+favorite_inset,favorite_size,favorite_size),favorite_star,z=7)
     s.label('list_scroll_track',(1398,184,5,740),background='#243D59');s.label('list_scroll_thumb',(1398,184,5,100),background=CYAN,z=6)
     s.pic('preview_frame',(1430,122,456,262),art('file-row'),z=3)
     s.parts.append('<widget name="preview_video" position="{},{}" size="{},{}" backgroundColor="transparent" zPosition="5"/>'.format(*s.rect((1436,128,444,250))));s.names.add('preview_video')

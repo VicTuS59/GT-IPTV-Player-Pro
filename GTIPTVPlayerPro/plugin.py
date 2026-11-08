@@ -12,11 +12,11 @@ MAIN_MENU_ENTRY_ID = "gt_iptv_player_pro"
 MAIN_MENU_WEIGHT = 50
 
 
-def _log_scheduler_failure(message, error):
+def _log_hook_failure(area, message, error):
     try:
         from .diagnostics import log_event
 
-        log_event("epg_scheduler", message, error)
+        log_event(area, message, error)
     except Exception:
         pass
 
@@ -28,7 +28,7 @@ def _prepare_storage():
         from .backup import BackupManager
         BackupManager().recover()
     except Exception as error:
-        _log_scheduler_failure("Backup recovery failed", error)
+        _log_hook_failure("epg_scheduler", "Backup recovery failed", error)
         return False
     # Create both first-run account files before registering their TXT banks.
     from .playlist import ensure_playlist_file
@@ -55,6 +55,21 @@ def _prepare_storage():
     return True
 
 
+def _install_optional_session_hooks(session):
+    try:
+        from .web_shortcut import install as install_web_shortcut
+
+        install_web_shortcut(session)
+    except Exception as error:
+        _log_hook_failure("web_shortcut", "Web MENU shortcut setup failed", error)
+    try:
+        from .download_guard import install as install_download_guard
+
+        install_download_guard(session)
+    except Exception as error:
+        _log_hook_failure("download_guard", "Download monitor setup failed", error)
+
+
 def main(session, **kwargs):
     from .main import GTIPTVPlayerProScreen
 
@@ -62,10 +77,7 @@ def main(session, **kwargs):
         from Screens.MessageBox import MessageBox
         session.open(MessageBox, _("Restore failed. Use the safety backup."), MessageBox.TYPE_ERROR)
         return
-    from .web_shortcut import install as install_web_shortcut
-    install_web_shortcut(session)
-    from .download_guard import install as install_download_guard
-    install_download_guard(session)
+    _install_optional_session_hooks(session)
     session.open(GTIPTVPlayerProScreen)
 
 
@@ -93,15 +105,13 @@ def session_start(reason, session=None, **kwargs):
     if reason == 0 and session is not None:
         if not _prepare_storage():
             return
-        from .web_shortcut import install as install_web_shortcut
-        install_web_shortcut(session)
-        from .web_remote import WEB_REMOTE
-        WEB_REMOTE.bind_session(session)
+        _install_optional_session_hooks(session)
         try:
-            from .download_guard import install as install_download_guard
-            install_download_guard(session)
-        except Exception:
-            pass
+            from .web_remote import WEB_REMOTE
+
+            WEB_REMOTE.bind_session(session)
+        except Exception as error:
+            _log_hook_failure("web_remote", "Web remote session setup failed", error)
         try:
             # OpenWebif builds its external resource tree after ordinary
             # session-start plugins.  Register the gated /gtiptv endpoint now;
@@ -133,13 +143,13 @@ def session_start(reason, session=None, **kwargs):
     except Exception as error:
         # Scheduler failures must never prevent Enigma2 plugin discovery or
         # stop the independent M3U XMLTV lifecycle from being serviced.
-        _log_scheduler_failure("DVB EPG scheduler hook failed", error)
+        _log_hook_failure("epg_scheduler", "DVB EPG scheduler hook failed", error)
     try:
         from .m3u_epg_scheduler import session_start as m3u_scheduler_start
 
         m3u_scheduler_start(reason, session=session, **kwargs)
     except Exception as error:
-        _log_scheduler_failure("M3U XMLTV scheduler hook failed", error)
+        _log_hook_failure("epg_scheduler", "M3U XMLTV scheduler hook failed", error)
 
 
 def autostart(reason, **kwargs):

@@ -4333,3 +4333,65 @@ msgstr "{} • {} FILMA"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SERIALE"
+
+msgid "AC3 downmix is active"
+msgstr "Përzierja e AC3 në më pak kanale është aktive"
+
+msgid "Bulk Move"
+msgstr "Zhvendos në grup"
+
+msgid "Channel order saved."
+msgstr "Renditja e kanaleve u ruajt."
+
+msgid "Choose a TXT file."
+msgstr "Zgjidhni një skedar TXT."
+
+msgid "Choose an unmarked channel."
+msgstr "Zgjidh një kanal të pashënuar."
+
+msgid "Digital audio passthrough"
+msgstr "Kalimi i drejtpërdrejtë i audios dixhitale"
+
+msgid "Import TXT"
+msgstr "Importo TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Në rreshtin {}, ndani emrin e përdoruesit dhe fjalëkalimin me një hapësirë."
+
+msgid "Mark channels with RED first."
+msgstr "Shëno fillimisht kanalet me butonin e kuq."
+
+msgid "Not supported"
+msgstr "Nuk mbështetet"
+
+msgid "PCM Multichannel Audio"
+msgstr "Audio PCM me shumë kanale"
+
+msgid "Place above"
+msgstr "Vendos sipër"
+
+msgid "Place below"
+msgstr "Vendos poshtë"
+
+msgid "Place marked channels before saving."
+msgstr "Vendos kanalet e shënuara përpara ruajtjes."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Vendosni URL-në HTTP ose HTTPS të serverit në rreshtin e parë."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Ruajeni skedarin TXT me kodim UTF-8."
+
+msgid "Setting could not be changed"
+msgstr "Cilësimi nuk mund të ndryshohej"
+
+msgid "Temporarily unavailable"
+msgstr "Përkohësisht i padisponueshëm"
+
+msgid "The TXT file could not be read."
+msgstr "Skedari TXT nuk mund të lexohej."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Llogaritë Xtream të shtuara ({})\nDublikatat e anashkaluara ({})"

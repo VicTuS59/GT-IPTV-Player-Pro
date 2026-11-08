@@ -4333,3 +4333,65 @@ msgstr "{} • {} FILMS"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SEARJES"
+
+msgid "AC3 downmix is active"
+msgstr "AC3-downmix is aktyf"
+
+msgid "Bulk Move"
+msgstr "Meardere ferpleatse"
+
+msgid "Channel order saved."
+msgstr "De kanaalfolchoarder is opslein."
+
+msgid "Choose a TXT file."
+msgstr "Kies in TXT-bestân."
+
+msgid "Choose an unmarked channel."
+msgstr "Kies in net-markearre kanaal."
+
+msgid "Digital audio passthrough"
+msgstr "Digitaal lûd trochjaan"
+
+msgid "Import TXT"
+msgstr "TXT ymportearje"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Op rigel {} moatte brûkersnamme en wachtwurd skieden wêze troch in spaasje."
+
+msgid "Mark channels with RED first."
+msgstr "Markearje earst kanalen mei de reade knop."
+
+msgid "Not supported"
+msgstr "Net stipe"
+
+msgid "PCM Multichannel Audio"
+msgstr "Mearkanaals PCM-lûd"
+
+msgid "Place above"
+msgstr "Hjirboppe pleatse"
+
+msgid "Place below"
+msgstr "Hjirûnder pleatse"
+
+msgid "Place marked channels before saving."
+msgstr "Pleats de markearre kanalen foar it opslaan."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Set de HTTP- of HTTPS-URL fan de server op de earste rigel."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Bewarje it TXT-bestân mei UTF-8-kodearring."
+
+msgid "Setting could not be changed"
+msgstr "De ynstelling koe net wizige wurde"
+
+msgid "Temporarily unavailable"
+msgstr "Tydlik net beskikber"
+
+msgid "The TXT file could not be read."
+msgstr "It TXT-bestân koe net lêzen wurde."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Xtream-akkounts tafoege ({})\nDûbele yngongen oerslein ({})"

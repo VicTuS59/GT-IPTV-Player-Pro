@@ -4339,3 +4339,65 @@ msgstr "{} • {} ФИЛМОВА"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} СЕРИЈА"
+
+msgid "AC3 downmix is active"
+msgstr "Мешање AC3 у мање канала је укључено"
+
+msgid "Bulk Move"
+msgstr "Групно премештање"
+
+msgid "Channel order saved."
+msgstr "Редослед канала је сачуван."
+
+msgid "Choose a TXT file."
+msgstr "Изаберите TXT датотеку."
+
+msgid "Choose an unmarked channel."
+msgstr "Изаберите неозначени канал."
+
+msgid "Digital audio passthrough"
+msgstr "Директан пренос дигиталног звука"
+
+msgid "Import TXT"
+msgstr "Увези TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "У реду {} одвојите корисничко име и лозинку размаком."
+
+msgid "Mark channels with RED first."
+msgstr "Најпре означите канале црвеним дугметом."
+
+msgid "Not supported"
+msgstr "Није подржано"
+
+msgid "PCM Multichannel Audio"
+msgstr "Вишеканални PCM звук"
+
+msgid "Place above"
+msgstr "Постави изнад"
+
+msgid "Place below"
+msgstr "Постави испод"
+
+msgid "Place marked channels before saving."
+msgstr "Поставите означене канале пре чувања."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "У први ред унесите HTTP или HTTPS адресу сервера."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Сачувајте TXT датотеку у UTF-8 кодирању."
+
+msgid "Setting could not be changed"
+msgstr "Подешавање није могло да се промени"
+
+msgid "Temporarily unavailable"
+msgstr "Привремено недоступно"
+
+msgid "The TXT file could not be read."
+msgstr "TXT датотека није могла да се прочита."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Додати Xtream налози ({})\nПрескочени дупликати ({})"

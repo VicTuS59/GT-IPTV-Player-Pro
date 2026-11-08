@@ -4333,3 +4333,65 @@ msgstr "{} • {} FILMI"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SARJA"
+
+msgid "AC3 downmix is active"
+msgstr "AC3 kanalite vähendamine on aktiivne"
+
+msgid "Bulk Move"
+msgstr "Hulgiliigutamine"
+
+msgid "Channel order saved."
+msgstr "Kanalite järjekord on salvestatud."
+
+msgid "Choose a TXT file."
+msgstr "Vali TXT-fail."
+
+msgid "Choose an unmarked channel."
+msgstr "Vali märkimata kanal."
+
+msgid "Digital audio passthrough"
+msgstr "Digitaalheli otseedastus"
+
+msgid "Import TXT"
+msgstr "Impordi TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Real {} peavad kasutajanimi ja parool olema tühikuga eraldatud."
+
+msgid "Mark channels with RED first."
+msgstr "Märgi esmalt kanalid punase nupuga."
+
+msgid "Not supported"
+msgstr "Ei toetata"
+
+msgid "PCM Multichannel Audio"
+msgstr "Mitmekanaliline PCM-heli"
+
+msgid "Place above"
+msgstr "Paiguta üles"
+
+msgid "Place below"
+msgstr "Paiguta alla"
+
+msgid "Place marked channels before saving."
+msgstr "Paiguta märgitud kanalid enne salvestamist."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Sisesta esimesele reale serveri HTTP- või HTTPS-aadress."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Salvesta TXT-fail UTF-8 kodeeringus."
+
+msgid "Setting could not be changed"
+msgstr "Seadet ei saanud muuta"
+
+msgid "Temporarily unavailable"
+msgstr "Ajutiselt pole saadaval"
+
+msgid "The TXT file could not be read."
+msgstr "TXT-faili ei saanud lugeda."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Lisatud Xtreami kontod ({})\nVahele jäetud duplikaadid ({})"

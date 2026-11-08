@@ -12,6 +12,7 @@ import threading
 import time
 from collections import OrderedDict, deque
 from contextlib import nullcontext
+from copy import copy
 from Components.ActionMap import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
@@ -19,6 +20,7 @@ from Screens.Screen import Screen
 from enigma import ePoint, eSize, eTimer, getDesktop, iServiceInformation
 from . import sorting_ui as content_sort_ui
 from .provider_preview import catalogue_info
+from .vod_artwork import provider_backdrop_loader
 from .artwork import is_tmdb_artwork_url, poster_batch_timeout, tmdb_poster_url
 from .content import ContentError, XtreamContentClient
 from .diagnostics import log_event
@@ -99,7 +101,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
     _no_match_message = N_('No movies matched this search.')
     _item_noun_message = N_('Movie')
 
-    def __init__(self, session, account, client=None, favorite_store=None, hidden_category_ids=None, initial_query=None, shared_catalog=None):
+    def __init__(self, session, account, client=None, favorite_store=None, hidden_category_ids=None, initial_query=None, shared_catalog=None, discovery_search=False):
         search_footer = ALL_SERIES_SEARCH_FOOTER_ITEMS if self.content_type == 'series' else ALL_MOVIES_SEARCH_FOOTER_ITEMS
         self.skin = decorate_remote_footer(prepared_skin(_all_movies_search_skin), search_footer, transparent_panel=True, show_dividers=False, stacked=True)
         Screen.__init__(self, session)
@@ -128,7 +130,13 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._page_cache = OrderedDict()
         self._event_lock = threading.Lock()
         self._events = deque()
-        self._catalog_mode = self.content_type == 'series' or str(getattr(self.client, 'source_type', '')).lower() in ('xtream', 'stalker') or isinstance(self.client, XtreamContentClient)
+        source_type = str(getattr(self.client, 'source_type', '')).lower()
+        self._discovery_search = discovery_search
+        # Portal search does not always supply membership for filtered rows.
+        provider_first = discovery_search and (source_type != 'stalker' or not self._hidden_category_ids)
+        self._catalog_mode = not provider_first and (
+            self.content_type == 'series' or source_type in ('xtream', 'stalker')
+            or isinstance(self.client, XtreamContentClient))
         self._catalog_index = shared_catalog
         self._shared_catalog = shared_catalog is not None
         self._owns_search_client = not self._shared_catalog
@@ -404,7 +412,9 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self._results = []
             self._render()
             return False
-        token = _WorkerToken(MOVIE_SEARCH_TIMEOUT_SECONDS)
+        streaming_discovery = (getattr(self, '_discovery_search', False) and not self._catalog_mode
+                               and getattr(self.client, 'source_type', '') == 'xtream')
+        token = _WorkerToken(90 if streaming_discovery else MOVIE_SEARCH_TIMEOUT_SECONDS)
         self._search_token = token
         self._loading = True
         self._requested_page = page
@@ -484,6 +494,11 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
 
                 def search_page():
                     source_type = str(getattr(self.client, 'source_type', '') or '').lower()
+                    if getattr(self, '_discovery_search', False) and source_type == 'xtream':
+                        def preview(result):
+                            self._queue_search_event(('partial', generation, page, result))
+                        return searcher(query, page=page, page_size=self.provider_page_size,
+                                        hidden_category_ids=self._hidden_category_ids, preview=preview)
                     if self._hidden_category_ids and (source_type == 'xtream' or isinstance(self.client, XtreamContentClient)):
                         try:
                             return searcher(query, page=page, page_size=self.provider_page_size, hidden_category_ids=self._hidden_category_ids)
@@ -507,7 +522,15 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                           else 'limit' if isinstance(error, CatalogLimitError) else 'storage')
                 self._queue_search_event(('error', generation, page, reason))
             except ContentError as error:
-                if error.reason == ContentError.UNSUPPORTED_TYPE and callable(getattr(self.client, 'load_vod_catalog_step', None)):
+                portal_fallback = error.reason == ContentError.UNSUPPORTED_TYPE and callable(getattr(self.client, 'load_vod_catalog_step', None))
+                xtream_fallback = (
+                    getattr(self, '_discovery_search', False) and not self._catalog_mode
+                    and getattr(self.client, 'source_type', '') == 'xtream'
+                    and (error.reason in (ContentError.CONTENT_RESPONSE, ContentError.INVALID_RESPONSE,
+                                          ContentError.CATALOG_ITEM_LIMIT, ContentError.RESPONSE_TOO_LARGE)
+                         or error.http_status in (400, 404, 405, 422, 501))
+                )
+                if portal_fallback or xtream_fallback:
                     self._queue_search_event(('fallback', generation, page, None))
                     return
                 self._queue_search_event(('error', generation, page, str(getattr(error, 'reason', '') or 'search_error')))
@@ -590,7 +613,8 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._release_search_results()
         self._results = result_items
         self._total_items = result_total
-        if not result_has_more and (not (getattr(self, '_catalog_mode', False) and (not self._catalog_state.get('complete', False)))):
+        if (not result_has_more and not getattr(result, 'progress_preview', False)
+                and not (getattr(self, '_catalog_mode', False) and not self._catalog_state.get('complete', False))):
             self._known_last_page = page
         self._has_more = bool(result_has_more and (self._known_last_page is None or page < self._known_last_page))
         try:
@@ -621,6 +645,10 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             if event[2] != self._requested_page and (not (event[0] == 'preview' and (not self._loading) and (event[2] == self._current_page))):
                 if event[0] in ('page', 'preview'):
                     self._release_search_page(event[3])
+                continue
+            if event[0] == 'partial':
+                self._apply_search_page(event[3], event[2], self._pending_page_index)
+                changed = True
                 continue
             self._loading = False
             self._search_token = None
@@ -792,7 +820,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         fit_dynamic_text(self['detail_plot'], str(getattr(item, 'plot', '') or '') or _(self._empty_summary_message), max_lines=7, fallback_chars=48)
 
     def _select(self, index):
-        if self._loading:
+        if self._loading and self._search_source != 'xtream-preview':
             return
         try:
             index = int(index)
@@ -879,7 +907,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
     def open_selected(self):
         if not self._results:
             return
-        if self._loading:
+        if self._loading and self._search_source != 'xtream-preview':
             self['status'].setText(_('Please wait'))
             return
         if self.content_type == 'series':
@@ -909,7 +937,9 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self._keyboard_timer.stop()
         except Exception:
             pass
-        self._release_xtream_search_cache()
+        # Discover Movies owns this cache across consecutive searches.
+        if not getattr(self, '_discovery_search', False):
+            self._release_xtream_search_cache()
 
 class GTAllSeriesSearchScreen(GTAllMoviesSearchScreen):
     """Paged account-wide series search using the session RAM catalogue."""
@@ -2965,16 +2995,38 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 setattr(self, '_' + kind + '_detail_preview', (generation, info, _cached_picon_path(url) if url else '', '', url, _safe_picon_url(getattr(item, 'icon', ''))))
         return info
 
+    def _fill_light_provider_backdrop(self, item, info, token):
+        if not getattr(self, '_light_vod_enabled', False) or info is None:
+            return info
+        loader = provider_backdrop_loader(self.client, item, info)
+        if loader is None:
+            return info
+        artwork_token = _WorkerToken(3)
+        if token is not None:
+            artwork_token.cancel_event = token.cancel_event
+            artwork_token.deadline = min(artwork_token.deadline, token.deadline)
+        try:
+            details = _bounded_client_call(self.client, artwork_token, lambda: loader(item.stream_id))
+        except Exception:
+            if token is not None:
+                token.check()
+            return info
+        result = copy(info)
+        result._provider_backdrop_checked = True
+        result.backdrop = getattr(details, 'backdrop', '') or getattr(info, 'backdrop', '')
+        return result
+
     def _load_movie_detail_worker(self, generation, item, token=None):
         if token is not None:
             token.check()
         catalogue_poster_url = _safe_picon_url(getattr(item, 'icon', ''))
         info = _detail_cache_get(self._movie_info_cache, self._movie_info_cache_lock, item.stream_id) if hasattr(self, '_movie_info_cache_lock') else self._movie_info_cache.get(item.stream_id)
         metadata_status = ''
+        light = getattr(self, '_light_vod_enabled', False)
         early_info = catalogue_info(self.client, 'movie', item) if info is None else None
         if info is None and early_info is not None and early_info.plot:
             info = early_info
-        if info is None:
+        if info is None and not light:
             localized = self._catalogue_detail_preview('movie', generation, item, token)
             if localized is not None:
                 info = localized
@@ -2983,9 +3035,16 @@ class VODBrowserMethods(DiscoveryVODMethods):
             preview_url = _safe_picon_url(getattr(early_info, 'cover', '') or getattr(item, 'icon', ''))
             self._movie_detail_preview = (generation, early_info, _cached_picon_path(preview_url) if preview_url else '', '', preview_url, catalogue_poster_url)
         loader = getattr(self.client, 'load_vod_info', None)
+        enriched = self._fill_light_provider_backdrop(item, info, token)
+        if enriched is not info and getattr(enriched, 'backdrop', ''):
+            early_info = None  # Publish the provider hero before completing the synopsis.
+        info = enriched
         if info is None and loader is not None:
             try:
                 info = _bounded_client_call(self.client, token, lambda: loader(item.stream_id))
+                if light and info is not None:
+                    info = copy(info)
+                    info._provider_backdrop_checked = True
                 if hasattr(self, '_movie_info_cache_lock'):
                     _detail_cache_put(self._movie_info_cache, self._movie_info_cache_lock, item.stream_id, info)
                 else:
@@ -2993,6 +3052,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
             except Exception as error:
                 _debug('movie detail failed id={} error={}'.format(item.stream_id, error.__class__.__name__))
                 info = None
+        if info is None and light:
+            info = self._catalogue_detail_preview('movie', generation, item, token)
         if token is not None:
             token.check()
         if early_info is None and info is not None and (generation == self._movie_generation) and (token is None or token.active()):
@@ -3004,7 +3065,10 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 completer = getattr(self._metadata_client, 'complete_movie_cinematic', None)
             if not callable(completer):
                 completer = self._metadata_client.complete_movie
+            backdrop_checked = getattr(info, '_provider_backdrop_checked', False)
             info = _bounded_client_call(self._metadata_client, token, lambda: complete_movie_for_device_language(self._metadata_client, completer, item, info))
+            if backdrop_checked and info is not None:
+                info._provider_backdrop_checked = True
             if hasattr(self, '_movie_info_cache_lock'):
                 _detail_cache_put(self._movie_info_cache, self._movie_info_cache_lock, item.stream_id, info)
             else:
@@ -3826,11 +3890,12 @@ class VODBrowserMethods(DiscoveryVODMethods):
         catalogue_poster_url = _safe_picon_url(getattr(item, 'icon', ''))
         info = _detail_cache_get(self._series_info_cache, self._series_info_cache_lock, item.stream_id) if hasattr(self, '_series_info_cache_lock') else self._series_info_cache.get(item.stream_id)
         metadata_status = ''
+        light = getattr(self, '_light_vod_enabled', False)
         early_info = catalogue_info(self.client, 'series', item) if info is None else None
         if info is None and early_info is not None:
             # Episodes are fetched only when entering the selected series.
             info = early_info
-        if info is None:
+        if info is None and not light:
             localized = self._catalogue_detail_preview('series', generation, item, token)
             if localized is not None:
                 info = localized
@@ -3841,9 +3906,16 @@ class VODBrowserMethods(DiscoveryVODMethods):
         loader = getattr(self.client, 'load_series_summary', None)
         if loader is None:
             loader = getattr(self.client, 'load_series_info', None)
+        enriched = self._fill_light_provider_backdrop(item, info, token)
+        if enriched is not info and getattr(enriched, 'backdrop', ''):
+            early_info = None
+        info = enriched
         if info is None and loader is not None:
             try:
                 info = _bounded_client_call(self.client, token, lambda: loader(item.stream_id))
+                if light and info is not None:
+                    info = copy(info)
+                    info._provider_backdrop_checked = True
                 if hasattr(self, '_series_info_cache_lock'):
                     _detail_cache_put(self._series_info_cache, self._series_info_cache_lock, item.stream_id, info)
                 else:
@@ -3851,6 +3923,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
             except Exception as error:
                 _debug('series detail failed id={} error={}'.format(_debug_identifier(item.stream_id), error.__class__.__name__))
                 info = None
+        if info is None and light:
+            info = self._catalogue_detail_preview('series', generation, item, token)
         if token is not None:
             token.check()
         if early_info is None and info is not None and (generation == self._series_generation) and (token is None or token.active()):
@@ -3862,7 +3936,10 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 completer = getattr(self._metadata_client, 'complete_series_cinematic', None)
             if not callable(completer):
                 completer = self._metadata_client.complete_series
+            backdrop_checked = getattr(info, '_provider_backdrop_checked', False)
             info = _bounded_client_call(self._metadata_client, token, lambda: complete_media_for_device_language(self._metadata_client, completer, item, info))
+            if backdrop_checked and info is not None:
+                info._provider_backdrop_checked = True
             if hasattr(self, '_series_info_cache_lock'):
                 _detail_cache_put(self._series_info_cache, self._series_info_cache_lock, item.stream_id, info)
             else:

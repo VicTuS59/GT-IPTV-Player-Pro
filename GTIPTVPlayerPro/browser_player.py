@@ -3734,24 +3734,57 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         opener = getattr(self.session, 'openWithCallback', None)
         if not callable(opener):
             return self.open_subtitle_selection()
+        from .pcm_audio import pcm_menu_label, pcm_status, toggle_pcm
+        from .passthrough_audio import (passthrough_choices, passthrough_label, passthrough_rows,
+                                        passthrough_title, set_passthrough)
+        choices = [(_('Audio tracks'), 'audio'), (_('Subtitles'), 'subtitle'),
+                   (pcm_menu_label(pcm_status()), 'pcm'), (passthrough_title(), 'passthrough')]
         generation, item = (self._generation, self.current_item)
         expected_context = self._audio_selection_context()
-        self._media_menu_open = True
         self.hide_info()
 
-        def chosen(selection):
-            self._media_menu_open = False
-            if self._closed or self._generation != generation or self.current_item is not item or (not selection) or self._live_transition_in_progress() or (self._audio_selection_context() != expected_context):
+        def open_choices(callback, title, entries):
+            def selected(selection):
+                self._media_menu_open = False
+                if (self._closed or not self._started or self._generation != generation
+                        or self.current_item is not item or self._pending_engine_reference is not None
+                        or self._live_transition_in_progress() or self._audio_selection_context() != expected_context):
+                    return
+                if isinstance(selection, (tuple, list)) and len(selection) > 1:
+                    callback(selection[1])
+
+            self._media_menu_open = True
+            try:
+                opener(selected, ChoiceBox, title, entries)
+            except Exception:
+                self._media_menu_open = False
+                self.show_info()
+
+        def select_codec(codec):
+            if codec not in ('ac3', 'dts'):
                 return
-            if selection[1] == 'audio':
+            element, title, entries = passthrough_choices(codec)
+            if element is None:
+                self._show_audio_message(title)
+                return
+
+            def select_mode(enabled):
+                state = set_passthrough(codec, enabled, element)
+                self._show_audio_message(passthrough_label(codec, state))
+
+            open_choices(select_mode, title, entries)
+
+        def chosen(action):
+            if action == 'audio':
                 self.open_audio_selection()
-            elif selection[1] == 'subtitle':
+            elif action == 'subtitle':
                 self.open_subtitle_selection()
-        try:
-            opener(chosen, ChoiceBox, _('Select'), [(_('Audio tracks'), 'audio'), (_('Subtitles'), 'subtitle')])
-        except Exception:
-            self._media_menu_open = False
-            self.show_info()
+            elif action == 'pcm':
+                self._show_audio_message(pcm_menu_label(toggle_pcm()))
+            elif action == 'passthrough':
+                open_choices(select_codec, passthrough_title(), passthrough_rows())
+
+        open_choices(chosen, _('Select'), choices)
         return True
 
     def open_audio_selection(self):

@@ -121,6 +121,7 @@ from .playlist import (
     check_source_health,
     delete_source,
     delete_sources,
+    import_xtream_txt,
     load_accounts,
     load_sources,
     localized_connection_usage_line,
@@ -163,8 +164,6 @@ ACCOUNT_BATCH_QUERY_POLL_MS = 100
 ACCOUNT_BATCH_DELETE_TIMEOUT_SECONDS = 12.0
 ACCOUNT_BATCH_OPEN_DELAY_MS = 50
 ACCOUNT_BATCH_OPEN_MAX_ATTEMPTS = 3
-ACCOUNT_BATCH_CONFIRM_DELAY_MS = 50
-ACCOUNT_BATCH_CONFIRM_MAX_ATTEMPTS = 3
 DEFAULT_LOCAL_M3U_PATH = "/etc/enigma2/gtiptvplayer/IPTV_Liste.m3u"
 M3U_FILE_PATTERN = r"(?i)^.*\.m3u8?$"
 TXT_FILE_PATTERN = r"(?i)^.*\.txt$"
@@ -766,6 +765,7 @@ ADD_ACCOUNT_FOOTER_ITEMS = (
     footer_item("up_down", "select", 1.3),
     footer_item("ok", "edit"),
     footer_item("green", "save"),
+    footer_item("blue", N_("Import TXT"), 1.3),
     footer_item("exit", "cancel"),
 )
 HEALTH_FOOTER_ITEMS = (
@@ -4735,14 +4735,6 @@ class GTAccountBatchTestScreen(Screen):
         self._events = []
         self._cancel_event = threading.Event()
         self._close_after_delete_cancel = False
-        self._confirmation_armed = False
-        self._confirmation_open = False
-        self._confirmation_attempts = 0
-        self._confirmation_timer = eTimer()
-        _connect_timer(
-            self._confirmation_timer,
-            self._open_inactive_confirmation,
-        )
         self._timer = eTimer()
         _connect_timer(self._timer, self._poll_events)
         unused_width, unused_height, px = _scale()
@@ -4854,7 +4846,6 @@ class GTAccountBatchTestScreen(Screen):
             queue_event("result", index, account, result)
         queue_event("complete")
 
-    @seven_refresh_after
     def _poll_events(self):
         if getattr(self, "_closed", True):
             return
@@ -5000,11 +4991,12 @@ class GTAccountBatchTestScreen(Screen):
         if not self._inactive_accounts:
             self.close(self._result_payload())
             return
-        self._state = "confirming"
+        # Keep the review and confirmation on the batch screen. The parent
+        # account list resumes once the operation has finished.
+        self._state = "review"
         self._review_page = 0
-        set_remote_footer(self, ACCOUNT_BATCH_RUNNING_FOOTER_ITEMS)
+        set_remote_footer(self, ACCOUNT_BATCH_REVIEW_FOOTER_ITEMS)
         self._refresh_review()
-        self._arm_inactive_confirmation()
 
     def _review_counts(self):
         results = [self._results.get(_source_result_key(account)) for account in self._inactive_accounts]
@@ -5016,8 +5008,8 @@ class GTAccountBatchTestScreen(Screen):
         return errors, inactive
 
     @seven_refresh_after
-    def _refresh_review(self):
-        if self._state not in ("review", "confirming"):
+    def _refresh_review(self, error=""):
+        if self._state != "review":
             return
         count = len(self._inactive_accounts)
         page_count = max(1, int((count + self.page_size - 1) / self.page_size))
@@ -5034,93 +5026,13 @@ class GTAccountBatchTestScreen(Screen):
             ]
         )
         set_text_if_changed(self['progress_text'], '{}: {}  •  100%'.format(_('Accounts'), count))
-        set_text_if_changed(self['current_account'], '')
-
-    def _arm_inactive_confirmation(self):
-        if (
-            getattr(self, "_closed", True)
-            or self._state != "confirming"
-            or not self._inactive_accounts
-            or self._confirmation_armed
-            or self._confirmation_open
-            or self._confirmation_attempts
-            >= ACCOUNT_BATCH_CONFIRM_MAX_ATTEMPTS
-        ):
-            return False
-        if not callable(getattr(self.session, "openWithCallback", None)):
-            self._show_inline_review()
-            return False
-        self._confirmation_armed = True
-        self._confirmation_timer.start(
-            ACCOUNT_BATCH_CONFIRM_DELAY_MS,
-            True,
-        )
-        return True
-
-    def _open_inactive_confirmation(self):
-        if getattr(self, "_closed", True):
-            return False
-        self._confirmation_armed = False
-        try:
-            self._confirmation_timer.stop()
-        except Exception:
-            pass
-        if (
-            self._closed
-            or self._state != "confirming"
-            or not self._inactive_accounts
-            or self._confirmation_open
-            or self._confirmation_attempts
-            >= ACCOUNT_BATCH_CONFIRM_MAX_ATTEMPTS
-        ):
-            return False
-        opener = getattr(self.session, "openWithCallback", None)
-        if not callable(opener):
-            self._show_inline_review()
-            return False
-        self._confirmation_attempts += 1
-        self._confirmation_open = True
-        question = "{}\n\n{}".format(
-            _account_test_review_summary(*self._review_counts()),
-            _("Delete {}?").format(localized_upper(_("Accounts"))),
-        )
-        try:
-            opener(
-                self._inactive_confirmation_closed,
-                MessageBox,
-                question,
-                type=MessageBox.TYPE_YESNO,
-                default=False,
+        if error:
+            message = _("Could not delete the source: {}").format(
+                clean_dynamic_text(_localized_runtime_text(error))
             )
-        except RuntimeError as error:
-            self._confirmation_open = False
-            if not _is_modal_open_error(error):
-                raise
-            if self._arm_inactive_confirmation():
-                return True
-            self._show_inline_review()
-            return False
-        return True
-
-    def _inactive_confirmation_closed(self, confirmed):
-        if getattr(self, "_closed", True):
-            return
-        self._confirmation_open = False
-        if self._closed or self._state != "confirming":
-            return
-        if bool(confirmed):
-            self._begin_delete_inactive()
-            return
-        self.close(self._result_payload())
-
-    def _show_inline_review(self):
-        if getattr(self, "_closed", True) or not self._inactive_accounts:
-            return
-        self._confirmation_armed = False
-        self._confirmation_open = False
-        self._state = "review"
-        set_remote_footer(self, ACCOUNT_BATCH_REVIEW_FOOTER_ITEMS)
-        self._refresh_review()
+        else:
+            message = _("Delete {}?").format(localized_upper(_("Accounts")))
+        set_text_if_changed(self["current_account"], message)
 
     def previous_page(self):
         if self._state == "review" and self._review_page > 0:
@@ -5138,23 +5050,22 @@ class GTAccountBatchTestScreen(Screen):
             self._review_page += 1
             self._refresh_review()
 
+    @seven_refresh_after
     def delete_inactive(self):
-        if self._state != "review" or not self._inactive_accounts:
-            return
-        self._begin_delete_inactive()
-
-    def _begin_delete_inactive(self):
         if (
-            self._state not in ("review", "confirming")
+            getattr(self, "_closed", True)
+            or self._state != "review"
             or not self._inactive_accounts
         ):
             return
         self._state = "deleting"
         self._close_after_delete_cancel = False
         self._cancel_event.clear()
-        self["header"].setText(localized_upper(_("Delete")))
-        self["subtitle"].setText(_("Please wait"))
-        self["review_page"].setText("")
+        log_event("account_batch", "stage=confirmed count={}".format(len(self._inactive_accounts)))
+        set_text_if_changed(self["header"], localized_upper(_("Delete")))
+        set_text_if_changed(self["subtitle"], _("Please wait"))
+        set_text_if_changed(self["review_page"], "")
+        set_text_if_changed(self["current_account"], "")
         set_remote_footer(self, ACCOUNT_BATCH_RUNNING_FOOTER_ITEMS)
         worker = threading.Thread(
             target=self._run_delete,
@@ -5163,7 +5074,12 @@ class GTAccountBatchTestScreen(Screen):
                   self._event_lock, self._events),
         )
         worker.daemon = True
-        worker.start()
+        try:
+            worker.start()
+        except (OSError, RuntimeError) as error:
+            log_event("account_batch", "stage=worker-start-failed", error)
+            self._finish_delete(0, str(error))
+            return
         self._timer.start(ACCOUNT_BATCH_QUERY_POLL_MS, True)
 
     @staticmethod
@@ -5182,9 +5098,11 @@ class GTAccountBatchTestScreen(Screen):
             else:
                 removed = batch_deleter(accounts)
             error = ""
+            log_event("account_batch", "stage=worker-done removed={}".format(removed))
         except Exception as caught:
             removed = 0
             error = str(caught)
+            log_event("account_batch", "stage=worker-failed", caught)
         with event_lock:
             events.append(("delete_done", removed, error))
 
@@ -5197,16 +5115,11 @@ class GTAccountBatchTestScreen(Screen):
                 return
             self._state = "review"
             set_remote_footer(self, ACCOUNT_BATCH_REVIEW_FOOTER_ITEMS)
-            self._refresh_review()
-            ellipsize_dynamic_text(
-                self["current_account"],
-                _("Could not delete the source: {}").format(
-                    clean_dynamic_text(_localized_runtime_text(error))
-                ),
-                fallback_chars=72,
-            )
+            self._refresh_review(error)
             return
-        self.close(self._result_payload(deleted=removed))
+        self.close(self._result_payload(
+            deleted=removed, cancelled=self._close_after_delete_cancel and not removed,
+        ))
 
     def _result_payload(self, deleted=0, cancelled=False):
         errors, inactive = self._review_counts()
@@ -5244,12 +5157,6 @@ class GTAccountBatchTestScreen(Screen):
             return
         self._closed = True
         self._cancel_event.set()
-        self._confirmation_armed = False
-        self._confirmation_open = False
-        try:
-            self._confirmation_timer.stop()
-        except Exception:
-            pass
         try:
             self._timer.stop()
         except Exception:
@@ -5598,11 +5505,11 @@ class GTAccountsScreen(Screen):
         return True
 
     def _automatic_test_closed(self, payload=None):
+        if getattr(self, "_account_screen_closed", True):
+            return
         self._automatic_test_open = False
         tested = self._automatic_test_accounts
         self._automatic_test_accounts = ()
-        if self._account_screen_closed:
-            return
         if not isinstance(payload, dict):
             self._refresh()
             return
@@ -7978,6 +7885,7 @@ class GTAddAccountScreen(Screen):
                 "left": self.previous_output,
                 "right": self.next_output,
                 "green": self.save,
+                "blue": self.open_txt_import,
                 "red": self.close,
             },
             -1,
@@ -8094,6 +8002,32 @@ class GTAddAccountScreen(Screen):
         ) % self.FIELD_COUNT
         set_text_if_changed(self["message"], _("Information received. Edit the next field or press GREEN to save."))
         self._refresh()
+
+    def open_txt_import(self):
+        opener = getattr(self.session, "openWithCallback", None)
+        if FileList is None or not callable(opener):
+            self.session.open(MessageBox, _("Not available"), type=MessageBox.TYPE_ERROR)
+            return
+        opener(self._txt_import_selected, GTTXTFileBrowserScreen)
+
+    def _txt_import_selected(self, path=None):
+        if not path:
+            return
+        try:
+            added, duplicates = import_xtream_txt(path, output_format=self._field_values[3])
+        except (OSError, ValueError) as error:
+            message = (
+                _(str(error)) if isinstance(error, ValueError)
+                else _("Settings could not be saved. Check the receiver storage.")
+            )
+            self.session.open(MessageBox, message, type=MessageBox.TYPE_ERROR)
+            return
+        self.session.openWithCallback(
+            lambda *unused: self.close(True),
+            MessageBox,
+            _("Xtream accounts added ({})\nDuplicates skipped ({})").format(added, duplicates),
+            type=MessageBox.TYPE_INFO,
+        )
 
     def save(self):
         try:

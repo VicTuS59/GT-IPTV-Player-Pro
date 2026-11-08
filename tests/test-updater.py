@@ -162,6 +162,11 @@ class UpdateServiceTests(unittest.TestCase):
   with patch.object(shutil,'disk_usage',return_value=types.SimpleNamespace(free=1)),self.assertRaises(UpdateError):self.s.download(offer)
   invalid=dict(offer,body=vector('test'))
   with self.assertRaises(UpdateError):self.s.download(invalid)
+ def test_download_uses_space_for_one_verified_ipk(self):
+  offer = self.offer()
+  with patch.object(shutil, 'disk_usage', return_value=types.SimpleNamespace(free=manifest()['bytes'])):
+   path = self.s.download(offer)
+  self.assertEqual(Path(path).read_bytes(), ipk())
  def install_call(self,**kw):
   offer=self.offer();p=self.s.download(offer)
   with patch.object(self.s,'installation_lock',side_effect=lambda:contextlib.nullcontext()):
@@ -184,6 +189,27 @@ class UpdateServiceTests(unittest.TestCase):
   with patch.object(shutil,'disk_usage',side_effect=[types.SimpleNamespace(free=10**9),types.SimpleNamespace(free=10**9),types.SimpleNamespace(free=1)]),self.assertRaises(UpdateError) as error:
    self.install_call(runner=runner)
   self.assertEqual(error.exception.code,'space');runner.assert_not_called()
+ def test_install_uses_payload_filesystem_on_an_expanded_usr(self):
+  target = Path(self.folder) / protocol.PREFIX
+  target.mkdir(parents=True)
+  self.s.cache = str(Path(self.folder) / 'tmp' / 'updates')
+  free = {self.s.cache: 64 * 1024 ** 2, self.folder: 1, str(target): manifest()['installed_bytes']}
+  runner = Mock(return_value=0)
+  with patch.object(shutil, 'disk_usage', side_effect=lambda path: types.SimpleNamespace(free=free[path])) as usage:
+   self.install_call(runner=runner)
+  runner.assert_called_once()
+  self.assertEqual([call.args[0] for call in usage.call_args_list], [self.s.cache, str(target), str(target)])
+ def test_install_stops_if_expanded_payload_filesystem_is_full(self):
+  target = Path(self.folder) / protocol.PREFIX
+  target.mkdir(parents=True)
+  free = {self.folder: 64 * 1024 ** 2, str(target): 1}
+  runner = Mock(return_value=0)
+  with patch.object(shutil, 'disk_usage', side_effect=lambda path: types.SimpleNamespace(free=free[path])):
+   with self.assertRaises(UpdateError) as caught:
+    self.install_call(runner=runner)
+  runner.assert_not_called()
+  self.assertEqual(caught.exception.code, 'space')
+  self.assertEqual(caught.exception.context['path'], str(target))
  def test_opkg_failure_is_visible_and_keeps_failed_state(self):
   for effect in (1,OSError('failed')):
    run=Mock(return_value=effect) if isinstance(effect,int) else Mock(side_effect=effect)

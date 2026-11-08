@@ -25,7 +25,9 @@ from urllib.parse import urljoin, urlsplit, urlunsplit
 from . import PLUGIN_VERSION
 from .content import ContentCategory, ContentError, ContentItem
 from .i18n import N_, _
+from .live_channel_order import LiveChannelOrderStore, channel_order_key_for_id, channel_order_scope
 from .persistence import guarded_mutation
+from .playback import resume_account_scope
 from .category_visibility import category_ids_visible, hidden_category_match_ids
 
 
@@ -657,6 +659,8 @@ class M3UContentClient(object):
         self._category_rows = OrderedDict()
         self._categories = []
         self._page_states = OrderedDict()
+        self._channel_order_store = LiveChannelOrderStore()
+        self._channel_order_write_lock = threading.Lock()
         self._diagnostics = _empty_diagnostics(source)
         self._prepared = False
         self._force_refresh = False
@@ -793,16 +797,32 @@ class M3UContentClient(object):
         self.prepare()
         with self._state_lock:
             state = self._page_states.get(category_id)
+            if state is not None:
+                self._page_states.move_to_end(category_id)
+                return list(state["values"])
+        scope = channel_order_scope(resume_account_scope(self), category_id)
+        order = self._channel_order_store.load(scope)
+        with self._state_lock:
+            state = self._page_states.get(category_id)
             if state is None:
                 rows = self._category_rows.get(category_id)
                 if rows is None:
                     return []
+                if order:
+                    keys = {index: channel_order_key_for_id(self._records[index]["stream_id"])
+                            for index in rows}
+                    ranks = {key: rank for rank, key in enumerate(order)}
+                    rows = sorted(rows, key=lambda index: ranks.get(keys[index], len(ranks)))
+                    present = set(keys.values())
+                    order = tuple(key for key in order if key in present)
                 end = min(M3U_INITIAL_ITEMS, len(rows))
                 values = [self._content_item(self._records[index]) for index in rows[:end]]
                 state = {
                     "cursor": end,
                     "values": values,
                     "complete": end >= len(rows),
+                    "rows": rows,
+                    "order": order,
                 }
                 self._page_states[category_id] = state
                 while len(self._page_states) > M3U_PAGE_STATE_MAX:
@@ -817,9 +837,9 @@ class M3UContentClient(object):
         self.load_items("live", category_id)
         with self._state_lock:
             state = self._page_states.get(category_id)
-            rows = self._category_rows.get(category_id)
-            if state is None or rows is None or state["complete"]:
+            if state is None or state["complete"]:
                 return []
+            rows = state["rows"]
             start = state["cursor"]
             end = min(start + M3U_MORE_ITEMS, len(rows))
             added = [self._content_item(self._records[index]) for index in rows[start:end]]
@@ -828,6 +848,47 @@ class M3UContentClient(object):
             state["complete"] = end >= len(rows)
             self._page_states.move_to_end(category_id)
             return added
+
+    @guarded_mutation
+    def save_channel_order(self, category_id, stream_ids):
+        """Save the edited prefix and retain hidden rows and the unvisited tail."""
+        category_id = str(category_id or "")
+        draft = set(stream_ids)
+        if not draft or "" in draft or len(draft) != len(stream_ids):
+            return False
+        scope = channel_order_scope(resume_account_scope(self), category_id)
+        with self._channel_order_write_lock:
+            with self._state_lock:
+                state = self._page_states.get(category_id)
+                if state is None:
+                    return False
+                cached = tuple(state["values"])
+                rows, previous_order = state["rows"], state["order"]
+
+            items = {item.stream_id: item for item in cached}
+            if not draft.issubset(items):
+                return False
+            # Replace only slots represented in the screen's draft. Filtered
+            # channels and pages fetched during the save retain their slots.
+            positions = dict(zip(items, rows))
+            ordered = iter(stream_ids)
+            prefix = [next(ordered) if key in draft else key for key in items]
+            values = [items[key] for key in prefix]
+            ordered_rows = [positions[key] for key in prefix] + rows[len(cached):]
+            order = self._channel_order_store.save_keys(
+                scope, (channel_order_key_for_id(key) for key in prefix), previous_order,
+            )
+            if order is None:
+                return False
+
+            with self._state_lock:
+                if self._page_states.get(category_id) is state:
+                    state["values"][:len(cached)] = values
+                    state["rows"] = ordered_rows
+                    state["order"] = order
+                else:
+                    self._page_states.pop(category_id, None)
+            return True
 
     def epg_channel_ids(self):
         """Return prepared ``tvg-id`` values without loading the M3U source.

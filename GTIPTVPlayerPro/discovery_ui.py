@@ -713,7 +713,7 @@ class GTMovieDiscoveryScreen(Screen):
 
     def search_iptv(self):
         movie = self._selected()
-        if self._busy or not movie:
+        if self._busy or self._child_open or not movie:
             return
         movie = dict(movie)
         if self._provider is None:
@@ -727,10 +727,12 @@ class GTMovieDiscoveryScreen(Screen):
         set_text_if_changed(self["status"], _("Search in IPTV") + "…")
 
         def work(token):
+            store = LiveCategoryPreferenceStore(category_preferences_path("movie"))
+            preferences = store.load(resume_account_scope(provider))
+            if not (preferences.hidden or preferences.include_terms or preferences.exclude_terms):
+                return frozenset()
             with provider.request_scope(cancel_event=token.cancel_event, deadline=token.deadline):
                 categories = provider.load_categories("movie")
-                store = LiveCategoryPreferenceStore(category_preferences_path("movie"))
-                preferences = store.load(resume_account_scope(provider))
                 return category_visibility_ids(categories, preferences)
 
         def ready(hidden):
@@ -738,7 +740,8 @@ class GTMovieDiscoveryScreen(Screen):
             adapter = DiscoverySearchClient(provider, movie, hidden)
             set_text_if_changed(self["status"], _(SHORT_HINT))
             self._open_child(None, GTAllMoviesSearchScreen, self.account, adapter,
-                             hidden_category_ids=hidden, initial_query=movie["title"])
+                             hidden_category_ids=hidden, initial_query=movie["title"],
+                             discovery_search=True)
 
         self._submit("search", work, ready, timeout=30)
 
@@ -841,3 +844,7 @@ class GTMovieDiscoveryScreen(Screen):
         self._entries = []
         self._details.clear()
         self._history = []
+        if getattr(self._provider, "source_type", "") == "xtream":
+            release = getattr(self._provider, "release_movie_search", None)
+            if callable(release):
+                release()

@@ -4333,3 +4333,65 @@ msgstr "{} • {} திரைப்படங்கள்"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} தொடர்கள்"
+
+msgid "AC3 downmix is active"
+msgstr "AC3 டவுன்மிக்ஸ் செயலில் உள்ளது"
+
+msgid "Bulk Move"
+msgstr "பல சேனல்களை நகர்த்து"
+
+msgid "Channel order saved."
+msgstr "சேனல் வரிசை சேமிக்கப்பட்டது."
+
+msgid "Choose a TXT file."
+msgstr "ஒரு TXT கோப்பைத் தேர்ந்தெடுக்கவும்."
+
+msgid "Choose an unmarked channel."
+msgstr "குறிக்கப்படாத சேனலைத் தேர்ந்தெடுக்கவும்."
+
+msgid "Digital audio passthrough"
+msgstr "டிஜிட்டல் ஒலியை நேரடியாக அனுப்புதல்"
+
+msgid "Import TXT"
+msgstr "TXT இறக்குமதி"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "{} ஆம் வரியில் பயனர் பெயரையும் கடவுச்சொல்லையும் ஓர் இடைவெளியால் பிரிக்கவும்."
+
+msgid "Mark channels with RED first."
+msgstr "முதலில் சிவப்பு பொத்தானால் சேனல்களைக் குறிக்கவும்."
+
+msgid "Not supported"
+msgstr "ஆதரிக்கப்படவில்லை"
+
+msgid "PCM Multichannel Audio"
+msgstr "பல்சேனல் PCM ஒலி"
+
+msgid "Place above"
+msgstr "மேலே வை"
+
+msgid "Place below"
+msgstr "கீழே வை"
+
+msgid "Place marked channels before saving."
+msgstr "சேமிப்பதற்கு முன் குறித்த சேனல்களை இடமாற்றவும்."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "சர்வரின் HTTP அல்லது HTTPS முகவரியை முதல் வரியில் உள்ளிடவும்."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "TXT கோப்பை UTF-8 குறியாக்கத்தில் சேமிக்கவும்."
+
+msgid "Setting could not be changed"
+msgstr "அமைப்பை மாற்ற முடியவில்லை"
+
+msgid "Temporarily unavailable"
+msgstr "தற்காலிகமாகக் கிடைக்கவில்லை"
+
+msgid "The TXT file could not be read."
+msgstr "TXT கோப்பைப் படிக்க முடியவில்லை."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "சேர்க்கப்பட்ட Xtream கணக்குகள் ({})\nதவிர்க்கப்பட்ட நகல்கள் ({})"

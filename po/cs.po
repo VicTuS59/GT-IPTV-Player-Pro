@@ -4339,3 +4339,65 @@ msgstr "{} • {} FILMŮ"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SERIÁLŮ"
+
+msgid "AC3 downmix is active"
+msgstr "Slučování kanálů AC3 je aktivní"
+
+msgid "Bulk Move"
+msgstr "Hromadný přesun"
+
+msgid "Channel order saved."
+msgstr "Pořadí kanálů bylo uloženo."
+
+msgid "Choose a TXT file."
+msgstr "Vyberte soubor TXT."
+
+msgid "Choose an unmarked channel."
+msgstr "Vyberte neoznačený kanál."
+
+msgid "Digital audio passthrough"
+msgstr "Přímý průchod digitálního zvuku"
+
+msgid "Import TXT"
+msgstr "Importovat TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Na řádku {} uveďte uživatelské jméno a heslo oddělené mezerou."
+
+msgid "Mark channels with RED first."
+msgstr "Nejprve označte kanály červeným tlačítkem."
+
+msgid "Not supported"
+msgstr "Nepodporováno"
+
+msgid "PCM Multichannel Audio"
+msgstr "Vícekanálový zvuk PCM"
+
+msgid "Place above"
+msgstr "Umístit nad"
+
+msgid "Place below"
+msgstr "Umístit pod"
+
+msgid "Place marked channels before saving."
+msgstr "Před uložením umístěte označené kanály."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Na první řádek zadejte adresu serveru ve formátu HTTP nebo HTTPS."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Uložte soubor TXT v kódování UTF-8."
+
+msgid "Setting could not be changed"
+msgstr "Nastavení se nepodařilo změnit"
+
+msgid "Temporarily unavailable"
+msgstr "Dočasně nedostupné"
+
+msgid "The TXT file could not be read."
+msgstr "Soubor TXT se nepodařilo přečíst."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Přidané účty Xtream ({})\nPřeskočené duplicity ({})"

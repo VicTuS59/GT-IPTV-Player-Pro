@@ -190,17 +190,21 @@ class DiscoverySearchClient(object):
     def __getattr__(self, name):
         return getattr(self._client, name)
 
-    def search_movies(self, query, page=1, page_size=14, hidden_category_ids=None):
+    def search_movies(self, query, page=1, page_size=14, hidden_category_ids=None, preview=None):
         hidden = self._hidden if hidden_category_ids is None else hidden_category_ids
         if not self._variants or _text(query, 120).casefold() != self._variants[0].casefold():
             return self._plain_search(query, page, page_size, hidden)
         searcher = getattr(self._client, "search_discovery_movies", None)
         if callable(searcher):
-            return searcher(self._movie, page=page, page_size=page_size, hidden_category_ids=hidden)
+            options = {"preview": preview} if preview is not None else {}
+            return searcher(self._movie, page=page, page_size=page_size,
+                            hidden_category_ids=hidden, **options)
         choices = [self._chosen_query] if self._chosen_query else self._variants
         result = None
         for candidate in choices:
             result = self._plain_search(candidate, page, page_size, hidden)
+            if not result.supported:
+                return result
             if getattr(result, "items", ()) or getattr(result, "has_more", False):
                 self._chosen_query = candidate
                 break

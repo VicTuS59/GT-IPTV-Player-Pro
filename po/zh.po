@@ -4327,3 +4327,65 @@ msgstr "{} • {} 部电影"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} 部剧集"
+
+msgid "AC3 downmix is active"
+msgstr "AC3 缩混已启用"
+
+msgid "Bulk Move"
+msgstr "批量移动"
+
+msgid "Channel order saved."
+msgstr "频道顺序已保存。"
+
+msgid "Choose a TXT file."
+msgstr "请选择 TXT 文件。"
+
+msgid "Choose an unmarked channel."
+msgstr "请选择一个未标记的频道。"
+
+msgid "Digital audio passthrough"
+msgstr "数字音频直通"
+
+msgid "Import TXT"
+msgstr "导入 TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "第 {} 行的用户名和密码须用空格分隔。"
+
+msgid "Mark channels with RED first."
+msgstr "请先用红色键标记频道。"
+
+msgid "Not supported"
+msgstr "不支持"
+
+msgid "PCM Multichannel Audio"
+msgstr "多声道 PCM 音频"
+
+msgid "Place above"
+msgstr "放在上方"
+
+msgid "Place below"
+msgstr "放在下方"
+
+msgid "Place marked channels before saving."
+msgstr "请先放置已标记的频道，再保存。"
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "请在第一行输入服务器的 HTTP 或 HTTPS 地址。"
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "请用 UTF-8 编码保存 TXT 文件。"
+
+msgid "Setting could not be changed"
+msgstr "无法更改设置"
+
+msgid "Temporarily unavailable"
+msgstr "暂不可用"
+
+msgid "The TXT file could not be read."
+msgstr "无法读取 TXT 文件。"
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "已添加 Xtream 帐号（{}）\n已跳过重复项（{}）"

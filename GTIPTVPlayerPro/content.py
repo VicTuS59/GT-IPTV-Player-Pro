@@ -7,11 +7,12 @@ import html
 import json
 import re
 import socket
+from sys import getsizeof
 import threading
 import time
 import unicodedata
 from collections import OrderedDict
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urljoin, urlsplit, urlunsplit
 from urllib.request import Request
@@ -38,6 +39,7 @@ API_READ_CHUNK_BYTES = 64 * 1024
 MAX_PROVIDER_INTEGER_DIGITS = 128
 MAX_PROVIDER_JSON_NESTING = 128
 _SURROGATE_CODE_POINT = re.compile(r"[\ud800-\udfff]")
+_ASCII_SEARCH_SEPARATOR = re.compile(r"[^a-z0-9]+")
 LIVE_INITIAL_ITEMS = 36
 LIVE_MORE_ITEMS = 60
 
@@ -327,6 +329,8 @@ def _clean_text(value, fallback=""):
 def _movie_search_text(value):
     """Return a compact, language-neutral key for local Xtream searching."""
     value = str(value or "").replace("ı", "i").casefold()
+    if value.isascii():
+        return _ASCII_SEARCH_SEPARATOR.sub(" ", value).strip()
     value = unicodedata.normalize("NFKD", value)
     value = "".join(
         character
@@ -582,6 +586,19 @@ def _select_current_epg_window(events, limit=2, now=None):
             return []
         selected_index = 0
     return events[selected_index : selected_index + limit]
+
+
+class _MovieSearchCatalog(list):
+    """Keep the RAM reservation alive while a search worker reads the rows."""
+    __slots__ = ("lease",)
+
+    def reserve(self, amount):
+        from .memory_catalog import limit
+        from .movie_catalog import CATALOG_MAX_BYTES
+
+        if self.lease.amount[0] + amount > CATALOG_MAX_BYTES:
+            raise limit("catalog-memory")
+        self.lease.reserve(amount)
 
 
 class XtreamContentClient(object):
@@ -917,14 +934,9 @@ class XtreamContentClient(object):
                 active_load[2].set()
 
     @staticmethod
-    def _movie_search_record(entry):
+    def _movie_search_record(entry, stream_id, untitled):
         """Keep only fields needed to reconstruct a normalised movie card."""
-        if not isinstance(entry, dict):
-            return None
-        stream_id = _numeric_id(entry.get("stream_id"))
-        if not stream_id:
-            return None
-        name = _clean_text(entry.get("name"), _("Untitled content"))
+        name = _clean_text(entry.get("name"), untitled)
         search_text = _movie_search_text(name)
         icon = (
             entry.get("stream_icon")
@@ -945,11 +957,12 @@ class XtreamContentClient(object):
             entry.get("rating") or entry.get("rating_5based"),
             entry.get("year") or entry.get("releaseDate"),
             str(entry.get("tmdb_id") or entry.get("tmdb") or "")[:32],
+            (),
         )
 
     def _movie_search_item(self, record):
         """Re-enter the established Xtream normaliser for a visible row."""
-        return self._content_item(
+        item = self._content_item(
             "movie",
             {
                 "stream_id": record[1],
@@ -962,8 +975,11 @@ class XtreamContentClient(object):
                 "tmdb_id": record[8] if len(record) > 8 else "",
             },
         )
+        if item is not None:
+            item.portal_category_ids = record[9]
+        return item
 
-    def _movie_search_catalog_for(self, generation):
+    def _movie_search_catalog_for(self, generation, on_progress=None):
         """Return the one-response Xtream catalogue for this search lifetime."""
         while True:
             self._check_request_limits()
@@ -999,26 +1015,7 @@ class XtreamContentClient(object):
                 continue
 
             try:
-                payload = self._request_json(ITEM_ACTIONS["movie"])
-                if not isinstance(payload, list):
-                    raise ContentError(
-                        N_("Could not load the content list"),
-                        ContentError.CONTENT_RESPONSE,
-                    )
-                if len(payload) > MAX_CATALOG_RESULTS:
-                    raise ContentError(
-                        N_("Server content list is too large"),
-                        ContentError.CATALOG_ITEM_LIMIT,
-                    )
-                records = []
-                for index, entry in enumerate(payload):
-                    if index % 128 == 0:
-                        self._check_request_limits()
-                    record = self._movie_search_record(entry)
-                    if record is not None:
-                        records.append(record)
-                self._check_request_limits()
-                records = tuple(records)
+                records = self._load_movie_search_catalog(on_progress)
             except Exception:
                 with self._movie_search_lock:
                     if self._movie_search_load is active_load:
@@ -1042,6 +1039,60 @@ class XtreamContentClient(object):
                 N_("Request cancelled"),
                 ContentError.CANCELLED,
             )
+
+    def _load_movie_search_catalog(self, on_progress=None):
+        from .content_sort import Lease
+        from .movie_catalog import CATALOG_MAX_ITEMS
+        from .plain_catalog import raw_weight
+
+        records = _MovieSearchCatalog()
+        records.lease = Lease()
+        positions = {}
+        pending_bytes = 0
+        untitled = _("Untitled content")
+        try:
+            with closing(self.iter_movie_category_rows()) as entries:
+                for index, entry in enumerate(entries):
+                    if index % 256 == 0:
+                        records.reserve(pending_bytes)
+                        pending_bytes = 0
+                        if on_progress is not None:
+                            on_progress(records)
+                    if not isinstance(entry, dict):
+                        continue
+                    identity = _numeric_id(entry.get("stream_id"))
+                    if not identity:
+                        continue
+                    position = positions.get(identity)
+                    if position is not None:
+                        record = records[position]
+                        category_id = str(entry.get("category_id") or "").strip()
+                        aliases = record[9]
+                        if (0 < len(category_id) <= 128 and category_id != str(record[3]) and
+                                category_id not in aliases and len(aliases) < 127):
+                            records[position] = record[:9] + (aliases + (category_id,),)
+                            pending_bytes += getsizeof(category_id) + 8
+                        continue
+                    if len(records) >= CATALOG_MAX_ITEMS:
+                        raise ContentError(N_("Server content list is too large"),
+                                           ContentError.CATALOG_ITEM_LIMIT)
+                    record = self._movie_search_record(entry, identity, untitled)
+                    positions[identity] = len(records)
+                    records.append(record)
+                    pending_bytes += getsizeof(record) + 112
+                    for value in record[:9]:
+                        pending_bytes += (raw_weight({"value": value})
+                                          if isinstance(value, (dict, list, tuple))
+                                          else getsizeof(value))
+                    if pending_bytes >= 262144:
+                        records.reserve(pending_bytes)
+                        pending_bytes = 0
+            self._check_request_limits()
+            records.reserve(pending_bytes)
+            return records
+        except BaseException:
+            records.lease.close()
+            raise
 
     def _movie_search_match_indexes(self, catalog, generation, query):
         with self._movie_search_lock:
@@ -1121,7 +1172,7 @@ class XtreamContentClient(object):
                 index
                 for index in matches
                 if category_ids_visible(
-                    (catalog[index][3],), hidden_category_ids
+                    (catalog[index][3],) + catalog[index][9], hidden_category_ids
                 )
             )
         start = (page - 1) * page_size
@@ -1144,33 +1195,60 @@ class XtreamContentClient(object):
             supported=True,
         )
 
-    def search_discovery_movies(self, movie, page=1, page_size=14, hidden_category_ids=None):
+    def search_discovery_movies(self, movie, page=1, page_size=14, hidden_category_ids=None,
+                                preview=None):
         """Match TMDB IDs or either title against the same bounded VOD cache."""
         page, page_size = max(1, int(page)), max(1, min(100, int(page_size)))
         with self._movie_search_lock:
             generation = self._movie_search_generation
-        catalog = self._movie_search_catalog_for(generation)
         titles = [_movie_search_text(movie.get(key, ""))[:120]
                   for key in ("title", "original_title")]
-        titles = [title for title in titles if title]
+        titles = tuple(dict.fromkeys(title for title in titles if title))
+        title_terms = tuple(tuple(title.split()) for title in titles)
         target_id = str(movie.get("id") or "")
         year = str(movie.get("year") or "")
         hidden = hidden_category_match_ids((), hidden_category_ids)
         matches = []
-        for index, record in enumerate(catalog):
-            if index % 128 == 0:
-                self._check_request_limits()
-            if not category_ids_visible((record[3],), hidden):
-                continue
-            same_id = bool(target_id and len(record) > 8 and record[8] == target_id)
-            title_match = any(all(term in record[0] for term in title.split()) for title in titles)
-            if not same_id and not title_match:
-                continue
-            same_year = bool(year and (year in str(record[7] or "") or year in record[2]))
-            matches.append((not same_id, not same_year, index))
+        scanned = 0
+        preview_sent = False
+
+        def collect(catalog):
+            nonlocal scanned
+            for index in range(scanned, len(catalog)):
+                if index % 128 == 0:
+                    self._check_request_limits()
+                record = catalog[index]
+                same_id = bool(target_id and record[8] == target_id)
+                if not same_id and not any(all(term in record[0] for term in terms) for terms in title_terms):
+                    continue
+                if hidden and not category_ids_visible((record[3],) + record[9], hidden):
+                    continue
+                same_year = bool(year and (year in str(record[7] or "") or year in record[2]))
+                matches.append((not same_id, not same_year, record[0] not in titles, index))
+            scanned = len(catalog)
+
+        def report_first_matches(catalog):
+            nonlocal preview_sent
+            if preview_sent:
+                return
+            collect(catalog)
+            if matches:
+                items = [self._movie_search_item(catalog[value[-1]])
+                         for value in sorted(matches)[:page_size]]
+                result = MovieSearchPage(items, page_size=page_size, total_items=len(matches),
+                                         source="xtream-preview")
+                result.progress_preview = True
+                preview(result)
+                preview_sent = True
+
+        # Duplicates can add hidden membership later in the response. Resolve
+        # all membership before exposing any row when filters are enabled.
+        on_progress = report_first_matches if callable(preview) and page == 1 and not hidden else None
+        catalog = self._movie_search_catalog_for(generation, on_progress)
+        collect(catalog)
         matches.sort()
         start = (page - 1) * page_size
-        items = [self._movie_search_item(catalog[value[2]])
+        items = [self._movie_search_item(catalog[value[-1]])
                  for value in matches[start:start + page_size]]
         self._check_request_limits()
         with self._movie_search_lock:

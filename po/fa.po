@@ -4333,3 +4333,65 @@ msgstr "{} • {} فیلم‌ها"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} سریال‌ها"
+
+msgid "AC3 downmix is active"
+msgstr "داون‌میکس AC3 فعال است"
+
+msgid "Bulk Move"
+msgstr "جابجایی گروهی"
+
+msgid "Channel order saved."
+msgstr "ترتیب کانال‌ها ذخیره شد."
+
+msgid "Choose a TXT file."
+msgstr "یک فایل TXT انتخاب کنید."
+
+msgid "Choose an unmarked channel."
+msgstr "کانالی را انتخاب کنید که علامت نخورده باشد."
+
+msgid "Digital audio passthrough"
+msgstr "عبور مستقیم صدای دیجیتال"
+
+msgid "Import TXT"
+msgstr "وارد کردن TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "در خط {} نام کاربری و رمز عبور را با یک فاصله از هم جدا کنید."
+
+msgid "Mark channels with RED first."
+msgstr "ابتدا کانال‌ها را با دکمهٔ قرمز انتخاب کنید."
+
+msgid "Not supported"
+msgstr "پشتیبانی نمی‌شود"
+
+msgid "PCM Multichannel Audio"
+msgstr "صدای چندکانالهٔ PCM"
+
+msgid "Place above"
+msgstr "قرار دادن در بالا"
+
+msgid "Place below"
+msgstr "قرار دادن در پایین"
+
+msgid "Place marked channels before saving."
+msgstr "پیش از ذخیره، کانال‌های انتخاب‌شده را در جای خود قرار دهید."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "نشانی HTTP یا HTTPS سرور را در خط اول بنویسید."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "فایل TXT را با کدگذاری UTF-8 ذخیره کنید."
+
+msgid "Setting could not be changed"
+msgstr "تغییر تنظیم امکان‌پذیر نبود"
+
+msgid "Temporarily unavailable"
+msgstr "موقتاً در دسترس نیست"
+
+msgid "The TXT file could not be read."
+msgstr "فایل TXT خوانده نشد."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "حساب‌های Xtream اضافه‌شده ({})\nموارد تکراری ردشده ({})"

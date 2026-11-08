@@ -4339,3 +4339,65 @@ msgstr "{} • {} FILME"
 
 msgid "{} • {} SERIES"
 msgstr "{} • {} SERIALE"
+
+msgid "AC3 downmix is active"
+msgstr "Mixarea AC3 pe mai puține canale este activă"
+
+msgid "Bulk Move"
+msgstr "Mută în bloc"
+
+msgid "Channel order saved."
+msgstr "Ordinea canalelor a fost salvată."
+
+msgid "Choose a TXT file."
+msgstr "Selectați un fișier TXT."
+
+msgid "Choose an unmarked channel."
+msgstr "Alege un canal nemarcat."
+
+msgid "Digital audio passthrough"
+msgstr "Transmiterea directă a sunetului digital"
+
+msgid "Import TXT"
+msgstr "Importă TXT"
+
+#, python-brace-format
+msgid "Line {} needs a username and password separated by a space."
+msgstr "Pe linia {}, separați numele de utilizator și parola printr-un spațiu."
+
+msgid "Mark channels with RED first."
+msgstr "Marchează întâi canalele cu butonul roșu."
+
+msgid "Not supported"
+msgstr "Neacceptat"
+
+msgid "PCM Multichannel Audio"
+msgstr "Sunet PCM multicanal"
+
+msgid "Place above"
+msgstr "Plasează deasupra"
+
+msgid "Place below"
+msgstr "Plasează dedesubt"
+
+msgid "Place marked channels before saving."
+msgstr "Plasează canalele marcate înainte de a salva."
+
+msgid "Put the HTTP or HTTPS server URL on the first line."
+msgstr "Scrieți adresa HTTP sau HTTPS a serverului pe prima linie."
+
+msgid "Save the TXT file with UTF-8 encoding."
+msgstr "Salvați fișierul TXT cu codificarea UTF-8."
+
+msgid "Setting could not be changed"
+msgstr "Setarea nu a putut fi modificată"
+
+msgid "Temporarily unavailable"
+msgstr "Indisponibil temporar"
+
+msgid "The TXT file could not be read."
+msgstr "Fișierul TXT nu a putut fi citit."
+
+#, python-brace-format
+msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
+msgstr "Conturi Xtream adăugate ({})\nDuplicate omise ({})"
