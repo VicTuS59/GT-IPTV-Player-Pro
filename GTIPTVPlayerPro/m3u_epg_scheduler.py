@@ -42,10 +42,12 @@ _SAFE_ERROR_REASONS = frozenset(
         "connection",
         "content_response",
         "deadline",
+        "dns",
         "http_error",
         "invalid_response",
         "m3u-source-unavailable",
         "no-tvg-id",
+        "no-channel-match",
         "rate_limited",
         "response_too_large",
         "invalid-refresh-result",
@@ -141,6 +143,11 @@ def _is_due(binding, now=None):
     return now >= last_success + (_interval_hours(binding) * 60 * 60)
 
 
+def _name_mapping_signature(binding):
+    mappings = _value(binding, "name_mappings", {})
+    return tuple(sorted(mappings.items())) if isinstance(mappings, dict) else ()
+
+
 def _binding_signature(binding):
     """Return configuration fields used for pending/retry decisions.
 
@@ -158,6 +165,7 @@ def _binding_signature(binding):
         str(_value(binding, "update_mode", "") or ""),
         _interval_hours(binding),
         str(fingerprint or ""),
+        _name_mapping_signature(binding),
     )
 
 
@@ -169,6 +177,7 @@ def _pipeline_signature(binding):
         str(_value(binding, "kind", "") or ""),
         str(_value(binding, "location", "") or ""),
         str(_value(binding, "fingerprint", "") or ""),
+        _name_mapping_signature(binding),
     )
 
 
@@ -1192,8 +1201,10 @@ class M3UEPGScheduler(object):
                 raise _RefreshError("deadline")
             if cancel_event.is_set():
                 raise _RefreshError("cancelled")
-            if not wanted_ids:
-                raise _RefreshError("no-tvg-id")
+            get_names = getattr(client, "epg_channel_names", None)
+            wanted_names = get_names() if callable(get_names) else {}
+            if not wanted_ids and not wanted_names:
+                raise _RefreshError("no-channel-match")
             store = self._store
             if store is None:
                 store = get_default_store()
@@ -1206,6 +1217,7 @@ class M3UEPGScheduler(object):
                 cancel_event=cancel_event,
                 deadline=deadline,
                 diagnostics=diagnostics,
+                **({"wanted_names": wanted_names} if wanted_names else {}),
             )
             if not isinstance(summary, dict):
                 raise _RefreshError("invalid-refresh-result")

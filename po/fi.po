@@ -4395,3 +4395,53 @@ msgstr "TXT-tiedostoa ei voitu lukea."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Lisätyt Xtream-tilit ({})\nOhitetut kaksoiskappaleet ({})"
+
+msgid "Change layout"
+msgstr "Vaihda asettelua"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Kanavan kohdistus tallennettiin. Ota se käyttöön päivittämällä EPG."
+
+msgid "Cinematic view"
+msgstr "Elokuvanäkymä"
+
+msgid "EPG server name could not be resolved."
+msgstr "EPG-palvelimen nimen selvitys epäonnistui."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Anna kelvollinen nimi, jossa on enintään {} merkkiä."
+
+msgid "Football scores\u0004Select source"
+msgstr "Valitse lähde"
+
+msgid "List view"
+msgstr "Luettelonäkymä"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "M3U-lista päivitettiin. Muutokset näkyvät seuraavan päivityksen jälkeen."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "M3U-listan päivitys epäonnistui. Näytetään välimuistissa oleva lista."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "M3U-päivityksen yhteenveto\n\nUudet kanavat ({added})\nListalta poistuneet kanavat ({removed})\nUudelleennimetyt kanavat ({renamed})"
+
+msgid "Matching release details"
+msgstr "Yhteensopivat julkaisutiedot"
+
+msgid "Matching release group"
+msgstr "Sama julkaisuryhmä"
+
+msgid "No channels need manual mapping."
+msgstr "Yksikään kanava ei tarvitse manuaalista kohdistusta."
+
+msgid "No matching EPG channels found."
+msgstr "Vastaavia EPG-kanavia ei löytynyt."
+
+msgid "Recommended"
+msgstr "Suositeltu"
+
+msgid "Restore source name"
+msgstr "Palauta alkuperäinen nimi"

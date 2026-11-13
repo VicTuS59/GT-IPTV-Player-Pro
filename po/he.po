@@ -4407,3 +4407,53 @@ msgstr "לא ניתן לקרוא את קובץ ה־TXT."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "חשבונות Xtream שנוספו ({})\nכפילויות שדולגו ({})"
+
+msgid "Change layout"
+msgstr "שינוי פריסה"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "התאמת הערוץ נשמרה. יש לרענן את מדריך השידורים כדי להחיל אותה."
+
+msgid "Cinematic view"
+msgstr "תצוגה קולנועית"
+
+msgid "EPG server name could not be resolved."
+msgstr "לא ניתן היה לאתר את כתובת שרת מדריך השידורים לפי שמו."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "יש להזין שם תקין באורך של עד {} תווים."
+
+msgid "Football scores\u0004Select source"
+msgstr "בחירת מקור"
+
+msgid "List view"
+msgstr "תצוגת רשימה"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "רשימת M3U רועננה. השינויים יוצגו ברענון הבא."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "רענון רשימת M3U נכשל. מוצגת הרשימה מהמטמון."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "סיכום רענון M3U\n\nערוצים חדשים ({added})\nערוצים שכבר אינם ברשימה ({removed})\nערוצים ששמם השתנה ({renamed})"
+
+msgid "Matching release details"
+msgstr "פרטי גרסה תואמים"
+
+msgid "Matching release group"
+msgstr "אותה קבוצת הפצה"
+
+msgid "No channels need manual mapping."
+msgstr "אין ערוצים שדורשים התאמה ידנית."
+
+msgid "No matching EPG channels found."
+msgstr "לא נמצאו ערוצים תואמים במדריך השידורים."
+
+msgid "Recommended"
+msgstr "מומלץ"
+
+msgid "Restore source name"
+msgstr "שחזור השם המקורי"

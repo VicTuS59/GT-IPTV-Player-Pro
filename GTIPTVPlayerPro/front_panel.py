@@ -30,6 +30,12 @@ def front_panel_skin(live=False, vod=False, series=False):
     return panel_skin(front_panel_layout(live, vod, series))
 
 
+def _playback_kind(item):
+    if getattr(item, 'youtube_native', False):
+        return 'youtube'
+    return str(getattr(item, 'content_type', '') or '').lower()
+
+
 def _connect(timer, callback):
     try:
         timer.callback.append(callback)
@@ -42,8 +48,10 @@ class GTPlayerFrontPanelSummary(Screen):
     """Large text on colour panels; compact and rotating small-panel views."""
 
     def __init__(self, session, parent):
-        content_type = str(getattr(getattr(parent, 'current_item', None), 'content_type', '') or '').lower()
-        self._layout = front_panel_layout(content_type == 'live', content_type in ('movie', 'series', 'catchup'), content_type == 'series')
+        item = getattr(parent, 'current_item', None)
+        self._youtube_preview = bool(getattr(parent, '_youtube_preview', False))
+        kind = 'youtube' if self._youtube_preview else _playback_kind(item)
+        self._layout = panel_layout(*front_panel_size(), kind=kind)
         self.skin = panel_skin(self._layout)
         try:
             Screen.__init__(self, session, parent=parent)
@@ -67,8 +75,12 @@ class GTPlayerFrontPanelSummary(Screen):
         self._refresh_timer, self._motion_timer = eTimer(), eTimer()
         self._refresh_connection = _connect(self._refresh_timer, self._refresh)
         self._motion_connection = _connect(self._motion_timer, self._animate)
-        # Native Screen inspects bound methods here; do not wrap these in lambdas.
-        self.onShown.append(self._start)
+        # Summary dialogs can be shown again without running Screen.execBegin().
+        on_show = getattr(self, 'onShow', None)
+        if on_show is None:
+            on_show = self.onShown
+        on_show.append(self._start)
+        # Native Screen inspects bound layout callbacks.
         self.onLayoutFinish.append(self._render)
         self.onClose.append(self._stop)
         self.onHide.append(self._pause)
@@ -85,10 +97,16 @@ class GTPlayerFrontPanelSummary(Screen):
         return ('{:02d}:{:02d}:{:02d}'.format(hours, minutes, seconds) if hours
                 else '{:02d}:{:02d}'.format(minutes, seconds))
 
-    def _values(self):
+    def _values(self, seek=None):
         item = getattr(self._player, 'current_item', None)
-        content_type = str(getattr(item, 'content_type', '') or '').lower()
         values = dict.fromkeys(FIELDS, '')
+        if self._youtube_preview and (
+            item is None or (seek is None and not self._player._preview_owns_service())
+        ):
+            values['title'] = 'YouTube'
+            return values, 0, ('', '', values['title'], '')
+
+        content_type = _playback_kind(item)
         values['title'] = getattr(item, 'name', '') or getattr(self._player, 'title', '') or 'GT IPTV'
         values['clock'] = time.strftime('%H:%M:%S', time.localtime())
         percent = 0
@@ -111,17 +129,20 @@ class GTPlayerFrontPanelSummary(Screen):
                 except (TypeError, ValueError, OverflowError, OSError):
                     pass
         else:
-            values['kind'] = localized_upper(_('TV Archive') if content_type == 'catchup' else
-                _('SERIES') if content_type == 'series' else _('MOVIES') if content_type == 'movie' else 'GT IPTV')
+            if content_type == 'youtube':
+                values['kind'] = 'YouTube'
+            else:
+                values['kind'] = localized_upper(_('TV Archive') if content_type == 'catchup' else
+                    _('SERIES') if content_type == 'series' else _('MOVIES') if content_type == 'movie' else 'GT IPTV')
             # A separate episode row takes space from the readable clocks.
             # Provider titles remain intact, including any episode in the name.
             values['elapsed_label'] = localized_upper(_('Elapsed'))
             values['total_label'] = localized_upper(_('Total'))
             values['remaining_label'] = localized_upper(_('REMAINING'))
             try:
-                position, length = self._player._seek_position()
+                position, length = self._player._seek_position() if seek is None else seek
                 position, length = int(position), int(length)
-            except (TypeError, ValueError, OverflowError, AttributeError):
+            except (TypeError, ValueError, OverflowError, AttributeError, RuntimeError):
                 position, length = -1, 0
             if position < 0 or length <= 0:
                 values['elapsed'] = values['total'] = values['remaining'] = '--:--'
@@ -187,8 +208,8 @@ class GTPlayerFrontPanelSummary(Screen):
             value = '{} {}'.format(values[current + '_label'], value)
         self['title'].set_panel_text(value, preserve_phase=True)
 
-    def _apply_progress_fill(self):
-        visible = self._layout['progress_h'] > 0 and self._layout['kind'] != 'live'
+    def _apply_progress_fill(self, show_bar=True):
+        visible = show_bar and self._layout['progress_h'] > 0 and self._layout['kind'] != 'live'
         self['progress_bg'].show() if visible else self['progress_bg'].hide()
         if not visible or self._progress_value <= 0:
             self['progress_fill'].hide()
@@ -198,25 +219,28 @@ class GTPlayerFrontPanelSummary(Screen):
             self['progress_fill'].instance.resize(eSize(width, self._layout['progress_h']))
         self['progress_fill'].show()
 
-    def _render(self):
-        values, percent, content_key = self._values()
+    def _render(self, seek=None):
+        values, percent, content_key = self._values(seek)
+        preview_idle = self._youtube_preview and not content_key[0]
         compact_vod = self._layout['mode'] == 'compact' and content_key[0] != 'live'
         for name in FIELDS:
             field = self._layout['fields'][name]
             if field['visible']:
                 self[name].show()
-                if self._layout['mode'] != 'minimal' and not compact_vod:
+                if preview_idle or (self._layout['mode'] != 'minimal' and not compact_vod):
                     self[name].set_panel_text(values[name], preserve_phase=name in (
                         'elapsed', 'total', 'remaining', 'percent', 'clock') or
                         (name == 'subtitle' and content_key[0] != 'live'))
             else:
                 self[name].hide()
-        if self._layout['mode'] == 'minimal':
+        if preview_idle:
+            self._rotation_key = None
+        elif self._layout['mode'] == 'minimal':
             self._rotate_minimal(values, content_key)
         elif compact_vod:
             self._rotate_compact(values, content_key)
         self._progress_value = percent
-        self._apply_progress_fill()
+        self._apply_progress_fill(show_bar=not preview_idle)
         self._sync_motion()
 
     def _moving_fields(self):
@@ -244,10 +268,12 @@ class GTPlayerFrontPanelSummary(Screen):
     def _start(self):
         self._active = True
         self._render()
-        self._refresh_timer.start(1000, True)
+        if not self._youtube_preview:
+            self._refresh_timer.start(1000, True)
 
-    def refresh_now(self):
-        self._render()
+    def refresh_now(self, seek=None):
+        if self._active or not self._youtube_preview:
+            self._render(seek)
 
     def _refresh(self):
         if self._active:

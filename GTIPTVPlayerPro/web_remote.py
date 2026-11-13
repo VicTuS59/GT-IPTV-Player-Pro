@@ -30,7 +30,7 @@ class WebRemote(object):
         self.session = session
         self._gui_thread = threading.get_ident() if session is not None else None
 
-    def _run_on_gui(self, callback):
+    def _run_on_gui(self, callback, timeout=3):
         if self.session is None:
             raise WebServiceError("receiver_unavailable", "Receiver unavailable", 503)
         if threading.get_ident() == self._gui_thread:
@@ -56,7 +56,7 @@ class WebRemote(object):
                 ready.set()
 
         reactor.callFromThread(invoke)
-        if not ready.wait(3):
+        if not ready.wait(timeout):
             expired.set()
             raise WebServiceError("receiver_unavailable", "Receiver unavailable", 503)
         if not result[0][0]:

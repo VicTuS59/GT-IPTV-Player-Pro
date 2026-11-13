@@ -39,14 +39,16 @@ from .browser_common import GTAsyncListScreen, LIVE_CATEGORY_FOOTER_ITEMS, M3U_L
 LIVE_PREVIEW_RETURN_RESTORE_MS = 160
 
 class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
+    _vod_layout = "list"
 
-    def __init__(self, session, account, content_type, client=None, weather_settings_loader=None, weather_service=None, metadata_client=None, player_settings_loader=None, favorite_store=None, category_store=None, category_lock_store=None):
+    def __init__(self, session, account, content_type, client=None, weather_settings_loader=None, weather_service=None, metadata_client=None, player_settings_loader=None, favorite_store=None, category_store=None, category_lock_store=None, vod_layout_category=None):
         self.account = account
         self.client = client or content_client_for(account)
         self.content_type = _validated_content_type(self.client, content_type)
         if self.content_type in ('movie', 'series'):
             from .browser_vod import install_vod_methods
-            install_vod_methods(type(self))
+            install_vod_methods(GTContentBrowserScreen)
+            self._vod_layout_category = vod_layout_category
         if self.content_type == 'live':
             self._clear_live_recall_history()
         self._footer_layout_stacked = self.content_type in ('movie', 'series')
@@ -81,7 +83,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._light_palette=(getattr(browser_settings,'channel_highlight','navy'),getattr(browser_settings,'selection_border','navy'))
         self._light_vod_enabled = self.content_type in ('movie', 'series')
         self._cinematic_enabled = False
-        self._vod_discovery_layout = False
+        self._vod_discovery_layout = self._light_vod_enabled and self._vod_layout == "cinematic"
         self._cinematic_composite_plan = None
         self._cinematic_composite_visible = False
         self._poster_grid_enabled = False
@@ -137,8 +139,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             width, height, px = _scale()
             self._list_scroll_geometry = (px(50 + 945 - 15), px(145), px(10), px(716))
         elif self.content_type == 'movie':
-            from .vod_light import configure
-            configure(self)
+            self._configure_vod()
             self._movie_catalog_entries = []
             self._movie_entries = []
             self._movie_browser_catalog = CategoryBrowseCatalog(self.client, native=True) if source_type in ('xtream', 'stalker') else None
@@ -194,8 +195,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._movie_search_resume_timer = eTimer()
             _connect_timer(self._movie_search_resume_timer, self._poll_movie_search_resume)
         elif self.content_type == 'series':
-            from .vod_light import configure
-            configure(self)
+            self._configure_vod()
             self._series_entries = []
             self._series_browser_catalog = CategoryBrowseCatalog(self.client, content_type='series', native=True) if source_type in ('xtream', 'stalker') else None
             self._series_browse_cursor = 0
@@ -334,6 +334,10 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             if self.content_type in ('movie', 'series'):
                 self.onLayoutFinish.append(self._prepare_cinematic_shadows)
         if self.content_type == 'live': setup_broadcast(self, 'categories', self._footer_layout_items)
+
+    def _configure_vod(self):
+        from .vod_light import configure
+        configure(self)
 
     def _refit_content_dynamic_layout(self):
         widget_name = getattr(self, '_dynamic_server_widget', '')
@@ -556,12 +560,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             _cancel_worker_token(getattr(self, name, None))
         self._loading = False
         self._category_titles_refresh = True
-        invalidator = getattr(self.client, 'invalidate_cache', None)
-        if invalidator is not None:
-            try:
-                invalidator(self.content_type)
-            except Exception:
-                pass
+        self._invalidate_refresh_cache(self.content_type)
         self.start_load()
         self.start_weather(force=True)
 
@@ -694,11 +693,14 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._stop_weather(suspend=True)
         from .browser_live import GTLiveCategoryManagerScreen
         arguments = (GTLiveCategoryManagerScreen, self.account.display_name, self.favorite_scope, list(self._all_categories), self.category_store, self._category_manager_return_id)
+        options = {'content_type': self.content_type}
+        if self.content_type == 'live' and _is_m3u_client(self.client):
+            options['m3u_rename'] = True
         self._category_manager_child_open = True
         opener = getattr(self.session, 'openWithCallback', None)
         if callable(opener):
             try:
-                opener(self._category_manager_closed, *arguments, content_type=self.content_type)
+                opener(self._category_manager_closed, *arguments, **options)
             except Exception:
                 self._category_manager_child_open = False
                 if self.content_type == 'live':
@@ -706,7 +708,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
                 self['message'].setText(_('Could not open the content list.'))
             return
         try:
-            dialog = self.session.open(*arguments, content_type=self.content_type)
+            dialog = self.session.open(*arguments, **options)
         except Exception:
             self._category_manager_child_open = False
             if self.content_type == 'live':
@@ -720,7 +722,9 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
     def _category_manager_closed(self, changed=False, ordered_ids=None, hidden_ids=None, include_terms=None, exclude_terms=None, sort_mode=None):
         self._category_manager_child_open = False
         if changed and self._all_categories and (not self._error):
-            preferences = CategoryPreferences(ordered_ids or (), hidden_ids or (), include_terms or (), exclude_terms or (), sort_mode, self.category_store.load(self.favorite_scope).recency)
+            stored = self.category_store.load(self.favorite_scope)
+            preferences = (stored if self.content_type == 'live' and _is_m3u_client(self.client)
+                           else CategoryPreferences(ordered_ids or (), hidden_ids or (), include_terms or (), exclude_terms or (), sort_mode, stored.recency))
             previous_visibility = self._hidden_category_ids
             previous_rules = getattr(previous_visibility, 'rule_key', ((), ()))
             self._hidden_category_ids = category_visibility_ids(self._all_categories, preferences)

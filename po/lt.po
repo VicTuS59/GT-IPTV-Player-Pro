@@ -4407,3 +4407,53 @@ msgstr "Nepavyko perskaityti TXT failo."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Pridėtos Xtream paskyros ({})\nPraleisti pasikartojantys įrašai ({})"
+
+msgid "Change layout"
+msgstr "Keisti išdėstymą"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Kanalo susiejimas išsaugotas. Atnaujinkite EPG, kad jis įsigaliotų."
+
+msgid "Cinematic view"
+msgstr "Kino rodinys"
+
+msgid "EPG server name could not be resolved."
+msgstr "Nepavyko nustatyti EPG serverio adreso pagal jo vardą."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Įveskite tinkamą pavadinimą, kurio ilgis neviršija {} ženklų."
+
+msgid "Football scores\u0004Select source"
+msgstr "Pasirinkite šaltinį"
+
+msgid "List view"
+msgstr "Sąrašo rodinys"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "M3U sąrašas atnaujintas. Pakeitimai bus rodomi per kitą atnaujinimą."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Nepavyko atnaujinti M3U sąrašo. Rodomas podėlyje išsaugotas sąrašas."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "M3U atnaujinimo suvestinė\n\nNauji kanalai ({added})\nKanalai, kurių sąraše nebeliko ({removed})\nPervadinti kanalai ({renamed})"
+
+msgid "Matching release details"
+msgstr "Suderinami leidimo duomenys"
+
+msgid "Matching release group"
+msgstr "Ta pati leidimo grupė"
+
+msgid "No channels need manual mapping."
+msgstr "Nė vieno kanalo nereikia susieti rankiniu būdu."
+
+msgid "No matching EPG channels found."
+msgstr "Atitinkančių EPG kanalų nerasta."
+
+msgid "Recommended"
+msgstr "Rekomenduojama"
+
+msgid "Restore source name"
+msgstr "Atkurti pradinį pavadinimą"

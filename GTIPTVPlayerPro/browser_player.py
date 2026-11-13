@@ -48,7 +48,10 @@ from .remote_footer import prepared_skin
 from .settings import DEFAULT_INFOBAR_TIMEOUT, available_service_types, load_player_settings, normalize_infobar_timeout, serviceapp_uses_async_seek, service_engine_label
 from .subtitles import MovieSubtitleController
 from .video_aspect import aspect_groups, apply_aspect_choice
-from .youtube_playback import youtube_duration_seconds, NATIVE_AUDIO_SERVICE_TYPE, YouTubeEndWatcher
+from .youtube_playback import (
+    NATIVE_AUDIO_SERVICE_TYPE, YouTubeEndWatcher, request_youtube_native_stop, youtube_duration_seconds,
+    youtube_native_control,
+)
 from .youtube_history import youtube_resume_position
 from .typography import ellipsize_dynamic_text, fit_dynamic_text, font_px, scale_skin_fonts, set_static_text, set_text_if_changed, visible_count
 from .weather import DEFAULT_CITY, WeatherError, WeatherService, load_weather_settings, shared_weather_service, weather_description, weather_icon_name
@@ -2523,6 +2526,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
     def start_playback(self):
         if self._closed or self._started:
             return
+        self._youtube_rejected_reference = None
         navigation = getattr(self.session, 'nav', None)
         if navigation is None:
             self._set_static_info_channel_name(_('Could not start the player.'))
@@ -2602,8 +2606,11 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             self._archive_previous_pts = _ArchivePlaybackWatchdog._snapshot_pts(previous_snapshot)
             self._archive_previous_position = _ArchivePlaybackWatchdog._position_ticks(self._archive_previous_service)
         try:
-            self._play_subtitle_service(navigation, self.reference)
+            with youtube_native_control(navigation, self.reference, self.current_item):
+                self._play_subtitle_service(navigation, self.reference)
         except Exception as error:
+            if getattr(self.current_item, 'youtube_native', False):
+                self._youtube_rejected_reference = self.reference
             _debug('playback start failed content={} error={}'.format(getattr(self.current_item, 'content_type', 'unknown'), error.__class__.__name__))
             self._restore_old_service(navigation)
             if self._is_archive_item():
@@ -2755,11 +2762,20 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             return False
         previous_reference = self.reference
         self._save_resume_position()
+        stop_requested = request_youtube_native_stop(navigation, previous_reference, self.current_item)
         try:
-            self._play_subtitle_service(navigation, reference)
+            with youtube_native_control(navigation, reference, item):
+                self._play_subtitle_service(navigation, reference)
         except Exception:
             try:
-                self._play_subtitle_service(navigation, previous_reference)
+                if stop_requested:
+                    current = self._reference_identity(navigation.getCurrentlyPlayingServiceReference())
+                    if current == self._reference_identity(previous_reference):
+                        navigation.stopService()
+                    elif current and current != self._reference_identity(reference):
+                        return False
+                with youtube_native_control(navigation, previous_reference, self.current_item):
+                    self._play_subtitle_service(navigation, previous_reference)
             except Exception:
                 pass
             return False
@@ -3575,14 +3591,16 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         is_live = getattr(self.current_item, 'content_type', '') == 'live'
         self._info_dialog['epg_now_label'].setText(_('NOW') if is_live else _('PREVIOUS'))
         self._info_dialog['epg_next_label'].setText(_('NEXT') if is_live else _('REMAINING'))
+        self._clear_player_progress()
         if is_live:
             epg_text = _('EPG information unavailable.') if self._live_info_loader() is None else _('Loading EPG...')
             self._set_static_info_epg('epg_now', epg_text)
             self._set_static_info_epg('epg_next', '')
+        elif youtube:
+            self._render_partial_youtube_times(-1, youtube_duration_seconds(self.current_item))
         else:
             self._set_static_info_epg('epg_now', _('Reading duration...'))
             self._set_static_info_epg('epg_next', '--:--:--')
-        self._clear_player_progress()
         self._render_favorite_badge()
         self.setTitle(self.title)
 
@@ -4835,20 +4853,24 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             return -1
 
     def _seek_position(self, seeker=None):
-        duration = youtube_duration_seconds(getattr(self, 'current_item', None))
+        item = getattr(self, 'current_item', None)
+        duration = youtube_duration_seconds(item)
         seeker = seeker or (self._raw_seek_interface() if duration > 0 else self._seek_interface())
-        if seeker is None:
-            return (-1, duration if duration > 0 else -1)
-        try:
-            position = self._seek_seconds(seeker.getPlayPosition())
-        except Exception:
-            position = -1
-        try:
-            length = self._seek_seconds(seeker.getLength())
-        except Exception:
-            length = -1
+        position, length = -1, -1
+        if seeker is not None:
+            try:
+                position = self._seek_seconds(seeker.getPlayPosition())
+            except Exception:
+                pass
+            try:
+                length = self._seek_seconds(seeker.getLength())
+            except Exception:
+                pass
         if length <= 0 and duration > 0:
             length = duration
+        decoder = getattr(item, 'youtube_decoder_position', None)
+        if position < 0 and decoder is not None:
+            position = decoder.position(getattr(self.session, 'nav', None), length)
         if position >= 0 and length > 0:
             self._seek_ready = True
         return (position, length)
@@ -5541,6 +5563,18 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             pass
         fill.show()
 
+    def _render_partial_youtube_times(self, position, length):
+        """Show each available time without implying an unmeasured position."""
+        unknown = '--:--:--'
+        elapsed = self._format_play_time(position) if position >= 0 else unknown
+        duration = self._format_play_time(length) if length > 0 else unknown
+        self._set_static_info_epg('epg_now', elapsed)
+        self._set_static_info_epg('epg_next', unknown)
+        set_text_if_changed(self._info_dialog['player_progress_text'], '')
+        set_text_if_changed(self._info_dialog['player_progress_start'], elapsed)
+        set_text_if_changed(self._info_dialog['player_progress_end'], duration)
+        self._info_dialog['player_progress_fill'].hide()
+
     def _playback_tick(self):
         """Refresh elapsed/remaining VOD time from ExtEplayer3 once a second."""
         if self._closed:
@@ -5558,6 +5592,8 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             self._set_static_info_epg('epg_now', self._format_play_time(position))
             self._set_static_info_epg('epg_next', self._format_play_time(max(0, length - position)))
             self._set_playback_progress(position, length)
+        elif getattr(self.current_item, 'youtube_native', False):
+            self._render_partial_youtube_times(position, length)
         self._refresh_front_panel()
         self._playback_timer.start(1000, True)
 

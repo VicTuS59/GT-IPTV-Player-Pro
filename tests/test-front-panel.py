@@ -15,7 +15,7 @@ import unicodedata
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1] / 'GTIPTVPlayerPro'
 
@@ -92,6 +92,7 @@ class Screen(dict):
         super().__init__()
         self.session, self.parent = session, parent
         self.onShown, self.onLayoutFinish, self.onHide, self.onClose = [], [], [], []
+        self.onShow = []
 
 
 class Timer:
@@ -121,6 +122,7 @@ language = types.SimpleNamespace(getLanguage=lambda: 'en_EN', addCallback=lambda
 sdk_module('Components.Language', language=language)
 sdk_module('enigma', eWidget=Widget, eLabel=NativeLabel, ePoint=Size, eSize=Size,
            gFont=lambda family, size: (family, size), eTimer=Timer,
+           iServiceInformation=types.SimpleNamespace(),
            getDesktop=lambda index: types.SimpleNamespace(size=lambda: Size(400, 240)))
 NAME = '_front_panel_tests'
 spec = importlib.util.spec_from_file_location(NAME, ROOT / '__init__.py', submodule_search_locations=[str(ROOT)])
@@ -146,20 +148,26 @@ def bind(component, field):
 
 class FrontPanelTests(unittest.TestCase):
     def summary(self, kind='movie', dimensions=(400, 240), title='Harry Potter and the Philosopher’s Stone', seek=(13, 9653), **metadata):
+        if kind == 'youtube':
+            kind = 'movie'
+            metadata['youtube_native'] = True
         item = types.SimpleNamespace(id='fixture', content_type=kind, name=title, **metadata)
         player = types.SimpleNamespace(current_item=item, _seek_position=lambda: seek, _current_epg_events=[])
+        return self.bind_summary(player, dimensions), player
+
+    def bind_summary(self, player, dimensions, summary_class=front.GTPlayerFrontPanelSummary):
         with patch.object(front, 'getDesktop', return_value=types.SimpleNamespace(size=lambda: Size(*dimensions))):
-            panel = front.GTPlayerFrontPanelSummary(None, player)
+            panel = summary_class(None, player)
         for name in layout.FIELDS:
             bind(panel[name], panel._layout['fields'][name])
         panel['progress_fill'].instance = Widget()
         for callback in panel.onLayoutFinish: callback()
         self.addCleanup(panel._stop)
-        return panel, player
+        return panel
 
     def test_geometry_matrix_and_skin_stay_inside_the_real_viewport(self):
         for width, height in PANELS:
-            for kind in ('movie', 'series', 'live'):
+            for kind in ('movie', 'series', 'youtube', 'live', 'catchup'):
                 with self.subTest(panel=(width, height), kind=kind):
                     result = layout.panel_layout(width, height, kind)
                     skin = ET.fromstring(layout.panel_skin(result))
@@ -207,21 +215,18 @@ class FrontPanelTests(unittest.TestCase):
             self.assertEqual(panel['total'].getText(), '02:40:53')
             self.assertEqual(panel['remaining'].getText(), '02:40:40')
 
-    def test_series_keeps_movie_geometry_without_a_separate_episode_row(self):
-        panel, player = self.summary('series', season='2', episode='7')
-        self.assertFalse(panel['episode'].visible)
-        self.assertEqual(panel['episode'].getText(), '')
-        self.assertEqual(panel['kind'].getText(), 'SERIES')
-        self.assertEqual((player.current_item.season, player.current_item.episode), ('2', '7'))
+    def test_movies_series_and_youtube_share_the_layout_at_each_panel_size(self):
         for dimensions in PANELS:
-            movie = layout.panel_layout(*dimensions, kind='movie')
-            series = layout.panel_layout(*dimensions, kind='series')
-            self.assertEqual(movie['fields'], series['fields'])
+            movie = layout.panel_skin(layout.panel_layout(*dimensions, kind='movie'))
+            for kind in ('series', 'youtube'):
+                with self.subTest(dimensions=dimensions, kind=kind):
+                    self.assertEqual(movie, layout.panel_skin(layout.panel_layout(*dimensions, kind=kind)))
 
     def test_archive_and_unknown_seek_remain_readable(self):
         panel, player = self.summary('catchup', seek=(-1, 0))
         self.assertEqual(panel['kind'].getText(), 'TV ARCHIVE')
         self.assertEqual(panel['elapsed'].getText(), '--:--')
+        self.assertEqual(panel._layout['progress_h'], 6)
         self.assertFalse(panel['progress_fill'].visible)
         player._seek_position = lambda: (10000, 9999)
         panel.refresh_now()
@@ -342,24 +347,31 @@ class FrontPanelTests(unittest.TestCase):
         self.assertEqual(widget.getText(), ('தமிழ் ' * 20).strip())
 
     def test_numeric_clocks_fit_before_scrolling_and_keep_their_full_value(self):
-        panel, player = self.summary(seek=(3599999, 7199999))
-        for name in ('elapsed', 'total', 'remaining'):
-            field = panel[name]
-            self.assertLessEqual(field._label.calculateSize().height(), field._height)
-            self.assertFalse(field.moving())
-            self.assertEqual(field._label.value, field.getText())
+        for dimensions in ((320, 240), (400, 240), (240, 320), (480, 800)):
+            panel, _ = self.summary(dimensions=dimensions, seek=(3599999, 7199999))
+            for name in ('elapsed', 'total', 'remaining', 'percent'):
+                with self.subTest(dimensions=dimensions, field=name):
+                    field = panel[name]
+                    measured = field._label.calculateSize()
+                    self.assertLessEqual(measured.width(), field._width)
+                    self.assertLessEqual(measured.height(), field._height)
+                    self.assertFalse(field.moving())
+                    self.assertEqual(field._label.value, field.getText())
 
     def test_hide_close_and_reshow_manage_both_timers(self):
         panel, player = self.summary(title='Overflow text ' * 20)
         self.assertTrue(panel._motion_timer.active)
         self.assertTrue(panel._refresh_timer.active)
-        panel._pause()
+        for callback in panel.onHide:
+            callback()
         self.assertFalse(panel._motion_timer.active)
         self.assertFalse(panel._refresh_timer.active)
         panel._animate()
         self.assertFalse(panel._motion_timer.active)
-        panel._start()
+        for callback in panel.onShow:
+            callback()
         self.assertTrue(panel._motion_timer.active)
+        self.assertTrue(panel._refresh_timer.active)
         panel._stop()
         self.assertIsNone(player._front_panel_summary)
         self.assertFalse(panel._motion_timer.active)
@@ -402,25 +414,107 @@ class FrontPanelTests(unittest.TestCase):
                 self.assertIn('2', result)
                 self.assertIn('7', result)
                 with patch.object(front, '_', translator.gettext):
-                    panel, player = self.summary('series', season='2', episode='7')
-                    self.assertFalse(panel['episode'].visible)
-                    self.assertEqual(panel['elapsed_label'].getText(), translator.gettext('Elapsed').upper())
-                    self.assertEqual(panel['total_label'].getText(), translator.gettext('Total').upper())
-                    for name in ('kind', 'title', 'elapsed_label', 'total_label', 'remaining_label'):
-                        self.assertLessEqual(panel[name]._label.calculateSize().height(), panel[name]._height)
+                    for kind in ('movie', 'series', 'youtube'):
+                        panel, player = self.summary(kind, season='2', episode='7')
+                        self.assertFalse(panel['episode'].visible)
+                        for name, message in (('elapsed_label', 'Elapsed'), ('total_label', 'Total'),
+                                              ('remaining_label', 'REMAINING')):
+                            self.assertEqual(panel[name].getText(), translator.gettext(message).upper())
+                        for name in ('kind', 'title', 'elapsed_label', 'total_label', 'remaining_label'):
+                            self.assertLessEqual(panel[name]._label.calculateSize().height(), panel[name]._height)
 
-    def test_400_by_240_captions_and_clocks_are_large_and_high_contrast(self):
-        for kind in ('movie', 'series'):
-            panel, player = self.summary(kind, seek=(3361, 9653), season='2', episode='7')
-            self.assertEqual(panel['elapsed'].getText(), '56:01')
-            self.assertEqual(panel['total'].getText(), '02:40:53')
-            self.assertEqual(panel['remaining'].getText(), '01:44:52')
-            for name in ('elapsed_label', 'total_label', 'remaining_label'):
-                self.assertGreaterEqual(panel[name]._display_font, 22)
-                self.assertEqual(panel[name]._label.color, '#FFFFFF')
-            for name in ('elapsed', 'total', 'remaining'):
-                self.assertGreaterEqual(panel[name]._display_font, 32)
-                self.assertFalse(panel[name].moving())
+    def test_all_playback_types_emphasize_remaining_time_and_scroll_long_titles(self):
+        title = 'A long programme title with more text than the LCD can fit'
+        for kind, caption in (('movie', 'MOVIES'), ('series', 'SERIES'), ('youtube', 'YouTube')):
+            with self.subTest(kind=kind):
+                panel, player = self.summary(kind, title=title, seek=(738, 6006), season='2', episode='7')
+                fields = panel._layout['fields']
+                self.assertEqual(panel['kind'].getText(), caption)
+                self.assertFalse(panel['episode'].visible)
+                self.assertEqual(panel['title'].getText(), title)
+                self.assertTrue(panel['title'].moving())
+                self.assertEqual(panel['elapsed'].getText(), '12:18')
+                self.assertEqual(panel['total'].getText(), '01:40:06')
+                self.assertEqual(panel['remaining'].getText(), '01:27:48')
+                self.assertEqual(panel['percent'].getText(), '12%')
+                self.assertEqual(panel['remaining']._label.halign, NativeLabel.alignCenter)
+                self.assertEqual(panel['remaining']._label.color, '#22D3EE')
+                self.assertEqual(panel['remaining_label']._label.color, '#22D3EE')
+                self.assertLess(fields['title']['box'][1], fields['remaining_label']['box'][1])
+                self.assertLess(fields['remaining']['box'][1], fields['elapsed_label']['box'][1])
+                self.assertEqual(fields['elapsed']['box'][1], fields['total']['box'][1])
+                self.assertGreaterEqual(panel['remaining']._display_font, 2 * panel['total']._display_font)
+
+                self.assertEqual(panel._layout['progress_h'], 20)
+                self.assertGreaterEqual(panel._layout['content_w'], 380)
+                progress = panel['progress_fill']
+                self.assertEqual(progress.instance.size().width(), 47)
+                self.assertEqual(progress.instance.size().height(), 20)
+                player._seek_position = lambda: (0, 6006)
+                panel.refresh_now()
+                self.assertFalse(progress.visible)
+                player._seek_position = lambda: (6006, 6006)
+                panel.refresh_now()
+                self.assertTrue(progress.visible)
+                self.assertEqual(progress.instance.size().width(), panel._layout['content_w'])
+
+    def test_youtube_preview_uses_its_existing_sample_and_clears_after_playback(self):
+        main = types.ModuleType(NAME + '.main')
+        main._connect_timer = front._connect
+        with patch.dict(sys.modules, {main.__name__: main}):
+            preview = __import__(NAME + '.youtube_preview', fromlist=['YouTubePreviewMixin'])
+
+        for dimensions in ((400, 240), (132, 64), (64, 32)):
+            with self.subTest(dimensions=dimensions):
+                player = preview.YouTubePreviewMixin()
+                navigation = types.SimpleNamespace(reference=None)
+                navigation.getCurrentlyPlayingServiceReference = lambda: navigation.reference
+                player.session = types.SimpleNamespace(current_dialog=player, nav=navigation)
+                player._closed = False
+                player._init_youtube_preview(True)
+                player._resume_youtube_window = Mock()
+                player._suspend_youtube_window = Mock()
+                player._seek_position = Mock(return_value=(738, 6006))
+                panel = self.bind_summary(player, dimensions, player.createSummary())
+                self.assertEqual(panel['title'].getText(), 'YouTube')
+                self.assertFalse(panel['progress_bg'].visible)
+                self.assertFalse(panel._refresh_timer.active)
+                player._seek_position.assert_not_called()
+
+                item = types.SimpleNamespace(id='video', name='A YouTube video title',
+                                             content_type='movie', youtube_native=True)
+                player.current_item = item
+                player.reference = navigation.reference = object()
+                player._started = True
+                player._preview_tick()
+                player._seek_position.assert_called_once_with()
+                self.assertEqual(panel['title'].getText(), item.name)
+                if panel._layout['mode'] == 'full':
+                    self.assertEqual(panel['kind'].getText(), 'YouTube')
+                    self.assertEqual(panel['remaining'].getText(), '01:27:48')
+                    self.assertEqual(panel['progress_fill'].instance.size().height(), 20)
+
+                for callback in panel.onHide:
+                    callback()
+                player._fullscreen_active = True
+                player._preview_tick()
+                player._seek_position.assert_called_once_with()
+                player._fullscreen_active = False
+                player._seek_position.return_value = (900, 6006)
+                for callback in panel.onShow:
+                    callback()
+                self.assertTrue(panel._active)
+                self.assertFalse(panel._refresh_timer.active)
+                if panel._layout['mode'] == 'full':
+                    self.assertEqual(panel['remaining'].getText(), '01:25:06')
+
+                player._seek_position.reset_mock()
+                navigation.reference = None
+                player._preview_tick()
+                self.assertEqual(panel['title'].getText(), 'YouTube')
+                self.assertFalse(panel['progress_bg'].visible)
+                self.assertFalse(panel['progress_fill'].visible)
+                player._seek_position.assert_not_called()
 
     def test_portrait_clocks_use_the_full_width_to_remain_large(self):
         for dimensions in ((240, 320), (480, 800)):

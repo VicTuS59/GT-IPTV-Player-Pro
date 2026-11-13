@@ -5,9 +5,12 @@
 
 from enigma import ePoint, eSize, eTimer, iServiceInformation
 
+from .diagnostics import log_event
 from .i18n import _
 from .main import _connect_timer
-from .youtube_playback import YouTubeEndWatcher, youtube_duration_seconds
+from .youtube_playback import (
+    YouTubeEndWatcher, request_youtube_native_stop, youtube_duration_seconds, youtube_native_control,
+)
 from .stream_resolution import ResolutionTracker
 
 
@@ -46,6 +49,20 @@ class YouTubePreviewMixin(object):
         self._youtube_resolution_tracker = ResolutionTracker()
         self._preview_timer = eTimer()
         _connect_timer(self._preview_timer, self._preview_tick)
+
+    def createSummary(self):
+        if self._preview_available:
+            from .front_panel import GTPlayerFrontPanelSummary
+            return GTPlayerFrontPanelSummary
+        return None
+
+    def _refresh_youtube_panel(self, seek=None):
+        summary = getattr(self, "_front_panel_summary", None)
+        if summary is not None:
+            try:
+                summary.refresh_now(seek)
+            except Exception as error:
+                log_event("front_panel", "YouTube preview refresh failed", error)
 
     def _preview_current_reference(self):
         try:
@@ -93,18 +110,21 @@ class YouTubePreviewMixin(object):
     def _seek_position(self):
         length = youtube_duration_seconds(self.current_item)
         seeker = self._preview_seek()
-        if seeker is None:
-            return -1, length or -1
-        try:
-            position = self._preview_seconds(seeker.getPlayPosition())
-        except Exception:
-            position = -1
-        try:
-            native_length = self._preview_seconds(seeker.getLength())
-            if native_length > 0:
-                length = native_length
-        except Exception:
-            pass
+        position = -1
+        if seeker is not None:
+            try:
+                position = self._preview_seconds(seeker.getPlayPosition())
+            except Exception:
+                pass
+            try:
+                native_length = self._preview_seconds(seeker.getLength())
+                if native_length > 0:
+                    length = native_length
+            except Exception:
+                pass
+        decoder = getattr(self.current_item, "youtube_decoder_position", None)
+        if position < 0 and decoder is not None:
+            position = decoder.position(getattr(self.session, "nav", None), length)
         return position, length or -1
 
     def _save_resume_position(self):
@@ -131,17 +151,24 @@ class YouTubePreviewMixin(object):
         if not self._preview_old_captured or not self._preview_owns_service():
             self._preview_old_reference = previous
             self._preview_old_captured = True
+        navigation = self.session.nav
+        stop_requested = request_youtube_native_stop(navigation, self.reference, self.current_item)
         try:
-            result = self.session.nav.playService(reference)
+            with youtube_native_control(navigation, reference, item):
+                result = navigation.playService(reference)
             if isinstance(result, int) and result != 0:
                 raise RuntimeError("playService returned {}".format(result))
         except Exception:
             # A failed start may release the decoder. Restore only that slot,
             # and never replace a different service opened in the meantime.
             current = self._preview_current_reference()
-            if previous is not None and (current is None or same_reference(current, reference)):
+            restarting = stop_requested and same_reference(current, previous)
+            if previous is not None and (current is None or same_reference(current, reference) or restarting):
                 try:
-                    self.session.nav.playService(previous)
+                    if restarting:
+                        navigation.stopService()
+                    with youtube_native_control(navigation, previous, self.current_item):
+                        navigation.playService(previous)
                 except Exception:
                     pass
             return False
@@ -222,7 +249,10 @@ class YouTubePreviewMixin(object):
             pass
 
     def _preview_tick(self):
-        if self._closed or self._fullscreen_active or not self._preview_owns_service():
+        if self._closed or self._fullscreen_active:
+            return
+        if not self._preview_owns_service():
+            self._refresh_youtube_panel()
             return
         if self._preview_is_foreground():
             self._resume_youtube_window()
@@ -230,6 +260,7 @@ class YouTubePreviewMixin(object):
             if callable(updater):
                 updater()
             position, length = self._seek_position()
+            self._refresh_youtube_panel((position, length))
             if self._youtube_end_watcher is not None:
                 self._youtube_end_watcher.sample(position, length)
             if self._preview_resume_position > 0:
@@ -318,6 +349,8 @@ class YouTubePreviewMixin(object):
         self._resume_youtube_window()
         if self._preview_owns_service():
             self._preview_timer.start(200, True)
+        else:
+            self._refresh_youtube_panel()
 
     def _close_youtube_preview(self):
         self._preview_timer.stop()
@@ -336,3 +369,4 @@ class YouTubePreviewMixin(object):
             except Exception:
                 pass
         self._started = False
+        self._refresh_youtube_panel()

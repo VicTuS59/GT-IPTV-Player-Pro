@@ -4395,3 +4395,53 @@ msgstr "TXT கோப்பைப் படிக்க முடியவில
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "சேர்க்கப்பட்ட Xtream கணக்குகள் ({})\nதவிர்க்கப்பட்ட நகல்கள் ({})"
+
+msgid "Change layout"
+msgstr "தளவமைப்பை மாற்று"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "சேனல் பொருத்தம் சேமிக்கப்பட்டது. அதைப் பயன்படுத்த EPG ஐப் புதுப்பிக்கவும்."
+
+msgid "Cinematic view"
+msgstr "திரைப்படக் காட்சி"
+
+msgid "EPG server name could not be resolved."
+msgstr "EPG சேவையகப் பெயருக்கான முகவரியைக் கண்டறிய முடியவில்லை."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "அதிகபட்சம் {} எழுத்துகள் கொண்ட செல்லுபடியாகும் பெயரை உள்ளிடவும்."
+
+msgid "Football scores\u0004Select source"
+msgstr "மூலத்தைத் தேர்ந்தெடுக்கவும்"
+
+msgid "List view"
+msgstr "பட்டியல் காட்சி"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "M3U பட்டியல் புதுப்பிக்கப்பட்டது. அடுத்த புதுப்பிப்பில் மாற்றங்கள் காட்டப்படும்."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "M3U பட்டியலைப் புதுப்பிக்க முடியவில்லை. தற்காலிகச் சேமிப்பிலுள்ள பட்டியல் காட்டப்படுகிறது."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "M3U புதுப்பிப்புச் சுருக்கம்\n\nபுதிய சேனல்கள் ({added})\nபட்டியலில் இனி இல்லாத சேனல்கள் ({removed})\nபெயர் மாற்றப்பட்ட சேனல்கள் ({renamed})"
+
+msgid "Matching release details"
+msgstr "பொருந்தும் வெளியீட்டு விவரங்கள்"
+
+msgid "Matching release group"
+msgstr "ஒரே வெளியீட்டுக் குழு"
+
+msgid "No channels need manual mapping."
+msgstr "எந்தச் சேனலையும் கைமுறையாகப் பொருத்தத் தேவையில்லை."
+
+msgid "No matching EPG channels found."
+msgstr "பொருந்தும் EPG சேனல்கள் எதுவும் கிடைக்கவில்லை."
+
+msgid "Recommended"
+msgstr "பரிந்துரைக்கப்பட்டது"
+
+msgid "Restore source name"
+msgstr "அசல் பெயரை மீட்டமை"

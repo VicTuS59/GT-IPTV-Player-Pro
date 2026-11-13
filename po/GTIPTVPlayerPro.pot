@@ -6256,3 +6256,50 @@ msgstr ""
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr ""
+
+msgid "Change layout"
+msgstr ""
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr ""
+
+msgid "EPG server name could not be resolved."
+msgstr ""
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr ""
+
+msgid "Football scores\u0004Select source"
+msgstr ""
+
+msgid "List view"
+msgstr ""
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr ""
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr ""
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr ""
+
+msgid "Matching release details"
+msgstr ""
+
+msgid "Matching release group"
+msgstr ""
+
+msgid "No channels need manual mapping."
+msgstr ""
+
+msgid "No matching EPG channels found."
+msgstr ""
+
+msgid "Recommended"
+msgstr ""
+
+msgid "Restore source name"
+msgstr ""

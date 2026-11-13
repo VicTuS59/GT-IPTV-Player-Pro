@@ -273,6 +273,7 @@ _ACTION_TEXT = {
     "download": N_("Download"),
     "channel_list": N_("Channels"),
     "xmltv_epg": N_("EPG settings"),
+    "epg_mapping": N_("Manual channel mapping"),
     "metadata": "TMDb",
     "fullscreen": N_("Full screen"),
     "select_change": N_("Change"),

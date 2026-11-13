@@ -567,8 +567,6 @@ class WebSubtitles(object):
                 meta["year"] = 0
                 for field in ("tmdb_id", "imdb_id", "sd_id"):
                     meta[field] = ""
-                from .online_subtitles import normalized_metadata
-                meta["year"] = normalized_metadata(meta, language)["year"]
             from .online_subtitles import subtitle_search_available
             if not subtitle_search_available(meta):
                 raise SubtitleError("invalid_search", 400)

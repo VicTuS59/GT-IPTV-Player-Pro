@@ -4389,3 +4389,53 @@ msgstr "ไม่สามารถอ่านไฟล์ TXT ได้"
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "เพิ่มบัญชี Xtream แล้ว ({})\nข้ามรายการซ้ำ ({})"
+
+msgid "Change layout"
+msgstr "เปลี่ยนรูปแบบ"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "บันทึกการจับคู่ช่องแล้ว รีเฟรช EPG เพื่อใช้การจับคู่นี้"
+
+msgid "Cinematic view"
+msgstr "มุมมองแบบโรงภาพยนตร์"
+
+msgid "EPG server name could not be resolved."
+msgstr "ไม่สามารถค้นหาที่อยู่จากชื่อเซิร์ฟเวอร์ EPG ได้"
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "ป้อนชื่อที่ถูกต้องโดยมีความยาวไม่เกิน {} อักขระ"
+
+msgid "Football scores\u0004Select source"
+msgstr "เลือกแหล่งข้อมูล"
+
+msgid "List view"
+msgstr "มุมมองรายการ"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "รีเฟรชรายการ M3U แล้ว การเปลี่ยนแปลงจะแสดงในการรีเฟรชครั้งถัดไป"
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "รีเฟรชรายการ M3U ไม่สำเร็จ กำลังแสดงรายการจากแคช"
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "สรุปการรีเฟรช M3U\n\nช่องใหม่ ({added})\nช่องที่ไม่อยู่ในรายการแล้ว ({removed})\nช่องที่เปลี่ยนชื่อ ({renamed})"
+
+msgid "Matching release details"
+msgstr "รายละเอียดรุ่นตรงกัน"
+
+msgid "Matching release group"
+msgstr "กลุ่มเผยแพร่เดียวกัน"
+
+msgid "No channels need manual mapping."
+msgstr "ไม่มีช่องที่ต้องจับคู่ด้วยตนเอง"
+
+msgid "No matching EPG channels found."
+msgstr "ไม่พบช่อง EPG ที่ตรงกัน"
+
+msgid "Recommended"
+msgstr "แนะนำ"
+
+msgid "Restore source name"
+msgstr "คืนชื่อเดิม"

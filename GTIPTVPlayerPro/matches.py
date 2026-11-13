@@ -54,6 +54,8 @@ finally:
         globals().pop(_variable, None)
 
 BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/"
+SCORE_SOURCES = {"espn": "ESPN", "flashscore": "Flashscore"}
+FLASH_DATE_LIMIT = 7
 JSON_LIMIT = 2 * 1024 * 1024
 LOGO_LIMIT = 512 * 1024
 REFRESH_SECONDS = 60
@@ -227,6 +229,21 @@ class Snapshot(namedtuple("Snapshot", (
     __slots__ = ()
 
 
+def read_score_body(response, limit, budget):
+    body = bytearray()
+    read = getattr(response, "read1", response.read)
+    while True:
+        budget.check()
+        chunk = read(min(65536, limit + 1 - len(body)))
+        if not chunk:
+            break
+        body.extend(chunk)
+        if len(body) > limit:
+            raise ScoresError("Response too large")
+    budget.check()
+    return bytes(body)
+
+
 class ESPNClient:
     def __init__(self, opener=None, clock=time.time):
         self._opener = opener or build_opener(_SameHostRedirect()).open
@@ -242,15 +259,7 @@ class ESPNClient:
         request = Request(url, headers={"Accept":"application/json,image/png", "Accept-Encoding":"identity",
                                         "User-Agent":"GTIPTVPlayerPro/1.7.0 (scores)"})
         with self._opener(request, timeout=budget.timeout()) as response:
-            body = bytearray()
-            while True:
-                budget.check()
-                chunk = response.read(min(65536, limit + 1 - len(body)))
-                if not chunk:break
-                body.extend(chunk)
-                if len(body) > limit:raise ScoresError("Response too large")
-        budget.check()
-        return bytes(body)
+            return read_score_body(response, limit, budget)
 
     @staticmethod
     def _entry_bytes(value):
@@ -402,18 +411,23 @@ _RECENT_MATCHES_LOCK = threading.Lock()
 
 class MatchesLoader:
     """One screen worker, latest request wins; never touches native widgets."""
-    def __init__(self, client=None):
+    def __init__(self, client=None, source="espn"):
         self.client=client or _shared_scores_client()
+        self.source = source if isinstance(source, str) and source in SCORE_SOURCES else "espn"
         self._share_results=client is None
         self._condition=threading.Condition()
         self._pending=None;self._result=None;self._active=None
         self._closed=False;self._generation=0;self._thread=None
         self._temp_root=os.path.realpath(tempfile.gettempdir())
-        self._directory=tempfile.mkdtemp(prefix="gtiptv-matches-",dir=self._temp_root)
+        try:
+            self._directory=tempfile.mkdtemp(prefix="gtiptv-matches-",dir=self._temp_root)
+        except OSError:
+            self._directory=None
 
-    @staticmethod
-    def _snapshot_key(kind, value):
-        return kind, value if kind == "scores" else dt.date.today()
+    def _snapshot_key(self, kind, value):
+        if kind == "scores":
+            return self.source, kind, value
+        return "espn", kind, dt.date.today()
 
     def cached(self, kind, value):
         if not self._share_results:
@@ -443,8 +457,14 @@ class MatchesLoader:
             self._pending=(self._generation, kind, value)
             self._result=None
             if self._thread is None:
-                self._thread=threading.Thread(target=self._work,name="gt-match-page",daemon=True)
-                self._thread.start()
+                worker = threading.Thread(target=self._work, name="gt-match-page", daemon=True)
+                try:
+                    worker.start()
+                except (RuntimeError, OSError):
+                    self._pending = None
+                    self._result = (self._generation, kind, None, True)
+                    return self._generation
+                self._thread = worker
             self._condition.notify()
             return self._generation
 
@@ -462,6 +482,8 @@ class MatchesLoader:
         if self._thread is None:self._cleanup()
 
     def _cleanup(self):
+        if self._directory is None:
+            return
         root=self._temp_root;target=os.path.realpath(self._directory)
         if os.path.dirname(target)==root and os.path.basename(target).startswith("gtiptv-matches-"):
             shutil.rmtree(target,ignore_errors=True)
@@ -476,11 +498,18 @@ class MatchesLoader:
                     cancel=threading.Event();self._active=cancel
                 key = self._snapshot_key(kind, value)
                 try:
-                    if kind=="scores":payload=self.client.fetch_day(value,cancel)
+                    if kind == "scores":
+                        if self.source == "espn" or not self._share_results:
+                            payload = self.client.fetch_day(value, cancel)
+                        else:
+                            from .matches_sources import fetch_flashscore_day
+                            payload = fetch_flashscore_day(value, cancel)
                     elif kind=="broadcasts":payload=self.client.fetch_broadcasts(cancel)
-                    else:
+                    elif self._directory is not None:
                         budget=Budget(cancel,seconds=10)
                         payload=tuple(self.client.logo(team,self._directory,budget) for team in value)
+                    else:
+                        payload = ()
                     error=False
                 except Cancelled:continue
                 except Exception:payload=None;error=True

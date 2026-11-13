@@ -4395,3 +4395,53 @@ msgstr "Het TXT-bestand kon niet worden gelezen."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Xtream-accounts toegevoegd ({})\nDubbele vermeldingen overgeslagen ({})"
+
+msgid "Change layout"
+msgstr "Indeling wijzigen"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Kanaalkoppeling opgeslagen. Vernieuw de EPG om deze toe te passen."
+
+msgid "Cinematic view"
+msgstr "Bioscoopweergave"
+
+msgid "EPG server name could not be resolved."
+msgstr "De hostnaam van de EPG-server kon niet worden opgezocht."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Voer een geldige naam van maximaal {} tekens in."
+
+msgid "Football scores\u0004Select source"
+msgstr "Kies een bron"
+
+msgid "List view"
+msgstr "Lijstweergave"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "De M3U-lijst is vernieuwd. Wijzigingen verschijnen bij de volgende vernieuwing."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "De M3U-lijst kon niet worden vernieuwd. De opgeslagen lijst wordt getoond."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Overzicht van M3U-vernieuwing\n\nNieuwe zenders ({added})\nZenders die niet meer in de lijst staan ({removed})\nHernoemde zenders ({renamed})"
+
+msgid "Matching release details"
+msgstr "Overeenkomende releasegegevens"
+
+msgid "Matching release group"
+msgstr "Dezelfde releasegroep"
+
+msgid "No channels need manual mapping."
+msgstr "Geen kanalen vereisen handmatige koppeling."
+
+msgid "No matching EPG channels found."
+msgstr "Geen overeenkomende EPG-kanalen gevonden."
+
+msgid "Recommended"
+msgstr "Aanbevolen"
+
+msgid "Restore source name"
+msgstr "Oorspronkelijke naam herstellen"

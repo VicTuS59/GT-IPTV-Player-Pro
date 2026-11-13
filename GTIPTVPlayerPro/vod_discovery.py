@@ -5,8 +5,6 @@ from xml.etree import ElementTree as ET
 import sys
 from .ui_update import set_visible
 from Components.ActionMap import ActionMap
-from Components.Label import Label
-from Components.Pixmap import Pixmap
 from .i18n import _, device_language, localized_upper
 from .paths import plugin_path
 from .remote_footer import footer_item, remote_action_text
@@ -250,7 +248,6 @@ class DiscoveryVODMethods:
         from .browser_common import _scale
         self.skin=style_footer(self.skin,self.content_type,_scale()[2])
         self.onLayoutFinish.append(self._refresh_discovery_footer)
-        self.onLayoutFinish.append(self._render_discovery_navigation)
         self.onShown.append(self._refresh_discovery_footer)
         self._refresh_discovery_footer()
         self._discovery_drawer_open=False
@@ -258,23 +255,13 @@ class DiscoveryVODMethods:
         self._discovery_tab_cursor=0
         self._discovery_category_cursor=0
         self['header'].setText('GT IPTV PLAYER')
-        for name in ('vod_header_divider','vod_page_title','vod_category_name','vod_counter','vod_footer_line',
-                     'vod_drawer_divider','vod_drawer_hint','vod_drawer_count','vod_drawer_subtitle','vod_drawer_status','vod_drawer_help_line'):
-            self[name]=Label('')
-        self['vod_drawer_surface']=Pixmap()
-        for i in range(CATEGORY_ROWS):
-            self['vod_drawer_focus_'+str(i)]=Pixmap()
-            for prefix in ('vod_drawer_number_','vod_drawer_rule_','vod_drawer_row_line_'):self[prefix+str(i)]=Label('')
-        for i in range(3):self['vod_drawer_help_'+str(i)]=Label('')
         self['vod_page_title'].setText(localized_upper(_('Movies' if self.content_type=='movie' else 'Series')))
         self['vod_drawer_hint'].setText('↑↓  {}    OK  {}    EXIT  {}'.format(_('Navigate'),_('Select'),_('Back')))
-        for i in range(5):
-            self['vod_tab_'+str(i)]=Label('')
-            self['vod_tab_focus_'+str(i)]=Label('')
         kind=self.content_type
         setattr(self,'_'+kind+'_focus','posters' if kind=='movie' else 'series')
         setattr(self,'_'+kind+'_title_preferred_font',font_px(_scale()[2],68,role='title'))
-        self['actions']=ActionMap(['OkCancelActions','DirectionActions','ColorActions','MoviePlayerActions','MenuActions'],{
+        self['actions']=ActionMap(['OkCancelActions','DirectionActions','ColorActions','MoviePlayerActions',
+            'MenuActions','InfobarEPGActions'],{
             'ok':self._discovery_ok,'cancel':self._discovery_cancel,
             'up':lambda:self._discovery_move('up'),'down':lambda:self._discovery_move('down'),
             'left':lambda:self._discovery_move('left'),'right':lambda:self._discovery_move('right'),
@@ -282,7 +269,8 @@ class DiscoveryVODMethods:
             'leftRepeated':lambda:self._discovery_move('left'),'rightRepeated':lambda:self._discovery_move('right'),
             'channelUp':lambda:self._discovery_page(-1),'channelDown':lambda:self._discovery_page(1),
             'yellow':self._discovery_toggle_categories,'green':self._discovery_search,
-            'blue':self._discovery_sort,'red':self._discovery_favorite,'menu':self._discovery_menu},-1)
+            'blue':self._discovery_sort,'red':self._discovery_favorite,'menu':self._discovery_menu,
+            'showEventInfo':self._light_info},-1)
         self._render_discovery_navigation()
 
     def _refresh_discovery_footer(self):
@@ -466,15 +454,16 @@ class DiscoveryVODMethods:
         if not self._discovery_drawer_open:self.toggle_selected_favorite()
 
     def _discovery_menu(self):
-        if self._discovery_drawer_open:
-            self._discovery_toggle_categories();self.open_content_edit();return
         from Screens.ChoiceBox import ChoiceBox
-        options=[(_('Download'),'download'),(_('Refresh'),'refresh'),(_('Edit categories'),'edit')]
+        options=[(_('Change layout'),'layout'),(_('Information'),'info'),
+                 (_('Download'),'download'),(_('Refresh'),'refresh'),(_('Edit categories'),'edit')]
         if self.content_type=='series':options.append((_('Continue watching'),'continue'))
         def chosen(choice):
-            if not choice:return
+            if self._closed or not choice:return
             action=choice[1]
-            if action=='download':self.download_selected()
+            if action=='layout':self._choose_vod_layout()
+            elif action=='info':self._light_info()
+            elif action=='download':self.download_selected()
             elif action=='edit':self.open_content_edit()
             elif action=='continue':self.open_series_continue()
             else:getattr(self,'refresh_movies' if self.content_type=='movie' else 'refresh_series')()

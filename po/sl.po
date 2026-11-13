@@ -4407,3 +4407,53 @@ msgstr "Datoteke TXT ni bilo mogoče prebrati."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Dodani računi Xtream ({})\nPreskočeni dvojniki ({})"
+
+msgid "Change layout"
+msgstr "Spremeni postavitev"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Povezava kanala je shranjena. Osvežite EPG, da jo uporabite."
+
+msgid "Cinematic view"
+msgstr "Filmski prikaz"
+
+msgid "EPG server name could not be resolved."
+msgstr "Imena strežnika EPG ni bilo mogoče razrešiti."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Vnesite veljavno ime z največ {} znaki."
+
+msgid "Football scores\u0004Select source"
+msgstr "Izberite vir"
+
+msgid "List view"
+msgstr "Prikaz seznama"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "Seznam M3U je osvežen. Spremembe bodo prikazane pri naslednji osvežitvi."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Seznama M3U ni bilo mogoče osvežiti. Prikazan je seznam iz predpomnilnika."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Povzetek osvežitve M3U\n\nNovi kanali ({added})\nKanali, ki jih ni več na seznamu ({removed})\nPreimenovani kanali ({renamed})"
+
+msgid "Matching release details"
+msgstr "Združljivi podatki o izdaji"
+
+msgid "Matching release group"
+msgstr "Ista skupina izdaje"
+
+msgid "No channels need manual mapping."
+msgstr "Noben kanal ne potrebuje ročne povezave."
+
+msgid "No matching EPG channels found."
+msgstr "Ujemajočih se kanalov EPG ni bilo mogoče najti."
+
+msgid "Recommended"
+msgstr "Priporočeno"
+
+msgid "Restore source name"
+msgstr "Obnovi izvirno ime"

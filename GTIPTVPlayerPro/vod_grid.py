@@ -143,25 +143,37 @@ def page_position(index, count, has_more=False):
 
 
 class LatestPosterWorkers:
-    """Two reusable daemon workers; queued obsolete pages are discarded."""
+    """Up to two reusable daemon workers for the latest visible selection."""
 
     def __init__(self, worker_count=2):
         self._condition = threading.Condition()
         self._pending = deque()
         self._closed = False
         self._threads = []
-        for number in range(max(1, min(2, int(worker_count)))):
-            worker = threading.Thread(target=self._run, name="gt-vod-poster-{}".format(number))
-            worker.daemon = True
-            self._threads.append(worker)
-            worker.start()
+        self._worker_count = max(1, min(2, int(worker_count)))
 
     def replace(self, tasks):
         with self._condition:
             self._pending.clear()
-            if not self._closed:
-                self._pending.extend(tasks)
-                self._condition.notify_all()
+            if self._closed:
+                return False
+            self._pending.extend(tasks)
+            if not self._pending:
+                return True
+            if not self._threads:
+                for number in range(self._worker_count):
+                    try:
+                        worker = threading.Thread(target=self._run, name="gt-vod-poster-{}".format(number),
+                                                  daemon=True)
+                        worker.start()
+                    except (RuntimeError, OSError, MemoryError):
+                        break
+                    self._threads.append(worker)
+                if not self._threads:
+                    self._pending.clear()
+                    return False
+            self._condition.notify_all()
+            return True
 
     def close(self):
         with self._condition:

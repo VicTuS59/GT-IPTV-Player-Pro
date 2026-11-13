@@ -113,11 +113,18 @@ class EPGChannelIndex(object):
                 self._write(struct.pack(">II", len(raw), len(packed)))
                 self._write(packed)
             pairs, normalised = [], {}
+            name_targets = {}
             ambiguous = frozenset(payload.get("ambiguous", ()))
             for number, (wanted, channel_id) in enumerate(payload["aliases"]):
                 if check is not None and number % 128 == 0:
                     check()
                 pairs.append((b"E" + wanted.encode("utf-8"), locations[channel_id]))
+                if wanted.startswith("m3u-name:"):
+                    if channel_id not in name_targets:
+                        encoded_id = channel_id.encode("utf-8")
+                        name_targets[channel_id] = self.file.tell()
+                        self._write(struct.pack(">H", len(encoded_id)) + encoded_id)
+                    pairs.append((b"I" + wanted.encode("utf-8"), name_targets[channel_id]))
                 key = normalise(wanted)
                 if not key or key in ambiguous:
                     continue
@@ -216,8 +223,8 @@ class EPGChannelIndex(object):
                 high = middle
         return None
 
-    def get(self, wanted, normalised, cache_only=False):
-        key = (self.ticket, wanted)
+    def get(self, wanted, normalised, cache_only=False, fallback_name_key=""):
+        key = (self.ticket, wanted, fallback_name_key)
         rows = self.cache.get(key)
         if rows is not None:
             return rows
@@ -227,6 +234,8 @@ class EPGChannelIndex(object):
             location = self._find(b"E" + wanted.encode("utf-8"))
             if location is None and normalised:
                 location = self._find(b"N" + normalised.encode("utf-8"))
+            if location is None and fallback_name_key:
+                location = self._find(b"E" + fallback_name_key.encode("utf-8"))
             if location is None:
                 rows = ()
                 packed = None
@@ -248,3 +257,12 @@ class EPGChannelIndex(object):
             rows = tuple(tuple(row) for row in values)
         self.cache.put(key, rows)
         return rows
+
+    def resolve_name(self, wanted):
+        with self.lock:
+            location = self._find(b"I" + wanted.encode("utf-8"))
+            if location is None:
+                return ""
+            self.file.seek(location)
+            size = struct.unpack(">H", self._read(2))[0]
+            return self._read(size).decode("utf-8")

@@ -129,6 +129,28 @@ def _read_proc_pts(path):
         return None
 
 
+def video_decoder_clock(pts_reader=None, dvb_pts_reader=None):
+    """Read the decoder's video clock without querying audio tracks."""
+    reader = pts_reader or _read_proc_pts
+    decoder_reader = dvb_pts_reader
+    if decoder_reader is None and pts_reader is None:
+        decoder_reader = _read_dvb_video_pts
+    if callable(decoder_reader):
+        try:
+            pts = decoder_reader()
+            if pts is not None:
+                return pts, "dvb"
+        except Exception:
+            pass
+    try:
+        pts = reader("/proc/stb/vmpeg/0/pts")
+        if pts is not None:
+            return pts, "proc_video"
+    except Exception:
+        pass
+    return None, None
+
+
 def media_snapshot(
     service,
     information,
@@ -162,30 +184,7 @@ def media_snapshot(
         pass
 
     reader = pts_reader or _read_proc_pts
-    # Unit tests and non-Enigma consumers can explicitly supply the legacy
-    # reader without touching a receiver device.  Production first uses the
-    # DVB decoder clock verified on Vu+ and then falls back to a simple proc
-    # hexadecimal value on images that expose one.
-    decoder_reader = dvb_pts_reader
-    if decoder_reader is None and pts_reader is None:
-        decoder_reader = _read_dvb_video_pts
-    decoder_pts = None
-    if callable(decoder_reader):
-        try:
-            decoder_pts = decoder_reader()
-        except Exception:
-            decoder_pts = None
-    if decoder_pts is not None:
-        snapshot["video_pts"] = decoder_pts
-        snapshot["video_pts_source"] = "dvb"
-    try:
-        if snapshot["video_pts"] is None:
-            snapshot["video_pts"] = reader("/proc/stb/vmpeg/0/pts")
-            if snapshot["video_pts"] is not None:
-                snapshot["video_pts_source"] = "proc_video"
-    except Exception:
-        snapshot["video_pts"] = None
-        snapshot["video_pts_source"] = None
+    snapshot["video_pts"], snapshot["video_pts_source"] = video_decoder_clock(pts_reader, dvb_pts_reader)
     try:
         snapshot["audio_pts"] = reader("/proc/stb/audio/0/pts")
     except Exception:

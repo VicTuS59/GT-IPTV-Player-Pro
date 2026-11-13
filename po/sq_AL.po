@@ -4395,3 +4395,53 @@ msgstr "Skedari TXT nuk mund të lexohej."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Llogaritë Xtream të shtuara ({})\nDublikatat e anashkaluara ({})"
+
+msgid "Change layout"
+msgstr "Ndrysho paraqitjen"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Përputhja e kanalit u ruajt. Rifreskoni EPG për ta zbatuar."
+
+msgid "Cinematic view"
+msgstr "Pamja kinematografike"
+
+msgid "EPG server name could not be resolved."
+msgstr "Nuk u gjet adresa e serverit EPG nga emri i tij."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Shkruani një emër të vlefshëm me deri në {} shenja."
+
+msgid "Football scores\u0004Select source"
+msgstr "Zgjidhni burimin"
+
+msgid "List view"
+msgstr "Pamja si listë"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "Lista M3U u rifreskua. Ndryshimet do të shfaqen në rifreskimin e radhës."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Rifreskimi i listës M3U dështoi. Po shfaqet lista nga memoria e përkohshme."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Përmbledhje e rifreskimit të M3U-së\n\nKanale të reja ({added})\nKanale që nuk janë më në listë ({removed})\nKanale me emër të ndryshuar ({renamed})"
+
+msgid "Matching release details"
+msgstr "Të dhëna të përputhshme të versionit"
+
+msgid "Matching release group"
+msgstr "I njëjti grup publikimi"
+
+msgid "No channels need manual mapping."
+msgstr "Asnjë kanal nuk kërkon përputhje manuale."
+
+msgid "No matching EPG channels found."
+msgstr "Nuk u gjetën kanale EPG që përputhen."
+
+msgid "Recommended"
+msgstr "Rekomanduar"
+
+msgid "Restore source name"
+msgstr "Rikthe emrin origjinal"

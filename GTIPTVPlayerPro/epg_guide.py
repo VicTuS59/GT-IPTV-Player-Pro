@@ -170,11 +170,11 @@ def load_guide(client, item, day=None):
     if kind == "m3u":
         from .m3u_epg_settings import get_m3u_epg_binding
         from .m3u_epg import M3UEPGError, read_guide_events
-        with client._state_lock:
-            record = dict(client._record_by_id.get(str(item.stream_id), {}))
-        tvg_id = str(record.get("tvg_id", "") or "").strip()
         binding = get_m3u_epg_binding(client.account.source_id)
-        if not tvg_id or binding is None or not binding.enabled:
+        if binding is None or not binding.enabled:
+            return GuideBatch()
+        tvg_id = client.resolved_epg_id(item.stream_id, binding.fingerprint)
+        if not tvg_id:
             return GuideBatch()
         deadline = client._operation_deadline()
         cancel_event, unused_deadline, unused_timeout = client._request_limits()

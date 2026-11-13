@@ -4395,3 +4395,53 @@ msgstr "Δεν ήταν δυνατή η ανάγνωση του αρχείου T
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Λογαριασμοί Xtream που προστέθηκαν ({})\nΔιπλότυπα που παραλείφθηκαν ({})"
+
+msgid "Change layout"
+msgstr "Αλλαγή διάταξης"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Η αντιστοίχιση αποθηκεύτηκε. Ανανεώστε το EPG για να εφαρμοστεί."
+
+msgid "Cinematic view"
+msgstr "Κινηματογραφική προβολή"
+
+msgid "EPG server name could not be resolved."
+msgstr "Δεν ήταν δυνατή η επίλυση του ονόματος του διακομιστή EPG."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Εισαγάγετε ένα έγκυρο όνομα με έως {} χαρακτήρες."
+
+msgid "Football scores\u0004Select source"
+msgstr "Επιλέξτε πηγή"
+
+msgid "List view"
+msgstr "Προβολή λίστας"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "Η λίστα M3U ανανεώθηκε. Οι αλλαγές θα εμφανιστούν στην επόμενη ανανέωση."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Η ανανέωση της λίστας M3U απέτυχε. Εμφανίζεται η αποθηκευμένη λίστα."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Σύνοψη ανανέωσης M3U\n\nΝέα κανάλια ({added})\nΚανάλια που δεν εμφανίζονται πλέον στη λίστα ({removed})\nΚανάλια με αλλαγή ονόματος ({renamed})"
+
+msgid "Matching release details"
+msgstr "Συμβατά στοιχεία έκδοσης"
+
+msgid "Matching release group"
+msgstr "Ίδια ομάδα έκδοσης"
+
+msgid "No channels need manual mapping."
+msgstr "Κανένα κανάλι δεν χρειάζεται χειροκίνητη αντιστοίχιση."
+
+msgid "No matching EPG channels found."
+msgstr "Δεν βρέθηκαν αντίστοιχα κανάλια EPG."
+
+msgid "Recommended"
+msgstr "Προτεινόμενο"
+
+msgid "Restore source name"
+msgstr "Επαναφορά αρχικού ονόματος"

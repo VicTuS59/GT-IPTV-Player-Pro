@@ -18,4 +18,17 @@
         <key id="KEY_PAGEDOWN" mapto="ignorePageKey" flags="mr" />
         <key id="KEY_INFO" mapto="showSynopsis" flags="m" />
     </map>
+    <map context="GTIPTVCinematicActions">
+        <key id="KEY_LEFT" mapto="posterPrevious" flags="m" />
+        <key id="KEY_LEFT" mapto="posterPreviousRepeat" flags="r" />
+        <key id="KEY_LEFT" mapto="navigationReleased" flags="b" />
+        <key id="KEY_RIGHT" mapto="posterNext" flags="m" />
+        <key id="KEY_RIGHT" mapto="posterNextRepeat" flags="r" />
+        <key id="KEY_RIGHT" mapto="navigationReleased" flags="b" />
+        <key id="KEY_CHANNELUP" mapto="previousPage" flags="m" />
+        <key id="KEY_CHANNELDOWN" mapto="nextPage" flags="m" />
+        <key id="KEY_PAGEUP" mapto="previousPage" flags="m" />
+        <key id="KEY_PAGEDOWN" mapto="nextPage" flags="m" />
+        <key id="KEY_INFO" mapto="showSynopsis" flags="m" />
+    </map>
 </keymap>

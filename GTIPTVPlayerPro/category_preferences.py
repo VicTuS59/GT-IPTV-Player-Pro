@@ -11,6 +11,7 @@ import re
 import stat
 import threading
 import time
+from copy import copy
 
 from .category_filters import (
     category_filter_ids,
@@ -41,6 +42,8 @@ _FORMAT_VERSION = 1
 _STORE_LOCK = threading.RLock()
 _WRITE_LOCK_TIMEOUT_SECONDS = 2.0
 _SCOPE_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+_M3U_NAME_KEY = re.compile(r"m3u-(?:category|channel):[0-9a-f]{64}")
+MAX_M3U_NAME_LENGTH = 128
 
 
 def _clean_scope(value):
@@ -69,6 +72,72 @@ def _category_id(category):
     if isinstance(category, dict):
         return str(category.get("category_id") or "").strip()
     return str(getattr(category, "category_id", "") or "").strip()
+
+
+def clean_m3u_display_name(value):
+    if not isinstance(value, str):
+        return ""
+    value = value.strip()
+    if not 1 <= len(value) <= MAX_M3U_NAME_LENGTH:
+        return ""
+    if any(ord(character) < 32 or ord(character) == 127 for character in value):
+        return ""
+    try:
+        value.encode("utf-8")
+    except UnicodeError:
+        return ""
+    return value
+
+
+def _clean_m3u_names(values):
+    if not isinstance(values, dict):
+        return {}
+    names = {}
+    for key, value in values.items():
+        if isinstance(key, str) and _M3U_NAME_KEY.fullmatch(key):
+            name = clean_m3u_display_name(value)
+            if name:
+                names[key] = name
+    return names
+
+
+def _apply_m3u_name_changes(entry, changes):
+    if changes is None:
+        return True
+    if not isinstance(changes, dict):
+        return False
+    names = dict(entry.get("names", {}))
+    for key, value in changes.items():
+        if not isinstance(key, str) or not _M3U_NAME_KEY.fullmatch(key):
+            return False
+        if value == "":
+            names.pop(key, None)
+        else:
+            name = clean_m3u_display_name(value)
+            if not name:
+                return False
+            names[key] = name
+    if names:
+        entry["names"] = names
+    else:
+        entry.pop("names", None)
+    return True
+
+
+def apply_m3u_category_names(categories, names):
+    result = []
+    for category in categories:
+        name = names.get(_category_id(category))
+        if name:
+            category = copy(category)
+            if isinstance(category, dict):
+                category["name"] = name
+                if "category_name" in category:
+                    category["category_name"] = name
+            else:
+                category.name = name
+        result.append(category)
+    return result
 
 
 def category_preferences_path(content_type):
@@ -256,6 +325,7 @@ class CategoryPreferences(object):
         sort_mode=None,
         recency=None,
         recency_work=None,
+        names=None,
     ):
         self.recency = clean_recency(recency)
         self.recency_work = clean_recency(recency_work)
@@ -266,6 +336,7 @@ class CategoryPreferences(object):
         self.hidden = frozenset(_clean_id_list(hidden or ()))
         self.include_terms = clean_filter_terms(include_terms or ())
         self.exclude_terms = clean_filter_terms(exclude_terms or ())
+        self.names = _clean_m3u_names(names)
 
 
 def arrange_live_categories(
@@ -323,6 +394,9 @@ def arrange_live_categories(
             category_id not in hidden and category_id in allowed
         )
     )
+    names = getattr(preferences, "names", None)
+    if names:
+        arranged = apply_m3u_category_names(arranged, names)
     if mode == 'recent':
         from .content_sort import heap_order, normalized_name
         def recent_key(row):
@@ -395,6 +469,7 @@ class LiveCategoryPreferenceStore(object):
                 raw_preferences.get("sort_mode"),
                 raw_preferences.get("recency"),
                 raw_preferences.get("recency_work"),
+                raw_preferences.get("names"),
             )
             sources[scope] = {
                 "order": list(preferences.order),
@@ -405,6 +480,8 @@ class LiveCategoryPreferenceStore(object):
                 "recency": preferences.recency,
                 "recency_work": preferences.recency_work,
             }
+            if preferences.names:
+                sources[scope]["names"] = preferences.names
             if len(sources) >= MAX_CATEGORY_SOURCES:
                 break
         return sources, True
@@ -612,6 +689,7 @@ class LiveCategoryPreferenceStore(object):
             entry.get("sort_mode"),
             entry.get("recency"),
             entry.get("recency_work"),
+            entry.get("names"),
         )
 
     def apply(self, account_scope, categories, include_hidden=False):
@@ -707,6 +785,8 @@ class LiveCategoryPreferenceStore(object):
         include_terms=None,
         exclude_terms=None,
         sort_mode=None,
+        *,
+        name_changes=None,
     ):
         scope = _clean_scope(account_scope)
         if not scope:
@@ -719,6 +799,7 @@ class LiveCategoryPreferenceStore(object):
         order = _clean_id_list(ordered_ids)
         hidden = set(_clean_id_list(hidden_ids))
         hidden.intersection_update(order)
+        name_only = ordered_ids is None and hidden_ids is None and name_changes is not None
         with _STORE_LOCK:
             directory_descriptor, lock_descriptor = (
                 self._acquire_store_lock(exclusive=True)
@@ -735,7 +816,7 @@ class LiveCategoryPreferenceStore(object):
                 ):
                     return False
                 previous = sources.get(scope, {})
-                sources[scope] = {
+                entry = dict(previous) if name_only else {
                     "order": order,
                     "hidden": sorted(hidden),
                     "recency": previous.get("recency", {}),
@@ -753,6 +834,13 @@ class LiveCategoryPreferenceStore(object):
                         else previous.get("exclude_terms", [])
                     ),
                 }
+                if previous.get("names"):
+                    entry["names"] = previous["names"]
+                if not _apply_m3u_name_changes(entry, name_changes):
+                    return False
+                if not entry and scope not in sources:
+                    return True
+                sources[scope] = entry
                 return self._write_locked(
                     sources,
                     directory_descriptor=directory_descriptor,
@@ -812,7 +900,7 @@ class LiveCategoryPreferenceStore(object):
             finally:
                 self._release_store_lock(directory_descriptor, lock_descriptor)
 
-    def reset(self, account_scope):
+    def reset(self, account_scope, *, name_changes=None):
         scope = _clean_scope(account_scope)
         if not scope:
             return False
@@ -826,9 +914,17 @@ class LiveCategoryPreferenceStore(object):
                 sources, mutable = self._load_state(directory_descriptor)
                 if not mutable:
                     return False
-                if scope not in sources:
+                entry = {}
+                if name_changes is not None:
+                    entry["names"] = sources.get(scope, {}).get("names", {})
+                    if not _apply_m3u_name_changes(entry, name_changes):
+                        return False
+                if entry:
+                    if scope not in sources and len(sources) >= MAX_CATEGORY_SOURCES:
+                        return False
+                    sources[scope] = entry
+                elif sources.pop(scope, None) is None:
                     return True
-                sources.pop(scope, None)
                 return self._write_locked(
                     sources,
                     directory_descriptor=directory_descriptor,

@@ -180,16 +180,14 @@ class SubtitleIdentityResolver(object):
         if expected_imdb and actual_imdb == expected_imdb:
             return True
         names = {_title_key(value) for value in _aliases(payload)}
-        expected = _title_key(meta.get("search_title"))
-        if not expected or expected not in names:
-            return False
-        expected_year = _year(meta.get("year"))
         actual_year = _year(payload.get("release_date") or payload.get("first_air_date"))
-        return not expected_year or bool(actual_year and abs(expected_year - actual_year) <= 1)
+        return any(
+            title and _title_key(title) in names
+            and (not year or actual_year and abs(year - actual_year) <= 1)
+            for title, year in meta["_title_queries"]
+        )
 
     def _search(self, meta, kind):
-        if len(meta.get("search_title", "")) < 2:
-            return None
         params = {"query": meta["search_title"], "include_adult": "false", "page": 1}
         year = _year(meta.get("year"))
         if year:
@@ -215,7 +213,7 @@ class SubtitleIdentityResolver(object):
         return self._detail(kind, choices[0]) if len(choices) == 1 else None
 
     def _resolve(self, original):
-        from .online_subtitles import normalized_metadata
+        from .online_subtitles import normalized_metadata, subtitle_title_queries
         meta = normalized_metadata(original, "en")
         kind = "tv" if meta["content_type"] == "series" else "movie"
         if kind == "tv":
@@ -238,18 +236,26 @@ class SubtitleIdentityResolver(object):
         if payload is None:
             # A portal ID can be stale. Recover only through an unambiguous
             # exact title/year search, then retain the newly verified IDs.
-            title_meta = dict(meta, imdb_id="", tmdb_id="")
-            payload = self._search(title_meta, kind)
-            if payload is not None and not self._valid_detail(title_meta, payload):
-                payload = None
+            for title_meta in subtitle_title_queries(dict(meta, imdb_id="", tmdb_id="")):
+                candidate = self._search(title_meta, kind)
+                if candidate is not None and self._valid_detail(title_meta, candidate):
+                    payload = candidate
+                    break
         if payload is None:
             return None
         tmdb_id = _identifier(payload.get("id"))
         found_imdb = self._imdb(payload)
         aliases = _aliases(payload)
         title = payload.get("original_title" if kind == "movie" else "original_name") or (aliases[0] if aliases else meta["title"])
-        data = {"title": str(title)[:120], "year": _year(
-                    payload.get("release_date") or payload.get("first_air_date")) or meta["year"],
+        names = {_title_key(alias) for alias in aliases}
+        actual_year = _year(payload.get("release_date") or payload.get("first_air_date"))
+        source_query, query_year = next((
+            (name, year) for name, year in meta["_title_queries"]
+            if _title_key(name) in names
+            and (not year or not actual_year or abs(year - actual_year) <= 1)
+        ), ("", 0))
+        data = {"title": str(title)[:120], "year": actual_year or query_year,
+                "_verified_title_query": source_query, "_catalogue_title": meta["title"],
                 "tmdb_id": tmdb_id, "imdb_id": "tt" + found_imdb.zfill(7) if found_imdb else "",
                 "sd_id": "", "_title_aliases": aliases, "_tmdb_verified": True}
         if kind == "tv":

@@ -1,10 +1,13 @@
-# GT IPTV Player Pro 1.9.2-r0
+# GT IPTV Player Pro 1.9.3-r0
 
-* Added a movie and series Info/Summary screen with title artwork, synopsis, director, cast, and rating.
-* Improved **Discover Movies > Search in IPTV** to find the selected movie in the connected IPTV source and show matching results sooner.
-* Added a **PCM Multichannel Audio** toggle to the yellow-button audio menu on supported receivers.
-* Added **Dolby Digital and DTS passthrough** controls to the yellow-button audio menu on supported receivers.
-* Added bulk Xtream account import from TXT via the blue button. Supports single-server lists and labeled `User/Pass` blocks.
-* Added bulk channel reordering to M3U Live TV. Press Red to mark channels with a check mark, Yellow to place them above the target channel, or OK to place them below. Press Green to save the new order.
+- **M3U refresh summary** – Press GREEN to refresh the list and see which channels were added, removed, or renamed.
+- **M3U channel and category names** – Rename channels and categories or restore their original names.
+- **M3U and XMLTV improvements** – Large playlists and compressed XMLTV guides load more reliably. EPG matching uses channel names when `tvg-id` is missing or unmatched, accounts for country prefixes and quality tags, and offers manual selection when several channels match.
+- **Cinematic view** – Switch between List and Cinematic views for Movies and Series using MENU → Change layout. The plugin remembers your choice.
+- **Artwork and summaries** – Movie and series posters and backdrops load sooner, with fallback artwork when available. Movie summaries show up to eight lines at once and scroll for longer descriptions.
+- **On-device subtitle matching** – Subtitle search handles provider tags such as DE and NL and date suffixes more accurately. Recommended results are marked in the list. Press OK to download the selected subtitle.
+- **YouTube playback** – Improved startup and video switching with ServiceApp / ExtEplayer3 (5002), including duration display and seeking on the first video after an Enigma2 restart.
+- **Receiver front-panel display** – Movies, series, and YouTube now show larger remaining-time digits, a taller progress bar, and scrolling titles on supported displays.
+- **Football scores** – Choose ESPN or Flashscore when opening the Matches screen.
 
 Signed stable updates: Settings > Software update. Publishing: [UPDATING.md](UPDATING.md).

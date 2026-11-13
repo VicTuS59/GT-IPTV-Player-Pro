@@ -4395,3 +4395,53 @@ msgstr "Pelê TXT nehat xwendin."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Hesabên Xtream hatin zêdekirin ({})\nTomarên dubare hatin derbaskirin ({})"
+
+msgid "Change layout"
+msgstr "Guhertina xuyangê"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Hevberkirina kanalê hat tomarkirin. Ji bo sepandinê EPG nû bike."
+
+msgid "Cinematic view"
+msgstr "Dîtina sînemayî"
+
+msgid "EPG server name could not be resolved."
+msgstr "Navê pêşkêşkara EPG nehat çareserkirin."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Navekî derbasdar bi herî zêde {} tîpan binivîse."
+
+msgid "Football scores\u0004Select source"
+msgstr "Çavkaniyê hilbijêre"
+
+msgid "List view"
+msgstr "Dîtina lîsteyê"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "Lîsteya M3U hate nûkirin. Guhertin dê di nûkirina bê de bên nîşandan."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Nûkirina lîsteya M3U bi ser neket. Lîsteya tomarkirî tê nîşandan."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Kurtenasiya nûkirina M3U\n\nKanalên nû ({added})\nKanalên ku êdî di lîsteyê de nînin ({removed})\nKanalên ku navê wan guherî ({renamed})"
+
+msgid "Matching release details"
+msgstr "Hûrguliyên weşanê li hev tên"
+
+msgid "Matching release group"
+msgstr "Koma weşanê yek e"
+
+msgid "No channels need manual mapping."
+msgstr "Ti kanal hewceyê hevberkirina bi destan nîne."
+
+msgid "No matching EPG channels found."
+msgstr "Ti kanalên lihevhatî yên EPG nehatin dîtin."
+
+msgid "Recommended"
+msgstr "Pêşniyarkirî"
+
+msgid "Restore source name"
+msgstr "Navê orîjînal vegerîne"

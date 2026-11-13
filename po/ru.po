@@ -4401,3 +4401,53 @@ msgstr "Не удалось прочитать файл TXT."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Добавлено аккаунтов Xtream ({})\nПропущено дубликатов ({})"
+
+msgid "Change layout"
+msgstr "Изменить оформление"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Сопоставление канала сохранено. Обновите EPG, чтобы применить его."
+
+msgid "Cinematic view"
+msgstr "Кинематографический вид"
+
+msgid "EPG server name could not be resolved."
+msgstr "Не удалось разрешить имя сервера EPG."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Введите допустимое название длиной до {} символов."
+
+msgid "Football scores\u0004Select source"
+msgstr "Выберите источник"
+
+msgid "List view"
+msgstr "Вид списка"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "Список M3U обновлён. Изменения будут показаны при следующем обновлении."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Не удалось обновить список M3U. Показан список из кэша."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Итоги обновления M3U\n\nНовые каналы ({added})\nКаналы, которых больше нет в списке ({removed})\nПереименованные каналы ({renamed})"
+
+msgid "Matching release details"
+msgstr "Совместимые параметры релиза"
+
+msgid "Matching release group"
+msgstr "Та же группа релиза"
+
+msgid "No channels need manual mapping."
+msgstr "Нет каналов, требующих ручного сопоставления."
+
+msgid "No matching EPG channels found."
+msgstr "Подходящие каналы EPG не найдены."
+
+msgid "Recommended"
+msgstr "Рекомендуется"
+
+msgid "Restore source name"
+msgstr "Восстановить исходное название"

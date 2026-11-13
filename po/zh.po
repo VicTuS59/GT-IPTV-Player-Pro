@@ -4389,3 +4389,53 @@ msgstr "无法读取 TXT 文件。"
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "已添加 Xtream 帐号（{}）\n已跳过重复项（{}）"
+
+msgid "Change layout"
+msgstr "切换布局"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "频道匹配已保存。刷新 EPG 以应用更改。"
+
+msgid "Cinematic view"
+msgstr "电影式视图"
+
+msgid "EPG server name could not be resolved."
+msgstr "无法解析 EPG 服务器名称。"
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "请输入不超过 {} 个字符的有效名称。"
+
+msgid "Football scores\u0004Select source"
+msgstr "选择来源"
+
+msgid "List view"
+msgstr "列表视图"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "M3U 列表已刷新。下次刷新时将显示变更。"
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "M3U 列表刷新失败。正在显示缓存列表。"
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "M3U 刷新摘要\n\n新增频道 ({added})\n不再列出的频道 ({removed})\n已更名的频道 ({renamed})"
+
+msgid "Matching release details"
+msgstr "版本详情匹配"
+
+msgid "Matching release group"
+msgstr "发行组相同"
+
+msgid "No channels need manual mapping."
+msgstr "没有需要手动匹配的频道。"
+
+msgid "No matching EPG channels found."
+msgstr "未找到匹配的 EPG 频道。"
+
+msgid "Recommended"
+msgstr "推荐"
+
+msgid "Restore source name"
+msgstr "恢复原名称"

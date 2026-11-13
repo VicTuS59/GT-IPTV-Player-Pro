@@ -4401,3 +4401,53 @@ msgstr "Soubor TXT se nepodařilo přečíst."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Přidané účty Xtream ({})\nPřeskočené duplicity ({})"
+
+msgid "Change layout"
+msgstr "Změnit rozložení"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Přiřazení kanálu bylo uloženo. Použijte jej obnovením EPG."
+
+msgid "Cinematic view"
+msgstr "Filmové zobrazení"
+
+msgid "EPG server name could not be resolved."
+msgstr "Název serveru EPG se nepodařilo přeložit."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Zadejte platný název o délce nejvýše {} znaků."
+
+msgid "Football scores\u0004Select source"
+msgstr "Vyberte zdroj"
+
+msgid "List view"
+msgstr "Zobrazení seznamu"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "Seznam M3U byl obnoven. Změny se zobrazí při příštím obnovení."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Seznam M3U se nepodařilo obnovit. Zobrazuje se seznam z mezipaměti."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Přehled aktualizace M3U\n\nNové kanály ({added})\nKanály, které už nejsou v seznamu ({removed})\nPřejmenované kanály ({renamed})"
+
+msgid "Matching release details"
+msgstr "Kompatibilní údaje o vydání"
+
+msgid "Matching release group"
+msgstr "Shodná skupina vydání"
+
+msgid "No channels need manual mapping."
+msgstr "Žádné kanály nevyžadují ruční přiřazení."
+
+msgid "No matching EPG channels found."
+msgstr "Nebyly nalezeny odpovídající kanály EPG."
+
+msgid "Recommended"
+msgstr "Doporučeno"
+
+msgid "Restore source name"
+msgstr "Obnovit původní název"

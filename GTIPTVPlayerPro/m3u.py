@@ -18,7 +18,7 @@ import threading
 import time
 import unicodedata
 import uuid
-from collections import OrderedDict
+from collections import Counter, OrderedDict, namedtuple
 from contextlib import contextmanager
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
@@ -29,6 +29,7 @@ from .live_channel_order import LiveChannelOrderStore, channel_order_key_for_id,
 from .persistence import guarded_mutation
 from .playback import resume_account_scope
 from .category_visibility import category_ids_visible, hidden_category_match_ids
+from .category_preferences import LiveCategoryPreferenceStore, clean_m3u_display_name
 
 
 M3U_SOURCE_PATH = "/etc/enigma2/gtiptvplayer/m3u-sources.json"
@@ -57,6 +58,9 @@ MAX_REMOTE_REDIRECTS = 3
 REMOTE_CACHE_FRESH_SECONDS = 12 * 60 * 60
 REMOTE_CACHE_STALE_SECONDS = 24 * 60 * 60
 DEFAULT_M3U_TIMEOUT = 30
+M3U_DOWNLOAD_TIMEOUT = 90
+M3U_REMOTE_PREPARE_TIMEOUT = M3U_DOWNLOAD_TIMEOUT + DEFAULT_M3U_TIMEOUT
+M3U_NETWORK_IDLE_TIMEOUT = 28
 M3U_INITIAL_ITEMS = 36
 M3U_MORE_ITEMS = 60
 M3U_PAGE_STATE_MAX = 3
@@ -618,7 +622,7 @@ class M3UContentClient(object):
     def __init__(
         self,
         source,
-        timeout=DEFAULT_M3U_TIMEOUT,
+        timeout=None,
         cache_dir=M3U_CACHE_DIR,
         fetcher=None,
         resolver=None,
@@ -627,9 +631,12 @@ class M3UContentClient(object):
         local_roots=None,
         registry_path=M3U_SOURCE_PATH,
         epg_store=None,
+        name_store=None,
     ):
         if not isinstance(source, M3USource):
             raise TypeError(N_("M3U source is invalid."))
+        if timeout is None:
+            timeout = M3U_REMOTE_PREPARE_TIMEOUT if source.kind == "url" else DEFAULT_M3U_TIMEOUT
         try:
             timeout = float(timeout)
         except (TypeError, ValueError, OverflowError) as error:
@@ -661,9 +668,14 @@ class M3UContentClient(object):
         self._page_states = OrderedDict()
         self._channel_order_store = LiveChannelOrderStore()
         self._channel_order_write_lock = threading.Lock()
+        self._name_store = name_store if name_store is not None else LiveCategoryPreferenceStore()
+        self._channel_names = {}
         self._diagnostics = _empty_diagnostics(source)
         self._prepared = False
         self._force_refresh = False
+        self._catalog_snapshot = None
+        self._summarize_refresh = False
+        self._refresh_summary = None
         # Explicit refresh may race a worker which is already parsing or
         # downloading the catalogue.  Fence publication so that older work can
         # never undo the refresh request and mark itself prepared afterwards.
@@ -737,8 +749,11 @@ class M3UContentClient(object):
                         return dict(self._diagnostics)
                     force_refresh = self._force_refresh
                     generation = self._catalog_generation
+                    summarize = self._summarize_refresh
+                    cache = self._catalog_snapshot if summarize else None
 
-                cache = self._load_cache(deadline)
+                if cache is None:
+                    cache = self._load_cache(deadline)
                 if self.account.kind == "file":
                     catalog, diagnostic = self._prepare_local(
                         cache,
@@ -757,11 +772,21 @@ class M3UContentClient(object):
                     # network probe consumed its deadline, avoid rebuilding the
                     # in-memory browser catalogue after that deadline has passed.
                     return dict(diagnostic)
+                summary = None
+                if summarize:
+                    if diagnostic.get("stale"):
+                        summary = ("stale", ())
+                    elif cache is None:
+                        summary = ("baseline", ())
+                    else:
+                        counts = _refresh_channel_counts(cache["records"], catalog["records"])
+                        summary = ("updated", counts)
                 if self._install_catalog(
                     catalog,
                     diagnostic,
                     deadline,
                     expected_generation=generation,
+                    refresh_summary=summary,
                 ):
                     return dict(diagnostic)
                 # An explicit refresh landed while the source was being read.
@@ -771,7 +796,7 @@ class M3UContentClient(object):
         finally:
             self._prepare_lock.release()
 
-    def invalidate_cache(self, content_type=None, category_id=None):
+    def invalidate_cache(self, content_type=None, category_id=None, *, summarize=False):
         content_type = str(content_type or "").strip().lower()
         if content_type and content_type != "live":
             return
@@ -779,11 +804,23 @@ class M3UContentClient(object):
             self._catalog_generation += 1
             self._prepared = False
             self._force_refresh = True
+            self._summarize_refresh = summarize
+            self._refresh_summary = None
+            if not summarize:
+                self._catalog_snapshot = None
             self._records = []
             self._record_by_id = {}
             self._category_rows = OrderedDict()
             self._categories = []
             self._page_states = OrderedDict()
+            self._channel_names = {}
+            return self._catalog_generation if summarize else None
+
+    def refresh_summary(self, generation):
+        with self._state_lock:
+            if self._prepared and generation == self._catalog_generation:
+                return self._refresh_summary
+        return None
 
     def load_categories(self, content_type):
         self._validate_live(content_type)
@@ -849,6 +886,57 @@ class M3UContentClient(object):
             self._page_states.move_to_end(category_id)
             return added
 
+    @guarded_mutation(failure=None)
+    def set_channel_name(self, item, name):
+        """Save the label for the selected source row. None restores its source name."""
+        if name is not None:
+            name = clean_m3u_display_name(name)
+            if not name:
+                return None
+        stream_id = item.stream_id
+        deadline = self._operation_deadline()
+        self._acquire_prepare_lock(deadline)
+        try:
+            with self._state_lock:
+                record = self._record_by_id.get(stream_id)
+                records, generation = self._records, self._catalog_generation
+            if record is None or _channel_name_row_key(record) != getattr(item, "_m3u_name_key", None):
+                return None
+            tvg_id, url = record["tvg_id"].casefold(), record["url"]
+            tvg_count = url_count = 0
+            for index, entry in enumerate(records):
+                if index % 256 == 0:
+                    self._check_limits(deadline)
+                if entry["tvg_id"].casefold() == tvg_id:
+                    tvg_count += 1
+                    if entry["url"] == url:
+                        url_count += 1
+            keys = tuple(_channel_name_keys(record, tvg_count, url_count))
+            alias = name if name != item.m3u_source_name else None
+            changes = dict.fromkeys(keys, "")
+            if alias:
+                changes[keys[0]] = alias
+            scope = resume_account_scope(self)
+            if not self._name_store.save(scope, None, None, name_changes=changes):
+                return None
+            label = alias or item.m3u_source_name
+            with self._state_lock:
+                if generation == self._catalog_generation:
+                    names = dict(self._channel_names)
+                    if alias:
+                        names[stream_id] = alias
+                    else:
+                        names.pop(stream_id, None)
+                    self._channel_names = names
+                    for state in self._page_states.values():
+                        for cached in state["values"]:
+                            if cached.stream_id == stream_id:
+                                cached.name = label
+                                cached.m3u_custom_name = bool(alias)
+            return label, bool(alias)
+        finally:
+            self._prepare_lock.release()
+
     @guarded_mutation
     def save_channel_order(self, category_id, stream_ids):
         """Save the edited prefix and retain hidden rows and the unvisited tail."""
@@ -907,6 +995,34 @@ class M3UContentClient(object):
         values.discard("")
         return tuple(sorted(values))
 
+    def epg_channel_names(self):
+        """Collect original names for channels whose ID may be absent from XMLTV."""
+        with self._state_lock:
+            records = self._records if self._prepared else ()
+        names = {}
+        for record in records:
+            name, tvg_id = record["name"], record["tvg_id"]
+            key = epg_name_key(name, tvg_id)
+            if key:
+                names.setdefault(key, (name, tvg_id) if tvg_id else name)
+        return names
+
+    def resolved_epg_id(self, stream_id, fingerprint=None):
+        """Resolve the XMLTV ID for a full-guide read on a worker."""
+        with self._state_lock:
+            record = self._record_by_id.get(str(stream_id or ""))
+        if record is None:
+            return ""
+        tvg_id = str(record.get("tvg_id", "") or "").strip()
+        resolve = getattr(self._epg_store, "resolve_name", None)
+        if callable(resolve):
+            try:
+                key = epg_name_key(record["name"], tvg_id)
+                return resolve(self.account.source_id, key, fingerprint) or tvg_id
+            except (OSError, ValueError):
+                pass
+        return tvg_id
+
     def peek_epg(self, stream_id, limit=2):
         """Return already decoded current/next for immediate GUI rendering."""
         return self.load_epg(stream_id, limit=limit, cache_only=True)
@@ -927,15 +1043,17 @@ class M3UContentClient(object):
             record = self._record_by_id.get(stream_id)
             if record is None:
                 return []
-            tvg_id = str(record.get("tvg_id", "") or "").strip()
-        if not tvg_id or self._epg_store is None:
+            tvg_id, name = record["tvg_id"], record["name"]
+        if self._epg_store is None:
             return []
+        name_key = epg_name_key(name, tvg_id)
         try:
             events = self._epg_store.lookup(
                 self.account.source_id,
-                tvg_id,
+                tvg_id or name_key,
                 now=self.wall_clock(),
                 cache_only=cache_only,
+                fallback_name_key=name_key if tvg_id else "",
             )
         except Exception:
             return []
@@ -1004,6 +1122,7 @@ class M3UContentClient(object):
             # generation briefly and release the state lock before the bounded
             # Unicode scan so playback and EPG lookups remain responsive.
             records = self._records
+            names = self._channel_names
         for index, record in enumerate(records):
             if index % 128 == 0:
                 self._check_limits(deadline)
@@ -1012,14 +1131,15 @@ class M3UContentClient(object):
             ):
                 continue
             searchable = _search_text(
-                "{} {} {}".format(
+                "{} {} {} {}".format(
                     record["name"],
                     record["group"],
                     record["tvg_id"],
+                    names.get(record["stream_id"], ""),
                 )
             )
             if query in searchable:
-                matches.append(self._content_item(record))
+                matches.append(self._content_item(record, names))
                 if len(matches) >= limit:
                     break
         return matches
@@ -1146,8 +1266,10 @@ class M3UContentClient(object):
 
         started = self.clock()
         try:
-            data = self._fetch_remote(deadline)
-            catalog = _parse_m3u(data, self.account, deadline, self._check_limits)
+            download_deadline = min(deadline, started + M3U_DOWNLOAD_TIMEOUT)
+            data = self._fetch_remote(download_deadline)
+            catalog_deadline = min(deadline, self.clock() + DEFAULT_M3U_TIMEOUT)
+            catalog = _parse_m3u(data, self.account, catalog_deadline, self._check_limits)
         except ContentError as error:
             if error.reason == ContentError.CANCELLED:
                 raise
@@ -1175,7 +1297,7 @@ class M3UContentClient(object):
                 "size_bytes": len(data),
             }
         )
-        self._save_cache(catalog, deadline)
+        self._save_cache(catalog, catalog_deadline)
         diagnostic = self._diagnostic_for_catalog(
             catalog,
             "source",
@@ -1186,7 +1308,7 @@ class M3UContentClient(object):
 
     def _fetch_remote(self, deadline):
         self._check_limits(deadline)
-        timeout = self._remaining_timeout(deadline)
+        timeout = min(M3U_NETWORK_IDLE_TIMEOUT, self._remaining_timeout(deadline))
         if self.fetcher is not None:
             try:
                 result = self.fetcher(
@@ -1275,6 +1397,7 @@ class M3UContentClient(object):
         diagnostic,
         deadline,
         expected_generation=None,
+        refresh_summary=None,
     ):
         with self._state_lock:
             if (
@@ -1283,6 +1406,8 @@ class M3UContentClient(object):
             ):
                 return False
         records = list(catalog.get("records") or [])
+        names = self._name_store.load(resume_account_scope(self)).names
+        channel_names = _channel_names_by_stream_id(records, names, deadline, self._check_limits)
         category_rows = OrderedDict()
         category_rows[""] = list(range(len(records)))
         rows_by_id = {}
@@ -1317,12 +1442,16 @@ class M3UContentClient(object):
             self._category_rows = category_rows
             self._categories = categories
             self._page_states = OrderedDict()
+            self._channel_names = channel_names
             self._diagnostics = dict(diagnostic)
+            self._catalog_snapshot = catalog
+            self._summarize_refresh = False
+            self._refresh_summary = refresh_summary
             self._prepared = True
             self._force_refresh = False
             return True
 
-    def _content_item(self, record):
+    def _content_item(self, record, names=None):
         item = ContentItem(
             "live",
             record["stream_id"],
@@ -1333,6 +1462,12 @@ class M3UContentClient(object):
         )
         item.tvg_id = record["tvg_id"]
         item.group_title = record["group"]
+        item.m3u_source_name = item.name
+        item._m3u_name_key = _channel_name_row_key(record)
+        alias = (self._channel_names if names is None else names).get(item.stream_id)
+        item.m3u_custom_name = bool(alias)
+        if alias:
+            item.name = alias
         return item
 
     def _diagnostic_for_cache(self, catalog, cache_state, stale):
@@ -1355,6 +1490,118 @@ class M3UContentClient(object):
             "latency_ms": max(0, int(latency_ms or 0)),
             "reason": "",
         }
+
+
+_CHANNEL_NAME_PREFIX = "m3u-channel:"
+_EPG_NAME_PREFIX = "m3u-name:"
+
+
+def normalise_epg_name(value):
+    return " ".join(unicodedata.normalize("NFKC", str(value or "")[:256]).casefold().split())
+
+
+def epg_name_key(value, tvg_id=""):
+    name = normalise_epg_name(value)
+    if not name:
+        return ""
+    if tvg_id:
+        name = tvg_id + "\0" + name
+    return _EPG_NAME_PREFIX + hashlib.sha256(name.encode("utf-8")).hexdigest()
+
+
+def is_epg_name_key(value):
+    return (isinstance(value, str) and value.startswith(_EPG_NAME_PREFIX)
+            and len(value) == len(_EPG_NAME_PREFIX) + 64
+            and all(char in "0123456789abcdef" for char in value[len(_EPG_NAME_PREFIX):]))
+
+
+def _channel_name_key(*parts):
+    raw = "\x1f".join(parts).encode("utf-8", "replace")
+    return _CHANNEL_NAME_PREFIX + hashlib.sha256(raw).hexdigest()
+
+
+def _channel_name_row_key(record):
+    return _channel_name_key("row", record["tvg_id"].casefold(), record["group"].casefold(),
+                             record["name"].casefold(), record["url"])
+
+
+def _channel_name_keys(record, tvg_count, url_count):
+    tvg_id = record["tvg_id"].casefold()
+    if tvg_id and tvg_count == 1:
+        yield _channel_name_key("tvg", tvg_id)
+    if url_count == 1:
+        yield _channel_name_key("url", tvg_id, record["url"])
+    yield _channel_name_row_key(record)
+
+
+def _channel_names_by_stream_id(records, names, deadline, check_limits):
+    if not any(key.startswith(_CHANNEL_NAME_PREFIX) for key in names):
+        return {}
+    # Shared TVG IDs can change their first occurrence on a source refresh.
+    # Match those variants by URL or by the complete provider row instead.
+    tvg_counts = Counter(record["tvg_id"].casefold() for record in records)
+    url_counts = Counter((record["tvg_id"].casefold(), record["url"]) for record in records)
+    result = {}
+    for index, record in enumerate(records):
+        if index % 256 == 0:
+            check_limits(deadline)
+        tvg_id, url = record["tvg_id"].casefold(), record["url"]
+        for key in _channel_name_keys(record, tvg_counts[tvg_id], url_counts[tvg_id, url]):
+            if key in names:
+                result[record["stream_id"]] = names[key]
+                break
+    return result
+
+
+_RefreshChannel = namedtuple("_RefreshChannel", "tvg_id group name url")
+
+
+def _refresh_channel_keys(records):
+    return {
+        _RefreshChannel(record["tvg_id"].casefold(), record["group"].casefold(),
+                        record["name"], record["url"])
+        for record in records
+    }
+
+
+def _unique_refresh_channels(channels, key):
+    matches = {}
+    for channel in channels:
+        value = key(channel)
+        if value:
+            matches[value] = None if value in matches else channel
+    return matches
+
+
+def _refresh_channel_counts(previous, current):
+    old_channels = _refresh_channel_keys(previous)
+    new_channels = _refresh_channel_keys(current)
+    removed = old_channels - new_channels
+    added = new_channels - old_channels
+    renamed = 0
+    # Match unchanged rows first. The first occurrence of a shared tvg-id
+    # can change with provider ordering, so require uniqueness in both lists.
+    for key in (
+        lambda channel: channel.tvg_id,
+        lambda channel: channel.url,
+        lambda channel: (channel.tvg_id, channel.group, channel.name,
+                         channel.url.partition("?")[0]),
+    ):
+        if not removed or not added:
+            break
+        old_matches = _unique_refresh_channels(old_channels, key)
+        new_matches = _unique_refresh_channels(new_channels, key)
+        for value, old in old_matches.items():
+            new = new_matches.get(value)
+            if old not in removed or new not in added:
+                continue
+            if old.tvg_id and new.tvg_id and old.tvg_id != new.tvg_id:
+                continue
+            removed.remove(old)
+            added.remove(new)
+            if old.name != new.name:
+                renamed += 1
+    return len(added), len(removed), renamed
 
 
 def _empty_diagnostics(source):
@@ -2981,6 +3228,8 @@ def _fetch_remote_m3u(
             if body is not None:
                 break
         if body is None:
+            if isinstance(last_error, (socket.timeout, TimeoutError)):
+                raise ContentError(N_("Request timed out"), ContentError.DEADLINE) from last_error
             raise ContentError(
                 N_("Could not load the M3U source."),
                 ContentError.CONNECTION,

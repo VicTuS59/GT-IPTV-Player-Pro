@@ -4395,3 +4395,53 @@ msgstr "A TXT-fájl nem olvasható."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Hozzáadott Xtream-fiókok ({})\nKihagyott ismétlődések ({})"
+
+msgid "Change layout"
+msgstr "Elrendezés módosítása"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "A csatornapárosítás mentve. Frissítse az EPG-t az alkalmazásához."
+
+msgid "Cinematic view"
+msgstr "Mozinézet"
+
+msgid "EPG server name could not be resolved."
+msgstr "Az EPG-kiszolgáló neve nem oldható fel."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Adjon meg egy érvényes, legfeljebb {} karakterből álló nevet."
+
+msgid "Football scores\u0004Select source"
+msgstr "Forrás kiválasztása"
+
+msgid "List view"
+msgstr "Listanézet"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "Az M3U-lista frissült. A változások a következő frissítéskor jelennek meg."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Az M3U-lista frissítése sikertelen. A gyorsítótárban lévő lista látható."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "M3U-frissítés összefoglalója\n\nÚj csatornák ({added})\nA listáról eltűnt csatornák ({removed})\nÁtnevezett csatornák ({renamed})"
+
+msgid "Matching release details"
+msgstr "Egyező kiadási adatok"
+
+msgid "Matching release group"
+msgstr "Azonos kiadási csoport"
+
+msgid "No channels need manual mapping."
+msgstr "Egyetlen csatornához sem szükséges kézi párosítás."
+
+msgid "No matching EPG channels found."
+msgstr "Nem találhatók megfelelő EPG-csatornák."
+
+msgid "Recommended"
+msgstr "Ajánlott"
+
+msgid "Restore source name"
+msgstr "Eredeti név visszaállítása"

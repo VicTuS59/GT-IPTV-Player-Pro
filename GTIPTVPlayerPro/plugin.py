@@ -102,6 +102,13 @@ def menu(menuid, **kwargs):
 
 def session_start(reason, session=None, **kwargs):
     """Start or stop the optional EPG schedulers with the GUI session."""
+    if reason == 0:
+        try:
+            from .youtube_playback import reserve_native_standard_fds
+
+            reserve_native_standard_fds()
+        except Exception as error:
+            _log_hook_failure("youtube", "Native player standard descriptor setup failed", error)
     if reason == 0 and session is not None:
         if not _prepare_storage():
             return

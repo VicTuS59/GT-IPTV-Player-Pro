@@ -1699,7 +1699,8 @@ def check_source_health(
         # client for refresh; it does not delete the last-good disk cache, so
         # an unavailable source can still be reported accurately as STALE.
         client.invalidate_cache("live")
-        diagnostic = client.source_health(allow_stale_deadline=True)
+        with client.request_scope(cancel_event=cancel_event):
+            diagnostic = client.source_health(allow_stale_deadline=True)
     except Exception:
         diagnostic = {
             "status": "error",

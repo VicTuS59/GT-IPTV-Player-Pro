@@ -22,6 +22,7 @@ from .content import MovieInfo, SeriesInfo
 from .diagnostics import log_event
 from .http_transport import build_credential_urlopen
 from .i18n import N_, _, metadata_language
+from .media_title import title_options, year_number
 
 
 TMDB_API_BASE = "https://api.themoviedb.org/3"
@@ -132,7 +133,7 @@ def _year(value):
     return match.group(0) if match else ""
 
 
-def clean_media_title(value):
+def clean_media_title(value, *, preserve_years=False):
     """Remove common IPTV decorations without damaging the actual title."""
     title = _text(value)
     if not title:
@@ -201,8 +202,9 @@ def clean_media_title(value):
         title,
         flags=re.I,
     )
+    year_pattern = "" if preserve_years else r"19\d{2}|20\d{2}|"
     title = re.sub(
-        r"[\[({][^\])}]*\b(?:19\d{2}|20\d{2}|4K|UHD|FHD|HD|SD|"
+        r"[\[({][^\])}]*\b(?:" + year_pattern + r"4K|UHD|FHD|HD|SD|"
         r"DUBLAJ|ALTYAZI|TURKCE|TÜRKÇE)[^\])}]*[\])}]",
         " ",
         title,
@@ -217,7 +219,7 @@ def clean_media_title(value):
         flags=re.I,
     )
     title = re.sub(r"[\[({]\s*[\])}]", " ", title)
-    if not title.strip().isdigit():
+    if not preserve_years and not title.strip().isdigit():
         title = re.sub(r"\b(?:19|20)\d{2}\b", " ", title)
     title = re.sub(r"\s*[|:_]+\s*", " ", title)
     title = re.sub(r"\s+-\s*$", "", title)
@@ -249,6 +251,44 @@ def _normalised(value):
             for character in value
         ).split()
     )
+
+
+def _vod_title_queries(value, year):
+    queries = []
+    for title, date_year in title_options(value, year, limit=None):
+        # Keep legacy IPTV season and quality labels out of searches without
+        # letting that cleanup guess the year or erase a numeric title word.
+        legacy = clean_media_title(title, preserve_years=True)
+        if legacy and not re.match(r"(?i)^it\s*:", title) and _normalised(legacy) != _normalised(title):
+            title = legacy
+        if _normalised(title):
+            queries.append((title, str(date_year) if date_year else ""))
+    return tuple(dict.fromkeys(queries))
+
+
+def _matches_vod_title(title, year, payload):
+    """Compare a prepared query to the canonical names of one TMDb record."""
+    query = _normalised(title)
+    if not query or not isinstance(payload, dict):
+        return False
+    actual = year_number(payload.get("year"))
+    expected = year_number(year)
+    if expected and actual and abs(expected - actual) > 1:
+        return False
+    numbers = re.findall(r"\d+", query)
+    for field in ("title", "original_title"):
+        name = _normalised(payload.get(field))
+        if name and numbers == re.findall(r"\d+", name) and (
+                name == query or difflib.SequenceMatcher(None, query, name).ratio() >= 0.84):
+            return True
+    return False
+
+
+def _poster_record_urls(value):
+    value = value or {}
+    extra = value.get("cover_urls")
+    values = (value.get("cover"), *(extra if isinstance(extra, (tuple, list)) else ()))
+    return tuple(dict.fromkeys(url for url in values if isinstance(url, str) and url))[:3]
 
 
 def _has_rating(value):
@@ -775,7 +815,7 @@ class TMDbMetadataClient(object):
             score += 18 if requested_year == candidate_year else -22
         return score
 
-    def _search(self, media_type, title, requested_year, require_poster=False):
+    def _search(self, media_type, title, requested_year, verify_identity=False):
         path = "/search/movie" if media_type == "movie" else "/search/tv"
         params = {"query": title, "page": 1, "include_adult": "false"}
         year_key = "primary_release_year" if media_type == "movie" else "first_air_date_year"
@@ -805,10 +845,16 @@ class TMDbMetadataClient(object):
                     )
                     for item in results[:20]
                     if isinstance(item, dict)
-                    and (not require_poster or item.get("poster_path"))
+                    and (not verify_identity or (
+                        self._valid_tmdb_id(item.get("id"))
+                        and _matches_vod_title(title, requested_year, self._poster_identity(item, media_type))
+                    ))
                 ]
                 ranked.sort(key=lambda pair: pair[0], reverse=True)
                 if ranked and ranked[0][0] >= 68:
+                    if verify_identity and len({item.get("id") for score, item in ranked
+                                                if score == ranked[0][0]}) != 1:
+                        continue
                     selected = dict(ranked[0][1])
                     selected["_requested_language"] = str(language).replace("_", "-").lower()
                     return selected
@@ -829,82 +875,110 @@ class TMDbMetadataClient(object):
         result = self._poster_identity(payload, media_type)
         if payload.get("_requested_language") == self.language.replace("_", "-").lower():
             result["localized_plot"] = _text(payload.get("overview"))[:2000]
-        if not result["cover"] and result["tmdb_id"].isdigit():
+        if not result["cover"] and self._valid_tmdb_id(result["tmdb_id"]):
             root = "/tv" if media_type == "series" else "/movie"
+            # Leave language unfiltered so even a title with only one
+            # foreign-language poster has an eligible image.
             images = self._request_json(root + "/" + result["tmdb_id"] + "/images")
-            posters = [p for p in (images.get("posters") or []) if isinstance(p, dict) and p.get("file_path")]
-            language = self.language.replace("_", "-").split("-")[0]
-            posters.sort(key=lambda p: (p.get("iso_639_1") != language, p.get("iso_639_1") not in ("en", None)))
-            if posters:
-                result["cover"] = _image_url(posters[0]["file_path"], "w500")
-        return result if result["cover"] else None
+            posters = images.get("posters")
+            posters = [p for p in posters if isinstance(p, dict)] if isinstance(posters, list) else []
+            language = self.language.replace("_", "-").split("-")[0].lower()
+            original = _text(payload.get("original_language")).lower()
+            preferences = tuple(dict.fromkeys(code for code in (language, original, None, "en") if code != ""))
+            posters.sort(key=lambda p: preferences.index(p.get("iso_639_1"))
+                         if p.get("iso_639_1") in preferences else len(preferences))
+            urls = tuple(dict.fromkeys(filter(None, (
+                _image_url(p.get("file_path"), "w500") for p in posters
+            ))))[:3]
+            if urls:
+                result["cover"], result["cover_urls"] = urls[0], urls[1:]
+        return result
 
     def poster_cover(self, media_type, item, info=None):
+        return next(iter(self.poster_covers(media_type, item, info)), "")
+
+    def _poster_key(self, media_type, tmdb_id, imdb_id, queries):
+        return self._cache_key(media_type, "poster-v2:" + json.dumps(
+            (tmdb_id, imdb_id, queries), ensure_ascii=False), "")
+
+    def _find_artwork_feature(self, media_type, queries, tmdb_id, imdb_id, portal_item):
+        """Resolve a feature from basic TMDb replies for poster or wide artwork."""
+        root = "/tv" if media_type == "series" else "/movie"
+
+        def matches(payload):
+            return not portal_item or any(
+                _matches_vod_title(title, year, self._poster_identity(payload, media_type))
+                for title, year in queries)
+
+        if tmdb_id:
+            try:
+                payload = self._request_json(root + "/" + tmdb_id, language=self.language)
+            except MetadataError as error:
+                if error.http_status != 404:
+                    raise
+                payload = {}
+            if self._valid_tmdb_id(payload.get("id")) == tmdb_id and matches(payload):
+                return payload
+        if imdb_id:
+            payload = self._request_json("/find/" + imdb_id, {"external_source": "imdb_id"}, self.language)
+            results = payload.get("tv_results" if media_type == "series" else "movie_results")
+            if isinstance(results, list) and len(results) == 1:
+                item = results[0]
+                if isinstance(item, dict) and self._valid_tmdb_id(item.get("id")) and matches(item):
+                    return item
+        for title, year in queries:
+            selected = self._search(media_type, title, year, verify_identity=True)
+            if selected:
+                return selected
+        return None
+
+    def poster_covers(self, media_type, item, info=None):
         """Resolve artwork without downloading plot translations or credits."""
         if not self.available:
-            return ""
-        media_type = "series" if media_type == "series" else "movie"
+            return ()
+        media_type = "series" if media_type in ("series", "tv") else "movie"
         raw_title = getattr(info, "title", "") or getattr(item, "name", "")
         if raw_title == N_("Movie"):
             raw_title = getattr(item, "name", "")
-        title = clean_media_title(raw_title)
-        year = _year(getattr(info, "year", "") or getattr(item, "year", ""))
-        if not year and not str(raw_title).strip().isdigit():
-            year = _year(raw_title)
+        year = getattr(info, "year", "") or getattr(item, "year", "")
+        queries = _vod_title_queries(raw_title, year)
         tmdb_id = self._valid_tmdb_id(getattr(info, "tmdb_id", "") or getattr(item, "tmdb_id", ""))
         imdb_id = str(getattr(info, "imdb_id", "") or getattr(item, "imdb_id", ""))
         if not re.fullmatch(r"tt\d{5,12}", imdb_id):
             imdb_id = ""
-        if not (title or tmdb_id or imdb_id):
-            return ""
-        key = self._cache_key(media_type, "poster-v1:{}:{}:{}".format(tmdb_id, imdb_id, title), year)
+        if not (queries or tmdb_id or imdb_id):
+            return ()
+        key = self._poster_key(media_type, tmdb_id, imdb_id, queries)
+        portal_item = bool(getattr(item, "portal_request_type", ""))
         with self._lookup_guard(key):
             self._check_request_limits()
             with self._lock:
                 cached, value = self._cached(key)
-                if cached:
-                    return (value or {}).get("cover", "")
+                if cached and (not value or not portal_item
+                               or any(_matches_vod_title(title, release_year, value) for title, release_year in queries)):
+                    return _poster_record_urls(value)
                 # Full selected-item metadata may already contain this image.
-                full_keys = [self._cache_key(media_type, title, year)]
+                full_keys = [self._cache_key(media_type, title, release_year) for title, release_year in queries]
                 if tmdb_id:
                     full_keys.insert(0, self._cache_key(media_type, "tmdb-id:" + tmdb_id, ""))
                 for full_key in full_keys:
                     found, value = self._cached(full_key)
                     if found and value and value.get("cover"):
-                        if (getattr(item, "portal_request_type", "")
-                                and not self._provider_identity_matches(media_type, title, year, value)):
+                        if not (tmdb_id and not portal_item and self._valid_tmdb_id(value.get("tmdb_id")) == tmdb_id
+                                or any(_matches_vod_title(title, release_year, value) for title, release_year in queries)):
                             continue
-                        return value["cover"]
-            root = "/tv" if media_type == "series" else "/movie"
-            result = None
-            if tmdb_id:
-                try:
-                    payload = self._request_json(root + "/" + tmdb_id, language=self.language)
-                except MetadataError as error:
-                    if error.http_status != 404:
-                        raise
-                    payload = {}
-                identity = self._poster_identity(payload, media_type)
-                if (payload.get("id") and (not getattr(item, "portal_request_type", "")
-                        or self._provider_identity_matches(media_type, title, year, identity))):
-                    result = self._poster_record(media_type, payload)
-            if result is None and imdb_id:
-                payload = self._request_json("/find/" + imdb_id, {"external_source": "imdb_id"}, self.language)
-                matches = payload.get("tv_results" if media_type == "series" else "movie_results") or []
-                if matches and isinstance(matches[0], dict):
-                    result = self._poster_record(media_type, matches[0])
-            if result is None and title:
-                selected = self._search(media_type, title, year, require_poster=True)
-                if selected:
-                    result = self._poster_record(media_type, selected)
+                        return _poster_record_urls(value)
+            selected = self._find_artwork_feature(media_type, queries, tmdb_id, imdb_id, portal_item)
+            result = self._poster_record(media_type, selected) if selected else None
+            urls = _poster_record_urls(result)
             self._check_request_limits()
             with self._lock:
                 self._load_cache()[key] = {
-                    "cached_at": self.clock(), "found": bool(result), "data": result or {},
+                    "cached_at": self.clock(), "found": bool(urls), "data": result or {},
                     "poster_lookup": True, "payload_version": CACHE_PAYLOAD_VERSION,
                 }
                 self._cache_changed()
-            return (result or {}).get("cover", "")
+            return urls
 
     def _backdrop_record(self, media_type, payload):
         result = self._poster_identity(payload, media_type)
@@ -926,7 +1000,7 @@ class TMDbMetadataClient(object):
                 result["backdrop"] = _image_url(backdrops[0]["file_path"], "w780")
         return result if result["backdrop"] else None
 
-    def cinematic_backdrop(self, media_type, item, info=None):
+    def cinematic_backdrop(self, media_type, item, info=None, *, artwork_only=False):
         """Resolve verified wide art without credits or plot translations.
 
         This has its own bounded cache key: an artwork-only response must
@@ -938,10 +1012,9 @@ class TMDbMetadataClient(object):
         raw_title = getattr(info, "title", "") or getattr(item, "name", "")
         if raw_title == N_("Movie"):
             raw_title = getattr(item, "name", "")
-        title = clean_media_title(raw_title)
-        year = _year(getattr(info, "year", "") or getattr(item, "year", ""))
-        if not year and not str(raw_title).strip().isdigit():
-            year = _year(raw_title)
+        provided_year = getattr(info, "year", "") or getattr(item, "year", "")
+        queries = _vod_title_queries(raw_title, provided_year)
+        title, year = queries[0] if queries else ("", "")
         tmdb_id = self._valid_tmdb_id(getattr(info, "tmdb_id", "") or getattr(item, "tmdb_id", ""))
         imdb_id = str(getattr(info, "imdb_id", "") or getattr(item, "imdb_id", ""))
         if not re.fullmatch(r"tt\d{5,12}", imdb_id):
@@ -949,13 +1022,15 @@ class TMDbMetadataClient(object):
         if not (title or tmdb_id or imdb_id):
             return ""
         provider_item = bool(getattr(item, "portal_request_type", ""))
-        key = self._cache_key(media_type, "backdrop-v1:{}:{}:{}".format(tmdb_id, imdb_id, title), year)
+        key = (self._cache_key(media_type, "hero-preview:" + json.dumps(
+                    (tmdb_id, imdb_id, queries), ensure_ascii=False), "") if artwork_only else
+               self._cache_key(media_type, "backdrop-v1:{}:{}:{}".format(tmdb_id, imdb_id, title), year))
         with self._lookup_guard(key):
             self._check_request_limits()
             with self._lock:
                 cached, value = self._cached(key)
                 if cached and (not value or not provider_item
-                        or self._provider_identity_matches(media_type, title, year, value)):
+                        or self._provider_identity_matches(media_type, raw_title, provided_year, value)):
                     return (value or {}).get("backdrop", "")
                 full_keys = [self._cache_key(media_type, title, year)]
                 if tmdb_id:
@@ -963,14 +1038,19 @@ class TMDbMetadataClient(object):
                 for full_key in full_keys:
                     found, value = self._cached(full_key)
                     if found and value and value.get("backdrop"):
-                        if provider_item and not self._provider_identity_matches(media_type, title, year, value):
+                        if provider_item and not self._provider_identity_matches(media_type, raw_title, provided_year, value):
                             continue
                         return value["backdrop"]
+            if artwork_only:
+                selected = self._find_artwork_feature(media_type, queries, tmdb_id, imdb_id, provider_item)
+                result = self._backdrop_record(media_type, selected) if selected else None
+                self._remember_backdrop(key, result)
+                return (result or {}).get("backdrop", "")
             # Artwork and synopsis share the exact-ID/title lookup lock and
             # full localized result. Credits arrive in that same HTTP response.
             outcome = {}
             result, unused_id = self._lookup_for_completion(
-                media_type, item, title, year, tmdb_id, outcome=outcome)
+                media_type, item, raw_title, provided_year, tmdb_id, outcome=outcome)
             if outcome.get('failed'):
                 raise MetadataError(self.last_error)
             if not result and imdb_id:
@@ -981,7 +1061,7 @@ class TMDbMetadataClient(object):
                     if not isinstance(match, dict):
                         continue
                     if provider_item and not self._provider_identity_matches(
-                            media_type, title, year, self._poster_identity(match, media_type)):
+                            media_type, raw_title, provided_year, self._poster_identity(match, media_type)):
                         continue
                     identity = self._valid_tmdb_id(match.get('id'))
                     if identity:
@@ -996,14 +1076,17 @@ class TMDbMetadataClient(object):
                     "overview": result.get("localized_plot"),
                     "_requested_language": self.language.replace("_", "-").lower(),
                 })
-            self._check_request_limits()
-            with self._lock:
-                self._load_cache()[key] = {
-                    "cached_at": self.clock(), "found": bool(result), "data": result or {},
-                    "poster_lookup": True, "payload_version": CACHE_PAYLOAD_VERSION,
-                }
-                self._cache_changed()
+            self._remember_backdrop(key, result)
             return (result or {}).get("backdrop", "")
+
+    def _remember_backdrop(self, key, result):
+        self._check_request_limits()
+        with self._lock:
+            self._load_cache()[key] = {
+                "cached_at": self.clock(), "found": bool(result and result.get("backdrop")),
+                "data": result or {}, "poster_lookup": True, "payload_version": CACHE_PAYLOAD_VERSION,
+            }
+            self._cache_changed()
 
     @staticmethod
     def _merge_payload(primary, fallback):
@@ -1022,37 +1105,8 @@ class TMDbMetadataClient(object):
         TMDb title, so an exact-ID response is only a hint until its title and
         optional year agree with the selected portal item.
         """
-        if not isinstance(payload, dict):
-            return False
-        query = _normalised(clean_media_title(title))
-        if len(query) < 2:
-            return False
-        # ``_detail_uncached`` maps both movie and TV original names to this
-        # common result key so the verification path stays media agnostic.
-        title_keys = ("title", "original_title")
-        names = [
-            _normalised(clean_media_title(payload.get(key)))
-            for key in title_keys
-        ]
-        names = [value for value in names if value]
-        if not names:
-            return False
-        exact = query in names
-        similarity = max(
-            difflib.SequenceMatcher(None, query, name).ratio()
-            for name in names
-        )
-        if not exact and similarity < 0.84:
-            return False
-        expected_year = _year(requested_year) or _year(title)
-        candidate_year = _year(payload.get("year"))
-        if expected_year and candidate_year:
-            try:
-                if abs(int(expected_year) - int(candidate_year)) > 1:
-                    return False
-            except (TypeError, ValueError, OverflowError):
-                return False
-        return True
+        return any(_matches_vod_title(query, year, payload)
+                   for query, year in _vod_title_queries(title, requested_year))
 
     @staticmethod
     def _valid_tmdb_id(value):
@@ -1134,7 +1188,7 @@ class TMDbMetadataClient(object):
         }
 
     def _lookup_uncached(self, media_type, title, requested_year):
-        selected = self._search(media_type, title, requested_year)
+        selected = self._search(media_type, title, requested_year, verify_identity=True)
         if not selected or not selected.get("id"):
             return None
         return self._detail_uncached(
@@ -1159,12 +1213,11 @@ class TMDbMetadataClient(object):
             )
             return None
         media_type = "series" if media_type == "series" else "movie"
-        query = clean_media_title(title)
-        requested_year = _year(requested_year) or _year(title)
-        if len(_normalised(query)) < 2:
+        queries = tuple((query, year) for query, year in _vod_title_queries(title, requested_year)
+                        if len(_normalised(query)) >= 2 or year)
+        if not queries:
             self.last_error = N_("No valid title was found for TMDb")
             return None
-        key = self._cache_key(media_type, query, requested_year)
         try:
             required_payload_version = max(
                 1,
@@ -1172,6 +1225,14 @@ class TMDbMetadataClient(object):
             )
         except (TypeError, ValueError, OverflowError):
             required_payload_version = 1
+        for query, year in queries:
+            value = self._lookup_title(media_type, query, year, required_payload_version, outcome)
+            if value:
+                return value
+        return None
+
+    def _lookup_title(self, media_type, query, requested_year, required_payload_version, outcome):
+        key = self._cache_key(media_type, query, requested_year)
         # Serialize duplicate requests for the same title, but let different
         # visible titles query TMDb in parallel. Network I/O must not hold the
         # global cache lock or every poster waits for the previous one.
@@ -1187,7 +1248,8 @@ class TMDbMetadataClient(object):
                     payload_version = 1
                 if cached and (
                     not value
-                    or payload_version >= required_payload_version
+                    or (payload_version >= required_payload_version
+                        and _matches_vod_title(query, requested_year, value))
                 ):
                     if outcome is not None:
                         outcome["cached_at"] = entry.get("cached_at", self.clock())
@@ -1412,26 +1474,28 @@ class TMDbMetadataClient(object):
 
     def _artwork_synopsis(self, media_type, item):
         """Reuse language-proven artwork text without marking partial data complete."""
-        title = clean_media_title(getattr(item, "name", ""))
-        year = _year(getattr(item, "year", "")) or _year(getattr(item, "name", ""))
+        raw_title, provided_year = getattr(item, "name", ""), getattr(item, "year", "")
+        queries = _vod_title_queries(raw_title, provided_year)
+        title, year = queries[0] if queries else ("", "")
         tmdb_id = self._valid_tmdb_id(getattr(item, "tmdb_id", ""))
         imdb_id = str(getattr(item, "imdb_id", "") or "")
         if not re.fullmatch(r"tt\d{5,12}", imdb_id):
             imdb_id = ""
+        keys = (self._poster_key(media_type, tmdb_id, imdb_id, queries),
+                self._cache_key(media_type, "backdrop-v1:{}:{}:{}".format(tmdb_id, imdb_id, title), year))
         with self._lock:
-            for prefix in ("poster-v1", "backdrop-v1"):
-                key = self._cache_key(media_type,
-                    "{}:{}:{}:{}".format(prefix, tmdb_id, imdb_id, title), year)
+            for key in keys:
                 found, value = self._cached(key)
                 if not found or not value or not value.get("localized_plot"):
                     continue
                 if (getattr(item, "portal_request_type", "") and not
-                        self._provider_identity_matches(media_type, title, year, value)):
+                        self._provider_identity_matches(media_type, raw_title, provided_year, value)):
                     continue
                 cls = SeriesInfo if media_type == "series" else MovieInfo
                 result = cls(title=getattr(item, "name", "") or value.get("title"),
                     plot=value["localized_plot"], year=year or value.get("year"),
                     cover=getattr(item, "icon", "") or value.get("cover"),
+                    cover_urls=value.get("cover_urls", ()),
                     backdrop=value.get("backdrop"), tmdb_id=value.get("tmdb_id"))
                 result._metadata_localized_plot = value["localized_plot"]
                 result._metadata_language = self.language.replace("_", "-").lower()

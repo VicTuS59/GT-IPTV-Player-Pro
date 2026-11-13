@@ -15,6 +15,7 @@ from .diagnostics import log_event
 from .i18n import N_, _
 from .subtitle_clock import SubtitlePlaybackClock
 from .online_subtitles import active_subtitle_text, annotate_subtitle_results, parse_subtitle, POLISH_PROVIDERS, polish_search_providers, provider_display_name, retime_subtitle_cues, save_subtitle_file, subtitle_client, subtitle_result_sort_key, subtitle_search_available
+from .online_subtitles import subtitle_recommendation_prefix
 from .subtitle_settings import PROVIDERS, load_subtitle_settings
 from .subtitle_language import normalize_subtitle_language
 from .subtitle_search_cache import subtitle_search_context
@@ -45,15 +46,6 @@ PLAYER_INFOBAR_HEIGHT = 280
 INFOBAR_SUBTITLE_GAP = 24
 _NATIVE_SOURCE_EXECUTOR = ThreadPoolExecutor(max_workers=3)
 
-
-def _result_compatibility_sort(result):
-    value = result.get("compatibility_sort") if isinstance(result, dict) else None
-    if isinstance(value, (tuple, list)) and len(value) == 8:
-        try:
-            return tuple(int(item) for item in value)
-        except (TypeError, ValueError, OverflowError):
-            pass
-    return (0, 2, 2, 2, 2, 2, 2, 0)
 
 _ERROR_MESSAGES = {
     "provider_key_missing": N_("Enter a SubDL API key in subtitle settings."),
@@ -1176,7 +1168,7 @@ class OnlineSubtitleController(object):
                         str(pair[1].get("language") or "").lower(),
                         len(language_order),
                     ),
-                    _result_compatibility_sort(pair[1]),
+                    subtitle_result_sort_key(pair[1]),
                     bool(pair[1].get("hearing_impaired")),
                     pair[0],
                 ))
@@ -1534,7 +1526,7 @@ class OnlineSubtitleController(object):
             self._finish(generation)
             return
         choices = []
-        for result in results[:40]:
+        for index, result in enumerate(results[:40]):
             language = str(result.get("language") or "").upper()
             suffix = " • HI" if result.get("hearing_impaired") else ""
             try:
@@ -1549,6 +1541,10 @@ class OnlineSubtitleController(object):
                 language,
                 suffix,
             )
+            if index == 0:
+                recommendation = subtitle_recommendation_prefix(result)
+                if recommendation:
+                    label = "{} · {}".format(recommendation, label)
             choices.append((label[:120], result))
 
         def selected(selection):

@@ -325,7 +325,7 @@ def _online(s):
         pos=s.top+i;entry=entries[pos] if pos<len(entries) else None
         show(s,'aux_subtitle_focus_'+str(i),entry is not None and pos==s.selected)
         if entry:
-            text(s,'release_'+str(i),b.subtitle_result_release(entry,_('Subtitle')),26)
+            text(s,'release_'+str(i),b.subtitle_display_release(entry,first=pos==0),26)
             text(s,'compatibility_'+str(i),s['compatibility_'+str(i)].getText(),23)
             text(s,'provider_'+str(i),b.provider_display_name(str(entry.get('provider') or 'subdl')),25)
             text(s,'meta_'+str(i),s['meta_'+str(i)].getText(),22,2)
@@ -339,7 +339,7 @@ def _online(s):
     language=str((selected or {}).get('language') or '')
     text(s,'aux_selected_language',localized_language_name(language) if language else '—',34)
     text(s,'aux_selected_provider',b.provider_display_name(str(selected.get('provider') or 'subdl')) if selected else '',27)
-    text(s,'aux_release_value',b.subtitle_result_release(selected,_('Subtitle')) if selected else '—',27,3)
+    text(s,'aux_release_value',b.subtitle_display_release(selected,first=s.selected==0) if selected else '—',27,3)
     text(s,'aux_fps_value',s['meta_'+str(s.selected-s.top)].getText() if selected else '—',29)
     for state in b.COMPATIBILITY_STATUSES:
         visible=selected is not None and state==status

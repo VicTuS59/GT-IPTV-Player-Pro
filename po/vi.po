@@ -4389,3 +4389,53 @@ msgstr "Không đọc được tệp TXT."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Đã thêm tài khoản Xtream ({})\nĐã bỏ qua mục trùng lặp ({})"
+
+msgid "Change layout"
+msgstr "Đổi bố cục"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Đã lưu liên kết kênh. Hãy làm mới EPG để áp dụng."
+
+msgid "Cinematic view"
+msgstr "Dạng điện ảnh"
+
+msgid "EPG server name could not be resolved."
+msgstr "Không thể phân giải tên máy chủ EPG."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Nhập tên hợp lệ có tối đa {} ký tự."
+
+msgid "Football scores\u0004Select source"
+msgstr "Chọn nguồn"
+
+msgid "List view"
+msgstr "Dạng danh sách"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "Danh sách M3U đã được làm mới. Các thay đổi sẽ hiển thị trong lần làm mới tiếp theo."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Không thể làm mới danh sách M3U. Đang hiển thị danh sách từ bộ nhớ đệm."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Tóm tắt làm mới M3U\n\nKênh mới ({added})\nKênh không còn trong danh sách ({removed})\nKênh đã đổi tên ({renamed})"
+
+msgid "Matching release details"
+msgstr "Thông tin bản phát hành tương thích"
+
+msgid "Matching release group"
+msgstr "Cùng nhóm phát hành"
+
+msgid "No channels need manual mapping."
+msgstr "Không có kênh nào cần ghép thủ công."
+
+msgid "No matching EPG channels found."
+msgstr "Không tìm thấy kênh EPG phù hợp."
+
+msgid "Recommended"
+msgstr "Đề xuất"
+
+msgid "Restore source name"
+msgstr "Khôi phục tên gốc"

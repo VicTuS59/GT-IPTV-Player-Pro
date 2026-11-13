@@ -97,6 +97,7 @@ from .settings import (
     configurable_service_types,
     load_dashboard_order,
     load_player_settings,
+    load_vod_layout,
     normalize_infobar_timeout,
     normalize_text_size,
     save_dashboard_order,
@@ -4577,6 +4578,10 @@ class _DirectAccountConnection(object):
         self.on_failure = on_failure
         self.on_return = on_return
         self.automatic = bool(automatic)
+        self._check_timeout = None
+        if _source_type(account) == "m3u" and getattr(account, "kind", None) == "url":
+            from .m3u import M3U_REMOTE_PREPARE_TIMEOUT
+            self._check_timeout = M3U_REMOTE_PREPARE_TIMEOUT
         self._checking = False
         self._closed = False
         self._result = None
@@ -4599,7 +4604,7 @@ class _DirectAccountConnection(object):
         if self.on_started is not None:
             self.on_started(self.account)
         _cancel_ui_job(self._job)
-        job = _UIJobToken(UI_NETWORK_JOB_TIMEOUT_SECONDS)
+        job = _UIJobToken(max(UI_NETWORK_JOB_TIMEOUT_SECONDS, (self._check_timeout or 0) + 1))
         self._job = job
         worker = threading.Thread(
             target=lambda: self._run_check(job),
@@ -4614,9 +4619,10 @@ class _DirectAccountConnection(object):
             if job is not None:
                 job.check()
             if self.checker is check_source_health and job is not None:
-                result = self.checker(
-                    self.account, cancel_event=job.cancel_event,
-                )
+                options = {"cancel_event": job.cancel_event}
+                if self._check_timeout is not None:
+                    options["timeout"] = self._check_timeout
+                result = self.checker(self.account, **options)
             else:
                 result = self.checker(self.account)
         except Exception:
@@ -8722,19 +8728,34 @@ class GTDashboardScreen(DashboardPresentation, Screen):
         if args and args[0] == PLAYLIST_FILES_CONNECTED:
             self.close(PLAYLIST_FILES_CONNECTED)
             return
+        if (not self._dashboard_closed and args and isinstance(args[0], tuple)
+                and len(args[0]) == 3 and args[0][0] == "vod-layout"
+                and args[0][1] in ("movie", "series")):
+            self._open_vod_library(args[0][1], args[0][2])
+            return
         self._dashboard_shown()
 
-    def _open_dashboard_child(self, screen, *args):
+    def _open_dashboard_child(self, screen, *args, **kwargs):
         self._dashboard_child_open = True
         self._stop_clock()
         opener = getattr(self.session, "openWithCallback", None)
         if callable(opener):
-            return opener(self._dashboard_child_closed, screen, *args)
-        dialog = self.session.open(screen, *args)
+            return opener(self._dashboard_child_closed, screen, *args, **kwargs)
+        dialog = self.session.open(screen, *args, **kwargs)
         callbacks = getattr(dialog, "onClose", None)
         if isinstance(callbacks, list):
             callbacks.append(self._dashboard_child_closed)
         return dialog
+
+    def _open_vod_library(self, kind, category_id=None):
+        from .browser_categories import GTContentBrowserScreen
+
+        screen = GTContentBrowserScreen
+        if load_vod_layout() == "cinematic":
+            from .vod_cinematic import GTCinematicContentBrowserScreen
+            screen = GTCinematicContentBrowserScreen
+        self._open_dashboard_child(screen, self.account, kind, self._dashboard_content_client(),
+                                   vod_layout_category=category_id)
 
     def _dashboard_content_client(self):
         if _source_type(self.account) != "stalker":
@@ -8846,7 +8867,9 @@ class GTDashboardScreen(DashboardPresentation, Screen):
                 _("Standard M3U sources support Live TV only."),
             )
             return
-        if item[2] in ("live", "movie", "series"):
+        if item[2] in ("movie", "series"):
+            self._open_vod_library(item[2])
+        elif item[2] == "live":
             from .browser import GTContentBrowserScreen
 
             self._open_dashboard_child(
@@ -9732,8 +9755,10 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
 
 
     def open_matches(self):
-        from .matches_ui import GTMatchesScreen
+        from .matches_ui import GTMatchesSourceScreen
         self.selected_action = 4
         self._refresh()
         self._cancel_account_preview()
-        return self._open_child_screen(GTMatchesScreen, self._schedule_account_preview_check)
+        return self._open_child_screen(
+            GTMatchesSourceScreen, lambda *result: self._schedule_account_preview_check()
+        )

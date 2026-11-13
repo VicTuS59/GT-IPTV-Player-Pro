@@ -21,7 +21,8 @@ from .web_remote import WEB_REMOTE
 from .youtube_vendor.config import EXTRACT_LOCK, set_preferences
 from .diagnostics import log_event
 from .youtube_playback import (
-    YouTubeNativePlayerUnavailable, youtube_service_type, youtube_stream_parts,
+    NATIVE_AUDIO_SERVICE_TYPE, native_youtube_service_url, prepare_youtube_decoder_position,
+    youtube_stream_parts,
 )
 from .youtube_startup import (
     YouTubePlaybackError, YouTubeStartupMonitor, registered_youtube_services,
@@ -743,7 +744,7 @@ class WebYouTube(object):
             current = bool(job and job["state"] != "cancelled" and token == self._latest_play_token)
         return current and str(load_player_settings().youtube_resolution) == quality
 
-    def _monitor_youtube_start(self, token, quality, reference):
+    def _monitor_youtube_start(self, token, quality, reference, service_type):
         """GUI sampling follows the logical player across mini/fullscreen."""
         if self._startup_monitor is not None:
             self._startup_monitor.close()
@@ -753,7 +754,11 @@ class WebYouTube(object):
             dialog = self._player
             if dialog is None or getattr(dialog, "_closed", True):
                 return None
-            navigation = WEB_REMOTE.session.nav
+            session = WEB_REMOTE.session
+            if (getattr(session, "current_dialog", None) is dialog
+                    and same_reference(reference, getattr(dialog, "_youtube_rejected_reference", None))):
+                return dict(rejected=True)
+            navigation = session.nav
             owned = same_reference(reference, navigation.getCurrentlyPlayingServiceReference())
             if not owned:
                 # A newly opened screen can be waiting for onShown. Once its
@@ -764,10 +769,10 @@ class WebYouTube(object):
                 return dict(owned=True)
             from enigma import iServiceInformation
             from .stream_resolution import read_resolution
-            from .live_recovery import media_snapshot
-            decoder = media_snapshot(service, iServiceInformation)
+            from .live_recovery import video_decoder_clock
+            video_pts, video_pts_source = video_decoder_clock()
             snapshot = read_resolution(service, iServiceInformation,
-                decoder_reader=None if decoder.get("video_pts") is not None else lambda *_: -1)
+                decoder_reader=None if video_pts is not None else lambda *_: -1)
             pts = -1
             try:
                 error, value = service.seek().getPlayPosition()
@@ -777,15 +782,17 @@ class WebYouTube(object):
                 pass
             return dict(owned=True, video=bool(snapshot), pts=pts,
                         service_video=bool(snapshot and snapshot["source"] == "service"),
-                        video_pts=decoder.get("video_pts"),
-                        video_pts_source=decoder.get("video_pts_source"),
+                        video_pts=video_pts, video_pts_source=video_pts_source,
                         paused=bool(getattr(dialog, "_paused", False)))
-        monitor = YouTubeStartupMonitor(sample)
+        native = service_type == NATIVE_AUDIO_SERVICE_TYPE
+        navigation = WEB_REMOTE.session.nav if native else None
+        monitor = YouTubeStartupMonitor(sample, navigation=navigation, reference=reference,
+                                       allow_unclocked_video=native)
         self._startup_monitor = monitor
         return monitor
 
     def _finish_youtube_start(self, token, quality, candidate, sequence):
-        """Only decoder evidence may commit playback/history/automatic EOF."""
+        """Commit playback/history/automatic EOF after startup is confirmed."""
         if not self._play_is_current(token, quality):
             return False
         dialog = self._player
@@ -864,78 +871,98 @@ class WebYouTube(object):
                                  "requested_quality": quality}
             self._latest_play_token = token
 
-        def worker(attempt=0, previous=None):
+        service_type = player.movie_service_type
+        native = service_type == NATIVE_AUDIO_SERVICE_TYPE
+        avc = frozenset(("h264",))
+        resolver, codecs, supports_separate_audio = None, avc, False
+
+        def resolve_stream(previous):
+            compatible = previous is not None or not supports_separate_audio
+            maximum = int(quality)
+            mode = "compatible" if compatible else player.youtube_stream_mode
+            with EXTRACT_LOCK:
+                if not self._play_is_current(token, quality):
+                    return None
+                set_preferences(str(maximum),
+                                "en" if _original_audio else _search_locale(metadata_language())[0],
+                                player.youtube_dash, mode,
+                                "original" if _original_audio else player.youtube_audio_preference)
+                resolver.preferred_quality = maximum
+                resolver.allowed_codecs = avc if compatible else codecs
+                resolver.allow_separate_audio = not compatible
+                url = resolver.cached_compatible_stream(previous["stream"]["url"]) if previous else ""
+                if previous and not url and not previous["stream"]["separate_audio"] and previous["codec"] == "h264":
+                    raise YouTubePlaybackError("youtube_start_failed")
+                try:
+                    if not url:
+                        url = resolver.extract(video_id)
+                except Exception:
+                    raise YouTubePlaybackError(
+                        "youtube_stream_unavailable" if resolver.response_received
+                        else "youtube_resolve_failed") from None
+                if not url:
+                    raise YouTubePlaybackError("youtube_stream_unavailable")
+                unused_video, audio = youtube_stream_parts(url)
+                codec = resolver.selected_video_codec
+                height = resolver.selected_quality
+                if not 0 < height <= maximum or codec not in resolver.allowed_codecs or (compatible and audio):
+                    raise YouTubePlaybackError("youtube_stream_unavailable")
+                return dict(url=url, quality=height, codec=codec, separate_audio=bool(audio),
+                            duration=resolver.duration_seconds, video_itag=resolver.selected_video_itag,
+                            audio_itag=resolver.selected_audio_itag, audio_bitrate=resolver.selected_audio_bitrate)
+
+        def worker(previous=None):
+            nonlocal resolver, codecs, supports_separate_audio
+            attempt = int(previous is not None)
             state = "failed"
             monitor = None
             candidate = None
             try:
-                from .youtube_vendor.video_url import YouTubeVideoUrl
                 if not self._play_is_current(token, quality):
                     with self._lock:
                         self._jobs[token]["state"] = "cancelled"
                     return "cancelled"
-                service_types, codecs = WEB_REMOTE._run_on_gui(
-                    lambda: (registered_youtube_services(), receiver_youtube_codecs()))
-                if not service_types:
-                    raise YouTubePlaybackError("youtube_service_unavailable")
-                native_player = probe_native_player() if 5002 in service_types else dict(
-                    available=False, version=0, reason="service_missing")
-                native_ready = native_player["available"]
-                log_event("youtube", "player-check services={} native={} version={} codecs={}".format(
-                    ",".join(map(str, service_types)), native_player["reason"], native_player["version"],
-                    ",".join(sorted(codecs))))
-                maximum = int(quality)
-                if previous:
-                    maximum = next((int(value) for value in YOUTUBE_QUALITIES
-                                    if int(value) < previous["quality"]), 0)
-                    if not maximum:
-                        raise YouTubePlaybackError("youtube_start_failed")
-                mode = "compatible" if attempt else player.youtube_stream_mode
-                with EXTRACT_LOCK:
-                    if not self._play_is_current(token, quality):
-                        state = "cancelled"
-                        return "cancelled"
-                    set_preferences(str(maximum),
-                                    "en" if _original_audio else _search_locale(metadata_language())[0],
-                                    player.youtube_dash, mode,
-                                    "original" if _original_audio else player.youtube_audio_preference)
-                    resolver = YouTubeVideoUrl()
-                    resolver.preferred_quality = maximum
-                    resolver.allowed_codecs = (frozenset(("h264",))
-                                               if attempt or not native_ready else codecs)
-                    resolver.allow_separate_audio = native_ready and not attempt
-                    try:
-                        url = resolver.extract(video_id)
-                    except Exception:
+                if not attempt:
+                    from .youtube_vendor.video_url import YouTubeVideoUrl
+                    service_types, codecs = WEB_REMOTE._run_on_gui(
+                        lambda: (registered_youtube_services(), receiver_youtube_codecs() if native else avc))
+                    registered = service_type in service_types
+                    native_player = probe_native_player() if native and registered else dict(
+                        available=False, version=0, reason="not_requested" if registered else "service_missing")
+                    separate_audio = native_player.get("separate_audio")
+                    supports_separate_audio = native and native_player["available"] and separate_audio is not False
+                    log_event("youtube", "player-check services={} engine={} native={} version={} "
+                              "separate_audio_option={} codecs={}".format(
+                        ",".join(map(str, service_types)), service_type, native_player["reason"],
+                        native_player["version"], separate_audio, ",".join(sorted(codecs))))
+                    if not registered or (native and not native_player["available"]):
                         raise YouTubePlaybackError(
-                            "youtube_native_player_required" if not native_ready and resolver.requires_native_audio
-                            else "youtube_stream_unavailable" if resolver.response_received
-                            else "youtube_resolve_failed") from None
-                if not url:
-                    raise YouTubePlaybackError("youtube_stream_unavailable")
-                unused_video, audio = youtube_stream_parts(url)
-                video_codec = getattr(resolver, "selected_video_codec", "")
-                service_type = youtube_service_type(url, 4097 if attempt else player.movie_service_type,
-                    video_codec, available_types=service_types, native_available=native_ready)
-                selected_quality = int(getattr(resolver, "selected_quality", 0) or 0)
-                if not 0 < selected_quality <= maximum or video_codec not in resolver.allowed_codecs:
-                    raise YouTubePlaybackError("youtube_stream_unavailable")
-                duration_seconds = int(getattr(resolver, "duration_seconds", 0) or 0)
+                            "youtube_native_player_required" if native else "youtube_service_unavailable")
+                    resolver = YouTubeVideoUrl()
+                stream = resolve_stream(previous)
+                if stream is None:
+                    state = "cancelled"
+                    return state
+                url, audio = stream["url"], stream["separate_audio"]
+                video_codec, selected_quality, duration_seconds = stream["codec"], stream["quality"], stream["duration"]
+                try:
+                    playback_url = native_youtube_service_url(url) if native else url
+                except (ImportError, OSError, RuntimeError, ValueError) as error:
+                    log_event("youtube", "native-link-adaptation-failed error_type={}".format(type(error).__name__))
+                    raise YouTubePlaybackError("youtube_service_unavailable") from None
                 candidate = dict(id=video_id, title=title, quality=selected_quality,
-                                 duration=duration_seconds, codec=video_codec, engine=service_type)
+                                 duration=duration_seconds, codec=video_codec, stream=stream)
                 print("[GTYouTube] video_id={} requested={} selected={} "
                       "video_itag={} audio_itag={} audio_bitrate={} engine={} native_audio={} duration={}".format(
                           video_id, player.youtube_resolution, selected_quality,
-                          getattr(resolver, "selected_video_itag", ""),
-                          getattr(resolver, "selected_audio_itag", ""),
-                          getattr(resolver, "selected_audio_bitrate", 0),
-                          service_type, bool(audio), duration_seconds))
+                          stream["video_itag"], stream["audio_itag"], stream["audio_bitrate"],
+                          service_type, audio, duration_seconds))
                 log_event(
                     "youtube",
                     "playback-resolved video_id={} requested={} selected={} "
-                    "engine={} codec={} separate_audio={} duration={} attempt={}".format(
+                    "engine={} codec={} separate_audio={} local_redirect={} duration={} attempt={}".format(
                         video_id, player.youtube_resolution, selected_quality,
-                        service_type, video_codec, bool(audio), duration_seconds, attempt,
+                        service_type, video_codec, audio, playback_url != url, duration_seconds, attempt,
                     ),
                 )
 
@@ -946,6 +973,7 @@ class WebYouTube(object):
                         return "cancelled"
 
                 def launch():
+                    nonlocal candidate
                     current = load_player_settings()
                     with self._lock:
                         if (token != self._latest_play_token
@@ -966,7 +994,7 @@ class WebYouTube(object):
                     item.youtube_native = True
                     item.youtube_separate_audio = bool(audio)
                     item.youtube_video_codec = video_codec
-                    reference = eServiceReference(service_type, 0, url)
+                    reference = eServiceReference(service_type, 0, playback_url)
                     reference.setName(title)
                     session = WEB_REMOTE.session
                     candidate.update(reference=reference, accepted=False,
@@ -1015,7 +1043,8 @@ class WebYouTube(object):
                         if (getattr(active, "_closed", False)
                                 or getattr(session, "current_dialog", None) is not active):
                             return False
-                        active._save_resume_position()
+                    if native and duration_seconds > 0:
+                        item.youtube_decoder_position = prepare_youtube_decoder_position(reference)
                     # Both TV and web history cards carry this server-owned
                     # context. Read current seconds, rather than a stale card.
                     bookmark = (self._playback_history.get(video_id)
@@ -1027,6 +1056,8 @@ class WebYouTube(object):
                         if not preview.replace_web_video(
                                 reference, item, resume_store=self._playback_history,
                                 start_position=start_position):
+                            if attempt and previous["accepted"]:
+                                candidate = previous
                             raise YouTubePlaybackError("youtube_start_failed")
                         with self._lock:
                             self._player = preview
@@ -1046,6 +1077,8 @@ class WebYouTube(object):
                         if not replace(
                                 reference, item, resume_store=self._playback_history,
                                 start_position=start_position):
+                            if attempt and previous["accepted"] and not retry_initial_start:
+                                candidate = previous
                             raise YouTubePlaybackError("youtube_start_failed")
                         if getattr(active, "_youtube_preview", False) and not _automatic:
                             active._open_youtube_fullscreen()
@@ -1090,12 +1123,17 @@ class WebYouTube(object):
                     with self._lock:
                         self._jobs[token].update(quality=selected_quality, phase="starting",
                             codec=video_codec, engine=service_type, attempt=attempt)
-                    return self._monitor_youtube_start(token, quality, reference)
+                    return self._monitor_youtube_start(token, quality, reference, service_type)
 
-                monitor = WEB_REMOTE._run_on_gui(launch)
+                launch_at = time.monotonic()
+                # Legacy ServiceApp can spend up to ten seconds releasing
+                # the old player. Let this transition report its real outcome.
+                monitor = WEB_REMOTE._run_on_gui(launch, timeout=15 if native else 3)
                 if not monitor:
                     state = "cancelled"
                     return state
+                log_event("youtube", "playback-launch engine={} gui_ms={}".format(
+                    service_type, round((time.monotonic() - launch_at) * 1000)))
                 # No GUI waits: its short timer supplies decoder/PTS evidence.
                 while not monitor.done.wait(0.25):
                     if not self._play_is_current(token, quality):
@@ -1110,8 +1148,8 @@ class WebYouTube(object):
                 state = ("playing" if monitor.outcome == "playing" and WEB_REMOTE._run_on_gui(
                     lambda: self._finish_youtube_start(token, quality, candidate, sequence)) else "cancelled")
                 if state == "playing":
-                    log_event("youtube", "playback-started video_id={} selected={} engine={} attempt={}".format(
-                        video_id, selected_quality, service_type, attempt))
+                    log_event("youtube", "playback-started video_id={} selected={} engine={} attempt={} confirmed_by={}".format(
+                        video_id, selected_quality, service_type, attempt, monitor.confirmation or "-"))
                     try:
                         self._playback_history.add(video_id, title, selected_quality, duration_seconds)
                     except OSError as exc:
@@ -1121,16 +1159,22 @@ class WebYouTube(object):
                 if not self._play_is_current(token, quality):
                     state = "cancelled"
                     return state
-                code = ("youtube_native_player_required" if isinstance(exc, YouTubeNativePlayerUnavailable)
-                        else getattr(exc, "code", "youtube_start_failed"))
-                if (not attempt and code == "youtube_start_failed" and candidate
-                        and candidate.get("reference") is not None and candidate["quality"] > 360
-                        and self._play_is_current(token, quality)):
+                code = getattr(exc, "code", "youtube_start_failed")
+                if code == "youtube_start_failed" and candidate and candidate.get("reference") is not None:
+                    sample = monitor.last_sample if monitor else {}
+                    reason = (monitor.failure_reason or "monitor_stalled" if monitor else "service_rejected")
+                    log_event("youtube", "playback-start-unverified engine={} quality={} reason={} "
+                              "owned={} video={} service_pts={} decoder_pts={} attempt={}".format(
+                        service_type, candidate["quality"], reason, bool(sample.get("owned")),
+                        bool(sample.get("video")), sample.get("pts", -1) >= 0,
+                        sample.get("video_pts_source") or "-", attempt))
+                if (native and not attempt and code == "youtube_start_failed" and candidate
+                        and candidate.get("reference") is not None):
                     with self._lock:
                         self._jobs[token].update(phase="retrying", attempt=1)
                     log_event("youtube", "playback-retry video_id={} previous={} codec={} engine={}".format(
-                        video_id, candidate["quality"], candidate["codec"], candidate["engine"]))
-                    state = worker(1, candidate)
+                        video_id, candidate["quality"], candidate["codec"], service_type))
+                    state = worker(candidate)
                     return state
                 # Signed media URLs must never be written to device logs.
                 print("[GTYouTube] playback failed video_id={} error={}".format(

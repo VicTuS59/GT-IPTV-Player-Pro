@@ -4395,3 +4395,53 @@ msgstr "TXT-filen kunne ikke læses."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Tilføjede Xtream-konti ({})\nSprungne dubletter ({})"
+
+msgid "Change layout"
+msgstr "Skift layout"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Kanaltilknytningen er gemt. Opdater EPG for at anvende den."
+
+msgid "Cinematic view"
+msgstr "Biografvisning"
+
+msgid "EPG server name could not be resolved."
+msgstr "EPG-serverens navn kunne ikke slås op."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Indtast et gyldigt navn på højst {} tegn."
+
+msgid "Football scores\u0004Select source"
+msgstr "Vælg kilde"
+
+msgid "List view"
+msgstr "Listevisning"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "M3U-listen er opdateret. Ændringer vises ved næste opdatering."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "M3U-listen kunne ikke opdateres. Den gemte liste vises."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Oversigt over M3U-opdatering\n\nNye kanaler ({added})\nKanaler, der er udgået af listen ({removed})\nOmdøbte kanaler ({renamed})"
+
+msgid "Matching release details"
+msgstr "Matchende udgivelsesoplysninger"
+
+msgid "Matching release group"
+msgstr "Samme udgivelsesgruppe"
+
+msgid "No channels need manual mapping."
+msgstr "Ingen kanaler kræver manuel tilknytning."
+
+msgid "No matching EPG channels found."
+msgstr "Der blev ikke fundet matchende EPG-kanaler."
+
+msgid "Recommended"
+msgstr "Anbefalet"
+
+msgid "Restore source name"
+msgstr "Gendan det oprindelige navn"

@@ -52,7 +52,7 @@ def content_client_for(account):
         return _protect_download_client(StalkerContentClient(account))
     if source_type == 'm3u':
         from .m3u import M3UContentClient
-        return M3UContentClient(account, timeout=28)
+        return M3UContentClient(account)
     return _protect_download_client(XtreamContentClient(account))
 
 def _client_supports(client, capability):
@@ -830,7 +830,8 @@ class GTAsyncListScreen(Screen):
         footer_stacked = bool(getattr(self, '_footer_layout_stacked', False))
         footer_transparent_panel = bool(getattr(self, '_footer_transparent_panel', bool(frameless_footer)))
         footer_show_dividers = bool(getattr(self, '_footer_show_dividers', not bool(frameless_footer)))
-        if not getattr(self, '_light_vod_enabled', False):
+        standard_footer = not getattr(self, '_light_vod_enabled', False) or getattr(self, '_vod_discovery_layout', False)
+        if standard_footer:
             self.skin = decorate_remote_footer(self.skin, footer_items, alternate_items=footer_alternate_items, transparent_panel=footer_transparent_panel, show_dividers=footer_show_dividers, skin_fonts_scaled=bool(getattr(self, '_seven_pending_kind', '')) or screen_name == 'GTStreamListScreen' or (screen_name == 'GTContentBrowserScreen' and getattr(self, 'content_type', None) == 'live'), stacked=footer_stacked, panel_height=getattr(self, '_footer_panel_height', None), bottom_padding=getattr(self, '_footer_bottom_padding', None), side_padding=getattr(self, '_footer_side_padding', None), content_y_offset=getattr(self, '_footer_content_y_offset', 0), show_web_hint=getattr(self, '_footer_show_web_hint', True))
         if not getattr(self, '_list_scroll_geometry', None):
             width, height, px = _scale()
@@ -870,7 +871,7 @@ class GTAsyncListScreen(Screen):
         hide_scrollbar(self, 'list_scroll')
         self['message'] = Label('')
         self['footer'] = Label('')
-        if not getattr(self, '_light_vod_enabled', False):
+        if standard_footer:
             install_remote_footer(self, footer_items, slot_count=max(len(footer_items), len(footer_alternate_items)), stacked=footer_stacked)
         self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions'], {'ok': self.open_selected, 'cancel': self.close, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'green': self.start_load, 'red': self.close}, -1)
         if hasattr(self, 'onShown'):
@@ -913,13 +914,58 @@ class GTAsyncListScreen(Screen):
     def item_text(self, item):
         return item.name
 
+    def _invalidate_refresh_cache(self, *args):
+        self._m3u_refresh_generation = None
+        invalidator = getattr(self.client, 'invalidate_cache', None)
+        if invalidator is None:
+            return
+        try:
+            if (self.content_type == 'live' and _is_m3u_client(self.client)
+                    and callable(getattr(self.client, 'refresh_summary', None))):
+                self._m3u_refresh_generation = invalidator(*args, summarize=True)
+            else:
+                invalidator(*args)
+        except Exception:
+            pass
+
+    def _show_m3u_refresh_summary(self):
+        generation = getattr(self, '_m3u_refresh_generation', None)
+        self._m3u_refresh_generation = None
+        if generation is None or self._error or getattr(self.session, 'current_dialog', self) is not self:
+            return
+        summary = self.client.refresh_summary(generation)
+        if summary is None:
+            return
+        from Screens.MessageBox import MessageBox
+        status, counts = summary
+        message_type = MessageBox.TYPE_INFO
+        if status == 'stale':
+            message = _('M3U refresh failed. Showing the cached list.')
+            message_type = MessageBox.TYPE_ERROR
+        elif status == 'baseline':
+            message = _('M3U list refreshed. The next refresh will show changes.')
+        else:
+            added, removed, renamed = counts
+            message = _(
+                'M3U refresh summary\n\n'
+                'New channels ({added})\n'
+                'Channels no longer listed ({removed})\n'
+                'Renamed channels ({renamed})'
+            ).format(added=added, removed=removed, renamed=renamed)
+        self.session.open(MessageBox, message, type=message_type)
+
     def start_load(self):
         if self._loading or self._closed:
             return
         _cancel_worker_token(self._load_token)
         self._load_generation += 1
         generation = self._load_generation
-        token = _WorkerToken(content_sort_ui.list_timeout(self, WORKER_LIST_TIMEOUT_SECONDS))
+        timeout = WORKER_LIST_TIMEOUT_SECONDS
+        client = getattr(self, 'client', None)
+        if _is_m3u_client(client) and getattr(getattr(client, 'account', None), 'kind', None) == 'url':
+            from .m3u import M3U_REMOTE_PREPARE_TIMEOUT
+            timeout = M3U_REMOTE_PREPARE_TIMEOUT
+        token = _WorkerToken(content_sort_ui.list_timeout(self, timeout))
         self._load_token = token
         self._loading = True
         self._ready = False
@@ -929,9 +975,19 @@ class GTAsyncListScreen(Screen):
         self['items'].setText(_('Loading content...'))
         self['message'].setText(_('Please wait'))
         hide_scrollbar(self, 'list_scroll')
-        worker = threading.Thread(target=self._run_load, args=(generation, token))
-        worker.daemon = True
-        worker.start()
+        self._launch_list_load(generation, token)
+
+    def _launch_list_load(self, generation, token):
+        if not _start_browser_worker(self._run_load, (generation, token)):
+            token.cancel()
+            self._timer.stop()
+            self._load_token = None
+            self._loading = False
+            self._ready = True
+            self._error = N_('Could not load content')
+            self._m3u_refresh_generation = None
+            self._refresh()
+            return
         self._timer.start(150, True)
 
     def _start_initial_load(self):
@@ -970,6 +1026,7 @@ class GTAsyncListScreen(Screen):
                 self._loading = False
                 self._error = N_('Request timed out')
                 self._ready = True
+                self._m3u_refresh_generation = None
                 self._refresh()
                 return
             self._timer.start(150, True)
@@ -977,6 +1034,7 @@ class GTAsyncListScreen(Screen):
         self._loading = False
         self._load_token = None
         self._refresh()
+        self._show_m3u_refresh_summary()
 
     def _refresh(self):
         if self._error:
@@ -1065,6 +1123,15 @@ def _connect_timer(timer, callback):
         timer.timeout.connect(callback)
     except AttributeError:
         timer.callback.append(callback)
+
+
+def _start_browser_worker(target, args):
+    try:
+        threading.Thread(target=target, args=args, daemon=True).start()
+    except (RuntimeError, OSError, MemoryError) as error:
+        log_event('browser', 'Could not start content worker', error)
+        return False
+    return True
 
 def _read_proc_number(path, base=10):
     try:

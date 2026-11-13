@@ -8,10 +8,8 @@ Published snapshots use compact local indexes and a shared decoded-channel
 cache. GUI rendering requests cache-only lookups, which never open a file,
 resolve a host, or parse XML while changing channels.
 
-Channel association is intentionally conservative.  A playlist ``tvg-id`` is
-matched to an XMLTV channel ID first by an exact comparison and then, only if
-there is a single candidate, by an NFKC/casefold comparison.  Display names
-and fuzzy matching are not used.
+An explicit playlist ``tvg-id`` retains priority. Entries without an ID can
+match a unique normalised XMLTV display name or use a saved manual choice.
 """
 
 import gzip
@@ -21,6 +19,7 @@ import http.client
 import json
 import math
 import os
+import re
 import socket
 import ssl
 import stat
@@ -29,6 +28,7 @@ import threading
 import time
 import unicodedata
 import uuid
+import zlib
 from collections import OrderedDict, defaultdict
 from urllib.parse import urljoin
 
@@ -50,6 +50,7 @@ MAX_XMLTV_BYTES = MAX_UNCOMPRESSED_XMLTV_BYTES
 MAX_XMLTV_CHANNELS = 50000
 MAX_XMLTV_PROGRAMMES = 500000
 MAX_WANTED_TVG_IDS = 20000
+MAX_NAME_CHOICES_BYTES = 1024 * 1024
 MAX_EVENTS_PER_CHANNEL = 2048
 MAX_SNAPSHOT_EVENTS = 100000
 MAX_SNAPSHOT_TEXT_CHARACTERS = 24 * 1024 * 1024
@@ -88,6 +89,10 @@ _DEFAULT_STORE_LOCK = threading.Lock()
 
 class M3UEPGError(RuntimeError):
     """Base failure raised by the external M3U XMLTV core."""
+
+    def __init__(self, message="", reason=""):
+        super().__init__(message)
+        self.reason = reason
 
 
 class M3UEPGSourceError(M3UEPGError):
@@ -349,7 +354,46 @@ class M3UEPGStore(object):
                 self._remember_runtime_locked(source_id, runtime)
             return True
 
-    def lookup(self, source_id, tvg_id, now=None, cache_only=False):
+    def _lookup_index(self, source_id, cache_only=False):
+        with self._lock:
+            runtime = self._snapshots.get(source_id)
+            if runtime is not None:
+                self._snapshots.move_to_end(source_id)
+        if runtime is None:
+            return None
+        index = runtime.get("index")
+        if index is None:
+            if cache_only:
+                return None
+            if not self.load_from_disk(source_id, cache_dir=runtime["cache_dir"], _expected_runtime=runtime):
+                return None
+            with self._lock:
+                runtime = self._snapshots.get(source_id)
+                index = runtime.get("index") if runtime is not None else None
+        return index
+
+    def resolve_name(self, source_id, key, fingerprint=None):
+        if not m3u.is_epg_name_key(key):
+            return ""
+        index = self._lookup_index(source_id)
+        if index is None:
+            return ""
+        if fingerprint is not None:
+            with self._lock:
+                runtime = self._snapshots.get(source_id)
+                if (runtime is None or runtime["index"] is not index
+                        or runtime["binding_fingerprint"] != fingerprint):
+                    return ""
+        return index.resolve_name(key)
+
+    def name_choices(self, source_id, fingerprint):
+        with self._lock:
+            runtime = self._snapshots.get(source_id)
+            if runtime is not None and runtime["binding_fingerprint"] == fingerprint:
+                return runtime.get("name_choices", ())
+        return ()
+
+    def lookup(self, source_id, tvg_id, now=None, cache_only=False, fallback_name_key=""):
         """Read current/next on existing EPG workers; hot channels stay in RAM."""
         try:
             source_id = _validated_source_id(source_id)
@@ -359,24 +403,13 @@ class M3UEPGStore(object):
             return (None, None)
         if not math.isfinite(moment):
             return (None, None)
-        with self._lock:
-            runtime = self._snapshots.get(source_id)
-            if runtime is not None:
-                self._snapshots.move_to_end(source_id)
-        if runtime is None:
-            return (None, None)
-        index = runtime.get("index")
+        index = self._lookup_index(source_id, cache_only)
         if index is None:
-            if cache_only:
-                return (None, None)
-            if not self.load_from_disk(source_id, cache_dir=runtime["cache_dir"], _expected_runtime=runtime):
-                return (None, None)
-            with self._lock:
-                runtime = self._snapshots.get(source_id)
-                index = runtime.get("index") if runtime is not None else None
-            if index is None:
-                return (None, None)
-        events = index.get(tvg_id, normalise_tvg_id(tvg_id), cache_only=cache_only)
+            return (None, None)
+        events = index.get(
+            tvg_id, normalise_tvg_id(tvg_id), cache_only=cache_only,
+            fallback_name_key=fallback_name_key if m3u.is_epg_name_key(fallback_name_key) else "",
+        )
         current_index = None
         upcoming_index = None
         for index, event in enumerate(events):
@@ -460,6 +493,7 @@ def refresh_source(
     archive_days=None,
     persist=True,
     guide_all_dates=False,
+    wanted_names=None,
 ):
     """Read, match, and publish one external XMLTV source.
 
@@ -476,6 +510,9 @@ def refresh_source(
     kind, location = _binding_location(binding, source_id)
     fingerprint = binding_fingerprint(binding, source_id)
     wanted = _normalise_wanted_ids(wanted_ids)
+    wanted_names = wanted_names or {}
+    if not isinstance(wanted_names, dict) or len(wanted_names) > MAX_WANTED_TVG_IDS:
+        raise ValueError("invalid playlist EPG names")
     if guide_all_dates and (len(wanted) != 1 or persist or store is None or archive_days is not None):
         raise ValueError("full XMLTV guide reads require one channel and an isolated nonpersistent store")
     if archive_days is not None:
@@ -582,6 +619,8 @@ def refresh_source(
                 moment,
                 cancel_event,
                 deadline,
+                **({"wanted_names": wanted_names, "name_mappings": _binding_value(binding, "name_mappings")}
+                   if wanted_names else {}),
                 **({"archive_days": archive_days} if archive_days is not None else {}),
                 **({"guide_all_dates": True} if guide_all_dates else {}),
             )
@@ -871,13 +910,13 @@ def _check_limits(cancel_event, deadline):
         except AttributeError as error:
             raise ValueError("invalid cancellation event") from error
     if time.monotonic() >= float(deadline):
-        raise M3UEPGCancelled("external XMLTV refresh reached its deadline")
+        raise M3UEPGCancelled("external XMLTV refresh reached its deadline", "deadline")
 
 
 def _remaining_timeout(deadline, timeout):
     remaining = float(deadline) - time.monotonic()
     if remaining <= 0:
-        raise M3UEPGCancelled("external XMLTV refresh reached its deadline")
+        raise M3UEPGCancelled("external XMLTV refresh reached its deadline", "deadline")
     return min(float(timeout), remaining)
 
 
@@ -966,6 +1005,7 @@ def _create_stage_file(path, directory_descriptor=None):
         os.O_WRONLY
         | os.O_CREAT
         | os.O_EXCL
+        | getattr(os, "O_BINARY", 0)
         | getattr(os, "O_CLOEXEC", 0)
         | getattr(os, "O_NOFOLLOW", 0)
     )
@@ -1060,6 +1100,8 @@ def _download_remote_source(
                 lambda unused: _check_limits(cancel_event, deadline),
             )
         except ContentError as error:
+            if isinstance(error.__cause__, socket.gaierror):
+                raise M3UEPGSourceError("external XMLTV host could not be resolved", "dns") from error
             raise M3UEPGSourceError("external XMLTV host is not allowed") from error
         if original_scope is None:
             original_scope = scope
@@ -1177,6 +1219,8 @@ def _download_remote_source(
                     "external XMLTV redirect URL is invalid"
                 ) from error
             continue
+        if isinstance(last_error, (socket.timeout, TimeoutError)):
+            raise M3UEPGSourceError("external XMLTV request timed out", "deadline") from last_error
         raise M3UEPGSourceError("external XMLTV source could not be loaded") from last_error
     raise M3UEPGSourceError("external XMLTV redirect limit exceeded")
 
@@ -1198,6 +1242,13 @@ def _copy_http_response(
         descriptor = _create_stage_file(destination)
         while True:
             _check_limits(cancel_event, deadline)
+            remaining = getattr(response, "length", None)
+            if remaining == 0:
+                break
+            if getattr(response, "fp", True) is None:
+                if remaining is not None:
+                    raise http.client.IncompleteRead(b"", remaining)
+                break
             m3u._set_response_socket_timeout(
                 response,
                 connection,
@@ -1209,6 +1260,9 @@ def _copy_http_response(
             chunk = reader(READ_CHUNK_BYTES)
             _check_limits(cancel_event, deadline)
             if not chunk:
+                remaining = getattr(response, "length", None)
+                if remaining not in (None, 0):
+                    raise http.client.IncompleteRead(b"", remaining)
                 break
             if len(prefix) < 2:
                 prefix = (prefix + bytes(chunk))[:2]
@@ -1272,12 +1326,34 @@ def _expand_gzip(source_path, destination, cancel_event, deadline):
             raise M3UEPGSourceError("expanded XMLTV guide is empty")
         os.fsync(descriptor)
         os.fchmod(descriptor, 0o600)
-    except (OSError, EOFError, gzip.BadGzipFile) as error:
+    except (OSError, EOFError, zlib.error) as error:
         raise M3UEPGSourceError("compressed XMLTV guide is invalid") from error
     finally:
         if descriptor is not None:
             os.close(descriptor)
     return total
+
+
+def _without_epg_quality(name):
+    parts = name.split()
+    while len(parts) > 1 and parts[-1] in dvb_epg._QUALITY_SUFFIXES:
+        parts.pop()
+    return " ".join(parts)
+
+
+_EPG_COUNTRY_PREFIX = re.compile(r"^([a-z]{2})(?:\s*[:|]\s*|\s+[-–—]\s+)")
+
+
+def _epg_name_variants(name, country=""):
+    """Compare provider labels while preserving channel numbers and + variants."""
+    prefix = _EPG_COUNTRY_PREFIX.match(name)
+    if prefix is not None:
+        country = prefix.group(1)
+        name = name[prefix.end():]
+    name = _without_epg_quality(name)
+    compact = "".join(char for char in name if not char.isspace() and char not in "._-–—")
+    short = compact[:-2] if name.endswith(" tv") else compact
+    return (country, compact), (country, short)
 
 
 def _build_snapshot(
@@ -1290,8 +1366,27 @@ def _build_snapshot(
     deadline,
     archive_days=None,
     guide_all_dates=False,
+    wanted_names=None,
+    name_mappings=None,
 ):
     normalised_wanted = set(normalise_tvg_id(value) for value in wanted)
+    explicit_ids = frozenset(wanted)
+    name_rows = []
+    for index, (key, entry) in enumerate((wanted_names or {}).items()):
+        if index % 128 == 0:
+            _check_limits(cancel_event, deadline)
+        if not m3u.is_epg_name_key(key) or key in explicit_ids:
+            continue
+        label, tvg_id = entry if isinstance(entry, tuple) and len(entry) == 2 else (entry, "")
+        if not isinstance(label, str) or not label.strip():
+            continue
+        name = m3u.normalise_epg_name(label)
+        name_rows.append((key, label, tvg_id, name, _epg_name_variants(name)))
+    exact_names = {name: set() for _, _, _, name, _ in name_rows}
+    quality_names = {_without_epg_quality(name): set() for name in exact_names}
+    variant_names = {variant: set() for _, _, _, _, (variant, _) in name_rows if variant[1]}
+    short_names = {short: set() for _, _, _, _, (_, short) in name_rows if short[1]}
+    name_mappings = name_mappings if isinstance(name_mappings, dict) else {}
     channels = OrderedDict()
     normalised_channels = defaultdict(set)
     channel_elements = 0
@@ -1325,6 +1420,24 @@ def _build_snapshot(
                         continue
                     channels.setdefault(xmltv_id, None)
                     normalised_channels[normalise_tvg_id(xmltv_id)].add(xmltv_id)
+                    if exact_names:
+                        _, dot, country = xmltv_id.casefold().rpartition(".")
+                        if not dot or len(country) != 2 or not country.isascii() or not country.isalpha():
+                            country = ""
+                        for child in element:
+                            if dvb_epg._local_name(child.tag) != "display-name":
+                                continue
+                            name = m3u.normalise_epg_name(child.text)
+                            if name in exact_names:
+                                exact_names[name].add(xmltv_id)
+                            quality_name = _without_epg_quality(name)
+                            if quality_name in quality_names:
+                                quality_names[quality_name].add(xmltv_id)
+                            variants = _epg_name_variants(name, country)
+                            for names, (tag, compact) in zip((variant_names, short_names), variants):
+                                for candidate in ((tag, compact), ("", compact)):
+                                    if candidate in names:
+                                        names[candidate].add(xmltv_id)
                     continue
                 if tag == "programme":
                     programme_elements += 1
@@ -1351,6 +1464,29 @@ def _build_snapshot(
             continue
         aliases.append([wanted_id, selected])
         matched_channels.setdefault(selected, None)
+
+    matched_wanted = {key for key, _ in aliases}
+    name_choices = []
+    choice_bytes = 2
+    for index, (key, label, tvg_id, name, (variant, short)) in enumerate(name_rows):
+        if index % 128 == 0:
+            _check_limits(cancel_event, deadline)
+        if tvg_id in matched_wanted:
+            continue
+        candidates = (exact_names[name] or quality_names[_without_epg_quality(name)]
+                      or variant_names.get(variant) or short_names.get(short, ()))
+        chosen = name_mappings.get(key)
+        if len(candidates) > 1 or chosen:
+            row = [key, _clean_snapshot_text(label, 180), sorted(candidates)]
+            size = _encoded_json_size(row) + 1
+            if choice_bytes + size <= MAX_NAME_CHOICES_BYTES:
+                name_choices.append(row)
+                choice_bytes += size
+        if not chosen and len(candidates) == 1:
+            chosen = next(iter(candidates))
+        if isinstance(chosen, str) and chosen in channels:
+            aliases.append([key, chosen])
+            matched_channels.setdefault(chosen, None)
 
     candidate_events = defaultdict(list)
     invalid_programmes = 0
@@ -1480,6 +1616,8 @@ def _build_snapshot(
         "matched_ids": len(aliases),
         "event_count": event_count,
     }
+    if name_choices:
+        payload["name_choices"] = name_choices
     # Validate the complete object before it can reach a last-good cache path.
     # The persisted-size check runs after transfer metadata is attached so the
     # byte budget covers the exact object written to disk.
@@ -1970,6 +2108,24 @@ def _validate_snapshot(payload, cancel_event=None, deadline=None):
         output[name] = value
     if output["matched_ids"] != len(aliases) or output["event_count"] != total_events:
         raise M3UEPGSnapshotError("M3U EPG snapshot totals do not match")
+    name_choices = payload.get("name_choices", [])
+    if not isinstance(name_choices, list) or _encoded_json_size(name_choices) > MAX_NAME_CHOICES_BYTES:
+        raise M3UEPGSnapshotError("M3U EPG name choices exceed the size limit")
+    if name_choices:
+        seen_names = set()
+        for row in name_choices:
+            if not isinstance(row, list) or len(row) != 3:
+                raise M3UEPGSnapshotError("M3U EPG name choice is invalid")
+            key, label, ids = row
+            if (not m3u.is_epg_name_key(key) or key in seen_names or not isinstance(label, str)
+                    or not 0 < len(label) <= 180 or not label.isprintable()
+                    or not isinstance(ids, list) or len(ids) > MAX_XMLTV_CHANNELS):
+                raise M3UEPGSnapshotError("M3U EPG name choice is invalid")
+            for xmltv_id in ids:
+                if not isinstance(xmltv_id, str) or _validated_tvg_id(xmltv_id) != xmltv_id:
+                    raise M3UEPGSnapshotError("M3U EPG name choice is invalid")
+            seen_names.add(key)
+        output["name_choices"] = name_choices
     return output
 
 
@@ -2011,6 +2167,7 @@ def _runtime_snapshot(payload, cancel_event=None, deadline=None, cache=None,
             "cached_at": payload["cached_at"],
             "cache_dir": cache_dir,
             "index": index,
+            "name_choices": tuple((key, name, tuple(ids)) for key, name, ids in payload.get("name_choices", ())),
         }
     finally:
         if own_descriptor is not None:

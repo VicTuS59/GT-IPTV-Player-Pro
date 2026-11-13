@@ -4395,3 +4395,53 @@ msgstr "TXT dosyası okunamadı."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Eklenen Xtream hesabı ({})\nAtlanan yinelenen kayıt ({})"
+
+msgid "Change layout"
+msgstr "Tasarımı Değiştir"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Kanal eşleştirmesi kaydedildi. Uygulamak için EPG’yi yenileyin."
+
+msgid "Cinematic view"
+msgstr "Sinematik"
+
+msgid "EPG server name could not be resolved."
+msgstr "EPG sunucusunun adı çözümlenemedi."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "En fazla {} karakterden oluşan geçerli bir ad gir."
+
+msgid "Football scores\u0004Select source"
+msgstr "Kaynak seç"
+
+msgid "List view"
+msgstr "Liste"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "M3U listesi yenilendi. Değişiklikler sonraki yenilemede gösterilecek."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "M3U listesi yenilenemedi. Önbellekteki liste gösteriliyor."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "M3U güncelleme özeti\n\nYeni kanallar ({added})\nListeden çıkan kanallar ({removed})\nAdı değişen kanallar ({renamed})"
+
+msgid "Matching release details"
+msgstr "Sürüm bilgileri uyumlu"
+
+msgid "Matching release group"
+msgstr "Aynı sürüm grubu"
+
+msgid "No channels need manual mapping."
+msgstr "Elle eşleştirme gerektiren kanal yok."
+
+msgid "No matching EPG channels found."
+msgstr "EPG’de eşleşen kanal bulunamadı."
+
+msgid "Recommended"
+msgstr "Önerilen"
+
+msgid "Restore source name"
+msgstr "Kaynak adını geri yükle"

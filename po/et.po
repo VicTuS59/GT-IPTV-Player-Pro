@@ -4395,3 +4395,53 @@ msgstr "TXT-faili ei saanud lugeda."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Lisatud Xtreami kontod ({})\nVahele jäetud duplikaadid ({})"
+
+msgid "Change layout"
+msgstr "Muuda paigutust"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Kanali seos salvestati. Selle rakendamiseks värskenda EPG-d."
+
+msgid "Cinematic view"
+msgstr "Kinovaade"
+
+msgid "EPG server name could not be resolved."
+msgstr "EPG-serveri nime ei õnnestunud lahendada."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Sisesta kuni {} märgi pikkune kehtiv nimi."
+
+msgid "Football scores\u0004Select source"
+msgstr "Vali allikas"
+
+msgid "List view"
+msgstr "Loendivaade"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "M3U loend on värskendatud. Muudatusi kuvatakse järgmisel värskendamisel."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "M3U loendi värskendamine nurjus. Kuvatakse vahemällu salvestatud loend."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "M3U värskenduse kokkuvõte\n\nUued kanalid ({added})\nLoendist kadunud kanalid ({removed})\nÜmber nimetatud kanalid ({renamed})"
+
+msgid "Matching release details"
+msgstr "Sobivad väljalaskeandmed"
+
+msgid "Matching release group"
+msgstr "Sama väljalaskegrupp"
+
+msgid "No channels need manual mapping."
+msgstr "Ükski kanal ei vaja käsitsi sidumist."
+
+msgid "No matching EPG channels found."
+msgstr "Sobivaid EPG-kanaleid ei leitud."
+
+msgid "Recommended"
+msgstr "Soovitatud"
+
+msgid "Restore source name"
+msgstr "Taasta algne nimi"

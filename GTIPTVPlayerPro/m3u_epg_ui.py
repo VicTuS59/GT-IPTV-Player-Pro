@@ -69,6 +69,7 @@ XMLTV_SETTINGS_FOOTER_ITEMS = (
     footer_item("ok", "edit", 0.75),
     footer_item("green", "save", 0.8),
     footer_item("yellow", "refresh", 0.95),
+    footer_item("blue", "epg_mapping", 1.35),
     footer_item("exit", "back", 0.75),
 )
 XMLTV_BROWSER_FOOTER_ITEMS = (
@@ -376,6 +377,7 @@ def _binding_snapshot(binding, source_id):
         last_event_count=max(
             0, _safe_int(getattr(binding, "last_event_count", 0), 0)
         ),
+        name_mappings=getattr(binding, "name_mappings", None),
     )
 
 
@@ -528,14 +530,24 @@ def _status_text(binding, refresh_state=None):
         return _("Background update requested")
     if state == "cancelled":
         return _("Request cancelled")
-    error_code = str(getattr(binding, "last_error_code", "") or "").strip()
+    persisted_error = str(getattr(binding, "last_error_code", "") or "").strip()
+    error_code = str(refresh_state.get("error_code") or persisted_error) if state == "failed" else persisted_error
     attempt = max(0, _safe_int(getattr(binding, "last_attempt_utc", 0), 0))
     success = max(0, _safe_int(getattr(binding, "last_success_utc", 0), 0))
-    if error_code and attempt >= success:
+    if state == "failed" or (error_code and attempt >= success):
+        if error_code == "dns":
+            return _("EPG server name could not be resolved.")
+        if error_code == "deadline":
+            return _("Request timed out")
+        if error_code in ("no-tvg-id", "no-channel-match"):
+            return _("No matching EPG channels found.")
         return _("Update failed; the previous guide remains available.")
     if success:
+        channels = max(0, _safe_int(getattr(binding, "last_channel_count", 0), 0))
+        if not channels:
+            return _("No matching EPG channels found.")
         return _("Completed: {} channels, {} events").format(
-            max(0, _safe_int(getattr(binding, "last_channel_count", 0), 0)),
+            channels,
             max(0, _safe_int(getattr(binding, "last_event_count", 0), 0)),
         )
     if attempt:
@@ -821,6 +833,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
                 "red": self.close_screen,
                 "green": self.save,
                 "yellow": self.request_refresh,
+                "blue": self.open_name_mapping,
                 "up": self.move_up,
                 "down": self.move_down,
                 "upRepeated": self.move_up,
@@ -915,6 +928,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
             last_error_code=("" if endpoint_changed else self.binding.last_error_code),
             last_channel_count=(0 if endpoint_changed else self.binding.last_channel_count),
             last_event_count=(0 if endpoint_changed else self.binding.last_event_count),
+            name_mappings={} if endpoint_changed else self.binding.name_mappings,
         )
 
     def _change(self, step):
@@ -1078,6 +1092,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
                                 "last_error_code": "",
                                 "last_channel_count": 0,
                                 "last_event_count": 0,
+                                "name_mappings": {},
                             }
                         )
                     return patch
@@ -1106,6 +1121,89 @@ class GTM3UXMLTVSettingsScreen(Screen):
         if self._save_preferences():
             set_text_if_changed(self["message"], _("External XMLTV EPG settings saved."))
             self._refresh()
+
+    def _mapping_page(self, title, items, callback, page=0):
+        if self._closed:
+            return
+        try:
+            from Screens.ChoiceBox import ChoiceBox
+        except ImportError:
+            set_text_if_changed(self["message"], _("Manual channel mapping could not be opened."))
+            return
+        start = page * 60
+        options = list(items[start:start + 60])
+        if page:
+            options.insert(0, ("◀ " + _("Page"), page - 1))
+        if start + 60 < len(items):
+            options.append((_("Page") + " ▶", page + 1))
+
+        def picked(choice=None):
+            if self._closed or not choice:
+                return
+            value = choice[1]
+            if isinstance(value, int):
+                self._mapping_page(title, items, callback, value)
+            else:
+                callback(value)
+
+        self.session.openWithCallback(picked, ChoiceBox, title, options)
+
+    def open_name_mapping(self):
+        if self._closed:
+            return
+        from .m3u_epg import get_default_store
+        choices = get_default_store().name_choices(self.source_id, self.binding.fingerprint)
+        if not choices:
+            message = (_("No channels need manual mapping.") if self.binding.last_success_utc
+                       else _("No update has been completed yet."))
+            set_text_if_changed(self["message"], message)
+            return
+        items = [(label, (key, label, ids)) for key, label, ids in choices]
+        items.sort(key=lambda row: row[0].casefold())
+        self._mapping_page(_("Manual channel mapping"), items, self._choose_xmltv_name)
+
+    def _choose_xmltv_name(self, choice):
+        key, label, ids = choice
+        options = [(_("Automatic"), "")]
+        options.extend((xmltv_id, xmltv_id) for xmltv_id in ids)
+        self._mapping_page(_("Select XMLTV channel") + " · " + label, options,
+                           lambda selected: self._save_name_mapping(key, selected))
+
+    def _save_name_mapping(self, key, selected):
+        if self._closed:
+            return
+        fingerprint = self.binding.fingerprint
+
+        def merge(current):
+            if current.fingerprint != fingerprint:
+                return None
+            mappings = dict(current.name_mappings)
+            if selected:
+                mappings[key] = selected
+            else:
+                mappings.pop(key, None)
+            return {"name_mappings": mappings}
+
+        try:
+            if self._uses_default_persistence:
+                saved = update_m3u_epg_binding(self.source_id, merge)
+            else:
+                payload = self.binding.as_dict()
+                payload.update(merge(self.binding))
+                candidate = Binding.from_dict(payload)
+                saved = self.settings_saver(candidate)
+                if saved is not False and not isinstance(saved, Binding):
+                    saved = candidate
+            if not isinstance(saved, Binding):
+                raise OSError("mapping save failed")
+        except (OSError, ValueError, TypeError):
+            set_text_if_changed(self["message"], _("The manual channel mapping could not be saved."))
+            return
+        self.binding.name_mappings = dict(saved.name_mappings)
+        self._saved_binding = _binding_snapshot(saved, self.source_id)
+        _notify_settings_changed()
+        set_text_if_changed(self["message"], _("Channel mapping saved. Refresh EPG to apply it."))
+        self._refresh()
 
     def _arm_refresh_poll(self):
         if (
@@ -1145,6 +1243,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
             last_error_code=persisted.last_error_code,
             last_channel_count=persisted.last_channel_count,
             last_event_count=persisted.last_event_count,
+            name_mappings=persisted.name_mappings,
         )
         return True
 
@@ -1168,12 +1267,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
         self._reload_completed_status()
         self._refresh_runtime_state = dict(state)
         self._refresh()
-        if phase == "success":
-            set_text_if_changed(self["message"], _status_text(self.binding))
-        elif phase == "cancelled":
-            set_text_if_changed(self["message"], _("Request cancelled"))
-        else:
-            set_text_if_changed(self["message"], _("Update failed; the previous guide remains available."))
+        set_text_if_changed(self["message"], _status_text(self.binding, state))
         self._refresh_runtime_state = None
 
     def _poll_refresh(self):

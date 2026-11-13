@@ -84,26 +84,28 @@ class PanelText(GUIComponent):
         label.setBackgroundColor(parseColor('#000000'))
         label.setVAlign(eLabel.alignCenter)
         label.setText(self._text)
-        chosen=self._font_size;measured_width=0
-        # Use actual glyph metrics. Scrolling text keeps a large font; numbers
-        # can fit down to half that size instead of moving every clock tick.
-        minimum=chosen if self._allow_scroll else max(1,chosen//2)
-        for size in range(chosen,minimum-1,-1):
+        size = self._font_size
+        while True:
             label.setFont(gFont(self._family,size))
             label.resize(eSize(max(self._width,size*max(1,len(self._text))*2),self._height))
             try:
                 measured=label.calculateSize();measured_width=max(0,int(measured.width()));measured_height=max(0,int(measured.height()))
             except Exception:
                 measured_width=int(_text_units(self._text)*size*.58);measured_height=size
-            if measured_height<=self._height and (self._allow_scroll or measured_width<=self._width):break
-        # Height fitting is needed for every language, including tall glyphs.
-        while size>1 and measured_height>self._height:
-            size-=1;label.setFont(gFont(self._family,size))
-            try:
-                measured=label.calculateSize();measured_width=max(0,int(measured.width()));measured_height=max(0,int(measured.height()))
-            except Exception:measured_height=size
+            if size == 1:
+                break
+            # Scale to the measured bounds before rechecking the native font.
+            # Clocks can change each second, so avoid measuring every size.
+            fitted = size
+            if measured_height > self._height:
+                fitted = self._height * size // measured_height
+            if not self._allow_scroll and measured_width > self._width:
+                fitted = min(fitted, self._width * size // measured_width)
+            if fitted == size:
+                break
+            size = max(1, fitted)
         self._display_font=size
-        self._overflow=max(0,measured_width-self._width)
+        self._overflow=max(0,measured_width-self._width) if self._allow_scroll else 0
         self._speed=max(10.0,min(90.0,size*.8))
         if self._overflow:
             label.setHAlign(eLabel.alignRight if self._rtl else eLabel.alignLeft)

@@ -4395,3 +4395,53 @@ msgstr "TXT-filen kunde inte läsas."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Xtream-konton tillagda ({})\nDubbletter överhoppade ({})"
+
+msgid "Change layout"
+msgstr "Byt layout"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Kanalkopplingen sparades. Uppdatera EPG för att använda den."
+
+msgid "Cinematic view"
+msgstr "Biovy"
+
+msgid "EPG server name could not be resolved."
+msgstr "EPG-serverns namn kunde inte slås upp."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Ange ett giltigt namn med högst {} tecken."
+
+msgid "Football scores\u0004Select source"
+msgstr "Välj källa"
+
+msgid "List view"
+msgstr "Listvy"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "M3U-listan har uppdaterats. Ändringar visas vid nästa uppdatering."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "M3U-listan kunde inte uppdateras. Listan från cacheminnet visas."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Sammanfattning av M3U-uppdateringen\n\nNya kanaler ({added})\nKanaler som inte längre finns i listan ({removed})\nNamnändrade kanaler ({renamed})"
+
+msgid "Matching release details"
+msgstr "Matchande utgivningsuppgifter"
+
+msgid "Matching release group"
+msgstr "Samma utgivningsgrupp"
+
+msgid "No channels need manual mapping."
+msgstr "Inga kanaler behöver kopplas manuellt."
+
+msgid "No matching EPG channels found."
+msgstr "Inga matchande EPG-kanaler hittades."
+
+msgid "Recommended"
+msgstr "Rekommenderad"
+
+msgid "Restore source name"
+msgstr "Återställ det ursprungliga namnet"

@@ -37,6 +37,8 @@ except ImportError:  # Allow settings migration outside a running Enigma2 GUI.
 
 
 DEFAULT_SETTINGS_PATH = "/etc/enigma2/gtiptvplayerpro-settings.json"
+VOD_LAYOUTS = ("list", "cinematic")
+_NATIVE_CONFIG_ERRORS = (AttributeError, OSError, RuntimeError, TypeError, ValueError, MemoryError)
 TEXT_SIZE_CHOICES = ("standard", "large", "very_large")
 DEFAULT_INFOBAR_TIMEOUT = 4
 INFOBAR_TIMEOUT_CHOICES = tuple(range(11))  # Zero disables automatic hiding.
@@ -116,6 +118,8 @@ def _player_config():
         section.youtube_search_language = ConfigSelection(default="tr", choices=["tr", "en", "de", "fr", "es", "ar"])
     if not hasattr(section, "cinematic_view"):
         section.cinematic_view = ConfigYesNo(default=True)
+    if not hasattr(section, "vod_layout"):
+        section.vod_layout = ConfigSelection(default="list", choices=list(VOD_LAYOUTS))
     if not hasattr(section, "show_in_main_menu"):
         section.show_in_main_menu = ConfigYesNo(default=True)
     if not hasattr(section, "dashboard_order"):
@@ -417,6 +421,7 @@ class PlayerSettings(object):
         youtube_autoplay=False,
         auto_login_source="",
         infobar_timeout=DEFAULT_INFOBAR_TIMEOUT,
+        vod_layout="list",
     ):
         self.live_service_type = supported_service_type(
             live_service_type, 5002
@@ -441,6 +446,7 @@ class PlayerSettings(object):
         self.ui_text_size = normalize_text_size(ui_text_size)
         self.infobar_timeout = normalize_infobar_timeout(infobar_timeout)
         self.cinematic_view = bool(cinematic_view)
+        self.vod_layout = vod_layout if vod_layout in VOD_LAYOUTS else "list"
         self.show_in_main_menu = bool(show_in_main_menu)
         self.channel_highlight = normalize_channel_highlight(channel_highlight)
         self.selection_border = normalize_selection_border(
@@ -469,6 +475,7 @@ class PlayerSettings(object):
                 payload.get("text_size", "standard"),
             ),
             cinematic_view=payload.get("cinematic_view", True),
+            vod_layout=payload.get("vod_layout", "list"),
             show_in_main_menu=payload.get("show_in_main_menu", True),
             channel_highlight=payload.get(
                 "channel_highlight", DEFAULT_CHANNEL_HIGHLIGHT
@@ -498,6 +505,7 @@ class PlayerSettings(object):
             "ui_text_size": self.ui_text_size,
             "infobar_timeout": self.infobar_timeout,
             "cinematic_view": self.cinematic_view,
+            "vod_layout": self.vod_layout,
             "show_in_main_menu": self.show_in_main_menu,
             "channel_highlight": self.channel_highlight,
             "selection_border": self.selection_border,
@@ -602,6 +610,7 @@ def _settings_from_config(section):
             getattr(section, "infobar_timeout", None), "value", DEFAULT_INFOBAR_TIMEOUT,
         ),
         cinematic_view=section.cinematic_view.value,
+        vod_layout=getattr(getattr(section, "vod_layout", None), "value", "list"),
         show_in_main_menu=section.show_in_main_menu.value,
         channel_highlight=channel_highlight,
         selection_border=selection_border,
@@ -627,10 +636,13 @@ def _restore_native_snapshot(snapshot):
     for element, value, has_saved, saved in snapshot:
         try:
             _set_config_value(element, value)
-            if has_saved:
-                element.saved_value = saved
-        except (AttributeError, IOError, OSError, TypeError, ValueError):
+        except _NATIVE_CONFIG_ERRORS:
             pass
+        if has_saved:
+            try:
+                element.saved_value = saved
+            except _NATIVE_CONFIG_ERRORS:
+                pass
 
 
 @guarded_mutation
@@ -639,10 +651,11 @@ def _store_config_settings(section, settings, migrated=True):
         return False
     if not isinstance(settings, PlayerSettings):
         settings = PlayerSettings.from_dict(settings)
-    snapshot = _native_snapshot(section)
+    snapshot = []
     try:
         if configfile is None:
             return False
+        snapshot = _native_snapshot(section)
         _set_config_value(
             section.live_service_type,
             str(settings.live_service_type),
@@ -676,6 +689,8 @@ def _store_config_settings(section, settings, migrated=True):
             section.cinematic_view,
             bool(settings.cinematic_view),
         )
+        if hasattr(section, "vod_layout"):
+            _set_config_value(section.vod_layout, settings.vod_layout)
         _set_config_value(
             section.show_in_main_menu,
             bool(settings.show_in_main_menu),
@@ -689,9 +704,11 @@ def _store_config_settings(section, settings, migrated=True):
         if migrated:
             _set_config_value(section.legacy_json_migrated, True)
         section.save()
-        configfile.save()
+        if configfile.save() is False:
+            _restore_native_snapshot(snapshot)
+            return False
         return True
-    except (AttributeError, IOError, OSError, TypeError, ValueError):
+    except _NATIVE_CONFIG_ERRORS:
         _restore_native_snapshot(snapshot)
         return False
 
@@ -711,6 +728,14 @@ def load_player_settings(path=DEFAULT_SETTINGS_PATH):
         return PlayerSettings.from_dict(_read_json_settings(path))
     _migrate_legacy_settings(section, path)
     return _settings_from_config(section)
+
+
+def load_vod_layout():
+    """Keep the library accessible if an image's native config read fails."""
+    try:
+        return load_player_settings().vod_layout
+    except _NATIVE_CONFIG_ERRORS:
+        return "list"
 
 
 @guarded_mutation

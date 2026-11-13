@@ -4401,3 +4401,53 @@ msgstr "TXT failu nevarēja nolasīt."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Pievienotie Xtream konti ({})\nIzlaistie dublikāti ({})"
+
+msgid "Change layout"
+msgstr "Mainīt izkārtojumu"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Kanāla sasaiste saglabāta. Atsvaidziniet EPG, lai to lietotu."
+
+msgid "Cinematic view"
+msgstr "Kino skats"
+
+msgid "EPG server name could not be resolved."
+msgstr "Neizdevās noteikt EPG servera adresi pēc tā nosaukuma."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Ievadiet derīgu nosaukumu, kas nepārsniedz {} rakstzīmes."
+
+msgid "Football scores\u0004Select source"
+msgstr "Izvēlieties avotu"
+
+msgid "List view"
+msgstr "Saraksta skats"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "M3U saraksts ir atsvaidzināts. Izmaiņas tiks parādītas nākamajā atsvaidzināšanas reizē."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Neizdevās atsvaidzināt M3U sarakstu. Tiek rādīts kešatmiņā saglabātais saraksts."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "M3U atsvaidzināšanas kopsavilkums\n\nJauni kanāli ({added})\nKanāli, kuru sarakstā vairs nav ({removed})\nPārdēvēti kanāli ({renamed})"
+
+msgid "Matching release details"
+msgstr "Saderīga informācija par izlaidumu"
+
+msgid "Matching release group"
+msgstr "Tā pati izlaiduma grupa"
+
+msgid "No channels need manual mapping."
+msgstr "Neviens kanāls nav jāsasaista manuāli."
+
+msgid "No matching EPG channels found."
+msgstr "Atbilstoši EPG kanāli nav atrasti."
+
+msgid "Recommended"
+msgstr "Ieteikts"
+
+msgid "Restore source name"
+msgstr "Atjaunot sākotnējo nosaukumu"

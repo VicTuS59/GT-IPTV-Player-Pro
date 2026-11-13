@@ -11,7 +11,9 @@ from .typography import (clean_dynamic_text, ellipsize_dynamic_text,
 from .provider_preview import catalogue_info
 from .metadata import media_metadata_ready
 from .scrollbar import update_scrollbar, hide_scrollbar
-from .vod_artwork import backdrop_urls, cached_backdrop, download_backdrop, provider_backdrop_loader
+from .vod_artwork import (backdrop_urls, cached_backdrop, cached_poster, cached_preview_backdrop,
+                          download_backdrop, load_poster, load_preview_backdrop, poster_urls,
+                          provider_backdrop_loader)
 
 CATEGORY_ROWS = 11
 CONTENT_ROWS = 10
@@ -189,9 +191,6 @@ class LightVODMethods:
         from Components.Label import Label
         from Components.Pixmap import Pixmap
         from Components.ActionMap import ActionMap
-        from enigma import eTimer
-        from .browser_common import _connect_timer
-        from .source_loader import SourceLoader
         from .native_vod_list import NativeVODList
         from xml.etree import ElementTree as ET
         kind=self.content_type
@@ -223,41 +222,12 @@ class LightVODMethods:
         self['light_hero'].hide()
         self['light_primary'].hide()
         self._light_rows_signature=self._light_categories_signature=None
-        self._light_cover_identity=None
-        self._light_cover_token=None
-        self._light_cover_request=None
-        self._light_cover_job=None
-        self._light_visual_identity=None
-        self._light_hero_request=None
-        self._light_hero_after_cache=None
-        self._light_hero_token=None
-        self._light_hero_ready=False
-        self._light_hero_decoding=False
-        self._light_hero_url=''
-        self._light_navigation_held=False
-        self._light_navigation_repeated=False
-        self._light_visible=False
-        self._light_plot_text=''
-        self._light_repeat_direction=0
-        self._light_repeat_count=0
-        self._light_repeat_time=0
-        self._light_detail_identity=None
         self._light_list_sync=False
         self._light_favorite_revision=0
         self._light_favorite_signature=None
         self['light_category_list'].onSelectionChanged.append(self._light_native_category_changed)
         self['light_content_list'].onSelectionChanged.append(self._light_native_content_changed)
-        self._light_cover_loader=SourceLoader(eTimer(),_connect_timer,self._light_cover_done)
-        self._light_hero_loader=SourceLoader(eTimer(),_connect_timer,self._light_hero_done)
-        self._light_list_delivery=SourceLoader(eTimer(),_connect_timer,self._light_list_ready)
-        self._light_list_delivery_job=None
-        self._light_cover_start_timer=eTimer()
-        _connect_timer(self._light_cover_start_timer,self._light_start_cover)
-        self.onShown.append(self._light_shown)
-        self.onLayoutFinish.append(self._light_layout_ready)
-        self.onHide.append(self._light_hidden)
-        self.onClose.append(self._light_close)
-        self.onClose.append(self._stop_movie if kind=='movie' else self._stop_series)
+        self._setup_vod_runtime()
         self['actions']=ActionMap(['OkCancelActions','DirectionActions','ColorActions',
             'MoviePlayerActions','MenuActions','InfobarEPGActions'],{
             'ok':self._light_ok,'cancel':self._light_back,
@@ -287,6 +257,43 @@ class LightVODMethods:
         self._light_render_categories(schedule_load=False)
         self._light_waiting()
 
+    def _setup_vod_runtime(self):
+        from enigma import eTimer
+        from .browser_common import _connect_timer
+        from .source_loader import SourceLoader
+
+        self._light_cover_identity=None
+        self._light_poster_url=''
+        self._light_cover_token=None
+        self._light_cover_request=None
+        self._light_cover_job=None
+        self._light_visual_identity=None
+        self._light_hero_request=None
+        self._light_hero_after_cache=None
+        self._light_hero_token=None
+        self._light_hero_ready=False
+        self._light_hero_decoding=False
+        self._light_hero_url=''
+        self._light_navigation_held=False
+        self._light_navigation_repeated=False
+        self._light_visible=False
+        self._light_plot_text=''
+        self._light_repeat_direction=0
+        self._light_repeat_count=0
+        self._light_repeat_time=0
+        self._light_detail_identity=None
+        self._light_cover_loader=SourceLoader(eTimer(),_connect_timer,self._light_cover_done)
+        self._light_hero_loader=SourceLoader(eTimer(),_connect_timer,self._light_hero_done)
+        self._light_list_delivery=SourceLoader(eTimer(),_connect_timer,self._light_list_ready)
+        self._light_list_delivery_job=None
+        self._light_cover_start_timer=eTimer()
+        _connect_timer(self._light_cover_start_timer,self._light_start_cover)
+        self.onShown.append(self._light_shown)
+        self.onLayoutFinish.append(self._light_layout_ready)
+        self.onHide.append(self._light_hidden)
+        self.onClose.append(self._light_close)
+        self.onClose.append(self._stop_movie if self.content_type=='movie' else self._stop_series)
+
     def _setup_movie_widgets(self):self._setup_light_widgets()
     def _setup_series_widgets(self):self._setup_light_widgets()
 
@@ -308,7 +315,8 @@ class LightVODMethods:
     def _light_shown(self):
         self._light_visible=True
         self['light_video_guard'].show()
-        self[self.content_type+'_poster_backing'].show()
+        backing=self.content_type+'_poster_backing'
+        if backing in self:self[backing].show()
         entries=self._light_field('entries',())
         if entries and not self._light_field('loading',False):
             self._light_detail_identity=None
@@ -353,6 +361,7 @@ class LightVODMethods:
             self._light_cancel_art()
         self._light_visual_identity=identity
         self._light_cover_identity=None
+        self._light_poster_url=''
         self._light_hero_ready=False
         self._light_hero_url=''
         self._light_show('light_hero',False)
@@ -459,32 +468,43 @@ class LightVODMethods:
 
     def _light_select(self,index):
         kind=self.content_type;entries=self._light_field('entries',())
-        if not getattr(entries,'full_category',False):
-            from .browser_vod import VODBrowserMethods
-            return getattr(VODBrowserMethods,'_select_'+kind)(self,index)
         if self._closed or self._light_field('loading',False) or not entries:return
+        prefix='_'+kind+'_'
         focused=self._light_content_focus()
-        setattr(self,'_'+kind+'_focus','posters' if kind=='movie' else 'series')
+        setattr(self,prefix+'focus','posters' if kind=='movie' else 'series')
         index=int(index)
+        full_category=getattr(entries,'full_category',False)
+        if not full_category:
+            if index<0 and self._vod_window_base(kind):
+                self._request_vod_window(kind,index)
+                return
+            if index>=len(entries) and self._light_field('has_more',False):
+                setattr(self,prefix+'pending_advance',True)
+                setattr(self,prefix+'pending_selection_index',index)
+                getattr(self,'_start_'+kind+'_more_load')()
+                return
+            self._light_discard_deferred_step()
         if getattr(entries,'progressive',False):
             from .progressive_vod import defer_selection
             if defer_selection(self,kind,index):return
-            setattr(self,'_'+kind+'_pending_advance',False)
-            setattr(self,'_'+kind+'_pending_selection_index',None)
+            self._light_discard_deferred_step()
             catalog=self._light_field('browser_catalog')
             if entries.pending or (catalog is not None and catalog.state.get('preparing')):
                 index=max(0,min(index,len(entries)-1))
             else:index%=len(entries)
         else:index%=len(entries)
         if index!=self._light_field('selected_index',0):
-            setattr(self,'_'+kind+'_selected_index',index)
-            setattr(self,'_'+kind+'_generation',self._light_field('generation')+1)
+            setattr(self,prefix+'selected_index',index)
+            if not full_category:self._trim_vod_window(kind)
+            setattr(self,prefix+'generation',self._light_field('generation')+1)
             if kind=='series':
                 self._series_info=None;self._series_info_stream_id=''
                 self._remember_series_selection()
             self._light_schedule_detail()
         self._light_render_rows()
         if not focused:self._light_render_categories(schedule_load=False)
+        if not full_category:
+            getattr(self,'_maybe_load_more_movies' if kind=='movie' else '_maybe_load_more_series')()
 
     def _select_movie(self,index):self._light_select(index)
     def _select_series(self,index):self._light_select(index)
@@ -602,13 +622,56 @@ class LightVODMethods:
 
     def _light_menu(self):
         from Screens.ChoiceBox import ChoiceBox
-        options=[(_('Refresh'),self.refresh_movies if self.content_type=='movie' else self.refresh_series),
+        options=[(_('Change layout'),self._choose_vod_layout),
+            (_('Refresh'),self.refresh_movies if self.content_type=='movie' else self.refresh_series),
             (_('Download'),self.download_selected),(_('Edit categories'),self.open_category_manager),
             (_('Sorting'),self._light_sort),(_('Information'),self._light_info)]
         if self.content_type=='series':options.append((_('Continue Watching'),self.open_series_continue))
         def selected(value):
             if value and not self._closed:value[1]()
         self.session.openWithCallback(selected,ChoiceBox,title=_('Menu'),list=options)
+
+    def _choose_vod_layout(self):
+        from Screens.ChoiceBox import ChoiceBox
+
+        options = ((_("List view"), "list"), (_("Cinematic view"), "cinematic"))
+        choices = [("✓ " + label if value == self._vod_layout else label, value)
+                   for label, value in options]
+        self.session.openWithCallback(self._vod_layout_chosen, ChoiceBox,
+                                      title=_("Change layout"), list=choices)
+
+    def _vod_layout_chosen(self, choice):
+        if self._closed or not choice or choice[1] == self._vod_layout:
+            return
+        from Screens.MessageBox import MessageBox
+        from .settings import VOD_LAYOUTS, _NATIVE_CONFIG_ERRORS, load_player_settings, save_player_settings
+
+        layout = choice[1]
+        if layout not in VOD_LAYOUTS:
+            return
+        try:
+            settings = load_player_settings()
+            settings.vod_layout = layout
+            saved = save_player_settings(settings)
+        except _NATIVE_CONFIG_ERRORS:
+            saved = False
+        if not saved:
+            self.session.open(MessageBox, _("Settings could not be saved. Check the receiver storage."),
+                              type=MessageBox.TYPE_ERROR)
+            return
+        category_id = self._light_field("loaded_category_id")
+        if category_id is None and self._entries:
+            category_id = self._entries[self.selected_index].category_id
+        self.close(("vod-layout", self.content_type, category_id))
+
+    def _restore_vod_layout_category(self):
+        category_id = getattr(self, "_vod_layout_category", None)
+        if category_id is not None and self._entries and not self._loading:
+            self._vod_layout_category = None
+            for index, entry in enumerate(self._entries):
+                if str(entry.category_id) == str(category_id):
+                    self.selected_index = index
+                    break
 
     def _light_info(self):
         entries = self._light_field('entries', ())
@@ -618,12 +681,14 @@ class LightVODMethods:
         from .vod_light_info import LightSynopsisScreen
         identity = self._light_item_identity(item)
         hero_url = self._light_hero_url if identity == self._light_visual_identity else ''
+        poster_url = self._light_poster_url if identity == self._light_cover_identity else ''
         self.session.open(
             LightSynopsisScreen, self.client, self._metadata_client, item,
-            self._cached_grid_detail(self.content_type), hero_url=hero_url,
+            self._cached_grid_detail(self.content_type), hero_url=hero_url, poster_url=poster_url,
         )
 
     def _light_render_categories(self,schedule_load=True):
+        self._restore_vod_layout_category()
         kind=self.content_type
         if self._entries:self.selected_index%=len(self._entries)
         cursor=self.selected_index
@@ -786,7 +851,7 @@ class LightVODMethods:
         set_text_if_changed(self[kind+'_rating'],_rating_label(getattr(info,'tmdb_rating','') or getattr(info,'rating','') or getattr(item,'rating','')))
         self._light_set_plot(getattr(info,'plot','') or (_('Loading...') if info is None else _('Movie summary unavailable.') if kind=='movie' else _('Series summary unavailable.')))
         if not cache_only:
-            self._light_cover(item,poster_path,poster_url or getattr(info,'cover','') or getattr(item,'icon',''))
+            self._light_cover(item,poster_path,poster_url,info)
 
     def _apply_movie_detail(self,*args):self._light_apply_detail(*args)
     def _apply_series_detail(self,*args):self._light_apply_detail(*args)
@@ -842,22 +907,32 @@ class LightVODMethods:
     def _commit_movie_detail(self):self._light_commit_detail()
     def _commit_series_detail(self):self._light_commit_detail()
 
-    def _light_cover(self,item,path,url):
-        from .browser_common import _cached_picon_path
+    def _light_cover(self,item,path,url,info=None):
         if not self._light_visible:return
-        kind=self.content_type;generation=self._light_field('generation')
-        identity=(str(self._light_field('loaded_category_id') or ''),str(item.stream_id),str(url or ''))
+        kind=self.content_type
+        identity=self._light_item_identity(item)
         if identity!=self._light_cover_identity:
             self._light_cancel_cover();self._light_cover_identity=identity
+            self._light_poster_url=''
             self[kind+'_poster'].hide();self[kind+'_poster_placeholder'].show()
-        path=path or (_cached_picon_path(url) if url else '')
+        elif getattr(self[kind+'_poster'],'visible',False):
+            return
+        covers=poster_urls(item,info,url)
+        hit=cached_poster(covers,width=getattr(self,'_poster_image_width',342)) if not path else None
+        path=path or (hit[1] if hit else '')
         if path:
+            self._light_cancel_cover()
+            self._light_poster_url=hit[0] if hit else next(iter(covers),'')
             self._apply_detail_poster(kind,item,path)
             return
-        if not url or self._light_cover_request==(identity,generation):return
+        if not covers and not getattr(self._metadata_client,'available',False):return
+        hints=tuple(getattr(info,field,'') or getattr(item,source,'') for field,source in
+                    (('title','name'),('year','year'),('tmdb_id','tmdb_id'),('imdb_id','imdb_id')))
+        request=(identity,covers,hints)
+        if self._light_cover_request==request:return
         self._light_cancel_cover()
-        self._light_cover_request=(identity,generation)
-        self._light_cover_job=(identity,generation,item,url)
+        self._light_cover_request=request
+        self._light_cover_job=(request,item,info)
         # Selection has already settled before detail/artwork is requested.
         self._light_cover_start_timer.start(0,True)
 
@@ -865,34 +940,38 @@ class LightVODMethods:
         from .browser_common import _WorkerToken
         job,self._light_cover_job=self._light_cover_job,None
         if job is None or self._closed or not self._light_visible:return
-        identity,generation,item,url=job
-        if identity!=self._light_cover_identity or generation!=self._light_field('generation'):return
-        token=self._light_cover_token=_WorkerToken(8)
+        request,item,info=job
+        if request!=self._light_cover_request:return
+        kind=self.content_type
+        token=self._light_cover_token=_WorkerToken(12)
+        width=getattr(self,'_poster_image_width',342)
         def load():
-            path=self._fetch_vod_card(url,token,priority=True,timeout=4)
-            if not path:
-                path,unused_url=self._recover_vod_card(self.content_type,item,url,token)
+            found=load_poster(self.client,self._metadata_client,kind,item,info,request[1],token,width=width)
             token.check()
-            return identity,generation,path
+            return request,found
         self._light_cover_loader.request(load)
 
     def _light_cover_done(self,result,error):
         if self._closed or not self._light_visible or error is not None or not result:return
-        identity,generation,path=result
-        if identity!=self._light_cover_identity or generation!=self._light_field('generation'):return
+        request,found=result
+        if request!=self._light_cover_request:return
         entries=self._light_field('entries',())
         if not entries:return
         item=entries[self._light_field('selected_index',0)]
-        if str(item.stream_id)!=identity[1]:return
-        if path:self._apply_detail_poster(self.content_type,item,path)
+        if self._light_item_identity(item)!=request[0]:return
+        if found:
+            self._light_poster_url,path=found
+            self._apply_detail_poster(self.content_type,item,path)
 
     def _light_hero(self,item,info,*,cache_only=False):
         identity=self._light_item_identity(item)
         if not self._light_visible or (self._light_visual_identity==identity and self._light_hero_ready):return
         from .browser_common import _WorkerToken,_cinematic_cover_ratio
         from .hero_artwork import is_composite,preparation_allowance,prepare_hero,vod_hero_plan
+        cinema=getattr(self,'_vod_discovery_layout',False)
         urls=backdrop_urls(item,info)
-        if not urls:return
+        if not urls and (not cinema or cache_only or not getattr(self._metadata_client,'available',False)):
+            return
         request=(identity,urls,cache_only)
         previous=self._light_hero_request
         if request==previous:return
@@ -903,14 +982,24 @@ class LightVODMethods:
         self._light_cancel_hero()
         self._light_hero_request=request
         token=self._light_hero_token=_WorkerToken(8)
-        plan=vod_hero_plan(*self._light_geometry['hero'][2:])
+        plan=None if cinema else vod_hero_plan(*self._light_geometry['hero'][2:])
 
         def load():
-            found=cached_backdrop(urls,token)
-            if found is None and not cache_only:
-                found=download_backdrop(self.client,urls,token)
+            if cinema:
+                found=(cached_preview_backdrop(urls,token) if cache_only else
+                       load_preview_backdrop(self.client,self._metadata_client,self.content_type,item,info,urls,token))
+            else:
+                found=cached_backdrop(urls,token)
+                if found is None and not cache_only:
+                    found=download_backdrop(self.client,urls,token)
             if found is None:return None
             url,path=found
+            if cinema:
+                # The restored skin already provides native gradient layers.
+                # Limit the decoded texture on UHD receivers.
+                width,height=self._light_geometry['hero'][2:]
+                size=(min(width,1420),min(height,650))
+                return request,url,path,size,False,_cinematic_cover_ratio(path),info
             path=prepare_hero(path,plan,token,preparation_allowance())
             token.check()
             composited=is_composite(path,plan)

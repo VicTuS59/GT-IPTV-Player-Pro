@@ -110,10 +110,10 @@ class SourceLoader:
             self.result = None
             self.waiting = True
             if self.thread is None:
-                self.thread = threading.Thread(target=self._run, name="GT-SourceReader", daemon=True)
                 try:
+                    self.thread = threading.Thread(target=self._run, name="GT-SourceReader", daemon=True)
                     self.thread.start()
-                except (OSError, RuntimeError) as error:
+                except (OSError, RuntimeError, MemoryError) as error:
                     self.thread = None
                     self.pending = None
                     self.result = (self.generation, None, error)

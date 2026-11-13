@@ -4389,3 +4389,53 @@ msgstr "Berkas TXT tidak dapat dibaca."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Akun Xtream yang ditambahkan ({})\nDuplikat yang dilewati ({})"
+
+msgid "Change layout"
+msgstr "Ubah tata letak"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Pemetaan saluran disimpan. Segarkan EPG untuk menerapkannya."
+
+msgid "Cinematic view"
+msgstr "Tampilan sinematik"
+
+msgid "EPG server name could not be resolved."
+msgstr "Alamat server EPG tidak dapat ditemukan berdasarkan namanya."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Masukkan nama yang valid dengan maksimal {} karakter."
+
+msgid "Football scores\u0004Select source"
+msgstr "Pilih sumber"
+
+msgid "List view"
+msgstr "Tampilan daftar"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "Daftar M3U telah disegarkan. Perubahan akan ditampilkan pada penyegaran berikutnya."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Daftar M3U gagal disegarkan. Daftar dari cache ditampilkan."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Ringkasan penyegaran M3U\n\nSaluran baru ({added})\nSaluran yang tidak lagi tercantum ({removed})\nSaluran yang berganti nama ({renamed})"
+
+msgid "Matching release details"
+msgstr "Rincian rilis cocok"
+
+msgid "Matching release group"
+msgstr "Grup rilis sama"
+
+msgid "No channels need manual mapping."
+msgstr "Tidak ada saluran yang perlu dipetakan secara manual."
+
+msgid "No matching EPG channels found."
+msgstr "Tidak ditemukan saluran EPG yang cocok."
+
+msgid "Recommended"
+msgstr "Disarankan"
+
+msgid "Restore source name"
+msgstr "Pulihkan nama asli"

@@ -24,7 +24,8 @@ from .paths import plugin_path
 from .provider_preview import catalogue_info
 from .source_loader import SourceLoader
 from .typography import fit_dynamic_text, set_text_if_changed
-from .vod_artwork import artwork_urls, backdrop_urls, cached_artwork, cached_backdrop, download_artwork, download_backdrop
+from .vod_artwork import (artwork_urls, backdrop_urls, cached_backdrop, cached_poster,
+                          download_backdrop, load_poster, poster_urls)
 from .vod_light import geometry
 
 
@@ -35,6 +36,7 @@ ACCENT = "#36D7F4"
 GOLD = "#FFCE58"
 HERO_BOX = (680, 0, 1240, 1080)
 POSTER_BOX = (1242, 139, 493, 739)
+FILM_SUMMARY_LINES = 8
 DETAIL_FIELDS = ("title", "plot", "director", "cast", "rating", "year", "genre",
                  "duration", "backdrop", "cover", "cover_urls", "tmdb_id",
                  "imdb_id", "season_ids")
@@ -48,17 +50,53 @@ def _display_text(value):
     return _UNSAFE_NATIVE_TEXT.sub("\ufffd", "" if value is None else str(value))
 
 
-def _skin(width, height, layout):
+def _film_summary_size(font_size, available_height):
+    """Fit eight whole lines using the receiver's native ScrollLabel metrics."""
+    try:
+        from skin import parseFont
+
+        if hasattr(ScrollLabel, "goPageDown"):
+            from enigma import eLabel, eSize
+
+            # Newer ScrollLabel versions use a single native line as the unit.
+            bounds = eSize(10000, 10000)
+
+            def line_height(font):
+                return eLabel.calculateTextSize(font, "Abcdefgh", bounds, True).height()
+        else:
+            from enigma import fontRenderClass
+
+            line_height = fontRenderClass.getInstance().getLineHeight
+
+        for size in range(font_size, 7, -1):
+            line = int(line_height(parseFont("Regular;{}".format(size))))
+            if line <= 0:
+                break
+            height = FILM_SUMMARY_LINES * line
+            if height <= available_height:
+                return size, height
+    except (ImportError, AttributeError, KeyError, OSError, RuntimeError, TypeError, ValueError, OverflowError):
+        pass
+    return font_size, available_height
+
+
+def _skin(width, height, layout, kind):
     rect, font = layout["rect"], layout["font"]
+    film = kind == "movie"
+    summary_height, director_y, cast_y = (328, 820, 889) if film else (224, 739, 820)
 
     def box(values):
         x, y, w, h = rect(*values)
         return 'position="{},{}" size="{},{}"'.format(x, y, w, h)
 
-    def label(name, values, size, color=INK, extra="", transparent=1):
-        return ('<widget name="{}" {} zPosition="3" font="Regular;{}" '
+    def label(name, values, size, color=INK, extra="", transparent=1, *, fit_summary=False):
+        x, y, w, h = rect(*values)
+        size = font(size)
+        if fit_summary:
+            size, h = _film_summary_size(size, h)
+        return ('<widget name="{}" position="{},{}" size="{},{}" zPosition="3" font="Regular;{}" '
                 'foregroundColor="{}" transparent="{}" {} />'.format(
-                    name, box(values), font(size), color, transparent, extra))
+                    name, x, y, w, h, size, color, transparent, extra))
 
     def fill(values, color):
         return ('<eLabel {} zPosition="2" transparent="0" backgroundColor="{}" />'
@@ -82,11 +120,12 @@ def _skin(width, height, layout):
         label("rating", (748, 336, 146, 46), 31, GOLD,
               'valign="center" halign="center" backgroundColor="#30250F"', transparent=0),
         label("summary_heading", (80, 421, 820, 49), 36),
-        label("text", (80, 478, 835, 224), 34, MUTED, 'scrollbarMode="showOnDemand"'),
-        label("director_label", (80, 742, 226, 49), 29, ACCENT),
-        label("director", (325, 739, 565, 64), 32),
-        label("cast_label", (80, 823, 226, 49), 29, ACCENT),
-        label("cast", (325, 820, 565, 70), 32),
+        label("text", (80, 478, 835, summary_height), 34, MUTED,
+              'scrollbarMode="showOnDemand"', fit_summary=film),
+        label("director_label", (80, director_y + 3, 226, 49), 29, ACCENT),
+        label("director", (325, director_y, 565, 64), 32),
+        label("cast_label", (80, cast_y + 3, 226, 49), 29, ACCENT),
+        label("cast", (325, cast_y, 565, 70), 32),
         fill((80, 969, 1760, 2), "#566475"),
         label("footer", (80, 990, 1700, 53), 29, MUTED),
         "</screen>",
@@ -134,20 +173,22 @@ def _fill_detail(primary, fallback):
 
 
 class LightSynopsisScreen(Screen):
-    def __init__(self, session, provider, metadata, item, info=None, hero_url=""):
+    def __init__(self, session, provider, metadata, item, info=None, hero_url="", poster_url=""):
         width, height, unused = _scale()
         self._layout = geometry(width, height)
-        self.skin = _skin(width, height, self._layout)
+        self.kind = "series" if item.content_type == "series" else "movie"
+        self.skin = _skin(width, height, self._layout, self.kind)
         Screen.__init__(self, session)
         self.provider, self.metadata, self.item = provider, metadata, copy(item)
-        self.kind = "series" if item.content_type == "series" else "movie"
         self._closed = False
         self._started = False
         self._token = None
         self._art_token = None
         self._art_plan = self._art_request = None
         self._hero_ready = self._hero_decoding = False
+        self._poster_previewed = False
         self._hero_url = hero_url
+        self._poster_url = poster_url
         self._plot = ""
         self._info = info or catalogue_info(provider, self.kind, self.item)
         self["hero"], self["poster"] = Pixmap(), Pixmap()
@@ -300,11 +341,10 @@ class LightSynopsisScreen(Screen):
             return
         info = self._info
         backdrops = backdrop_urls(self.item, info, self._hero_url)
-        covers = artwork_urls([getattr(info, "cover", ""), getattr(self.item, "icon", "")]
-                              + list(getattr(info, "cover_urls", ()) or ()))[:4]
+        covers = poster_urls(self.item, info, self._poster_url)
         verified_id = getattr(info, "_summary_tmdb_id", "") if complete else ""
         plan = backdrops, covers, verified_id, complete
-        if not (backdrops or covers or verified_id) or plan == self._art_plan:
+        if not (backdrops or covers or verified_id or getattr(self.metadata, "available", False)) or plan == self._art_plan:
             return
         self._art_plan = plan
         if self._hero_decoding:
@@ -322,6 +362,9 @@ class LightSynopsisScreen(Screen):
             path = hit[1]
             self._art_ready(("hero", path, _cinematic_cover_ratio(path)), None)
         else:
+            portrait = cached_poster(covers) if not self._poster_previewed else None
+            if portrait:
+                self._show_art("poster", portrait[1], _cinematic_cover_ratio(portrait[1]))
             self._launch_art()
 
     def _launch_art(self):
@@ -331,18 +374,21 @@ class LightSynopsisScreen(Screen):
         plan = self._art_request = self._art_plan
         token = self._art_token = _WorkerToken(14)
         info = self._info
-        self._art.request(lambda: self._load_art(plan, info, token))
+        preview = not self._poster_previewed
+        self._art.request(lambda: self._load_art(plan, info, token, preview=preview))
 
-    def _load_art(self, plan, info, token):
-        backdrops, covers, verified_id, complete = plan
+    def _load_art(self, plan, info, token, *, preview=True):
+        backdrops, covers, verified_id, _ = plan
         found = cached_backdrop(backdrops + covers, token)
+        if found is None and preview:
+            portrait = cached_poster(covers, token)
+            if portrait:
+                return "preview", portrait[1], _cinematic_cover_ratio(portrait[1])
         if found is None:
             found = download_backdrop(self.provider, backdrops, token)
         if found is not None:
             path = found[1]
             return "hero", path, _cinematic_cover_ratio(path)
-        if not complete:
-            return None
         if verified_id:
             try:
                 url = _bounded_client_call(self.metadata, token, lambda:
@@ -354,17 +400,11 @@ class LightSynopsisScreen(Screen):
                     return "hero", path, _cinematic_cover_ratio(path)
             except Exception:
                 token.check()
-        found = cached_artwork(covers, _cinematic_cover_ratio, token)
+        found = load_poster(self.provider, self.metadata, self.kind, self.item, info, covers, token)
         if found is not None:
             path = found[1]
             name = "hero" if _valid_cinematic_backdrop_file(path) else "poster"
             return name, path, _cinematic_cover_ratio(path)
-        for url in covers:
-            token.check()
-            path = download_artwork(self.provider, url, token)
-            ratio = _cinematic_cover_ratio(path) if path else None
-            if ratio:
-                return ("hero" if _valid_cinematic_backdrop_file(path) else "poster"), path, ratio
         return None
 
     def _art_ready(self, result, error):
@@ -375,6 +415,18 @@ class LightSynopsisScreen(Screen):
             self._launch_art()
             return
         name, path, ratio = result
+        if name == "preview":
+            # Continue the same plan for wide art after painting a disk hit.
+            self._art_request = None
+            if not self._poster_previewed and not self._hero_ready:
+                self._show_art("poster", path, ratio)
+            self._launch_art()
+            return
+        self._show_art(name, path, ratio)
+
+    def _show_art(self, name, path, ratio):
+        if name == "poster":
+            self._poster_previewed = True
         box = HERO_BOX if name == "hero" else POSTER_BOX
         width, height = self._layout["rect"](*box)[2:]
         self._hero_decoding = name == "hero"

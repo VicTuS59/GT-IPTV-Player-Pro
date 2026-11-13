@@ -28,6 +28,7 @@ from .i18n import N_, _, localized_upper
 from .background import attach_native_alpha_pixmap, attach_pixmap
 from .source_loader import SourceLoader
 from .vod_discovery import DiscoveryVODMethods, skin as discovery_vod_skin
+from .browser_common import _start_browser_worker
 from .hero_artwork import prepare_hero, preparation_allowance, is_composite, release_prepared
 from .category_visibility import category_filter_active, filter_hidden_category_items, hidden_category_match_ids
 from .metadata import MetadataError, complete_movie_for_device_language, media_metadata_ready, complete_media_for_device_language
@@ -1072,13 +1073,23 @@ class VODBrowserMethods(DiscoveryVODMethods):
         token = _WorkerToken(WORKER_DETAIL_TIMEOUT_SECONDS)
         _cancel_worker_token(getattr(self, prefix + 'detail_token'))
         setattr(self, prefix + 'detail_token', token)
-        setattr(self, prefix + 'detail_pending', True)
+        if not getattr(self, '_poster_grid_enabled', False) and getattr(self, '_cinematic_enabled', False):
+            self._start_cinematic_backdrop(kind, item, self._cached_grid_detail(kind))
         pool = getattr(self, '_grid_detail_workers', None)
         if pool is None:
             pool = self._grid_detail_workers = LatestPosterWorkers(worker_count=2)
             self.onClose.append(pool.close)
         worker = getattr(self, '_load_' + kind + '_detail_worker')
-        pool.replace([lambda: worker(generation, item, token)])
+        if not pool.replace([lambda: worker(generation, item, token)]):
+            token.cancel()
+            setattr(self, prefix + 'detail_token', None)
+            setattr(self, prefix + 'detail_pending', False)
+            info = self._cached_grid_detail(kind) or catalogue_info(self.client, kind, item)
+            if not getattr(info, 'plot', ''):
+                message = _('Movie summary unavailable.') if kind == 'movie' else _('Series summary unavailable.')
+                getattr(self, '_set_' + kind + '_plot')(message)
+            return
+        setattr(self, prefix + 'detail_pending', True)
         getattr(self, '_start_deferred_' + kind + '_posters')()
         getattr(self, prefix + 'timer').start(80, True)
 
@@ -1372,10 +1383,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._loading = True
         self._ready = False
         self._error = ''
-        worker = threading.Thread(target=self._run_load, args=(generation, token))
-        worker.daemon = True
-        worker.start()
-        self._timer.start(150, True)
+        self._launch_list_load(generation, token)
 
     def _resume_movie_category_after_search(self, category_id):
         if self._closed or category_id is None or self._movie_loading:
@@ -1384,20 +1392,13 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._movie_generation += 1
         self._movie_catalog_generation += 1
         generation = self._movie_generation
-        browse_catalog = getattr(self, '_movie_browser_catalog', None)
-        if browse_catalog is not None:
-            browse_catalog.start()
+        if getattr(self, '_movie_browser_catalog', None) is not None:
             self._movie_browse_cursor = 0
-        token = _WorkerToken(MOVIE_CATEGORY_TIMEOUT_SECONDS)
-        self._movie_load_token = token
         self._movie_loading = True
         self._movie_ready = False
         self._movie_error = ''
         self._movie_loaded_category_id = category_id
-        worker = threading.Thread(target=self._load_movie_worker, args=(generation, category_id, token))
-        worker.daemon = True
-        worker.start()
-        self._movie_timer.start(120, True)
+        self._start_vod_category_worker('movie', generation, category_id, MOVIE_CATEGORY_TIMEOUT_SECONDS)
 
     def _resume_movie_work_after_search(self):
         resume_categories = self._movie_search_resume_categories
@@ -1535,17 +1536,39 @@ class VODBrowserMethods(DiscoveryVODMethods):
         ellipsize_dynamic_text(self['movie_rail_caption'], _('{} • LOADING MOVIES').format(localized_upper(category.name)), fallback_chars=90)
         self._clear_movie_posters()
         self._render_movie_waiting()
-        browse_catalog = getattr(self, '_movie_browser_catalog', None)
+        self._start_vod_category_worker('movie', generation, category.category_id, MOVIE_CATEGORY_TIMEOUT_SECONDS)
+
+    def _start_vod_category_worker(self, kind, generation, category_id, timeout):
+        prefix = '_' + kind + '_'
+        browse_catalog = getattr(self, prefix + 'browser_catalog', None)
         if browse_catalog is not None:
-            browse_catalog.start(preferred_category=category.category_id)
-        token = _WorkerToken(browse_catalog.load_timeout if browse_catalog is not None else MOVIE_CATEGORY_TIMEOUT_SECONDS)
-        self._movie_load_token = token
+            browse_catalog.start(preferred_category=category_id)
+            timeout = browse_catalog.load_timeout
+        token = _WorkerToken(timeout)
+        setattr(self, prefix + 'load_token', token)
         begin_delivery = getattr(self, '_light_begin_list', None)
-        if callable(begin_delivery): begin_delivery('movie', generation)
-        worker = threading.Thread(target=self._load_movie_worker, args=(generation, category.category_id, token))
-        worker.daemon = True
-        worker.start()
-        self._movie_timer.start(120, True)
+        if callable(begin_delivery):
+            begin_delivery(kind, generation)
+        timer = getattr(self, prefix + 'timer')
+        worker = getattr(self, '_load_' + kind + '_worker')
+        if _start_browser_worker(worker, (generation, category_id, token)):
+            timer.start(120, True)
+            return
+
+        token.cancel()
+        timer.stop()
+        if browse_catalog is not None:
+            browse_catalog.stop()
+        delivery = getattr(self, '_light_list_delivery', None)
+        if delivery is not None:
+            self._light_list_delivery_job = None
+            delivery.cancel()
+        error = N_('Could not load movies') if kind == 'movie' else N_('Could not load series')
+        setattr(self, prefix + 'load_token', None)
+        setattr(self, prefix + 'loading', False)
+        setattr(self, prefix + 'ready', True)
+        setattr(self, prefix + 'error', error)
+        getattr(self, '_render_' + kind + '_results')()
 
     def _load_movie_worker(self, generation, category_id, token=None):
         browse_catalog = getattr(self, '_movie_browser_catalog', None)
@@ -1600,17 +1623,26 @@ class VODBrowserMethods(DiscoveryVODMethods):
         loader = getattr(self.client, 'load_more_items', None)
         if not callable(loader) and getattr(self, '_movie_browser_catalog', None) is None or not self._movie_has_more or self._movie_more_loading or self._closed:
             return False
-        self._movie_more_loading = True
-        generation = self._movie_catalog_generation
-        category_id = str(self._movie_loaded_category_id or '')
-        token = _WorkerToken(MOVIE_CATEGORY_TIMEOUT_SECONDS)
-        _cancel_worker_token(self._movie_more_token)
-        self._movie_more_token = token
-        worker = threading.Thread(target=self._load_movie_more_worker, args=(generation, category_id, loader, token))
-        worker.daemon = True
-        worker.start()
-        self._movie_timer.start(80, True)
-        return True
+        return self._start_vod_more_worker('movie', loader, MOVIE_CATEGORY_TIMEOUT_SECONDS)
+
+    def _start_vod_more_worker(self, kind, loader, timeout):
+        prefix = '_' + kind + '_'
+        generation = getattr(self, prefix + 'catalog_generation')
+        category_id = str(getattr(self, prefix + 'loaded_category_id') or '')
+        token = _WorkerToken(timeout)
+        _cancel_worker_token(getattr(self, prefix + 'more_token'))
+        setattr(self, prefix + 'more_token', token)
+        setattr(self, prefix + 'more_loading', True)
+        worker = getattr(self, '_load_' + kind + '_more_worker')
+        if _start_browser_worker(worker, (generation, category_id, loader, token)):
+            getattr(self, prefix + 'timer').start(80, True)
+            return True
+
+        token.cancel()
+        error = N_('Could not load movies') if kind == 'movie' else N_('Could not load series')
+        setattr(self, prefix + 'more_result', (generation, category_id, [], True, error))
+        getattr(self, '_apply_' + kind + '_more_result')()
+        return False
 
     def _load_movie_more_worker(self, generation, category_id, loader, token=None):
         browse_catalog = getattr(self, '_movie_browser_catalog', None)
@@ -2959,27 +2991,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             loaded(False)
 
     def _start_movie_detail(self):
-        if getattr(self, '_poster_grid_enabled', False):
-            self._start_grid_detail('movie')
-            return
-        if not self._movie_entries:
-            return
-        item = self._movie_entries[self._movie_selected_index]
-        generation = self._movie_generation
-        _cancel_worker_token(self._movie_detail_token)
-        token = _WorkerToken(WORKER_DETAIL_TIMEOUT_SECONDS)
-        self._movie_detail_token = token
-        if getattr(self, '_cinematic_enabled', False):
-            info = _detail_cache_get(self._movie_info_cache, self._movie_info_cache_lock, item.stream_id)
-            self._start_cinematic_backdrop('movie', item, info)
-        pool = getattr(self, '_grid_detail_workers', None)
-        if pool is None:
-            pool = self._grid_detail_workers = LatestPosterWorkers(worker_count=2)
-            self.onClose.append(pool.close)
-        self._movie_detail_pending = True
-        pool.replace([lambda: self._load_movie_detail_worker(generation, item, token)])
-        self._start_deferred_movie_posters()
-        self._movie_timer.start(80, True)
+        self._start_grid_detail('movie')
 
 
 
@@ -3337,17 +3349,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         ellipsize_dynamic_text(self['series_rail_caption'], _('{} • LOADING SERIES').format(localized_upper(category.name)), fallback_chars=65)
         self._clear_series_tiles()
         self._render_series_waiting()
-        browse_catalog = getattr(self, '_series_browser_catalog', None)
-        if browse_catalog is not None:
-            browse_catalog.start(preferred_category=category.category_id)
-        token = _WorkerToken(browse_catalog.load_timeout if browse_catalog is not None else WORKER_LIST_TIMEOUT_SECONDS)
-        self._series_load_token = token
-        begin_delivery = getattr(self, '_light_begin_list', None)
-        if callable(begin_delivery): begin_delivery('series', generation)
-        worker = threading.Thread(target=self._load_series_worker, args=(generation, category.category_id, token))
-        worker.daemon = True
-        worker.start()
-        self._series_timer.start(120, True)
+        self._start_vod_category_worker('series', generation, category.category_id, WORKER_LIST_TIMEOUT_SECONDS)
 
     def _load_series_worker(self, generation, category_id, token=None):
         browse_catalog = getattr(self, '_series_browser_catalog', None)
@@ -3407,17 +3409,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             self._series_scan_timer.stop()
         except Exception:
             pass
-        self._series_more_loading = True
-        generation = self._series_catalog_generation
-        category_id = str(self._series_loaded_category_id or '')
-        token = _WorkerToken(WORKER_LIST_TIMEOUT_SECONDS)
-        _cancel_worker_token(self._series_more_token)
-        self._series_more_token = token
-        worker = threading.Thread(target=self._load_series_more_worker, args=(generation, category_id, loader, token))
-        worker.daemon = True
-        worker.start()
-        self._series_timer.start(80, True)
-        return True
+        return self._start_vod_more_worker('series', loader, WORKER_LIST_TIMEOUT_SECONDS)
 
     def _load_series_more_worker(self, generation, category_id, loader, token=None):
         browse_catalog = getattr(self, '_series_browser_catalog', None)
@@ -3860,27 +3852,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             loaded(False)
 
     def _start_series_detail(self):
-        if getattr(self, '_poster_grid_enabled', False):
-            self._start_grid_detail('series')
-            return
-        if not self._series_entries:
-            return
-        item = self._series_entries[self._series_selected_index]
-        generation = self._series_generation
-        _cancel_worker_token(self._series_detail_token)
-        token = _WorkerToken(WORKER_DETAIL_TIMEOUT_SECONDS)
-        self._series_detail_token = token
-        if getattr(self, '_cinematic_enabled', False):
-            info = _detail_cache_get(self._series_info_cache, self._series_info_cache_lock, item.stream_id)
-            self._start_cinematic_backdrop('series', item, info)
-        pool = getattr(self, '_grid_detail_workers', None)
-        if pool is None:
-            pool = self._grid_detail_workers = LatestPosterWorkers(worker_count=2)
-            self.onClose.append(pool.close)
-        self._series_detail_pending = True
-        pool.replace([lambda: self._load_series_detail_worker(generation, item, token)])
-        self._start_deferred_series_posters()
-        self._series_timer.start(80, True)
+        self._start_grid_detail('series')
 
 
 

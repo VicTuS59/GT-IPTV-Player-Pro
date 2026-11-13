@@ -4395,3 +4395,53 @@ msgstr "Ekki tókst að lesa TXT-skrána."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Xtream-reikningum bætt við ({})\nTvíteknum færslum sleppt ({})"
+
+msgid "Change layout"
+msgstr "Breyta útliti"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Rásapörun vistuð. Uppfærðu EPG til að virkja hana."
+
+msgid "Cinematic view"
+msgstr "Kvikmyndasýn"
+
+msgid "EPG server name could not be resolved."
+msgstr "Ekki tókst að fletta upp heiti EPG-þjónsins."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Sláðu inn gilt heiti sem er að hámarki {} stafir."
+
+msgid "Football scores\u0004Select source"
+msgstr "Veldu heimild"
+
+msgid "List view"
+msgstr "Listasýn"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "M3U-listinn var uppfærður. Breytingar birtast við næstu uppfærslu."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Ekki tókst að uppfæra M3U-listann. Listinn úr skyndiminni er sýndur."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Yfirlit yfir M3U-uppfærslu\n\nNýjar rásir ({added})\nRásir sem eru ekki lengur á listanum ({removed})\nEndurnefndar rásir ({renamed})"
+
+msgid "Matching release details"
+msgstr "Samhæfar útgáfuupplýsingar"
+
+msgid "Matching release group"
+msgstr "Sami útgáfuhópur"
+
+msgid "No channels need manual mapping."
+msgstr "Engar rásir þurfa handvirka pörun."
+
+msgid "No matching EPG channels found."
+msgstr "Engar samsvarandi EPG-rásir fundust."
+
+msgid "Recommended"
+msgstr "Mælt með"
+
+msgid "Restore source name"
+msgstr "Endurheimta upprunalegt heiti"

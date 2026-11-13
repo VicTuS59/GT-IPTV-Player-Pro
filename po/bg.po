@@ -4395,3 +4395,53 @@ msgstr "TXT файлът не можа да бъде прочетен."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Добавени акаунти в Xtream ({})\nПропуснати дубликати ({})"
+
+msgid "Change layout"
+msgstr "Промяна на оформлението"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "Съпоставянето на канала е запазено. Обновете EPG, за да го приложите."
+
+msgid "Cinematic view"
+msgstr "Кинематографичен изглед"
+
+msgid "EPG server name could not be resolved."
+msgstr "Името на EPG сървъра не можа да бъде разрешено."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Въведете валидно име с дължина до {} знака."
+
+msgid "Football scores\u0004Select source"
+msgstr "Изберете източник"
+
+msgid "List view"
+msgstr "Изглед като списък"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "Списъкът M3U е обновен. Промените ще се покажат при следващото обновяване."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "Списъкът M3U не можа да се обнови. Показва се кешираният списък."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Обобщение на обновяването на M3U\n\nНови канали ({added})\nКанали, отпаднали от списъка ({removed})\nПреименувани канали ({renamed})"
+
+msgid "Matching release details"
+msgstr "Съвместими данни за изданието"
+
+msgid "Matching release group"
+msgstr "Съвпадаща група на изданието"
+
+msgid "No channels need manual mapping."
+msgstr "Няма канали за ръчно съпоставяне."
+
+msgid "No matching EPG channels found."
+msgstr "Не са намерени съвпадащи EPG канали."
+
+msgid "Recommended"
+msgstr "Препоръчано"
+
+msgid "Restore source name"
+msgstr "Възстановяване на оригиналното име"

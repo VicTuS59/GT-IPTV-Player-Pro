@@ -20,7 +20,7 @@ import uuid
 from contextlib import contextmanager
 from urllib.parse import urlsplit
 
-from .m3u import LOCAL_M3U_ROOTS, _remote_url_info
+from .m3u import LOCAL_M3U_ROOTS, MAX_M3U_CHANNELS, _remote_url_info, is_epg_name_key
 
 
 M3U_XMLTV_SETTINGS_PATH = "/etc/enigma2/gtiptvplayer/m3u-xmltv.json"
@@ -160,6 +160,7 @@ class Binding(object):
         "last_error_code",
         "last_channel_count",
         "last_event_count",
+        "name_mappings",
     )
 
     def __init__(
@@ -176,6 +177,7 @@ class Binding(object):
         last_channel_count=0,
         last_event_count=0,
         local_roots=None,
+        name_mappings=None,
     ):
         self._source_id = _source_id(source_id)
         self.enabled = bool(enabled)
@@ -237,6 +239,16 @@ class Binding(object):
             "last event count",
             MAX_COUNTER,
         )
+        if name_mappings is None:
+            name_mappings = {}
+        if not isinstance(name_mappings, dict) or len(name_mappings) > MAX_M3U_CHANNELS:
+            raise ValueError("M3U XMLTV name mappings are invalid")
+        self.name_mappings = {}
+        for key, value in name_mappings.items():
+            if (not is_epg_name_key(key) or not isinstance(value, str)
+                    or value != value.strip() or not 0 < len(value) <= 256 or not value.isprintable()):
+                raise ValueError("M3U XMLTV name mapping is invalid")
+            self.name_mappings[key] = value
 
     @property
     def source_id(self):
@@ -277,6 +289,7 @@ class Binding(object):
             "last_error_code": self.last_error_code,
             "last_channel_count": self.last_channel_count,
             "last_event_count": self.last_event_count,
+            "name_mappings": dict(self.name_mappings),
         }
 
     to_dict = as_dict
@@ -338,6 +351,7 @@ class Binding(object):
             last_channel_count=payload.get("last_channel_count", 0),
             last_event_count=payload.get("last_event_count", 0),
             local_roots=local_roots,
+            name_mappings=payload.get("name_mappings"),
         )
 
     def copy(self):

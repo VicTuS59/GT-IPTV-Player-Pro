@@ -158,6 +158,8 @@ class YouTubeVideoUrl():
 		self.selected_audio_itag = ''
 		self.selected_audio_bitrate = 0
 		self.duration_seconds = 0
+		self._compatible_formats = []
+		self._compatible_hls = []
 		self._code_cache = {}
 		self._player_cache = {}
 		self.nsig_cache = (None, None)
@@ -475,7 +477,8 @@ class YouTubeVideoUrl():
 		return sorted(sorted_fmt, key=(lambda fmt: audio_sort_key(fmt, get_audio))
 			if get_audio is not None else (lambda fmt: fmt['preference']))
 
-	def _extract_fmt_video_format(self, streaming_formats, player_id, stream_mode='auto', audio_preference='original'):
+	def _extract_fmt_video_format(self, streaming_formats, player_id, stream_mode='auto',
+			audio_preference='original', excluded_url=''):
 		print('[YouTubeVideoUrl] Try fmt url')
 		formats = self._sort_formats(PRIORITY_VIDEO_FORMAT, streaming_formats)
 		limit = self.preferred_quality or RESOLUTION_LIMIT.get(str(config.plugins.YouTube.maxResolution.value), 720)
@@ -514,13 +517,15 @@ class YouTubeVideoUrl():
 					continue
 			try:
 				url = self._extract_url(fmt, player_id)
-				if url and self.preferred_quality:
-					youtube_stream_parts(url + (SUBURI + audio_url if audio_url else ''))
+				if url:
+					url += SUBURI + audio_url if audio_url else ''
+					if self.preferred_quality:
+						youtube_stream_parts(url)
 			except Exception:
 				if not self.preferred_quality:
 					raise
 				continue
-			if url:
+			if url and url != excluded_url:
 				self.selected_quality = height
 				self.selected_video_itag = itag
 				self.selected_video_codec = codec
@@ -533,7 +538,7 @@ class YouTubeVideoUrl():
 					stream_mode))
 				print('[YouTubeVideoUrl] audio bitrate=%s original_preference=%s' % (
 					self.selected_audio_bitrate, audio_preference == 'original'))
-				return url + (SUBURI + audio_url if audio_url else ''), itag
+				return url, itag
 		return '', ''
 
 	def _extract_dash_audio_format(self, streaming_formats, player_id, audio_preference):
@@ -893,12 +898,40 @@ class YouTubeVideoUrl():
 				return duration
 		return 0
 
+	def _selected_stream(self, url):
+		return {'url': url, 'height': self.selected_quality, 'codec': self.selected_video_codec,
+			'itag': self.selected_video_itag, 'audio_itag': self.selected_audio_itag,
+			'audio_bitrate': self.selected_audio_bitrate}
+
+	def _select_stream(self, chosen):
+		self.selected_quality = chosen['height']
+		self.selected_video_itag = chosen.get('itag', '')
+		self.selected_video_codec = chosen['codec']
+		self.selected_audio_itag = chosen.get('audio_itag', '')
+		self.selected_audio_bitrate = chosen.get('audio_bitrate', 0)
+		return chosen['url']
+
+	def cached_compatible_stream(self, excluded_url):
+		"""Find a muxed AVC stream from the responses already read for this video."""
+		choices = [fmt for fmt in self._compatible_hls
+			if fmt['height'] <= self.preferred_quality and fmt['url'] != excluded_url]
+		for formats, player_id in self._compatible_formats:
+			url, unused_itag = self._extract_fmt_video_format(
+				formats, player_id, 'compatible', excluded_url=excluded_url)
+			if url:
+				choices.append(self._selected_stream(url))
+		if choices:
+			return self._select_stream(max(choices, key=lambda fmt: fmt['height']))
+		return ''
+
 	def _preferred_extract(self, video_id, yt_auth, lang, stream_mode, audio_preference):
 		"""Use the chosen height as a ceiling, falling back only downwards.
 
 		Each candidate retains its own original video/audio URLs and player
 		context. No streams are joined, converted or fetched during search.
 		"""
+		self._compatible_formats.clear()
+		self._compatible_hls.clear()
 		candidates, duration, age_restricted = [], 0, False
 
 		def rank(candidate):
@@ -920,19 +953,20 @@ class YouTubeVideoUrl():
 			choices = []
 			if not self.try_get(response, ('videoDetails', 'isLive')):
 				url, unused_itag = self._extract_fmt_video_format(formats, player_id, stream_mode, audio_preference)
+				self._compatible_formats.append((formats, player_id))
 				if url:
-					choices.append({'url': url, 'height': self.selected_quality,
-						'codec': self.selected_video_codec, 'itag': self.selected_video_itag,
-						'audio_itag': self.selected_audio_itag, 'audio_bitrate': self.selected_audio_bitrate})
+					choices.append(self._selected_stream(url))
 			if (streaming.get('hlsManifestUrl')
 					and not any(choice['height'] == self.preferred_quality for choice in choices)):
 				try:
 					for fmt in self._extract_from_m3u8(streaming['hlsManifestUrl'], self.preferred_quality, stream_mode != 'compatible'):
 						try:
-							youtube_stream_parts(fmt['url'])
+							unused_video, audio = youtube_stream_parts(fmt['url'])
 						except ValueError:
 							continue
-						choices.append(dict(fmt, audio_itag=''))
+						choices.append(fmt)
+						if not audio and fmt['codec'] == 'h264':
+							self._compatible_hls.append(fmt)
 				except Exception:
 					pass  # A bad manifest must not discard a resolved direct input.
 			if choices:
@@ -960,14 +994,8 @@ class YouTubeVideoUrl():
 				pass
 		if not candidates:
 			raise RuntimeError('No supported original YouTube video and audio stream found')
-		chosen = max(candidates, key=rank)
-		self.selected_quality = chosen['height']
-		self.selected_video_itag = chosen.get('itag', '')
-		self.selected_video_codec = chosen['codec']
-		self.selected_audio_itag = chosen.get('audio_itag', '')
-		self.selected_audio_bitrate = chosen.get('audio_bitrate', 0)
 		self.duration_seconds = duration
-		return chosen['url']
+		return self._select_stream(max(candidates, key=rank))
 
 	def _real_extract(self, video_id, yt_auth):
 		url = ''

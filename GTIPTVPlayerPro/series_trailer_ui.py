@@ -74,7 +74,7 @@ def add_hint_skin(skin, width, height, px, cinematic=True, prefix="series"):
 class SeriesTrailerHint:
     def __init__(self, screen):
         self.screen = screen
-        screen['series_trailer_hint_bg'] = Label('') if getattr(screen, '_light_vod_enabled', False) else Pixmap()
+        screen['series_trailer_hint_bg'] = Label('') if 'light_play_key' in screen else Pixmap()
         screen['series_trailer_hint_text'] = Label(_('Trailer'))
         _ensure_play_keys()
         screen['series_trailer_actions'] = ActionMap([PLAY_KEY_CONTEXT], {
@@ -95,7 +95,7 @@ class SeriesTrailerHint:
             return
         self._hint_visible = visible
         names = ('series_trailer_hint_bg', 'series_trailer_hint_text')
-        if getattr(screen, '_light_vod_enabled', False):
+        if 'light_play_key' in screen:
             names += ('light_play_key',)
         for name in names:
             screen[name].show() if visible else screen[name].hide()

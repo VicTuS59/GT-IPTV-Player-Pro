@@ -204,8 +204,14 @@ class NapiProjektClient:
     def search(self, metadata, languages):
         if not polish_search_providers(languages):
             return []
-        from .online_subtitles import normalized_metadata
-        meta = normalized_metadata(metadata, 'pl')
+        from .online_subtitles import normalized_metadata, subtitle_title_queries, title_query_results
+        for meta in subtitle_title_queries(normalized_metadata(metadata, 'pl')):
+            results = self._search_title(meta)
+            if results:
+                return title_query_results(results, meta)
+        return []
+
+    def _search_title(self, meta):
         query = meta['search_title']
         queries = [query]
         shorter = re.sub(r'(?i)^(?:the|a|an)\s+', '', query)
@@ -301,10 +307,20 @@ class Napisy24Client:
     def search(self, metadata, languages):
         if not polish_search_providers(languages):
             return []
-        from .online_subtitles import normalized_metadata
+        from .online_subtitles import normalized_metadata, subtitle_title_queries, title_query_results
         meta = normalized_metadata(metadata, 'pl')
-        imdb = str(meta.get('imdb_id') or '')
-        query = {'imdb':imdb} if re.fullmatch(r'tt\d{5,12}', imdb) else {'title':meta['search_title']}
+        if meta['imdb_id']:
+            results = self._search_query(meta, {'imdb': meta['imdb_id']})
+            if results:
+                return results
+        for query_meta in subtitle_title_queries(meta):
+            results = self._search_query(query_meta, {'title': query_meta['search_title']})
+            if results:
+                return title_query_results(results, query_meta)
+        return []
+
+    def _search_query(self, meta, query):
+        imdb = meta['imdb_id']
         document = _xml(_raw(self.BASE + '/libs/webapi.php?' + urlencode(query), 'napisy24.pl'), fragments=True)
         results, seen = [], set()
         for item in document.iter('subtitle'):

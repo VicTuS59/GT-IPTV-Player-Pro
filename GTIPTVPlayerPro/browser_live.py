@@ -41,11 +41,13 @@ from .background import attach_native_alpha_pixmap
 from .channel_highlight import DEFAULT_CHANNEL_HIGHLIGHT, channel_highlight_colors, normalize_channel_highlight
 from .category_filters import category_filter_ids
 from .category_preferences import MAX_CATEGORIES_PER_SOURCE, CategoryPreferences, LiveCategoryPreferenceStore, arrange_categories, category_preferences_path
+from .category_preferences import MAX_M3U_NAME_LENGTH, apply_m3u_category_names, clean_m3u_display_name
 from .category_visibility import category_filter_active, filter_hidden_category_items, hidden_category_match_ids
 from .live_programme_art_ui import LiveProgrammePosterMixin
 from .broadcast_layout import live_geometry as live_guide_side_geometry
 from .playback import resume_account_scope
 from .paths import plugin_path
+from .persistence import RESTORE_COORDINATOR
 from .remote_footer import prepared_skin, set_remote_footer
 from .scrollbar import hide_scrollbar, update_scrollbar
 from .settings import load_player_settings, service_engine_label
@@ -58,6 +60,33 @@ from .browser_common import M3U_LIVE_CHANNEL_MOVE_FOOTER_ITEMS, M3U_LIVE_STREAM_
 from .browser_common import CATEGORY_MANAGER_FOOTER_ITEMS, CATEGORY_MANAGER_MOVE_FOOTER_ITEMS, FAVORITE_STAR_PATH, GTAsyncListScreen, LIVE_CHANNEL_MOVE_FOOTER_ITEMS, LIVE_CHANNEL_ORDER_FOOTER_ITEMS, LIVE_DETAIL_CACHE_TTL_SECONDS, LIVE_DETAIL_EMPTY_RETRY_SECONDS, LIVE_DETAIL_EPG_RETRY_LIMIT, LIVE_DETAIL_EPG_TIMEOUT_SECONDS, LIVE_DETAIL_PROGRESS_INTERVAL_MS, LIVE_EPG_CACHE_MAX_ENTRIES, LIVE_EPG_CACHE_TTL_SECONDS, LIVE_EPG_FETCH_LIMIT, LIVE_FULLSCREEN_RESULT_KIND, LIVE_PICON_DOWNLOAD_TIMEOUT, LIVE_PICON_PREFETCH_POLL_MS, LIVE_PICON_PREFETCH_WORKERS, LIVE_PREVIEW_FRAME_PATH, LIVE_PREVIEW_LINK_POLL_MS, LIVE_PREVIEW_VIDEO_ERROR_CHECKS, LIVE_PREVIEW_VIDEO_INITIAL_MS, LIVE_PREVIEW_VIDEO_MAX_CHECKS, LIVE_PREVIEW_VIDEO_RETRY_MS, LIVE_STREAM_FOOTER_ITEMS, LIVE_STREAM_PAGE_SIZE, M3U_SEARCH_FOOTER_ITEMS, M3U_SEARCH_RESULT_LIMIT, STALKER_LIVE_EPG_QUIET_MS, STALKER_LIVE_PICON_QUIET_MS, WORKER_LIST_TIMEOUT_SECONDS, WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _client_epg_state, _client_supports, _connect_timer, _debug, _debug_identifier, _desktop_size, _disable_live_window_animation, _epg_event_starts_in_future, _is_m3u_client, _is_stalker_client, _live_detail_dwell_ms, _load_live_picon_path, _load_shared_live_epg, _mark_picon_failure, _picon_failure_active, _picon_failure_remaining, _read_proc_number, _safe_picon_url, _scale, _stream_diag_pts_progress, _trace_fullscreen_osd, _valid_live_picon_file, _validated_content_type, _wrap_live_summary, content_client_for
 
 LIVE_INITIAL_RESULT_POLL_MS = 45
+
+
+def _open_m3u_name_keyboard(screen, current_name, callback):
+    def entered(value):
+        if screen._closed:
+            return
+        if value is None:
+            callback(None)
+            return
+        name = clean_m3u_display_name(value)
+        callback(name or None)
+        if not name:
+            message = _('Enter a valid name of up to {} characters.').format(MAX_M3U_NAME_LENGTH)
+            screen.session.open(MessageBox, message, type=MessageBox.TYPE_ERROR)
+
+    try:
+        from Screens.VirtualKeyBoard import VirtualKeyBoard
+    except (ImportError, AttributeError):
+        message = _('The virtual keyboard is unavailable on this image.')
+    else:
+        try:
+            screen.session.openWithCallback(entered, VirtualKeyBoard, title=_('Rename'), text=current_name)
+            return True
+        except Exception:
+            message = _('Could not open the virtual keyboard.')
+    screen.session.open(MessageBox, message, type=MessageBox.TYPE_ERROR)
+    return False
 
 @broadcast_skin_after('categories')
 def _live_category_skin():
@@ -149,7 +178,7 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
     """Transactional order, bulk move and visibility editor."""
     page_size = 8
 
-    def __init__(self, session, account_name, account_scope, categories, category_store=None, selected_category_id='', content_type='live'):
+    def __init__(self, session, account_name, account_scope, categories, category_store=None, selected_category_id='', content_type='live', *, m3u_rename=False):
         content_type = str(content_type or '').strip().lower()
         if content_type not in ('live', 'movie', 'series'):
             content_type = 'live'
@@ -160,6 +189,12 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self.category_store = category_store if category_store is not None else LiveCategoryPreferenceStore(category_preferences_path(content_type))
         self.account_scope = str(account_scope or '')
         self._footer_layout_items = CATEGORY_MANAGER_FOOTER_ITEMS
+        self._m3u_rename = bool(m3u_rename and content_type == 'live')
+        if self._m3u_rename:
+            self._footer_layout_items = tuple(
+                (key, 'edit' if key == 'menu' else action, *layout)
+                for key, action, *layout in CATEGORY_MANAGER_FOOTER_ITEMS
+            )
         self._footer_layout_alternate_items = CATEGORY_MANAGER_MOVE_FOOTER_ITEMS
         self.skin = prepared_skin(_live_category_manager_skin)
         unused_width, unused_height, px = _scale()
@@ -168,6 +203,8 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._source_categories = list(categories)
         self._selected_category_id = selected_category_id
         self._stored_preferences = CategoryPreferences()
+        self._source_names = {}
+        self._name_changes = {}
         self._provider_entries = []
         self._hidden = set()
         self._initial_ids = self._provider_ids = ()
@@ -196,7 +233,7 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
             self['category_insert_{}'.format(index)] = Label('')
             for edge in ('fill', 'top', 'bottom', 'left', 'right'):
                 self['category_focus_{}_{}'.format(index, edge)] = Label('')
-        self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions', 'MenuActions'], {'ok': self.open_selected, 'cancel': self.cancel_or_close, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'yellow': self.start_move, 'red': self.toggle_mark, 'menu': self.hide_all_categories, 'green': self.save_and_close, 'blue': self.restore_defaults}, -1)
+        self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions', 'MenuActions'], {'ok': self.open_selected, 'cancel': self.cancel_or_close, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'yellow': self.start_move, 'red': self.toggle_mark, 'menu': self.open_m3u_category_menu if self._m3u_rename else self.hide_all_categories, 'green': self.save_and_close, 'blue': self.restore_defaults}, -1)
         if hasattr(self, 'onShown'):
             self.onShown.append(self._refresh)
 
@@ -234,6 +271,8 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
             return
         self._stored_preferences, self._entries = prepared
         self._provider_entries = arrange_categories(self._source_categories, CategoryPreferences(), include_hidden=True)
+        if self._m3u_rename:
+            self._source_names = {entry.category_id: entry.name for entry in self._provider_entries if entry.category_id}
         self._hidden = set(self._stored_preferences.hidden)
         current_ids = set(self._current_ids())
         self._hidden.intersection_update(current_ids)
@@ -419,6 +458,50 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._notice = _('Category hidden.')
         self._refresh()
 
+    def open_m3u_category_menu(self):
+        if self._loading or self._move_mode or self._closed:
+            return
+        category_id = self._selected_id()
+        choices = []
+        if category_id in self._source_names:
+            current_name = self._entries[self.selected_index].name
+            choices.append((_('Rename'), 'rename'))
+            if self._name_changes.get(category_id, self._stored_preferences.names.get(category_id)):
+                choices.append((_('Restore source name'), 'restore'))
+        choices.append((_('Hide All'), 'hide'))
+
+        def selected(choice):
+            if self._closed or not isinstance(choice, (tuple, list)) or len(choice) < 2:
+                return
+            action = choice[1]
+            if action == 'hide':
+                self.hide_all_categories()
+            elif action == 'restore':
+                self._set_m3u_category_name(category_id, '')
+            elif action == 'rename' and category_id in self._source_names:
+                _open_m3u_name_keyboard(self, current_name,
+                                        lambda name: self._set_m3u_category_name(category_id, name))
+
+        try:
+            from Screens.ChoiceBox import ChoiceBox
+            self.session.openWithCallback(selected, ChoiceBox, title=_('Edit'), list=choices)
+        except Exception:
+            log_event('content', 'Could not open M3U category edit menu')
+
+    def _set_m3u_category_name(self, category_id, name):
+        if (name is None or self._closed or self._loading or self._move_mode
+                or category_id not in self._source_names):
+            return
+        source_name = self._source_names[category_id]
+        alias = '' if name == source_name else name
+        if alias == self._stored_preferences.names.get(category_id, ''):
+            self._name_changes.pop(category_id, None)
+        else:
+            self._name_changes[category_id] = alias
+        self._entries = apply_m3u_category_names(self._entries, {category_id: alias or source_name})
+        self._notice = _('Press GREEN to save the changes.')
+        self._refresh()
+
     def start_move(self):
         if self._loading:
             return
@@ -457,7 +540,7 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._move_snapshot_index = 0
         self._move_snapshot_reset_requested = False
         self._notice = _('Position updated. Press GREEN to save.')
-        set_remote_footer(self, CATEGORY_MANAGER_FOOTER_ITEMS)
+        set_remote_footer(self, self._footer_layout_items)
         self._refresh()
 
     def cancel_or_close(self):
@@ -475,7 +558,7 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
             self._reset_requested = self._move_snapshot_reset_requested
             self._move_snapshot_reset_requested = False
             self._notice = _('Move cancelled.')
-            set_remote_footer(self, CATEGORY_MANAGER_FOOTER_ITEMS)
+            set_remote_footer(self, self._footer_layout_items)
             self._refresh()
             return
         self.close(False)
@@ -487,6 +570,9 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
             return
         selected_id = self._selected_id()
         self._entries = list(self._provider_entries)
+        if self._m3u_rename:
+            names = {**self._stored_preferences.names, **self._name_changes}
+            self._entries = apply_m3u_category_names(self._entries, names)
         self._hidden.clear()
         self._marked.clear()
         self._reset_requested = True
@@ -506,10 +592,15 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
             self._notice = self._move_guidance()
             self._refresh()
             return
-        if not self._has_changes():
+        name_changes = dict(self._name_changes)
+        if not self._has_changes() and not name_changes:
             self.close(False)
             return
         ordered_ids = self._current_ids()
+        names_only = bool(name_changes) and not (
+            self._reset_requested or tuple(ordered_ids) != self._initial_ids
+            or frozenset(self._hidden) != self._initial_hidden
+        )
         current_id_set = set(ordered_ids)
         ordered_id_set = set(current_id_set)
         if not self._reset_requested:
@@ -566,12 +657,25 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
 
         def save():
             try:
-                result['saved'] = store.reset(scope) if reset else store.save(scope, result['order'], result['hidden'], include_terms=(), exclude_terms=(), sort_mode=mode)
+                with RESTORE_COORDINATOR.mutation() as admitted:
+                    if not admitted:
+                        return
+                    if names_only:
+                        result['saved'] = store.save(scope, None, None, name_changes=name_changes)
+                    elif reset:
+                        result['saved'] = (store.reset(scope, name_changes=name_changes)
+                                           if self._m3u_rename else store.reset(scope))
+                    else:
+                        options = {'name_changes': name_changes} if name_changes else {}
+                        result['saved'] = store.save(scope, result['order'], result['hidden'], include_terms=(), exclude_terms=(), sort_mode=mode, **options)
             except Exception:
                 result['saved'] = False
             finally:
                 result['done'].set()
-        threading.Thread(target=save, daemon=True).start()
+        try:
+            threading.Thread(target=save, daemon=True).start()
+        except (OSError, RuntimeError, MemoryError):
+            result['done'].set()
         self._timer.start(100, True)
         self._refresh()
 
@@ -714,12 +818,7 @@ class _GTStreamListBase(GTAsyncListScreen):
         for name in ('_load_token', '_live_more_token'):
             _cancel_worker_token(getattr(self, name, None))
         self._loading = False
-        invalidator = getattr(self.client, 'invalidate_cache', None)
-        if invalidator is not None:
-            try:
-                invalidator(self.content_type, self.category.category_id)
-            except Exception:
-                pass
+        self._invalidate_refresh_cache(self.content_type, self.category.category_id)
         self.start_load()
 
     def start_load(self):
@@ -770,6 +869,7 @@ class _GTStreamListBase(GTAsyncListScreen):
             self._loading = False
             self._load_token = None
             self._refresh()
+            self._show_m3u_refresh_summary()
             return
         if not self._live_more_loading:
             return
@@ -1290,6 +1390,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
     def _live_list_action(self, name, action):
 
         def dispatch():
+            if getattr(self, '_m3u_name_save', None) is not None:
+                return
             if self._preview_fullscreen_pending is not None:
                 if name == 'ok':
                     return
@@ -1355,26 +1457,91 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if not self._can_start_channel_move():
             return
         generation = self._live_catalog_generation
+        item = self._entries[self.selected_index]
+        choices = [(_('Bulk Move'), 'bulk')]
+        if callable(getattr(self.client, 'set_channel_name', None)) and getattr(item, '_m3u_name_key', None):
+            choices.append((_('Rename'), 'rename'))
+            if item.m3u_custom_name:
+                choices.append((_('Restore source name'), 'restore'))
         with self._preview_link_lock:
             self._preview_generation += 1
         self._cancel_preview_resolution(clear_target=True)
         self._live_modal_active = True
 
+        def renamed(name):
+            self._live_modal_active = False
+            if name is not None and generation == self._live_catalog_generation:
+                self._save_m3u_channel_name(item, name)
+
         def selected(choice):
             if self._closed:
                 return
             self._live_modal_active = False
-            if (generation == self._live_catalog_generation
-                    and isinstance(choice, (tuple, list)) and len(choice) > 1
-                    and choice[1] == 'bulk'):
+            if (generation != self._live_catalog_generation
+                    or not isinstance(choice, (tuple, list)) or len(choice) < 2):
+                return
+            action = choice[1]
+            if action == 'bulk':
                 self.start_channel_move()
+            elif action == 'restore':
+                self._save_m3u_channel_name(item, None)
+            elif action == 'rename':
+                self._live_modal_active = True
+                if not _open_m3u_name_keyboard(self, item.name, renamed):
+                    self._live_modal_active = False
 
         try:
             from Screens.ChoiceBox import ChoiceBox
-            self.session.openWithCallback(selected, ChoiceBox, title=_('Edit'), list=[(_('Bulk Move'), 'bulk')])
+            self.session.openWithCallback(selected, ChoiceBox, title=_('Edit'), list=choices)
         except Exception:
             self._live_modal_active = False
             log_event('content', 'Could not open M3U channel edit menu')
+
+    def _save_m3u_channel_name(self, item, name):
+        if self._closed or getattr(self, '_m3u_name_save', None) is not None:
+            return
+        if not hasattr(self, '_m3u_name_timer'):
+            self._m3u_name_timer = eTimer()
+            _connect_timer(self._m3u_name_timer, self._poll_m3u_channel_name)
+            self.onClose.append(self._m3u_name_timer.stop)
+        result = {'done': threading.Event(), 'name': None, 'item': item,
+                  'generation': self._live_catalog_generation}
+        self._m3u_name_save = result
+        self._live_modal_active = True
+        self._live_pending_target_index = None
+
+        def save():
+            try:
+                result['name'] = self.client.set_channel_name(item, name)
+            except Exception:
+                log_event('content', 'Could not save M3U channel name')
+            finally:
+                result['done'].set()
+
+        try:
+            threading.Thread(target=save, name='GT-M3U-Name', daemon=True).start()
+        except (OSError, RuntimeError, MemoryError):
+            result['done'].set()
+        self._poll_m3u_channel_name()
+
+    def _poll_m3u_channel_name(self):
+        result = self._m3u_name_save
+        if self._closed or result is None:
+            return
+        if not result['done'].is_set():
+            self._m3u_name_timer.start(100, True)
+            return
+        self._m3u_name_save = None
+        self._live_modal_active = False
+        if result['generation'] != self._live_catalog_generation:
+            return
+        if result['name'] is None:
+            self.session.open(MessageBox, _('Settings could not be saved. Check the receiver storage.'), type=MessageBox.TYPE_ERROR)
+            return
+        item = result['item']
+        item.name, item.m3u_custom_name = result['name']
+        self._live_render_page_key = None
+        self._refresh_live_streams()
 
     def _bind_live_channel_order(self):
         source = str(getattr(self.client, 'source_type', 'xtream') or 'xtream').lower()

@@ -8,6 +8,7 @@ services and samples its current decoder; it never opens a media URL to test it.
 """
 import json
 import os
+import re
 import shutil
 import subprocess
 import threading
@@ -24,6 +25,7 @@ ERROR_MESSAGES = {
 }
 RETRY_MESSAGE = N_("Trying a compatible YouTube stream...")
 STARTUP_SECONDS = 20.0
+NATIVE_VIDEO_CONFIRM_SECONDS = 1.25
 _PLAYER_CACHE = {}
 _PLAYER_LOCK = threading.Lock()
 
@@ -39,10 +41,10 @@ def youtube_error_message(code):
 
 
 def probe_native_player():
-    """Verify ExtEplayer3's own version response, including its shared loader.
+    """Verify ExtEplayer3 can run and inspect its separate-audio option.
 
 The no-argument invocation is also used by ServiceApp's player detection.
-Its usage exit code can be nonzero; a valid version response is authoritative.
+Some builds print usage in place of the version record.
 Do not run a subprocess on the GUI/main thread, even on a cold cache.
 """
     executable = shutil.which("exteplayer3")
@@ -72,6 +74,9 @@ Do not run a subprocess on the GUI/main thread, even on a cold cache.
                 process.communicate()
                 output = b""
         text = output[:65536].decode("utf-8", "replace")
+        has_usage = re.search(r"(?im)^\s*usage:\s*exteplayer3\b", text) is not None
+        advertises_audio = re.search(r"(?:^|[\s\[])-x\b", text) is not None
+        separate_audio = True if advertises_audio else False if has_usage else None
         decoder = json.JSONDecoder()
         for index, character in enumerate(text):
             if character != "{":
@@ -82,8 +87,10 @@ Do not run a subprocess on the GUI/main thread, even on a cold cache.
             except (ValueError, TypeError, KeyError):
                 continue
             if version > 0:
-                result = dict(available=True, version=version, reason="ready")
+                result = dict(available=True, version=version, reason="ready", separate_audio=separate_audio)
                 break
+        if not result["available"] and has_usage and process.returncode in (0, 1):
+            result = dict(available=True, version=0, reason="usage_only", separate_audio=separate_audio)
     except (OSError, subprocess.SubprocessError):
         pass
     with _PLAYER_LOCK:
@@ -97,10 +104,16 @@ def registered_youtube_services():
     try:
         from enigma import eServiceCenter, eServiceReference
         center = eServiceCenter.getInstance()
-        return tuple(kind for kind in (4097, 5001, 5002)
-                     if center.info(eServiceReference(kind, 0, "https://www.youtube.com/")) is not None)
     except Exception:
         return ()
+    registered = []
+    for kind in (4097, 5001, 5002):
+        try:
+            if center.info(eServiceReference(kind, 0, "https://www.youtube.com/")) is not None:
+                registered.append(kind)
+        except Exception:
+            continue
+    return tuple(registered)
 
 
 _VP9_FLAGS = ("HasVP9", "CanVP9", "SupportsVP9")
@@ -176,20 +189,30 @@ def same_reference(left, right):
 
 
 class YouTubeStartupMonitor:
-    """One current reference, real video dimensions and advancing playback PTS.
+    """Confirm the current service from advancing PTS or stable native video info.
 
 The logical player may move from preview to fullscreen during this check.
 Callbacks must return None after cancellation and must never return another
-service's dimensions. Decoder/HDMI resolution alone cannot signal success.
+service's dimensions. Only the owned 5002 service can confirm an unclocked start.
 """
-    def __init__(self, sample, timer=None, clock=None):
+    def __init__(self, sample, timer=None, clock=None, navigation=None, reference=None,
+                 allow_unclocked_video=False):
         self.sample = sample
         self.clock = clock or time.monotonic
         self.started_at = self.last_at = self.clock()
         self.active_seconds = 0.0
         self._clocks = {}
+        self._allow_unclocked_video = allow_unclocked_video
+        self._service_video_since = None
         self.outcome = ""
+        self.confirmation = ""
+        self.failure_reason = ""
+        self.last_sample = {}
         self.done = threading.Event()
+        self.navigation = navigation
+        self.reference = reference
+        self._events = None
+        self._player_exited = False
         self.timer = timer
         self.connection = None
         if self.timer is None:
@@ -199,12 +222,35 @@ service's dimensions. Decoder/HDMI resolution alone cannot signal success.
             self.timer.callback.append(self.poll)
         else:
             self.connection = self.timer.timeout.connect(self.poll)
+        if navigation is not None:
+            try:
+                from enigma import iPlayableService
+                self._eof_event = iPlayableService.evEOF
+                navigation.event.append(self._service_event)
+                self._events = navigation.event
+            except (ImportError, AttributeError, TypeError):
+                pass
         self.timer.start(250, True)
 
-    def finish(self, outcome):
+    def _service_event(self, event):
+        if event != self._eof_event or self.done.is_set():
+            return
+        try:
+            current = self.navigation.getCurrentlyPlayingServiceReference()
+            if not same_reference(self.reference, current):
+                return
+        except Exception:
+            return
+        # ServiceApp emits EOF when its external process stops. Defer recovery
+        # until Navigation returns from the current event dispatch.
+        self._player_exited = True
+        self.timer.start(1, True)
+
+    def finish(self, outcome, reason=""):
         if self.done.is_set():
             return
         self.outcome = outcome
+        self.failure_reason = reason
         self.timer.stop()
         if hasattr(self.timer, "callback"):
             try:
@@ -212,6 +258,13 @@ service's dimensions. Decoder/HDMI resolution alone cannot signal success.
             except ValueError:
                 pass
         self.connection = None
+        if self._events is not None:
+            try:
+                self._events.remove(self._service_event)
+            except ValueError:
+                pass
+            self._events = None
+        self.navigation = self.reference = None
         self.sample = None
         self.done.set()
 
@@ -219,8 +272,9 @@ service's dimensions. Decoder/HDMI resolution alone cannot signal success.
         self.finish("cancelled")
 
     def _clock_is_advancing(self, pts, source, now, interval):
+        """Distinguish an unavailable clock from a reported clock without progress."""
         if pts is None or pts < 0 or not source:
-            return False
+            return None
         last_pts, last_advance, progress = self._clocks.get(source, (None, None, 0))
         if last_pts is not None:
             delta = pts - last_pts
@@ -250,9 +304,18 @@ service's dimensions. Decoder/HDMI resolution alone cannot signal success.
         if state is None:
             self.finish("cancelled")
             return
+        self.last_sample = state
+        if state.get("rejected"):
+            self.finish("failed", "service_rejected")
+            return
+        if state.get("owned") and self._player_exited:
+            self.finish("failed", "player_exited")
+            return
         if not state.get("paused"):
             self.active_seconds += interval
-        if state.get("owned") and not state.get("paused"):
+        active = state.get("owned") and not state.get("paused")
+        confirming_video_info = False
+        if active:
             decoder_advancing = self._clock_is_advancing(
                 state.get("video_pts"), state.get("video_pts_source"), now, interval)
             service_advancing = self._clock_is_advancing(
@@ -262,9 +325,23 @@ service's dimensions. Decoder/HDMI resolution alone cannot signal success.
             if (now - self.started_at >= 0.75 and
                     ((state.get("video") and decoder_advancing)
                      or (state.get("service_video", state.get("video")) and service_advancing))):
+                self.confirmation = "decoder_pts" if state.get("video") and decoder_advancing else "service_pts"
                 self.finish("playing")
                 return
-        if self.active_seconds >= STARTUP_SECONDS:
-            self.finish("failed")
+            confirming_video_info = (self._allow_unclocked_video and state.get("service_video")
+                                     and decoder_advancing is None and service_advancing is None)
+        # Some native builds report the new video's dimensions but expose no
+        # position sensor. Require sustained service-owned video information.
+        if confirming_video_info:
+            if self._service_video_since is None:
+                self._service_video_since = now
+            elif now - self._service_video_since >= NATIVE_VIDEO_CONFIRM_SECONDS:
+                self.confirmation = "native_video_info"
+                self.finish("playing")
+                return
+        else:
+            self._service_video_since = None
+        if self.active_seconds >= STARTUP_SECONDS and not confirming_video_info:
+            self.finish("failed", "startup_timeout")
             return
         self.timer.start(250, True)

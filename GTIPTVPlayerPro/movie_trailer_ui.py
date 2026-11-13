@@ -13,7 +13,7 @@ from .series_trailer_ui import (SeriesTrailerHint, SeriesTrailerScreen,
 class MovieTrailerHint(SeriesTrailerHint):
     def __init__(self, screen):
         self.screen = screen
-        screen['movie_trailer_hint_bg'] = Label('') if getattr(screen, '_light_vod_enabled', False) else Pixmap()
+        screen['movie_trailer_hint_bg'] = Label('') if 'light_play_key' in screen else Pixmap()
         screen['movie_trailer_hint_text'] = Label(_('Trailer'))
         _ensure_play_keys()
         screen['movie_trailer_actions'] = ActionMap([PLAY_KEY_CONTEXT],
@@ -35,7 +35,7 @@ class MovieTrailerHint(SeriesTrailerHint):
             return
         self._hint_visible = visible
         names = ('movie_trailer_hint_bg', 'movie_trailer_hint_text')
-        if getattr(screen, '_light_vod_enabled', False):
+        if 'light_play_key' in screen:
             names += ('light_play_key',)
         for name in names:
             screen[name].show() if visible else screen[name].hide()

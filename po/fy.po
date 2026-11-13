@@ -4395,3 +4395,53 @@ msgstr "It TXT-bestân koe net lêzen wurde."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "Xtream-akkounts tafoege ({})\nDûbele yngongen oerslein ({})"
+
+msgid "Change layout"
+msgstr "Yndieling feroarje"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "De kanaalkeppeling is bewarre. Fernij de EPG om dy ta te passen."
+
+msgid "Cinematic view"
+msgstr "Bioskoopwerjefte"
+
+msgid "EPG server name could not be resolved."
+msgstr "De namme fan de EPG-tsjinner koe net opsocht wurde."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "Fier in jildige namme fan maksimaal {} tekens yn."
+
+msgid "Football scores\u0004Select source"
+msgstr "Kies in boarne"
+
+msgid "List view"
+msgstr "Listwerjefte"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "De M3U-list is fernijd. De feroarings wurde by de folgjende fernijing toand."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "De M3U-list koe net fernijd wurde. De bewarre list wurdt toand."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "Gearfetting fan de M3U-fernijing\n\nNije kanalen ({added})\nKanalen dy't net mear op de list steane ({removed})\nOmneamde kanalen ({renamed})"
+
+msgid "Matching release details"
+msgstr "Passende útjeftegegevens"
+
+msgid "Matching release group"
+msgstr "Deselde útjeftegroep"
+
+msgid "No channels need manual mapping."
+msgstr "Gjin kanalen hoege mei de hân keppele te wurden."
+
+msgid "No matching EPG channels found."
+msgstr "Gjin oerienkommende EPG-kanalen fûn."
+
+msgid "Recommended"
+msgstr "Oanrikkemandearre"
+
+msgid "Restore source name"
+msgstr "Oarspronklike namme weromsette"

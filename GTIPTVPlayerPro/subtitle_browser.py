@@ -12,7 +12,7 @@ from .auxiliary_presentation import skin_after as aux_skin_after, refresh_after 
 from .i18n import _
 from .online_subtitles import (
     canonical_subtitle_fps, polish_search_providers, provider_display_name,
-    subtitle_result_release,
+    subtitle_recommendation_prefix, subtitle_result_release,
 )
 from .paths import plugin_path
 from .remote_footer import (
@@ -65,6 +65,14 @@ COMPATIBILITY_ART = {
     "unknown": "status-neutral-r64.png",
     "different": "status-red-r64.png",
 }
+
+
+def subtitle_display_release(result, first=False):
+    release = subtitle_result_release(result, _("Subtitle"))
+    recommendation = subtitle_recommendation_prefix(result) if first else ""
+    return "{} · {}".format(recommendation, release) if recommendation else release
+
+
 SUBTITLE_BROWSER_FOOTER = (
     footer_item("green", "search"),
     footer_item("yellow", "filter"),
@@ -698,7 +706,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             language = str(result.get("language") or "--").upper()[:3]
             provider = str(result.get("provider") or "subdl").lower()
             release = " ".join(
-                subtitle_result_release(result, _("Subtitle")).split()
+                subtitle_display_release(result, first=self.top + row == 0).split()
             )[:150]
             meta = []
             try:

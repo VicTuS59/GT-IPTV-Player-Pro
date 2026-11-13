@@ -20,7 +20,10 @@ from enigma import eTimer
 from .background import attach_native_alpha_pixmap
 from .i18n import _, localized_upper
 from .main import _connect_timer, _scale
-from .matches import LEAGUE_NAMES, MatchesLoader, REFRESH_SECONDS, leagues_for_matches
+from .matches import (
+    FLASH_DATE_LIMIT, LEAGUE_NAMES, MatchesLoader, REFRESH_SECONDS, SCORE_SOURCES,
+    leagues_for_matches,
+)
 from .matches_text import tr
 from .liveonsat import COUNTRIES, filter_broadcasts, load_country, save_country
 from .match_highlights import available as highlights_available, search_query as highlights_query
@@ -41,13 +44,28 @@ def matches_skin():
     return theme_skin(*_scale())
 
 
+class GTMatchesSourceScreen(ChoiceBox):
+    def __init__(self, session):
+        options = [(name, 'CALLFUNC', self._opener(source)) for source, name in SCORE_SOURCES.items()]
+        # The first two arguments also work on images with text/choiceList.
+        ChoiceBox.__init__(self, session, tr('Select source'), options)
+
+    def _opener(self, source):
+        def open_scores(*unused):
+            self.session.open(GTMatchesScreen, source=source)
+        return open_scores
+
+
 class GTMatchesScreen(Screen):
-    def __init__(self,session,loader=None,today=None):
+    def __init__(self,session,loader=None,today=None,source='espn'):
         self.skin=prepared_skin(matches_skin)
         Screen.__init__(self,session)
         from .skin_artwork import install as install_skin_artwork
         install_skin_artwork(self)
-        self.loader=loader or MatchesLoader()
+        self.loader=loader or MatchesLoader(source=source)
+        self.source = getattr(self.loader, 'source', source)
+        self._date_limit = FLASH_DATE_LIMIT if self.source == 'flashscore' else 30
+        self._league_names = {}
         self.day=today or dt.date.today()
         self.tab=0;self.league='';self.selected=0;self.window=0
         self.snapshot=None;self.matches=[];self._closed=False;self._started=False
@@ -85,7 +103,7 @@ class GTMatchesScreen(Screen):
             set_text_if_changed(self[name], localized_upper(tr(message)) if name=='detail_header' else tr(message))
         set_text_if_changed(self['action_red'], _('Back'));set_text_if_changed(self['action_green'], _('Refresh'))
         set_text_if_changed(self['action_yellow'], tr('Date'));set_text_if_changed(self['action_blue'], tr('League filter'))
-        set_text_if_changed(self['source'], tr('Source: ESPN'))
+        set_text_if_changed(self['source'], _('Source: {}').format(SCORE_SOURCES.get(self.source, 'ESPN')))
         set_text_if_changed(self['navigation'], '')
         set_text_if_changed(self['tv_action_red'], _('Back'));set_text_if_changed(self['tv_action_green'], _('Refresh'))
         set_text_if_changed(self['tv_action_yellow'], tr('Select country'))
@@ -194,12 +212,13 @@ class GTMatchesScreen(Screen):
         self._timer.start(250,True)
 
     def _league_options(self):
-        return leagues_for_matches(self.snapshot.matches) if self.snapshot else ()
+        if self.snapshot is None:
+            return ()
+        return getattr(self.snapshot, 'leagues', ()) or leagues_for_matches(self.snapshot.matches)
 
-    @staticmethod
-    def _league_label(key):
+    def _league_label(self,key):
         if key == 'espn:unknown':return tr('League')
-        return LEAGUE_NAMES.get(key) or (tr('League') + ' ' + key.split(':')[-1])
+        return self._league_names.get(key) or LEAGUE_NAMES.get(key) or (tr('League') + ' ' + key.split(':')[-1])
 
     def _is_broadcast(self):
         return self.tab==3
@@ -211,7 +230,8 @@ class GTMatchesScreen(Screen):
             self.selected=next((i for i,m in enumerate(self.matches) if m.id==selected_id),0)
             self.window=0;self._channel_window=0
             return
-        if self.league and self.league not in dict(self._league_options()):self.league=''
+        self._league_names = dict(self._league_options())
+        if self.league and self.league not in self._league_names:self.league=''
         category=TABS[self.tab][0]
         self.matches=[m for m in (self.snapshot.matches if self.snapshot else ())
                       if m.category==category and (not self.league or m.league==self.league)]
@@ -412,10 +432,10 @@ class GTMatchesScreen(Screen):
     def choose_country(self):
         if self._closed or self._dialog_open:return
         self._dialog_open=True
-        self.session.openWithCallback(self._country_chosen,ChoiceBox,title=tr('Select country'),
-                                      list=[(tr(name),key) for key,name in COUNTRIES])
+        self.session.openWithCallback(self._country_chosen,ChoiceBox,tr('Select country'),
+                                      [(tr(name),key) for key,name in COUNTRIES])
 
-    def _country_chosen(self,choice):
+    def _country_chosen(self,choice=None):
         self._dialog_open=False
         if self._closed or not choice or choice[1] not in dict(COUNTRIES):return
         try:save_country(choice[1])
@@ -510,15 +530,16 @@ class GTMatchesScreen(Screen):
         today=dt.date.today()
         options=[(tr('Previous day'),self.day-dt.timedelta(days=1)),(tr('Next day'),self.day+dt.timedelta(days=1)),
                  (tr('Today'),today),(tr('Yesterday'),today-dt.timedelta(days=1)),(tr('Tomorrow'),today+dt.timedelta(days=1))]
+        options = [(label, day) for label, day in options if abs((day - today).days) <= self._date_limit]
         self._dialog_open=True
-        self.session.openWithCallback(self._date_chosen,ChoiceBox,title=tr('Select date'),list=options)
+        self.session.openWithCallback(self._date_chosen,ChoiceBox,tr('Select date'),options)
 
-    def _date_chosen(self,choice):
+    def _date_chosen(self,choice=None):
         self._dialog_open=False
         if self._closed or not choice:return
         day=choice[1]
-        today=dt.date.today()
-        day=max(today-dt.timedelta(days=30),min(today+dt.timedelta(days=30),day))
+        if type(day) is not dt.date or abs((day - dt.date.today()).days) > self._date_limit:
+            return
         if day==self.day:return
         self.day=day;self.snapshot=None;self.matches=[];self.selected=0;self.window=0
         # Supersede a pending fetch rather than allowing its day to replace this one.
@@ -529,9 +550,9 @@ class GTMatchesScreen(Screen):
         if self._dialog_open:return
         self._dialog_open=True
         options=[(tr('All leagues'),'')]+[(self._league_label(key),key) for key,name in self._league_options()]
-        self.session.openWithCallback(self._league_chosen,ChoiceBox,title=tr('League filter'),list=options)
+        self.session.openWithCallback(self._league_chosen,ChoiceBox,tr('League filter'),options)
 
-    def _league_chosen(self,choice):
+    def _league_chosen(self,choice=None):
         self._dialog_open=False
         if self._closed or not choice:return
         if choice[1] not in dict(self._league_options()) and choice[1]!='':return

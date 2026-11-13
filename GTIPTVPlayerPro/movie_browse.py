@@ -61,11 +61,10 @@ class MovieBrowseCatalog(object):
                 self._positions.clear()
             self._workers += 1
             self.idle.clear()
-            worker = threading.Thread(target=self._run, args=(generation, token, force, self.index))
-            worker.daemon = True
             try:
-                worker.start()
-            except (RuntimeError, OSError):
+                threading.Thread(target=self._run, args=(generation, token, force, self.index),
+                                 daemon=True).start()
+            except (RuntimeError, OSError, MemoryError):
                 self._workers -= 1
                 self._state.update(preparing=False, reason="storage")
                 if not self._workers:

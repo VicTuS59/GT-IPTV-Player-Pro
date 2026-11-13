@@ -4395,3 +4395,53 @@ msgstr "فایل TXT خوانده نشد."
 #, python-brace-format
 msgid "Xtream accounts added ({})\nDuplicates skipped ({})"
 msgstr "حساب‌های Xtream اضافه‌شده ({})\nموارد تکراری ردشده ({})"
+
+msgid "Change layout"
+msgstr "تغییر چیدمان"
+
+msgid "Channel mapping saved. Refresh EPG to apply it."
+msgstr "تطبیق کانال ذخیره شد. برای اعمال آن راهنمای برنامه‌ها را تازه‌سازی کنید."
+
+msgid "Cinematic view"
+msgstr "نمای سینمایی"
+
+msgid "EPG server name could not be resolved."
+msgstr "نشانی سرور راهنمای برنامه‌ها از روی نام آن پیدا نشد."
+
+#, python-brace-format
+msgid "Enter a valid name of up to {} characters."
+msgstr "نام معتبری با حداکثر {} نویسه وارد کنید."
+
+msgid "Football scores\u0004Select source"
+msgstr "منبع را انتخاب کنید"
+
+msgid "List view"
+msgstr "نمای فهرست"
+
+msgid "M3U list refreshed. The next refresh will show changes."
+msgstr "فهرست M3U به‌روز شد. تغییرات در به‌روزرسانی بعدی نمایش داده می‌شوند."
+
+msgid "M3U refresh failed. Showing the cached list."
+msgstr "به‌روزرسانی فهرست M3U ناموفق بود. فهرست ذخیره‌شده در حافظهٔ پنهان نمایش داده می‌شود."
+
+#, python-brace-format
+msgid "M3U refresh summary\n\nNew channels ({added})\nChannels no longer listed ({removed})\nRenamed channels ({renamed})"
+msgstr "خلاصهٔ به‌روزرسانی M3U\n\nکانال‌های جدید ({added})\nکانال‌های خارج‌شده از فهرست ({removed})\nکانال‌های تغییرنام‌یافته ({renamed})"
+
+msgid "Matching release details"
+msgstr "جزئیات انتشار سازگار"
+
+msgid "Matching release group"
+msgstr "گروه انتشار یکسان"
+
+msgid "No channels need manual mapping."
+msgstr "هیچ کانالی به تطبیق دستی نیاز ندارد."
+
+msgid "No matching EPG channels found."
+msgstr "کانال منطبقی در راهنمای برنامه‌ها پیدا نشد."
+
+msgid "Recommended"
+msgstr "پیشنهادی"
+
+msgid "Restore source name"
+msgstr "بازگرداندن نام اصلی"

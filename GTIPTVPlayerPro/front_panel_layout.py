@@ -11,9 +11,12 @@ def panel_layout(width, height, kind='movie'):
     width, height = min(width,4096), min(height,4096)
     minimal = height < (40 if kind == 'live' else 56) or width < 96
     compact = not minimal and (height < 160 or width < 240)
+    full_playback = kind in ('movie', 'series', 'youtube') and not minimal and not compact
     margin = 0 if minimal else max(1,min(width,height)//40)
     content = max(1,width-2*margin)
     bar = 0 if minimal else min(max(2,height//38),max(1,height//10))
+    if full_playback:
+        bar = height // 12
     bar_y = max(margin,height-margin-bar)
     usable = max(1,bar_y-margin-(max(1,height//90) if bar else 0))
     fields = {name:dict(box=(0,0,1,1),font=1,visible=False,scroll=True) for name in FIELDS}
@@ -46,15 +49,19 @@ def panel_layout(width, height, kind='movie'):
             put(name,margin,y,content,h,'#A855F7' if name=='kind' else '#22D3EE' if name=='detail' else '#FFFFFF',
                 'center' if name=='clock' else 'left',name!='clock')
     else:
-        # Time captions previously received only 7% of the screen height.
-        # Give captions and both clocks real space instead of a huge title
-        # and remaining clock. Series deliberately share the movie layout.
-        portrait=height>width
-        weights=([('kind',8),('title',17),('elapsed_label',8),('elapsed',16),
-                  ('total_label',8),('total',16),('remaining_label',8),('remaining',19)]
-                 if portrait else
-                 [('kind',12),('title',20),('time_labels',13),('times',20),
-                  ('remaining_label',13),('remaining',22)])
+        portrait = height > width
+        if full_playback and portrait:
+            weights = [('kind', 8), ('title', 13), ('remaining_label', 8), ('remaining', 29),
+                       ('elapsed_label', 7), ('elapsed', 14), ('total_label', 7), ('total', 14)]
+        elif full_playback:
+            weights = [('kind', 11), ('title', 16), ('remaining_label', 10), ('remaining', 37),
+                       ('time_labels', 10), ('times', 16)]
+        elif portrait:
+            weights = [('kind', 8), ('title', 17), ('elapsed_label', 8), ('elapsed', 16),
+                       ('total_label', 8), ('total', 16), ('remaining_label', 8), ('remaining', 19)]
+        else:
+            weights = [('kind', 12), ('title', 20), ('time_labels', 13), ('times', 20),
+                       ('remaining_label', 13), ('remaining', 22)]
         cells=rows(weights)
         y,h=cells['kind'];half=max(1,content//2)
         put('kind',margin,y,content*3//4,h,'#A855F7')
@@ -71,7 +78,8 @@ def panel_layout(width, height, kind='movie'):
             y,h=cells['times']
             put('elapsed',margin,y,half,h,scroll=False)
             put('total',margin+half,y,content-half,h,align='right',scroll=False)
-        y,h=cells['remaining_label'];put('remaining_label',margin,y,content,h,align='center')
+        y, h = cells['remaining_label']
+        put('remaining_label', margin, y, content, h, '#22D3EE' if full_playback else '#FFFFFF', 'center')
         y,h=cells['remaining'];put('remaining',margin,y,content,h,'#22D3EE','center',False)
     return dict(width=width,height=height,mode='minimal' if minimal else 'compact' if compact else 'full',
                 kind=kind,margin=margin,content_w=content,progress_y=bar_y,progress_h=bar,
