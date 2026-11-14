@@ -8,7 +8,7 @@ import operator
 import sys
 import threading
 
-from .category_visibility import category_ids_visible
+from .category_visibility import category_filter_active, category_ids_visible
 from .content import ContentError
 from .content_sort import Lease
 from .movie_catalog import CatalogLimitError
@@ -25,7 +25,7 @@ class CategoryContentList(Sequence):
     cache_limit = 128
 
     def __init__(self, backend, category_id, hidden=(), sorted_view=None, token=None,
-                 search_terms=None):
+                 search_terms=None, discovery=None):
         self.backend, self.category_id = backend, str(category_id or '')
         self.full_search = search_terms is not None
         self.lock = threading.RLock()
@@ -49,19 +49,18 @@ class CategoryContentList(Sequence):
                     self.sort_weight = sorted_view.lease.amount[0]
                 else:
                     direct = (getattr(rows, 'plain', False)
-                              and not hidden and not hasattr(hidden, 'allowed')
+                              and not hidden and not category_filter_active(hidden)
                               and self.category_id == rows.selected)
-                    allowed = (True,) if direct else tuple((not self.category_id or self.category_id in ids)
+                    allowed = (True,) if direct and not discovery else tuple((not self.category_id or self.category_id in ids)
                                     and category_ids_visible(ids, hidden, self.category_id) for ids in rows.groups)
                     if self.full_search:
                         # Store only matching integer positions, never a second
                         # full set of ContentItem objects or provider metadata.
-                        cost = len(rows) * 5 + 4096
+                        cost = len(rows) * (6 if discovery else 5) + 4096
                         if backend.session.weight() + cost > backend.owner.max_bytes:
                             raise CatalogLimitError('catalog-memory')
                         self.lease.reserve(cost)
-                        self.order = array('I', rows.matches(search_terms, allowed,
-                            lambda: backend.check(token))) if search_terms else array('I')
+                        self.order = array('I', backend.matching_positions(rows, search_terms, allowed, token, discovery))
                         self.lease.reserve(sys.getsizeof(self.order) + 4096 - cost)
                     elif all(allowed):
                         self.order = range(len(rows))

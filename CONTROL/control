@@ -1,11 +1,11 @@
 Package: enigma2-plugin-extensions-gtiptvplayerpro
-Version: 1.9.3-r0
+Version: 1.9.4-r0
 Section: extra
 Priority: optional
 Architecture: all
 Maintainer: VicTuS59
 Depends: enigma2, python3-core, python3-asyncio, python3-compression, python3-datetime, python3-difflib, python3-fcntl, python3-html, python3-io, python3-json, python3-logging, python3-math, python3-netclient, python3-netserver, python3-stringold, python3-threading, python3-xml, tzdata, ca-certificates
-Installed-Size: 20534
+Installed-Size: 20946
 Homepage: https://github.com/VicTuS59/GT-IPTV-Player-Pro
 License: GPL-2.0-or-later
 Description: GT IPTV Player Pro for Enigma2
@@ -95,6 +95,8 @@ Description: GT IPTV Player Pro for Enigma2
  Status-aware REC infobar: localized record/stop caption and a blinking recording indicator.
  Start movie/series heroes sooner, adopt matching neighbor work, and prioritize foreground artwork within four slots.
  Native cinematic movie discovery, portrait cards, inline remote guide and 43-language discovery hint.
+ Discover movies and series with fast cached artwork, IPTV seasons and episodes, and native trailer playback.
+ Keep discovery series search available without category filters and discard obsolete catalogue views after playback.
  Scope recording/download lists to the selected folder and prefill exact local M3U edit paths.
  Folder-scoped recording lists, exact local M3U edits, shared yellow edit menus and scoped budgeted content sorting.
  Independent persistent category ordering, with separate content and channel sorting.

@@ -539,7 +539,15 @@ class MemoryCatalog:
                 remember(item)
         return item
 
-    def search(self, query, page, page_size, hidden, token):
+    def matching_positions(self, rows, terms, permitted, token, discovery):
+        def check():
+            self.check(token)
+        if discovery:
+            from .discovery import series_match_positions
+            return series_match_positions(rows, permitted, discovery, check)
+        return rows.matches(terms, permitted, check) if terms else ()
+
+    def search(self, query, page, page_size, hidden, token, discovery=None):
         # Existing rows remain readable under pressure. Optional query/read
         # caches may decline growth; only producers need the RAM reserve.
         self.check(token)
@@ -551,14 +559,16 @@ class MemoryCatalog:
         with self.session.lock:
             self.check(token)
             generation = self.session.visible()
-            if generation is not None and terms:
-                key = (terms, frozenset(hidden or ()), hasattr(hidden, "allowed"),
+            if generation is not None and (terms or discovery):
+                key = (terms, discovery, frozenset(hidden or ()), hasattr(hidden, "allowed"),
                        frozenset(getattr(hidden, "allowed", ())), frozenset(getattr(hidden, "known", ())))
                 cached = self.session.queries.get(key)
                 if cached is None:
                     permitted = tuple(category_ids_visible(group, hidden) for group in generation.rows.groups)
-                    matches = array("I", generation.rows.matches(terms, permitted, lambda: self.check(token)))
+                    matches = array("I", self.matching_positions(generation.rows, terms, permitted, token, discovery))
                     cost = sys.getsizeof(matches) + 512 + sum(sys.getsizeof(term) for term in terms)
+                    if discovery:
+                        cost += sum(sys.getsizeof(title) for title in discovery[2])
                     while len(self.session.queries) >= 4:
                         unused, (old, weight) = self.session.queries.popitem(last=False)
                         self.session.query_weight -= weight
@@ -585,7 +595,7 @@ class MemoryCatalog:
             result.catalog_state = self.session.state()
             return result
 
-    def search_all(self, query, hidden, token):
+    def search_all(self, query, hidden, token, discovery=None):
         """Expose every match, hydrating only the rows the screen reads."""
         from .category_content import CategoryContentList
         terms = tuple(term.encode('utf-8') for term in
@@ -597,11 +607,11 @@ class MemoryCatalog:
             # bounded progress preview until it stops, then expose all matches
             # from the completed or explicitly incomplete catalogue.
             if state['preparing'] or self.session.visible() is None:
-                result = self.search(query, 1, 14, hidden, token)
+                result = self.search(query, 1, 14, hidden, token, discovery)
                 result.has_more = False
                 result.progress_preview = True
                 return result
-            full = CategoryContentList(self, '', hidden, token=token, search_terms=terms)
+            full = CategoryContentList(self, '', hidden, token=token, search_terms=terms, discovery=discovery)
             try:
                 self.check(token)
                 result = MovieSearchPage(page_size=max(1, len(full)),

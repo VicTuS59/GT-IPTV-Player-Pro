@@ -197,6 +197,10 @@ class PackedRows:
         record["sr"] = self.sort_release[position]
         return record
 
+    def discovery_identity(self, position):
+        row = self.record(position)
+        return row.get("t", ""), row.get("n", ""), row.get("y", "")
+
     def matches(self, terms, permitted, check):
         needle = max(terms, key=len)
         position, iterations = 0, 0

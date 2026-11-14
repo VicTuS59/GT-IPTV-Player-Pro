@@ -224,7 +224,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self._keyboard_timer.start(40, True)
 
     def _open_initial_search(self):
-        if self._closed:
+        if getattr(self, '_closed', True):
             return
         if self._initial_query is not None:
             query, self._initial_query = (self._initial_query, None)
@@ -292,7 +292,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._search_source = ''
 
     def _query_entered(self, value):
-        if self._closed or value is None:
+        if getattr(self, '_closed', True) or value is None:
             return
         query = ' '.join(str(value or '').split())[:120]
         query_key = _movie_search_text(query)
@@ -348,14 +348,16 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
     def _catalog_worker(self, generation, token, force):
 
         def progress(state):
-            with self._event_lock:
-                if not self._closed and generation == self._catalog_generation:
-                    self._catalog_mailbox = (generation, dict(state))
+            lock = getattr(self, '_event_lock', None)
+            if lock is not None:
+                with lock:
+                    if not getattr(self, '_closed', True) and generation == self._catalog_generation:
+                        self._catalog_mailbox = (generation, dict(state))
         try:
             result = self._catalog_index.prepare(token, callback=progress, force=force)
             progress(dict(result, preparing=False))
         except Exception:
-            progress(dict(self._catalog_state, complete=False, preparing=False, reason='storage'))
+            progress(dict(getattr(self, '_catalog_state', {}), complete=False, preparing=False, reason='storage'))
         finally:
             self._provider_worker_finished()
 
@@ -443,12 +445,14 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         return True
 
     def _queue_search_event(self, event):
-        with self._event_lock:
-            if not self._closed and event[1] == self._search_generation:
-                self._events.append(event)
-                return
+        lock = getattr(self, '_event_lock', None)
+        if lock is not None:
+            with lock:
+                if not getattr(self, '_closed', True) and event[1] == self._search_generation:
+                    self._events.append(event)
+                    return
         if event[0] in ('page', 'preview'):
-            self._release_search_page(event[3])
+            GTAllMoviesSearchScreen._release_search_page(event[3])
 
     def _provider_worker_started(self):
         with self._provider_worker_lock:
@@ -456,7 +460,12 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             self._provider_workers_idle.clear()
 
     def _provider_worker_finished(self):
-        with self._provider_worker_lock:
+        lock = getattr(self, '_provider_worker_lock', None)
+        if lock is None:
+            return
+        with lock:
+            if getattr(self, '_closed', True):
+                return
             self._provider_worker_count = max(0, self._provider_worker_count - 1)
             if self._provider_worker_count == 0:
                 self._provider_workers_idle.set()
@@ -467,11 +476,14 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
             try:
                 token.check()
                 if getattr(self, '_catalog_mode', False):
+                    lookup = getattr(self, '_discovery_series_lookup', None)
+                    options = {'discovery': lookup} if lookup and _movie_search_text(query) == lookup[2][0] else {}
                     if not self._catalog_preparing:
                         pending_result = self._catalog_index.search_all(query,
-                            hidden_category_ids=self._hidden_category_ids, token=token)
+                            hidden_category_ids=self._hidden_category_ids, token=token, **options)
                     else:
-                        pending_result = self._catalog_index.search(query, page=page, page_size=self.provider_page_size, hidden_category_ids=self._hidden_category_ids, token=token)
+                        pending_result = self._catalog_index.search(query, page=page, page_size=self.provider_page_size,
+                            hidden_category_ids=self._hidden_category_ids, token=token, **options)
                         pending_result.has_more = False
                         pending_result.progress_preview = True
                     token.check()
@@ -631,7 +643,7 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
         self._render()
 
     def _poll_search(self):
-        if self._closed:
+        if getattr(self, '_closed', True):
             return
         events = []
         with self._event_lock:
@@ -746,6 +758,10 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
 
     @search_file_refresh_after
     def _render(self):
+        if self._discard_stale_catalog_results():
+            self._catalog_refresh_pending = bool(self._query_key)
+            if self._catalog_refresh_pending:
+                self._poll_timer.start(60, True)
         if self._results:
             self.selected_index = min(len(self._results) - 1, max(0, self.selected_index))
         else:
@@ -791,6 +807,18 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
                 set_text_if_changed(self['message'], '')
         set_text_if_changed(self['status'], self._status_text())
         self._render_detail()
+
+    def _discard_stale_catalog_results(self):
+        results = self._results
+        if not getattr(results, 'full_search', False):
+            return False
+        session = results.backend.session
+        with session.lock:
+            if not results.closed and not session.closed and results.generation is session.visible():
+                return False
+        self._release_search_results()
+        self._catalog_page_complete = False
+        return True
 
     def _render_detail(self):
         if not self._results:
@@ -921,7 +949,8 @@ class GTAllMoviesSearchScreen(_FavoriteSupport, Screen):
     def _stop(self):
         if self._closed:
             return
-        self._closed = True
+        with self._provider_worker_lock:
+            self._closed = True
         self._catalog_generation += 1
         _cancel_worker_token(self._catalog_token)
         self._catalog_token = None
@@ -955,6 +984,14 @@ class GTAllSeriesSearchScreen(GTAllMoviesSearchScreen):
     _no_match_message = N_('No series matched this search.')
     _item_noun_message = N_('Series')
 
+    def __init__(self, *args, discovery_title=None, **kwargs):
+        if discovery_title:
+            from .discovery import series_lookup
+            lookup = series_lookup(discovery_title)
+            if lookup[2]:
+                self._discovery_series_lookup = lookup
+        super().__init__(*args, **kwargs)
+
     def _release_xtream_search_cache(self):
         pass
 
@@ -965,6 +1002,9 @@ class GTAllSeriesSearchScreen(GTAllMoviesSearchScreen):
         if self._closed or not self._results or self._loading:
             return
         if getattr(self, '_series_episode_child_open', False):
+            return
+        if self._discard_stale_catalog_results():
+            self._series_episode_closed()
             return
         self._series_episode_child_open = True
         self._catalog_generation += 1
@@ -985,13 +1025,16 @@ class GTAllSeriesSearchScreen(GTAllMoviesSearchScreen):
             self['status'].setText(_('Could not open the content list.'))
 
     def _series_episode_closed(self, *args):
-        self._series_episode_child_open = False
-        if self._closed:
+        if getattr(self, '_closed', True):
             return
+        self._series_episode_child_open = False
         self._reload_favorite_keys()
         self._page_cache.clear()
         self._known_last_page = None
-        if self._query_key:
+        if self._query_key and not self._catalog_page_complete:
+            # A resumed producer can commit a new generation before the GUI
+            # refreshes. Keep the current position, but drop the old view.
+            self._release_search_results()
             self._start_catalog()
             self._catalog_refresh_pending = True
             self._poll_timer.start(60, True)

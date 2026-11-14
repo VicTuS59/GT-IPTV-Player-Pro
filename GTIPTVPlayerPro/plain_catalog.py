@@ -292,6 +292,12 @@ class PlainRows(CategoryRows):
         year = _compact_text(_clean_text(year), 20)
         return _movie_search_text(name+' '+year).replace('\x00', ' ').encode('utf-8')
 
+    def discovery_identity(self, position):
+        entry = raw_entry(self.values[position])
+        return (entry.get('tmdb_id') or entry.get('tmdb') or entry.get('tmdbId') or entry.get('themoviedb_id'),
+                str(entry.get('name') or entry.get('title') or entry.get('o_name') or ''),
+                entry.get('year') or entry.get('release_year') or entry.get('releasedate') or entry.get('releaseDate'))
+
     def dates(self, position):
         if self._added is not None: return self._added[position], self._released[position]
         value = self.values[position]

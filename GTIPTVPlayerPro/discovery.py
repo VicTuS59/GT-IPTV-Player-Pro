@@ -5,23 +5,22 @@
 
 import copy
 import hashlib
+import heapq
 import re
 import threading
 import time
 from collections import OrderedDict
-from urllib.parse import urlsplit
 
-from .content import ContentError
-from .diagnostics import log_event
+from .content import ContentError, _movie_search_text
 from .i18n import N_
-from .metadata import MetadataError, TMDbMetadataClient, _image_url
+from .metadata import MetadataError, TMDbMetadataClient, _image_url, _year, clean_media_title
 
 
 DISCOVERY_CACHE_SECONDS = 6 * 60 * 60
 _CACHE = OrderedDict()
 _CACHE_LOCK = threading.RLock()
-_TRAILER_LOCK = threading.Lock()
 _VIDEO_KEY = re.compile(r"^[A-Za-z0-9_-]{11}$")
+_LANGUAGE_KEY = re.compile(r"^[a-z]{2}$")
 
 
 def _text(value, limit=2000):
@@ -35,31 +34,41 @@ def _number(value, default=0, maximum=1000000000):
         return default
 
 
-def movie_record(value):
+def _title_record(value, media_type, backdrop_size="w1280"):
     if not isinstance(value, dict) or value.get("adult"):
         return None
-    movie_id = _number(value.get("id"))
-    title = _text(value.get("title") or value.get("original_title"), 240)
-    if not movie_id or not title:
+    is_series = media_type == "tv"
+    title_id = _number(value.get("id"))
+    original = _text(value.get("original_name" if is_series else "original_title"), 240)
+    title = _text(value.get("name" if is_series else "title"), 240) or original
+    if not title_id or not title:
         return None
     try:
         rating = max(0.0, min(10.0, float(value.get("vote_average") or 0)))
     except (TypeError, ValueError, OverflowError):
         rating = 0.0
-    date = _text(value.get("release_date"), 10)
-    year = date[:4] if re.match(r"^\d{4}-\d{2}-\d{2}$", date) else ""
+    date = _text(value.get("first_air_date" if is_series else "release_date"), 10)
+    year = date[:4] if re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", date) else ""
     return {
-        "id": movie_id, "title": title,
-        "original_title": _text(value.get("original_title"), 240),
+        "id": title_id, "media_type": media_type, "title": title, "original_title": original,
+        "original_language": _text(value.get("original_language"), 2).lower(),
         "year": year, "rating": rating,
         "overview": _text(value.get("overview"), 6000),
         "poster": _image_url(value.get("poster_path"), "w342"),
-        "backdrop": _image_url(value.get("backdrop_path"), "w1280"),
+        "backdrop": _image_url(value.get("backdrop_path"), backdrop_size),
     }
+
+
+def movie_record(value):
+    return _title_record(value, "movie")
 
 
 class TMDbDiscoveryClient(TMDbMetadataClient):
     """Use the existing authenticated, bounded and cancellable transport."""
+
+    def __init__(self, *args, backdrop_size="w1280", **kwargs):
+        super().__init__(*args, **kwargs)
+        self._backdrop_size = "w780" if backdrop_size == "w780" else "w1280"
 
     def _cached_request(self, path, parameters=None, force=False, language=None):
         self._check_request_limits()
@@ -86,27 +95,31 @@ class TMDbDiscoveryClient(TMDbMetadataClient):
         return result
 
     def movies(self, section="popular", page=1, genre_id=0, movie_id=0, force=False):
+        return self.titles("movie", section, page, genre_id, movie_id, force)
+
+    def titles(self, media_type, section="popular", page=1, genre_id=0, title_id=0, force=False):
+        media_type = "tv" if media_type == "tv" else "movie"
         page = max(1, _number(page, 1, 500))
         parameters = {"page": page, "include_adult": "false"}
         if section == "top":
-            path = "/movie/top_rated"
+            path = "/{}/top_rated".format(media_type)
         elif section == "new":
-            path = "/movie/now_playing"
+            path = "/tv/on_the_air" if media_type == "tv" else "/movie/now_playing"
         elif section == "genres":
-            path = "/discover/movie"
+            path = "/discover/{}".format(media_type)
             parameters["sort_by"] = "popularity.desc"
             if _number(genre_id):
                 parameters["with_genres"] = _number(genre_id)
-        elif section == "similar" and _number(movie_id):
-            path = "/movie/{}/recommendations".format(_number(movie_id))
+        elif section == "similar" and _number(title_id):
+            path = "/{}/{}/recommendations".format(media_type, _number(title_id))
         else:
-            path = "/movie/popular"
+            path = "/{}/popular".format(media_type)
         payload = self._cached_request(path, parameters, force=force)
         if not isinstance(payload.get("results"), list):
             raise MetadataError(N_("TMDb returned an invalid response"))
         entries, seen = [], set()
         for value in payload["results"][:20]:
-            record = movie_record(value)
+            record = _title_record(value, media_type, self._backdrop_size)
             if record and record["id"] not in seen:
                 seen.add(record["id"])
                 entries.append(record)
@@ -115,8 +128,9 @@ class TMDbDiscoveryClient(TMDbMetadataClient):
             "pages": max(1, _number(payload.get("total_pages"), 1, 500)),
         }
 
-    def genres(self, force=False):
-        payload = self._cached_request("/genre/movie/list", force=force)
+    def genres(self, force=False, *, media_type="movie"):
+        media_type = "tv" if media_type == "tv" else "movie"
+        payload = self._cached_request("/genre/{}/list".format(media_type), force=force)
         values = payload.get("genres")
         if not isinstance(values, list):
             raise MetadataError(N_("TMDb returned an invalid response"))
@@ -124,42 +138,60 @@ class TMDbDiscoveryClient(TMDbMetadataClient):
                 for x in values[:100]
                 if isinstance(x, dict) and _number(x.get("id")) and x.get("name")]
 
-    def detail(self, movie_id, force=False):
-        movie_id = _number(movie_id)
-        if not movie_id:
+    def detail(self, movie_id, force=False, *, media_type="movie", listing=None):
+        media_type = "tv" if media_type == "tv" else "movie"
+        title_id = _number(movie_id)
+        if not title_id:
             raise MetadataError(N_("TMDb returned an invalid response"))
-        path = "/movie/{}".format(movie_id)
-        payload = self._cached_request(path, {"append_to_response": "credits"}, force=force)
-        record = movie_record(payload)
-        if not record or record["id"] != movie_id:
+        path = "/{}/{}".format(media_type, title_id)
+        parameters = {"append_to_response": "credits"} if media_type == "movie" else None
+        payload = self._cached_request(path, parameters, force=force)
+        record = _title_record(payload, media_type, self._backdrop_size)
+        if not record or record["id"] != title_id:
             raise MetadataError(N_("TMDb returned an invalid response"))
+        for field in ("poster", "backdrop", "overview"):
+            if listing and not record[field]:
+                record[field] = listing.get(field) or ""
         if (not record["overview"] or not record["backdrop"]) and not self.language.startswith("en"):
             try:
                 fallback = self._cached_request(path, language="en-US", force=force)
                 if not record["overview"]:
                     record["overview"] = _text(fallback.get("overview"), 6000)
                 if not record["backdrop"]:
-                    record["backdrop"] = _image_url(fallback.get("backdrop_path"), "w1280")
+                    record["backdrop"] = _image_url(fallback.get("backdrop_path"), self._backdrop_size)
             except MetadataError:
                 self._check_request_limits()
         record["runtime"] = _number(payload.get("runtime"), maximum=2000)
         genres = payload.get("genres") or []
         record["genres"] = ", ".join(_text(x.get("name"), 70)
-                                      for x in genres[:6] if isinstance(x, dict))
-        credits = payload.get("credits") or {}
-        crew = credits.get("crew", []) if isinstance(credits, dict) else []
-        record["director"] = ", ".join(_text(x.get("name"), 100)
-                                        for x in crew[:300]
-                                        if isinstance(x, dict) and x.get("job") == "Director")[:300]
+                                      for x in (genres[:6] if isinstance(genres, list) else ())
+                                      if isinstance(x, dict))
+        if media_type == "tv":
+            record["seasons"] = _number(payload.get("number_of_seasons"), maximum=1000)
+            creators = payload.get("created_by")
+            record["creators"] = ", ".join(_text(x.get("name"), 100)
+                                            for x in (creators[:6] if isinstance(creators, list) else ())
+                                            if isinstance(x, dict))[:300]
+        else:
+            credits = payload.get("credits") or {}
+            crew = credits.get("crew") if isinstance(credits, dict) else None
+            record["director"] = ", ".join(_text(x.get("name"), 100)
+                                            for x in (crew[:300] if isinstance(crew, list) else ())
+                                            if isinstance(x, dict) and x.get("job") == "Director")[:300]
         return record
 
-    def trailer(self, movie_id):
-        path = "/movie/{}/videos".format(_number(movie_id))
-        languages = [self.language]
-        if not self.language.startswith("en"):
-            languages.append("en-US")
-        for language in languages:
-            payload = self._cached_request(path, language=language)
+    def trailer(self, movie_id, *, media_type="movie", original_language=""):
+        media_type = "tv" if media_type == "tv" else "movie"
+        title_id = _number(movie_id)
+        if not title_id:
+            return ""
+        path = "/{}/{}/videos".format(media_type, title_id)
+        languages = [self.language, "en-US"]
+        if isinstance(original_language, str) and _LANGUAGE_KEY.fullmatch(original_language):
+            languages.insert(1, original_language)
+        tried = set()
+
+        def pick(payload):
             videos = payload.get("results")
             if not isinstance(videos, list):
                 raise MetadataError(N_("TMDb returned an invalid response"))
@@ -170,7 +202,68 @@ class TMDbDiscoveryClient(TMDbMetadataClient):
             if candidates:
                 candidates.sort(key=lambda x: (x.get("type") == "Trailer", bool(x.get("official"))), reverse=True)
                 return str(candidates[0]["key"])
+            return ""
+
+        for language in languages:
+            code = language.lower().split("-", 1)[0]
+            if code in tried:
+                continue
+            tried.add(code)
+            found = pick(self._cached_request(path, language=language))
+            if found:
+                return found
+        if media_type == "tv":
+            params = {"include_video_language": ",".join(sorted(tried) + ["null"])}
+            return pick(self._cached_request(path, params, language=self.language))
         return ""
+
+
+def series_lookup(title):
+    titles = tuple(dict.fromkeys(_movie_search_text(_text(title.get(key), 120))
+                                 for key in ("title", "original_title")))
+    return str(_number(title.get("id")) or ""), _year(title.get("year")), tuple(filter(None, titles))
+
+
+def series_match_positions(rows, permitted, lookup, check):
+    """Match both TMDb names and rank provider rows without hydrating the catalogue."""
+    tmdb_id, year, titles = lookup
+    scores = bytearray(len(rows))
+    if tmdb_id:
+        for position, group in enumerate(rows.codes):
+            if position % 256 == 0:
+                check()
+            if permitted[group] and str(rows.discovery_identity(position)[0] or "").strip() == tmdb_id:
+                scores[position] = 5
+    phrases = tuple(" " + title + " " for title in titles)
+    candidates = heapq.merge(*(rows.matches((title.encode("utf-8"),), permitted, check)
+                               for title in titles))
+    previous = -1
+    for count, position in enumerate(candidates):
+        if count % 256 == 0:
+            check()
+        if position == previous:
+            continue
+        previous = position
+        if scores[position] == 5:
+            continue
+        unused_id, name, recorded_year = rows.discovery_identity(position)
+        text = " " + _movie_search_text(name) + " "
+        if not any(phrase in text for phrase in phrases):
+            continue
+        clean = _movie_search_text(clean_media_title(name, preserve_years=True))
+        exact = clean in titles or bool(year and clean.endswith(" " + year) and clean[:-5] in titles)
+        known_year = _year(recorded_year) or (year if year and year in text.split() else "")
+        scores[position] = (4 if exact else 2) if year and known_year == year else (3 if exact else 1)
+    for rank in range(5, 0, -1):
+        needle = bytes((rank,))
+        position = scores.find(needle)
+        emitted = 0
+        while position >= 0:
+            if emitted % 256 == 0:
+                check()
+            yield position
+            emitted += 1
+            position = scores.find(needle, position + 1)
 
 
 class DiscoverySearchClient(object):
@@ -223,64 +316,3 @@ class DiscoverySearchClient(object):
         if str(getattr(self._client, "source_type", "")) == "xtream":
             return self._client.search_movies(query, page=page, page_size=page_size, hidden_category_ids=hidden)
         return self._client.search_movies(query, page=page, page_size=page_size)
-
-
-class _BundledTrailerResolver(object):
-    """Use the packaged resolver with the receiver's own video preferences."""
-
-    def __init__(self, player):
-        from .i18n import metadata_language
-        self.requested_quality = str(player.youtube_resolution)
-        self._preferences = (player.youtube_resolution, metadata_language(),
-                             player.youtube_dash, player.youtube_stream_mode,
-                             player.youtube_audio_preference)
-
-    def extract(self, video_id):
-        # set_preferences is thread-local, so configure the worker that does
-        # the extraction, not the GUI thread that opens Discover Movies.
-        from .youtube_vendor.config import EXTRACT_LOCK, set_preferences
-        with EXTRACT_LOCK:
-            set_preferences(*self._preferences)
-            from .youtube_vendor.video_url import YouTubeVideoUrl
-            resolver = YouTubeVideoUrl()
-            url = resolver.extract(video_id)
-            self.selected_quality = int(getattr(resolver, "selected_quality", 0) or 0)
-            self.duration_seconds = int(getattr(resolver, "duration_seconds", 0) or 0)
-            return url
-
-
-def prepare_youtube_trailer():
-    """Prepare a trailer without importing a separate YouTube plugin."""
-    try:
-        from .settings import load_player_settings
-        player = load_player_settings()
-        service_type = int(player.movie_service_type)
-        # Service type 1 is for DVB; trailers need an HTTP playback engine.
-        if service_type not in (4097, 5001, 5002):
-            service_type = 4097
-        return _BundledTrailerResolver(player), service_type
-    except Exception as exc:
-        log_event("discovery", "trailer initialization failed: {}".format(type(exc).__name__))
-        raise MetadataError(N_("The trailer could not be played."))
-
-
-def resolve_youtube_trailer(video_id, token, resolver):
-    """Resolve with the bundled extractor; keep its DASH audio URI intact."""
-    if not _VIDEO_KEY.fullmatch(str(video_id or "")):
-        raise MetadataError(N_("No trailer is available for this movie."))
-    if not _TRAILER_LOCK.acquire(False):
-        raise MetadataError(N_("Please wait"))
-    try:
-        token.check()
-        try:
-            url = str(resolver.extract(video_id) or "")
-            token.check()
-            from .youtube_playback import youtube_stream_parts
-            youtube_stream_parts(url)
-        except Exception as exc:
-            token.check()
-            log_event("discovery", "trailer resolution failed: {}".format(type(exc).__name__))
-            raise MetadataError(N_("The trailer could not be played."))
-        return url
-    finally:
-        _TRAILER_LOCK.release()

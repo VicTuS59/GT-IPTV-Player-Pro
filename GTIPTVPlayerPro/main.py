@@ -504,7 +504,7 @@ CONTENT_ITEMS = (
         "series",
     ),
     (
-        N_("Discover Movies"),
+        N_("Discover"),
         N_("Discover new movies with TMDB recommendations"),
         "discover",
     ),

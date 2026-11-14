@@ -2,26 +2,35 @@
 # SPDX-FileCopyrightText: 2026 VicTuS59
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Bounded match-only search; the existing YouTube player is delegated unchanged."""
-import datetime as dt
 import json
 import secrets
 import threading
 import time
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from concurrent.futures import ThreadPoolExecutor,as_completed,TimeoutError
+from itertools import zip_longest
 from pathlib import Path
+from urllib.error import HTTPError
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler,Request,build_opener
 
+from .flashscore_video import fetch_flashscore_videos
 from .i18n import metadata_language
 from .settings import load_player_settings
-from .web_api import WebServiceError
+from .web_errors import WebServiceError
 from .web_youtube import _search_page,_results,SEARCH_USER_AGENT
-from .match_highlights_filter import candidate_ok,metadata_from_page,verify,VIDEO_ID,fold
+from .match_highlights import alternate_search, fold, international_search, league_key, match_date
+from .match_highlights_filter import candidate_ok,metadata_from_page,verify,VIDEO_ID
+from .matches import Cancelled as ScoresCancelled, ScoresError, _shared_scores_client, parse_match, text
+from .matches_sources import fetch_flashscore_kickoff
+from .uefa_highlights import eligible as uefa_eligible, find_highlight as find_uefa_highlight
 
 MAX_CANDIDATES=12
 SEARCH_BUDGET=45
 METADATA_LIMIT=3*1024*1024
+FLASHSCORE_VIDEO_BUDGET=10
+LOCAL_SEARCH_BUDGET = 12
+LOCAL_MAX_CANDIDATES = 6
 
 
 class _YouTubeRedirect(HTTPRedirectHandler):
@@ -64,13 +73,58 @@ class MetadataReader:
 
 
 def public_candidates(query,language,cancel,deadline):
-    if cancel.is_set() or time.monotonic()>=deadline:raise Cancelled()
-    data,unused_config=_search_page(query,language)
+    remaining = deadline - time.monotonic()
+    if cancel.is_set() or remaining <= 0:
+        raise Cancelled()
+    data, unused_config = _search_page(query, language, timeout=max(0.1, min(9, remaining)))
     if cancel.is_set() or time.monotonic()>=deadline:raise Cancelled()
     return _results(data,set())
 
 
+def _match_for_search(match, cancel):
+    if not match.league.startswith('flashscore:'):
+        return match, False
+    try:
+        kickoff = fetch_flashscore_kickoff(match, cancel)
+        return match._replace(kickoff=kickoff), True
+    except ScoresCancelled as error:
+        raise Cancelled() from error
+    except HTTPError as error:
+        error.close()
+    except (ScoresError, OSError, ValueError):
+        pass
+    return match, False
+
+
+def _espn_season(match, cancel):
+    """Require independent season evidence for a precisely matched Série B fixture."""
+    day = match_date(match)
+    try:
+        events = _shared_scores_client().competition_events('bra.2', day, cancel)
+    except ScoresCancelled as error:
+        raise Cancelled() from error
+    except HTTPError as error:
+        error.close()
+        return None
+    except (ScoresError, OSError, ValueError):
+        return None
+
+    expected = (match.kickoff, fold(match.home), fold(match.away), match.home_score, match.away_score)
+    for event in events:
+        game = parse_match(event)
+        if game is None or game.league != 'bra.2' or game.category != 'finished':
+            continue
+        identity = (game.kickoff, fold(game.home), fold(game.away), game.home_score, game.away_score)
+        season = event.get('season')
+        if identity == expected and isinstance(season, dict) and season.get('year') == day.year:
+            return day.year
+    return None
+
+
 class MatchHighlightsService:
+    # The parent screen can render a cached search before verification starts.
+    recent_search = None
+
     def __init__(self,match,backend,candidate_source=None,reader=None,registry=None,clock=time.monotonic):
         self.match=match;self.backend=backend;self._source=candidate_source or public_candidates
         self._reader=reader or MetadataReader();self._clock=clock
@@ -78,30 +132,108 @@ class MatchHighlightsService:
         self._lock=threading.RLock();self._jobs=OrderedDict();self._contexts=OrderedDict();self._closed=False
     def __getattr__(self,name):return getattr(self.backend,name)
     def _quality(self):return str(load_player_settings().youtube_resolution)
-    def _queries(self,query):
+    def _queries(self,query,language,match):
         # Search candidates only. Every video still has to pass metadata checks.
-        first=query[:120]
-        keyword='highlights -efootball -fifa -gameplay -simulation'
-        suffix=dt.datetime.fromtimestamp(self.match.kickoff).strftime('%Y-%m-%d')+' '+keyword
-        room=120-len(suffix)-2
-        home=self.match.home[:room//2];away=self.match.away[:room-len(home)]
-        second=' '.join((home,away,suffix))
-        return tuple(dict.fromkeys((first,second)))
-    def _collect(self,query,language,cancel):
-        deadline=self._clock()+SEARCH_BUDGET;entries={};source_errors=0
-        for term in self._queries(query):
-            if cancel.is_set() or self._clock()>=deadline:raise Cancelled()
-            try:values=self._source(term,language,cancel,deadline)
-            except Cancelled:raise
-            except Exception:source_errors+=1;continue
-            for item in values[:120]:
-                if isinstance(item,dict) and candidate_ok(item,self.match):entries.setdefault(item['id'],item)
+        original_day, verified_day = match_date(self.match), match_date(match)
+        if original_day != verified_day:
+            query = query.replace(' {} '.format(original_day), ' {} '.format(verified_day), 1)
+        return tuple(dict.fromkeys(((query[:120], language), alternate_search(match, language))))
+
+    def _flashscore_result(self, cancel, deadline):
+        try:
+            match, season, ids = fetch_flashscore_videos(self.match, cancel)
+        except ScoresCancelled as error:
+            raise Cancelled() from error
+        except HTTPError as error:
+            error.close()
+            return None, None, None
+        except (ScoresError, OSError, ValueError, KeyError, TypeError, AttributeError, RecursionError):
+            return None, None, None
+
+        stats = {
+            'candidates': len(ids), 'inspected': 0, 'accepted': 0, 'rejected': {},
+            'source_errors': 0, 'metadata_errors': 0,
+        }
+
+        for video_id in ids:
+            if cancel.is_set():
+                raise Cancelled()
+            if self._clock() >= deadline:
+                break
+            stats['inspected'] += 1
+            try:
+                metadata = self._reader.read(video_id, cancel, deadline)
+            except Cancelled:
+                if cancel.is_set():
+                    raise
+                break
+            except HTTPError as error:
+                error.close()
+                stats['metadata_errors'] += 1
+                continue
+            except (OSError, ValueError, KeyError, TypeError, AttributeError, RecursionError):
+                stats['metadata_errors'] += 1
+                continue
+            seconds = metadata.get('duration_seconds', '')
+            duration = ''
+            if isinstance(seconds, str) and seconds.isascii() and seconds.isdecimal() and len(seconds) <= 5:
+                duration = '{}:{:02d}'.format(*divmod(int(seconds), 60))
+            entry = {
+                'id': video_id,
+                'title': metadata.get('title', ''),
+                'thumbnail': 'https://i.ytimg.com/vi/{}/hqdefault.jpg'.format(video_id),
+                'duration': duration,
+                'published': 'Flashscore',
+            }
+            item, reason = verify(entry, metadata, match, self._registry, flashscore_season=season)
+            if item:
+                item['title'] = text(item['title'], 180)
+                stats['accepted'] = 1
+                return item, match, stats
+            stats['rejected'][reason] = stats['rejected'].get(reason, 0) + 1
+        return None, match, None
+
+    def _search_youtube(self, queries, match, kickoff_verified, cancel, deadline, *, local_names=()):
+        candidate_lists = []
+        source_errors = 0
+        for term, search_language in queries:
+            if cancel.is_set() or self._clock() >= deadline:
+                raise Cancelled()
+            try:
+                values = self._source(term, search_language, cancel, deadline)
+            except Cancelled:
+                raise
+            except Exception:
+                source_errors += 1
+                continue
+            candidate_lists.append([
+                item for item in values[:120] if isinstance(item, dict)
+                and candidate_ok(item, match, local_names=local_names)
+            ])
+        # Give both searches inspection slots before applying the global cap.
+        if match.league.startswith('flashscore:'):
+            ranked = (item for row in zip_longest(*candidate_lists) for item in row if item is not None)
+        else:
+            ranked = (item for rows in candidate_lists for item in rows)
+        entries = {}
+        for item in ranked:
+            entries.setdefault(item['id'], item)
         # Channel names only influence the bounded inspection order. They never
         # establish official status; final priority uses the real channel ID/URL.
-        def likely_official(item):
-            name=fold(item.get('channel',''))
-            return not any(name==fold(v['name']) for v in self._registry)
-        candidates=sorted(entries.values(),key=likely_official)[:MAX_CANDIDATES]
+        publisher_names = {
+            fold(name)
+            for publisher in self._registry
+            for name in (publisher.get('name', ''), *publisher.get('search_names', ()))
+            if name
+        }
+        limit = LOCAL_MAX_CANDIDATES if local_names else MAX_CANDIDATES
+        candidates = sorted(
+            entries.values(),
+            key=lambda item: fold(item.get('channel', '')) not in publisher_names,
+        )[:limit]
+        espn_season = None
+        if candidates and kickoff_verified and league_key(match.league) == 'bra.2':
+            espn_season = _espn_season(match, cancel)
         verified=[];reasons={};metadata_errors=0
         pool=ThreadPoolExecutor(max_workers=2,thread_name_prefix='GT-Match-Date')
         futures={pool.submit(self._reader.read,item['id'],cancel,deadline):item for item in candidates}
@@ -111,7 +243,8 @@ class MatchHighlightsService:
                 try:metadata=future.result()
                 except Cancelled:raise
                 except Exception:metadata_errors+=1;continue
-                item,reason=verify(futures[future],metadata,self.match,self._registry)
+                item, reason = verify(futures[future], metadata, match, self._registry,
+                                      espn_season=espn_season, local_names=local_names)
                 reasons[reason]=reasons.get(reason,0)+1
                 if item:verified.append(item)
         except TimeoutError:
@@ -122,9 +255,69 @@ class MatchHighlightsService:
         if cancel.is_set():raise Cancelled()
         order={value['id']:index for index,value in enumerate(candidates)}
         verified.sort(key=lambda value:(not value['official'],order[value['id']]))
-        error='youtube_unavailable' if not verified and (source_errors==len(self._queries(query)) or candidates and metadata_errors==len(candidates)) else ''
         return verified,{'candidates':len(entries),'inspected':len(candidates),'accepted':len(verified),
-            'rejected':reasons,'source_errors':source_errors,'metadata_errors':metadata_errors},error
+            'rejected':reasons,'source_errors':source_errors,'metadata_errors':metadata_errors}
+
+    def _collect(self, query, language, cancel):
+        deadline = self._clock() + SEARCH_BUDGET
+        match = None
+        if self.match.league.startswith('flashscore:'):
+            result, match, stats = self._flashscore_result(
+                cancel, min(deadline, self._clock() + FLASHSCORE_VIDEO_BUDGET),
+            )
+            if result is not None:
+                if cancel.is_set():
+                    raise Cancelled()
+                return [result], stats, ''
+        kickoff_verified = match is not None
+        if match is None:
+            match, kickoff_verified = _match_for_search(self.match, cancel)
+
+        queries = self._queries(query, language, match)
+        try:
+            results, stats = self._search_youtube(queries, match, kickoff_verified, cancel, deadline)
+        except Cancelled:
+            if cancel.is_set() or not uefa_eligible(match):
+                raise
+            results, stats = [], {'candidates': 0, 'inspected': 0, 'accepted': 0, 'rejected': {},
+                                  'source_errors': len(queries), 'metadata_errors': 0}
+        if not results and stats['source_errors'] < len(queries) and self._clock() < deadline:
+            extra = international_search(match, language)
+            if extra and extra[0] not in queries:
+                local_query, local_names = extra
+                try:
+                    results, local_stats = self._search_youtube(
+                        (local_query,), match, kickoff_verified, cancel,
+                        min(deadline, self._clock() + LOCAL_SEARCH_BUDGET), local_names=local_names,
+                    )
+                except Cancelled:
+                    if cancel.is_set():
+                        raise
+                else:
+                    queries += (local_query,)
+                    for field in ('candidates', 'inspected', 'source_errors', 'metadata_errors'):
+                        stats[field] += local_stats[field]
+                    stats['accepted'] = len(results)
+                    stats['rejected'] = dict(Counter(stats['rejected']) + Counter(local_stats['rejected']))
+
+        if cancel.is_set():
+            raise Cancelled()
+        if not results and uefa_eligible(match):
+            try:
+                uefa = find_uefa_highlight(match, cancel)
+            except ScoresCancelled as error:
+                raise Cancelled() from error
+            if cancel.is_set():
+                raise Cancelled()
+            if uefa:
+                stats['accepted'] = 1
+                return [uefa], stats, ''
+
+        unavailable = stats['source_errors'] == len(queries) or (
+            stats['inspected'] and stats['metadata_errors'] == stats['inspected']
+        )
+        return results, stats, 'youtube_unavailable' if not results and unavailable else ''
+
     def search_async(self,query,cursor='',language=None):
         if cursor:raise WebServiceError('youtube_page_expired','Search again to see more results',410)
         if not isinstance(query,str) or not 2<=len(query)<=120 or self.match is None:
@@ -143,7 +336,7 @@ class MatchHighlightsService:
             try:
                 results,stats,error=self._collect(query,language or metadata_language(),job['cancel'])
                 if job['cancel'].is_set():return
-                context=secrets.token_urlsafe(24) if results else ''
+                context=secrets.token_urlsafe(24) if results and not results[0].get('playback_url') else ''
                 final=dict(response,results=results,pending=False,context=context,error=error,verification=stats)
                 with self._lock:
                     if self._closed or job['cancel'].is_set():return

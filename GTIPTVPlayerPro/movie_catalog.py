@@ -142,11 +142,11 @@ class MovieCatalogIndex:
     def state(self):
         return self._select_backend().state()
 
-    def search(self, query, page=1, page_size=14, hidden_category_ids=(), token=None):
-        return self._select_backend(token).search(query, page, page_size, hidden_category_ids, token)
+    def search(self, query, page=1, page_size=14, hidden_category_ids=(), token=None, *, discovery=None):
+        return self._select_backend(token).search(query, page, page_size, hidden_category_ids, token, discovery)
 
-    def search_all(self, query, hidden_category_ids=(), token=None):
-        return self._select_backend(token).search_all(query, hidden_category_ids, token)
+    def search_all(self, query, hidden_category_ids=(), token=None, *, discovery=None):
+        return self._select_backend(token).search_all(query, hidden_category_ids, token, discovery)
 
     def browse(self, category_id="", after=0, page_size=80, hidden_category_ids=(), token=None, include_total=True):
         return self._select_backend(token).browse(category_id, after, page_size, hidden_category_ids, token, include_total)

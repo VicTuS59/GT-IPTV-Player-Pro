@@ -4,6 +4,7 @@
 import threading
 from enigma import eTimer
 from .background import attach_pixmap
+from .content import ContentError
 from .browser_common import (_WorkerToken,_connect_timer,
     _safe_picon_url,_cached_picon_path,_picon_cache_path,_download_client_image)
 from .vod_grid import LatestPosterWorkers
@@ -27,8 +28,13 @@ class SearchPoster(object):
 
     def target(self):
         s=self.screen
-        if self.closed or s._closed or not s._results:return None
-        item=s._results[s.selected_index]
+        if self.closed or getattr(s, '_closed', True) or not s._results:return None
+        try:
+            item=s._results[s.selected_index]
+        except ContentError as error:
+            if error.reason == ContentError.CANCELLED:
+                return None
+            raise
         url=_safe_picon_url(getattr(item,'icon',''))
         return (s.content_type,str(item.stream_id),url) if url else None
 

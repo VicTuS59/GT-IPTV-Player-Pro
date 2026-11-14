@@ -5,22 +5,37 @@
 import datetime as dt
 import re
 import time
+from html import unescape
 from html.parser import HTMLParser
 from urllib.error import HTTPError
+from urllib.parse import urlsplit
 from urllib.request import Request, build_opener
 
 from .matches import (
-    FLASH_DATE_LIMIT, FEED_EVENT_LIMIT, JSON_LIMIT, Budget, Cancelled, Match,
+    FLASH_DATE_LIMIT, JSON_LIMIT, Budget, Cancelled, Match,
     ScoresError, Snapshot, _CLOCK, _SameHostRedirect, _local_day,
     read_score_body, text,
 )
 
 
 FLASH_URL = "https://www.flashscore.mobi/"
+# The mobile page can list more than 1,000 fixtures in a single day.
+FLASH_EVENT_LIMIT = 3000
 _MATCH_LINK = re.compile(r"^/match/([A-Za-z0-9]{8})(?:/|[?#]|$)")
 _MATCH_SCORE = re.compile(r"^(\d{1,3})\s*[-:–]\s*(\d{1,3})(?!\d)")
 _KICKOFF_TIME = re.compile(r"^([0-2]\d):([0-5]\d)\b")
 _FLASH_CATEGORIES = {"sched": "upcoming", "live": "live", "fin": "finished"}
+_MATCH_DETAIL = re.compile(
+    r'<h3\b[^>]*>(?P<teams>.{1,4096}?)</h3>\s*'
+    r'<div class="detail">\s*<b>(?P<score>[^<]{1,20})</b>[^<]{0,200}</div>\s*'
+    r'<div class="detail">[^<]{1,80}</div>\s*'
+    r'<div class="detail">\s*(?P<kickoff>\d{2}\.\d{2}\.20\d{2} \d{2}:\d{2})\s*</div>',
+    re.IGNORECASE | re.DOTALL,
+)
+_FLASH_HEADERS = {
+    "Accept": "text/html", "Accept-Encoding": "identity",
+    "User-Agent": "GTIPTVPlayerPro/1.9.2 (scores)",
+}
 
 try:
     from zoneinfo import ZoneInfo
@@ -105,7 +120,7 @@ class _FlashscorePage(HTMLParser):
             if self._heading is None and link:
                 self.seen += 1
                 self.budget.check()
-                if self.seen > FEED_EVENT_LIMIT:
+                if self.seen > FLASH_EVENT_LIMIT:
                     raise ScoresError("Too many Flashscore matches")
                 self._match_id = link.group(1)
                 classes = (attrs.get("class") or "").split()
@@ -186,10 +201,7 @@ def _flash_day(opener, day, now, budget):
     offset = (day - site_today).days
     if abs(offset) > FLASH_DATE_LIMIT:
         raise ScoresError("Date outside the Flashscore calendar")
-    request = Request(FLASH_URL + "?d=" + str(offset), headers={
-        "Accept": "text/html", "Accept-Encoding": "identity",
-        "User-Agent": "GTIPTVPlayerPro/1.9.2 (scores)",
-    })
+    request = Request(FLASH_URL + "?d=" + str(offset), headers=_FLASH_HEADERS)
     with opener(request, timeout=budget.timeout()) as response:
         body = read_score_body(response, JSON_LIMIT, budget)
     page = _FlashscorePage(day, now, budget)
@@ -198,6 +210,32 @@ def _flash_day(opener, day, now, budget):
     if not page.complete or (page.seen and not page.records):
         raise ScoresError("Unrecognised Flashscore results")
     return page.records
+
+
+def fetch_flashscore_kickoff(match, cancel=None, opener=None):
+    """Read the selected match's explicit date independent of the daily list."""
+    if not re.fullmatch(r"[A-Za-z0-9]{8}", match.id):
+        raise ScoresError("Invalid Flashscore match ID")
+    budget = Budget(cancel, seconds=4)
+    opener = opener or build_opener(_SameHostRedirect()).open
+    path = "/match/{}/".format(match.id)
+    request = Request(FLASH_URL.rstrip("/") + path + "?d=0", headers=_FLASH_HEADERS)
+    with opener(request, timeout=budget.timeout()) as response:
+        location = urlsplit(response.geturl())
+        if (location.scheme, location.netloc, location.path) != ("https", "www.flashscore.mobi", path):
+            raise ScoresError("Unexpected Flashscore match page")
+        body = read_score_body(response, 128 * 1024, budget)
+    detail = _MATCH_DETAIL.search(body.decode("utf-8-sig"))
+    if detail is None:
+        raise ScoresError("Flashscore match date unavailable")
+    names = text(unescape(re.sub(r"<[^>]+>", "", detail["teams"])), 225)
+    teams = tuple(team[:100].casefold() for team in names.split(" - ", 1))
+    score = _MATCH_SCORE.fullmatch(detail["score"].strip())
+    if (teams != (match.home.casefold(), match.away.casefold())
+            or not score or tuple(map(int, score.groups())) != (match.home_score, match.away_score)):
+        raise ScoresError("Flashscore match details differ from the selected match")
+    local = dt.datetime.strptime(detail["kickoff"], "%d.%m.%Y %H:%M")
+    return local.replace(tzinfo=_flash_zone(local.date(), local.hour)).timestamp()
 
 
 def fetch_flashscore_day(day, cancel=None, opener=None, clock=time.time):

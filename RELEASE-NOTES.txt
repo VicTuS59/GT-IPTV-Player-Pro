@@ -1,9 +1,2 @@
-- **M3U refresh summary** – Press GREEN to refresh the list and see which channels were added, removed, or renamed.
-- **M3U channel and category names** – Rename channels and categories or restore their original names.
-- **M3U and XMLTV improvements** – Large playlists and compressed XMLTV guides load more reliably. EPG matching uses channel names when `tvg-id` is missing or unmatched, accounts for country prefixes and quality tags, and offers manual selection when several channels match.
-- **Cinematic view** – Switch between List and Cinematic views for Movies and Series using MENU → Change layout. The plugin remembers your choice.
-- **Artwork and summaries** – Movie and series posters and backdrops load sooner, with fallback artwork when available. Movie summaries show up to eight lines at once and scroll for longer descriptions.
-- **On-device subtitle matching** – Subtitle search handles provider tags such as DE and NL and date suffixes more accurately. Recommended results are marked in the list. Press OK to download the selected subtitle.
-- **YouTube playback** – Improved startup and video switching with ServiceApp / ExtEplayer3 (5002), including duration display and seeking on the first video after an Enigma2 restart.
-- **Receiver front-panel display** – Movies, series, and YouTube now show larger remaining-time digits, a taller progress bar, and scrolling titles on supported displays.
-- **Football scores** – Choose ESPN or Flashscore when opening the Matches screen.
+- Added a **Series** tab to **Discover**.
+- Improved **Flashscore** match list loading and highlights search.

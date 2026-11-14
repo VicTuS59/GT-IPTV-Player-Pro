@@ -89,7 +89,7 @@ def _page_config(page):
     return config
 
 
-def _search_page(query, language):
+def _search_page(query, language, *, timeout=9):
     # Search the public YouTube page. This is a web page, not the Data API:
     # no user-supplied developer key or third-party instance is involved.
     youtube_language, region, accept_language = _search_locale(language)
@@ -101,7 +101,7 @@ def _search_page(query, language):
         "User-Agent": SEARCH_USER_AGENT,
     })
     try:
-        with urlopen(request, timeout=9) as response:
+        with urlopen(request, timeout=timeout) as response:
             payload = response.read(4 * 1024 * 1024 + 1)
     except HTTPError as error:
         if error.code == 429:
@@ -845,7 +845,7 @@ class WebYouTube(object):
 
     def play(self, video_id, title, context="", _automatic=False, _guard=None,
              _sequence_override=None, _preview_owner=None, _request_owner=None,
-             _on_closed=None, _original_audio=False):
+             _on_closed=None, _original_audio=False, _trailer=False):
         if not isinstance(video_id, str) or not VIDEO_ID.fullmatch(video_id):
             raise WebServiceError("invalid_video", "Invalid video selection", 400)
         if not isinstance(context, str) or len(context) > 100:
@@ -871,8 +871,9 @@ class WebYouTube(object):
                                  "requested_quality": quality}
             self._latest_play_token = token
 
-        service_type = player.movie_service_type
+        service_type = 4097 if _trailer and player.movie_service_type == 1 else player.movie_service_type
         native = service_type == NATIVE_AUDIO_SERVICE_TYPE
+        resume_store = None if _trailer else self._playback_history
         avc = frozenset(("h264",))
         resolver, codecs, supports_separate_audio = None, avc, False
 
@@ -912,7 +913,7 @@ class WebYouTube(object):
                             audio_itag=resolver.selected_audio_itag, audio_bitrate=resolver.selected_audio_bitrate)
 
         def worker(previous=None):
-            nonlocal resolver, codecs, supports_separate_audio
+            nonlocal resolver, codecs, supports_separate_audio, service_type, native
             attempt = int(previous is not None)
             state = "failed"
             monitor = None
@@ -929,6 +930,10 @@ class WebYouTube(object):
                     registered = service_type in service_types
                     native_player = probe_native_player() if native and registered else dict(
                         available=False, version=0, reason="not_requested" if registered else "service_missing")
+                    if _trailer and 4097 in service_types and (not registered or native and not native_player["available"]):
+                        # Keep a trailer playable on images without the optional service factory.
+                        log_event("youtube", "trailer-native-engine-unavailable engine={}".format(service_type))
+                        service_type, native, codecs, registered = 4097, False, avc, True
                     separate_audio = native_player.get("separate_audio")
                     supports_separate_audio = native and native_player["available"] and separate_audio is not False
                     log_event("youtube", "player-check services={} engine={} native={} version={} "
@@ -1054,7 +1059,7 @@ class WebYouTube(object):
                     )
                     if preview is not None:
                         if not preview.replace_web_video(
-                                reference, item, resume_store=self._playback_history,
+                                reference, item, resume_store=resume_store,
                                 start_position=start_position):
                             if attempt and previous["accepted"]:
                                 candidate = previous
@@ -1075,7 +1080,7 @@ class WebYouTube(object):
                         replace = (active.retry_youtube_start if retry_initial_start
                                    else active.replace_web_video)
                         if not replace(
-                                reference, item, resume_store=self._playback_history,
+                                reference, item, resume_store=resume_store,
                                 start_position=start_position):
                             if attempt and previous["accepted"] and not retry_initial_start:
                                 candidate = previous
@@ -1091,19 +1096,15 @@ class WebYouTube(object):
                                 return session.openWithCallback(_on_closed, *args, **kwargs)
                             return session.open(*args, **kwargs)
                         try:
+                            resume = {} if _trailer else dict(resume_store=resume_store,
+                                resume_key_value=video_id, start_position=start_position)
                             if return_state is not None:
                                 dialog = open_player(
                                     GTExternalPlayerScreen, reference, item,
-                                    web_return_player=(interrupted, return_state),
-                                    resume_store=self._playback_history,
-                                    resume_key_value=video_id, start_position=start_position,
+                                    web_return_player=(interrupted, return_state), **resume,
                                 )
                             else:
-                                dialog = open_player(
-                                    GTExternalPlayerScreen, reference, item,
-                                    resume_store=self._playback_history,
-                                    resume_key_value=video_id, start_position=start_position,
-                                )
+                                dialog = open_player(GTExternalPlayerScreen, reference, item, **resume)
                         except Exception:
                             if return_state is not None:
                                 interrupted.resume_from_web_video(return_state)
@@ -1150,11 +1151,12 @@ class WebYouTube(object):
                 if state == "playing":
                     log_event("youtube", "playback-started video_id={} selected={} engine={} attempt={} confirmed_by={}".format(
                         video_id, selected_quality, service_type, attempt, monitor.confirmation or "-"))
-                    try:
-                        self._playback_history.add(video_id, title, selected_quality, duration_seconds)
-                    except OSError as exc:
-                        # A storage failure must not stop an already launched video.
-                        log_event("youtube", "playback-history-write-failed error_type={}".format(type(exc).__name__))
+                    if not _trailer:
+                        try:
+                            self._playback_history.add(video_id, title, selected_quality, duration_seconds)
+                        except OSError as exc:
+                            # A storage failure must not stop an already launched video.
+                            log_event("youtube", "playback-history-write-failed error_type={}".format(type(exc).__name__))
             except Exception as exc:
                 if not self._play_is_current(token, quality):
                     state = "cancelled"

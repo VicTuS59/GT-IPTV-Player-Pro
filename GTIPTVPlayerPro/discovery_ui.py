@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # SPDX-FileCopyrightText: 2026 VicTuS59
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Remote-controlled TMDB movie discovery, independent of provider playback."""
+"""Native TMDb discovery for movies and series."""
 
 import threading
 import time
-from collections import deque
+from collections import OrderedDict, deque
 from .ui_update import set_visible
 from .typography import set_text_if_changed
 
@@ -17,12 +17,12 @@ from Components.Pixmap import Pixmap
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from enigma import eServiceReference, eTimer
+from enigma import eTimer
 
 from .background import attach_pixmap
-from .discovery_layout import skin as discovery_skin
+from .discovery_layout import _units, skin as discovery_skin
 from .browser import (
-    GTAllMoviesSearchScreen, GTExternalPlayerScreen, _WorkerToken, _WorkerCancelled,
+    _WorkerToken, _WorkerCancelled,
     PICON_DOWNLOAD_TIMEOUT,
     _cached_picon_path, _cinematic_cover_ratio, _client_supports,
     _download_picon, _picon_cache_path, _valid_cinematic_backdrop_file, content_client_for,
@@ -30,12 +30,10 @@ from .browser import (
 from .artwork import RETRY_DELAY_SECONDS
 from .category_preferences import LiveCategoryPreferenceStore, category_preferences_path
 from .category_visibility import category_visibility_ids
-from .content import ContentError, ContentItem
+from .content import ContentError
 from .diagnostics import log_event
-from .discovery import (
-    TMDbDiscoveryClient, DiscoverySearchClient, prepare_youtube_trailer, resolve_youtube_trailer,
-)
-from .i18n import N_, _, localized_upper, metadata_language
+from .discovery import TMDbDiscoveryClient, DiscoverySearchClient
+from .i18n import N_, _, localized_upper, metadata_language, ngettext
 from .main import _connect_timer, _scale
 from .metadata import MetadataError
 from .paths import plugin_path
@@ -43,21 +41,28 @@ from .playback import resume_account_scope
 from .remote_footer import prepared_skin
 from .remote_footer import footer_item, remote_action_text, web_shortcut_hint_text
 from .settings import load_player_settings
+from .source_loader import SourceLoader
 from .typography import ellipsize_dynamic_text, fit_dynamic_text, font_px
 
 
-SECTIONS = (("popular", N_("Popular")), ("top", N_("Top Rated")),
-            ("new", N_("New Releases")), ("genres", N_("Genres")))
+MEDIA_TABS = (("movie", N_("Movies")), ("tv", N_("Series")))
+FILTERS = (("popular", N_("Popular")), ("top", N_("Top Rated")),
+           ("new", N_("New Releases")), ("genres", N_("Genres")))
 LOADING = N_("Loading data... Please wait.")
-KEY_REQUIRED = N_("Please enter your TMDB API key to use Discover Movies.")
-SHORT_HINT = N_("Choose a movie, then search in IPTV.")
+KEY_REQUIRED = N_("TMDb API key is not configured")
+HINTS = {"movie": N_("Choose a movie, then search in IPTV."),
+         "tv": N_("Choose a series, then search in IPTV.")}
+SIMILAR = {"movie": N_("Similar Movies"), "tv": N_("Similar Series")}
+INFO = {"movie": N_("Movie information"), "tv": N_("Series information")}
+SUMMARY_UNAVAILABLE = {"movie": N_("Movie summary unavailable."), "tv": N_("Series summary unavailable.")}
+EMPTY = {"movie": N_("No movies found."), "tv": N_("No series found.")}
 FOOTER = (
-    footer_item("ok", N_("Movie information")),
+    footer_item("ok", INFO["movie"]),
     footer_item("green", N_("Search in IPTV"), 1.15),
     footer_item("yellow", N_("Genres")),
-    footer_item("blue", N_("Similar Movies")),
+    footer_item("blue", SIMILAR["movie"]),
     footer_item("play", N_("Trailer")),
-    footer_item("menu", "refresh"),
+    footer_item("menu", N_("Menu")),
     footer_item("exit", "back"),
 )
 
@@ -68,8 +73,11 @@ def _asset(name):
 
 def _skin():
     width, height, px = _scale()
+    captions = [remote_action_text(item[1]) for item in FOOTER]
+    captions[0] = max((captions[0], _(INFO["tv"])), key=_units)
+    captions[3] = max((captions[3], _(SIMILAR["tv"])), key=_units)
     return discovery_skin(width, height, px,
-                          [remote_action_text(item[1]) for item in FOOTER],
+                          captions,
                           [item[0] for item in FOOTER], font_px, _asset)
 
 
@@ -86,6 +94,7 @@ class GTMovieDiscoveryScreen(Screen):
         self._child_open = False
         self._started = False
         self._busy = False
+        self._media_type = "movie"
         self._entries = []
         self._selected_index = 0
         self._page = self._pages = 1
@@ -97,35 +106,43 @@ class GTMovieDiscoveryScreen(Screen):
         self._tab_index = 0
         self._tabs_focused = False
         self._history = []
-        self._details = {}
+        self._details = OrderedDict()
         self._jobs = {}
         self._events = deque()
         self._event_lock = threading.Lock()
         self._worker_slots = threading.BoundedSemaphore(3)
+        self._poster_slots = threading.BoundedSemaphore(2)
         self._channel_workers = {}
         self._visible_ids = ()
         self._hero_identity = None
         self._hero_request = None
         self._hero_generation = 0
         self._pending_index = 0
+        self._youtube = None
+        self._play_token = ""
+        self._play_deadline = 0
         self._poll_timer = eTimer()
         self._start_timer = eTimer()
         self._detail_timer = eTimer()
+        self._hero_timer = eTimer()
         _connect_timer(self._poll_timer, self._poll)
         _connect_timer(self._start_timer, self._begin)
         _connect_timer(self._detail_timer, self._load_selected_detail)
+        _connect_timer(self._hero_timer, self._start_selected_hero)
+        self._delivery = SourceLoader(eTimer(), _connect_timer, self._wake_workers)
+        self._delivery_generation = None
 
-        for name in ("backdrop", "scrim", "hero_bottom", "hero_top", "tmdb_logo"):
+        for name in ("backdrop", "hero_fallback", "scrim", "hero_bottom", "hero_top", "tmdb_logo"):
             self[name] = Pixmap()
         # Alpha masks are loaded by the skin, never by ePicLoad.
-        for name in ("backdrop", "scrim", "hero_bottom", "hero_top"):
+        for name in ("backdrop", "hero_fallback", "scrim", "hero_bottom", "hero_top"):
             set_visible(self[name], False)
-        for name in ("video_guard", "app_bg", "header", "header_divider", "page_title",
+        for name in ("video_guard", "app_bg", "header", "header_divider", "page_title", "tabs_divider",
                      "tmdb_wordmark", "section", "title", "original", "rating_star", "rating",
                      "meta", "genres", "director", "plot", "status", "busy", "counter",
                      "footer", "footer_line", "guide_divider", "web_hint"):
             self[name] = Label("")
-        for index in range(4):
+        for index in range(len(MEDIA_TABS) + len(FILTERS)):
             for prefix in ("tab", "tab_selected", "tab_focus"):
                 self["{}_{}".format(prefix, index)] = Label("")
         for index in range(6):
@@ -139,7 +156,7 @@ class GTMovieDiscoveryScreen(Screen):
                 self["guide_bg_{}".format(index)] = Pixmap()
                 self["guide_key_{}".format(index)] = Label(key.upper())
             self["guide_action_{}".format(index)] = Label("")
-        set_text_if_changed(self["title"], _("Discover Movies"))
+        set_text_if_changed(self["title"], _("Discover"))
         self["actions"] = ActionMap(
             ["OkCancelActions", "DirectionActions", "ColorActions", "MenuActions",
              "ChannelSelectBaseActions", "InfobarChannelSelection"],
@@ -151,18 +168,16 @@ class GTMovieDiscoveryScreen(Screen):
              "menu": self.open_menu,
              "nextBouquet": lambda: self.move(6), "prevBouquet": lambda: self.move(-6),
              "channelUp": lambda: self.move(-6), "channelDown": lambda: self.move(6)}, -1)
-        # Player contexts also map LEFT/RIGHT on key-up in some images.
-        # Keep only trailer actions here so a release cannot navigate again.
-        # The normal map has priority for color/channel keys that MediaPlayer
-        # aliases to playback (for example GREEN -> play on OpenATV).
-        self["trailer_actions"] = ActionMap(
-            ["InfobarMoviePlayerActions", "InfobarSeekActions", "MediaPlayerActions"],
-            {"play": self.play_trailer, "playpauseService": self.play_trailer,
-             "playpause": self.play_trailer, "playService": self.play_trailer}, 0)
+        try:
+            from .series_trailer_ui import PLAY_KEY_CONTEXT, _ensure_play_keys
+            _ensure_play_keys()
+            self["trailer_actions"] = ActionMap([PLAY_KEY_CONTEXT], {"playTrailer": self.play_trailer}, -1)
+        except Exception as error:
+            log_event("discovery", "Could not bind trailer play key", error)
         self.onShown.append(self._shown)
         self.onLayoutFinish.append(self._layout_ready)
         self.onClose.append(self._stop)
-        self.setTitle(_("Discover Movies"))
+        self.setTitle(_("Discover"))
         self._render()
 
     def _layout_ready(self):
@@ -172,6 +187,7 @@ class GTMovieDiscoveryScreen(Screen):
         # on some images; initialise visibility again after the skin is built.
         set_visible(self["video_guard"], True)
         set_visible(self["backdrop"], False)
+        set_visible(self["hero_fallback"], False)
         set_visible(self["scrim"], False)
         set_visible(self["hero_bottom"], False)
         set_visible(self["hero_top"], False)
@@ -181,13 +197,17 @@ class GTMovieDiscoveryScreen(Screen):
     def _refresh_chrome(self):
         unused_width, unused_height, px = _scale()
         fit_dynamic_text(self["header"], "GT IPTV PLAYER PRO", preferred_size=font_px(px, 30), min_size=px(20))
-        fit_dynamic_text(self["page_title"], localized_upper(_("Discover Movies")), preferred_size=font_px(px, 30), min_size=px(20))
+        fit_dynamic_text(self["page_title"], localized_upper(_("Discover")), preferred_size=font_px(px, 30), min_size=px(20))
         set_text_if_changed(self["tmdb_wordmark"], "TMDB")
-        for index, item in enumerate(FOOTER):
-            fit_dynamic_text(self["guide_action_{}".format(index)], remote_action_text(item[1]),
-                             preferred_size=font_px(px, 23), min_size=px(13))
+        self._refresh_footer(px)
         fit_dynamic_text(self["web_hint"], web_shortcut_hint_text(),
                          preferred_size=font_px(px, 17), min_size=px(11))
+
+    def _refresh_footer(self, px):
+        for index, item in enumerate(FOOTER):
+            label = {"ok": INFO[self._media_type], "blue": SIMILAR[self._media_type]}.get(item[0], item[1])
+            fit_dynamic_text(self["guide_action_{}".format(index)], remote_action_text(label),
+                             preferred_size=font_px(px, 23), min_size=px(13))
 
     def _shown(self):
         self._refresh_chrome()
@@ -195,23 +215,27 @@ class GTMovieDiscoveryScreen(Screen):
         if not self._started:
             self._started = True
             self._start_timer.start(50, True)
-        elif self._jobs or self._events:
-            self._poll_timer.start(80, True)
-        if self._entries and not self._busy:
+        elif self._jobs or self._events or self._play_token:
+            self._poll_timer.start(30, True)
+        if self._entries and self._client is not None and not self._busy:
+            self._start_selected_hero()
             self._detail_timer.start(300, True)
 
     def _begin(self):
-        if self._closed:
+        if getattr(self, "_closed", True):
             return
         self.settings = load_player_settings()
         if not str(self.settings.tmdb_api_key or "").strip():
             set_text_if_changed(self["status"], _(KEY_REQUIRED))
-            self._open_child(self._key_choice, ChoiceBox, title=_(KEY_REQUIRED),
-                             list=[(_("Settings"), "settings"), (_("Back"), "back")])
+            self._open_child(self._key_choice, ChoiceBox, _(KEY_REQUIRED),
+                             [(_("Settings"), "settings"), (_("Back"), "back")])
             return
-        self._client = TMDbDiscoveryClient(api_key=self.settings.tmdb_api_key,
-                                           enabled=True, language=metadata_language(), timeout=8)
+        self._configure_client(self.settings.tmdb_api_key)
         self._load_page(1)
+
+    def _configure_client(self, key):
+        self._client = TMDbDiscoveryClient(api_key=key, language=metadata_language(), timeout=8,
+                                           backdrop_size="w780" if _scale()[0] <= 1280 else "w1280")
 
     def _key_choice(self, choice=None):
         if choice and choice[1] == "settings":
@@ -229,39 +253,54 @@ class GTMovieDiscoveryScreen(Screen):
         # Settings may remove the key while requests from the old client are
         # still pending. Cancel them before the missing-key early return so
         # late results cannot overwrite the prompt or leave navigation busy.
+        self._cancel_playback()
         for channel in tuple(self._jobs):
             self._cancel(channel)
         self._detail_timer.stop()
+        self._reset_hero()
         self._poll_timer.stop()
         with self._event_lock:
             self._events.clear()
+        self._delivery.cancel()
+        self._delivery_generation = None
         self._details.clear()
         self._busy = False
         set_text_if_changed(self["busy"], "")
         if not key:
             self._client = None
+            self._entries = []
+            self._selected_index = 0
+            self._history.clear()
+            self._selection_changed()
+            self._render()
             set_text_if_changed(self["status"], _(KEY_REQUIRED))
             return
-        self._client = TMDbDiscoveryClient(api_key=key, enabled=True, language=metadata_language(), timeout=8)
+        self._configure_client(key)
         self._load_page(1, force=True)
 
     def _open_child(self, callback, screen, *args, **kwargs):
+        if self._closed or self._child_open:
+            return
         self._child_open = True
 
         def closed(*values):
-            if self._closed:
+            if getattr(self, "_closed", True):
                 return
             self._child_open = False
             if callback:
                 callback(*values)
-            if not self._child_open and (self._jobs or self._events):
-                self._poll_timer.start(80, True)
+            if not getattr(self, "_closed", True) and not self._child_open and (self._jobs or self._events or self._play_token):
+                self._poll_timer.start(30, True)
 
         try:
-            return self.session.openWithCallback(closed, screen, *args, **kwargs)
-        except Exception:
-            self._child_open = False
-            raise
+            dialog = self.session.openWithCallback(closed, screen, *args, **kwargs)
+        except Exception as error:
+            log_event("discovery", "Could not open child screen", error)
+        else:
+            if dialog is not None and not isinstance(dialog, str):
+                return dialog
+        self._child_open = False
+        set_text_if_changed(self["status"], _("Could not open the content list."))
 
     def _cancel(self, channel):
         job = self._jobs.pop(channel, None)
@@ -270,9 +309,9 @@ class GTMovieDiscoveryScreen(Screen):
         if channel == "hero":
             self._hero_request = None
 
-    @staticmethod
-    def _channel_error(channel):
+    def _channel_error(self, channel):
         return (N_("The trailer could not be played.") if channel == "trailer"
+                else N_("Could not load series") if self._media_type == "tv"
                 else N_("Could not load movies"))
 
     def _submit(self, channel, work, done, timeout=25):
@@ -280,12 +319,14 @@ class GTMovieDiscoveryScreen(Screen):
         token = _WorkerToken(timeout)
         self._jobs[channel] = (token, done)
         client = self._client
+        failure = self._channel_error(channel)
+        slots = self._poster_slots if channel in ("posters", "posters2") else self._worker_slots
 
         def run():
             acquired = False
             result, error = None, ""
             try:
-                while not self._worker_slots.acquire(timeout=0.1):
+                while not slots.acquire(timeout=0.1):
                     token.check()
                 acquired = True
                 token.check()
@@ -300,56 +341,76 @@ class GTMovieDiscoveryScreen(Screen):
                 error = str(exc)
             except Exception as exc:
                 log_event("discovery", "{} failed: {}".format(channel, type(exc).__name__))
-                error = self._channel_error(channel)
+                error = failure
             finally:
                 if acquired:
-                    self._worker_slots.release()
+                    slots.release()
             self._queue(("done", channel, token, result, error))
 
         pool = self._channel_workers.get(channel)
         if pool is None:
             pool = self._channel_workers[channel] = LatestPosterWorkers(worker_count=1)
-        pool.replace([run])
-        self._poll_timer.start(80, True)
-        return token
+        if not pool.replace([run]):
+            self._cancel(channel)
+            self._failed(channel, failure)
+            return
+        self._arm_delivery()
+        self._poll_timer.start(40, True)
+
+    def _arm_delivery(self):
+        if self._delivery_generation is None:
+            self._delivery_generation = self._delivery.expect()
+
+    def _wake_workers(self, unused_value, unused_error):
+        self._delivery_generation = None
+        self._poll()
 
     def _queue(self, event):
-        with self._event_lock:
-            if not self._closed and event[2].active():
+        lock = getattr(self, "_event_lock", None)
+        if lock is None:
+            return
+        with lock:
+            if getattr(self, "_closed", True) or not event[2].active():
+                return
+            if event[1] in ("hero", "list"):
+                self._events.appendleft(event)
+            else:
                 self._events.append(event)
+            generation = self._delivery_generation
+            delivery = self._delivery
+        if generation is not None:
+            delivery.publish(generation, True)
 
     def _poll(self):
-        if self._closed:
+        if getattr(self, "_closed", True):
             return
-        if self._child_open:
-            self._poll_timer.start(150, True)
+        self._poll_timer.stop()
+        if self._child_open or getattr(self.session, "current_dialog", self) is not self:
             return
-        with self._event_lock:
-            events = []
-            images = 0
-            while self._events:
-                event = self._events[0]
-                if event[0] == "image":
-                    if images >= 2:
-                        break
-                    images += 1
-                events.append(self._events.popleft())
-        for kind, channel, token, result, error in events:
+        images = 0
+        while True:
+            with self._event_lock:
+                if not self._events or (images >= 2 and self._events[0][0] == "image"):
+                    break
+                kind, channel, token, result, error = self._events.popleft()
             job = self._jobs.get(channel)
             if not job or job[0] is not token or not token.active():
                 continue
-            if kind == "image":
-                self._apply_image(*result)
-            else:
-                self._jobs.pop(channel, None)
-                if error:
-                    self._failed(channel, error)
+            try:
+                if kind == "image":
+                    images += 1
+                    self._apply_image(*result)
                 else:
-                    try:
+                    self._jobs.pop(channel, None)
+                    if error:
+                        self._failed(channel, error)
+                    else:
                         job[1](result)
-                    except Exception as exc:
-                        log_event("discovery", "{} callback failed: {}".format(channel, type(exc).__name__))
-                        self._failed(channel, self._channel_error(channel))
+            except Exception as exc:
+                log_event("discovery", "{} callback failed: {}".format(channel, type(exc).__name__))
+                self._failed(channel, self._channel_error(channel))
+            if self._closed or self._child_open:
+                return
         for channel, job in list(self._jobs.items()):
             if job[0].expired():
                 if not job[0].cancel_event.is_set():
@@ -358,9 +419,18 @@ class GTMovieDiscoveryScreen(Screen):
                 self._failed(channel, N_("The trailer could not be played.") if channel == "trailer"
                              else N_("Could not connect to the TMDb service")
                              if channel in ("list", "genres", "detail") else N_("Request timed out"))
+                if self._closed or self._child_open:
+                    return
+        self._poll_playback()
         set_text_if_changed(self["busy"], "•" * (1 + int(time.monotonic() * 2) % 3) if self._busy else "")
-        if self._jobs or self._events:
-            self._poll_timer.start(100, True)
+        if self._jobs and not self._child_open:
+            self._arm_delivery()
+        if self._jobs or self._events or self._play_token:
+            self._poll_timer.start(30 if self._events else 100, True)
+
+    def _hint(self):
+        text = _(HINTS[self._media_type] if self._entries else EMPTY[self._media_type])
+        ellipsize_dynamic_text(self["status"], text, fallback_chars=100)
 
     def _failed(self, channel, error):
         if channel == "hero":
@@ -368,9 +438,13 @@ class GTMovieDiscoveryScreen(Screen):
         if channel in ("detail", "posters", "posters2", "hero"):
             return
         self._busy = False
+        if channel == "list" and self._entries:
+            self._selection_changed(start_now=True)
+            self._visible_ids = ()
+            self._render()
         set_text_if_changed(self["busy"], "")
-        retry = "PLAY: " + _("Trailer") if channel == "trailer" else "MENU: " + _("Retry")
-        set_text_if_changed(self["status"], _(error) + "  —  " + retry)
+        retry = "PLAY  " + _("Trailer") if channel == "trailer" else "MENU  " + _("Retry")
+        ellipsize_dynamic_text(self["status"], _(error) + "  —  " + retry, fallback_chars=100)
         if channel == "trailer":
             self._open_child(None, MessageBox, _(error), type=MessageBox.TYPE_INFO)
 
@@ -380,12 +454,14 @@ class GTMovieDiscoveryScreen(Screen):
         self._busy = True
         self._pending_index = pending_index
         self._detail_timer.stop()
-        for channel in ("detail", "posters", "hero"):
+        self._hero_timer.stop()
+        for channel in ("detail", "posters", "posters2", "hero"):
             self._cancel(channel)
-        set_text_if_changed(self["status"], _(LOADING))
-        section, genre_id, similar_id = self._section, self._genre_id, self._similar_id
+        self._render()
+        ellipsize_dynamic_text(self["status"], _(LOADING), fallback_chars=100)
+        mode, section, genre_id, similar_id = self._media_type, self._section, self._genre_id, self._similar_id
         client = self._client
-        self._submit("list", lambda token: client.movies(section, page, genre_id, similar_id, force),
+        self._submit("list", lambda token: client.titles(mode, section, page, genre_id, similar_id, force),
                      self._loaded)
 
     def _loaded(self, result):
@@ -395,44 +471,42 @@ class GTMovieDiscoveryScreen(Screen):
         self._selected_index = (len(self._entries) - 1 if self._pending_index < 0
                                 else min(self._pending_index, max(0, len(self._entries) - 1)))
         self._visible_ids = ()
-        set_text_if_changed(self["status"], _(SHORT_HINT)
-                               if self._entries else _("No movies found."))
-        self._selection_changed()
-        movie = self._selected()
-        if movie is not None:
-            # Start the selected backdrop before the remaining poster jobs.
-            initial = self._details.get(movie["id"], movie)
-            self._show_detail(initial)
-            self._load_hero(initial)
+        self._hint()
+        self._selection_changed(start_now=True)
         self._render()
 
     def _selected(self):
         return self._entries[self._selected_index] if self._entries else None
 
-    def _active_tab_index(self):
-        for index, (key, unused_label) in enumerate(SECTIONS):
-            if key == self._section:
-                return index
-        return -1
+    def _filters(self):
+        if self._media_type == "tv":
+            return FILTERS[:2] + (("new", N_("On the Air")), FILTERS[3])
+        return FILTERS
+
+    @staticmethod
+    def _identity(title):
+        return title["media_type"], title["id"]
 
     def _render(self):
         unused_width, unused_height, px = _scale()
-        active = self._tab_index if self._tabs_focused else self._active_tab_index()
-        for index, (key, label) in enumerate(SECTIONS):
-            for prefix in ("tab", "tab_selected"):
-                fit_dynamic_text(self["{}_{}".format(prefix, index)], _(label),
-                                 preferred_size=font_px(px, 28), min_size=px(20))
-            for prefix in ("tab_selected", "tab_focus"):
-                widget = self["{}_{}".format(prefix, index)]
-                set_visible(widget, True) if index == active else set_visible(widget, False)
-        section = dict(SECTIONS).get(self._section, N_("Similar Movies"))
+        filters = self._filters()
+        for index, (key, label) in enumerate(MEDIA_TABS + filters):
+            selected = key in (self._media_type, self._section)
+            focused = self._tabs_focused and index == self._tab_index
+            label_widget, active_widget = self["tab_{}".format(index)], self["tab_selected_{}".format(index)]
+            fit_dynamic_text(active_widget if selected else label_widget, _(label),
+                             preferred_size=font_px(px, 28), min_size=px(17))
+            set_visible(label_widget, not selected)
+            set_visible(active_widget, selected)
+            set_visible(self["tab_focus_{}".format(index)], focused)
+        section = dict(filters).get(self._section, SIMILAR[self._media_type])
         suffix = self._genre_name if self._section == "genres" else self._similar_title if self._section == "similar" else ""
         ellipsize_dynamic_text(self["section"], localized_upper(_(section)) + ("  •  " + suffix if suffix else ""), fallback_chars=65)
         set_text_if_changed(self["counter"], "{}/{}  ·  {}/{}".format(self._page, self._pages,
                                   self._selected_index + 1 if self._entries else 0, len(self._entries)))
         start = self._selected_index // 6 * 6
         visible = self._entries[start:start + 6]
-        identities = tuple(movie["id"] for movie in visible)
+        identities = tuple(self._identity(title) for title in visible)
         changed = identities != self._visible_ids
         for index in range(6):
             present = index < len(visible)
@@ -462,28 +536,59 @@ class GTMovieDiscoveryScreen(Screen):
             loader.close()
         set_visible(self[name], False)
 
-    def _selection_changed(self):
+    def _detail_for(self, title):
+        identity = self._identity(title)
+        detail = self._details.get(identity)
+        if detail is not None:
+            self._details.move_to_end(identity)
+        return detail or title
+
+    def _selection_changed(self, start_now=False):
         self._cancel("detail")
-        movie = self._selected()
-        if movie is None:
+        self._detail_timer.stop()
+        title = self._selected()
+        if title is None:
             self._reset_hero()
-            set_text_if_changed(self["title"], _("Discover Movies"))
+            set_text_if_changed(self["title"], _("Discover"))
             for name in ("original", "rating", "rating_star", "meta", "genres", "director", "plot"):
                 set_text_if_changed(self[name], "")
             return
-        if self._hero_identity != movie["id"]:
+        if self._hero_identity is None or self._hero_identity[0] != self._identity(title):
             self._reset_hero()
+        detail = self._detail_for(title)
+        self._show_detail(detail, full=start_now or detail is not title)
+        self._load_hero(detail, cached_only=not start_now)
+        if not start_now and self._hero_identity is None and self._hero_request is None:
+            self._hero_timer.start(90, True)
         self._detail_timer.start(300, True)
 
     def _reset_hero(self):
+        self._hero_timer.stop()
         self._hero_generation += 1
         self._cancel("hero")
         self._hero_identity = None
         self._hide_art("backdrop")
+        self._hide_art("hero_fallback")
         for name in ("scrim", "hero_bottom", "hero_top"):
             set_visible(self[name], False)
 
-    def _show_detail(self, movie):
+    def _people(self, title):
+        if title.get("creators"):
+            return _("Created by {}").format(title["creators"])
+        if title.get("director"):
+            return _("Director: {}").format(title["director"])
+        return ""
+
+    @staticmethod
+    def _duration_or_seasons(title):
+        seasons = title.get("seasons")
+        if seasons:
+            return ngettext("{} season", "{} seasons", seasons).format(seasons)
+        if title.get("runtime"):
+            return _("{} min").format(title["runtime"])
+        return ""
+
+    def _show_detail(self, movie, full=True):
         unused_width, unused_height, px = _scale()
         fit_dynamic_text(self["title"], movie["title"], max_lines=2,
                          preferred_size=font_px(px, 72, role="title"), min_size=px(30))
@@ -491,136 +596,199 @@ class GTMovieDiscoveryScreen(Screen):
                               if movie.get("original_title") != movie["title"] else "", fallback_chars=70)
         set_text_if_changed(self["rating_star"], "★" if movie.get("rating") else "")
         set_text_if_changed(self["rating"], "{:.1f}".format(movie["rating"]) if movie.get("rating") else "")
-        meta = [str(movie.get("year") or "")]
-        if movie.get("runtime"):
-            meta.append(_("{} min").format(movie["runtime"]))
-        ellipsize_dynamic_text(self["meta"], "  •  ".join(x for x in meta if x), fallback_chars=50)
+        meta = (movie["year"], self._duration_or_seasons(movie))
+        ellipsize_dynamic_text(self["meta"], "  •  ".join(filter(None, meta)), fallback_chars=50)
         ellipsize_dynamic_text(self["genres"], movie.get("genres") or "", fallback_chars=60)
-        ellipsize_dynamic_text(self["director"], _("Director: {}").format(movie["director"])
-                              if movie.get("director") else "", fallback_chars=70)
-        fit_dynamic_text(self["plot"], movie.get("overview") or _("Movie summary unavailable."),
-                         max_lines=3, preferred_size=font_px(px, 26), min_size=px(22), fallback_chars=78)
+        ellipsize_dynamic_text(self["director"], self._people(movie), fallback_chars=70)
+        if full:
+            fit_dynamic_text(self["plot"], movie.get("overview") or _(SUMMARY_UNAVAILABLE[self._media_type]),
+                             max_lines=3, preferred_size=font_px(px, 26), min_size=px(22), fallback_chars=78)
+        else:
+            set_text_if_changed(self["plot"], "")
 
     def _load_selected_detail(self):
-        if self._closed or self._busy or self._child_open or not self._selected():
+        if getattr(self, "_closed", True) or self._busy or self._child_open or self._client is None or not self._selected():
             return
-        movie = dict(self._selected())
-        # The existing selection timer also gates native title/plot fitting.
-        # Rapid key repeats must not measure every intermediate long title.
-        self._show_detail(self._details.get(movie["id"], movie))
-        if movie["id"] not in self._details:
+        title = self._selected()
+        identity = self._identity(title)
+        self._show_detail(self._detail_for(title))
+        if identity not in self._details:
             client = self._client
+            media_type, title_id = identity
 
             def ready(detail):
-                self._details[detail["id"]] = detail
+                self._details[identity] = detail
                 if len(self._details) > 60:
-                    self._details.pop(next(iter(self._details)))
-                if self._selected() and self._selected()["id"] == detail["id"]:
+                    self._details.popitem(last=False)
+                if self._selected() and self._identity(self._selected()) == identity:
                     self._show_detail(detail)
-                    self._load_hero(detail)
+                    if detail.get("backdrop") != title.get("backdrop") or detail.get("poster") != title.get("poster"):
+                        self._load_hero(detail)
 
-            self._submit("detail", lambda token: client.detail(movie["id"]), ready)
-        self._load_hero(self._details.get(movie["id"], movie))
+            self._submit("detail", lambda token: client.detail(title_id, media_type=media_type, listing=title), ready)
 
-    def _image_path(self, url, token):
+    def _image_path(self, url, token, priority=False):
         token.check()
         return _cached_picon_path(url) or _download_picon(
-            url, _picon_cache_path(url), timeout=PICON_DOWNLOAD_TIMEOUT, token=token)
+            url, _picon_cache_path(url), timeout=PICON_DOWNLOAD_TIMEOUT, token=token, priority=priority)
 
     def _load_posters(self, visible):
         self._cancel("posters")
         self._cancel("posters2")
-        selected = self._selected()
-        selected_id = selected.get("id") if selected else None
-        records = [(index, dict(movie)) for index, movie in enumerate(visible)]
-        records.sort(key=lambda pair: pair[1].get("id") != selected_id)
+        active = self._selected_index % 6
+        records = []
+        ready_count = 0
+        for index in sorted(range(len(visible)), key=lambda index: abs(index - active)):
+            title = visible[index]
+            url = title.get("poster")
+            if not url:
+                continue
+            name, identity = "poster_{}".format(index), self._identity(title)
+            path = _cached_picon_path(url) if ready_count < 2 else ""
+            if path:
+                self._apply_image(name, path, identity)
+                ready_count += 1
+            else:
+                records.append((name, identity, url))
+
         def submit(channel, batch):
+            if not batch:
+                return
+
             def work(token):
-                for index, movie in batch:
+                for name, identity, url in batch:
                     token.check()
-                    if not movie.get("poster"):
-                        continue
                     try:
-                        path = self._image_path(movie["poster"], token)
+                        path = self._image_path(url, token)
                         if path:
-                            self._queue(("image", channel, token,
-                                         ("poster_{}".format(index), path, movie["id"]), ""))
+                            self._queue(("image", channel, token, (name, path, identity), ""))
                     except _WorkerCancelled:
                         raise
                     except Exception as error:
-                        log_event("discovery", "stage=poster outcome=error movie_id={}".format(movie["id"]), error)
+                        log_event("discovery", "Poster download failed for {}".format(identity), error)
                         token.check()
             timeout = len(batch) * (2 * PICON_DOWNLOAD_TIMEOUT + RETRY_DELAY_SECONDS) + 8
             self._submit(channel, work, lambda result: None, timeout=max(30, timeout))
         submit("posters", records[::2])
         submit("posters2", records[1::2])
 
-    def _load_hero(self, movie):
-        # Discovery always includes its own hero, independently of the classic
-        # versus cinematic layout preference for the provider's VOD browser.
-        if self._hero_identity == movie["id"] or not movie.get("backdrop"):
+    def _start_selected_hero(self):
+        if getattr(self, "_closed", True):
             return
-        movie_id, url = movie["id"], movie["backdrop"]
-        identity = (movie_id, url)
-        if self._hero_request == identity:
+        title = self._selected()
+        if title is not None and self._client is not None and not self._child_open:
+            self._load_hero(self._detail_for(title))
+
+    def _load_hero(self, title, cached_only=False):
+        identity = self._identity(title)
+        backdrop, poster = title.get("backdrop"), title.get("poster")
+        request = (identity, backdrop, poster)
+        if request in (self._hero_identity, self._hero_request) or not (backdrop or poster):
+            return
+        if backdrop:
+            path = _cached_picon_path(backdrop)
+            if path and _valid_cinematic_backdrop_file(path):
+                self._cancel("hero")
+                self._hero_request = request
+                self._apply_image("backdrop", path, identity)
+                return
+        elif poster:
+            path = _cached_picon_path(poster)
+            if path:
+                self._cancel("hero")
+                self._hero_request = request
+                self._apply_image("backdrop", path, identity, portrait=True)
+                return
+        if cached_only:
             return
 
-        def ready(path):
+        def work(token):
+            try:
+                path = self._image_path(backdrop, token, priority=True) if backdrop else ""
+            except _WorkerCancelled:
+                raise
+            except Exception as error:
+                log_event("discovery", "Hero download failed for {}".format(identity), error)
+                path = ""
             if path and _valid_cinematic_backdrop_file(path):
-                self._apply_image("backdrop", path, movie_id)
+                return path, False
+            # Portrait art is a last resort and stays on the right side.
+            return (self._image_path(poster, token, priority=True) if poster else ""), True
+
+        def ready(result):
+            path, portrait = result
+            if path:
+                self._apply_image("backdrop", path, identity, portrait=portrait)
             else:
                 self._hero_request = None
 
-        self._submit("hero", lambda token: self._image_path(url, token), ready,
-                     timeout=2 * PICON_DOWNLOAD_TIMEOUT + RETRY_DELAY_SECONDS + 8)
-        self._hero_request = identity
+        self._submit("hero", work, ready, timeout=4 * PICON_DOWNLOAD_TIMEOUT + 2 * RETRY_DELAY_SECONDS + 8)
+        if "hero" in self._jobs:
+            self._hero_request = request
 
-    def _apply_image(self, name, path, movie_id):
+    def _apply_image(self, name, path, identity, portrait=False):
         if self._closed:
             return
         if name == "backdrop":
-            if (not self._selected() or self._selected()["id"] != movie_id
-                    or not _valid_cinematic_backdrop_file(path)):
+            if not self._selected() or self._identity(self._selected()) != identity:
+                return
+            ratio = _cinematic_cover_ratio(path)
+            if not ratio or (not portrait and not _valid_cinematic_backdrop_file(path)):
+                self._hero_request = None
                 return
             self._hero_generation += 1
             generation = self._hero_generation
+            request = self._hero_request
+            widget_name = "hero_fallback" if portrait else name
+            other_name = name if portrait else "hero_fallback"
 
             def decoded(loaded):
-                if (self._closed or generation != self._hero_generation
-                        or not self._selected() or self._selected()["id"] != movie_id):
+                if (getattr(self, "_closed", True) or generation != self._hero_generation
+                        or not self._selected() or self._identity(self._selected()) != identity):
                     return
-                self._hero_request = None
+                if self._hero_request == request:
+                    self._hero_request = None
                 if loaded:
-                    self._hero_identity = movie_id
+                    self._hero_identity = request
+                    self._hide_art(other_name)
+                    set_visible(self[widget_name], True)
                     for mask in ("scrim", "hero_bottom", "hero_top"):
                         set_visible(self[mask], True)
                 else:
-                    log_event("discovery", "stage=decode kind=backdrop outcome=failed movie_id={}".format(movie_id))
-                    self._hero_identity = None
-                    set_visible(self["backdrop"], False)
-                    for mask in ("scrim", "hero_bottom", "hero_top"):
-                        set_visible(self[mask], False)
+                    log_event("discovery", "Hero decoding failed for {}".format(identity))
+                    set_visible(self[widget_name], False)
 
-            attach_pixmap(self, name, path, cover_ratio=_cinematic_cover_ratio(path),
-                          cover_alignment="top_right", on_loaded=decoded)
+            if portrait:
+                self._decode_art(widget_name, path, decoded)
+            else:
+                self._decode_art(widget_name, path, decoded, cover_ratio=ratio, cover_alignment="top_right")
         else:
             index = int(name.rsplit("_", 1)[1])
-            if index < len(self._visible_ids) and self._visible_ids[index] == movie_id:
+            if index < len(self._visible_ids) and self._visible_ids[index] == identity:
                 def decoded(loaded):
-                    if (self._closed or index >= len(self._visible_ids)
-                            or self._visible_ids[index] != movie_id):
+                    if (getattr(self, "_closed", True) or index >= len(self._visible_ids)
+                            or self._visible_ids[index] != identity):
                         return
+                    set_visible(self[name], loaded)
                     if not loaded:
-                        set_visible(self[name], False)
-                        log_event("discovery", "stage=decode kind=poster outcome=failed movie_id={}".format(movie_id))
-                attach_pixmap(self, name, path, on_loaded=decoded)
+                        log_event("discovery", "Poster decoding failed for {}".format(identity))
+                self._decode_art(name, path, decoded)
+
+    def _decode_art(self, name, path, callback, **options):
+        try:
+            attach_pixmap(self, name, path, show_on_load=False, on_loaded=callback, **options)
+        except (AttributeError, OSError, RuntimeError, TypeError, ValueError) as error:
+            log_event("discovery", "Artwork could not be attached", error)
+            callback(False)
 
     def move(self, step):
-        if self._closed or self._child_open or self._busy or not step:
+        if self._closed or self._child_open or not step:
             return
         if self._tabs_focused:
-            self._tab_index = (self._tab_index + (1 if step > 0 else -1)) % len(SECTIONS)
+            self._tab_index = (self._tab_index + (1 if step > 0 else -1)) % (len(MEDIA_TABS) + len(FILTERS))
             self._render()
+            return
+        if self._busy:
             return
         target = self._selected_index + step
         if target >= len(self._entries) and self._page < self._pages:
@@ -632,19 +800,37 @@ class GTMovieDiscoveryScreen(Screen):
             if target == self._selected_index:
                 return
             self._selected_index = target
-            self._render()
             self._selection_changed()
+            self._render()
 
     def focus_tabs(self, value):
         value = bool(value)
         if self._closed or self._child_open or value == self._tabs_focused:
             return
         self._tabs_focused = value
-        # Leaving an unconfirmed tab returns to the section actually open.
-        active_index = self._active_tab_index()
-        if active_index >= 0:
-            self._tab_index = active_index
+        self._tab_index = 1 if self._media_type == "tv" else 0
         self._render()
+
+    def _change_media(self, mode):
+        if mode == self._media_type:
+            self.focus_tabs(False)
+            return
+        self._cancel_playback()
+        for channel in tuple(self._jobs):
+            self._cancel(channel)
+        self._media_type = mode
+        self._section = "popular"
+        self._genre_id = self._similar_id = 0
+        self._genre_name = self._similar_title = ""
+        self._history.clear()
+        self._entries = []
+        self._page = self._pages = 1
+        self._selected_index = 0
+        self._tabs_focused = False
+        self._tab_index = 1 if mode == "tv" else 0
+        self._selection_changed()
+        self._refresh_footer(_scale()[2])
+        self._load_page(1)
 
     def open_selected(self):
         if self._closed or self._child_open:
@@ -652,56 +838,64 @@ class GTMovieDiscoveryScreen(Screen):
         if self._client is None:
             self.open_settings()
             return
-        if self._busy:
-            return
         if self._tabs_focused:
-            key = SECTIONS[self._tab_index][0]
+            key = (MEDIA_TABS + self._filters())[self._tab_index][0]
+            if self._tab_index < len(MEDIA_TABS):
+                self._change_media(key)
+                return
+            if self._busy:
+                return
             if key == "genres":
                 self.choose_genre()
             else:
+                self.focus_tabs(False)
                 if key == self._section and self._entries:
                     return
                 self._section = key
                 self._history = []
                 self._load_page(1)
             return
+        if self._busy:
+            return
         movie = self._selected()
         if movie:
             from .main import GTFeatureScreen
-            detail = self._details.get(movie["id"], movie)
-            text = "\n\n".join(x for x in (detail.get("original_title"),
-                                  "{}  •  TMDB {:.1f}/10".format(detail["year"], detail["rating"]),
-                                  detail.get("genres"),
-                                  _("Director: {}").format(detail["director"]) if detail.get("director") else "",
-                                  detail.get("overview") or _("Movie summary unavailable.")) if x)
+            detail = self._detail_for(movie)
+            rating = "TMDB {:.1f}/10".format(detail["rating"]) if detail["rating"] else ""
+            metadata = "  •  ".join(filter(None, (detail["year"], rating, self._duration_or_seasons(detail))))
+            text = "\n\n".join(filter(None, (detail.get("original_title"), metadata, detail.get("genres"),
+                                             self._people(detail), detail.get("overview")
+                                             or _(SUMMARY_UNAVAILABLE[self._media_type]))))
             self._open_child(None, GTFeatureScreen, detail["title"], text)
 
     def choose_genre(self):
-        if self._client is None or self._busy:
+        if self._client is None or self._busy or self._child_open:
             return
         self._busy = True
         set_text_if_changed(self["status"], _(LOADING))
         client = self._client
+        mode = self._media_type
 
         def ready(genres):
             self._busy = False
-            self._open_child(self._genre_chosen, ChoiceBox, title=_("Genres"),
-                             list=[(_("All Movies"), 0)] + genres)
+            all_titles = _("All Series") if mode == "tv" else _("All Movies")
+            self._open_child(self._genre_chosen, ChoiceBox, _("Genres"), [(all_titles, 0)] + genres)
 
-        self._submit("genres", lambda token: client.genres(), ready)
+        self._submit("genres", lambda token: client.genres(media_type=mode), ready)
 
     def _genre_chosen(self, choice=None):
         if not choice:
-            set_text_if_changed(self["status"], "")
+            self._hint()
             return
         self._genre_name, self._genre_id = choice
-        self._section, self._tab_index = "genres", 3
+        self._section = "genres"
+        self._tabs_focused = False
         self._history = []
         self._load_page(1)
 
     def similar(self):
         movie = self._selected()
-        if self._busy or not movie:
+        if self._busy or self._child_open or not movie:
             return
         self._history.append((self._section, self._genre_id, self._genre_name, self._similar_id,
                               self._similar_title, self._page, self._pages, self._selected_index,
@@ -712,14 +906,14 @@ class GTMovieDiscoveryScreen(Screen):
         self._load_page(1)
 
     def search_iptv(self):
-        movie = self._selected()
-        if self._busy or self._child_open or not movie:
+        title = self._selected()
+        if self._busy or self._child_open or self._client is None or not title:
             return
-        movie = dict(movie)
         if self._provider is None:
             self._provider = content_client_for(self.account)
         provider = self._provider
-        if not _client_supports(provider, "movie"):
+        kind = "series" if self._media_type == "tv" else "movie"
+        if not _client_supports(provider, kind):
             self._open_child(None, MessageBox, _("This source does not support the selected content type."),
                              type=MessageBox.TYPE_INFO)
             return
@@ -727,82 +921,105 @@ class GTMovieDiscoveryScreen(Screen):
         set_text_if_changed(self["status"], _("Search in IPTV") + "…")
 
         def work(token):
-            store = LiveCategoryPreferenceStore(category_preferences_path("movie"))
+            store = LiveCategoryPreferenceStore(category_preferences_path(kind))
             preferences = store.load(resume_account_scope(provider))
             if not (preferences.hidden or preferences.include_terms or preferences.exclude_terms):
                 return frozenset()
             with provider.request_scope(cancel_event=token.cancel_event, deadline=token.deadline):
-                categories = provider.load_categories("movie")
+                categories = provider.load_categories(kind)
                 return category_visibility_ids(categories, preferences)
 
         def ready(hidden):
+            from .browser_vod import GTAllMoviesSearchScreen, GTAllSeriesSearchScreen
+
             self._busy = False
-            adapter = DiscoverySearchClient(provider, movie, hidden)
-            set_text_if_changed(self["status"], _(SHORT_HINT))
-            self._open_child(None, GTAllMoviesSearchScreen, self.account, adapter,
-                             hidden_category_ids=hidden, initial_query=movie["title"],
-                             discovery_search=True)
+            self._hint()
+            options = dict(hidden_category_ids=hidden, initial_query=title["title"])
+            if kind == "series":
+                self._open_child(None, GTAllSeriesSearchScreen, self.account, provider,
+                                 discovery_title=title, **options)
+            else:
+                adapter = DiscoverySearchClient(provider, title, hidden)
+                self._open_child(None, GTAllMoviesSearchScreen, self.account, adapter,
+                                 discovery_search=True, **options)
 
         self._submit("search", work, ready, timeout=30)
 
     def play_trailer(self):
-        movie = self._selected()
-        if self._busy or not movie or self._client is None:
+        title = self._selected()
+        if self._busy or self._child_open or not title or self._client is None:
             return
-        try:
-            resolver, service_type = prepare_youtube_trailer()
-        except MetadataError as exc:
-            self._failed("trailer", str(exc))
-            return
-        movie = dict(movie)
         self._busy = True
         set_text_if_changed(self["status"], _("Trailer") + "…")
         client = self._client
+        media_type, title_id = self._identity(title)
 
         def work(token):
-            video_id = client.trailer(movie["id"])
+            video_id = client.trailer(title_id, media_type=media_type,
+                                      original_language=title.get("original_language", ""))
             if not video_id:
-                raise MetadataError(N_("No trailer is available for this movie."))
-            return resolve_youtube_trailer(video_id, token, resolver)
+                raise MetadataError(N_("No official trailer found."))
+            return video_id
 
-        def ready(url):
-            self._busy = False
-            from .youtube_playback import (
-                YouTubeNativePlayerUnavailable, youtube_service_type, youtube_stream_parts,
-            )
-            try:
-                native_type = youtube_service_type(url, service_type)
-                unused_video, audio = youtube_stream_parts(url)
-            except YouTubeNativePlayerUnavailable:
-                self._failed("trailer", _("The trailer could not be played.")
-                             + " · ServiceApp / ExtEplayer3 (5002)")
-                return
-            title = movie["title"] + " — " + _("Trailer")
-            item = ContentItem("movie", "tmdb-trailer-{}".format(movie["id"]), title, icon=movie.get("poster", ""))
-            item.youtube_native = True
-            item.youtube_separate_audio = bool(audio)
-            item.youtube_requested_quality = getattr(resolver, "requested_quality", "")
-            item.youtube_selected_quality = getattr(resolver, "selected_quality", 0)
-            item.youtube_duration_seconds = getattr(resolver, "duration_seconds", 0)
-            reference = eServiceReference(native_type, 0, url)
-            reference.setName(title)
-            set_text_if_changed(self["status"], _(SHORT_HINT))
-            self._open_child(None, GTExternalPlayerScreen, reference, item)
+        def ready(video_id):
+            from .web_remote import WEB_REMOTE
+            from .web_youtube import WEB_YOUTUBE
+
+            if WEB_REMOTE.session is not self.session:
+                WEB_REMOTE.bind_session(self.session)
+            self._youtube = WEB_YOUTUBE
+            job = self._youtube.play(video_id, title["title"] + " — " + _("Trailer"),
+                                     _request_owner=self, _on_closed=self._trailer_closed,
+                                     _original_audio=True, _trailer=True)
+            self._play_token = job["token"]
+            self._play_deadline = time.monotonic() + 70
 
         self._submit("trailer", work, ready, timeout=35)
 
+    def _poll_playback(self):
+        if not self._play_token:
+            return
+        try:
+            job = self._youtube.status(self._play_token).get("job") or {}
+        except Exception as error:
+            log_event("discovery", "Trailer status unavailable", error)
+            job = {}
+        state = job.get("state")
+        if state in ("cancelled", "playing", "failed") or time.monotonic() >= self._play_deadline or not state:
+            self._cancel_playback()
+            self._busy = False
+            if state in ("cancelled", "playing"):
+                self._hint()
+            else:
+                set_text_if_changed(self["status"], _("The trailer could not be played."))
+
+    def _cancel_playback(self):
+        if self._play_token:
+            self._youtube.cancel_play(self._play_token)
+            self._play_token = ""
+
+    def _trailer_closed(self, *unused):
+        if not getattr(self, "_closed", True):
+            self._cancel_playback()
+            self._busy = False
+            self._hint()
+
     def open_menu(self):
-        self._open_child(self._menu_chosen, ChoiceBox, title=_("Discover Movies"),
-                         list=[(_("Refresh"), "refresh"), (_("Genres"), "genres"),
-                               (_("Trailer"), "trailer"), (_("Settings"), "settings"), (_("Back"), "back")])
+        mode, label = MEDIA_TABS[0 if self._media_type == "tv" else 1]
+        self._open_child(self._menu_chosen, ChoiceBox, _("Discover"),
+                         [(_(label), mode), (_("Refresh"), "refresh"), (_("Genres"), "genres"),
+                          (_("Trailer"), "trailer"), (_("Settings"), "settings"), (_("Back"), "back")])
 
     def _menu_chosen(self, choice=None):
         if not choice:
             return
         action = choice[1]
-        if action == "settings":
+        if action in ("movie", "tv") and self._client is not None:
+            self._change_media(action)
+        elif action == "settings":
             self.open_settings()
         elif action == "refresh":
+            self._cancel_playback()
             for channel in tuple(self._jobs):
                 self._cancel(channel)
             self._details.clear()
@@ -814,8 +1031,21 @@ class GTMovieDiscoveryScreen(Screen):
             self.choose_genre()
         elif action == "trailer":
             self.play_trailer()
+        elif action == "back":
+            self.go_back()
 
     def go_back(self):
+        if self._child_open:
+            return
+        if self._tabs_focused:
+            self.focus_tabs(False)
+            return
+        if "trailer" in self._jobs or self._play_token:
+            self._cancel("trailer")
+            self._cancel_playback()
+            self._busy = False
+            self._hint()
+            return
         if self._history:
             for channel in tuple(self._jobs):
                 self._cancel(channel)
@@ -824,23 +1054,25 @@ class GTMovieDiscoveryScreen(Screen):
              self._page, self._pages, self._selected_index, self._entries, self._tab_index) = self._history.pop()
             self._tabs_focused = False
             self._visible_ids = ()
-            set_text_if_changed(self["status"], _(SHORT_HINT))
+            self._hint()
+            self._selection_changed(start_now=True)
             self._render()
-            self._selection_changed()
         else:
             self.close()
 
     def _stop(self):
-        self._closed = True
+        with self._event_lock:
+            self._closed = True
+            self._events.clear()
+        self._cancel_playback()
+        self._delivery.close()
         for pool in self._channel_workers.values():
             pool.close()
         self._channel_workers.clear()
-        for timer in (self._poll_timer, self._start_timer, self._detail_timer):
+        for timer in (self._poll_timer, self._start_timer, self._detail_timer, self._hero_timer):
             timer.stop()
         for channel in tuple(self._jobs):
             self._cancel(channel)
-        with self._event_lock:
-            self._events.clear()
         self._entries = []
         self._details.clear()
         self._history = []

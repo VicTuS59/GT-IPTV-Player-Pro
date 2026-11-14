@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Native movie-discovery geometry; no content or network work."""
+"""Native discovery geometry for movie and series browsing."""
 import unicodedata
 
 CANVAS = '#030910'
 CARD_X, CARD_STEP, CARD_Y, CARD_W, CARD_H = 68, 308, 582, 244, 366
+TAB_GEOMETRY = ((64, 172), (253, 172), (473, 188), (678, 230), (927, 290), (1235, 176))
 
 def _units(text):
     total = 0.0
@@ -39,6 +40,7 @@ def skin(width, height, px, captions, keys, font_size, asset):
     for name,z in (('video_guard',-30),('app_bg',-20)):
         label(name,0,0,width,height,1,background=CANVAS,z=z,native=True)
     pixmap('backdrop',500,0,1420,650,z=-10)
+    pixmap('hero_fallback',1308,0,612,650,z=-10)
     pixmap('scrim',0,0,1920,650,asset('hero-left-r48.png'),-9)
     pixmap('hero_bottom',0,430,1920,220,asset('hero-bottom-r48.png'),-8)
     pixmap('hero_top',0,0,1920,210,asset('hero-top-r48.png'),-7)
@@ -47,11 +49,12 @@ def skin(width, height, px, captions, keys, font_size, asset):
     label('page_title',501,27,1000,48,30,'#9DAEBF')
     label('tmdb_wordmark',1715,26,95,42,25,'#36D6D8')
     pixmap('tmdb_logo',1817,39,42,12,asset('tmdb-pill-r48.png'),5)
-    for i,(x,w) in enumerate(((64,236),(320,266),(607,258),(891,255))):
-        label('tab_'+str(i),x,94,w,46,28,'#93A1B4')
-        label('tab_selected_'+str(i),x,94,w,46,28)
-        label('tab_focus_'+str(i),x,147,96,3,1,background='#37D9EA',z=5)
-    label('counter',1400,94,456,46,25,'#9EADBF',align='right')
+    label('tabs_divider',443,100,1,34,1,background='#566A7A')
+    for i,(x,w) in enumerate(TAB_GEOMETRY):
+        label('tab_'+str(i),x,94,w,46,28,'#A5B4C5')
+        label('tab_selected_'+str(i),x,94,w,46,28,'#37D9EA' if i<2 else '#FFFFFF')
+        label('tab_focus_'+str(i),x,145,w,3,1,background='#37D9EA',z=5)
+    label('counter',1440,94,416,46,25,'#9EADBF',align='right')
     label('section',68,190,870,32,23,'#7C99B2')
     label('title',64,231,870,94,72,lines=True)
     label('original',68,327,790,28,23,'#8596A8')

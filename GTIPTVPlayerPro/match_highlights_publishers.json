@@ -21,6 +21,9 @@
   },
   {
     "name": "LALIGA",
+    "search_names": [
+      "LALIGA EA SPORTS"
+    ],
     "channel_ids": [
       "UCTv-XvfzLX3i4IGWAm4sbmA"
     ],
@@ -28,6 +31,19 @@
       "@laliga"
     ],
     "source": "https://www.laliga.com/en-GB"
+  },
+  {
+    "name": "Ligue 1 McDonald’s",
+    "search_names": [
+      "Ligue 1"
+    ],
+    "channel_ids": [
+      "UCQsH5XtIc9hONE1BQjucM0g"
+    ],
+    "handles": [
+      "@ligue1"
+    ],
+    "source": "https://www.youtube.com/@Ligue1"
   },
   {
     "name": "Premier League",
@@ -48,5 +64,29 @@
       "@seriea"
     ],
     "source": "https://www.youtube.com/@seriea"
+  },
+  {
+    "name": "kora plus",
+    "channel_ids": [
+      "UCoTREVo1yJwXXDY0TbTA4EQ"
+    ],
+    "handles": [],
+    "highlight_leagues": [
+      "flashscore:egypt: egypt cup"
+    ],
+    "source": "https://www.youtube.com/@koraplusegy"
+  },
+  {
+    "name": "ESPN Brasil",
+    "channel_ids": [
+      "UCw5-xj3AKqEizC7MvHaIPqA"
+    ],
+    "handles": [
+      "@espnbrasil"
+    ],
+    "calendar_season_leagues": [
+      "bra.2"
+    ],
+    "source": "https://www.youtube.com/@espnbrasil"
   }
 ]

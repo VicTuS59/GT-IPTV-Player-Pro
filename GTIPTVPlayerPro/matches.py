@@ -261,6 +261,16 @@ class ESPNClient:
         with self._opener(request, timeout=budget.timeout()) as response:
             return read_score_body(response, limit, budget)
 
+    def competition_events(self, league, day, cancel=None):
+        if league not in LEAGUE_NAMES:
+            raise ScoresError("Unknown ESPN competition")
+        url = BASE_URL + league + "/scoreboard?" + urlencode({"dates": day.strftime("%Y%m%d")})
+        data = json.loads(self._read(url, JSON_LIMIT, Budget(cancel, seconds=4)))
+        events = data.get("events") if isinstance(data, dict) else None
+        if not isinstance(events, list) or len(events) > FEED_EVENT_LIMIT:
+            raise ScoresError("Unrecognised ESPN competition results")
+        return events
+
     @staticmethod
     def _entry_bytes(value):
         # Conservative: shared strings are counted again for every record.
