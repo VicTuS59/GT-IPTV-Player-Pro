@@ -10,6 +10,7 @@ resolve a host, or parse XML while changing channels.
 
 An explicit playlist ``tvg-id`` retains priority. Entries without an ID can
 match a unique normalised XMLTV display name or use a saved manual choice.
+A small fitted name model runs on unresolved entries during background refresh.
 """
 
 import gzip
@@ -23,6 +24,7 @@ import re
 import socket
 import ssl
 import stat
+import sys
 import tempfile
 import threading
 import time
@@ -30,6 +32,8 @@ import unicodedata
 import uuid
 import zlib
 from collections import OrderedDict, defaultdict
+from difflib import SequenceMatcher
+from types import MappingProxyType
 from urllib.parse import urljoin
 
 from . import PLUGIN_VERSION
@@ -37,6 +41,7 @@ from . import dvb_epg
 from . import m3u
 from .content import ContentError, EPGEvent
 from .epg_runtime import DECODED_CHANNEL_BYTES, DecodedChannelCache, EPGChannelIndex
+from .network_security import MAX_PUBLIC_URL_LENGTH, NetworkSecurityError, validate_public_url_syntax
 
 
 M3U_EPG_CACHE_DIRECTORY = "/etc/enigma2/gtiptvplayer/m3u-epg-cache"
@@ -51,6 +56,7 @@ MAX_XMLTV_CHANNELS = 50000
 MAX_XMLTV_PROGRAMMES = 500000
 MAX_WANTED_TVG_IDS = 20000
 MAX_NAME_CHOICES_BYTES = 1024 * 1024
+MAX_CHANNEL_ICON_BYTES = 1024 * 1024
 MAX_EVENTS_PER_CHANNEL = 2048
 MAX_SNAPSHOT_EVENTS = 100000
 MAX_SNAPSHOT_TEXT_CHARACTERS = 24 * 1024 * 1024
@@ -194,26 +200,26 @@ class M3UEPGStore(object):
         runtime = self._snapshots.pop(source_id, None)
         index = runtime.get("index") if runtime is not None else None
         if index is not None:
-            self._index_bytes -= index.size_bytes
+            self._index_bytes -= runtime["size_bytes"]
             self._decoded.drop(index.ticket)
         return runtime
 
     def _remember_runtime_locked(self, source_id, runtime):
         self._drop_runtime_locked(source_id)
         self._snapshots[source_id] = runtime
-        index = runtime["index"]
-        self._index_bytes += index.size_bytes
+        self._index_bytes += runtime["size_bytes"]
         # Normally 64 MiB, matching the existing snapshot-file budget. At
         # least the newest single index stays usable even in tiny test budgets.
-        limit = max(self._index_limit, index.size_bytes)
+        limit = max(self._index_limit, runtime["size_bytes"])
         for other_id, other in self._snapshots.items():
             if self._index_bytes <= limit:
                 break
             cold = other.get("index")
             if other_id != source_id and cold is not None:
-                self._index_bytes -= cold.size_bytes
+                self._index_bytes -= other["size_bytes"]
                 self._decoded.drop(cold.ticket)
                 other["index"] = None
+                other["picon_urls"] = None
 
     def publish(
         self,
@@ -372,7 +378,7 @@ class M3UEPGStore(object):
                 index = runtime.get("index") if runtime is not None else None
         return index
 
-    def resolve_name(self, source_id, key, fingerprint=None):
+    def resolve_name(self, source_id, key, fingerprint=None, legacy_key=""):
         if not m3u.is_epg_name_key(key):
             return ""
         index = self._lookup_index(source_id)
@@ -384,6 +390,8 @@ class M3UEPGStore(object):
                 if (runtime is None or runtime["index"] is not index
                         or runtime["binding_fingerprint"] != fingerprint):
                     return ""
+        if not index.scoped_names and m3u.is_epg_name_key(legacy_key):
+            key = legacy_key
         return index.resolve_name(key)
 
     def name_choices(self, source_id, fingerprint):
@@ -393,7 +401,30 @@ class M3UEPGStore(object):
                 return runtime.get("name_choices", ())
         return ()
 
-    def lookup(self, source_id, tvg_id, now=None, cache_only=False, fallback_name_key=""):
+    def picon_urls(self, source_id):
+        """Return immutable logo URLs for resolved playlist aliases, from RAM."""
+        with self._lock:
+            runtime = self._snapshots.get(source_id)
+            return runtime.get("picon_urls") if runtime is not None else None
+
+    def picon_url(self, source_id, tvg_id, key, legacy_key=""):
+        with self._lock:
+            runtime = self._snapshots.get(source_id)
+            urls = runtime.get("picon_urls") if runtime is not None else None
+            if urls is None:
+                return ""
+            if legacy_key and not runtime["scoped_names"]:
+                key = legacy_key
+            return urls.get(tvg_id) or urls.get(key, "")
+
+    def snapshot_revision(self, source_id):
+        """Identify the published guide while keeping lookups in memory."""
+        with self._lock:
+            runtime = self._snapshots.get(source_id)
+            return runtime["revision"] if runtime is not None else None
+
+    def lookup(self, source_id, tvg_id, now=None, cache_only=False, fallback_name_key="",
+               legacy_name_key=""):
         """Read current/next on existing EPG workers; hot channels stay in RAM."""
         try:
             source_id = _validated_source_id(source_id)
@@ -406,6 +437,8 @@ class M3UEPGStore(object):
         index = self._lookup_index(source_id, cache_only)
         if index is None:
             return (None, None)
+        if not index.scoped_names and m3u.is_epg_name_key(legacy_name_key):
+            fallback_name_key = legacy_name_key
         events = index.get(
             tvg_id, normalise_tvg_id(tvg_id), cache_only=cache_only,
             fallback_name_key=fallback_name_key if m3u.is_epg_name_key(fallback_name_key) else "",
@@ -552,6 +585,7 @@ def refresh_source(
         raw_path = os.path.join(workspace, "source-{}.raw".format(uuid.uuid4().hex))
         staged_paths.append(raw_path)
         transfer_started = time.monotonic()
+        icon_base_url = ""
         if kind == "file":
             if timing is not None:
                 timing["stage"] = "copy"
@@ -572,7 +606,7 @@ def refresh_source(
                 timing["stage"] = "download"
                 timing["transfer_kind"] = "download"
             try:
-                compressed, input_bytes, redirect_count = _download_remote_source(
+                compressed, input_bytes, redirect_count, icon_base_url = _download_remote_source(
                     location,
                     raw_path,
                     timeout,
@@ -619,6 +653,7 @@ def refresh_source(
                 moment,
                 cancel_event,
                 deadline,
+                icon_base_url=icon_base_url,
                 **({"wanted_names": wanted_names, "name_mappings": _binding_value(binding, "name_mappings")}
                    if wanted_names else {}),
                 **({"archive_days": archive_days} if archive_days is not None else {}),
@@ -1205,7 +1240,7 @@ def _download_remote_source(
             if status_code or result is not None:
                 break
         if status_code == 200 and result is not None:
-            return result[0], result[1], redirect_count
+            return result[0], result[1], redirect_count, info["url"]
         if status_code in _REDIRECT_STATUSES:
             if not redirect_location or redirect_count >= MAX_REDIRECTS:
                 raise M3UEPGSourceError("external XMLTV redirect limit exceeded")
@@ -1334,26 +1369,244 @@ def _expand_gzip(source_path, destination, cancel_event, deadline):
     return total
 
 
-def _without_epg_quality(name):
+def _without_epg_quality(name, guide_label=False):
     parts = name.split()
-    while len(parts) > 1 and parts[-1] in dvb_epg._QUALITY_SUFFIXES:
+    while len(parts) > 1 and parts[-1].strip("()[]") in _EPG_QUALITY_LABELS:
+        if guide_label and parts[-1] in ("4k", "8k"):
+            break
         parts.pop()
     return " ".join(parts)
 
 
-_EPG_COUNTRY_PREFIX = re.compile(r"^([a-z]{2})(?:\s*[:|]\s*|\s+[-–—]\s+)")
+_EPG_COUNTRY_PREFIX = re.compile(r"^(?:\[([a-z]{2})\]|\(([a-z]{2})\)|([a-z]{2})(?:\s*[:|]\s*|\s+[-–—]\s+))\s*")
+_EPG_NAME_ANNOTATION = re.compile(r"\s*(?:\(\s*#\s*\)|\[\s*#\s*\])$")
+_EPG_SERVICE_NUMBER = re.compile(r"(?:\+\s*)?\d+(?:[.,]\d+)?")
+_EPG_QUALITY_LABELS = dvb_epg._QUALITY_SUFFIXES | {"hevc", "720p", "1080p", "2160p", "4320p"}
 
 
-def _epg_name_variants(name, country=""):
-    """Compare provider labels while preserving channel numbers and + variants."""
-    prefix = _EPG_COUNTRY_PREFIX.match(name)
-    if prefix is not None:
-        country = prefix.group(1)
-        name = name[prefix.end():]
-    name = _without_epg_quality(name)
-    compact = "".join(char for char in name if not char.isspace() and char not in "._-–—")
-    short = compact[:-2] if name.endswith(" tv") else compact
-    return (country, compact), (country, short)
+def _epg_id_country(xmltv_id):
+    if not isinstance(xmltv_id, str):
+        return ""
+    _, dot, suffix = xmltv_id.rpartition(".")
+    return m3u.epg_country_code(suffix) if dot else ""
+
+
+def _fold_epg_latin(name):
+    if name.isascii():
+        return name
+    result = []
+    latin = False
+    for char in unicodedata.normalize("NFD", name):
+        if unicodedata.combining(char):
+            if not latin:
+                result.append(char)
+            continue
+        latin = "a" <= char <= "z" or char == "ı"
+        result.append("i" if char == "ı" else char)
+    return unicodedata.normalize("NFC", "".join(result))
+
+
+def _compact_epg_label(name):
+    return "".join(char for char in name if not char.isspace() and char not in "._-–—")
+
+
+def _epg_name_forms(value, guide_label=False):
+    label = m3u.normalise_epg_name(value)
+    prefix = _EPG_COUNTRY_PREFIX.match(label)
+    country = m3u.epg_country_code(prefix.group(prefix.lastindex)) if prefix else ""
+    if country:
+        label = label[prefix.end():]
+    plain = _EPG_NAME_ANNOTATION.sub("", label)
+    name = _without_epg_quality(plain, guide_label)
+    compact = _compact_epg_label(name)
+    folded = _fold_epg_latin(compact)
+    short = folded[:-2] if name.endswith(" tv") and len(folded) > 3 else folded
+    numbers = tuple(value.replace(" ", "").replace(",", ".") for value in _EPG_SERVICE_NUMBER.findall(name))
+    return country, (label, _compact_epg_label(plain), compact, folded, short), numbers
+
+
+def _epg_candidates(index, forms, country):
+    unknown = set()
+    for rank, name in enumerate(forms):
+        entries = index.get((rank, name))
+        if not entries:
+            continue
+        if not country:
+            return {xmltv_id for xmltv_id, _ in entries}
+        local = {xmltv_id for xmltv_id, region in entries if region == country}
+        if local:
+            return local
+        if not unknown:
+            unknown = {xmltv_id for xmltv_id, region in entries if not region}
+    return unknown
+
+
+_EPG_MODEL_GUIDE_LABEL_LIMIT = 24000
+_EPG_MODEL_BUCKET_LIMIT = 24
+_EPG_MODEL_SECONDS = 0.45
+_EPG_MODEL_PROGRAMME_LIMIT = 12000
+_EPG_MODEL_EVENT_LIMIT = 4096
+_EPG_MODEL_TEXT_LIMIT = 1024 * 1024
+_EPG_MODEL_ICON_LIMIT = 64 * 1024
+_EPG_MODEL_WORD_SEPARATORS = re.compile(r"[\s._\-–—]+")
+_EPG_MODEL_VOWELS = str.maketrans("", "", "aeiou")
+
+# Log-odds fitted by tests/train-epg-name-model.py. The acceptance threshold
+# and runner-up margin apply to scores, not to estimated error probabilities.
+_EPG_MODEL_BIAS = -3.895851
+_EPG_MODEL_WEIGHTS = (1.213951, 1.483976, 0.363738, 3.023139, 2.624506, 1.505732)
+_EPG_MODEL_ACCEPT = 3.20
+_EPG_MODEL_UNSCOPED_MARGIN = 0.15
+_EPG_MODEL_SUGGEST = 0.30
+_EPG_MODEL_MARGIN = 0.90
+
+
+def _epg_model_profile(label):
+    # Keep service numbers, plus signs and 4K/8K channel variants distinct.
+    name = _fold_epg_latin(_without_epg_quality(_EPG_NAME_ANNOTATION.sub("", label), guide_label=True))
+    words = tuple(word for word in _EPG_MODEL_WORD_SEPARATORS.split(name) if word)
+    compact = "".join(words)
+    if not 6 <= len(compact) <= 64 or not 1 <= len(words) <= 8:
+        return None
+    numbers = tuple(number.replace(" ", "").replace(",", ".")
+                    for number in _EPG_SERVICE_NUMBER.findall(name))
+    return compact, words, (len(words), numbers, name.count("+"))
+
+
+def _epg_model_blocks(profile):
+    compact, _, signature = profile
+    return (signature, 0, compact[:3]), (signature, 1, compact[-3:])
+
+
+def _epg_word_edit(left, right):
+    """Return 2 for an internal gap or swap, 1 for weaker single edits."""
+    if len(left) > len(right):
+        left, right = right, left
+    if len(left) < 4 or len(right) - len(left) > 1:
+        return 0
+    first = next((index for index, pair in enumerate(zip(left, right)) if pair[0] != pair[1]), len(left))
+    if len(left) < len(right):
+        if left[first:] != right[first + 1:]:
+            return 0
+        return 2 if 0 < first < len(left) else 1
+    if (left[first:first + 2] == right[first:first + 2][::-1]
+            and left[first + 2:] == right[first + 2:]):
+        return 2
+    return int(left[first + 1:] == right[first + 1:])
+
+
+def _epg_abbreviation(left, right):
+    short, long = sorted((left, right), key=len)
+    if not (3 <= len(short) <= 5 and len(long) - len(short) >= 2 and short[0] == long[0]):
+        return 0
+    if (short.isascii() and long.isascii() and short[-1] == long[-1]
+            and short == long.translate(_EPG_MODEL_VOWELS)):
+        return 2
+    return int(long.startswith(short))
+
+
+def _epg_model_features(source, target):
+    left, left_words, _ = source
+    right, right_words, _ = target
+    changes = [(a, b) for a, b in zip(left_words, right_words) if a != b]
+    edit = _epg_word_edit(*changes[0]) if len(changes) == 1 else 0
+    abbreviations = [_epg_abbreviation(a, b) for a, b in changes]
+    # Single substitutions and suffix changes may identify another service.
+    strong = edit == 2 or (len(left_words) > 1 and abbreviations == [2])
+    left_grams = set(zip(left, left[1:]))
+    right_grams = set(zip(right, right[1:]))
+    return (
+        SequenceMatcher(None, left, right, autojunk=False).ratio(),
+        2.0 * len(left_grams & right_grams) / (len(left_grams) + len(right_grams)),
+        1.0 - len(changes) / len(left_words),
+        float(bool(edit)),
+        float(0 < len(changes) <= 2 and all(abbreviations)),
+        float(strong),
+    )
+
+
+class _EPGNameModel:
+    """One bounded candidate index, owned only by the XMLTV refresh worker."""
+
+    def __init__(self, guide_names, cancel_event, deadline, reserve):
+        self.deadline = min(time.monotonic() + _EPG_MODEL_SECONDS, deadline - reserve)
+        self.buckets = {}
+        for index, (xmltv_id, country, label) in enumerate(guide_names):
+            if index % 64 == 0:
+                _check_limits(cancel_event, deadline)
+                if time.monotonic() >= self.deadline:
+                    self.buckets.clear()
+                    break
+            profile = _epg_model_profile(label)
+            if profile is None:
+                continue
+            for block in _epg_model_blocks(profile):
+                by_country = self.buckets.setdefault(block, {})
+                entries = by_country.setdefault(country, set())
+                if entries is not None:
+                    entries.add((xmltv_id, country, profile))
+                    if len(entries) > _EPG_MODEL_BUCKET_LIMIT:
+                        # An incomplete bucket could hide a competing match.
+                        by_country[country] = None
+
+    def match(self, label, country):
+        if not self.buckets or time.monotonic() >= self.deadline:
+            return "", ()
+        source = _epg_model_profile(label)
+        if source is None:
+            return "", ()
+        candidates = set()
+        for key in _epg_model_blocks(source):
+            by_country = self.buckets.get(key, {})
+            buckets = by_country.values()
+            if country:
+                buckets = (by_country.get(country, ()), by_country.get("", ()), by_country.get(None, ()))
+            for entries in buckets:
+                if entries is None:
+                    return "", ()
+                candidates.update(entries)
+                if len(candidates) > 2 * _EPG_MODEL_BUCKET_LIMIT:
+                    return "", ()
+        scores = {}
+        for xmltv_id, region, profile in candidates:
+            if time.monotonic() >= self.deadline:
+                return "", ()
+            features = _epg_model_features(source, profile)
+            score = _EPG_MODEL_BIAS + sum(weight * value for weight, value in zip(_EPG_MODEL_WEIGHTS, features))
+            # A name alone needs stronger evidence when the country is unknown.
+            cutoff = _EPG_MODEL_ACCEPT
+            if not country or country != region:
+                cutoff += _EPG_MODEL_UNSCOPED_MARGIN
+            eligible = region is not None and score >= cutoff and bool(features[5])
+            scores[xmltv_id] = max(scores.get(xmltv_id, (float("-inf"), False)), (score, eligible))
+        ranked = sorted(scores, key=lambda xmltv_id: (-scores[xmltv_id][0], xmltv_id))
+        if not ranked:
+            return "", ()
+        best = ranked[0]
+        best_score, eligible = scores[best]
+        second_score = scores[ranked[1]][0] if len(ranked) > 1 else float("-inf")
+        if eligible and best_score - second_score >= _EPG_MODEL_MARGIN:
+            return best, ()
+        return "", tuple(xmltv_id for xmltv_id in ranked[:4] if scores[xmltv_id][0] >= _EPG_MODEL_SUGGEST)
+
+
+def _safe_channel_icon_url(value, base_url=""):
+    value = value.strip() if isinstance(value, str) else ""
+    if (not value or len(value) > MAX_PUBLIC_URL_LENGTH
+            or any(ord(character) < 32 or ord(character) == 127 for character in value)):
+        return ""
+    try:
+        url = urljoin(base_url, value) if base_url else value
+        return validate_public_url_syntax(url)["url"]
+    except (NetworkSecurityError, TypeError, ValueError):
+        return ""
+
+
+def _guide_event_priority(key, now):
+    start, stop, _ = key
+    if stop <= now:
+        return (0, start, stop)
+    return (1, -start, -stop)
 
 
 def _build_snapshot(
@@ -1368,29 +1621,50 @@ def _build_snapshot(
     guide_all_dates=False,
     wanted_names=None,
     name_mappings=None,
+    icon_base_url="",
 ):
     normalised_wanted = set(normalise_tvg_id(value) for value in wanted)
     explicit_ids = frozenset(wanted)
     name_rows = []
+    names_index = {}
     for index, (key, entry) in enumerate((wanted_names or {}).items()):
         if index % 128 == 0:
             _check_limits(cancel_event, deadline)
         if not m3u.is_epg_name_key(key) or key in explicit_ids:
             continue
-        label, tvg_id = entry if isinstance(entry, tuple) and len(entry) == 2 else (entry, "")
+        if isinstance(entry, tuple) and len(entry) in (2, 4):
+            label, tvg_id = entry[:2]
+            group_country, alternate = entry[2:] if len(entry) == 4 else ("", "")
+        else:
+            label, tvg_id = entry, ""
+            group_country, alternate = "", ""
         if not isinstance(label, str) or not label.strip():
             continue
-        name = m3u.normalise_epg_name(label)
-        name_rows.append((key, label, tvg_id, name, _epg_name_variants(name)))
-    exact_names = {name: set() for _, _, _, name, _ in name_rows}
-    quality_names = {_without_epg_quality(name): set() for name in exact_names}
-    variant_names = {variant: set() for _, _, _, _, (variant, _) in name_rows if variant[1]}
-    short_names = {short: set() for _, _, _, _, (_, short) in name_rows if short[1]}
+        label_country, forms, numbers = _epg_name_forms(label)
+        regions = {region for region in (label_country, group_country, _epg_id_country(tvg_id)) if region}
+        country_conflict = group_country is None or len(regions) > 1
+        country = next(iter(regions)) if len(regions) == 1 else ""
+        alternate_forms = ()
+        if alternate and alternate != m3u.normalise_epg_name(label):
+            alternate_country, extra, alternate_numbers = _epg_name_forms(alternate)
+            if (not numbers or numbers == alternate_numbers) and (
+                    not country or not alternate_country or country == alternate_country):
+                alternate_forms = extra
+                if not country and not country_conflict:
+                    country = alternate_country
+        for variants in (forms, alternate_forms):
+            for rank, name in enumerate(variants):
+                if name:
+                    names_index[(rank, name)] = None
+        name_rows.append((key, label, tvg_id, country, country_conflict, forms, alternate_forms))
     name_mappings = name_mappings if isinstance(name_mappings, dict) else {}
     channels = OrderedDict()
     normalised_channels = defaultdict(set)
     channel_elements = 0
     programme_elements = 0
+    live_guide = archive_days is None and not guide_all_dates
+    model_labels = [] if names_index and live_guide else None
+    first_scan_started = time.monotonic()
 
     # The first pass resolves the complete channel-ID namespace.  XMLTV does
     # not require all channel declarations to precede programmes, so deciding
@@ -1420,24 +1694,30 @@ def _build_snapshot(
                         continue
                     channels.setdefault(xmltv_id, None)
                     normalised_channels[normalise_tvg_id(xmltv_id)].add(xmltv_id)
-                    if exact_names:
-                        _, dot, country = xmltv_id.casefold().rpartition(".")
-                        if not dot or len(country) != 2 or not country.isascii() or not country.isalpha():
-                            country = ""
-                        for child in element:
+                    if names_index:
+                        id_country = _epg_id_country(xmltv_id)
+                        for child_index, child in enumerate(element):
+                            if child_index and child_index % 128 == 0:
+                                _check_limits(cancel_event, deadline)
                             if dvb_epg._local_name(child.tag) != "display-name":
                                 continue
-                            name = m3u.normalise_epg_name(child.text)
-                            if name in exact_names:
-                                exact_names[name].add(xmltv_id)
-                            quality_name = _without_epg_quality(name)
-                            if quality_name in quality_names:
-                                quality_names[quality_name].add(xmltv_id)
-                            variants = _epg_name_variants(name, country)
-                            for names, (tag, compact) in zip((variant_names, short_names), variants):
-                                for candidate in ((tag, compact), ("", compact)):
-                                    if candidate in names:
-                                        names[candidate].add(xmltv_id)
+                            country, forms, _ = _epg_name_forms(child.text, guide_label=True)
+                            if model_labels is not None and forms[0]:
+                                if len(model_labels) >= _EPG_MODEL_GUIDE_LABEL_LIMIT:
+                                    # Only use complete candidate sets for automatic matches.
+                                    model_labels = None
+                                else:
+                                    region = country or id_country
+                                    if country and id_country and country != id_country:
+                                        region = None
+                                    model_labels.append((xmltv_id, region, forms[0]))
+                            for rank, name in enumerate(forms):
+                                candidate = (rank, name)
+                                if candidate in names_index:
+                                    bucket = names_index[candidate]
+                                    if bucket is None:
+                                        bucket = names_index[candidate] = set()
+                                    bucket.add((xmltv_id, country or id_country))
                     continue
                 if tag == "programme":
                     programme_elements += 1
@@ -1467,36 +1747,83 @@ def _build_snapshot(
 
     matched_wanted = {key for key, _ in aliases}
     name_choices = []
+    seen_choices = set()
     choice_bytes = 2
-    for index, (key, label, tvg_id, name, (variant, short)) in enumerate(name_rows):
+    learned_aliases = []
+    name_model = None
+    model_reserve = max(0.5, time.monotonic() - first_scan_started)
+    for index, (key, label, tvg_id, country, conflict, forms, alternate) in enumerate(name_rows):
         if index % 128 == 0:
             _check_limits(cancel_event, deadline)
         if tvg_id in matched_wanted:
             continue
-        candidates = (exact_names[name] or quality_names[_without_epg_quality(name)]
-                      or variant_names.get(variant) or short_names.get(short, ()))
+        candidates = _epg_candidates(names_index, forms, country)
+        if alternate:
+            candidates.update(_epg_candidates(names_index, alternate, country))
+        if not candidates and country:
+            exact = names_index.get((0, forms[0]))
+            if exact:
+                candidates = {xmltv_id for xmltv_id, _ in exact}
+                conflict = True
         chosen = name_mappings.get(key)
-        if len(candidates) > 1 or chosen:
-            row = [key, _clean_snapshot_text(label, 180), sorted(candidates)]
+        choice_key = key
+        if not chosen and name_mappings:
+            legacy = m3u.epg_name_key(label, tvg_id)
+            legacy_choice = name_mappings.get(legacy)
+            legacy_country = _epg_id_country(legacy_choice)
+            if (isinstance(legacy_choice, str) and legacy_choice in channels
+                    and (not country or not legacy_country or legacy_country == country)):
+                chosen, choice_key = legacy_choice, legacy
+        learned_choice, suggestions = "", ()
+        if (not chosen and not candidates and not conflict and len(forms[0]) >= 6
+                and (model_labels or name_model is not None)):
+            id_candidates = normalised_channels.get(normalise_tvg_id(tvg_id), ())
+            if len(id_candidates) < 2:
+                if name_model is None:
+                    name_model = _EPGNameModel(model_labels, cancel_event, deadline, model_reserve)
+                    model_labels = None
+                learned_choice, suggestions = name_model.match(forms[0], country)
+                candidates.update(suggestions)
+        if choice_key not in seen_choices and (
+                len(candidates) > 1 or (candidates and conflict) or chosen or suggestions):
+            caption = label
+            if country and key != m3u.epg_name_key(label, tvg_id):
+                caption = "{} ({})".format(label, country.upper())
+            row = [choice_key, _clean_snapshot_text(caption, 180), sorted(candidates)]
             size = _encoded_json_size(row) + 1
             if choice_bytes + size <= MAX_NAME_CHOICES_BYTES:
                 name_choices.append(row)
                 choice_bytes += size
-        if not chosen and len(candidates) == 1:
+                seen_choices.add(choice_key)
+        if not chosen and not conflict and not suggestions and len(candidates) == 1:
             chosen = next(iter(candidates))
         if isinstance(chosen, str) and chosen in channels:
             aliases.append([key, chosen])
             matched_channels.setdefault(chosen, None)
+        elif learned_choice:
+            learned_aliases.append([key, learned_choice])
+    del name_model, model_labels
 
-    candidate_events = defaultdict(list)
+    candidate_events = defaultdict(dict)
+    overflow_heaps = {}
     invalid_programmes = 0
     retained_events = 0
     retained_text = 0
-    earliest = int(now) - (archive_days * 86400 if archive_days is not None else DEFAULT_PAST_SECONDS)
-    latest = int(now) if archive_days is not None else int(now) + DEFAULT_FUTURE_SECONDS
+    moment = int(now)
+    earliest = moment - (archive_days * 86400 if archive_days is not None else DEFAULT_PAST_SECONDS)
+    latest = moment if archive_days is not None else moment + DEFAULT_FUTURE_SECONDS
     if guide_all_dates:
         earliest, latest = 0, 4102444800
-    selected_ids = frozenset(matched_channels)
+    model_only_ids = {xmltv_id for _, xmltv_id in learned_aliases if xmltv_id not in matched_channels}
+    selected_ids = frozenset(matched_channels).union(model_only_ids)
+    model_per_channel = min(MAX_EVENTS_PER_CHANNEL, max(2, _EPG_MODEL_EVENT_LIMIT // max(1, len(model_only_ids))))
+    model_programmes = 0
+    model_events = 0
+    model_text = 0
+    channel_icons = {}
+    icon_bytes = 2
+    model_icons = {}
+    model_icon_bytes = 0
 
     # The second bounded pass collects text only for the already resolved
     # XMLTV IDs.  A colliding but irrelevant channel can therefore never use
@@ -1516,6 +1843,25 @@ def _build_snapshot(
                     maximum_bytes=MAX_UNCOMPRESSED_XMLTV_BYTES,
                 )
                 for tag, element in elements:
+                    if tag == "channel" and live_guide:
+                        xmltv_id = element.attrib.get("id", "").strip()
+                        from_model = xmltv_id in model_only_ids
+                        icons = model_icons if from_model else channel_icons
+                        if xmltv_id in selected_ids and xmltv_id not in icons:
+                            for child in element:
+                                if dvb_epg._local_name(child.tag) != "icon":
+                                    continue
+                                url = _safe_channel_icon_url(child.attrib.get("src"), icon_base_url)
+                                if url:
+                                    row = [xmltv_id, url]
+                                    size = _encoded_json_size(row) + bool(icons)
+                                    if from_model and model_icon_bytes + size <= _EPG_MODEL_ICON_LIMIT:
+                                        model_icons[xmltv_id] = row
+                                        model_icon_bytes += size
+                                    elif not from_model and icon_bytes + size <= MAX_CHANNEL_ICON_BYTES:
+                                        channel_icons[xmltv_id] = row
+                                        icon_bytes += size
+                                    break
                     if tag != "programme":
                         continue
                     second_programme_count += 1
@@ -1532,6 +1878,11 @@ def _build_snapshot(
                         continue
                     if xmltv_id not in selected_ids:
                         continue
+                    from_model = xmltv_id in model_only_ids
+                    if from_model:
+                        if model_programmes >= _EPG_MODEL_PROGRAMME_LIMIT:
+                            continue
+                        model_programmes += 1
                     try:
                         start, stop = dvb_epg._programme_time_window(element, 0)
                     except ValueError:
@@ -1550,21 +1901,46 @@ def _build_snapshot(
                         MAX_DESCRIPTION_LENGTH,
                     )
                     events = candidate_events[xmltv_id]
-                    if len(events) >= MAX_EVENTS_PER_CHANNEL:
-                        raise M3UEPGSourceError(
-                            "XMLTV per-channel event limit exceeded"
-                        )
-                    retained_events += 1
-                    if retained_events > MAX_SNAPSHOT_EVENTS:
-                        raise M3UEPGSourceError(
-                            "XMLTV retained event limit exceeded"
-                        )
-                    retained_text += len(title) + len(description)
-                    if retained_text > MAX_SNAPSHOT_TEXT_CHARACTERS:
-                        raise M3UEPGSourceError(
-                            "XMLTV retained text limit exceeded"
-                        )
-                    events.append((int(start), int(stop), title, description))
+                    key = (int(start), int(stop), title)
+                    if key in events:
+                        continue
+                    previous = None
+                    text_delta = len(title) + len(description)
+                    per_channel_limit = model_per_channel if from_model else MAX_EVENTS_PER_CHANNEL
+                    if len(events) >= per_channel_limit:
+                        if not live_guide:
+                            raise M3UEPGSourceError(
+                                "XMLTV per-channel event limit exceeded"
+                            )
+                        # Keep the current and closest upcoming programmes
+                        # even when the XMLTV rows are out of order.
+                        heap = overflow_heaps.get(xmltv_id)
+                        if heap is None:
+                            heap = [(_guide_event_priority(row, moment), row) for row in events]
+                            heapq.heapify(heap)
+                            overflow_heaps[xmltv_id] = heap
+                        candidate = (_guide_event_priority(key, moment), key)
+                        if candidate <= heap[0]:
+                            continue
+                        previous = heap[0][1]
+                        text_delta -= len(previous[2]) + len(events[previous])
+                    if from_model:
+                        if ((previous is None and model_events >= _EPG_MODEL_EVENT_LIMIT)
+                                or model_text + text_delta > _EPG_MODEL_TEXT_LIMIT):
+                            continue
+                        model_events += previous is None
+                        model_text += text_delta
+                    else:
+                        retained_events += previous is None
+                        if retained_events > MAX_SNAPSHOT_EVENTS:
+                            raise M3UEPGSourceError("XMLTV retained event limit exceeded")
+                        retained_text += text_delta
+                        if retained_text > MAX_SNAPSHOT_TEXT_CHARACTERS:
+                            raise M3UEPGSourceError("XMLTV retained text limit exceeded")
+                    if previous is not None:
+                        heapq.heapreplace(heap, candidate)
+                        del events[previous]
+                    events[key] = description
             if second_programme_count != programme_elements:
                 raise M3UEPGSourceError("XMLTV guide changed while being parsed")
         except dvb_epg.OperationCancelled as error:
@@ -1572,27 +1948,45 @@ def _build_snapshot(
         except dvb_epg.XmltvError as error:
             raise M3UEPGSourceError("external XMLTV guide is invalid") from error
 
+    # A proposed alias needs actual programme data. Existing matches keep
+    # priority if extra channels would exceed the snapshot's event or text cap.
+    for index, (key, xmltv_id) in enumerate(learned_aliases):
+        if index % 128 == 0:
+            _check_limits(cancel_event, deadline)
+        if len(aliases) >= MAX_WANTED_TVG_IDS:
+            break
+        events = candidate_events.get(xmltv_id)
+        if not events:
+            continue
+        if xmltv_id not in matched_channels:
+            text_size = sum(len(event[2]) + len(description) for event, description in events.items())
+            if (retained_events + len(events) > MAX_SNAPSHOT_EVENTS
+                    or retained_text + text_size > MAX_SNAPSHOT_TEXT_CHARACTERS):
+                continue
+            matched_channels[xmltv_id] = None
+            retained_events += len(events)
+            retained_text += text_size
+            row = model_icons.get(xmltv_id)
+            if row:
+                size = _encoded_json_size(row) + bool(channel_icons)
+                if icon_bytes + size <= MAX_CHANNEL_ICON_BYTES:
+                    channel_icons[xmltv_id] = row
+                    icon_bytes += size
+        aliases.append([key, xmltv_id])
+
     snapshot_channels = []
     event_count = 0
     for channel_index, xmltv_id in enumerate(matched_channels):
         if channel_index % 128 == 0:
             _check_limits(cancel_event, deadline)
-        rows = sorted(
-            candidate_events.get(xmltv_id, ()),
-            key=lambda row: (row[0], row[1], row[2]),
-        )
-        deduplicated = []
-        previous = None
-        for event_index, row in enumerate(rows):
+        events = candidate_events.get(xmltv_id, {})
+        rows = []
+        for event_index, (start, stop, title) in enumerate(sorted(events)):
             if event_index % 128 == 0:
                 _check_limits(cancel_event, deadline)
-            key = (row[0], row[1], row[2])
-            if key == previous:
-                continue
-            deduplicated.append(list(row))
-            previous = key
-        event_count += len(deduplicated)
-        snapshot_channels.append([xmltv_id, deduplicated])
+            rows.append([start, stop, title, events[(start, stop, title)]])
+        event_count += len(rows)
+        snapshot_channels.append([xmltv_id, rows])
 
     ambiguous = []
     for key_index, (key, values) in enumerate(normalised_channels.items()):
@@ -1608,6 +2002,7 @@ def _build_snapshot(
         "binding_fingerprint": fingerprint,
         "cached_at": int(now),
         "aliases": aliases,
+        "scoped_names": True,
         "ambiguous": ambiguous,
         "channels": snapshot_channels,
         "channel_count": channel_elements,
@@ -1618,6 +2013,8 @@ def _build_snapshot(
     }
     if name_choices:
         payload["name_choices"] = name_choices
+    if channel_icons:
+        payload["channel_icons"] = list(channel_icons.values())
     # Validate the complete object before it can reach a last-good cache path.
     # The persisted-size check runs after transfer metadata is attached so the
     # byte budget covers the exact object written to disk.
@@ -1933,6 +2330,7 @@ def _fit_snapshot_budget(
     """Fit an oversized snapshot while leaving ordinary R58 output intact."""
     if deadline is None:
         deadline = float("inf")
+    icons = payload.pop("channel_icons", ())
     original_events = int(payload.get("event_count", 0) or 0)
     original_size = _snapshot_encoded_size(payload, cancel_event, deadline)
     if diagnostics is not None:
@@ -1943,8 +2341,10 @@ def _fit_snapshot_budget(
         diagnostics["snapshot_dropped_events"] = 0
         diagnostics["snapshot_trimmed_descriptions"] = 0
     if original_size <= int(MAX_SNAPSHOT_BYTES):
+        final_size = _fit_channel_icons(payload, icons, original_size, cancel_event, deadline)
         if diagnostics is not None:
             diagnostics["snapshot_compacted"] = 0
+            diagnostics["snapshot_final_bytes"] = final_size
         return payload
 
     if diagnostics is not None:
@@ -1955,6 +2355,7 @@ def _fit_snapshot_budget(
         cancel_event,
         deadline,
     )
+    final_size = _fit_channel_icons(compacted, icons, final_size, cancel_event, deadline)
     validated = _validate_snapshot(
         compacted,
         cancel_event=cancel_event,
@@ -1971,6 +2372,25 @@ def _fit_snapshot_budget(
         )
         diagnostics["snapshot_trimmed_descriptions"] = trimmed
     return validated
+
+
+def _fit_channel_icons(payload, icons, size, cancel_event, deadline):
+    """Keep optional logos within the space left by the programme guide."""
+    if not icons:
+        return size
+    with_key = size + len(',"channel_icons":[]')
+    selected = []
+    for index, row in enumerate(icons):
+        if index % 128 == 0:
+            _check_limits(cancel_event, deadline)
+        row_size = _encoded_json_size(row) + bool(selected)
+        if with_key + row_size <= MAX_SNAPSHOT_BYTES:
+            selected.append(row)
+            with_key += row_size
+    if selected:
+        payload["channel_icons"] = selected
+        return with_key
+    return size
 
 
 def _validate_snapshot(payload, cancel_event=None, deadline=None):
@@ -2089,6 +2509,8 @@ def _validate_snapshot(payload, cancel_event=None, deadline=None):
         "ambiguous": ambiguous,
         "channels": channels,
     }
+    if payload.get("scoped_names") is True:
+        output["scoped_names"] = True
     for name in (
         "channel_count",
         "programme_count",
@@ -2126,6 +2548,31 @@ def _validate_snapshot(payload, cancel_event=None, deadline=None):
                     raise M3UEPGSnapshotError("M3U EPG name choice is invalid")
             seen_names.add(key)
         output["name_choices"] = name_choices
+    icons = payload.get("channel_icons")
+    if isinstance(icons, list):
+        seen_icons = set()
+        clean_icons = []
+        size = 2
+        for icon_index, row in enumerate(icons):
+            if icon_index >= MAX_WANTED_TVG_IDS:
+                break
+            if deadline is not None and icon_index % 128 == 0:
+                _check_limits(cancel_event, deadline)
+            if not isinstance(row, list) or len(row) != 2 or not isinstance(row[0], str):
+                continue
+            xmltv_id, raw_url = row
+            if xmltv_id not in known_channels or xmltv_id in seen_icons:
+                continue
+            url = _safe_channel_icon_url(raw_url)
+            if url:
+                row = [xmltv_id, url]
+                row_size = _encoded_json_size(row) + bool(clean_icons)
+                if size + row_size <= MAX_CHANNEL_ICON_BYTES:
+                    clean_icons.append(row)
+                    seen_icons.add(xmltv_id)
+                    size += row_size
+        if clean_icons:
+            output["channel_icons"] = clean_icons
     return output
 
 
@@ -2159,6 +2606,17 @@ def _runtime_snapshot(payload, cancel_event=None, deadline=None, cache=None,
         if deadline is not None or cancel_event is not None:
             _check_limits(cancel_event, float("inf") if deadline is None else deadline)
     try:
+        icons = dict(payload.get("channel_icons", ()))
+        picon_urls = {}
+        picon_bytes = sum(sys.getsizeof(url) for url in icons.values())
+        if icons:
+            for number, (alias, channel_id) in enumerate(payload["aliases"]):
+                if number % 128 == 0:
+                    check()
+                if channel_id in icons:
+                    picon_urls[alias] = icons[channel_id]
+                    picon_bytes += sys.getsizeof(alias)
+            picon_bytes += sys.getsizeof(picon_urls)
         index = EPGChannelIndex(payload, normalise_tvg_id, cache,
             directory_descriptor=directory_descriptor, check=check)
         return {
@@ -2167,6 +2625,10 @@ def _runtime_snapshot(payload, cancel_event=None, deadline=None, cache=None,
             "cached_at": payload["cached_at"],
             "cache_dir": cache_dir,
             "index": index,
+            "scoped_names": index.scoped_names,
+            "revision": index.ticket,
+            "size_bytes": index.size_bytes + picon_bytes,
+            "picon_urls": MappingProxyType(picon_urls) if picon_urls else None,
             "name_choices": tuple((key, name, tuple(ids)) for key, name, ids in payload.get("name_choices", ())),
         }
     finally:

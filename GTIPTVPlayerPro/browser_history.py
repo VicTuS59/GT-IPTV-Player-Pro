@@ -8,7 +8,7 @@ import time
 from collections import deque
 from .ui_update import set_visible
 from .typography import set_text_if_changed
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from enigma import ePoint, eSize, eTimer, getDesktop, iServiceInformation

@@ -190,7 +190,7 @@ class LightVODMethods:
     def _setup_light_widgets(self):
         from Components.Label import Label
         from Components.Pixmap import Pixmap
-        from Components.ActionMap import ActionMap
+        from .action_map import ActionMap
         from .native_vod_list import NativeVODList
         from xml.etree import ElementTree as ET
         kind=self.content_type

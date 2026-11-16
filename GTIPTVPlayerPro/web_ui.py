@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Native Enigma2 screen that opens and approves temporary web sessions."""
 
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.Label import Label
 from Screens.Screen import Screen
 from enigma import eTimer, getDesktop

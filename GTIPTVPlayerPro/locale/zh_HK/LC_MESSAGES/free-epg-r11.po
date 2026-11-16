@@ -1,0 +1,861 @@
+# FreeEPG settings and region labels
+# Region display names from Unicode CLDR. See LICENSING.md.
+msgid ""
+msgstr ""
+"Language: zh_HK\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Could not open the country list."
+msgstr "無法開啟國家或地區清單。"
+
+msgid "Custom URL"
+msgstr "自訂網址"
+
+msgid "FreeEPG country AC"
+msgstr "阿森松島"
+
+msgid "FreeEPG country AD"
+msgstr "安道爾"
+
+msgid "FreeEPG country AE"
+msgstr "阿拉伯聯合酋長國"
+
+msgid "FreeEPG country AF"
+msgstr "阿富汗"
+
+msgid "FreeEPG country AG"
+msgstr "安提瓜和巴布達"
+
+msgid "FreeEPG country AI"
+msgstr "安奎拉"
+
+msgid "FreeEPG country AL"
+msgstr "阿爾巴尼亞"
+
+msgid "FreeEPG country AM"
+msgstr "亞美尼亞"
+
+msgid "FreeEPG country AN"
+msgstr "庫拉索"
+
+msgid "FreeEPG country AO"
+msgstr "安哥拉"
+
+msgid "FreeEPG country AQ"
+msgstr "南極洲"
+
+msgid "FreeEPG country AR"
+msgstr "阿根廷"
+
+msgid "FreeEPG country AS"
+msgstr "美屬薩摩亞"
+
+msgid "FreeEPG country AT"
+msgstr "奧地利"
+
+msgid "FreeEPG country AU"
+msgstr "澳洲"
+
+msgid "FreeEPG country AW"
+msgstr "阿魯巴"
+
+msgid "FreeEPG country AX"
+msgstr "奧蘭群島"
+
+msgid "FreeEPG country AZ"
+msgstr "亞塞拜疆"
+
+msgid "FreeEPG country BA"
+msgstr "波斯尼亞和黑塞哥維那"
+
+msgid "FreeEPG country BB"
+msgstr "巴巴多斯"
+
+msgid "FreeEPG country BD"
+msgstr "孟加拉"
+
+msgid "FreeEPG country BE"
+msgstr "比利時"
+
+msgid "FreeEPG country BF"
+msgstr "布基納法索"
+
+msgid "FreeEPG country BG"
+msgstr "保加利亞"
+
+msgid "FreeEPG country BH"
+msgstr "巴林"
+
+msgid "FreeEPG country BI"
+msgstr "布隆迪"
+
+msgid "FreeEPG country BJ"
+msgstr "貝寧"
+
+msgid "FreeEPG country BL"
+msgstr "聖巴泰勒米"
+
+msgid "FreeEPG country BM"
+msgstr "百慕達"
+
+msgid "FreeEPG country BN"
+msgstr "汶萊"
+
+msgid "FreeEPG country BO"
+msgstr "玻利維亞"
+
+msgid "FreeEPG country BQ"
+msgstr "荷蘭加勒比區"
+
+msgid "FreeEPG country BR"
+msgstr "巴西"
+
+msgid "FreeEPG country BS"
+msgstr "巴哈馬"
+
+msgid "FreeEPG country BT"
+msgstr "不丹"
+
+msgid "FreeEPG country BU"
+msgstr "緬甸"
+
+msgid "FreeEPG country BV"
+msgstr "鮑威特島"
+
+msgid "FreeEPG country BW"
+msgstr "博茨瓦納"
+
+msgid "FreeEPG country BY"
+msgstr "白俄羅斯"
+
+msgid "FreeEPG country BZ"
+msgstr "伯利茲"
+
+msgid "FreeEPG country CA"
+msgstr "加拿大"
+
+msgid "FreeEPG country CC"
+msgstr "科科斯 (基林) 群島"
+
+msgid "FreeEPG country CD"
+msgstr "剛果（金夏沙）"
+
+msgid "FreeEPG country CF"
+msgstr "中非共和國"
+
+msgid "FreeEPG country CG"
+msgstr "剛果（布拉薩）"
+
+msgid "FreeEPG country CH"
+msgstr "瑞士"
+
+msgid "FreeEPG country CI"
+msgstr "科特迪瓦"
+
+msgid "FreeEPG country CK"
+msgstr "庫克群島"
+
+msgid "FreeEPG country CL"
+msgstr "智利"
+
+msgid "FreeEPG country CM"
+msgstr "喀麥隆"
+
+msgid "FreeEPG country CN"
+msgstr "中國"
+
+msgid "FreeEPG country CO"
+msgstr "哥倫比亞"
+
+msgid "FreeEPG country CP"
+msgstr "克里珀頓島"
+
+msgid "FreeEPG country CQ"
+msgstr "薩克島"
+
+msgid "FreeEPG country CR"
+msgstr "哥斯達黎加"
+
+msgid "FreeEPG country CS"
+msgstr "塞爾維亞"
+
+msgid "FreeEPG country CU"
+msgstr "古巴"
+
+msgid "FreeEPG country CV"
+msgstr "佛得角"
+
+msgid "FreeEPG country CW"
+msgstr "庫拉索"
+
+msgid "FreeEPG country CX"
+msgstr "聖誕島"
+
+msgid "FreeEPG country CY"
+msgstr "塞浦路斯"
+
+msgid "FreeEPG country CZ"
+msgstr "捷克"
+
+msgid "FreeEPG country DD"
+msgstr "德國"
+
+msgid "FreeEPG country DE"
+msgstr "德國"
+
+msgid "FreeEPG country DG"
+msgstr "迪亞哥加西亞島"
+
+msgid "FreeEPG country DJ"
+msgstr "吉布提"
+
+msgid "FreeEPG country DK"
+msgstr "丹麥"
+
+msgid "FreeEPG country DM"
+msgstr "多米尼克"
+
+msgid "FreeEPG country DO"
+msgstr "多米尼加共和國"
+
+msgid "FreeEPG country DY"
+msgstr "貝寧"
+
+msgid "FreeEPG country DZ"
+msgstr "阿爾及利亞"
+
+msgid "FreeEPG country EA"
+msgstr "休達與梅利利亞"
+
+msgid "FreeEPG country EC"
+msgstr "厄瓜多爾"
+
+msgid "FreeEPG country EE"
+msgstr "愛沙尼亞"
+
+msgid "FreeEPG country EG"
+msgstr "埃及"
+
+msgid "FreeEPG country EH"
+msgstr "西撒哈拉"
+
+msgid "FreeEPG country ER"
+msgstr "厄立特里亞"
+
+msgid "FreeEPG country ES"
+msgstr "西班牙"
+
+msgid "FreeEPG country ET"
+msgstr "埃塞俄比亞"
+
+msgid "FreeEPG country EU"
+msgstr "歐盟"
+
+msgid "FreeEPG country EZ"
+msgstr "歐元區"
+
+msgid "FreeEPG country FI"
+msgstr "芬蘭"
+
+msgid "FreeEPG country FJ"
+msgstr "斐濟"
+
+msgid "FreeEPG country FK"
+msgstr "福克蘭群島"
+
+msgid "FreeEPG country FM"
+msgstr "密克羅尼西亞"
+
+msgid "FreeEPG country FO"
+msgstr "法羅群島"
+
+msgid "FreeEPG country FR"
+msgstr "法國"
+
+msgid "FreeEPG country FX"
+msgstr "法國"
+
+msgid "FreeEPG country GA"
+msgstr "加蓬"
+
+msgid "FreeEPG country GB"
+msgstr "英國"
+
+msgid "FreeEPG country GD"
+msgstr "格林納達"
+
+msgid "FreeEPG country GE"
+msgstr "格魯吉亞"
+
+msgid "FreeEPG country GF"
+msgstr "法屬圭亞那"
+
+msgid "FreeEPG country GG"
+msgstr "根息"
+
+msgid "FreeEPG country GH"
+msgstr "加納"
+
+msgid "FreeEPG country GI"
+msgstr "直布羅陀"
+
+msgid "FreeEPG country GL"
+msgstr "格陵蘭"
+
+msgid "FreeEPG country GM"
+msgstr "岡比亞"
+
+msgid "FreeEPG country GN"
+msgstr "幾內亞"
+
+msgid "FreeEPG country GP"
+msgstr "瓜地洛普"
+
+msgid "FreeEPG country GQ"
+msgstr "赤道幾內亞"
+
+msgid "FreeEPG country GR"
+msgstr "希臘"
+
+msgid "FreeEPG country GS"
+msgstr "南佐治亞島與南桑威奇群島"
+
+msgid "FreeEPG country GT"
+msgstr "危地馬拉"
+
+msgid "FreeEPG country GU"
+msgstr "關島"
+
+msgid "FreeEPG country GW"
+msgstr "幾內亞比紹"
+
+msgid "FreeEPG country GY"
+msgstr "圭亞那"
+
+msgid "FreeEPG country HK"
+msgstr "中國香港特別行政區"
+
+msgid "FreeEPG country HM"
+msgstr "赫德島及麥唐納群島"
+
+msgid "FreeEPG country HN"
+msgstr "洪都拉斯"
+
+msgid "FreeEPG country HR"
+msgstr "克羅地亞"
+
+msgid "FreeEPG country HT"
+msgstr "海地"
+
+msgid "FreeEPG country HU"
+msgstr "匈牙利"
+
+msgid "FreeEPG country HV"
+msgstr "布基納法索"
+
+msgid "FreeEPG country IC"
+msgstr "加那利群島"
+
+msgid "FreeEPG country ID"
+msgstr "印尼"
+
+msgid "FreeEPG country IE"
+msgstr "愛爾蘭"
+
+msgid "FreeEPG country IL"
+msgstr "以色列"
+
+msgid "FreeEPG country IM"
+msgstr "馬恩島"
+
+msgid "FreeEPG country IN"
+msgstr "印度"
+
+msgid "FreeEPG country IO"
+msgstr "英屬印度洋領地"
+
+msgid "FreeEPG country IQ"
+msgstr "伊拉克"
+
+msgid "FreeEPG country IR"
+msgstr "伊朗"
+
+msgid "FreeEPG country IS"
+msgstr "冰島"
+
+msgid "FreeEPG country IT"
+msgstr "意大利"
+
+msgid "FreeEPG country JE"
+msgstr "澤西島"
+
+msgid "FreeEPG country JM"
+msgstr "牙買加"
+
+msgid "FreeEPG country JO"
+msgstr "約旦"
+
+msgid "FreeEPG country JP"
+msgstr "日本"
+
+msgid "FreeEPG country KE"
+msgstr "肯尼亞"
+
+msgid "FreeEPG country KG"
+msgstr "吉爾吉斯"
+
+msgid "FreeEPG country KH"
+msgstr "柬埔寨"
+
+msgid "FreeEPG country KI"
+msgstr "吉里巴斯"
+
+msgid "FreeEPG country KM"
+msgstr "科摩羅"
+
+msgid "FreeEPG country KN"
+msgstr "聖基茨和尼維斯"
+
+msgid "FreeEPG country KP"
+msgstr "北韓"
+
+msgid "FreeEPG country KR"
+msgstr "南韓"
+
+msgid "FreeEPG country KW"
+msgstr "科威特"
+
+msgid "FreeEPG country KY"
+msgstr "開曼群島"
+
+msgid "FreeEPG country KZ"
+msgstr "哈薩克"
+
+msgid "FreeEPG country LA"
+msgstr "老撾"
+
+msgid "FreeEPG country LB"
+msgstr "黎巴嫩"
+
+msgid "FreeEPG country LC"
+msgstr "聖盧西亞"
+
+msgid "FreeEPG country LI"
+msgstr "列支敦士登"
+
+msgid "FreeEPG country LK"
+msgstr "斯里蘭卡"
+
+msgid "FreeEPG country LR"
+msgstr "利比里亞"
+
+msgid "FreeEPG country LS"
+msgstr "萊索托"
+
+msgid "FreeEPG country LT"
+msgstr "立陶宛"
+
+msgid "FreeEPG country LU"
+msgstr "盧森堡"
+
+msgid "FreeEPG country LV"
+msgstr "拉脫維亞"
+
+msgid "FreeEPG country LY"
+msgstr "利比亞"
+
+msgid "FreeEPG country MA"
+msgstr "摩洛哥"
+
+msgid "FreeEPG country MC"
+msgstr "摩納哥"
+
+msgid "FreeEPG country MD"
+msgstr "摩爾多瓦"
+
+msgid "FreeEPG country ME"
+msgstr "黑山"
+
+msgid "FreeEPG country MF"
+msgstr "法屬聖馬丁"
+
+msgid "FreeEPG country MG"
+msgstr "馬達加斯加"
+
+msgid "FreeEPG country MH"
+msgstr "馬紹爾群島"
+
+msgid "FreeEPG country MK"
+msgstr "北馬其頓"
+
+msgid "FreeEPG country ML"
+msgstr "馬里"
+
+msgid "FreeEPG country MM"
+msgstr "緬甸"
+
+msgid "FreeEPG country MN"
+msgstr "蒙古"
+
+msgid "FreeEPG country MO"
+msgstr "中國澳門特別行政區"
+
+msgid "FreeEPG country MP"
+msgstr "北馬利安納群島"
+
+msgid "FreeEPG country MQ"
+msgstr "馬丁尼克"
+
+msgid "FreeEPG country MR"
+msgstr "毛里塔尼亞"
+
+msgid "FreeEPG country MS"
+msgstr "蒙特塞拉特"
+
+msgid "FreeEPG country MT"
+msgstr "馬耳他"
+
+msgid "FreeEPG country MU"
+msgstr "毛里裘斯"
+
+msgid "FreeEPG country MV"
+msgstr "馬爾代夫"
+
+msgid "FreeEPG country MW"
+msgstr "馬拉維"
+
+msgid "FreeEPG country MX"
+msgstr "墨西哥"
+
+msgid "FreeEPG country MY"
+msgstr "馬來西亞"
+
+msgid "FreeEPG country MZ"
+msgstr "莫桑比克"
+
+msgid "FreeEPG country NA"
+msgstr "納米比亞"
+
+msgid "FreeEPG country NC"
+msgstr "新喀里多尼亞"
+
+msgid "FreeEPG country NE"
+msgstr "尼日爾"
+
+msgid "FreeEPG country NF"
+msgstr "諾福克島"
+
+msgid "FreeEPG country NG"
+msgstr "尼日利亞"
+
+msgid "FreeEPG country NH"
+msgstr "瓦努阿圖"
+
+msgid "FreeEPG country NI"
+msgstr "尼加拉瓜"
+
+msgid "FreeEPG country NL"
+msgstr "荷蘭"
+
+msgid "FreeEPG country NO"
+msgstr "挪威"
+
+msgid "FreeEPG country NP"
+msgstr "尼泊爾"
+
+msgid "FreeEPG country NR"
+msgstr "瑙魯"
+
+msgid "FreeEPG country NU"
+msgstr "紐埃島"
+
+msgid "FreeEPG country NZ"
+msgstr "紐西蘭"
+
+msgid "FreeEPG country OM"
+msgstr "阿曼"
+
+msgid "FreeEPG country PA"
+msgstr "巴拿馬"
+
+msgid "FreeEPG country PE"
+msgstr "秘魯"
+
+msgid "FreeEPG country PF"
+msgstr "法屬波利尼西亞"
+
+msgid "FreeEPG country PG"
+msgstr "巴布亞新畿內亞"
+
+msgid "FreeEPG country PH"
+msgstr "菲律賓"
+
+msgid "FreeEPG country PK"
+msgstr "巴基斯坦"
+
+msgid "FreeEPG country PL"
+msgstr "波蘭"
+
+msgid "FreeEPG country PM"
+msgstr "聖皮埃與密克隆群島"
+
+msgid "FreeEPG country PN"
+msgstr "皮特凱恩島"
+
+msgid "FreeEPG country PR"
+msgstr "波多黎各"
+
+msgid "FreeEPG country PS"
+msgstr "巴勒斯坦領土"
+
+msgid "FreeEPG country PT"
+msgstr "葡萄牙"
+
+msgid "FreeEPG country PW"
+msgstr "帛琉"
+
+msgid "FreeEPG country PY"
+msgstr "巴拉圭"
+
+msgid "FreeEPG country QA"
+msgstr "卡塔爾"
+
+msgid "FreeEPG country QO"
+msgstr "大洋洲邊疆群島"
+
+msgid "FreeEPG country RE"
+msgstr "留尼旺"
+
+msgid "FreeEPG country RH"
+msgstr "津巴布韋"
+
+msgid "FreeEPG country RO"
+msgstr "羅馬尼亞"
+
+msgid "FreeEPG country RS"
+msgstr "塞爾維亞"
+
+msgid "FreeEPG country RU"
+msgstr "俄羅斯"
+
+msgid "FreeEPG country RW"
+msgstr "盧旺達"
+
+msgid "FreeEPG country SA"
+msgstr "沙地阿拉伯"
+
+msgid "FreeEPG country SB"
+msgstr "所羅門群島"
+
+msgid "FreeEPG country SC"
+msgstr "塞舌爾"
+
+msgid "FreeEPG country SD"
+msgstr "蘇丹"
+
+msgid "FreeEPG country SE"
+msgstr "瑞典"
+
+msgid "FreeEPG country SG"
+msgstr "新加坡"
+
+msgid "FreeEPG country SH"
+msgstr "聖赫勒拿島"
+
+msgid "FreeEPG country SI"
+msgstr "斯洛文尼亞"
+
+msgid "FreeEPG country SJ"
+msgstr "斯瓦爾巴特群島及揚馬延島"
+
+msgid "FreeEPG country SK"
+msgstr "斯洛伐克"
+
+msgid "FreeEPG country SL"
+msgstr "塞拉利昂"
+
+msgid "FreeEPG country SM"
+msgstr "聖馬力諾"
+
+msgid "FreeEPG country SN"
+msgstr "塞內加爾"
+
+msgid "FreeEPG country SO"
+msgstr "索馬里"
+
+msgid "FreeEPG country SR"
+msgstr "蘇里南"
+
+msgid "FreeEPG country SS"
+msgstr "南蘇丹"
+
+msgid "FreeEPG country ST"
+msgstr "聖多美和普林西比"
+
+msgid "FreeEPG country SU"
+msgstr "俄羅斯"
+
+msgid "FreeEPG country SV"
+msgstr "薩爾瓦多"
+
+msgid "FreeEPG country SX"
+msgstr "荷屬聖馬丁"
+
+msgid "FreeEPG country SY"
+msgstr "敘利亞"
+
+msgid "FreeEPG country SZ"
+msgstr "斯威士蘭"
+
+msgid "FreeEPG country TA"
+msgstr "特里斯坦達庫尼亞群島"
+
+msgid "FreeEPG country TC"
+msgstr "特克斯和凱科斯群島"
+
+msgid "FreeEPG country TD"
+msgstr "乍得"
+
+msgid "FreeEPG country TF"
+msgstr "法屬南部領地"
+
+msgid "FreeEPG country TG"
+msgstr "多哥"
+
+msgid "FreeEPG country TH"
+msgstr "泰國"
+
+msgid "FreeEPG country TJ"
+msgstr "塔吉克"
+
+msgid "FreeEPG country TK"
+msgstr "托克勞群島"
+
+msgid "FreeEPG country TL"
+msgstr "東帝汶"
+
+msgid "FreeEPG country TM"
+msgstr "土庫曼"
+
+msgid "FreeEPG country TN"
+msgstr "突尼西亞"
+
+msgid "FreeEPG country TO"
+msgstr "湯加"
+
+msgid "FreeEPG country TP"
+msgstr "東帝汶"
+
+msgid "FreeEPG country TR"
+msgstr "土耳其"
+
+msgid "FreeEPG country TT"
+msgstr "千里達和多巴哥"
+
+msgid "FreeEPG country TV"
+msgstr "圖瓦盧"
+
+msgid "FreeEPG country TW"
+msgstr "台灣"
+
+msgid "FreeEPG country TZ"
+msgstr "坦桑尼亞"
+
+msgid "FreeEPG country UA"
+msgstr "烏克蘭"
+
+msgid "FreeEPG country UG"
+msgstr "烏干達"
+
+msgid "FreeEPG country UK"
+msgstr "英國"
+
+msgid "FreeEPG country UM"
+msgstr "美國本土外小島嶼"
+
+msgid "FreeEPG country UN"
+msgstr "聯合國"
+
+msgid "FreeEPG country US"
+msgstr "美國"
+
+msgid "FreeEPG country UY"
+msgstr "烏拉圭"
+
+msgid "FreeEPG country UZ"
+msgstr "烏茲別克"
+
+msgid "FreeEPG country VA"
+msgstr "梵蒂岡"
+
+msgid "FreeEPG country VC"
+msgstr "聖文森特和格林納丁斯"
+
+msgid "FreeEPG country VD"
+msgstr "越南"
+
+msgid "FreeEPG country VE"
+msgstr "委內瑞拉"
+
+msgid "FreeEPG country VG"
+msgstr "英屬維爾京群島"
+
+msgid "FreeEPG country VI"
+msgstr "美屬維爾京群島"
+
+msgid "FreeEPG country VN"
+msgstr "越南"
+
+msgid "FreeEPG country VU"
+msgstr "瓦努阿圖"
+
+msgid "FreeEPG country WF"
+msgstr "瓦利斯群島和富圖那群島"
+
+msgid "FreeEPG country WS"
+msgstr "薩摩亞"
+
+msgid "FreeEPG country XA"
+msgstr "偽區域"
+
+msgid "FreeEPG country XB"
+msgstr "偽比迪"
+
+msgid "FreeEPG country XK"
+msgstr "科索沃"
+
+msgid "FreeEPG country YD"
+msgstr "也門"
+
+msgid "FreeEPG country YE"
+msgstr "也門"
+
+msgid "FreeEPG country YT"
+msgstr "馬約特"
+
+msgid "FreeEPG country YU"
+msgstr "塞爾維亞"
+
+msgid "FreeEPG country ZA"
+msgstr "南非"
+
+msgid "FreeEPG country ZM"
+msgstr "贊比亞"
+
+msgid "FreeEPG country ZR"
+msgstr "剛果（金夏沙）"
+
+msgid "FreeEPG country ZW"
+msgstr "津巴布韋"
+
+msgid "FreeEPG country ZZ"
+msgstr "未知區域"
+
+msgid "No FreeEPG countries are available."
+msgstr "FreeEPG 暫無可用國家或地區。"
+
+msgid "Select a country"
+msgstr "選擇國家或地區"
+
+msgid "Showing the saved country list."
+msgstr "正在顯示已儲存的國家或地區清單。"

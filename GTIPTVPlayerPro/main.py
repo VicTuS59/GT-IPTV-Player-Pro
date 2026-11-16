@@ -18,7 +18,7 @@ from .source_loader import SourceLoader
 import textwrap
 import time
 
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 try:
     from Components.FileList import FileList
 except ImportError:

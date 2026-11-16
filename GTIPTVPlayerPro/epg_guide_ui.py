@@ -8,7 +8,7 @@ import threading
 import time
 import xml.etree.ElementTree as ET
 
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from .ui_update import set_visible
 from .ui_update import set_foreground, set_value
 from .typography import set_text_if_changed

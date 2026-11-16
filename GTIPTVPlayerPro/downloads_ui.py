@@ -7,7 +7,7 @@ import threading
 import time
 
 from .ui_update import set_value
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from .ui_update import set_visible
 from .ui_update import set_foreground
 from .typography import set_text_if_changed

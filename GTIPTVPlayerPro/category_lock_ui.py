@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Small remote-control code entry screen for the category edit lock."""
 
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.Label import Label
 from Screens.Screen import Screen
 from enigma import getDesktop

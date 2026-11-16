@@ -4,7 +4,7 @@
 from xml.etree import ElementTree as ET
 import sys
 from .ui_update import set_visible
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from .i18n import _, device_language, localized_upper
 from .paths import plugin_path
 from .remote_footer import footer_item, remote_action_text

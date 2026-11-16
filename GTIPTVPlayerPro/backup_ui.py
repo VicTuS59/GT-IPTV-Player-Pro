@@ -6,7 +6,7 @@
 import os
 import threading
 
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.FileList import FileList
 from Components.Label import Label
 from Components.ProgressBar import ProgressBar

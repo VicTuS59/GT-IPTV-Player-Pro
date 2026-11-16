@@ -6,7 +6,7 @@
 import datetime
 import re
 import time
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from .ui_update import set_visible
 from .typography import set_text_if_changed
 from Components.Label import Label

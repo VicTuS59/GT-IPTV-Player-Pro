@@ -11,7 +11,7 @@ from .typography import set_text_if_changed
 
 from .vod_grid import LatestPosterWorkers
 
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Screens.ChoiceBox import ChoiceBox

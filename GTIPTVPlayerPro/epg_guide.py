@@ -169,11 +169,11 @@ def load_guide(client, item, day=None):
         return _stalker_guide(client, item, day)
     if kind == "m3u":
         from .m3u_epg_settings import get_m3u_epg_binding
-        from .m3u_epg import M3UEPGError, read_guide_events
+        from .m3u_epg import M3UEPGError, binding_fingerprint, read_guide_events
         binding = get_m3u_epg_binding(client.account.source_id)
         if binding is None or not binding.enabled:
             return GuideBatch()
-        tvg_id = client.resolved_epg_id(item.stream_id, binding.fingerprint)
+        tvg_id = client.resolved_epg_id(item.stream_id, binding_fingerprint(binding, client.account.source_id))
         if not tvg_id:
             return GuideBatch()
         deadline = client._operation_deadline()

@@ -1,0 +1,861 @@
+# FreeEPG settings and region labels
+# Region display names from Unicode CLDR. See LICENSING.md.
+msgid ""
+msgstr ""
+"Language: nn\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Could not open the country list."
+msgstr "Kunne ikkje opne landslista."
+
+msgid "Custom URL"
+msgstr "Eigendefinert URL"
+
+msgid "FreeEPG country AC"
+msgstr "Ascension"
+
+msgid "FreeEPG country AD"
+msgstr "Andorra"
+
+msgid "FreeEPG country AE"
+msgstr "Dei sameinte arabiske emirata"
+
+msgid "FreeEPG country AF"
+msgstr "Afghanistan"
+
+msgid "FreeEPG country AG"
+msgstr "Antigua og Barbuda"
+
+msgid "FreeEPG country AI"
+msgstr "Anguilla"
+
+msgid "FreeEPG country AL"
+msgstr "Albania"
+
+msgid "FreeEPG country AM"
+msgstr "Armenia"
+
+msgid "FreeEPG country AN"
+msgstr "Curaçao"
+
+msgid "FreeEPG country AO"
+msgstr "Angola"
+
+msgid "FreeEPG country AQ"
+msgstr "Antarktis"
+
+msgid "FreeEPG country AR"
+msgstr "Argentina"
+
+msgid "FreeEPG country AS"
+msgstr "Amerikansk Samoa"
+
+msgid "FreeEPG country AT"
+msgstr "Austerrike"
+
+msgid "FreeEPG country AU"
+msgstr "Australia"
+
+msgid "FreeEPG country AW"
+msgstr "Aruba"
+
+msgid "FreeEPG country AX"
+msgstr "Åland"
+
+msgid "FreeEPG country AZ"
+msgstr "Aserbajdsjan"
+
+msgid "FreeEPG country BA"
+msgstr "Bosnia-Hercegovina"
+
+msgid "FreeEPG country BB"
+msgstr "Barbados"
+
+msgid "FreeEPG country BD"
+msgstr "Bangladesh"
+
+msgid "FreeEPG country BE"
+msgstr "Belgia"
+
+msgid "FreeEPG country BF"
+msgstr "Burkina Faso"
+
+msgid "FreeEPG country BG"
+msgstr "Bulgaria"
+
+msgid "FreeEPG country BH"
+msgstr "Bahrain"
+
+msgid "FreeEPG country BI"
+msgstr "Burundi"
+
+msgid "FreeEPG country BJ"
+msgstr "Benin"
+
+msgid "FreeEPG country BL"
+msgstr "Saint-Barthélemy"
+
+msgid "FreeEPG country BM"
+msgstr "Bermuda"
+
+msgid "FreeEPG country BN"
+msgstr "Brunei"
+
+msgid "FreeEPG country BO"
+msgstr "Bolivia"
+
+msgid "FreeEPG country BQ"
+msgstr "Karibisk Nederland"
+
+msgid "FreeEPG country BR"
+msgstr "Brasil"
+
+msgid "FreeEPG country BS"
+msgstr "Bahamas"
+
+msgid "FreeEPG country BT"
+msgstr "Bhutan"
+
+msgid "FreeEPG country BU"
+msgstr "Myanmar (Burma)"
+
+msgid "FreeEPG country BV"
+msgstr "Bouvetøya"
+
+msgid "FreeEPG country BW"
+msgstr "Botswana"
+
+msgid "FreeEPG country BY"
+msgstr "Belarus"
+
+msgid "FreeEPG country BZ"
+msgstr "Belize"
+
+msgid "FreeEPG country CA"
+msgstr "Canada"
+
+msgid "FreeEPG country CC"
+msgstr "Kokosøyane"
+
+msgid "FreeEPG country CD"
+msgstr "Kongo-Kinshasa"
+
+msgid "FreeEPG country CF"
+msgstr "Den sentralafrikanske republikken"
+
+msgid "FreeEPG country CG"
+msgstr "Kongo-Brazzaville"
+
+msgid "FreeEPG country CH"
+msgstr "Sveits"
+
+msgid "FreeEPG country CI"
+msgstr "Elfenbeinskysten"
+
+msgid "FreeEPG country CK"
+msgstr "Cookøyane"
+
+msgid "FreeEPG country CL"
+msgstr "Chile"
+
+msgid "FreeEPG country CM"
+msgstr "Kamerun"
+
+msgid "FreeEPG country CN"
+msgstr "Kina"
+
+msgid "FreeEPG country CO"
+msgstr "Colombia"
+
+msgid "FreeEPG country CP"
+msgstr "Clippertonøya"
+
+msgid "FreeEPG country CQ"
+msgstr "Sark"
+
+msgid "FreeEPG country CR"
+msgstr "Costa Rica"
+
+msgid "FreeEPG country CS"
+msgstr "Serbia"
+
+msgid "FreeEPG country CU"
+msgstr "Cuba"
+
+msgid "FreeEPG country CV"
+msgstr "Kapp Verde"
+
+msgid "FreeEPG country CW"
+msgstr "Curaçao"
+
+msgid "FreeEPG country CX"
+msgstr "Christmasøya"
+
+msgid "FreeEPG country CY"
+msgstr "Kypros"
+
+msgid "FreeEPG country CZ"
+msgstr "Tsjekkia"
+
+msgid "FreeEPG country DD"
+msgstr "Tyskland"
+
+msgid "FreeEPG country DE"
+msgstr "Tyskland"
+
+msgid "FreeEPG country DG"
+msgstr "Diego Garcia"
+
+msgid "FreeEPG country DJ"
+msgstr "Djibouti"
+
+msgid "FreeEPG country DK"
+msgstr "Danmark"
+
+msgid "FreeEPG country DM"
+msgstr "Dominica"
+
+msgid "FreeEPG country DO"
+msgstr "Den dominikanske republikken"
+
+msgid "FreeEPG country DY"
+msgstr "Benin"
+
+msgid "FreeEPG country DZ"
+msgstr "Algerie"
+
+msgid "FreeEPG country EA"
+msgstr "Ceuta og Melilla"
+
+msgid "FreeEPG country EC"
+msgstr "Ecuador"
+
+msgid "FreeEPG country EE"
+msgstr "Estland"
+
+msgid "FreeEPG country EG"
+msgstr "Egypt"
+
+msgid "FreeEPG country EH"
+msgstr "Vest-Sahara"
+
+msgid "FreeEPG country ER"
+msgstr "Eritrea"
+
+msgid "FreeEPG country ES"
+msgstr "Spania"
+
+msgid "FreeEPG country ET"
+msgstr "Etiopia"
+
+msgid "FreeEPG country EU"
+msgstr "Den europeiske unionen"
+
+msgid "FreeEPG country EZ"
+msgstr "eurosona"
+
+msgid "FreeEPG country FI"
+msgstr "Finland"
+
+msgid "FreeEPG country FJ"
+msgstr "Fiji"
+
+msgid "FreeEPG country FK"
+msgstr "Falklandsøyane"
+
+msgid "FreeEPG country FM"
+msgstr "Mikronesiaføderasjonen"
+
+msgid "FreeEPG country FO"
+msgstr "Færøyane"
+
+msgid "FreeEPG country FR"
+msgstr "Frankrike"
+
+msgid "FreeEPG country FX"
+msgstr "Frankrike"
+
+msgid "FreeEPG country GA"
+msgstr "Gabon"
+
+msgid "FreeEPG country GB"
+msgstr "Storbritannia"
+
+msgid "FreeEPG country GD"
+msgstr "Grenada"
+
+msgid "FreeEPG country GE"
+msgstr "Georgia"
+
+msgid "FreeEPG country GF"
+msgstr "Fransk Guyana"
+
+msgid "FreeEPG country GG"
+msgstr "Guernsey"
+
+msgid "FreeEPG country GH"
+msgstr "Ghana"
+
+msgid "FreeEPG country GI"
+msgstr "Gibraltar"
+
+msgid "FreeEPG country GL"
+msgstr "Grønland"
+
+msgid "FreeEPG country GM"
+msgstr "Gambia"
+
+msgid "FreeEPG country GN"
+msgstr "Guinea"
+
+msgid "FreeEPG country GP"
+msgstr "Guadeloupe"
+
+msgid "FreeEPG country GQ"
+msgstr "Ekvatorial-Guinea"
+
+msgid "FreeEPG country GR"
+msgstr "Hellas"
+
+msgid "FreeEPG country GS"
+msgstr "Sør-Georgia og Sør-Sandwichøyane"
+
+msgid "FreeEPG country GT"
+msgstr "Guatemala"
+
+msgid "FreeEPG country GU"
+msgstr "Guam"
+
+msgid "FreeEPG country GW"
+msgstr "Guinea-Bissau"
+
+msgid "FreeEPG country GY"
+msgstr "Guyana"
+
+msgid "FreeEPG country HK"
+msgstr "Hongkong SAR Kina"
+
+msgid "FreeEPG country HM"
+msgstr "Heardøya og McDonaldøyane"
+
+msgid "FreeEPG country HN"
+msgstr "Honduras"
+
+msgid "FreeEPG country HR"
+msgstr "Kroatia"
+
+msgid "FreeEPG country HT"
+msgstr "Haiti"
+
+msgid "FreeEPG country HU"
+msgstr "Ungarn"
+
+msgid "FreeEPG country HV"
+msgstr "Burkina Faso"
+
+msgid "FreeEPG country IC"
+msgstr "Kanariøyane"
+
+msgid "FreeEPG country ID"
+msgstr "Indonesia"
+
+msgid "FreeEPG country IE"
+msgstr "Irland"
+
+msgid "FreeEPG country IL"
+msgstr "Israel"
+
+msgid "FreeEPG country IM"
+msgstr "Man"
+
+msgid "FreeEPG country IN"
+msgstr "India"
+
+msgid "FreeEPG country IO"
+msgstr "Det britiske territoriet i Indiahavet"
+
+msgid "FreeEPG country IQ"
+msgstr "Irak"
+
+msgid "FreeEPG country IR"
+msgstr "Iran"
+
+msgid "FreeEPG country IS"
+msgstr "Island"
+
+msgid "FreeEPG country IT"
+msgstr "Italia"
+
+msgid "FreeEPG country JE"
+msgstr "Jersey"
+
+msgid "FreeEPG country JM"
+msgstr "Jamaica"
+
+msgid "FreeEPG country JO"
+msgstr "Jordan"
+
+msgid "FreeEPG country JP"
+msgstr "Japan"
+
+msgid "FreeEPG country KE"
+msgstr "Kenya"
+
+msgid "FreeEPG country KG"
+msgstr "Kirgisistan"
+
+msgid "FreeEPG country KH"
+msgstr "Kambodsja"
+
+msgid "FreeEPG country KI"
+msgstr "Kiribati"
+
+msgid "FreeEPG country KM"
+msgstr "Komorane"
+
+msgid "FreeEPG country KN"
+msgstr "Saint Kitts og Nevis"
+
+msgid "FreeEPG country KP"
+msgstr "Nord-Korea"
+
+msgid "FreeEPG country KR"
+msgstr "Sør-Korea"
+
+msgid "FreeEPG country KW"
+msgstr "Kuwait"
+
+msgid "FreeEPG country KY"
+msgstr "Caymanøyane"
+
+msgid "FreeEPG country KZ"
+msgstr "Kasakhstan"
+
+msgid "FreeEPG country LA"
+msgstr "Laos"
+
+msgid "FreeEPG country LB"
+msgstr "Libanon"
+
+msgid "FreeEPG country LC"
+msgstr "St. Lucia"
+
+msgid "FreeEPG country LI"
+msgstr "Liechtenstein"
+
+msgid "FreeEPG country LK"
+msgstr "Sri Lanka"
+
+msgid "FreeEPG country LR"
+msgstr "Liberia"
+
+msgid "FreeEPG country LS"
+msgstr "Lesotho"
+
+msgid "FreeEPG country LT"
+msgstr "Litauen"
+
+msgid "FreeEPG country LU"
+msgstr "Luxembourg"
+
+msgid "FreeEPG country LV"
+msgstr "Latvia"
+
+msgid "FreeEPG country LY"
+msgstr "Libya"
+
+msgid "FreeEPG country MA"
+msgstr "Marokko"
+
+msgid "FreeEPG country MC"
+msgstr "Monaco"
+
+msgid "FreeEPG country MD"
+msgstr "Moldova"
+
+msgid "FreeEPG country ME"
+msgstr "Montenegro"
+
+msgid "FreeEPG country MF"
+msgstr "Saint-Martin"
+
+msgid "FreeEPG country MG"
+msgstr "Madagaskar"
+
+msgid "FreeEPG country MH"
+msgstr "Marshalløyane"
+
+msgid "FreeEPG country MK"
+msgstr "Nord-Makedonia"
+
+msgid "FreeEPG country ML"
+msgstr "Mali"
+
+msgid "FreeEPG country MM"
+msgstr "Myanmar (Burma)"
+
+msgid "FreeEPG country MN"
+msgstr "Mongolia"
+
+msgid "FreeEPG country MO"
+msgstr "Macao SAR Kina"
+
+msgid "FreeEPG country MP"
+msgstr "Nord-Marianane"
+
+msgid "FreeEPG country MQ"
+msgstr "Martinique"
+
+msgid "FreeEPG country MR"
+msgstr "Mauritania"
+
+msgid "FreeEPG country MS"
+msgstr "Montserrat"
+
+msgid "FreeEPG country MT"
+msgstr "Malta"
+
+msgid "FreeEPG country MU"
+msgstr "Mauritius"
+
+msgid "FreeEPG country MV"
+msgstr "Maldivane"
+
+msgid "FreeEPG country MW"
+msgstr "Malawi"
+
+msgid "FreeEPG country MX"
+msgstr "Mexico"
+
+msgid "FreeEPG country MY"
+msgstr "Malaysia"
+
+msgid "FreeEPG country MZ"
+msgstr "Mosambik"
+
+msgid "FreeEPG country NA"
+msgstr "Namibia"
+
+msgid "FreeEPG country NC"
+msgstr "Ny-Caledonia"
+
+msgid "FreeEPG country NE"
+msgstr "Niger"
+
+msgid "FreeEPG country NF"
+msgstr "Norfolkøya"
+
+msgid "FreeEPG country NG"
+msgstr "Nigeria"
+
+msgid "FreeEPG country NH"
+msgstr "Vanuatu"
+
+msgid "FreeEPG country NI"
+msgstr "Nicaragua"
+
+msgid "FreeEPG country NL"
+msgstr "Nederland"
+
+msgid "FreeEPG country NO"
+msgstr "Noreg"
+
+msgid "FreeEPG country NP"
+msgstr "Nepal"
+
+msgid "FreeEPG country NR"
+msgstr "Nauru"
+
+msgid "FreeEPG country NU"
+msgstr "Niue"
+
+msgid "FreeEPG country NZ"
+msgstr "New Zealand"
+
+msgid "FreeEPG country OM"
+msgstr "Oman"
+
+msgid "FreeEPG country PA"
+msgstr "Panama"
+
+msgid "FreeEPG country PE"
+msgstr "Peru"
+
+msgid "FreeEPG country PF"
+msgstr "Fransk Polynesia"
+
+msgid "FreeEPG country PG"
+msgstr "Papua Ny-Guinea"
+
+msgid "FreeEPG country PH"
+msgstr "Filippinane"
+
+msgid "FreeEPG country PK"
+msgstr "Pakistan"
+
+msgid "FreeEPG country PL"
+msgstr "Polen"
+
+msgid "FreeEPG country PM"
+msgstr "Saint-Pierre-et-Miquelon"
+
+msgid "FreeEPG country PN"
+msgstr "Pitcairn"
+
+msgid "FreeEPG country PR"
+msgstr "Puerto Rico"
+
+msgid "FreeEPG country PS"
+msgstr "Det palestinske området"
+
+msgid "FreeEPG country PT"
+msgstr "Portugal"
+
+msgid "FreeEPG country PW"
+msgstr "Palau"
+
+msgid "FreeEPG country PY"
+msgstr "Paraguay"
+
+msgid "FreeEPG country QA"
+msgstr "Qatar"
+
+msgid "FreeEPG country QO"
+msgstr "Ytre Oseania"
+
+msgid "FreeEPG country RE"
+msgstr "Réunion"
+
+msgid "FreeEPG country RH"
+msgstr "Zimbabwe"
+
+msgid "FreeEPG country RO"
+msgstr "Romania"
+
+msgid "FreeEPG country RS"
+msgstr "Serbia"
+
+msgid "FreeEPG country RU"
+msgstr "Russland"
+
+msgid "FreeEPG country RW"
+msgstr "Rwanda"
+
+msgid "FreeEPG country SA"
+msgstr "Saudi-Arabia"
+
+msgid "FreeEPG country SB"
+msgstr "Salomonøyane"
+
+msgid "FreeEPG country SC"
+msgstr "Seychellane"
+
+msgid "FreeEPG country SD"
+msgstr "Sudan"
+
+msgid "FreeEPG country SE"
+msgstr "Sverige"
+
+msgid "FreeEPG country SG"
+msgstr "Singapore"
+
+msgid "FreeEPG country SH"
+msgstr "Saint Helena"
+
+msgid "FreeEPG country SI"
+msgstr "Slovenia"
+
+msgid "FreeEPG country SJ"
+msgstr "Svalbard og Jan Mayen"
+
+msgid "FreeEPG country SK"
+msgstr "Slovakia"
+
+msgid "FreeEPG country SL"
+msgstr "Sierra Leone"
+
+msgid "FreeEPG country SM"
+msgstr "San Marino"
+
+msgid "FreeEPG country SN"
+msgstr "Senegal"
+
+msgid "FreeEPG country SO"
+msgstr "Somalia"
+
+msgid "FreeEPG country SR"
+msgstr "Surinam"
+
+msgid "FreeEPG country SS"
+msgstr "Sør-Sudan"
+
+msgid "FreeEPG country ST"
+msgstr "São Tomé og Príncipe"
+
+msgid "FreeEPG country SU"
+msgstr "Russland"
+
+msgid "FreeEPG country SV"
+msgstr "El Salvador"
+
+msgid "FreeEPG country SX"
+msgstr "Sint Maarten"
+
+msgid "FreeEPG country SY"
+msgstr "Syria"
+
+msgid "FreeEPG country SZ"
+msgstr "Eswatini"
+
+msgid "FreeEPG country TA"
+msgstr "Tristan da Cunha"
+
+msgid "FreeEPG country TC"
+msgstr "Turks- og Caicosøyane"
+
+msgid "FreeEPG country TD"
+msgstr "Tsjad"
+
+msgid "FreeEPG country TF"
+msgstr "Dei franske sørterritoria"
+
+msgid "FreeEPG country TG"
+msgstr "Togo"
+
+msgid "FreeEPG country TH"
+msgstr "Thailand"
+
+msgid "FreeEPG country TJ"
+msgstr "Tadsjikistan"
+
+msgid "FreeEPG country TK"
+msgstr "Tokelau"
+
+msgid "FreeEPG country TL"
+msgstr "Aust-Timor"
+
+msgid "FreeEPG country TM"
+msgstr "Turkmenistan"
+
+msgid "FreeEPG country TN"
+msgstr "Tunisia"
+
+msgid "FreeEPG country TO"
+msgstr "Tonga"
+
+msgid "FreeEPG country TP"
+msgstr "Aust-Timor"
+
+msgid "FreeEPG country TR"
+msgstr "Tyrkia"
+
+msgid "FreeEPG country TT"
+msgstr "Trinidad og Tobago"
+
+msgid "FreeEPG country TV"
+msgstr "Tuvalu"
+
+msgid "FreeEPG country TW"
+msgstr "Taiwan"
+
+msgid "FreeEPG country TZ"
+msgstr "Tanzania"
+
+msgid "FreeEPG country UA"
+msgstr "Ukraina"
+
+msgid "FreeEPG country UG"
+msgstr "Uganda"
+
+msgid "FreeEPG country UK"
+msgstr "Storbritannia"
+
+msgid "FreeEPG country UM"
+msgstr "USAs ytre småøyar"
+
+msgid "FreeEPG country UN"
+msgstr "Dei sameinte nasjonane"
+
+msgid "FreeEPG country US"
+msgstr "USA"
+
+msgid "FreeEPG country UY"
+msgstr "Uruguay"
+
+msgid "FreeEPG country UZ"
+msgstr "Usbekistan"
+
+msgid "FreeEPG country VA"
+msgstr "Vatikanstaten"
+
+msgid "FreeEPG country VC"
+msgstr "St. Vincent og Grenadinane"
+
+msgid "FreeEPG country VD"
+msgstr "Vietnam"
+
+msgid "FreeEPG country VE"
+msgstr "Venezuela"
+
+msgid "FreeEPG country VG"
+msgstr "Dei britiske Jomfruøyane"
+
+msgid "FreeEPG country VI"
+msgstr "Dei amerikanske Jomfruøyane"
+
+msgid "FreeEPG country VN"
+msgstr "Vietnam"
+
+msgid "FreeEPG country VU"
+msgstr "Vanuatu"
+
+msgid "FreeEPG country WF"
+msgstr "Wallis og Futuna"
+
+msgid "FreeEPG country WS"
+msgstr "Samoa"
+
+msgid "FreeEPG country XA"
+msgstr "pseudospråk – aksentar"
+
+msgid "FreeEPG country XB"
+msgstr "pseudospråk – RTL"
+
+msgid "FreeEPG country XK"
+msgstr "Kosovo"
+
+msgid "FreeEPG country YD"
+msgstr "Jemen"
+
+msgid "FreeEPG country YE"
+msgstr "Jemen"
+
+msgid "FreeEPG country YT"
+msgstr "Mayotte"
+
+msgid "FreeEPG country YU"
+msgstr "Serbia"
+
+msgid "FreeEPG country ZA"
+msgstr "Sør-Afrika"
+
+msgid "FreeEPG country ZM"
+msgstr "Zambia"
+
+msgid "FreeEPG country ZR"
+msgstr "Kongo-Kinshasa"
+
+msgid "FreeEPG country ZW"
+msgstr "Zimbabwe"
+
+msgid "FreeEPG country ZZ"
+msgstr "ukjent område"
+
+msgid "No FreeEPG countries are available."
+msgstr "Ingen land er tilgjengelege i FreeEPG."
+
+msgid "Select a country"
+msgstr "Vel eit land"
+
+msgid "Showing the saved country list."
+msgstr "Den lagra landslista blir vist."

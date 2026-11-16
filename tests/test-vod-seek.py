@@ -1,7 +1,7 @@
 """Exercise the shipped VOD seek methods with inert native service adapters."""
 import ast,importlib,sys,types,unittest
 from pathlib import Path
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 P=Path(__file__).resolve().parents[1]/'GTIPTVPlayerPro'
 PACKAGE='_gt_vod_seek_test'
 package=types.ModuleType(PACKAGE);package.__path__=[str(P)];sys.modules[PACKAGE]=package
@@ -21,15 +21,22 @@ original=next(n for n in root.body if isinstance(n,ast.ClassDef) and n.name=='GT
 NAMES={'_raw_seek_interface','_seek_interface','_seek_seconds','_seek_seconds_precise','_seek_position',
        '_seek_call_failed','_seek_reached','_prepare_subtitle_seek','_complete_subtitle_seek',
        '_cancel_seek_verification','_schedule_seek_verification','_request_seek','_verify_seek_result',
-       '_seek_immediately','_begin_or_adjust_seek','confirm_seek','_seek_unavailable','_seek_not_ready',
+       '_seek_immediately','_seek_step_state','_begin_or_adjust_seek','confirm_seek','_seek_unavailable','_seek_not_ready',
+       'seek_forward','seek_backward','_seek_keys_active','_take_seek_key','_finish_seek_key',
+       'seek_right_or_info','seek_left_or_info','_clear_direction_hold','_direction_press',
+       '_direction_release','_direction_hold_timeout','_direction_long',
+       '_preview_seek_key','_handle_seek_key','_is_live_item','_playing_reference_identity','_reference_identity',
+       '_handle_player_key','_bind_player_key_handler','_seek_alias_directions',
+       '_unbind_player_key_handler','_prime_player_key',
        '_pause_interface','pause_playback','resume_playback','_resume_bookmark_position_ready'}
 methods=[node for node in original.body if isinstance(node,ast.FunctionDef) and node.name in NAMES]
 assert len(methods)==len(NAMES)
-namespace=dict(VodSeekSupport=support.VodSeekSupport,N_=lambda value:value,
-    youtube_duration_seconds=lambda item:0,serviceapp_uses_async_seek=lambda kind:kind in (5001,5002),
+namespace=dict(VodSeekSupport=support.VodSeekSupport,SeekKeyHold=support.SeekKeyHold,N_=lambda value:value,
+    youtube_duration_seconds=lambda item:getattr(item, 'youtube_duration', 0),
+    serviceapp_uses_async_seek=lambda kind:kind in (5001,5002),
     reference_service_type=lambda ref,*args:ref.type,_debug=lambda *args:None,log_event=lambda *args:None,
-    SEEK_VERIFY_DELAY_MS=650,SEEK_VERIFY_MAX_CHECKS=2,SEEK_ASYNC_VERIFY_TIMEOUT_SECONDS=12)
-node=ast.ClassDef(name='ActualSeekPlayer',bases=[ast.Name(id='VodSeekSupport',ctx=ast.Load())],keywords=[],body=methods,decorator_list=[])
+    DIRECTION_HOLD_MS=650,SEEK_VERIFY_DELAY_MS=650,SEEK_VERIFY_MAX_CHECKS=2,SEEK_ASYNC_VERIFY_TIMEOUT_SECONDS=12)
+node=ast.ClassDef(name='ActualSeekPlayer',bases=[ast.Name(id=base,ctx=ast.Load()) for base in ('VodSeekSupport','dict')],keywords=[],body=methods,decorator_list=[])
 exec(compile(ast.fix_missing_locations(ast.Module(body=[node],type_ignores=[])),'shipped-seek-methods','exec'),namespace)
 ActualPlayer=namespace['ActualSeekPlayer']
 
@@ -106,6 +113,390 @@ def complete(s,d,clock,target=None,pts=False):
         d.position+=1
         if pts:d.pts+=60000
         tick(s,clock)
+
+
+REMOTE_KEYS = dict(KEY_LEFT=105, KEY_RIGHT=106, KEY_REWIND=168, KEY_FASTFORWARD=208,
+                   KEY_PREVIOUSSONG=165, KEY_NEXTSONG=163, KEY_EXIT=174)
+
+
+class Remote:
+    """Model OpenPLi's suppressed break and OpenATV's long-release flag."""
+    def __init__(self):
+        self.callback = None
+        self.last_key = None
+        self.long = False
+        self.primes = []
+
+    def bindAction(self, context, priority, callback):
+        self.callback = callback
+
+    def unbindAction(self, context, callback):
+        assert self.callback == callback
+        self.callback = None
+
+    def keyPressed(self, device, key, flag):
+        self.primes.append(key)
+        self.send(key, flag)
+
+    def send(self, key, flag):
+        if self.callback is None:
+            return 0
+        if flag == 0:
+            self.last_key, self.long = key, False
+        elif key != self.last_key or (flag == 1 and self.long):
+            return 0
+        elif flag == 3:
+            self.long = True
+        return self.callback(key, flag)
+
+
+def bind_remote(screen, bindings=None, keymap_api='components', key_ids=REMOTE_KEYS):
+    remote = Remote()
+    screen._seek_key_hold = None
+    screen._seek_key_priming = False
+    screen._seek_key_directions = {}
+    screen._seek_key_timer = Timer()
+    screen._direction_hold_timer = Timer()
+    screen._held_direction = None
+    screen._held_direction_long = False
+    screen._minute_seek_open = False
+    screen._aspect_menu_open = False
+    screen._subtitle_message_tokens = set()
+    screen._player_key_ids = {}
+    screen._player_keys_bound = False
+    screen._player_key_callback = screen._handle_player_key
+    screen._player_key_map = None
+    screen._subtitle_sync_keys = Mock()
+    screen._live_zero_key = Mock()
+    screen._handle_live_patch_key = Mock(return_value=False)
+    screen._render_seek_timeline = Mock()
+    screen._reset_live_patch_code = Mock()
+    screen._dismiss_subtitle_sync_offset = Mock()
+    screen['actions'] = types.SimpleNamespace(
+        contexts=('ColorActions', 'InfobarSeekActions', 'InfobarSeekActionsPTS', 'MediaPlayerActions'),
+        actions=dict.fromkeys(('seekBack', 'seekFwd', 'seekBackManual', 'seekFwdManual',
+                               'SeekbarBack', 'SeekbarFwd', 'rewind', 'fastForward', 'fastforward',
+                               'yellow', 'stop', 'left', 'right')),
+    )
+    bindings = bindings or {}
+    keymap = types.SimpleNamespace(queryKeyBinding=lambda context, action: bindings.get((context, action), ()))
+    modules = {'keyids': types.SimpleNamespace(KEYIDS=key_ids),
+               'Components': types.ModuleType('Components'),
+               'Components.ActionMap': keymap if keymap_api == 'components' else types.SimpleNamespace(),
+               'Tools': types.ModuleType('Tools'),
+               'Tools.KeyBindings': keymap if keymap_api == 'tools' else types.SimpleNamespace(),
+               'enigma': types.SimpleNamespace(eActionMap=types.SimpleNamespace(getInstance=lambda: remote))}
+    with patch.dict(sys.modules, modules):
+        screen._bind_player_key_handler()
+    assert remote.callback is not None
+    return remote
+
+
+class RemoteSeekTests(unittest.TestCase):
+    def test_short_seek_is_one_second_each_way(self):
+        sources = (('movie', False), ('series', False), ('movie', True), ('catchup', False))
+        keys = (('KEY_FASTFORWARD', 1), ('KEY_REWIND', -1))
+        for content, is_youtube in sources:
+            for engine in (1, 4097, 5001, 5002):
+                for name, seconds in keys:
+                    with self.subTest(content=content, youtube=is_youtube, engine=engine, button=name):
+                        screen, decoder, navigation, clock = fixture(content, engine)
+                        screen.current_item.youtube_native = is_youtube
+                        remote = bind_remote(screen)
+                        key = REMOTE_KEYS[name]
+                        self.assertEqual(remote.send(key, 0), 1)
+                        self.assertEqual(decoder.commands, [])
+                        clock.now += 0.08
+                        self.assertEqual(remote.send(key, 1), 1)
+                        self.assertEqual(decoder.commands, [('absolute', 100 + seconds)])
+                        self.assertEqual(navigation.plays, [])
+                        self.assertFalse(screen._seek_key_timer.active)
+
+    def test_hold_accelerates_in_one_second_steps_and_seeks_once_on_release(self):
+        for name, direction, delay, interval, repeats in (
+                ('KEY_FASTFORWARD', 1, 0.5, 0.1, 45), ('KEY_REWIND', -1, 4.9, 0.4, 14)):
+            with self.subTest(key=name):
+                screen, decoder, navigation, clock = fixture()
+                remote = bind_remote(screen)
+                key = REMOTE_KEYS[name]
+                frames = []
+                screen._show_seek_overlay.side_effect = lambda title, hint, timeline=None: frames.append((timeline[0], clock.now))
+                screen._render_seek_timeline.side_effect = lambda position, length: frames.append((position, clock.now))
+                remote.send(key, 0)
+                self.assertGreater(screen._seek_key_timer.starts[-1][0], delay * 1000)
+                for index in range(repeats):
+                    clock.now = 100.0 + delay + index * interval
+                    remote.send(key, 2)
+                self.assertEqual(decoder.commands, [])
+                self.assertEqual([frame[0] for frame in frames],
+                                 list(range(100 + direction, 100 + direction * (len(frames) + 1), direction)))
+                self.assertGreater(frames[1][1] - frames[0][1], frames[-1][1] - frames[-2][1])
+                self.assertGreater(len(frames), 6)
+                self.assertEqual(remote.send(key, 5), 1)
+                self.assertEqual(decoder.commands, [('absolute', frames[-1][0])])
+                self.assertIsNone(screen._seek_key_hold)
+                screen._finish_seek_key()
+                self.assertEqual(len(decoder.commands), 1)
+                self.assertEqual(navigation.stops, 0)
+
+    def test_native_long_rearms_break_without_an_extra_step(self):
+        screen, decoder, _, clock = fixture('series')
+        remote = bind_remote(screen)
+        key = REMOTE_KEYS['KEY_FASTFORWARD']
+        remote.send(key, 0)
+        clock.now += 0.6
+        remote.send(key, 2)
+        remote.send(key, 3)
+        remote.send(key, 2)
+        self.assertEqual(remote.primes, [key])
+        self.assertEqual(screen._seek_key_hold.target, 101)
+        self.assertEqual(remote.send(key, 1), 1)
+        self.assertEqual(decoder.commands, [('absolute', 101)])
+
+    def test_missing_release_commits_the_last_displayed_second_once(self):
+        screen, decoder, _, clock = fixture()
+        remote = bind_remote(screen)
+        key = REMOTE_KEYS['KEY_REWIND']
+        remote.send(key, 0)
+        clock.now += 0.6
+        remote.send(key, 2)
+        self.assertEqual(decoder.commands, [])
+        self.assertEqual(screen._seek_key_timer.starts[-1], (support.SeekKeyHold.REPEAT_TIMEOUT_MS, True))
+        screen._finish_seek_key()
+        remote.send(key, 1)
+        self.assertEqual(decoder.commands, [('absolute', 99)])
+
+    def test_second_tap_is_queued_even_when_only_one_second_from_the_first(self):
+        screen, decoder, _, clock = fixture()
+        remote = bind_remote(screen)
+        key = REMOTE_KEYS['KEY_FASTFORWARD']
+        for _ in range(2):
+            remote.send(key, 0)
+            remote.send(key, 1)
+        self.assertEqual(decoder.commands, [('absolute', 101)])
+        self.assertEqual(screen._pending_seek_verification['queued_target'], 102)
+        complete(screen, decoder, clock)
+        self.assertEqual(decoder.commands, [('absolute', 101), ('absolute', 102)])
+
+    def test_seek_respects_boundaries_and_keeps_an_intentional_pause(self):
+        for position, name, edge in ((1, 'KEY_REWIND', 0), (599, 'KEY_FASTFORWARD', 600)):
+            with self.subTest(position=position):
+                screen, decoder, _, clock = fixture()
+                screen._paused = decoder.paused = True
+                decoder.position = position
+                remote = bind_remote(screen)
+                key = REMOTE_KEYS[name]
+                remote.send(key, 0)
+                for index in range(6):
+                    clock.now = 100.5 + index / 4
+                    remote.send(key, 2)
+                remote.send(key, 1)
+                self.assertEqual(decoder.commands, [('absolute', edge)])
+                self.assertTrue(screen._paused)
+                self.assertEqual(decoder.resumes, 0)
+
+    def test_seek_is_discarded_when_playback_or_focus_changes(self):
+        for change in ('unbind', 'new generation', 'another service', 'modal', 'exit'):
+            with self.subTest(change=change):
+                screen, decoder, navigation, clock = fixture()
+                remote = bind_remote(screen)
+                key = REMOTE_KEYS['KEY_FASTFORWARD']
+                remote.send(key, 0)
+                clock.now += 0.6
+                remote.send(key, 2)
+                if change == 'unbind':
+                    screen._unbind_player_key_handler()
+                elif change == 'new generation':
+                    screen._generation += 1
+                elif change == 'another service':
+                    navigation.current = Reference(4097, 'another')
+                elif change == 'modal':
+                    screen.session.current_dialog = object()
+                else:
+                    self.assertEqual(remote.send(REMOTE_KEYS['KEY_EXIT'], 0), 0)
+                screen._finish_seek_key()
+                self.assertEqual(decoder.commands, [])
+                self.assertFalse(screen._seek_key_timer.active)
+
+    def test_live_and_unseekable_startup_do_not_send_seek_requests(self):
+        for content in ('live', 'movie'):
+            with self.subTest(content=content):
+                screen, decoder, _, clock = fixture(content)
+                decoder.length = 0
+                screen._seek_ready = False
+                screen._seek_startup_deadline = clock.now + 8
+                remote = bind_remote(screen)
+                key = REMOTE_KEYS['KEY_FASTFORWARD']
+                expected = 0 if content == 'live' else 1
+                self.assertEqual(remote.send(key, 0), expected)
+                self.assertEqual(remote.send(key, 1), expected)
+                self.assertEqual(decoder.commands, [])
+                if content == 'movie':
+                    screen._show_seek_overlay.assert_called_once_with('Loading...', 'Please wait')
+
+    def test_youtube_can_use_metadata_when_the_first_video_has_no_native_length(self):
+        screen, decoder, navigation, _ = fixture(engine=5002)
+        decoder.length = 0
+        screen.current_item.youtube_native = True
+        screen.current_item.youtube_duration = 600
+        remote = bind_remote(screen)
+        key = REMOTE_KEYS['KEY_FASTFORWARD']
+        remote.send(key, 0)
+        remote.send(key, 1)
+        self.assertEqual(decoder.commands, [('absolute', 101)])
+        self.assertNotIn('guard', screen._pending_seek_verification)
+        self.assertEqual(navigation.stops, 0)
+
+
+class DirectionKeyTests(unittest.TestCase):
+    def test_short_arrows_keep_the_original_movie_series_and_youtube_steps(self):
+        for content, youtube in (('movie', False), ('series', False), ('movie', True)):
+            for name, target in (('KEY_LEFT', 40), ('KEY_RIGHT', 160)):
+                with self.subTest(content=content, youtube=youtube, key=name):
+                    screen, decoder, _, _ = fixture(content)
+                    screen.current_item.youtube_native = youtube
+                    remote = bind_remote(screen)
+                    key = REMOTE_KEYS[name]
+                    self.assertEqual(remote.send(key, 0), 1)
+                    self.assertEqual(remote.send(key, 1), 1)
+                    self.assertEqual(decoder.commands, [('absolute', target)])
+                    self.assertIsNone(screen._seek_key_hold)
+
+    def test_held_arrows_open_the_original_minute_input(self):
+        for name, direction in (('KEY_LEFT', -1), ('KEY_RIGHT', 1)):
+            with self.subTest(key=name):
+                screen, decoder, _, _ = fixture('series')
+                remote = bind_remote(screen)
+                screen.open_minute_seek = Mock()
+                key = REMOTE_KEYS[name]
+                self.assertEqual(remote.send(key, 0), 1)
+                self.assertEqual(screen._direction_hold_timer.starts[-1], (namespace['DIRECTION_HOLD_MS'], True))
+                if direction < 0:
+                    remote.send(key, 2)
+                else:
+                    screen._direction_hold_timeout()
+                remote.send(key, 1)
+                screen.open_minute_seek.assert_called_once_with(direction)
+                self.assertEqual(decoder.commands, [])
+                self.assertFalse(screen._seek_key_timer.active)
+
+    def test_arrows_and_seek_buttons_keep_separate_steps_in_manual_seekbar(self):
+        screen, decoder, _, _ = fixture()
+        remote = bind_remote(screen)
+        screen._seeking = True
+        screen._seek_target = 100
+        screen._seek_length = 600
+        for name, target in (('KEY_RIGHT', 130), ('KEY_FASTFORWARD', 131), ('KEY_LEFT', 101), ('KEY_REWIND', 100)):
+            key = REMOTE_KEYS[name]
+            remote.send(key, 0)
+            remote.send(key, 1)
+            self.assertEqual(screen._seek_target, target)
+        self.assertEqual(decoder.commands, [])
+
+    def test_live_and_catchup_arrows_leave_shortcuts_to_the_original_action_map(self):
+        for content in ('live', 'catchup'):
+            with self.subTest(content=content):
+                screen, decoder, _, _ = fixture(content)
+                remote = bind_remote(screen)
+                for name, action in (('KEY_LEFT', screen.seek_left_or_info), ('KEY_RIGHT', screen.seek_right_or_info)):
+                    key = REMOTE_KEYS[name]
+                    self.assertEqual(remote.send(key, 0), 0)
+                    self.assertEqual(remote.send(key, 1), 0)
+                    action()
+                self.assertEqual(screen.show_info.call_count, 2)
+                self.assertEqual(decoder.commands, [])
+
+    def test_previous_and_next_media_keys_keep_the_original_action_map(self):
+        for name in ('KEY_PREVIOUSSONG', 'KEY_NEXTSONG'):
+            with self.subTest(key=name):
+                screen, decoder, _, _ = fixture()
+                remote = bind_remote(screen)
+                key = REMOTE_KEYS[name]
+                self.assertEqual(remote.send(key, 0), 0)
+                self.assertEqual(remote.send(key, 1), 0)
+                self.assertEqual(decoder.commands, [])
+                self.assertIsNone(screen._seek_key_hold)
+
+
+class MediaSeekAliasTests(unittest.TestCase):
+    def test_seek_bindings_use_the_same_tap_and_hold_as_transport_keys(self):
+        for api in ('components', 'tools'):
+            for name, action, direction in (('KEY_PREVIOUSSONG', 'seekBack', -1),
+                                            ('KEY_NEXTSONG', 'seekFwd', 1)):
+                key = REMOTE_KEYS[name]
+                bindings = {('InfobarSeekActions', action): [(key, 2)]}
+                with self.subTest(api=api, key=name, gesture='tap'):
+                    screen, decoder, _, _ = fixture('series')
+                    remote = bind_remote(screen, bindings, api)
+                    self.assertEqual(remote.send(key, 0), 1)
+                    self.assertEqual(remote.send(key, 1), 1)
+                    self.assertEqual(decoder.commands, [('absolute', 100 + direction)])
+                with self.subTest(api=api, key=name, gesture='hold'):
+                    screen, decoder, _, clock = fixture('series')
+                    remote = bind_remote(screen, bindings, api)
+                    remote.send(key, 0)
+                    for repeat in range(32):
+                        clock.now = 100.5 + repeat / 10
+                        if repeat == 3:
+                            remote.send(key, 3)
+                        remote.send(key, 2)
+                    self.assertEqual(decoder.commands, [])
+                    frames = [screen._show_seek_overlay.call_args.kwargs['timeline'][0]]
+                    frames.extend(call.args[0] for call in screen._render_seek_timeline.call_args_list)
+                    self.assertGreater(len(frames), 8)
+                    self.assertEqual(frames, [100 + n * direction for n in range(1, len(frames) + 1)])
+                    self.assertEqual(remote.send(key, 1), 1)
+                    self.assertEqual(decoder.commands, [('absolute', frames[-1])])
+
+    def test_alias_direction_comes_from_the_active_seek_binding(self):
+        screen, decoder, _, _ = fixture('movie')
+        key = REMOTE_KEYS['KEY_NEXTSONG']
+        remote = bind_remote(screen, {('InfobarSeekActionsPTS', 'SeekbarBack'): [(key, 8)]})
+        remote.send(key, 0)
+        remote.send(key, 1)
+        self.assertEqual(decoder.commands, [('absolute', 99)])
+
+    def test_nonseek_inactive_and_conflicting_mappings_are_left_to_enigma(self):
+        key = REMOTE_KEYS['KEY_NEXTSONG']
+        for bindings in ({('ColorActions', 'yellow'): [(key, 2)]},
+                         {('OtherPlayerActions', 'seekFwd'): [(key, 2)]},
+                         {('InfobarSeekActions', 'seekFwd'): [(key, 0)]},
+                         {('InfobarSeekActions', 'seekFwd'): [(key, 2)],
+                          ('MediaPlayerActions', 'stop'): [(key, 8)]}):
+            with self.subTest(bindings=bindings):
+                screen, decoder, _, _ = fixture()
+                remote = bind_remote(screen, bindings)
+                self.assertEqual(remote.send(key, 0), 0)
+                self.assertEqual(remote.send(key, 1), 0)
+                self.assertEqual(decoder.commands, [])
+
+    def test_unavailable_keymap_api_keeps_dedicated_seek_and_direction_keys_working(self):
+        screen, decoder, _, _ = fixture('series')
+        remote = bind_remote(screen, keymap_api=None)
+        for name in ('KEY_FASTFORWARD', 'KEY_RIGHT'):
+            key = REMOTE_KEYS[name]
+            self.assertEqual(remote.send(key, 0), 1)
+            self.assertEqual(remote.send(key, 1), 1)
+        self.assertEqual(decoder.commands, [('absolute', 101)])
+        self.assertEqual(screen._pending_seek_verification['queued_target'], 161)
+
+    def test_direction_key_cannot_become_an_alias(self):
+        screen, decoder, _, _ = fixture('series')
+        key = REMOTE_KEYS['KEY_LEFT']
+        key_ids = dict(REMOTE_KEYS, KEY_PREVIOUSSONG=key)
+        remote = bind_remote(screen, {('InfobarSeekActions', 'seekBack'): [(key, 2)]}, key_ids=key_ids)
+        remote.send(key, 0)
+        remote.send(key, 1)
+        self.assertEqual(decoder.commands, [('absolute', 40)])
+
+    def test_live_tv_does_not_bind_the_seek_aliases(self):
+        screen, decoder, _, _ = fixture('live')
+        key = REMOTE_KEYS['KEY_NEXTSONG']
+        remote = bind_remote(screen, {('InfobarSeekActions', 'seekFwd'): [(key, 2)]})
+        self.assertEqual(remote.send(key, 0), 0)
+        self.assertEqual(remote.send(key, 1), 0)
+        self.assertEqual(decoder.commands, [])
+
 
 class FlowTests(unittest.TestCase):
     def test_rapid_forward_coalesces_without_overlapping_commands(self):

@@ -17,7 +17,7 @@ from .auxiliary_presentation import (
 from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
 from .vod_grid import LatestPosterWorkers
 
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 try:

@@ -1,10 +1,42 @@
-"""Serialize movie/episode seeks and recover one owned, stalled transaction."""
+"""Handle seek key repeats and serialize movie and episode seek requests."""
 import time
 
 from .live_recovery import media_snapshot, reference_identity
 from .diagnostics import log_event
 from .vod_seek_progress import (SeekProgress, RESUME_SECONDS, ACQUIRE_SECONDS,
                                 OVERALL_SECONDS, POLL_MS, RELEASE_MS)
+
+
+class SeekKeyHold:
+    # Some images allow a five-second delay before remote repeats start.
+    PRESS_TIMEOUT_MS = 5500
+    REPEAT_TIMEOUT_MS = 600
+
+    def __init__(self, key, direction, generation):
+        self.key = key
+        self.direction = direction
+        self.generation = generation
+        self.first_repeat_at = None
+        self.last_step_at = None
+        self.repeats_since_step = 0
+        self.target = None
+        self.length = 0
+
+    def step_due(self, now):
+        if self.first_repeat_at is None:
+            self.first_repeat_at = now
+        self.repeats_since_step += 1
+        held = now - self.first_repeat_at
+        repeats = 3 if held < 1.0 else 2 if held < 2.5 else 1
+        if self.last_step_at is not None:
+            if self.repeats_since_step < repeats or now - self.last_step_at < 0.075:
+                return False
+        self.repeats_since_step = 0
+        self.last_step_at = now
+        return True
+
+    def advance(self, position):
+        self.target = min(self.length, max(0, position + self.direction))
 
 
 class VodSeekSupport:
@@ -21,10 +53,15 @@ class VodSeekSupport:
                 getattr(self, '_pending_engine_reference', None) is None)
 
     def _vod_seek_foreground(self):
+        hold = getattr(self, '_seek_key_hold', None)
+        return (self._seek_foreground() and not self._seeking and
+                (hold is None or hold.target is None))
+
+    def _seek_foreground(self):
         return (getattr(self.session, 'current_dialog', self) is self and
                 bool(getattr(self.session, 'in_exec', True)) and
                 not any(getattr(self, name, False) for name in
-                        ('_subtitle_menu_open', '_audio_menu_open', '_media_menu_open', '_minute_seek_open', '_seeking')))
+                        ('_subtitle_menu_open', '_audio_menu_open', '_media_menu_open', '_minute_seek_open')))
 
     def _vod_seek_owned(self, state, released=False):
         getter = getattr(getattr(self.session, 'nav', None), 'getCurrentlyPlayingServiceReference', None)
@@ -72,7 +109,7 @@ class VodSeekSupport:
         observed = self._subtitle_position()
         self._complete_subtitle_seek(observed if observed >= 0 else position)
         self._restore_vod_seek_subtitles(state)
-        if queued is not None and abs(int(queued) - int(state['target'])) > 1 and self._vod_seek_context(state) and self._vod_seek_owned(state):
+        if queued is not None and queued != state['target'] and self._vod_seek_context(state) and self._vod_seek_owned(state):
             seeker = self._seek_interface()
             if not self._request_seek(seeker, position, queued):
                 self._seek_unavailable()

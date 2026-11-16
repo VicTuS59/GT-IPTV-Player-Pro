@@ -11,6 +11,7 @@ import ipaddress
 import json
 import math
 import os
+import re
 import socket
 import ssl
 import stat
@@ -20,6 +21,7 @@ import unicodedata
 import uuid
 from collections import Counter, OrderedDict, namedtuple
 from contextlib import contextmanager
+from functools import lru_cache
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
 from . import PLUGIN_VERSION
@@ -996,15 +998,22 @@ class M3UContentClient(object):
         return tuple(sorted(values))
 
     def epg_channel_names(self):
-        """Collect original names for channels whose ID may be absent from XMLTV."""
+        """Collect channel metadata for matching during the XMLTV refresh."""
         with self._state_lock:
             records = self._records if self._prepared else ()
         names = {}
         for record in records:
             name, tvg_id = record["name"], record["tvg_id"]
-            key = epg_name_key(name, tvg_id)
-            if key:
-                names.setdefault(key, (name, tvg_id) if tvg_id else name)
+            country = _epg_group_country(record.get("group", ""))
+            key = epg_name_key(name, tvg_id, _epg_country_scope(country))
+            if not key:
+                continue
+            alternate = normalise_epg_name(record.get("tvg_name"))
+            previous = names.get(key)
+            if previous is not None:
+                name = previous[0]
+                alternate = _merge_epg_hint(previous[3], alternate)
+            names[key] = (name, tvg_id, country, alternate)
         return names
 
     def resolved_epg_id(self, stream_id, fingerprint=None):
@@ -1017,8 +1026,9 @@ class M3UContentClient(object):
         resolve = getattr(self._epg_store, "resolve_name", None)
         if callable(resolve):
             try:
-                key = epg_name_key(record["name"], tvg_id)
-                return resolve(self.account.source_id, key, fingerprint) or tvg_id
+                key, legacy_key = _epg_name_keys(record)
+                return resolve(self.account.source_id, key, fingerprint,
+                               **({"legacy_key": legacy_key} if legacy_key else {})) or tvg_id
             except (OSError, ValueError):
                 pass
         return tvg_id
@@ -1026,6 +1036,10 @@ class M3UContentClient(object):
     def peek_epg(self, stream_id, limit=2):
         """Return already decoded current/next for immediate GUI rendering."""
         return self.load_epg(stream_id, limit=limit, cache_only=True)
+
+    def epg_revision(self):
+        revision = getattr(self._epg_store, "snapshot_revision", None)
+        return revision(self.account.source_id) if callable(revision) else None
 
     def load_epg(self, stream_id, limit=2, cache_only=False):
         """Read current/next on the existing list/player EPG workers.
@@ -1043,10 +1057,10 @@ class M3UContentClient(object):
             record = self._record_by_id.get(stream_id)
             if record is None:
                 return []
-            tvg_id, name = record["tvg_id"], record["name"]
+            tvg_id = record["tvg_id"]
         if self._epg_store is None:
             return []
-        name_key = epg_name_key(name, tvg_id)
+        name_key, legacy_key = _epg_name_keys(record)
         try:
             events = self._epg_store.lookup(
                 self.account.source_id,
@@ -1054,6 +1068,7 @@ class M3UContentClient(object):
                 now=self.wall_clock(),
                 cache_only=cache_only,
                 fallback_name_key=name_key if tvg_id else "",
+                **({"legacy_name_key": legacy_key} if legacy_key else {}),
             )
         except Exception:
             return []
@@ -1146,6 +1161,24 @@ class M3UContentClient(object):
 
     def picon_request_context(self, url=""):
         return {}
+
+    def epg_picon_urls(self):
+        lookup = getattr(self._epg_store, "picon_urls", None)
+        return lookup(self.account.source_id) if callable(lookup) else None
+
+    def epg_picon_url(self, item):
+        """Resolve an EPG logo for a playlist item with no logo of its own."""
+        key = getattr(item, "_m3u_epg_name_key", "")
+        if not key or getattr(item, "icon", ""):
+            return ""
+        tvg_id = getattr(item, "tvg_id", "")
+        lookup = getattr(self._epg_store, "picon_url", None)
+        if callable(lookup):
+            return lookup(self.account.source_id, tvg_id, key, getattr(item, "_m3u_epg_legacy_key", ""))
+        urls = self.epg_picon_urls()
+        if urls is None:
+            return ""
+        return urls.get(tvg_id) or urls.get(key, "")
 
     def catalog_diagnostics(self):
         with self._state_lock:
@@ -1461,6 +1494,8 @@ class M3UContentClient(object):
             icon=record["icon"],
         )
         item.tvg_id = record["tvg_id"]
+        if not item.icon:
+            item._m3u_epg_name_key, item._m3u_epg_legacy_key = _epg_name_keys(record)
         item.group_title = record["group"]
         item.m3u_source_name = item.name
         item._m3u_name_key = _channel_name_row_key(record)
@@ -1494,18 +1529,60 @@ class M3UContentClient(object):
 
 _CHANNEL_NAME_PREFIX = "m3u-channel:"
 _EPG_NAME_PREFIX = "m3u-name:"
+_EPG_GROUP_COUNTRY_START = re.compile(r"^([a-z]{2})(?:\s*[:|]\s*|\s+[-–—]\s+|$)")
+_EPG_GROUP_COUNTRY_TAG = re.compile(r"\(([a-z]{2})\)|\[([a-z]{2})\]")
 
 
 def normalise_epg_name(value):
     return " ".join(unicodedata.normalize("NFKC", str(value or "")[:256]).casefold().split())
 
 
-def epg_name_key(value, tvg_id=""):
+def epg_country_code(value):
+    code = str(value or "").casefold()
+    if len(code) != 2 or not code.isascii() or not code.isalpha() or code in {"tv", "hd", "ip", "eu"}:
+        return ""
+    return {"uk": "gb", "el": "gr"}.get(code, code)
+
+
+@lru_cache(maxsize=256)
+def _epg_group_country(group):
+    name = normalise_epg_name(group)
+    countries = {epg_country_code(match.group(match.lastindex))
+                 for match in _EPG_GROUP_COUNTRY_TAG.finditer(name)}
+    prefix = _EPG_GROUP_COUNTRY_START.match(name)
+    if prefix:
+        countries.add(epg_country_code(prefix.group(1)))
+    countries.discard("")
+    return next(iter(countries), "") if len(countries) < 2 else None
+
+
+def _epg_country_scope(country):
+    return "?" if country is None else country
+
+
+def _epg_name_keys(record):
+    name, tvg_id = record["name"], record["tvg_id"]
+    scope = _epg_country_scope(_epg_group_country(record.get("group", "")))
+    legacy_key = epg_name_key(name, tvg_id) if scope else ""
+    return epg_name_key(name, tvg_id, scope), legacy_key
+
+
+def _merge_epg_hint(previous, current):
+    if previous is None or not current:
+        return previous
+    if not previous or previous == current:
+        return current
+    return None
+
+
+def epg_name_key(value, tvg_id="", region=""):
     name = normalise_epg_name(value)
     if not name:
         return ""
     if tvg_id:
         name = tvg_id + "\0" + name
+    if region:
+        name = "\x1e" + region + "\0" + name
     return _EPG_NAME_PREFIX + hashlib.sha256(name.encode("utf-8")).hexdigest()
 
 
@@ -1822,16 +1899,15 @@ def _parse_extinf(payload, archive_defaults=None):
     else:
         metadata = attributes_text[separator + 1 :]
     attributes = _parse_attributes(metadata)
-    name = _single_line(display_name, 180) or _single_line(
-        attributes.get("tvg-name"),
-        180,
-    )
+    tvg_name = _single_line(attributes.get("tvg-name"), 180)
+    name = _single_line(display_name, 180) or tvg_name
     if not name:
         return None
     return {
         "name": name,
         "group": _single_line(attributes.get("group-title"), 180),
         "tvg_id": _single_line(attributes.get("tvg-id"), 256),
+        "tvg_name": tvg_name,
         "icon": _safe_icon_url(attributes.get("tvg-logo")),
         "url": "",
         "category_id": "",
@@ -2208,6 +2284,7 @@ def _catalog_cache_lines(source, catalog, deadline, check_limits):
                 "group": record["group"],
                 "category_id": record["category_id"],
                 "tvg_id": record["tvg_id"],
+                "tvg_name": record.get("tvg_name", ""),
                 "icon": record["icon"],
                 "url": record["url"],
                 "extension": record["extension"],
@@ -2643,6 +2720,7 @@ def _read_catalog_cache(path, source, deadline, check_limits):
                 "group": _single_line(entry.get("group"), 180),
                 "category_id": category_id,
                 "tvg_id": _single_line(entry.get("tvg_id"), 256),
+                "tvg_name": _single_line(entry.get("tvg_name"), 180),
                 "icon": _safe_icon_url(entry.get("icon")),
                 "url": stream_url,
                 "extension": _stream_extension(stream_url),

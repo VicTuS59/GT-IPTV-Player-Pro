@@ -1,0 +1,861 @@
+# FreeEPG settings and region labels
+# Region display names from Unicode CLDR. See LICENSING.md.
+msgid ""
+msgstr ""
+"Language: lt\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Could not open the country list."
+msgstr "Nepavyko atverti šalių sąrašo."
+
+msgid "Custom URL"
+msgstr "Pasirinktinis URL"
+
+msgid "FreeEPG country AC"
+msgstr "Dangun Žengimo sala"
+
+msgid "FreeEPG country AD"
+msgstr "Andora"
+
+msgid "FreeEPG country AE"
+msgstr "Jungtiniai Arabų Emyratai"
+
+msgid "FreeEPG country AF"
+msgstr "Afganistanas"
+
+msgid "FreeEPG country AG"
+msgstr "Antigva ir Barbuda"
+
+msgid "FreeEPG country AI"
+msgstr "Angilija"
+
+msgid "FreeEPG country AL"
+msgstr "Albanija"
+
+msgid "FreeEPG country AM"
+msgstr "Armėnija"
+
+msgid "FreeEPG country AN"
+msgstr "Kiurasao"
+
+msgid "FreeEPG country AO"
+msgstr "Angola"
+
+msgid "FreeEPG country AQ"
+msgstr "Antarktida"
+
+msgid "FreeEPG country AR"
+msgstr "Argentina"
+
+msgid "FreeEPG country AS"
+msgstr "Amerikos Samoa"
+
+msgid "FreeEPG country AT"
+msgstr "Austrija"
+
+msgid "FreeEPG country AU"
+msgstr "Australija"
+
+msgid "FreeEPG country AW"
+msgstr "Aruba"
+
+msgid "FreeEPG country AX"
+msgstr "Alandų Salos"
+
+msgid "FreeEPG country AZ"
+msgstr "Azerbaidžanas"
+
+msgid "FreeEPG country BA"
+msgstr "Bosnija ir Hercegovina"
+
+msgid "FreeEPG country BB"
+msgstr "Barbadosas"
+
+msgid "FreeEPG country BD"
+msgstr "Bangladešas"
+
+msgid "FreeEPG country BE"
+msgstr "Belgija"
+
+msgid "FreeEPG country BF"
+msgstr "Burkina Fasas"
+
+msgid "FreeEPG country BG"
+msgstr "Bulgarija"
+
+msgid "FreeEPG country BH"
+msgstr "Bahreinas"
+
+msgid "FreeEPG country BI"
+msgstr "Burundis"
+
+msgid "FreeEPG country BJ"
+msgstr "Beninas"
+
+msgid "FreeEPG country BL"
+msgstr "Sen Bartelemi"
+
+msgid "FreeEPG country BM"
+msgstr "Bermuda"
+
+msgid "FreeEPG country BN"
+msgstr "Brunėjus"
+
+msgid "FreeEPG country BO"
+msgstr "Bolivija"
+
+msgid "FreeEPG country BQ"
+msgstr "Karibų Nyderlandai"
+
+msgid "FreeEPG country BR"
+msgstr "Brazilija"
+
+msgid "FreeEPG country BS"
+msgstr "Bahamos"
+
+msgid "FreeEPG country BT"
+msgstr "Butanas"
+
+msgid "FreeEPG country BU"
+msgstr "Mianmaras (Birma)"
+
+msgid "FreeEPG country BV"
+msgstr "Buvė Sala"
+
+msgid "FreeEPG country BW"
+msgstr "Botsvana"
+
+msgid "FreeEPG country BY"
+msgstr "Baltarusija"
+
+msgid "FreeEPG country BZ"
+msgstr "Belizas"
+
+msgid "FreeEPG country CA"
+msgstr "Kanada"
+
+msgid "FreeEPG country CC"
+msgstr "Kokosų (Kilingo) Salos"
+
+msgid "FreeEPG country CD"
+msgstr "Kongas-Kinšasa"
+
+msgid "FreeEPG country CF"
+msgstr "Centrinės Afrikos Respublika"
+
+msgid "FreeEPG country CG"
+msgstr "Kongas-Brazavilis"
+
+msgid "FreeEPG country CH"
+msgstr "Šveicarija"
+
+msgid "FreeEPG country CI"
+msgstr "Dramblio Kaulo Krantas"
+
+msgid "FreeEPG country CK"
+msgstr "Kuko Salos"
+
+msgid "FreeEPG country CL"
+msgstr "Čilė"
+
+msgid "FreeEPG country CM"
+msgstr "Kamerūnas"
+
+msgid "FreeEPG country CN"
+msgstr "Kinija"
+
+msgid "FreeEPG country CO"
+msgstr "Kolumbija"
+
+msgid "FreeEPG country CP"
+msgstr "Klipertono sala"
+
+msgid "FreeEPG country CQ"
+msgstr "Sarkas"
+
+msgid "FreeEPG country CR"
+msgstr "Kosta Rika"
+
+msgid "FreeEPG country CS"
+msgstr "Serbija"
+
+msgid "FreeEPG country CU"
+msgstr "Kuba"
+
+msgid "FreeEPG country CV"
+msgstr "Žaliasis Kyšulys"
+
+msgid "FreeEPG country CW"
+msgstr "Kiurasao"
+
+msgid "FreeEPG country CX"
+msgstr "Kalėdų Sala"
+
+msgid "FreeEPG country CY"
+msgstr "Kipras"
+
+msgid "FreeEPG country CZ"
+msgstr "Čekija"
+
+msgid "FreeEPG country DD"
+msgstr "Vokietija"
+
+msgid "FreeEPG country DE"
+msgstr "Vokietija"
+
+msgid "FreeEPG country DG"
+msgstr "Diego Garsija"
+
+msgid "FreeEPG country DJ"
+msgstr "Džibutis"
+
+msgid "FreeEPG country DK"
+msgstr "Danija"
+
+msgid "FreeEPG country DM"
+msgstr "Dominika"
+
+msgid "FreeEPG country DO"
+msgstr "Dominikos Respublika"
+
+msgid "FreeEPG country DY"
+msgstr "Beninas"
+
+msgid "FreeEPG country DZ"
+msgstr "Alžyras"
+
+msgid "FreeEPG country EA"
+msgstr "Seuta ir Melila"
+
+msgid "FreeEPG country EC"
+msgstr "Ekvadoras"
+
+msgid "FreeEPG country EE"
+msgstr "Estija"
+
+msgid "FreeEPG country EG"
+msgstr "Egiptas"
+
+msgid "FreeEPG country EH"
+msgstr "Vakarų Sachara"
+
+msgid "FreeEPG country ER"
+msgstr "Eritrėja"
+
+msgid "FreeEPG country ES"
+msgstr "Ispanija"
+
+msgid "FreeEPG country ET"
+msgstr "Etiopija"
+
+msgid "FreeEPG country EU"
+msgstr "Europos Sąjunga"
+
+msgid "FreeEPG country EZ"
+msgstr "euro zona"
+
+msgid "FreeEPG country FI"
+msgstr "Suomija"
+
+msgid "FreeEPG country FJ"
+msgstr "Fidžis"
+
+msgid "FreeEPG country FK"
+msgstr "Folklando salos"
+
+msgid "FreeEPG country FM"
+msgstr "Mikronezija"
+
+msgid "FreeEPG country FO"
+msgstr "Farerų Salos"
+
+msgid "FreeEPG country FR"
+msgstr "Prancūzija"
+
+msgid "FreeEPG country FX"
+msgstr "Prancūzija"
+
+msgid "FreeEPG country GA"
+msgstr "Gabonas"
+
+msgid "FreeEPG country GB"
+msgstr "Jungtinė Karalystė"
+
+msgid "FreeEPG country GD"
+msgstr "Grenada"
+
+msgid "FreeEPG country GE"
+msgstr "Gruzija"
+
+msgid "FreeEPG country GF"
+msgstr "Prancūzijos Gviana"
+
+msgid "FreeEPG country GG"
+msgstr "Gernsis"
+
+msgid "FreeEPG country GH"
+msgstr "Gana"
+
+msgid "FreeEPG country GI"
+msgstr "Gibraltaras"
+
+msgid "FreeEPG country GL"
+msgstr "Grenlandija"
+
+msgid "FreeEPG country GM"
+msgstr "Gambija"
+
+msgid "FreeEPG country GN"
+msgstr "Gvinėja"
+
+msgid "FreeEPG country GP"
+msgstr "Gvadelupa"
+
+msgid "FreeEPG country GQ"
+msgstr "Pusiaujo Gvinėja"
+
+msgid "FreeEPG country GR"
+msgstr "Graikija"
+
+msgid "FreeEPG country GS"
+msgstr "Pietų Džordžija ir Pietų Sandvičo salos"
+
+msgid "FreeEPG country GT"
+msgstr "Gvatemala"
+
+msgid "FreeEPG country GU"
+msgstr "Guamas"
+
+msgid "FreeEPG country GW"
+msgstr "Bisau Gvinėja"
+
+msgid "FreeEPG country GY"
+msgstr "Gajana"
+
+msgid "FreeEPG country HK"
+msgstr "Ypatingasis Administracinis Kinijos Regionas Honkongas"
+
+msgid "FreeEPG country HM"
+msgstr "Herdo ir Makdonaldo Salos"
+
+msgid "FreeEPG country HN"
+msgstr "Hondūras"
+
+msgid "FreeEPG country HR"
+msgstr "Kroatija"
+
+msgid "FreeEPG country HT"
+msgstr "Haitis"
+
+msgid "FreeEPG country HU"
+msgstr "Vengrija"
+
+msgid "FreeEPG country HV"
+msgstr "Burkina Fasas"
+
+msgid "FreeEPG country IC"
+msgstr "Kanarų salos"
+
+msgid "FreeEPG country ID"
+msgstr "Indonezija"
+
+msgid "FreeEPG country IE"
+msgstr "Airija"
+
+msgid "FreeEPG country IL"
+msgstr "Izraelis"
+
+msgid "FreeEPG country IM"
+msgstr "Meno Sala"
+
+msgid "FreeEPG country IN"
+msgstr "Indija"
+
+msgid "FreeEPG country IO"
+msgstr "Indijos Vandenyno Britų Sritis"
+
+msgid "FreeEPG country IQ"
+msgstr "Irakas"
+
+msgid "FreeEPG country IR"
+msgstr "Iranas"
+
+msgid "FreeEPG country IS"
+msgstr "Islandija"
+
+msgid "FreeEPG country IT"
+msgstr "Italija"
+
+msgid "FreeEPG country JE"
+msgstr "Džersis"
+
+msgid "FreeEPG country JM"
+msgstr "Jamaika"
+
+msgid "FreeEPG country JO"
+msgstr "Jordanija"
+
+msgid "FreeEPG country JP"
+msgstr "Japonija"
+
+msgid "FreeEPG country KE"
+msgstr "Kenija"
+
+msgid "FreeEPG country KG"
+msgstr "Kirgizija"
+
+msgid "FreeEPG country KH"
+msgstr "Kambodža"
+
+msgid "FreeEPG country KI"
+msgstr "Kiribatis"
+
+msgid "FreeEPG country KM"
+msgstr "Komorai"
+
+msgid "FreeEPG country KN"
+msgstr "Sent Kitsas ir Nevis"
+
+msgid "FreeEPG country KP"
+msgstr "Šiaurės Korėja"
+
+msgid "FreeEPG country KR"
+msgstr "Pietų Korėja"
+
+msgid "FreeEPG country KW"
+msgstr "Kuveitas"
+
+msgid "FreeEPG country KY"
+msgstr "Kaimanų Salos"
+
+msgid "FreeEPG country KZ"
+msgstr "Kazachstanas"
+
+msgid "FreeEPG country LA"
+msgstr "Laosas"
+
+msgid "FreeEPG country LB"
+msgstr "Libanas"
+
+msgid "FreeEPG country LC"
+msgstr "Sent Lusija"
+
+msgid "FreeEPG country LI"
+msgstr "Lichtenšteinas"
+
+msgid "FreeEPG country LK"
+msgstr "Šri Lanka"
+
+msgid "FreeEPG country LR"
+msgstr "Liberija"
+
+msgid "FreeEPG country LS"
+msgstr "Lesotas"
+
+msgid "FreeEPG country LT"
+msgstr "Lietuva"
+
+msgid "FreeEPG country LU"
+msgstr "Liuksemburgas"
+
+msgid "FreeEPG country LV"
+msgstr "Latvija"
+
+msgid "FreeEPG country LY"
+msgstr "Libija"
+
+msgid "FreeEPG country MA"
+msgstr "Marokas"
+
+msgid "FreeEPG country MC"
+msgstr "Monakas"
+
+msgid "FreeEPG country MD"
+msgstr "Moldova"
+
+msgid "FreeEPG country ME"
+msgstr "Juodkalnija"
+
+msgid "FreeEPG country MF"
+msgstr "Sen Martenas"
+
+msgid "FreeEPG country MG"
+msgstr "Madagaskaras"
+
+msgid "FreeEPG country MH"
+msgstr "Maršalo Salos"
+
+msgid "FreeEPG country MK"
+msgstr "Šiaurės Makedonija"
+
+msgid "FreeEPG country ML"
+msgstr "Malis"
+
+msgid "FreeEPG country MM"
+msgstr "Mianmaras (Birma)"
+
+msgid "FreeEPG country MN"
+msgstr "Mongolija"
+
+msgid "FreeEPG country MO"
+msgstr "Ypatingasis Administracinis Kinijos Regionas Makao"
+
+msgid "FreeEPG country MP"
+msgstr "Marianos Šiaurinės Salos"
+
+msgid "FreeEPG country MQ"
+msgstr "Martinika"
+
+msgid "FreeEPG country MR"
+msgstr "Mauritanija"
+
+msgid "FreeEPG country MS"
+msgstr "Montseratas"
+
+msgid "FreeEPG country MT"
+msgstr "Malta"
+
+msgid "FreeEPG country MU"
+msgstr "Mauricijus"
+
+msgid "FreeEPG country MV"
+msgstr "Maldyvai"
+
+msgid "FreeEPG country MW"
+msgstr "Malavis"
+
+msgid "FreeEPG country MX"
+msgstr "Meksika"
+
+msgid "FreeEPG country MY"
+msgstr "Malaizija"
+
+msgid "FreeEPG country MZ"
+msgstr "Mozambikas"
+
+msgid "FreeEPG country NA"
+msgstr "Namibija"
+
+msgid "FreeEPG country NC"
+msgstr "Naujoji Kaledonija"
+
+msgid "FreeEPG country NE"
+msgstr "Nigeris"
+
+msgid "FreeEPG country NF"
+msgstr "Norfolko sala"
+
+msgid "FreeEPG country NG"
+msgstr "Nigerija"
+
+msgid "FreeEPG country NH"
+msgstr "Vanuatu"
+
+msgid "FreeEPG country NI"
+msgstr "Nikaragva"
+
+msgid "FreeEPG country NL"
+msgstr "Nyderlandai"
+
+msgid "FreeEPG country NO"
+msgstr "Norvegija"
+
+msgid "FreeEPG country NP"
+msgstr "Nepalas"
+
+msgid "FreeEPG country NR"
+msgstr "Nauru"
+
+msgid "FreeEPG country NU"
+msgstr "Niujė"
+
+msgid "FreeEPG country NZ"
+msgstr "Naujoji Zelandija"
+
+msgid "FreeEPG country OM"
+msgstr "Omanas"
+
+msgid "FreeEPG country PA"
+msgstr "Panama"
+
+msgid "FreeEPG country PE"
+msgstr "Peru"
+
+msgid "FreeEPG country PF"
+msgstr "Prancūzijos Polinezija"
+
+msgid "FreeEPG country PG"
+msgstr "Papua Naujoji Gvinėja"
+
+msgid "FreeEPG country PH"
+msgstr "Filipinai"
+
+msgid "FreeEPG country PK"
+msgstr "Pakistanas"
+
+msgid "FreeEPG country PL"
+msgstr "Lenkija"
+
+msgid "FreeEPG country PM"
+msgstr "Sen Pjeras ir Mikelonas"
+
+msgid "FreeEPG country PN"
+msgstr "Pitkerno salos"
+
+msgid "FreeEPG country PR"
+msgstr "Puerto Rikas"
+
+msgid "FreeEPG country PS"
+msgstr "Palestinos teritorija"
+
+msgid "FreeEPG country PT"
+msgstr "Portugalija"
+
+msgid "FreeEPG country PW"
+msgstr "Palau"
+
+msgid "FreeEPG country PY"
+msgstr "Paragvajus"
+
+msgid "FreeEPG country QA"
+msgstr "Kataras"
+
+msgid "FreeEPG country QO"
+msgstr "Nuošali Okeanija"
+
+msgid "FreeEPG country RE"
+msgstr "Reunjonas"
+
+msgid "FreeEPG country RH"
+msgstr "Zimbabvė"
+
+msgid "FreeEPG country RO"
+msgstr "Rumunija"
+
+msgid "FreeEPG country RS"
+msgstr "Serbija"
+
+msgid "FreeEPG country RU"
+msgstr "Rusija"
+
+msgid "FreeEPG country RW"
+msgstr "Ruanda"
+
+msgid "FreeEPG country SA"
+msgstr "Saudo Arabija"
+
+msgid "FreeEPG country SB"
+msgstr "Saliamono Salos"
+
+msgid "FreeEPG country SC"
+msgstr "Seišeliai"
+
+msgid "FreeEPG country SD"
+msgstr "Sudanas"
+
+msgid "FreeEPG country SE"
+msgstr "Švedija"
+
+msgid "FreeEPG country SG"
+msgstr "Singapūras"
+
+msgid "FreeEPG country SH"
+msgstr "Šv. Elenos Sala"
+
+msgid "FreeEPG country SI"
+msgstr "Slovėnija"
+
+msgid "FreeEPG country SJ"
+msgstr "Svalbardas ir Janas Majenas"
+
+msgid "FreeEPG country SK"
+msgstr "Slovakija"
+
+msgid "FreeEPG country SL"
+msgstr "Siera Leonė"
+
+msgid "FreeEPG country SM"
+msgstr "San Marinas"
+
+msgid "FreeEPG country SN"
+msgstr "Senegalas"
+
+msgid "FreeEPG country SO"
+msgstr "Somalis"
+
+msgid "FreeEPG country SR"
+msgstr "Surinamas"
+
+msgid "FreeEPG country SS"
+msgstr "Pietų Sudanas"
+
+msgid "FreeEPG country ST"
+msgstr "San Tomė ir Prinsipė"
+
+msgid "FreeEPG country SU"
+msgstr "Rusija"
+
+msgid "FreeEPG country SV"
+msgstr "Salvadoras"
+
+msgid "FreeEPG country SX"
+msgstr "Sint Martenas"
+
+msgid "FreeEPG country SY"
+msgstr "Sirija"
+
+msgid "FreeEPG country SZ"
+msgstr "Svazilandas"
+
+msgid "FreeEPG country TA"
+msgstr "Tristano da Kunjos"
+
+msgid "FreeEPG country TC"
+msgstr "Terkso ir Kaikoso Salos"
+
+msgid "FreeEPG country TD"
+msgstr "Čadas"
+
+msgid "FreeEPG country TF"
+msgstr "Prancūzijos Pietų sritys"
+
+msgid "FreeEPG country TG"
+msgstr "Togas"
+
+msgid "FreeEPG country TH"
+msgstr "Tailandas"
+
+msgid "FreeEPG country TJ"
+msgstr "Tadžikija"
+
+msgid "FreeEPG country TK"
+msgstr "Tokelau"
+
+msgid "FreeEPG country TL"
+msgstr "Rytų Timoras"
+
+msgid "FreeEPG country TM"
+msgstr "Turkmėnistanas"
+
+msgid "FreeEPG country TN"
+msgstr "Tunisas"
+
+msgid "FreeEPG country TO"
+msgstr "Tonga"
+
+msgid "FreeEPG country TP"
+msgstr "Rytų Timoras"
+
+msgid "FreeEPG country TR"
+msgstr "Turkija"
+
+msgid "FreeEPG country TT"
+msgstr "Trinidadas ir Tobagas"
+
+msgid "FreeEPG country TV"
+msgstr "Tuvalu"
+
+msgid "FreeEPG country TW"
+msgstr "Taivanas"
+
+msgid "FreeEPG country TZ"
+msgstr "Tanzanija"
+
+msgid "FreeEPG country UA"
+msgstr "Ukraina"
+
+msgid "FreeEPG country UG"
+msgstr "Uganda"
+
+msgid "FreeEPG country UK"
+msgstr "Jungtinė Karalystė"
+
+msgid "FreeEPG country UM"
+msgstr "Jungtinių Valstijų Mažosios Tolimosios Salos"
+
+msgid "FreeEPG country UN"
+msgstr "Jungtinės Tautos"
+
+msgid "FreeEPG country US"
+msgstr "Jungtinės Valstijos"
+
+msgid "FreeEPG country UY"
+msgstr "Urugvajus"
+
+msgid "FreeEPG country UZ"
+msgstr "Uzbekistanas"
+
+msgid "FreeEPG country VA"
+msgstr "Vatikano Miesto Valstybė"
+
+msgid "FreeEPG country VC"
+msgstr "Šventasis Vincentas ir Grenadinai"
+
+msgid "FreeEPG country VD"
+msgstr "Vietnamas"
+
+msgid "FreeEPG country VE"
+msgstr "Venesuela"
+
+msgid "FreeEPG country VG"
+msgstr "Didžiosios Britanijos Mergelių Salos"
+
+msgid "FreeEPG country VI"
+msgstr "Jungtinių Valstijų Mergelių Salos"
+
+msgid "FreeEPG country VN"
+msgstr "Vietnamas"
+
+msgid "FreeEPG country VU"
+msgstr "Vanuatu"
+
+msgid "FreeEPG country WF"
+msgstr "Volisas ir Futūna"
+
+msgid "FreeEPG country WS"
+msgstr "Samoa"
+
+msgid "FreeEPG country XA"
+msgstr "pseudo A"
+
+msgid "FreeEPG country XB"
+msgstr "pseudo B"
+
+msgid "FreeEPG country XK"
+msgstr "Kosovas"
+
+msgid "FreeEPG country YD"
+msgstr "Jemenas"
+
+msgid "FreeEPG country YE"
+msgstr "Jemenas"
+
+msgid "FreeEPG country YT"
+msgstr "Majotas"
+
+msgid "FreeEPG country YU"
+msgstr "Serbija"
+
+msgid "FreeEPG country ZA"
+msgstr "Pietų Afrika"
+
+msgid "FreeEPG country ZM"
+msgstr "Zambija"
+
+msgid "FreeEPG country ZR"
+msgstr "Kongas-Kinšasa"
+
+msgid "FreeEPG country ZW"
+msgstr "Zimbabvė"
+
+msgid "FreeEPG country ZZ"
+msgstr "nežinoma sritis"
+
+msgid "No FreeEPG countries are available."
+msgstr "„FreeEPG“ nėra pasiekiamų šalių."
+
+msgid "Select a country"
+msgstr "Pasirinkite šalį"
+
+msgid "Showing the saved country list."
+msgstr "Rodomas išsaugotas šalių sąrašas."

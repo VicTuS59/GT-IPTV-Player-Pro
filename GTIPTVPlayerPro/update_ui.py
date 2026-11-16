@@ -5,7 +5,7 @@ import threading
 import textwrap
 from .ui_update import set_visible
 from .typography import set_text_if_changed
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from enigma import eTimer,getDesktop

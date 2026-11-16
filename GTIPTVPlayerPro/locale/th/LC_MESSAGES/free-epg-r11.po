@@ -1,0 +1,861 @@
+# FreeEPG settings and region labels
+# Region display names from Unicode CLDR. See LICENSING.md.
+msgid ""
+msgstr ""
+"Language: th\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Could not open the country list."
+msgstr "ไม่สามารถเปิดรายชื่อประเทศได้"
+
+msgid "Custom URL"
+msgstr "URL ที่กำหนดเอง"
+
+msgid "FreeEPG country AC"
+msgstr "เกาะแอสเซนชัน"
+
+msgid "FreeEPG country AD"
+msgstr "อันดอร์รา"
+
+msgid "FreeEPG country AE"
+msgstr "สหรัฐอาหรับเอมิเรตส์"
+
+msgid "FreeEPG country AF"
+msgstr "อัฟกานิสถาน"
+
+msgid "FreeEPG country AG"
+msgstr "แอนติกาและบาร์บูดา"
+
+msgid "FreeEPG country AI"
+msgstr "แองกวิลลา"
+
+msgid "FreeEPG country AL"
+msgstr "แอลเบเนีย"
+
+msgid "FreeEPG country AM"
+msgstr "อาร์เมเนีย"
+
+msgid "FreeEPG country AN"
+msgstr "คูราเซา"
+
+msgid "FreeEPG country AO"
+msgstr "แองโกลา"
+
+msgid "FreeEPG country AQ"
+msgstr "แอนตาร์กติกา"
+
+msgid "FreeEPG country AR"
+msgstr "อาร์เจนตินา"
+
+msgid "FreeEPG country AS"
+msgstr "อเมริกันซามัว"
+
+msgid "FreeEPG country AT"
+msgstr "ออสเตรีย"
+
+msgid "FreeEPG country AU"
+msgstr "ออสเตรเลีย"
+
+msgid "FreeEPG country AW"
+msgstr "อารูบา"
+
+msgid "FreeEPG country AX"
+msgstr "หมู่เกาะโอลันด์"
+
+msgid "FreeEPG country AZ"
+msgstr "อาเซอร์ไบจาน"
+
+msgid "FreeEPG country BA"
+msgstr "บอสเนียและเฮอร์เซโกวีนา"
+
+msgid "FreeEPG country BB"
+msgstr "บาร์เบโดส"
+
+msgid "FreeEPG country BD"
+msgstr "บังกลาเทศ"
+
+msgid "FreeEPG country BE"
+msgstr "เบลเยียม"
+
+msgid "FreeEPG country BF"
+msgstr "บูร์กินาฟาโซ"
+
+msgid "FreeEPG country BG"
+msgstr "บัลแกเรีย"
+
+msgid "FreeEPG country BH"
+msgstr "บาห์เรน"
+
+msgid "FreeEPG country BI"
+msgstr "บุรุนดี"
+
+msgid "FreeEPG country BJ"
+msgstr "เบนิน"
+
+msgid "FreeEPG country BL"
+msgstr "เซนต์บาร์เธเลมี"
+
+msgid "FreeEPG country BM"
+msgstr "เบอร์มิวดา"
+
+msgid "FreeEPG country BN"
+msgstr "บรูไน"
+
+msgid "FreeEPG country BO"
+msgstr "โบลิเวีย"
+
+msgid "FreeEPG country BQ"
+msgstr "เนเธอร์แลนด์แคริบเบียน"
+
+msgid "FreeEPG country BR"
+msgstr "บราซิล"
+
+msgid "FreeEPG country BS"
+msgstr "บาฮามาส"
+
+msgid "FreeEPG country BT"
+msgstr "ภูฏาน"
+
+msgid "FreeEPG country BU"
+msgstr "เมียนมา (พม่า)"
+
+msgid "FreeEPG country BV"
+msgstr "เกาะบูเว"
+
+msgid "FreeEPG country BW"
+msgstr "บอตสวานา"
+
+msgid "FreeEPG country BY"
+msgstr "เบลารุส"
+
+msgid "FreeEPG country BZ"
+msgstr "เบลีซ"
+
+msgid "FreeEPG country CA"
+msgstr "แคนาดา"
+
+msgid "FreeEPG country CC"
+msgstr "หมู่เกาะโคโคส (คีลิง)"
+
+msgid "FreeEPG country CD"
+msgstr "คองโก - กินชาซา"
+
+msgid "FreeEPG country CF"
+msgstr "สาธารณรัฐแอฟริกากลาง"
+
+msgid "FreeEPG country CG"
+msgstr "คองโก - บราซซาวิล"
+
+msgid "FreeEPG country CH"
+msgstr "สวิตเซอร์แลนด์"
+
+msgid "FreeEPG country CI"
+msgstr "โกตดิวัวร์"
+
+msgid "FreeEPG country CK"
+msgstr "หมู่เกาะคุก"
+
+msgid "FreeEPG country CL"
+msgstr "ชิลี"
+
+msgid "FreeEPG country CM"
+msgstr "แคเมอรูน"
+
+msgid "FreeEPG country CN"
+msgstr "จีน"
+
+msgid "FreeEPG country CO"
+msgstr "โคลอมเบีย"
+
+msgid "FreeEPG country CP"
+msgstr "เกาะคลิปเปอร์ตัน"
+
+msgid "FreeEPG country CQ"
+msgstr "ซาร์ก"
+
+msgid "FreeEPG country CR"
+msgstr "คอสตาริกา"
+
+msgid "FreeEPG country CS"
+msgstr "เซอร์เบีย"
+
+msgid "FreeEPG country CU"
+msgstr "คิวบา"
+
+msgid "FreeEPG country CV"
+msgstr "เคปเวิร์ด"
+
+msgid "FreeEPG country CW"
+msgstr "คูราเซา"
+
+msgid "FreeEPG country CX"
+msgstr "เกาะคริสต์มาส"
+
+msgid "FreeEPG country CY"
+msgstr "ไซปรัส"
+
+msgid "FreeEPG country CZ"
+msgstr "เช็ก"
+
+msgid "FreeEPG country DD"
+msgstr "เยอรมนี"
+
+msgid "FreeEPG country DE"
+msgstr "เยอรมนี"
+
+msgid "FreeEPG country DG"
+msgstr "ดิเอโกการ์เซีย"
+
+msgid "FreeEPG country DJ"
+msgstr "จิบูตี"
+
+msgid "FreeEPG country DK"
+msgstr "เดนมาร์ก"
+
+msgid "FreeEPG country DM"
+msgstr "โดมินิกา"
+
+msgid "FreeEPG country DO"
+msgstr "สาธารณรัฐโดมินิกัน"
+
+msgid "FreeEPG country DY"
+msgstr "เบนิน"
+
+msgid "FreeEPG country DZ"
+msgstr "แอลจีเรีย"
+
+msgid "FreeEPG country EA"
+msgstr "เซวตาและเมลียา"
+
+msgid "FreeEPG country EC"
+msgstr "เอกวาดอร์"
+
+msgid "FreeEPG country EE"
+msgstr "เอสโตเนีย"
+
+msgid "FreeEPG country EG"
+msgstr "อียิปต์"
+
+msgid "FreeEPG country EH"
+msgstr "ซาฮาราตะวันตก"
+
+msgid "FreeEPG country ER"
+msgstr "เอริเทรีย"
+
+msgid "FreeEPG country ES"
+msgstr "สเปน"
+
+msgid "FreeEPG country ET"
+msgstr "เอธิโอเปีย"
+
+msgid "FreeEPG country EU"
+msgstr "สหภาพยุโรป"
+
+msgid "FreeEPG country EZ"
+msgstr "ยูโรโซน"
+
+msgid "FreeEPG country FI"
+msgstr "ฟินแลนด์"
+
+msgid "FreeEPG country FJ"
+msgstr "ฟิจิ"
+
+msgid "FreeEPG country FK"
+msgstr "หมู่เกาะฟอล์กแลนด์"
+
+msgid "FreeEPG country FM"
+msgstr "ไมโครนีเซีย"
+
+msgid "FreeEPG country FO"
+msgstr "หมู่เกาะแฟโร"
+
+msgid "FreeEPG country FR"
+msgstr "ฝรั่งเศส"
+
+msgid "FreeEPG country FX"
+msgstr "ฝรั่งเศส"
+
+msgid "FreeEPG country GA"
+msgstr "กาบอง"
+
+msgid "FreeEPG country GB"
+msgstr "สหราชอาณาจักร"
+
+msgid "FreeEPG country GD"
+msgstr "เกรเนดา"
+
+msgid "FreeEPG country GE"
+msgstr "จอร์เจีย"
+
+msgid "FreeEPG country GF"
+msgstr "เฟรนช์เกียนา"
+
+msgid "FreeEPG country GG"
+msgstr "เกิร์นซีย์"
+
+msgid "FreeEPG country GH"
+msgstr "กานา"
+
+msgid "FreeEPG country GI"
+msgstr "ยิบรอลตาร์"
+
+msgid "FreeEPG country GL"
+msgstr "กรีนแลนด์"
+
+msgid "FreeEPG country GM"
+msgstr "แกมเบีย"
+
+msgid "FreeEPG country GN"
+msgstr "กินี"
+
+msgid "FreeEPG country GP"
+msgstr "กวาเดอลูป"
+
+msgid "FreeEPG country GQ"
+msgstr "อิเควทอเรียลกินี"
+
+msgid "FreeEPG country GR"
+msgstr "กรีซ"
+
+msgid "FreeEPG country GS"
+msgstr "เกาะเซาท์จอร์เจียและหมู่เกาะเซาท์แซนด์วิช"
+
+msgid "FreeEPG country GT"
+msgstr "กัวเตมาลา"
+
+msgid "FreeEPG country GU"
+msgstr "กวม"
+
+msgid "FreeEPG country GW"
+msgstr "กินี-บิสเซา"
+
+msgid "FreeEPG country GY"
+msgstr "กายอานา"
+
+msgid "FreeEPG country HK"
+msgstr "เขตปกครองพิเศษฮ่องกงแห่งสาธารณรัฐประชาชนจีน"
+
+msgid "FreeEPG country HM"
+msgstr "เกาะเฮิร์ดและหมู่เกาะแมกดอนัลด์"
+
+msgid "FreeEPG country HN"
+msgstr "ฮอนดูรัส"
+
+msgid "FreeEPG country HR"
+msgstr "โครเอเชีย"
+
+msgid "FreeEPG country HT"
+msgstr "เฮติ"
+
+msgid "FreeEPG country HU"
+msgstr "ฮังการี"
+
+msgid "FreeEPG country HV"
+msgstr "บูร์กินาฟาโซ"
+
+msgid "FreeEPG country IC"
+msgstr "หมู่เกาะคานารี"
+
+msgid "FreeEPG country ID"
+msgstr "อินโดนีเซีย"
+
+msgid "FreeEPG country IE"
+msgstr "ไอร์แลนด์"
+
+msgid "FreeEPG country IL"
+msgstr "อิสราเอล"
+
+msgid "FreeEPG country IM"
+msgstr "เกาะแมน"
+
+msgid "FreeEPG country IN"
+msgstr "อินเดีย"
+
+msgid "FreeEPG country IO"
+msgstr "บริติชอินเดียนโอเชียนเทร์ริทอรี"
+
+msgid "FreeEPG country IQ"
+msgstr "อิรัก"
+
+msgid "FreeEPG country IR"
+msgstr "อิหร่าน"
+
+msgid "FreeEPG country IS"
+msgstr "ไอซ์แลนด์"
+
+msgid "FreeEPG country IT"
+msgstr "อิตาลี"
+
+msgid "FreeEPG country JE"
+msgstr "เจอร์ซีย์"
+
+msgid "FreeEPG country JM"
+msgstr "จาเมกา"
+
+msgid "FreeEPG country JO"
+msgstr "จอร์แดน"
+
+msgid "FreeEPG country JP"
+msgstr "ญี่ปุ่น"
+
+msgid "FreeEPG country KE"
+msgstr "เคนยา"
+
+msgid "FreeEPG country KG"
+msgstr "คีร์กีซสถาน"
+
+msgid "FreeEPG country KH"
+msgstr "กัมพูชา"
+
+msgid "FreeEPG country KI"
+msgstr "คิริบาส"
+
+msgid "FreeEPG country KM"
+msgstr "คอโมโรส"
+
+msgid "FreeEPG country KN"
+msgstr "เซนต์คิตส์และเนวิส"
+
+msgid "FreeEPG country KP"
+msgstr "เกาหลีเหนือ"
+
+msgid "FreeEPG country KR"
+msgstr "เกาหลีใต้"
+
+msgid "FreeEPG country KW"
+msgstr "คูเวต"
+
+msgid "FreeEPG country KY"
+msgstr "หมู่เกาะเคย์แมน"
+
+msgid "FreeEPG country KZ"
+msgstr "คาซัคสถาน"
+
+msgid "FreeEPG country LA"
+msgstr "ลาว"
+
+msgid "FreeEPG country LB"
+msgstr "เลบานอน"
+
+msgid "FreeEPG country LC"
+msgstr "เซนต์ลูเซีย"
+
+msgid "FreeEPG country LI"
+msgstr "ลิกเตนสไตน์"
+
+msgid "FreeEPG country LK"
+msgstr "ศรีลังกา"
+
+msgid "FreeEPG country LR"
+msgstr "ไลบีเรีย"
+
+msgid "FreeEPG country LS"
+msgstr "เลโซโท"
+
+msgid "FreeEPG country LT"
+msgstr "ลิทัวเนีย"
+
+msgid "FreeEPG country LU"
+msgstr "ลักเซมเบิร์ก"
+
+msgid "FreeEPG country LV"
+msgstr "ลัตเวีย"
+
+msgid "FreeEPG country LY"
+msgstr "ลิเบีย"
+
+msgid "FreeEPG country MA"
+msgstr "โมร็อกโก"
+
+msgid "FreeEPG country MC"
+msgstr "โมนาโก"
+
+msgid "FreeEPG country MD"
+msgstr "มอลโดวา"
+
+msgid "FreeEPG country ME"
+msgstr "มอนเตเนโกร"
+
+msgid "FreeEPG country MF"
+msgstr "เซนต์มาร์ติน"
+
+msgid "FreeEPG country MG"
+msgstr "มาดากัสการ์"
+
+msgid "FreeEPG country MH"
+msgstr "หมู่เกาะมาร์แชลล์"
+
+msgid "FreeEPG country MK"
+msgstr "มาซิโดเนียเหนือ"
+
+msgid "FreeEPG country ML"
+msgstr "มาลี"
+
+msgid "FreeEPG country MM"
+msgstr "เมียนมา (พม่า)"
+
+msgid "FreeEPG country MN"
+msgstr "มองโกเลีย"
+
+msgid "FreeEPG country MO"
+msgstr "เขตปกครองพิเศษมาเก๊าแห่งสาธารณรัฐประชาชนจีน"
+
+msgid "FreeEPG country MP"
+msgstr "หมู่เกาะนอร์เทิร์นมาเรียนา"
+
+msgid "FreeEPG country MQ"
+msgstr "มาร์ตินีก"
+
+msgid "FreeEPG country MR"
+msgstr "มอริเตเนีย"
+
+msgid "FreeEPG country MS"
+msgstr "มอนต์เซอร์รัต"
+
+msgid "FreeEPG country MT"
+msgstr "มอลตา"
+
+msgid "FreeEPG country MU"
+msgstr "มอริเชียส"
+
+msgid "FreeEPG country MV"
+msgstr "มัลดีฟส์"
+
+msgid "FreeEPG country MW"
+msgstr "มาลาวี"
+
+msgid "FreeEPG country MX"
+msgstr "เม็กซิโก"
+
+msgid "FreeEPG country MY"
+msgstr "มาเลเซีย"
+
+msgid "FreeEPG country MZ"
+msgstr "โมซัมบิก"
+
+msgid "FreeEPG country NA"
+msgstr "นามิเบีย"
+
+msgid "FreeEPG country NC"
+msgstr "นิวแคลิโดเนีย"
+
+msgid "FreeEPG country NE"
+msgstr "ไนเจอร์"
+
+msgid "FreeEPG country NF"
+msgstr "เกาะนอร์ฟอล์ก"
+
+msgid "FreeEPG country NG"
+msgstr "ไนจีเรีย"
+
+msgid "FreeEPG country NH"
+msgstr "วานูอาตู"
+
+msgid "FreeEPG country NI"
+msgstr "นิการากัว"
+
+msgid "FreeEPG country NL"
+msgstr "เนเธอร์แลนด์"
+
+msgid "FreeEPG country NO"
+msgstr "นอร์เวย์"
+
+msgid "FreeEPG country NP"
+msgstr "เนปาล"
+
+msgid "FreeEPG country NR"
+msgstr "นาอูรู"
+
+msgid "FreeEPG country NU"
+msgstr "นีอูเอ"
+
+msgid "FreeEPG country NZ"
+msgstr "นิวซีแลนด์"
+
+msgid "FreeEPG country OM"
+msgstr "โอมาน"
+
+msgid "FreeEPG country PA"
+msgstr "ปานามา"
+
+msgid "FreeEPG country PE"
+msgstr "เปรู"
+
+msgid "FreeEPG country PF"
+msgstr "เฟรนช์โปลินีเซีย"
+
+msgid "FreeEPG country PG"
+msgstr "ปาปัวนิวกินี"
+
+msgid "FreeEPG country PH"
+msgstr "ฟิลิปปินส์"
+
+msgid "FreeEPG country PK"
+msgstr "ปากีสถาน"
+
+msgid "FreeEPG country PL"
+msgstr "โปแลนด์"
+
+msgid "FreeEPG country PM"
+msgstr "แซงปีแยร์และมีเกอลง"
+
+msgid "FreeEPG country PN"
+msgstr "หมู่เกาะพิตแคร์น"
+
+msgid "FreeEPG country PR"
+msgstr "เปอร์โตริโก"
+
+msgid "FreeEPG country PS"
+msgstr "ดินแดนปาเลสไตน์"
+
+msgid "FreeEPG country PT"
+msgstr "โปรตุเกส"
+
+msgid "FreeEPG country PW"
+msgstr "ปาเลา"
+
+msgid "FreeEPG country PY"
+msgstr "ปารากวัย"
+
+msgid "FreeEPG country QA"
+msgstr "กาตาร์"
+
+msgid "FreeEPG country QO"
+msgstr "เอาต์ไลอิงโอเชียเนีย"
+
+msgid "FreeEPG country RE"
+msgstr "เรอูนียง"
+
+msgid "FreeEPG country RH"
+msgstr "ซิมบับเว"
+
+msgid "FreeEPG country RO"
+msgstr "โรมาเนีย"
+
+msgid "FreeEPG country RS"
+msgstr "เซอร์เบีย"
+
+msgid "FreeEPG country RU"
+msgstr "รัสเซีย"
+
+msgid "FreeEPG country RW"
+msgstr "รวันดา"
+
+msgid "FreeEPG country SA"
+msgstr "ซาอุดีอาระเบีย"
+
+msgid "FreeEPG country SB"
+msgstr "หมู่เกาะโซโลมอน"
+
+msgid "FreeEPG country SC"
+msgstr "เซเชลส์"
+
+msgid "FreeEPG country SD"
+msgstr "ซูดาน"
+
+msgid "FreeEPG country SE"
+msgstr "สวีเดน"
+
+msgid "FreeEPG country SG"
+msgstr "สิงคโปร์"
+
+msgid "FreeEPG country SH"
+msgstr "เซนต์เฮเลนา"
+
+msgid "FreeEPG country SI"
+msgstr "สโลวีเนีย"
+
+msgid "FreeEPG country SJ"
+msgstr "สฟาลบาร์และยานไมเอน"
+
+msgid "FreeEPG country SK"
+msgstr "สโลวะเกีย"
+
+msgid "FreeEPG country SL"
+msgstr "เซียร์ราลีโอน"
+
+msgid "FreeEPG country SM"
+msgstr "ซานมาริโน"
+
+msgid "FreeEPG country SN"
+msgstr "เซเนกัล"
+
+msgid "FreeEPG country SO"
+msgstr "โซมาเลีย"
+
+msgid "FreeEPG country SR"
+msgstr "ซูรินาเม"
+
+msgid "FreeEPG country SS"
+msgstr "ซูดานใต้"
+
+msgid "FreeEPG country ST"
+msgstr "เซาตูเมและปรินซิปี"
+
+msgid "FreeEPG country SU"
+msgstr "รัสเซีย"
+
+msgid "FreeEPG country SV"
+msgstr "เอลซัลวาดอร์"
+
+msgid "FreeEPG country SX"
+msgstr "ซินต์มาร์เทน"
+
+msgid "FreeEPG country SY"
+msgstr "ซีเรีย"
+
+msgid "FreeEPG country SZ"
+msgstr "เอสวาตีนี"
+
+msgid "FreeEPG country TA"
+msgstr "ทริสตันดาคูนา"
+
+msgid "FreeEPG country TC"
+msgstr "หมู่เกาะเติกส์และหมู่เกาะเคคอส"
+
+msgid "FreeEPG country TD"
+msgstr "ชาด"
+
+msgid "FreeEPG country TF"
+msgstr "เฟรนช์เซาเทิร์นเทร์ริทอรีส์"
+
+msgid "FreeEPG country TG"
+msgstr "โตโก"
+
+msgid "FreeEPG country TH"
+msgstr "ไทย"
+
+msgid "FreeEPG country TJ"
+msgstr "ทาจิกิสถาน"
+
+msgid "FreeEPG country TK"
+msgstr "โตเกเลา"
+
+msgid "FreeEPG country TL"
+msgstr "ติมอร์-เลสเต"
+
+msgid "FreeEPG country TM"
+msgstr "เติร์กเมนิสถาน"
+
+msgid "FreeEPG country TN"
+msgstr "ตูนิเซีย"
+
+msgid "FreeEPG country TO"
+msgstr "ตองกา"
+
+msgid "FreeEPG country TP"
+msgstr "ติมอร์-เลสเต"
+
+msgid "FreeEPG country TR"
+msgstr "ตุรกี"
+
+msgid "FreeEPG country TT"
+msgstr "ตรินิแดดและโตเบโก"
+
+msgid "FreeEPG country TV"
+msgstr "ตูวาลู"
+
+msgid "FreeEPG country TW"
+msgstr "ไต้หวัน"
+
+msgid "FreeEPG country TZ"
+msgstr "แทนซาเนีย"
+
+msgid "FreeEPG country UA"
+msgstr "ยูเครน"
+
+msgid "FreeEPG country UG"
+msgstr "ยูกันดา"
+
+msgid "FreeEPG country UK"
+msgstr "สหราชอาณาจักร"
+
+msgid "FreeEPG country UM"
+msgstr "หมู่เกาะรอบนอกของสหรัฐอเมริกา"
+
+msgid "FreeEPG country UN"
+msgstr "สหประชาชาติ"
+
+msgid "FreeEPG country US"
+msgstr "สหรัฐอเมริกา"
+
+msgid "FreeEPG country UY"
+msgstr "อุรุกวัย"
+
+msgid "FreeEPG country UZ"
+msgstr "อุซเบกิสถาน"
+
+msgid "FreeEPG country VA"
+msgstr "นครวาติกัน"
+
+msgid "FreeEPG country VC"
+msgstr "เซนต์วินเซนต์และเกรนาดีนส์"
+
+msgid "FreeEPG country VD"
+msgstr "เวียดนาม"
+
+msgid "FreeEPG country VE"
+msgstr "เวเนซุเอลา"
+
+msgid "FreeEPG country VG"
+msgstr "หมู่เกาะบริติชเวอร์จิน"
+
+msgid "FreeEPG country VI"
+msgstr "หมู่เกาะเวอร์จินของสหรัฐอเมริกา"
+
+msgid "FreeEPG country VN"
+msgstr "เวียดนาม"
+
+msgid "FreeEPG country VU"
+msgstr "วานูอาตู"
+
+msgid "FreeEPG country WF"
+msgstr "วาลลิสและฟุตูนา"
+
+msgid "FreeEPG country WS"
+msgstr "ซามัว"
+
+msgid "FreeEPG country XA"
+msgstr "สำเนียงไม่จริง"
+
+msgid "FreeEPG country XB"
+msgstr "Bidi ไม่จริง"
+
+msgid "FreeEPG country XK"
+msgstr "โคโซโว"
+
+msgid "FreeEPG country YD"
+msgstr "เยเมน"
+
+msgid "FreeEPG country YE"
+msgstr "เยเมน"
+
+msgid "FreeEPG country YT"
+msgstr "มายอต"
+
+msgid "FreeEPG country YU"
+msgstr "เซอร์เบีย"
+
+msgid "FreeEPG country ZA"
+msgstr "แอฟริกาใต้"
+
+msgid "FreeEPG country ZM"
+msgstr "แซมเบีย"
+
+msgid "FreeEPG country ZR"
+msgstr "คองโก - กินชาซา"
+
+msgid "FreeEPG country ZW"
+msgstr "ซิมบับเว"
+
+msgid "FreeEPG country ZZ"
+msgstr "ภูมิภาคที่ไม่รู้จัก"
+
+msgid "No FreeEPG countries are available."
+msgstr "ไม่มีประเทศที่ใช้งานได้ใน FreeEPG"
+
+msgid "Select a country"
+msgstr "เลือกประเทศ"
+
+msgid "Showing the saved country list."
+msgstr "กำลังแสดงรายชื่อประเทศที่บันทึกไว้"

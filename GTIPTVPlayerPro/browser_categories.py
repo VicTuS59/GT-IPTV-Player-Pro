@@ -9,7 +9,7 @@ import threading
 from .typography import set_text_if_changed
 from .ui_update import set_visible
 from collections import OrderedDict
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Screens.MessageBox import MessageBox
@@ -430,6 +430,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         self._live_preferences_generation = generation
 
     def _poll_result(self):
+        if getattr(self, '_closed', True) is not False:
+            return
         if self._category_preferences_enabled and self._ready and (not self._error) and (self._category_preferences_generation != self._load_generation):
             raw_categories = list(self._entries)
             self._all_categories = raw_categories
@@ -1198,10 +1200,16 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
         if self.content_type == 'live':
             self._restore_returned_preview()
         arguments = (GTStreamListScreen, self.account, self.content_type, self._entries[self.selected_index], self.client)
-        snapshot = self._weather_forecast
+        options = dict(
+            weather_forecast=self._weather_forecast,
+            favorite_store=self.favorite_store,
+            hidden_category_ids=self._hidden_category_ids,
+            live_source_categories=self._all_categories,
+            visible_live_categories=self._entries,
+        )
         self._stop_weather(suspend=True)
         opener = getattr(self.session, 'openWithCallback', None)
         if callable(opener):
-            opener(self._weather_child_closed, *arguments, weather_forecast=snapshot, favorite_store=self.favorite_store, hidden_category_ids=self._hidden_category_ids, live_source_categories=self._all_categories, defer_preview_exit=self.content_type == 'live')
+            opener(self._weather_child_closed, *arguments, defer_preview_exit=self.content_type == 'live', **options)
             return
-        self.session.open(*arguments, weather_forecast=snapshot, favorite_store=self.favorite_store, hidden_category_ids=self._hidden_category_ids, live_source_categories=self._all_categories)
+        self.session.open(*arguments, **options)

@@ -1,0 +1,861 @@
+# FreeEPG settings and region labels
+# Region display names from Unicode CLDR. See LICENSING.md.
+msgid ""
+msgstr ""
+"Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Could not open the country list."
+msgstr "Δεν ήταν δυνατό να ανοίξει η λίστα χωρών."
+
+msgid "Custom URL"
+msgstr "Προσαρμοσμένη διεύθυνση URL"
+
+msgid "FreeEPG country AC"
+msgstr "Νήσος Ασενσιόν"
+
+msgid "FreeEPG country AD"
+msgstr "Ανδόρα"
+
+msgid "FreeEPG country AE"
+msgstr "Ηνωμένα Αραβικά Εμιράτα"
+
+msgid "FreeEPG country AF"
+msgstr "Αφγανιστάν"
+
+msgid "FreeEPG country AG"
+msgstr "Αντίγκουα και Μπαρμπούντα"
+
+msgid "FreeEPG country AI"
+msgstr "Ανγκουίλα"
+
+msgid "FreeEPG country AL"
+msgstr "Αλβανία"
+
+msgid "FreeEPG country AM"
+msgstr "Αρμενία"
+
+msgid "FreeEPG country AN"
+msgstr "Κουρασάο"
+
+msgid "FreeEPG country AO"
+msgstr "Αγκόλα"
+
+msgid "FreeEPG country AQ"
+msgstr "Ανταρκτική"
+
+msgid "FreeEPG country AR"
+msgstr "Αργεντινή"
+
+msgid "FreeEPG country AS"
+msgstr "Αμερικανική Σαμόα"
+
+msgid "FreeEPG country AT"
+msgstr "Αυστρία"
+
+msgid "FreeEPG country AU"
+msgstr "Αυστραλία"
+
+msgid "FreeEPG country AW"
+msgstr "Αρούμπα"
+
+msgid "FreeEPG country AX"
+msgstr "Νήσοι Όλαντ"
+
+msgid "FreeEPG country AZ"
+msgstr "Αζερμπαϊτζάν"
+
+msgid "FreeEPG country BA"
+msgstr "Βοσνία - Ερζεγοβίνη"
+
+msgid "FreeEPG country BB"
+msgstr "Μπαρμπέιντος"
+
+msgid "FreeEPG country BD"
+msgstr "Μπανγκλαντές"
+
+msgid "FreeEPG country BE"
+msgstr "Βέλγιο"
+
+msgid "FreeEPG country BF"
+msgstr "Μπουρκίνα Φάσο"
+
+msgid "FreeEPG country BG"
+msgstr "Βουλγαρία"
+
+msgid "FreeEPG country BH"
+msgstr "Μπαχρέιν"
+
+msgid "FreeEPG country BI"
+msgstr "Μπουρούντι"
+
+msgid "FreeEPG country BJ"
+msgstr "Μπενίν"
+
+msgid "FreeEPG country BL"
+msgstr "Άγιος Βαρθολομαίος"
+
+msgid "FreeEPG country BM"
+msgstr "Βερμούδες"
+
+msgid "FreeEPG country BN"
+msgstr "Μπρουνέι"
+
+msgid "FreeEPG country BO"
+msgstr "Βολιβία"
+
+msgid "FreeEPG country BQ"
+msgstr "Ολλανδία Καραϊβικής"
+
+msgid "FreeEPG country BR"
+msgstr "Βραζιλία"
+
+msgid "FreeEPG country BS"
+msgstr "Μπαχάμες"
+
+msgid "FreeEPG country BT"
+msgstr "Μπουτάν"
+
+msgid "FreeEPG country BU"
+msgstr "Μιανμάρ (Βιρμανία)"
+
+msgid "FreeEPG country BV"
+msgstr "Νήσος Μπουβέ"
+
+msgid "FreeEPG country BW"
+msgstr "Μποτσουάνα"
+
+msgid "FreeEPG country BY"
+msgstr "Λευκορωσία"
+
+msgid "FreeEPG country BZ"
+msgstr "Μπελίζ"
+
+msgid "FreeEPG country CA"
+msgstr "Καναδάς"
+
+msgid "FreeEPG country CC"
+msgstr "Νήσοι Κόκος (Κίλινγκ)"
+
+msgid "FreeEPG country CD"
+msgstr "Κονγκό - Κινσάσα"
+
+msgid "FreeEPG country CF"
+msgstr "Κεντροαφρικανική Δημοκρατία"
+
+msgid "FreeEPG country CG"
+msgstr "Κονγκό - Μπραζαβίλ"
+
+msgid "FreeEPG country CH"
+msgstr "Ελβετία"
+
+msgid "FreeEPG country CI"
+msgstr "Ακτή Ελεφαντοστού"
+
+msgid "FreeEPG country CK"
+msgstr "Νήσοι Κουκ"
+
+msgid "FreeEPG country CL"
+msgstr "Χιλή"
+
+msgid "FreeEPG country CM"
+msgstr "Καμερούν"
+
+msgid "FreeEPG country CN"
+msgstr "Κίνα"
+
+msgid "FreeEPG country CO"
+msgstr "Κολομβία"
+
+msgid "FreeEPG country CP"
+msgstr "Νήσος Κλίπερτον"
+
+msgid "FreeEPG country CQ"
+msgstr "Σαρκ"
+
+msgid "FreeEPG country CR"
+msgstr "Κόστα Ρίκα"
+
+msgid "FreeEPG country CS"
+msgstr "Σερβία"
+
+msgid "FreeEPG country CU"
+msgstr "Κούβα"
+
+msgid "FreeEPG country CV"
+msgstr "Πράσινο Ακρωτήριο"
+
+msgid "FreeEPG country CW"
+msgstr "Κουρασάο"
+
+msgid "FreeEPG country CX"
+msgstr "Νήσος των Χριστουγέννων"
+
+msgid "FreeEPG country CY"
+msgstr "Κύπρος"
+
+msgid "FreeEPG country CZ"
+msgstr "Τσεχία"
+
+msgid "FreeEPG country DD"
+msgstr "Γερμανία"
+
+msgid "FreeEPG country DE"
+msgstr "Γερμανία"
+
+msgid "FreeEPG country DG"
+msgstr "Ντιέγκο Γκαρσία"
+
+msgid "FreeEPG country DJ"
+msgstr "Τζιμπουτί"
+
+msgid "FreeEPG country DK"
+msgstr "Δανία"
+
+msgid "FreeEPG country DM"
+msgstr "Ντομίνικα"
+
+msgid "FreeEPG country DO"
+msgstr "Δομινικανή Δημοκρατία"
+
+msgid "FreeEPG country DY"
+msgstr "Μπενίν"
+
+msgid "FreeEPG country DZ"
+msgstr "Αλγερία"
+
+msgid "FreeEPG country EA"
+msgstr "Θέουτα και Μελίγια"
+
+msgid "FreeEPG country EC"
+msgstr "Ισημερινός"
+
+msgid "FreeEPG country EE"
+msgstr "Εσθονία"
+
+msgid "FreeEPG country EG"
+msgstr "Αίγυπτος"
+
+msgid "FreeEPG country EH"
+msgstr "Δυτική Σαχάρα"
+
+msgid "FreeEPG country ER"
+msgstr "Ερυθραία"
+
+msgid "FreeEPG country ES"
+msgstr "Ισπανία"
+
+msgid "FreeEPG country ET"
+msgstr "Αιθιοπία"
+
+msgid "FreeEPG country EU"
+msgstr "Ευρωπαϊκή Ένωση"
+
+msgid "FreeEPG country EZ"
+msgstr "Ευρωζώνη"
+
+msgid "FreeEPG country FI"
+msgstr "Φινλανδία"
+
+msgid "FreeEPG country FJ"
+msgstr "Φίτζι"
+
+msgid "FreeEPG country FK"
+msgstr "Νήσοι Φόκλαντ"
+
+msgid "FreeEPG country FM"
+msgstr "Μικρονησία"
+
+msgid "FreeEPG country FO"
+msgstr "Νήσοι Φερόες"
+
+msgid "FreeEPG country FR"
+msgstr "Γαλλία"
+
+msgid "FreeEPG country FX"
+msgstr "Γαλλία"
+
+msgid "FreeEPG country GA"
+msgstr "Γκαμπόν"
+
+msgid "FreeEPG country GB"
+msgstr "Ηνωμένο Βασίλειο"
+
+msgid "FreeEPG country GD"
+msgstr "Γρενάδα"
+
+msgid "FreeEPG country GE"
+msgstr "Γεωργία"
+
+msgid "FreeEPG country GF"
+msgstr "Γαλλική Γουιάνα"
+
+msgid "FreeEPG country GG"
+msgstr "Γκέρνζι"
+
+msgid "FreeEPG country GH"
+msgstr "Γκάνα"
+
+msgid "FreeEPG country GI"
+msgstr "Γιβραλτάρ"
+
+msgid "FreeEPG country GL"
+msgstr "Γροιλανδία"
+
+msgid "FreeEPG country GM"
+msgstr "Γκάμπια"
+
+msgid "FreeEPG country GN"
+msgstr "Γουινέα"
+
+msgid "FreeEPG country GP"
+msgstr "Γουαδελούπη"
+
+msgid "FreeEPG country GQ"
+msgstr "Ισημερινή Γουινέα"
+
+msgid "FreeEPG country GR"
+msgstr "Ελλάδα"
+
+msgid "FreeEPG country GS"
+msgstr "Νήσοι Νότια Γεωργία και Νότιες Σάντουιτς"
+
+msgid "FreeEPG country GT"
+msgstr "Γουατεμάλα"
+
+msgid "FreeEPG country GU"
+msgstr "Γκουάμ"
+
+msgid "FreeEPG country GW"
+msgstr "Γουινέα Μπισάου"
+
+msgid "FreeEPG country GY"
+msgstr "Γουιάνα"
+
+msgid "FreeEPG country HK"
+msgstr "Χονγκ Κονγκ ΕΔΠ Κίνας"
+
+msgid "FreeEPG country HM"
+msgstr "Νήσοι Χερντ και Μακντόναλντ"
+
+msgid "FreeEPG country HN"
+msgstr "Ονδούρα"
+
+msgid "FreeEPG country HR"
+msgstr "Κροατία"
+
+msgid "FreeEPG country HT"
+msgstr "Αϊτή"
+
+msgid "FreeEPG country HU"
+msgstr "Ουγγαρία"
+
+msgid "FreeEPG country HV"
+msgstr "Μπουρκίνα Φάσο"
+
+msgid "FreeEPG country IC"
+msgstr "Κανάριοι Νήσοι"
+
+msgid "FreeEPG country ID"
+msgstr "Ινδονησία"
+
+msgid "FreeEPG country IE"
+msgstr "Ιρλανδία"
+
+msgid "FreeEPG country IL"
+msgstr "Ισραήλ"
+
+msgid "FreeEPG country IM"
+msgstr "Νήσος του Μαν"
+
+msgid "FreeEPG country IN"
+msgstr "Ινδία"
+
+msgid "FreeEPG country IO"
+msgstr "Βρετανικά Εδάφη Ινδικού Ωκεανού"
+
+msgid "FreeEPG country IQ"
+msgstr "Ιράκ"
+
+msgid "FreeEPG country IR"
+msgstr "Ιράν"
+
+msgid "FreeEPG country IS"
+msgstr "Ισλανδία"
+
+msgid "FreeEPG country IT"
+msgstr "Ιταλία"
+
+msgid "FreeEPG country JE"
+msgstr "Τζέρζι"
+
+msgid "FreeEPG country JM"
+msgstr "Τζαμάικα"
+
+msgid "FreeEPG country JO"
+msgstr "Ιορδανία"
+
+msgid "FreeEPG country JP"
+msgstr "Ιαπωνία"
+
+msgid "FreeEPG country KE"
+msgstr "Κένυα"
+
+msgid "FreeEPG country KG"
+msgstr "Κιργιστάν"
+
+msgid "FreeEPG country KH"
+msgstr "Καμπότζη"
+
+msgid "FreeEPG country KI"
+msgstr "Κιριμπάτι"
+
+msgid "FreeEPG country KM"
+msgstr "Κομόρες"
+
+msgid "FreeEPG country KN"
+msgstr "Σεν Κιτς και Νέβις"
+
+msgid "FreeEPG country KP"
+msgstr "Βόρεια Κορέα"
+
+msgid "FreeEPG country KR"
+msgstr "Νότια Κορέα"
+
+msgid "FreeEPG country KW"
+msgstr "Κουβέιτ"
+
+msgid "FreeEPG country KY"
+msgstr "Νήσοι Κέιμαν"
+
+msgid "FreeEPG country KZ"
+msgstr "Καζακστάν"
+
+msgid "FreeEPG country LA"
+msgstr "Λάος"
+
+msgid "FreeEPG country LB"
+msgstr "Λίβανος"
+
+msgid "FreeEPG country LC"
+msgstr "Αγία Λουκία"
+
+msgid "FreeEPG country LI"
+msgstr "Λιχτενστάιν"
+
+msgid "FreeEPG country LK"
+msgstr "Σρι Λάνκα"
+
+msgid "FreeEPG country LR"
+msgstr "Λιβερία"
+
+msgid "FreeEPG country LS"
+msgstr "Λεσότο"
+
+msgid "FreeEPG country LT"
+msgstr "Λιθουανία"
+
+msgid "FreeEPG country LU"
+msgstr "Λουξεμβούργο"
+
+msgid "FreeEPG country LV"
+msgstr "Λετονία"
+
+msgid "FreeEPG country LY"
+msgstr "Λιβύη"
+
+msgid "FreeEPG country MA"
+msgstr "Μαρόκο"
+
+msgid "FreeEPG country MC"
+msgstr "Μονακό"
+
+msgid "FreeEPG country MD"
+msgstr "Μολδαβία"
+
+msgid "FreeEPG country ME"
+msgstr "Μαυροβούνιο"
+
+msgid "FreeEPG country MF"
+msgstr "Άγιος Μαρτίνος (Γαλλικό τμήμα)"
+
+msgid "FreeEPG country MG"
+msgstr "Μαδαγασκάρη"
+
+msgid "FreeEPG country MH"
+msgstr "Νήσοι Μάρσαλ"
+
+msgid "FreeEPG country MK"
+msgstr "Βόρεια Μακεδονία"
+
+msgid "FreeEPG country ML"
+msgstr "Μάλι"
+
+msgid "FreeEPG country MM"
+msgstr "Μιανμάρ (Βιρμανία)"
+
+msgid "FreeEPG country MN"
+msgstr "Μογγολία"
+
+msgid "FreeEPG country MO"
+msgstr "Μακάο ΕΔΠ Κίνας"
+
+msgid "FreeEPG country MP"
+msgstr "Νήσοι Βόρειες Μαριάνες"
+
+msgid "FreeEPG country MQ"
+msgstr "Μαρτινίκα"
+
+msgid "FreeEPG country MR"
+msgstr "Μαυριτανία"
+
+msgid "FreeEPG country MS"
+msgstr "Μονσεράτ"
+
+msgid "FreeEPG country MT"
+msgstr "Μάλτα"
+
+msgid "FreeEPG country MU"
+msgstr "Μαυρίκιος"
+
+msgid "FreeEPG country MV"
+msgstr "Μαλδίβες"
+
+msgid "FreeEPG country MW"
+msgstr "Μαλάουι"
+
+msgid "FreeEPG country MX"
+msgstr "Μεξικό"
+
+msgid "FreeEPG country MY"
+msgstr "Μαλαισία"
+
+msgid "FreeEPG country MZ"
+msgstr "Μοζαμβίκη"
+
+msgid "FreeEPG country NA"
+msgstr "Ναμίμπια"
+
+msgid "FreeEPG country NC"
+msgstr "Νέα Καληδονία"
+
+msgid "FreeEPG country NE"
+msgstr "Νίγηρας"
+
+msgid "FreeEPG country NF"
+msgstr "Νήσος Νόρφολκ"
+
+msgid "FreeEPG country NG"
+msgstr "Νιγηρία"
+
+msgid "FreeEPG country NH"
+msgstr "Βανουάτου"
+
+msgid "FreeEPG country NI"
+msgstr "Νικαράγουα"
+
+msgid "FreeEPG country NL"
+msgstr "Κάτω Χώρες"
+
+msgid "FreeEPG country NO"
+msgstr "Νορβηγία"
+
+msgid "FreeEPG country NP"
+msgstr "Νεπάλ"
+
+msgid "FreeEPG country NR"
+msgstr "Ναουρού"
+
+msgid "FreeEPG country NU"
+msgstr "Νιούε"
+
+msgid "FreeEPG country NZ"
+msgstr "Νέα Ζηλανδία"
+
+msgid "FreeEPG country OM"
+msgstr "Ομάν"
+
+msgid "FreeEPG country PA"
+msgstr "Παναμάς"
+
+msgid "FreeEPG country PE"
+msgstr "Περού"
+
+msgid "FreeEPG country PF"
+msgstr "Γαλλική Πολυνησία"
+
+msgid "FreeEPG country PG"
+msgstr "Παπούα Νέα Γουινέα"
+
+msgid "FreeEPG country PH"
+msgstr "Φιλιππίνες"
+
+msgid "FreeEPG country PK"
+msgstr "Πακιστάν"
+
+msgid "FreeEPG country PL"
+msgstr "Πολωνία"
+
+msgid "FreeEPG country PM"
+msgstr "Σεν Πιερ και Μικελόν"
+
+msgid "FreeEPG country PN"
+msgstr "Νήσοι Πίτκερν"
+
+msgid "FreeEPG country PR"
+msgstr "Πουέρτο Ρίκο"
+
+msgid "FreeEPG country PS"
+msgstr "Παλαιστινιακά Εδάφη"
+
+msgid "FreeEPG country PT"
+msgstr "Πορτογαλία"
+
+msgid "FreeEPG country PW"
+msgstr "Παλάου"
+
+msgid "FreeEPG country PY"
+msgstr "Παραγουάη"
+
+msgid "FreeEPG country QA"
+msgstr "Κατάρ"
+
+msgid "FreeEPG country QO"
+msgstr "Περιφερειακή Ωκεανία"
+
+msgid "FreeEPG country RE"
+msgstr "Ρεϊνιόν"
+
+msgid "FreeEPG country RH"
+msgstr "Ζιμπάμπουε"
+
+msgid "FreeEPG country RO"
+msgstr "Ρουμανία"
+
+msgid "FreeEPG country RS"
+msgstr "Σερβία"
+
+msgid "FreeEPG country RU"
+msgstr "Ρωσία"
+
+msgid "FreeEPG country RW"
+msgstr "Ρουάντα"
+
+msgid "FreeEPG country SA"
+msgstr "Σαουδική Αραβία"
+
+msgid "FreeEPG country SB"
+msgstr "Νήσοι Σολομώντος"
+
+msgid "FreeEPG country SC"
+msgstr "Σεϋχέλλες"
+
+msgid "FreeEPG country SD"
+msgstr "Σουδάν"
+
+msgid "FreeEPG country SE"
+msgstr "Σουηδία"
+
+msgid "FreeEPG country SG"
+msgstr "Σιγκαπούρη"
+
+msgid "FreeEPG country SH"
+msgstr "Αγία Ελένη"
+
+msgid "FreeEPG country SI"
+msgstr "Σλοβενία"
+
+msgid "FreeEPG country SJ"
+msgstr "Σβάλμπαρντ και Γιαν Μαγιέν"
+
+msgid "FreeEPG country SK"
+msgstr "Σλοβακία"
+
+msgid "FreeEPG country SL"
+msgstr "Σιέρα Λεόνε"
+
+msgid "FreeEPG country SM"
+msgstr "Άγιος Μαρίνος"
+
+msgid "FreeEPG country SN"
+msgstr "Σενεγάλη"
+
+msgid "FreeEPG country SO"
+msgstr "Σομαλία"
+
+msgid "FreeEPG country SR"
+msgstr "Σουρινάμ"
+
+msgid "FreeEPG country SS"
+msgstr "Νότιο Σουδάν"
+
+msgid "FreeEPG country ST"
+msgstr "Σάο Τομέ και Πρίνσιπε"
+
+msgid "FreeEPG country SU"
+msgstr "Ρωσία"
+
+msgid "FreeEPG country SV"
+msgstr "Ελ Σαλβαδόρ"
+
+msgid "FreeEPG country SX"
+msgstr "Άγιος Μαρτίνος (Ολλανδικό τμήμα)"
+
+msgid "FreeEPG country SY"
+msgstr "Συρία"
+
+msgid "FreeEPG country SZ"
+msgstr "Εσουατίνι"
+
+msgid "FreeEPG country TA"
+msgstr "Τριστάν ντα Κούνια"
+
+msgid "FreeEPG country TC"
+msgstr "Νήσοι Τερκς και Κάικος"
+
+msgid "FreeEPG country TD"
+msgstr "Τσαντ"
+
+msgid "FreeEPG country TF"
+msgstr "Γαλλικά Νότια Εδάφη"
+
+msgid "FreeEPG country TG"
+msgstr "Τόγκο"
+
+msgid "FreeEPG country TH"
+msgstr "Ταϊλάνδη"
+
+msgid "FreeEPG country TJ"
+msgstr "Τατζικιστάν"
+
+msgid "FreeEPG country TK"
+msgstr "Τοκελάου"
+
+msgid "FreeEPG country TL"
+msgstr "Τιμόρ-Λέστε"
+
+msgid "FreeEPG country TM"
+msgstr "Τουρκμενιστάν"
+
+msgid "FreeEPG country TN"
+msgstr "Τυνησία"
+
+msgid "FreeEPG country TO"
+msgstr "Τόνγκα"
+
+msgid "FreeEPG country TP"
+msgstr "Τιμόρ-Λέστε"
+
+msgid "FreeEPG country TR"
+msgstr "Τουρκία"
+
+msgid "FreeEPG country TT"
+msgstr "Τρινιντάντ και Τομπάγκο"
+
+msgid "FreeEPG country TV"
+msgstr "Τουβαλού"
+
+msgid "FreeEPG country TW"
+msgstr "Ταϊβάν"
+
+msgid "FreeEPG country TZ"
+msgstr "Τανζανία"
+
+msgid "FreeEPG country UA"
+msgstr "Ουκρανία"
+
+msgid "FreeEPG country UG"
+msgstr "Ουγκάντα"
+
+msgid "FreeEPG country UK"
+msgstr "Ηνωμένο Βασίλειο"
+
+msgid "FreeEPG country UM"
+msgstr "Απομακρυσμένες Νησίδες ΗΠΑ"
+
+msgid "FreeEPG country UN"
+msgstr "Ηνωμένα Έθνη"
+
+msgid "FreeEPG country US"
+msgstr "Ηνωμένες Πολιτείες"
+
+msgid "FreeEPG country UY"
+msgstr "Ουρουγουάη"
+
+msgid "FreeEPG country UZ"
+msgstr "Ουζμπεκιστάν"
+
+msgid "FreeEPG country VA"
+msgstr "Βατικανό"
+
+msgid "FreeEPG country VC"
+msgstr "Άγιος Βικέντιος και Γρεναδίνες"
+
+msgid "FreeEPG country VD"
+msgstr "Βιετνάμ"
+
+msgid "FreeEPG country VE"
+msgstr "Βενεζουέλα"
+
+msgid "FreeEPG country VG"
+msgstr "Βρετανικές Παρθένες Νήσοι"
+
+msgid "FreeEPG country VI"
+msgstr "Αμερικανικές Παρθένες Νήσοι"
+
+msgid "FreeEPG country VN"
+msgstr "Βιετνάμ"
+
+msgid "FreeEPG country VU"
+msgstr "Βανουάτου"
+
+msgid "FreeEPG country WF"
+msgstr "Γουάλις και Φουτούνα"
+
+msgid "FreeEPG country WS"
+msgstr "Σαμόα"
+
+msgid "FreeEPG country XA"
+msgstr "Ψευδο-προφορές"
+
+msgid "FreeEPG country XB"
+msgstr "Ψευδο-αμφικατευθυντικό"
+
+msgid "FreeEPG country XK"
+msgstr "Κοσσυφοπέδιο"
+
+msgid "FreeEPG country YD"
+msgstr "Υεμένη"
+
+msgid "FreeEPG country YE"
+msgstr "Υεμένη"
+
+msgid "FreeEPG country YT"
+msgstr "Μαγιότ"
+
+msgid "FreeEPG country YU"
+msgstr "Σερβία"
+
+msgid "FreeEPG country ZA"
+msgstr "Νότια Αφρική"
+
+msgid "FreeEPG country ZM"
+msgstr "Ζάμπια"
+
+msgid "FreeEPG country ZR"
+msgstr "Κονγκό - Κινσάσα"
+
+msgid "FreeEPG country ZW"
+msgstr "Ζιμπάμπουε"
+
+msgid "FreeEPG country ZZ"
+msgstr "Άγνωστη περιοχή"
+
+msgid "No FreeEPG countries are available."
+msgstr "Δεν υπάρχουν διαθέσιμες χώρες στο FreeEPG."
+
+msgid "Select a country"
+msgstr "Επιλέξτε χώρα"
+
+msgid "Showing the saved country list."
+msgstr "Εμφανίζεται η αποθηκευμένη λίστα χωρών."

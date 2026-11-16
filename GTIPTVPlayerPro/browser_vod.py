@@ -13,7 +13,7 @@ import time
 from collections import OrderedDict, deque
 from contextlib import nullcontext
 from copy import copy
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Screens.Screen import Screen

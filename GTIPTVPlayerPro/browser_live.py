@@ -11,7 +11,8 @@ import time
 import uuid
 from .typography import set_text_if_changed
 from collections import OrderedDict, deque
-from Components.ActionMap import ActionMap
+from functools import partial
+from .action_map import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 try:
@@ -56,8 +57,8 @@ from .typography import _line_fits, clean_dynamic_text, current_text_size, ellip
 from .ui_update import set_size, set_visible
 from .download_guard import allow as _allow_account_playback
 from .download_guard import cancel_pending as _cancel_download_pending
-from .browser_common import M3U_LIVE_CHANNEL_MOVE_FOOTER_ITEMS, M3U_LIVE_STREAM_FOOTER_ITEMS
-from .browser_common import CATEGORY_MANAGER_FOOTER_ITEMS, CATEGORY_MANAGER_MOVE_FOOTER_ITEMS, FAVORITE_STAR_PATH, GTAsyncListScreen, LIVE_CHANNEL_MOVE_FOOTER_ITEMS, LIVE_CHANNEL_ORDER_FOOTER_ITEMS, LIVE_DETAIL_CACHE_TTL_SECONDS, LIVE_DETAIL_EMPTY_RETRY_SECONDS, LIVE_DETAIL_EPG_RETRY_LIMIT, LIVE_DETAIL_EPG_TIMEOUT_SECONDS, LIVE_DETAIL_PROGRESS_INTERVAL_MS, LIVE_EPG_CACHE_MAX_ENTRIES, LIVE_EPG_CACHE_TTL_SECONDS, LIVE_EPG_FETCH_LIMIT, LIVE_FULLSCREEN_RESULT_KIND, LIVE_PICON_DOWNLOAD_TIMEOUT, LIVE_PICON_PREFETCH_POLL_MS, LIVE_PICON_PREFETCH_WORKERS, LIVE_PREVIEW_FRAME_PATH, LIVE_PREVIEW_LINK_POLL_MS, LIVE_PREVIEW_VIDEO_ERROR_CHECKS, LIVE_PREVIEW_VIDEO_INITIAL_MS, LIVE_PREVIEW_VIDEO_MAX_CHECKS, LIVE_PREVIEW_VIDEO_RETRY_MS, LIVE_STREAM_FOOTER_ITEMS, LIVE_STREAM_PAGE_SIZE, M3U_SEARCH_FOOTER_ITEMS, M3U_SEARCH_RESULT_LIMIT, STALKER_LIVE_EPG_QUIET_MS, STALKER_LIVE_PICON_QUIET_MS, WORKER_LIST_TIMEOUT_SECONDS, WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _client_epg_state, _client_supports, _connect_timer, _debug, _debug_identifier, _desktop_size, _disable_live_window_animation, _epg_event_starts_in_future, _is_m3u_client, _is_stalker_client, _live_detail_dwell_ms, _load_live_picon_path, _load_shared_live_epg, _mark_picon_failure, _picon_failure_active, _picon_failure_remaining, _read_proc_number, _safe_picon_url, _scale, _stream_diag_pts_progress, _trace_fullscreen_osd, _valid_live_picon_file, _validated_content_type, _wrap_live_summary, content_client_for
+from .browser_common import LIVE_PAGE_EPG_DWELL_MS, M3U_LIVE_CHANNEL_MOVE_FOOTER_ITEMS, M3U_LIVE_STREAM_FOOTER_ITEMS
+from .browser_common import CATEGORY_MANAGER_FOOTER_ITEMS, CATEGORY_MANAGER_MOVE_FOOTER_ITEMS, FAVORITE_STAR_PATH, GTAsyncListScreen, LIVE_CHANNEL_MOVE_FOOTER_ITEMS, LIVE_CHANNEL_ORDER_FOOTER_ITEMS, LIVE_DETAIL_CACHE_TTL_SECONDS, LIVE_DETAIL_EMPTY_RETRY_SECONDS, LIVE_DETAIL_EPG_RETRY_LIMIT, LIVE_DETAIL_EPG_TIMEOUT_SECONDS, LIVE_DETAIL_PROGRESS_INTERVAL_MS, LIVE_EPG_CACHE_MAX_ENTRIES, LIVE_EPG_CACHE_TTL_SECONDS, LIVE_EPG_FETCH_LIMIT, LIVE_FULLSCREEN_RESULT_KIND, LIVE_PICON_DOWNLOAD_TIMEOUT, LIVE_PICON_PREFETCH_POLL_MS, LIVE_PICON_PREFETCH_WORKERS, LIVE_PREVIEW_FRAME_PATH, LIVE_PREVIEW_LINK_POLL_MS, LIVE_PREVIEW_VIDEO_ERROR_CHECKS, LIVE_PREVIEW_VIDEO_INITIAL_MS, LIVE_PREVIEW_VIDEO_MAX_CHECKS, LIVE_PREVIEW_VIDEO_RETRY_MS, LIVE_STREAM_FOOTER_ITEMS, LIVE_STREAM_PAGE_SIZE, M3U_SEARCH_FOOTER_ITEMS, M3U_SEARCH_RESULT_LIMIT, STALKER_LIVE_EPG_QUIET_MS, STALKER_LIVE_PICON_QUIET_MS, WORKER_LIST_TIMEOUT_SECONDS, WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _client_epg_state, _client_supports, _connect_timer, _debug, _debug_identifier, _desktop_size, _disable_live_window_animation, _epg_event_starts_in_future, _is_m3u_client, _is_stalker_client, _live_detail_dwell_ms, _load_live_picon_path, _load_shared_live_epg, _mark_picon_failure, _picon_failure_active, _picon_failure_remaining, _read_proc_number, _live_picon_path_is_current, _live_picon_url, _scale, _stream_diag_pts_progress, _trace_fullscreen_osd, _valid_live_picon_file, _validated_content_type, _wrap_live_summary, content_client_for
 
 LIVE_INITIAL_RESULT_POLL_MS = 45
 
@@ -285,7 +286,7 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._select_category_id(self._selected_category_id)
 
     def _poll_result(self):
-        if self._closed:
+        if getattr(self, '_closed', True) is not False:
             return
         result = self._save_result
         if result is not None:
@@ -837,23 +838,35 @@ class _GTStreamListBase(GTAsyncListScreen):
             self._timer.start(LIVE_INITIAL_RESULT_POLL_MS, True)
 
     def load_items(self):
-        entries = self.client.load_items(self.content_type, self.category.category_id)
-        if self.content_type == 'live':
-            checker = getattr(self.client, 'has_more_items', None)
+        category_id = self.category.category_id
+        content_type = self.content_type
+        client = self.client
+        hidden_ids = getattr(self, '_hidden_category_ids', ())
+        token = self._load_token
+        lock = self._load_result_lock
+        entries = client.load_items(content_type, category_id)
+        if content_type == 'live':
+            checker = getattr(client, 'has_more_items', None)
             try:
-                self._live_has_more = bool(checker is not None and checker('live', self.category.category_id))
+                has_more = bool(checker is not None and checker('live', category_id))
             except Exception:
-                self._live_has_more = False
-        category_id = str(getattr(self.category, 'category_id', '') or '').strip()
-        if not category_id or category_filter_active(getattr(self, '_hidden_category_ids', ())):
-            return filter_hidden_category_items(entries, getattr(self, '_hidden_category_ids', ()), category_id)
+                has_more = False
+            with lock:
+                if getattr(self, '_closed', True) is not False or self._load_token is not token:
+                    raise _WorkerCancelled()
+                if token is not None:
+                    token.check()
+                self._live_has_more = has_more
+        category_id = str(category_id or '').strip()
+        if not category_id or category_filter_active(hidden_ids):
+            return filter_hidden_category_items(entries, hidden_ids, category_id)
         return entries
 
     def _poll_result(self):
+        if getattr(self, '_closed', True) is not False:
+            return
         if self.content_type != 'live':
             GTAsyncListScreen._poll_result(self)
-            return
-        if self._closed:
             return
         if not self._ready:
             if self._load_token is not None and self._load_token.expired():
@@ -929,37 +942,40 @@ class _GTStreamListBase(GTAsyncListScreen):
         if self._live_pending_target_index is not None and self._live_has_more:
             self._start_live_more(force=True)
 
-    def _run_live_more(self, generation, token=None):
+    def _run_live_more(self, generation, category_id, token=None):
+        client = getattr(self, 'client', None)
+        lock = getattr(self, '_live_more_worker_events_lock', None)
+        if client is None or lock is None or getattr(self, '_closed', True) is not False:
+            return
+        hidden_ids = getattr(self, '_hidden_category_ids', ())
+        checker = getattr(client, 'has_more_items', None)
         entries = []
         error = ''
         has_more = False
         try:
-            loader = getattr(self.client, 'load_more_items', None)
+            loader = getattr(client, 'load_more_items', None)
             if loader is not None:
-                _bounded_client_call(self.client, token, lambda: loader('live', self.category.category_id))
-                entries = list(_bounded_client_call(self.client, token, lambda: self.client.load_items('live', self.category.category_id)) or [])
-                if not str(getattr(self.category, 'category_id', '') or '').strip() or category_filter_active(getattr(self, '_hidden_category_ids', ())):
-                    entries = filter_hidden_category_items(entries, getattr(self, '_hidden_category_ids', ()), getattr(self.category, 'category_id', ''))
-            checker = getattr(self.client, 'has_more_items', None)
-            has_more = bool(checker is not None and checker('live', self.category.category_id))
+                _bounded_client_call(client, token, lambda: loader('live', category_id))
+                entries = list(_bounded_client_call(client, token, lambda: client.load_items('live', category_id)) or [])
+                if not str(category_id or '').strip() or category_filter_active(hidden_ids):
+                    entries = filter_hidden_category_items(entries, hidden_ids, category_id)
+            has_more = bool(checker is not None and checker('live', category_id))
         except _WorkerCancelled:
             return
         except ContentError as caught:
             error = str(caught)
-            checker = getattr(self.client, 'has_more_items', None)
-            has_more = bool(checker is not None and checker('live', self.category.category_id))
+            if token is not None and not token.active():
+                return
+            try:
+                has_more = bool(checker is not None and checker('live', category_id))
+            except Exception:
+                pass
         except Exception:
             error = N_('Could not load content')
-        if token is not None:
-            try:
-                token.check()
-            except _WorkerCancelled:
-                return
-        lock = getattr(self, '_live_more_worker_events_lock', None)
-        if lock is None:
-            self._live_more_results[generation, token] = (entries, error, has_more)
-            return
         with lock:
+            if (getattr(self, '_closed', True) is not False
+                    or generation != getattr(self, '_live_catalog_generation', None)):
+                return
             if token is not None and (not token.active() or getattr(self, '_live_more_token', None) is not token):
                 return
             self._live_more_results[generation, token] = (entries, error, has_more)
@@ -1166,12 +1182,13 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
     """One live-list implementation for Xtream, Stalker and M3U sources."""
     _startup_preview = True
 
-    def __init__(self, session, account, content_type, category, client=None, weather_forecast=None, favorite_store=None, hidden_category_ids=None, live_source_categories=None, *, defer_preview_exit=False):
+    def __init__(self, session, account, content_type, category, client=None, weather_forecast=None, favorite_store=None, hidden_category_ids=None, live_source_categories=None, *, defer_preview_exit=False, visible_live_categories=None):
         self.account = account
         self.category = category
         self._source_categories = list(live_source_categories or [category])
         self.client = client or content_client_for(account)
         self.content_type = _validated_content_type(self.client, content_type)
+        self._visible_live_categories = tuple(visible_live_categories or ()) if self.content_type == 'live' else ()
         self._channel_move = None
         self._bulk_channel_move_enabled = self.content_type == 'live' and _is_m3u_client(self.client)
         self._bulk_move_save = None
@@ -1229,8 +1246,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._live_picon_prefetch_catalog_epoch = None
         self._live_picon_prefetch_priority = None
         self._live_picon_prefetch_completed = set()
-        self._live_picon_prefetch_tokens = set()
-        self._live_picon_prefetch_active = set()
+        self._live_picon_prefetch_tokens = {}
         self._live_picon_prefetch_worker_counts = {}
         self._init_programme_poster(eTimer, _connect_timer, settings)
         self._preview_item = None
@@ -1254,6 +1270,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._live_row_picon_revision = 0
         self._live_row_picon_painted_revision = -1
         self._detail_foreground_state = None
+        self._m3u_epg_revision = None
+        self._m3u_page_epg_worker = None
         self._live_more_worker_tokens = set()
         self._live_more_worker_events_lock = threading.Lock()
         self._pre_list_reference = None
@@ -1354,6 +1372,14 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._setup_live_widgets(px)
         self['header'].setText('GT IPTV PLAYER PRO  •  {}'.format(localized_upper(_('LIVE TV'))))
         self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions', 'MoviePlayerActions'], {name: self._live_list_action(name, action) for name, action in {'ok': self.open_selected, 'cancel': self.close_list, 'stop': self.close_list, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'green': self.refresh_streams, 'red': self.toggle_selected_favorite, 'blue': self.open_channel_search, 'yellow': self.open_content_edit}.items()}, -1)
+        if len(self._visible_live_categories) > 1:
+            next_category = partial(self._move_live_category, 1)
+            previous_category = partial(self._move_live_category, -1)
+            self['live_category_actions'] = ActionMap(
+                ['ChannelSelectBaseActions', 'MoviePlayerActions', 'DirectionActions'],
+                {'nextBouquet': next_category, 'prevBouquet': previous_category,
+                 'channelUp': next_category, 'channelDown': previous_category,
+                 'chplus': next_category, 'chminus': previous_category}, -2)
         if hasattr(self, 'onShown'):
             self.onShown.append(self._restore_preview_fullscreen_surface)
             self.onShown.append(self.start_epg_clock)
@@ -1402,6 +1428,41 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 return self._place_bulk_channels(before=True)
             return action()
         return dispatch
+
+    def _live_list_caption(self):
+        if self._visible_live_categories:
+            return self.category.name
+        return _('CHANNEL LIST')
+
+    def _move_live_category(self, offset):
+        if (self._closed or self._loading or self._fullscreen_active or self._live_modal_active
+                or self._channel_move is not None or self._preview_fullscreen_pending is not None
+                or not getattr(self, 'shown', True)
+                or getattr(self.session, 'current_dialog', self) is not self):
+            return
+        categories = self._visible_live_categories
+        current_id = str(self.category.category_id or '')
+        for index, category in enumerate(categories):
+            if str(category.category_id or '') == current_id:
+                self._switch_live_category(categories[(index + offset) % len(categories)])
+                return
+
+    @broadcast_refresh_after
+    def _switch_live_category(self, category):
+        self.category = category
+        self._bind_live_channel_order()
+        self._live_recall_context = None
+        self._playing_preview_index = -1
+        self._preview_item = None
+        self._preview_epg_events = []
+        self._preview_epg_loaded_at = 0.0
+        self._set_dynamic_breadcrumb('{}  >  {}'.format(self.account.display_name, category.name))
+        set_text_if_changed(self['ribbon_channel'], '')
+        self.start_load()
+        if self._loading:
+            self._clear_live_stream_rows()
+            fit_dynamic_text(self['list_caption'], self._live_list_caption(), max_lines=1)
+            self._render_detail_waiting()
 
     def _cancel_preview_fullscreen(self):
         self._preview_fullscreen_timer.stop()
@@ -2088,7 +2149,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if self._closed or self._fullscreen_active:
             self._live_render_page_key = None
             return
-        fit_dynamic_text(self['list_caption'], self._channel_move_guidance() if self._channel_move is not None else _('CHANNEL LIST'), max_lines=1)
+        fit_dynamic_text(self['list_caption'], self._channel_move_guidance() if self._channel_move is not None else self._live_list_caption(), max_lines=1)
         if self._error:
             ellipsize_dynamic_text(self['message'], _(self._error), fallback_chars=80)
             self._clear_live_stream_rows()
@@ -2488,12 +2549,13 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             return False
         self._live_more_loading = True
         generation = self._live_catalog_generation
+        category_id = self.category.category_id
         worker_token = _WorkerToken(WORKER_LIST_TIMEOUT_SECONDS)
         self._live_more_token = worker_token
         with self._live_more_worker_events_lock:
             self._live_more_worker_tokens.add(worker_token)
         try:
-            worker = threading.Thread(target=self._run_live_more, args=(generation, worker_token), daemon=True)
+            worker = threading.Thread(target=self._run_live_more, args=(generation, category_id, worker_token), daemon=True)
             worker.start()
         except (RuntimeError, OSError, MemoryError):
             _cancel_worker_token(worker_token)
@@ -2507,12 +2569,16 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._timer.start(100, True)
         return True
 
-    def _run_live_more(self, generation, worker_token=None):
+    def _run_live_more(self, generation, category_id, worker_token=None):
+        lock = getattr(self, '_live_more_worker_events_lock', None)
+        workers = getattr(self, '_live_more_worker_tokens', None)
+        if lock is None or workers is None:
+            return
         try:
-            return _GTStreamListBase._run_live_more(self, generation, worker_token)
+            return _GTStreamListBase._run_live_more(self, generation, category_id, worker_token)
         finally:
-            with self._live_more_worker_events_lock:
-                self._live_more_worker_tokens.discard(worker_token)
+            with lock:
+                workers.discard(worker_token)
 
     def _selection_key(self, item):
         return str(getattr(item, 'stream_id', '') or '')
@@ -2561,7 +2627,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 return []
         return []
 
-    def _store_detail_component(self, stream_id, component, value, expected_epoch=None):
+    def _store_detail_component(self, stream_id, component, value, expected_epoch=None,
+                                expected_epg_revision=None):
         """Commit a completed component independently of the current row."""
         stream_id = str(stream_id or '')
         if not stream_id:
@@ -2570,6 +2637,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         now_wall = time.time()
         with self._detail_store_lock:
             if expected_epoch is not None and expected_epoch != self._detail_store_epoch:
+                return False
+            if expected_epg_revision is not None and expected_epg_revision is not self._m3u_epg_revision:
                 return False
             entry = self._detail_store.setdefault(stream_id, {})
             if component == 'events':
@@ -2586,7 +2655,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                     entry['epg_retry_after'] = now_mono + LIVE_DETAIL_EMPTY_RETRY_SECONDS
             elif component == 'picon_path':
                 path = artwork_path(value)
-                if not path or not _valid_live_picon_file(path):
+                valid = getattr(path, 'live_valid', None)
+                if not path or not (valid if valid is not None else _valid_live_picon_file(path)):
                     path = ''
                 previous = entry.get('picon_path', '')
                 if (path != previous
@@ -2619,10 +2689,12 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             entry = dict(self._detail_store.get(stream_id, {}))
         path = artwork_path(entry.get('picon_path', '') or '')
         picon_cached_at = float(entry.get('picon_cached_at', 0.0) or 0.0)
-        if not path or not _valid_live_picon_file(path) or now - picon_cached_at >= LIVE_DETAIL_CACHE_TTL_SECONDS:
+        if (not path or not _valid_live_picon_file(path)
+                or now - picon_cached_at >= LIVE_DETAIL_CACHE_TTL_SECONDS
+                or (item is not None and not _live_picon_path_is_current(self.client, item, path))):
             path = ''
         if not path and item is not None:
-            url = _safe_picon_url(getattr(item, 'icon', ''))
+            url = _live_picon_url(self.client, item)
             cached_path = _cached_picon_path(url) if url else ''
             if cached_path and _valid_live_picon_file(cached_path):
                 path = cached_path
@@ -2632,33 +2704,62 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         picon_checked = bool(path or not url or _picon_failure_active(url))
         if picon_only:
             return {'picon_path': path, 'picon_checked': picon_checked}
-        events = []
-        epg_cached_at = float(entry.get('epg_cached_at', 0.0) or 0.0)
-        if entry.get('events') and now - epg_cached_at < LIVE_DETAIL_CACHE_TTL_SECONDS:
-            events = list(entry['events'])
-        epg_retry_after = float(entry.get('epg_retry_after', 0.0) or 0.0)
-        epg_checked = bool(events) or now < epg_retry_after
+        events, epg_checked = self._detail_epg_fields(entry, now)
         with self._detail_store_lock:
             stored = dict(self._detail_store.get(stream_id, {}))
         captured_at = max(float(stored.get('epg_captured_at', 0.0) or 0.0), float(stored.get('picon_captured_at', 0.0) or 0.0))
         return {'stream_id': stream_id, 'events': events, 'epg_checked': epg_checked, 'picon_path': path, 'picon_checked': picon_checked, 'captured_at': captured_at or time.time()}
 
-    def _publish_detail_component(self, generation, stream_id, component, value, store_epoch=None):
+    def _detail_epg_fields(self, entry, now):
+        events = []
+        epg_cached_at = float(entry.get('epg_cached_at', 0.0) or 0.0)
+        if entry.get('events') and now - epg_cached_at < LIVE_DETAIL_CACHE_TTL_SECONDS:
+            events = list(entry['events'])
+        if events and _is_m3u_client(self.client):
+            captured_at = entry.get('epg_captured_at', 0.0)
+            wall_time = time.time()
+            if any(captured_at < (getattr(event, field, 0) or 0) <= wall_time
+                   for event in events for field in ('start_timestamp', 'end_timestamp')):
+                events = []
+        retry_after = float(entry.get('epg_retry_after', 0.0) or 0.0)
+        return events, bool(events) or now < retry_after
+
+    def _publish_detail_component(self, generation, stream_id, component, value, store_epoch=None,
+                                  epg_revision=None):
         if self._closed:
             return
-        stored = self._store_detail_component(stream_id, component, value, expected_epoch=store_epoch)
+        stored = self._store_detail_component(stream_id, component, value, expected_epoch=store_epoch,
+                                              expected_epg_revision=epg_revision)
         if not stored:
             return
-        if generation != self._detail_generation:
-            return
         with self._detail_results_lock:
-            self._detail_results.setdefault(generation, []).append((str(stream_id or ''), component, value))
+            if generation == self._detail_generation:
+                self._detail_results.setdefault(generation, []).append((str(stream_id or ''), component, value))
 
     def _visible_detail_page(self):
         page_start = int(self.selected_index / self.page_size) * self.page_size
         items = tuple(self._entries[page_start:page_start + self.page_size])
         page_key = (page_start, tuple((self._selection_key(item) for item in items)))
         return (page_key, items)
+
+    def _update_m3u_epg_revision(self):
+        lookup = getattr(self.client, 'epg_revision', None)
+        revision = lookup() if callable(lookup) else None
+        if revision is self._m3u_epg_revision:
+            return False
+        with self._detail_store_lock:
+            self._m3u_epg_revision = revision
+            for entry in self._detail_store.values():
+                for field in ('events', 'epg_cached_at', 'epg_captured_at', 'epg_retry_after'):
+                    entry.pop(field, None)
+        self._detail_page_key = None
+        return True
+
+    def _pending_m3u_page_epg(self, stream_ids):
+        now = time.monotonic()
+        with self._detail_store_lock:
+            return tuple(key for key in dict.fromkeys(stream_ids) if key and
+                         not self._detail_epg_fields(self._detail_store.get(key, {}), now)[1])
 
     def _show_selected_local_detail(self, item, key, cached=None):
         if key != self._detail_selection_key or not self._detail_selection_started_at:
@@ -2680,7 +2781,8 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if self._preview_epg_events:
             self._render_selected_epg(self._preview_epg_events)
             self._detail_progress_timer.start(LIVE_DETAIL_PROGRESS_INTERVAL_MS, True)
-        elif cached.get('epg_checked') or self._provider_epg_loader() is None:
+        elif (cached.get('epg_checked') or self._provider_epg_loader() is None
+                or (_is_m3u_client(self.client) and self._m3u_epg_revision is None)):
             self._render_selected_epg([])
         else:
             self._render_detail_waiting()
@@ -2690,19 +2792,29 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             return
         item = self._entries[self.selected_index]
         key = self._selection_key(item)
+        m3u = _is_m3u_client(self.client)
+        if m3u:
+            self._update_m3u_epg_revision()
         page_key = self._visible_detail_page()[0]
         page_changed = page_key != self._detail_page_key
         selection_changed = key != self._detail_selection_key
         if selection_changed:
             self._detail_epg_retry_count = 0
         if selection_changed or page_changed:
-            self._cancel_selected_detail(clear_selection=False)
+            self._cancel_selected_detail(clear_selection=False, keep_page_epg=m3u and not page_changed)
         if page_changed:
             self._detail_page_key = page_key
         cached = self._detail_store_snapshot(key, item=item)
         if selection_changed or page_changed:
             self._show_selected_local_detail(item, key, cached)
         if self._provider_epg_loader() is None:
+            return
+        if m3u:
+            if (self._m3u_epg_revision is not None and not self._preview_link_pending
+                    and not self._detail_deadline and not self._detail_state_active(self._detail_foreground_state)
+                    and self._pending_m3u_page_epg(page_key[1])):
+                self._detail_deadline = time.monotonic() + LIVE_PAGE_EPG_DWELL_MS / 1000.0
+                self._detail_dwell_timer.start(LIVE_PAGE_EPG_DWELL_MS, True)
             return
         if cached.get('epg_checked'):
             if not cached.get('events'):
@@ -2736,11 +2848,14 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             _cancel_worker_token(token)
         _cancel_worker_token(state.get('token'))
 
-    def _cancel_selected_detail(self, clear_selection=False):
+    def _cancel_selected_detail(self, clear_selection=False, keep_page_epg=False):
         self._cancel_programme_poster()
         self._detail_epg_retry_key = ''
         self._detail_epg_retry_deadline = 0.0
-        for timer in (self._detail_dwell_timer, self._detail_epg_retry_timer, self._detail_poll_timer, self._detail_progress_timer, self._summary_scroll_timer):
+        timers = (self._detail_epg_retry_timer, self._detail_progress_timer, self._summary_scroll_timer)
+        if not keep_page_epg:
+            timers += (self._detail_dwell_timer, self._detail_poll_timer)
+        for timer in timers:
             try:
                 timer.stop()
             except Exception:
@@ -2748,12 +2863,13 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._summary_selection_key = None
         hide_scrollbar(self, 'summary_scrollbar')
         set_text_if_changed(self['summary_scroll'], '')
-        self._detail_generation += 1
-        self._cancel_detail_state(self._detail_foreground_state)
-        self._detail_foreground_state = None
-        self._detail_deadline = 0.0
-        with self._detail_results_lock:
-            self._detail_results = {}
+        if not keep_page_epg:
+            self._detail_generation += 1
+            self._cancel_detail_state(self._detail_foreground_state)
+            self._detail_foreground_state = None
+            self._detail_deadline = 0.0
+            with self._detail_results_lock:
+                self._detail_results = {}
         if clear_selection:
             self._detail_selection_key = None
             self._detail_page_key = None
@@ -2788,11 +2904,13 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
 
     def _detail_dwell_fired(self):
         if self._closed or self._fullscreen_active or self._loading or self._live_modal_active or self._preview_link_pending or not self._entries:
+            self._detail_deadline = 0.0
             return
         remaining = self._detail_deadline - time.monotonic()
         if remaining > 0.01:
             self._detail_dwell_timer.start(max(10, int(round(remaining * 1000))), True)
             return
+        self._detail_deadline = 0.0
         page_key = self._visible_detail_page()[0]
         if page_key != self._detail_page_key:
             return
@@ -2801,6 +2919,9 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         selected = self._entries[self.selected_index]
         stream_id = self._selection_key(selected)
         if not stream_id or stream_id != self._detail_selection_key:
+            return
+        if _is_m3u_client(self.client):
+            self._start_m3u_page_epg((stream_id,) + page_key[1])
             return
         if _is_stalker_client(self.client) and self._preview_service_active:
             now = time.monotonic()
@@ -2828,6 +2949,56 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         worker.start()
         self._detail_poll_timer.start(75, True)
         _debug('selected EPG started page={} selected={}'.format(page_key[0], stream_id))
+
+    def _start_m3u_page_epg(self, stream_ids):
+        loader = self._provider_epg_loader()
+        revision = self._m3u_epg_revision
+        if loader is None or revision is None:
+            return
+        pending = self._pending_m3u_page_epg(stream_ids)
+        if not pending:
+            return
+        previous = self._m3u_page_epg_worker
+        if previous is not None and previous.is_alive():
+            self._detail_deadline = time.monotonic() + LIVE_PAGE_EPG_DWELL_MS / 1000.0
+            self._detail_dwell_timer.start(LIVE_PAGE_EPG_DWELL_MS, True)
+            return
+        generation = self._detail_generation
+        event = threading.Event()
+        token = _WorkerToken(LIVE_DETAIL_EPG_TIMEOUT_SECONDS)
+        self._detail_foreground_state = {
+            'generation': generation, 'page_epg': True,
+            'events': {'events': event}, 'tokens': {'events': token},
+        }
+        worker = threading.Thread(target=self._load_m3u_page_epg, daemon=True,
+                                  args=(generation, revision, pending, loader, event,
+                                        self._detail_store_epoch, token))
+        self._m3u_page_epg_worker = worker
+        try:
+            worker.start()
+        except (OSError, RuntimeError):
+            token.cancel()
+            self._detail_foreground_state = None
+            self._m3u_page_epg_worker = None
+            return
+        self._detail_poll_timer.start(75, True)
+
+    def _load_m3u_page_epg(self, generation, revision, stream_ids, loader, event, store_epoch, token):
+        """Read the visible channels from the local XMLTV index in page order."""
+        try:
+            for stream_id in stream_ids:
+                token.check()
+                try:
+                    events = list(loader(stream_id, LIVE_EPG_FETCH_LIMIT) or [])
+                except Exception:
+                    events = []
+                token.check()
+                self._publish_detail_component(generation, stream_id, 'events', events,
+                                               store_epoch=store_epoch, epg_revision=revision)
+        except _WorkerCancelled:
+            pass
+        finally:
+            event.set()
 
     def _provider_epg_loader(self):
         loader = getattr(self.client, 'load_epg', None)
@@ -2990,7 +3161,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             pass
         with self._live_picon_prefetch_lock:
             self._live_picon_prefetch_generation += 1
-            tokens = tuple(self._live_picon_prefetch_tokens)
+            tokens = tuple(self._live_picon_prefetch_tokens.values())
             self._live_picon_prefetch_queue.clear()
             self._live_picon_prefetch_jobs.clear()
             self._live_picon_prefetch_known.clear()
@@ -3006,19 +3177,35 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._clear_live_visible_picons()
             self._clear_live_selected_picon()
 
+    def _sync_m3u_epg_picon_queue(self):
+        lookup = getattr(self.client, 'epg_picon_urls', None)
+        urls = lookup() if callable(lookup) else None
+        if urls is getattr(self, '_queued_epg_picon_urls', None):
+            return False
+        self._queued_epg_picon_urls = urls
+        self._cancel_live_picon_prefetch()
+        return True
+
     def _queue_live_category_picons(self, page_start=None, page_items=None):
-        """Prioritize ten visible logos and at most the following page."""
+        """Queue the current page and allow lookahead for provider lists."""
         if self._closed or self._fullscreen_active or getattr(self, '_live_modal_active', False) or (not self._entries):
             return
+        self._sync_m3u_epg_picon_queue()
         if page_start is None:
             page_start = self.selected_index // self.page_size * self.page_size
         if page_items is None:
             page_items = self._entries[page_start:page_start + self.page_size]
         visible_items = tuple(page_items or ())
-        ordered_items = tuple(self._entries[page_start:page_start + self.page_size * 2])
+        m3u = _is_m3u_client(self.client)
+        ordered_items = visible_items if m3u else self._entries[page_start:page_start + self.page_size * 2]
         target_keys = {self._selection_key(item) for item in ordered_items}
         with self._live_picon_prefetch_lock:
             generation = self._live_picon_prefetch_generation
+            active = self._live_picon_prefetch_tokens
+            if m3u:
+                for (unused_generation, key), token in active.items():
+                    if key not in target_keys:
+                        token.cancel()
             self._live_picon_prefetch_known.intersection_update(target_keys)
             jobs = self._live_picon_prefetch_jobs
             for key in tuple(jobs):
@@ -3029,11 +3216,12 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 key = self._selection_key(item)
                 if not key:
                     continue
-                url = _safe_picon_url(getattr(item, 'icon', ''))
+                url = _live_picon_url(self.client, item)
                 if not url:
                     continue
-                if key in self._live_picon_prefetch_known:
-                    if key in jobs or (generation, key) in self._live_picon_prefetch_active:
+                if m3u or key in self._live_picon_prefetch_known:
+                    token = active.get((generation, key))
+                    if key in jobs or (token is not None and token.active()):
                         continue
                     # The disk cache or GUI path hint may have expired since
                     # this key completed. A worker can recover/download it.
@@ -3082,7 +3270,6 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                         self._live_picon_prefetch_worker_counts[generation] = active - 1
 
     def _live_picon_prefetch_worker(self, generation):
-        key = None
         try:
             while True:
                 with self._live_picon_prefetch_lock:
@@ -3090,45 +3277,33 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                         return
                     key = self._live_picon_prefetch_queue.popleft()
                     job = self._live_picon_prefetch_jobs.pop(key, None)
-                    if job is not None:
-                        self._live_picon_prefetch_active.add((generation, key))
-                if job is None:
-                    continue
-                item, store_epoch = job
-                token = _WorkerToken(max(3, LIVE_PICON_DOWNLOAD_TIMEOUT + 2))
-                with self._live_picon_prefetch_lock:
-                    if generation != self._live_picon_prefetch_generation:
-                        self._live_picon_prefetch_active.discard((generation, key))
-                        token.cancel()
-                        return
-                    self._live_picon_prefetch_tokens.add(token)
+                    if job is None:
+                        continue
+                    item, store_epoch = job
+                    owner = (generation, key)
+                    token = _WorkerToken(max(3, LIVE_PICON_DOWNLOAD_TIMEOUT + 2))
+                    self._live_picon_prefetch_tokens[owner] = token
                 path = ''
                 try:
                     path = self._load_detail_picon_path(item, token)
                 except _WorkerCancelled:
                     pass
                 except Exception:
-                    url = _safe_picon_url(getattr(item, 'icon', ''))
-                    if url:
+                    url = _live_picon_url(self.client, item)
+                    if url and token.active():
                         _mark_picon_failure(url)
                 finally:
                     with self._live_picon_prefetch_lock:
-                        self._live_picon_prefetch_tokens.discard(token)
-                with self._live_picon_prefetch_lock:
-                    current = bool(generation == self._live_picon_prefetch_generation and (not self._closed) and (not self._fullscreen_active) and (not getattr(self, '_live_modal_active', False)))
-                if not current:
-                    with self._live_picon_prefetch_lock:
-                        self._live_picon_prefetch_active.discard((generation, key))
-                    return
-                self._store_detail_component(key, 'picon_path', path, expected_epoch=store_epoch)
-                with self._live_picon_prefetch_lock:
-                    self._live_picon_prefetch_active.discard((generation, key))
-                    if generation == self._live_picon_prefetch_generation:
-                        self._live_picon_prefetch_completed.add(key)
+                        active = self._live_picon_prefetch_tokens
+                        if active.get(owner) is token:
+                            del active[owner]
+                            if (token.active() and generation == self._live_picon_prefetch_generation
+                                    and not self._closed and not self._fullscreen_active
+                                    and not getattr(self, '_live_modal_active', False)):
+                                self._store_detail_component(key, 'picon_path', path, expected_epoch=store_epoch)
+                                self._live_picon_prefetch_completed.add(key)
         finally:
             with self._live_picon_prefetch_lock:
-                if key is not None:
-                    self._live_picon_prefetch_active.discard((generation, key))
                 active = int(self._live_picon_prefetch_worker_counts.get(generation, 0))
                 if active <= 1:
                     self._live_picon_prefetch_worker_counts.pop(generation, None)
@@ -3179,6 +3354,9 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
     def _schedule_live_active_picon(self, item, key):
         """Queue artwork only for the exact channel opened with OK."""
         self._cancel_live_active_picon_fetch(clear_target=True)
+        if _is_m3u_client(self.client):
+            self._refresh_live_active_picon(force=True)
+            return
         key = str(key or '')
         if not key or item is None or (not self._selected_detail_preview_ready(key)):
             self._refresh_live_active_picon(force=True)
@@ -3191,14 +3369,14 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             if not cached.get('picon_path'):
                 self._defer_live_active_picon_failure(item)
             return
-        if not _safe_picon_url(getattr(item, 'icon', '')):
+        if not _live_picon_url(self.client, item):
             return
         delay_ms = _live_detail_dwell_ms(self.client)
         self._live_active_picon_fetch_deadline = time.monotonic() + delay_ms / 1000.0
         self._live_active_picon_timer.start(delay_ms, True)
 
     def _defer_live_active_picon_failure(self, item):
-        url = _safe_picon_url(getattr(item, 'icon', ''))
+        url = _live_picon_url(self.client, item)
         remaining = _picon_failure_remaining(url) if url else 0.0
         if remaining <= 0.0:
             return False
@@ -3227,7 +3405,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             cached_path = artwork_path(cached.get('picon_path', '') or '')
             if cached_path and _valid_live_picon_file(cached_path):
                 return True
-            if not _safe_picon_url(getattr(item, 'icon', '')):
+            if not _live_picon_url(self.client, item):
                 return True
             if getattr(self, '_live_active_picon_fetch_state', None) is not None:
                 return True
@@ -3288,7 +3466,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         except _WorkerCancelled:
             pass
         except Exception:
-            url = _safe_picon_url(getattr(item, 'icon', ''))
+            url = _live_picon_url(self.client, item)
             if url:
                 _mark_picon_failure(url)
         finally:
@@ -3332,7 +3510,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._live_active_picon_fetch_state = None
         item = self._live_active_picon_fetch_item
         if timed_out and item is not None:
-            url = _safe_picon_url(getattr(item, 'icon', ''))
+            url = _live_picon_url(self.client, item)
             if url:
                 _mark_picon_failure(url)
         cached = self._detail_store_snapshot(key, item=item, picon_only=True)
@@ -3354,6 +3532,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             return
         generation = self._detail_generation
         state = self._detail_foreground_state
+        page_epg = state is not None and state.get('page_epg')
         worker_active = False
         worker_finished = False
         timed_out_components = []
@@ -3367,7 +3546,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             worker_finished = not worker_active
         with self._detail_results_lock:
             results = self._detail_results.pop(generation, [])
-        if 'events' in timed_out_components and state is not None:
+        if 'events' in timed_out_components and state is not None and not page_epg:
             stream_id = str(state.get('stream_id', '') or '')
             result_already_published = any((result[0] == stream_id and result[1] == 'events' for result in results))
             if stream_id and (not result_already_published):
@@ -3382,7 +3561,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
                 self._render_selected_epg(self._preview_epg_events)
                 if self._preview_epg_events:
                     self._detail_progress_timer.start(LIVE_DETAIL_PROGRESS_INTERVAL_MS, True)
-                else:
+                elif not page_epg:
                     self._schedule_selected_epg_retry(stream_id)
             elif component == 'picon_path':
                 path = artwork_path(value)
@@ -3673,7 +3852,11 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         if self._closed or self._fullscreen_active:
             return
         install_ready_live_art(self)
-        if self._update_epg_clock():
+        clock_changed = self._update_epg_clock()
+        if _is_m3u_client(self.client) and (self._update_m3u_epg_revision() or clock_changed):
+            self._schedule_selected_detail()
+        epg_icons_changed = self._sync_m3u_epg_picon_queue()
+        if clock_changed or epg_icons_changed:
             # Retry missing artwork when the current page stays open.
             self._queue_live_category_picons()
         else:
@@ -3793,9 +3976,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         with self._detail_store_lock:
             stored_channels = {key: dict(value) for key, value in self._detail_store.items()}
         for key, entry in stored_channels.items():
-            events = []
-            if entry.get('events') and now - float(entry.get('epg_cached_at', 0.0) or 0.0) < LIVE_DETAIL_CACHE_TTL_SECONDS:
-                events = list(entry['events'])
+            events, unused_checked = self._detail_epg_fields(entry, now)
             path = artwork_path(entry.get('picon_path', '') or '')
             if not path or not _valid_live_picon_file(path) or now - float(entry.get('picon_cached_at', 0.0) or 0.0) >= LIVE_DETAIL_CACHE_TTL_SECONDS:
                 path = ''

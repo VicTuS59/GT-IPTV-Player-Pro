@@ -177,7 +177,9 @@ class MatchingTests(unittest.TestCase):
             self.assertEqual(scheduler._refresh_job(binding, event, time.monotonic() + 5), 'success')
             refresh = m3u_epg_scheduler.refresh_source
             self.assertEqual(refresh.call_args.args[2], frozenset())
-            self.assertEqual(refresh.call_args.kwargs['wanted_names'], {m3u.epg_name_key('Das Erste HD'): 'Das Erste HD'})
+        self.assertEqual(refresh.call_args.kwargs['wanted_names'], {
+            m3u.epg_name_key('Das Erste HD'): ('Das Erste HD', '', '', ''),
+        })
 
     def test_explicit_ids_unique_names_and_manual_choices_are_cached(self):
         name = m3u.epg_name_key('Das Erste HD')

@@ -5,7 +5,7 @@ from copy import copy
 import re
 from xml.sax.saxutils import quoteattr
 
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Components.ScrollLabel import ScrollLabel

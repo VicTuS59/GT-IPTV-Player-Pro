@@ -1,0 +1,861 @@
+# FreeEPG settings and region labels
+# Region display names from Unicode CLDR. See LICENSING.md.
+msgid ""
+msgstr ""
+"Language: ar\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Could not open the country list."
+msgstr "تعذر فتح قائمة البلدان."
+
+msgid "Custom URL"
+msgstr "عنوان URL مخصص"
+
+msgid "FreeEPG country AC"
+msgstr "جزيرة أسينشيون"
+
+msgid "FreeEPG country AD"
+msgstr "أندورا"
+
+msgid "FreeEPG country AE"
+msgstr "الإمارات العربية المتحدة"
+
+msgid "FreeEPG country AF"
+msgstr "أفغانستان"
+
+msgid "FreeEPG country AG"
+msgstr "أنتيغوا وبربودا"
+
+msgid "FreeEPG country AI"
+msgstr "أنغويلا"
+
+msgid "FreeEPG country AL"
+msgstr "ألبانيا"
+
+msgid "FreeEPG country AM"
+msgstr "أرمينيا"
+
+msgid "FreeEPG country AN"
+msgstr "كوراساو"
+
+msgid "FreeEPG country AO"
+msgstr "أنغولا"
+
+msgid "FreeEPG country AQ"
+msgstr "أنتاركتيكا"
+
+msgid "FreeEPG country AR"
+msgstr "الأرجنتين"
+
+msgid "FreeEPG country AS"
+msgstr "ساموا الأمريكية"
+
+msgid "FreeEPG country AT"
+msgstr "النمسا"
+
+msgid "FreeEPG country AU"
+msgstr "أستراليا"
+
+msgid "FreeEPG country AW"
+msgstr "أروبا"
+
+msgid "FreeEPG country AX"
+msgstr "جزر آلاند"
+
+msgid "FreeEPG country AZ"
+msgstr "أذربيجان"
+
+msgid "FreeEPG country BA"
+msgstr "البوسنة والهرسك"
+
+msgid "FreeEPG country BB"
+msgstr "بربادوس"
+
+msgid "FreeEPG country BD"
+msgstr "بنغلاديش"
+
+msgid "FreeEPG country BE"
+msgstr "بلجيكا"
+
+msgid "FreeEPG country BF"
+msgstr "بوركينا فاسو"
+
+msgid "FreeEPG country BG"
+msgstr "بلغاريا"
+
+msgid "FreeEPG country BH"
+msgstr "البحرين"
+
+msgid "FreeEPG country BI"
+msgstr "بوروندي"
+
+msgid "FreeEPG country BJ"
+msgstr "بنين"
+
+msgid "FreeEPG country BL"
+msgstr "سان بارتليمي"
+
+msgid "FreeEPG country BM"
+msgstr "برمودا"
+
+msgid "FreeEPG country BN"
+msgstr "بروناي"
+
+msgid "FreeEPG country BO"
+msgstr "بوليفيا"
+
+msgid "FreeEPG country BQ"
+msgstr "هولندا الكاريبية"
+
+msgid "FreeEPG country BR"
+msgstr "البرازيل"
+
+msgid "FreeEPG country BS"
+msgstr "جزر البهاما"
+
+msgid "FreeEPG country BT"
+msgstr "بوتان"
+
+msgid "FreeEPG country BU"
+msgstr "ميانمار (بورما)"
+
+msgid "FreeEPG country BV"
+msgstr "جزيرة بوفيه"
+
+msgid "FreeEPG country BW"
+msgstr "بوتسوانا"
+
+msgid "FreeEPG country BY"
+msgstr "بيلاروس"
+
+msgid "FreeEPG country BZ"
+msgstr "بليز"
+
+msgid "FreeEPG country CA"
+msgstr "كندا"
+
+msgid "FreeEPG country CC"
+msgstr "جزر كوكوس (كيلينغ)"
+
+msgid "FreeEPG country CD"
+msgstr "الكونغو - كينشاسا"
+
+msgid "FreeEPG country CF"
+msgstr "جمهورية أفريقيا الوسطى"
+
+msgid "FreeEPG country CG"
+msgstr "الكونغو - برازافيل"
+
+msgid "FreeEPG country CH"
+msgstr "سويسرا"
+
+msgid "FreeEPG country CI"
+msgstr "ساحل العاج"
+
+msgid "FreeEPG country CK"
+msgstr "جزر كوك"
+
+msgid "FreeEPG country CL"
+msgstr "تشيلي"
+
+msgid "FreeEPG country CM"
+msgstr "الكاميرون"
+
+msgid "FreeEPG country CN"
+msgstr "الصين"
+
+msgid "FreeEPG country CO"
+msgstr "كولومبيا"
+
+msgid "FreeEPG country CP"
+msgstr "جزيرة كليبيرتون"
+
+msgid "FreeEPG country CQ"
+msgstr "سارك"
+
+msgid "FreeEPG country CR"
+msgstr "كوستاريكا"
+
+msgid "FreeEPG country CS"
+msgstr "صربيا"
+
+msgid "FreeEPG country CU"
+msgstr "كوبا"
+
+msgid "FreeEPG country CV"
+msgstr "الرأس الأخضر"
+
+msgid "FreeEPG country CW"
+msgstr "كوراساو"
+
+msgid "FreeEPG country CX"
+msgstr "جزيرة كريسماس"
+
+msgid "FreeEPG country CY"
+msgstr "قبرص"
+
+msgid "FreeEPG country CZ"
+msgstr "التشيك"
+
+msgid "FreeEPG country DD"
+msgstr "ألمانيا"
+
+msgid "FreeEPG country DE"
+msgstr "ألمانيا"
+
+msgid "FreeEPG country DG"
+msgstr "دييغو غارسيا"
+
+msgid "FreeEPG country DJ"
+msgstr "جيبوتي"
+
+msgid "FreeEPG country DK"
+msgstr "الدانمرك"
+
+msgid "FreeEPG country DM"
+msgstr "دومينيكا"
+
+msgid "FreeEPG country DO"
+msgstr "جمهورية الدومينيكان"
+
+msgid "FreeEPG country DY"
+msgstr "بنين"
+
+msgid "FreeEPG country DZ"
+msgstr "الجزائر"
+
+msgid "FreeEPG country EA"
+msgstr "سيوتا وميليلا"
+
+msgid "FreeEPG country EC"
+msgstr "الإكوادور"
+
+msgid "FreeEPG country EE"
+msgstr "إستونيا"
+
+msgid "FreeEPG country EG"
+msgstr "مصر"
+
+msgid "FreeEPG country EH"
+msgstr "الصحراء الغربية"
+
+msgid "FreeEPG country ER"
+msgstr "إريتريا"
+
+msgid "FreeEPG country ES"
+msgstr "إسبانيا"
+
+msgid "FreeEPG country ET"
+msgstr "إثيوبيا"
+
+msgid "FreeEPG country EU"
+msgstr "الاتحاد الأوروبي"
+
+msgid "FreeEPG country EZ"
+msgstr "منطقة اليورو"
+
+msgid "FreeEPG country FI"
+msgstr "فنلندا"
+
+msgid "FreeEPG country FJ"
+msgstr "فيجي"
+
+msgid "FreeEPG country FK"
+msgstr "جزر فوكلاند"
+
+msgid "FreeEPG country FM"
+msgstr "ميكرونيزيا"
+
+msgid "FreeEPG country FO"
+msgstr "جزر فارو"
+
+msgid "FreeEPG country FR"
+msgstr "فرنسا"
+
+msgid "FreeEPG country FX"
+msgstr "فرنسا"
+
+msgid "FreeEPG country GA"
+msgstr "الغابون"
+
+msgid "FreeEPG country GB"
+msgstr "المملكة المتحدة"
+
+msgid "FreeEPG country GD"
+msgstr "غرينادا"
+
+msgid "FreeEPG country GE"
+msgstr "جورجيا"
+
+msgid "FreeEPG country GF"
+msgstr "غويانا الفرنسية"
+
+msgid "FreeEPG country GG"
+msgstr "غيرنزي"
+
+msgid "FreeEPG country GH"
+msgstr "غانا"
+
+msgid "FreeEPG country GI"
+msgstr "جبل طارق"
+
+msgid "FreeEPG country GL"
+msgstr "غرينلاند"
+
+msgid "FreeEPG country GM"
+msgstr "غامبيا"
+
+msgid "FreeEPG country GN"
+msgstr "غينيا"
+
+msgid "FreeEPG country GP"
+msgstr "غوادلوب"
+
+msgid "FreeEPG country GQ"
+msgstr "غينيا الاستوائية"
+
+msgid "FreeEPG country GR"
+msgstr "اليونان"
+
+msgid "FreeEPG country GS"
+msgstr "جورجيا الجنوبية وجزر ساندويتش الجنوبية"
+
+msgid "FreeEPG country GT"
+msgstr "غواتيمالا"
+
+msgid "FreeEPG country GU"
+msgstr "غوام"
+
+msgid "FreeEPG country GW"
+msgstr "غينيا بيساو"
+
+msgid "FreeEPG country GY"
+msgstr "غيانا"
+
+msgid "FreeEPG country HK"
+msgstr "هونغ كونغ الصينية (منطقة إدارية خاصة)"
+
+msgid "FreeEPG country HM"
+msgstr "جزيرة هيرد وجزر ماكدونالد"
+
+msgid "FreeEPG country HN"
+msgstr "هندوراس"
+
+msgid "FreeEPG country HR"
+msgstr "كرواتيا"
+
+msgid "FreeEPG country HT"
+msgstr "هايتي"
+
+msgid "FreeEPG country HU"
+msgstr "هنغاريا"
+
+msgid "FreeEPG country HV"
+msgstr "بوركينا فاسو"
+
+msgid "FreeEPG country IC"
+msgstr "جزر الكناري"
+
+msgid "FreeEPG country ID"
+msgstr "إندونيسيا"
+
+msgid "FreeEPG country IE"
+msgstr "أيرلندا"
+
+msgid "FreeEPG country IL"
+msgstr "إسرائيل"
+
+msgid "FreeEPG country IM"
+msgstr "جزيرة مان"
+
+msgid "FreeEPG country IN"
+msgstr "الهند"
+
+msgid "FreeEPG country IO"
+msgstr "الإقليم البريطاني في المحيط الهندي"
+
+msgid "FreeEPG country IQ"
+msgstr "العراق"
+
+msgid "FreeEPG country IR"
+msgstr "إيران"
+
+msgid "FreeEPG country IS"
+msgstr "آيسلندا"
+
+msgid "FreeEPG country IT"
+msgstr "إيطاليا"
+
+msgid "FreeEPG country JE"
+msgstr "جيرسي"
+
+msgid "FreeEPG country JM"
+msgstr "جامايكا"
+
+msgid "FreeEPG country JO"
+msgstr "الأردن"
+
+msgid "FreeEPG country JP"
+msgstr "اليابان"
+
+msgid "FreeEPG country KE"
+msgstr "كينيا"
+
+msgid "FreeEPG country KG"
+msgstr "قيرغيزستان"
+
+msgid "FreeEPG country KH"
+msgstr "كمبوديا"
+
+msgid "FreeEPG country KI"
+msgstr "كيريباتي"
+
+msgid "FreeEPG country KM"
+msgstr "جزر القمر"
+
+msgid "FreeEPG country KN"
+msgstr "سانت كيتس ونيفيس"
+
+msgid "FreeEPG country KP"
+msgstr "كوريا الشمالية"
+
+msgid "FreeEPG country KR"
+msgstr "كوريا الجنوبية"
+
+msgid "FreeEPG country KW"
+msgstr "الكويت"
+
+msgid "FreeEPG country KY"
+msgstr "جزر كايمان"
+
+msgid "FreeEPG country KZ"
+msgstr "كازاخستان"
+
+msgid "FreeEPG country LA"
+msgstr "لاوس"
+
+msgid "FreeEPG country LB"
+msgstr "لبنان"
+
+msgid "FreeEPG country LC"
+msgstr "سانت لوسيا"
+
+msgid "FreeEPG country LI"
+msgstr "ليختنشتاين"
+
+msgid "FreeEPG country LK"
+msgstr "سريلانكا"
+
+msgid "FreeEPG country LR"
+msgstr "ليبيريا"
+
+msgid "FreeEPG country LS"
+msgstr "ليسوتو"
+
+msgid "FreeEPG country LT"
+msgstr "ليتوانيا"
+
+msgid "FreeEPG country LU"
+msgstr "لوكسمبورغ"
+
+msgid "FreeEPG country LV"
+msgstr "لاتفيا"
+
+msgid "FreeEPG country LY"
+msgstr "ليبيا"
+
+msgid "FreeEPG country MA"
+msgstr "المغرب"
+
+msgid "FreeEPG country MC"
+msgstr "موناكو"
+
+msgid "FreeEPG country MD"
+msgstr "مولدوفا"
+
+msgid "FreeEPG country ME"
+msgstr "الجبل الأسود"
+
+msgid "FreeEPG country MF"
+msgstr "سان مارتن"
+
+msgid "FreeEPG country MG"
+msgstr "مدغشقر"
+
+msgid "FreeEPG country MH"
+msgstr "جزر مارشال"
+
+msgid "FreeEPG country MK"
+msgstr "مقدونيا الشمالية"
+
+msgid "FreeEPG country ML"
+msgstr "مالي"
+
+msgid "FreeEPG country MM"
+msgstr "ميانمار (بورما)"
+
+msgid "FreeEPG country MN"
+msgstr "منغوليا"
+
+msgid "FreeEPG country MO"
+msgstr "منطقة ماكاو الإدارية الخاصة"
+
+msgid "FreeEPG country MP"
+msgstr "جزر ماريانا الشمالية"
+
+msgid "FreeEPG country MQ"
+msgstr "جزر المارتينيك"
+
+msgid "FreeEPG country MR"
+msgstr "موريتانيا"
+
+msgid "FreeEPG country MS"
+msgstr "مونتسرات"
+
+msgid "FreeEPG country MT"
+msgstr "مالطا"
+
+msgid "FreeEPG country MU"
+msgstr "موريشيوس"
+
+msgid "FreeEPG country MV"
+msgstr "جزر المالديف"
+
+msgid "FreeEPG country MW"
+msgstr "ملاوي"
+
+msgid "FreeEPG country MX"
+msgstr "المكسيك"
+
+msgid "FreeEPG country MY"
+msgstr "ماليزيا"
+
+msgid "FreeEPG country MZ"
+msgstr "موزمبيق"
+
+msgid "FreeEPG country NA"
+msgstr "ناميبيا"
+
+msgid "FreeEPG country NC"
+msgstr "كاليدونيا الجديدة"
+
+msgid "FreeEPG country NE"
+msgstr "النيجر"
+
+msgid "FreeEPG country NF"
+msgstr "جزيرة نورفولك"
+
+msgid "FreeEPG country NG"
+msgstr "نيجيريا"
+
+msgid "FreeEPG country NH"
+msgstr "فانواتو"
+
+msgid "FreeEPG country NI"
+msgstr "نيكاراغوا"
+
+msgid "FreeEPG country NL"
+msgstr "هولندا"
+
+msgid "FreeEPG country NO"
+msgstr "النرويج"
+
+msgid "FreeEPG country NP"
+msgstr "نيبال"
+
+msgid "FreeEPG country NR"
+msgstr "ناورو"
+
+msgid "FreeEPG country NU"
+msgstr "نيوي"
+
+msgid "FreeEPG country NZ"
+msgstr "نيوزيلندا"
+
+msgid "FreeEPG country OM"
+msgstr "عُمان"
+
+msgid "FreeEPG country PA"
+msgstr "بنما"
+
+msgid "FreeEPG country PE"
+msgstr "بيرو"
+
+msgid "FreeEPG country PF"
+msgstr "بولينيزيا الفرنسية"
+
+msgid "FreeEPG country PG"
+msgstr "بابوا غينيا الجديدة"
+
+msgid "FreeEPG country PH"
+msgstr "الفلبين"
+
+msgid "FreeEPG country PK"
+msgstr "باكستان"
+
+msgid "FreeEPG country PL"
+msgstr "بولندا"
+
+msgid "FreeEPG country PM"
+msgstr "سان بيير ومكويلون"
+
+msgid "FreeEPG country PN"
+msgstr "جزر بيتكيرن"
+
+msgid "FreeEPG country PR"
+msgstr "بورتوريكو"
+
+msgid "FreeEPG country PS"
+msgstr "الأراضي الفلسطينية"
+
+msgid "FreeEPG country PT"
+msgstr "البرتغال"
+
+msgid "FreeEPG country PW"
+msgstr "بالاو"
+
+msgid "FreeEPG country PY"
+msgstr "باراغواي"
+
+msgid "FreeEPG country QA"
+msgstr "قطر"
+
+msgid "FreeEPG country QO"
+msgstr "أوقيانوسيا النائية"
+
+msgid "FreeEPG country RE"
+msgstr "روينيون"
+
+msgid "FreeEPG country RH"
+msgstr "زيمبابوي"
+
+msgid "FreeEPG country RO"
+msgstr "رومانيا"
+
+msgid "FreeEPG country RS"
+msgstr "صربيا"
+
+msgid "FreeEPG country RU"
+msgstr "روسيا"
+
+msgid "FreeEPG country RW"
+msgstr "رواندا"
+
+msgid "FreeEPG country SA"
+msgstr "المملكة العربية السعودية"
+
+msgid "FreeEPG country SB"
+msgstr "جزر سليمان"
+
+msgid "FreeEPG country SC"
+msgstr "سيشل"
+
+msgid "FreeEPG country SD"
+msgstr "السودان"
+
+msgid "FreeEPG country SE"
+msgstr "السويد"
+
+msgid "FreeEPG country SG"
+msgstr "سنغافورة"
+
+msgid "FreeEPG country SH"
+msgstr "سانت هيلينا"
+
+msgid "FreeEPG country SI"
+msgstr "سلوفينيا"
+
+msgid "FreeEPG country SJ"
+msgstr "سفالبارد وجان ماين"
+
+msgid "FreeEPG country SK"
+msgstr "سلوفاكيا"
+
+msgid "FreeEPG country SL"
+msgstr "سيراليون"
+
+msgid "FreeEPG country SM"
+msgstr "سان مارينو"
+
+msgid "FreeEPG country SN"
+msgstr "السنغال"
+
+msgid "FreeEPG country SO"
+msgstr "الصومال"
+
+msgid "FreeEPG country SR"
+msgstr "سورينام"
+
+msgid "FreeEPG country SS"
+msgstr "جنوب السودان"
+
+msgid "FreeEPG country ST"
+msgstr "ساو تومي وبرينسيبي"
+
+msgid "FreeEPG country SU"
+msgstr "روسيا"
+
+msgid "FreeEPG country SV"
+msgstr "السلفادور"
+
+msgid "FreeEPG country SX"
+msgstr "سانت مارتن"
+
+msgid "FreeEPG country SY"
+msgstr "سوريا"
+
+msgid "FreeEPG country SZ"
+msgstr "إسواتيني"
+
+msgid "FreeEPG country TA"
+msgstr "تريستان دا كونا"
+
+msgid "FreeEPG country TC"
+msgstr "جزر توركس وكايكوس"
+
+msgid "FreeEPG country TD"
+msgstr "تشاد"
+
+msgid "FreeEPG country TF"
+msgstr "الأقاليم الجنوبية الفرنسية"
+
+msgid "FreeEPG country TG"
+msgstr "توغو"
+
+msgid "FreeEPG country TH"
+msgstr "تايلاند"
+
+msgid "FreeEPG country TJ"
+msgstr "طاجيكستان"
+
+msgid "FreeEPG country TK"
+msgstr "توكيلاو"
+
+msgid "FreeEPG country TL"
+msgstr "تيمور - ليشتي"
+
+msgid "FreeEPG country TM"
+msgstr "تركمانستان"
+
+msgid "FreeEPG country TN"
+msgstr "تونس"
+
+msgid "FreeEPG country TO"
+msgstr "تونغا"
+
+msgid "FreeEPG country TP"
+msgstr "تيمور - ليشتي"
+
+msgid "FreeEPG country TR"
+msgstr "تركيا"
+
+msgid "FreeEPG country TT"
+msgstr "ترينيداد وتوباغو"
+
+msgid "FreeEPG country TV"
+msgstr "توفالو"
+
+msgid "FreeEPG country TW"
+msgstr "تايوان"
+
+msgid "FreeEPG country TZ"
+msgstr "تنزانيا"
+
+msgid "FreeEPG country UA"
+msgstr "أوكرانيا"
+
+msgid "FreeEPG country UG"
+msgstr "أوغندا"
+
+msgid "FreeEPG country UK"
+msgstr "المملكة المتحدة"
+
+msgid "FreeEPG country UM"
+msgstr "جزر الولايات المتحدة النائية"
+
+msgid "FreeEPG country UN"
+msgstr "الأمم المتحدة"
+
+msgid "FreeEPG country US"
+msgstr "الولايات المتحدة"
+
+msgid "FreeEPG country UY"
+msgstr "أورغواي"
+
+msgid "FreeEPG country UZ"
+msgstr "أوزبكستان"
+
+msgid "FreeEPG country VA"
+msgstr "الفاتيكان"
+
+msgid "FreeEPG country VC"
+msgstr "سانت فنسنت وجزر غرينادين"
+
+msgid "FreeEPG country VD"
+msgstr "فيتنام"
+
+msgid "FreeEPG country VE"
+msgstr "فنزويلا"
+
+msgid "FreeEPG country VG"
+msgstr "جزر فيرجن البريطانية"
+
+msgid "FreeEPG country VI"
+msgstr "جزر فيرجن الأمريكية"
+
+msgid "FreeEPG country VN"
+msgstr "فيتنام"
+
+msgid "FreeEPG country VU"
+msgstr "فانواتو"
+
+msgid "FreeEPG country WF"
+msgstr "جزر والس وفوتونا"
+
+msgid "FreeEPG country WS"
+msgstr "ساموا"
+
+msgid "FreeEPG country XA"
+msgstr "لكنات تجريبية غير أصلية"
+
+msgid "FreeEPG country XB"
+msgstr "لكنات تجريبية ثنائية الاتجاه"
+
+msgid "FreeEPG country XK"
+msgstr "كوسوفو"
+
+msgid "FreeEPG country YD"
+msgstr "اليمن"
+
+msgid "FreeEPG country YE"
+msgstr "اليمن"
+
+msgid "FreeEPG country YT"
+msgstr "مايوت"
+
+msgid "FreeEPG country YU"
+msgstr "صربيا"
+
+msgid "FreeEPG country ZA"
+msgstr "جنوب أفريقيا"
+
+msgid "FreeEPG country ZM"
+msgstr "زامبيا"
+
+msgid "FreeEPG country ZR"
+msgstr "الكونغو - كينشاسا"
+
+msgid "FreeEPG country ZW"
+msgstr "زيمبابوي"
+
+msgid "FreeEPG country ZZ"
+msgstr "منطقة غير معروفة"
+
+msgid "No FreeEPG countries are available."
+msgstr "لا تتوفر بلدان في FreeEPG."
+
+msgid "Select a country"
+msgstr "اختر بلداً"
+
+msgid "Showing the saved country list."
+msgstr "تُعرض قائمة البلدان المحفوظة."

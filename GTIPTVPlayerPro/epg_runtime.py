@@ -96,6 +96,7 @@ def _anonymous_file(directory_descriptor):
 class EPGChannelIndex(object):
     def __init__(self, payload, normalise, cache, directory_descriptor=None, check=None):
         self.ticket = object()
+        self.scoped_names = payload.get("scoped_names") is True
         self.cache = cache
         self.lock = threading.Lock()
         self.file = _anonymous_file(directory_descriptor)

@@ -1,6 +1,9 @@
-# GT IPTV Player Pro 1.9.4-r0
+# GT IPTV Player Pro 1.9.5-r0
 
-- Added a **Series** tab to **Discover**.
-- Improved **Flashscore** match list loading and highlights search.
+- Added one-second seeking for movies and series, with faster seeking when holding the remote buttons.
+- Added **CH+ / CH−** category switching in the Live TV channel list.
+- M3U now loads EPG details and channel logos as rows come into view. XMLTV supplies logos when `tvg-logo` is missing and the channel matches.
+- Improved M3U EPG matching with an on-device model and added **FreeEPG** country selection.
+- Fixed OpenDroid remote-control errors, crashes when exiting a loading list, and invalid local or NAS XMLTV path handling.
 
 Signed stable updates: Settings > Software update. Publishing: [UPDATING.md](UPDATING.md).

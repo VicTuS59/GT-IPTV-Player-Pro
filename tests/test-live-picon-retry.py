@@ -3,6 +3,9 @@ import ast,importlib.util,json,sys,threading,types,unittest
 from pathlib import Path
 from unittest.mock import Mock
 P=Path(__file__).resolve().parents[1]/'GTIPTVPlayerPro'
+common_tree=ast.parse((P/'browser_common.py').read_bytes())
+picon_url_methods=[node for node in common_tree.body if isinstance(node,ast.FunctionDef)
+                   and node.name in ('_live_picon_url','_live_picon_path_is_current')]
 spec=importlib.util.spec_from_file_location('_live_picon_retry_policy',P/'live_picon_retry.py')
 policy=importlib.util.module_from_spec(spec);spec.loader.exec_module(policy)
 tree=ast.parse((P/'browser_player.py').read_bytes())
@@ -103,7 +106,7 @@ def player(cached=False,download=None,decode=None,source='xtream',thread_class=T
             _debug=lambda *args:None,threading=types.SimpleNamespace(Thread=thread_class,Event=threading.Event),
             attach_native_alpha_pixmap=lambda *a,**kw:model.paint('alpha',*a,**kw),
             attach_pixmap=lambda *a,**kw:model.paint('compatibility',*a,**kw))
-    exec(compile(ast.fix_missing_locations(ast.Module(body=METHODS,type_ignores=[])),'actual-live-picon-methods','exec'),ns)
+    exec(compile(ast.fix_missing_locations(ast.Module(body=picon_url_methods+METHODS,type_ignores=[])),'actual-live-picon-methods','exec'),ns)
     cls=type('ActualPiconFlow',(),{name:ns[name] for name in NAMES});s=cls()
     s._closed=False;s._started=True;s._generation=2
     s.current_item=types.SimpleNamespace(content_type='live',stream_id='B',icon=model.url())
@@ -380,20 +383,38 @@ class PolicyTests(unittest.TestCase):
 
 class HelperTests(unittest.TestCase):
     def namespace(self,active=False):
-        tree=ast.parse((P/'browser_common.py').read_bytes())
-        node=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='_load_live_picon_path')
+        node=next(n for n in common_tree.body if isinstance(n,ast.FunctionDef) and n.name=='_load_live_picon_path')
         download=Mock(return_value='');mark=Mock();clear=Mock()
         ns=dict(_safe_picon_url=lambda v:v,_cached_picon_path=lambda url:'',_valid_live_picon_file=lambda p:bool(p),
                 _download_client_image=download,_picon_cache_path=lambda url:'/fixture/logo.png',
                 LIVE_PICON_DOWNLOAD_TIMEOUT=2,_WorkerCancelled=Cancelled,
                 _picon_failure_active=lambda url:active,_mark_picon_failure=mark,_clear_picon_failure=clear,
                 _discard_invalid_live_picon_cache=Mock(return_value=True))
-        exec(compile(ast.fix_missing_locations(ast.Module(body=[node],type_ignores=[])),'actual-live-picon-cache-helper','exec'),ns)
+        exec(compile(ast.fix_missing_locations(ast.Module(body=picon_url_methods+[node],type_ignores=[])),'actual-live-picon-cache-helper','exec'),ns)
         return ns,download,mark
     def test_list_timeout_default_is_unchanged_and_infobar_can_override(self):
         ns,download,mark=self.namespace();item=types.SimpleNamespace(icon='https://example.invalid/logo.png')
         ns['_load_live_picon_path'](None,item);self.assertEqual(download.call_args.kwargs['timeout'],2)
         ns['_load_live_picon_path'](None,item,timeout=5);self.assertEqual(download.call_args.kwargs['timeout'],5)
+
+    def test_missing_playlist_logo_uses_only_the_resolved_epg_url(self):
+        ns, download, _ = self.namespace()
+        client = types.SimpleNamespace(epg_picon_url=Mock(return_value='https://example.invalid/epg.png'))
+        item = types.SimpleNamespace(icon='')
+        ns['_load_live_picon_path'](client, item)
+        self.assertEqual(download.call_args.args[1], 'https://example.invalid/epg.png')
+
+        item.icon = 'https://example.invalid/playlist.png'
+        client.epg_picon_url.reset_mock()
+        ns['_load_live_picon_path'](client, item)
+        self.assertEqual(download.call_args.args[1], item.icon)
+        client.epg_picon_url.assert_not_called()
+
+        item.icon = ''
+        download.reset_mock()
+        client.epg_picon_url.return_value = ''
+        ns['_load_live_picon_path'](client, item)
+        download.assert_not_called()
     def test_existing_transient_cooldown_is_not_overwritten(self):
         ns,download,mark=self.namespace(active=True);download.side_effect=TimeoutError('temporary')
         ns['_load_live_picon_path'](None,types.SimpleNamespace(icon='https://example.invalid/logo.png'))

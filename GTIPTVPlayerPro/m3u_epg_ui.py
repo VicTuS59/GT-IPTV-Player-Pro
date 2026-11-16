@@ -14,7 +14,7 @@ from urllib.parse import urlsplit
 from .ui_update import set_visible
 from .typography import set_text_if_changed
 
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 try:
     from Components.FileList import FileList
 except ImportError:
@@ -23,11 +23,13 @@ from Components.Label import Label
 from Screens.Screen import Screen
 from enigma import getDesktop
 
+from . import free_epg
 from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven
 from .background import attach_background
 from .i18n import N_, _, localized_upper, ngettext
 from .m3u_epg_settings import (
     Binding,
+    LocalXMLTVPathError,
     get_m3u_epg_binding,
     save_m3u_epg_binding,
     update_m3u_epg_binding,
@@ -58,7 +60,7 @@ XMLTV_BROWSER_LOCATIONS = (
     ("MNT", "/mnt"),
 )
 SUPPORTED_INTERVALS = (4, 6, 12, 24)
-SUPPORTED_KINDS = ("file", "url")
+SOURCE_SELECTIONS = ("file", "url", "freeepg")
 SUPPORTED_UPDATE_MODES = ("manual", "automatic")
 REFRESH_POLL_MILLISECONDS = 500
 REFRESH_ACTIVE_STATES = frozenset(("queued", "running"))
@@ -378,6 +380,8 @@ def _binding_snapshot(binding, source_id):
             0, _safe_int(getattr(binding, "last_event_count", 0), 0)
         ),
         name_mappings=getattr(binding, "name_mappings", None),
+        free_epg_country=getattr(binding, "free_epg_country", None),
+        source_locations=getattr(binding, "source_locations", None),
     )
 
 
@@ -410,14 +414,14 @@ def _path_within_xmltv_roots(path, roots=XMLTV_LOCAL_ROOTS):
 def _valid_local_xmltv_path(path, require_file=False):
     """Validate a file endpoint without requiring an offline mount to exist."""
     path = str(path or "").strip()
-    if not _xmltv_file_extension(path) or not _path_within_xmltv_roots(path):
-        return False
-    if os.path.lexists(path):
-        if os.path.islink(path) or not os.path.isfile(path):
+    try:
+        if not _xmltv_file_extension(path) or not _path_within_xmltv_roots(path):
             return False
-    elif require_file:
+        if os.path.lexists(path):
+            return not os.path.islink(path) and os.path.isfile(path)
+    except OSError:
         return False
-    return True
+    return not require_file
 
 
 def _xmltv_browser_directory(location, roots=XMLTV_LOCAL_ROOTS):
@@ -800,14 +804,17 @@ class GTM3UXMLTVSettingsScreen(Screen):
             self._refresh_timer,
             self._poll_refresh,
         )
+        self._country_timer = None
+        self._country_timer_binding = None
         load_failed = False
         try:
             loaded = self.settings_loader(self.source_id)
+            self.binding = _binding_snapshot(loaded, self.source_id)
         except Exception:
-            loaded = None
+            self.binding = Binding(self.source_id)
             load_failed = True
-        self.binding = _binding_snapshot(loaded, self.source_id)
-        self._saved_binding = _binding_snapshot(self.binding, self.source_id)
+        self._saved_binding = self.binding
+        self._enabled_preference = self.binding.enabled
 
         self["top_accent"] = Label("")
         self["header"] = Label(_("External XMLTV EPG"))
@@ -863,10 +870,17 @@ class GTM3UXMLTVSettingsScreen(Screen):
 
     def _values(self):
         automatic = self.binding.update_mode == "automatic"
-        endpoint = _binding_endpoint(self.binding) or _("Not configured")
+        source = self.binding.source_selection
+        if source == "freeepg":
+            country = self.binding.free_epg_country
+            endpoint = self._country_caption(country) if country else _("Select a country")
+            source_name = "FreeEPG"
+        else:
+            endpoint = _binding_endpoint(self.binding) or _("Not configured")
+            source_name = _("Local / NAS") if source == "file" else _("Custom URL")
         return (
             _("On") if self.binding.enabled else _("Off"),
-            _("Local / NAS") if self.binding.kind == "file" else _("Web URL"),
+            source_name,
             endpoint,
             _("Automatic") if automatic else _("Manual"),
             ngettext("{} hour", "{} hours", self.binding.interval_hours).format(
@@ -877,6 +891,8 @@ class GTM3UXMLTVSettingsScreen(Screen):
 
     @seven_refresh_after
     def _refresh(self):
+        source_label = _("Country") if self.binding.source_selection == "freeepg" else _(self.LABELS[2])
+        set_text_if_changed(self["label_2"], source_label)
         if getattr(self, '_seven_kind', None) == 'xmltv':
             return
         has_dynamic_endpoint = bool(_binding_endpoint(self.binding))
@@ -910,6 +926,8 @@ class GTM3UXMLTVSettingsScreen(Screen):
             "location": self.binding.location,
             "update_mode": self.binding.update_mode,
             "interval_hours": self.binding.interval_hours,
+            "free_epg_country": self.binding.free_epg_country,
+            "source_locations": self.binding.source_locations,
         }
         values.update(changes)
         endpoint_changed = (
@@ -929,32 +947,59 @@ class GTM3UXMLTVSettingsScreen(Screen):
             last_channel_count=(0 if endpoint_changed else self.binding.last_channel_count),
             last_event_count=(0 if endpoint_changed else self.binding.last_event_count),
             name_mappings={} if endpoint_changed else self.binding.name_mappings,
+            free_epg_country=values["free_epg_country"],
+            source_locations=values["source_locations"],
         )
 
+    def _change_source(self, step):
+        self._stop_country_picker()
+        previous = self.binding.source_selection
+        selected = SOURCE_SELECTIONS[(SOURCE_SELECTIONS.index(previous) + step) % len(SOURCE_SELECTIONS)]
+        locations = dict(self.binding.source_locations)
+        old_location = self.binding.free_epg_country if previous == "freeepg" else self.binding.location
+        if old_location:
+            locations[previous] = old_location
+        location = locations.pop(selected, "")
+        country = location if selected == "freeepg" else None
+        kind = "url" if selected == "freeepg" else selected
+        if country:
+            location = free_epg.xmltv_url(country)
+        try:
+            self._replace_preferences(
+                enabled=self._enabled_preference and bool(location),
+                kind=kind,
+                location=location,
+                free_epg_country=country,
+                source_locations=locations,
+            )
+        except (OSError, ValueError):
+            self._replace_preferences(
+                enabled=False,
+                kind=kind,
+                location="",
+                free_epg_country="" if selected == "freeepg" else None,
+                source_locations=locations,
+            )
+            set_text_if_changed(self["message"], _("XMLTV file path is invalid."))
+            self._refresh()
+            return False
+        return True
+
     def _change(self, step):
+        changes = {}
         if self.selected_index == 0:
             if not self.binding.enabled and not self.binding.location:
                 set_text_if_changed(self["message"], _("Choose an XMLTV source before enabling this option."))
                 return
-            self._replace_preferences(enabled=not self.binding.enabled)
+            changes["enabled"] = not self.binding.enabled
         elif self.selected_index == 1:
-            kind = "url" if self.binding.kind == "file" else "file"
-            location = self.binding.location
-            if kind == "file" and _redacted_web_endpoint(location):
-                location = ""
-            elif kind == "url" and location and not _redacted_web_endpoint(location):
-                location = ""
-            self._replace_preferences(
-                enabled=self.binding.enabled if location else False,
-                kind=kind,
-                location=location,
-            )
+            if not self._change_source(step):
+                return
         elif self.selected_index == 2:
             self.edit_location()
             return
         elif self.selected_index == 3:
-            mode = "manual" if self.binding.update_mode == "automatic" else "automatic"
-            self._replace_preferences(update_mode=mode)
+            changes["update_mode"] = "manual" if self.binding.update_mode == "automatic" else "automatic"
         elif self.selected_index == 4:
             if self.binding.update_mode != "automatic":
                 set_text_if_changed(self["message"], _("Switch Update mode to Automatic to change this option."))
@@ -963,14 +1008,18 @@ class GTM3UXMLTVSettingsScreen(Screen):
                 index = SUPPORTED_INTERVALS.index(self.binding.interval_hours)
             except ValueError:
                 index = len(SUPPORTED_INTERVALS) - 1
-            self._replace_preferences(
-                interval_hours=SUPPORTED_INTERVALS[
-                    (index + step) % len(SUPPORTED_INTERVALS)
-                ]
-            )
+            changes["interval_hours"] = SUPPORTED_INTERVALS[(index + step) % len(SUPPORTED_INTERVALS)]
         else:
             set_text_if_changed(self["message"], _("Status information is read-only."))
             return
+        if changes:
+            try:
+                self._replace_preferences(**changes)
+            except LocalXMLTVPathError:
+                set_text_if_changed(self["message"], _("XMLTV file path is invalid."))
+                return
+            if "enabled" in changes:
+                self._enabled_preference = self.binding.enabled
         set_text_if_changed(self["message"], _("Press GREEN to save the changes."))
         self._refresh()
 
@@ -987,6 +1036,9 @@ class GTM3UXMLTVSettingsScreen(Screen):
             self._change(1)
 
     def edit_location(self):
+        if self.binding.source_selection == "freeepg":
+            self._open_country_picker()
+            return
         if self.binding.kind == "file":
             if FileList is None or not hasattr(self.session, "openWithCallback"):
                 set_text_if_changed(self["message"], _("The XMLTV file browser is unavailable."))
@@ -1013,6 +1065,69 @@ class GTM3UXMLTVSettingsScreen(Screen):
             text=self.binding.location,
         )
 
+    @staticmethod
+    def _country_caption(country):
+        return "{} ({})".format(free_epg.country_name(country), country.upper())
+
+    def _open_country_picker(self):
+        if self._closed or self._country_timer is not None:
+            return
+        if free_epg.request_countries():
+            try:
+                self._country_timer = _new_timer()
+                self._country_timer_binding = _connect_timer(self._country_timer, self._poll_country_picker)
+            except (TypeError, RuntimeError):
+                self._stop_country_picker()
+        self._poll_country_picker()
+
+    def _poll_country_picker(self):
+        if self._closed or self.selected_index != 2 or self.binding.source_selection != "freeepg":
+            self._stop_country_picker()
+            return
+        countries, loading, saved = free_epg.catalogue()
+        if loading and self._country_timer_binding:
+            try:
+                self._country_timer.start(150, True)
+            except (AttributeError, TypeError, RuntimeError):
+                pass
+            else:
+                set_text_if_changed(self["message"], _("Loading..."))
+                return
+        self._stop_country_picker()
+        if not countries:
+            set_text_if_changed(self["message"], _("No FreeEPG countries are available."))
+            return
+        items = [(self._country_caption(code), code) for code in countries]
+        items.sort(key=lambda item: (item[0].casefold(), item[1]))
+        title = _("Select a country")
+        message = _("Showing the saved country list.") if saved or loading else title
+        set_text_if_changed(self["message"], message)
+        self._mapping_page(title, items, self._country_selected,
+                           unavailable=_("Could not open the country list."))
+
+    def _country_selected(self, value):
+        country = free_epg.country_code(value)
+        if self._closed or self.binding.source_selection != "freeepg" or not country:
+            return
+        self._replace_preferences(
+            enabled=self._enabled_preference,
+            location=free_epg.xmltv_url(country),
+            free_epg_country=country,
+        )
+        set_text_if_changed(self["message"], _("Press GREEN to save the changes."))
+        self._refresh()
+
+    def _stop_country_picker(self):
+        timer = self._country_timer
+        if timer is not None:
+            try:
+                timer.stop()
+            except (AttributeError, RuntimeError):
+                pass
+        _disconnect_timer(timer, self._country_timer_binding)
+        self._country_timer = None
+        self._country_timer_binding = None
+
     def _file_selected(self, value):
         if value is None:
             set_text_if_changed(self["message"], _("File selection cancelled."))
@@ -1022,7 +1137,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
             set_text_if_changed(self["message"], _("XMLTV file path is invalid."))
             return
         try:
-            self._replace_preferences(location=path)
+            self._replace_preferences(location=path, enabled=self._enabled_preference)
         except (TypeError, ValueError):
             set_text_if_changed(self["message"], _("XMLTV file path is invalid."))
             return
@@ -1039,7 +1154,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
             set_text_if_changed(self["message"], _("XMLTV URL must start with http:// or https://."))
             return
         try:
-            self._replace_preferences(location=location)
+            self._replace_preferences(location=location, enabled=self._enabled_preference)
         except (TypeError, ValueError):
             set_text_if_changed(self["message"], _("XMLTV URL is invalid."))
             return
@@ -1047,6 +1162,9 @@ class GTM3UXMLTVSettingsScreen(Screen):
         self._refresh()
 
     def _validate_preferences(self):
+        if self.binding.free_epg_country == "":
+            set_text_if_changed(self["message"], _("Select a country"))
+            return False
         location = str(self.binding.location or "").strip()
         if not location:
             if self.binding.enabled:
@@ -1069,8 +1187,8 @@ class GTM3UXMLTVSettingsScreen(Screen):
     def _save_preferences(self):
         if not self._validate_preferences():
             return False
-        candidate = _binding_snapshot(self.binding, self.source_id)
         try:
+            candidate = _binding_snapshot(self.binding, self.source_id)
             if self._uses_default_persistence:
                 def merge_preferences(current):
                     endpoint_changed = (
@@ -1083,6 +1201,8 @@ class GTM3UXMLTVSettingsScreen(Screen):
                         "location": candidate.location,
                         "update_mode": candidate.update_mode,
                         "interval_hours": candidate.interval_hours,
+                        "free_epg_country": candidate.free_epg_country,
+                        "source_locations": dict(candidate.source_locations),
                     }
                     if endpoint_changed:
                         patch.update(
@@ -1108,27 +1228,27 @@ class GTM3UXMLTVSettingsScreen(Screen):
             if saved is False:
                 raise OSError("settings save failed")
             if isinstance(saved, Binding):
-                candidate = _binding_snapshot(saved, self.source_id)
+                candidate = saved
+        except LocalXMLTVPathError:
+            set_text_if_changed(self["message"], _("XMLTV file path is invalid."))
+            return False
         except Exception:
             set_text_if_changed(self["message"], _("XMLTV settings could not be saved. Check the receiver storage."))
             return False
         self.binding = candidate
-        self._saved_binding = _binding_snapshot(candidate, self.source_id)
+        self._saved_binding = candidate
+        self._enabled_preference = candidate.enabled
         _notify_settings_changed()
         return True
 
     def save(self):
+        self._stop_country_picker()
         if self._save_preferences():
             set_text_if_changed(self["message"], _("External XMLTV EPG settings saved."))
             self._refresh()
 
-    def _mapping_page(self, title, items, callback, page=0):
+    def _mapping_page(self, title, items, callback, page=0, unavailable=None):
         if self._closed:
-            return
-        try:
-            from Screens.ChoiceBox import ChoiceBox
-        except ImportError:
-            set_text_if_changed(self["message"], _("Manual channel mapping could not be opened."))
             return
         start = page * 60
         options = list(items[start:start + 60])
@@ -1138,21 +1258,32 @@ class GTM3UXMLTVSettingsScreen(Screen):
             options.append((_("Page") + " ▶", page + 1))
 
         def picked(choice=None):
-            if self._closed or not choice:
+            if self._closed or not isinstance(choice, (tuple, list)) or len(choice) < 2:
                 return
             value = choice[1]
             if isinstance(value, int):
-                self._mapping_page(title, items, callback, value)
+                self._mapping_page(title, items, callback, value, unavailable)
             else:
                 callback(value)
 
-        self.session.openWithCallback(picked, ChoiceBox, title, options)
+        try:
+            from Screens.ChoiceBox import ChoiceBox
+
+            self.session.openWithCallback(picked, ChoiceBox, title, options)
+        except (ImportError, AttributeError, TypeError, RuntimeError):
+            message = unavailable or _("Manual channel mapping could not be opened.")
+            set_text_if_changed(self["message"], message)
 
     def open_name_mapping(self):
+        if getattr(self, "_country_timer", None) is not None:
+            self._stop_country_picker()
         if self._closed:
             return
-        from .m3u_epg import get_default_store
-        choices = get_default_store().name_choices(self.source_id, self.binding.fingerprint)
+        from .m3u_epg import binding_fingerprint, get_default_store
+        choices = ()
+        if self.binding.location:
+            fingerprint = binding_fingerprint(self.binding, self.source_id)
+            choices = get_default_store().name_choices(self.source_id, fingerprint)
         if not choices:
             message = (_("No channels need manual mapping.") if self.binding.last_success_utc
                        else _("No update has been completed yet."))
@@ -1200,7 +1331,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
             set_text_if_changed(self["message"], _("The manual channel mapping could not be saved."))
             return
         self.binding.name_mappings = dict(saved.name_mappings)
-        self._saved_binding = _binding_snapshot(saved, self.source_id)
+        self._saved_binding = saved
         _notify_settings_changed()
         set_text_if_changed(self["message"], _("Channel mapping saved. Refresh EPG to apply it."))
         self._refresh()
@@ -1221,30 +1352,28 @@ class GTM3UXMLTVSettingsScreen(Screen):
         try:
             loaded = self.settings_loader(self.source_id)
             persisted = _binding_snapshot(loaded, self.source_id)
+            self._saved_binding = persisted
+            current = self.binding
+            if persisted.kind != current.kind or persisted.location != current.location:
+                return False
+            self.binding = Binding(
+                source_id=self.source_id,
+                enabled=current.enabled,
+                kind=current.kind,
+                location=current.location,
+                update_mode=current.update_mode,
+                interval_hours=current.interval_hours,
+                last_attempt_utc=persisted.last_attempt_utc,
+                last_success_utc=persisted.last_success_utc,
+                last_error_code=persisted.last_error_code,
+                last_channel_count=persisted.last_channel_count,
+                last_event_count=persisted.last_event_count,
+                name_mappings=persisted.name_mappings,
+                free_epg_country=current.free_epg_country,
+                source_locations=current.source_locations,
+            )
         except Exception:
             return False
-        same_endpoint = bool(
-            persisted.kind == self.binding.kind
-            and persisted.location == self.binding.location
-        )
-        self._saved_binding = _binding_snapshot(persisted, self.source_id)
-        if not same_endpoint:
-            return False
-        current = self.binding
-        self.binding = Binding(
-            source_id=self.source_id,
-            enabled=current.enabled,
-            kind=current.kind,
-            location=current.location,
-            update_mode=current.update_mode,
-            interval_hours=current.interval_hours,
-            last_attempt_utc=persisted.last_attempt_utc,
-            last_success_utc=persisted.last_success_utc,
-            last_error_code=persisted.last_error_code,
-            last_channel_count=persisted.last_channel_count,
-            last_event_count=persisted.last_event_count,
-            name_mappings=persisted.name_mappings,
-        )
         return True
 
     def _apply_refresh_state(self, state):
@@ -1292,6 +1421,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
         if self._closed:
             return
         self._closed = True
+        self._stop_country_picker()
         self._refresh_polling = False
         timer = self._refresh_timer
         if timer is not None:
@@ -1304,6 +1434,7 @@ class GTM3UXMLTVSettingsScreen(Screen):
         self._refresh_timer = None
 
     def request_refresh(self):
+        self._stop_country_picker()
         if not self.binding.enabled:
             set_text_if_changed(self["message"], _("Enable external XMLTV EPG before requesting an update."))
             return

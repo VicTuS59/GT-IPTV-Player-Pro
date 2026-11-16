@@ -11,7 +11,7 @@ import threading
 import time
 import uuid
 from urllib.parse import urlsplit
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Screens.Screen import Screen
@@ -60,11 +60,11 @@ from .download_guard import remember as _remember_account_url
 from .download_guard import play_service as _guarded_play_service
 from .download_guard import cancel_pending as _cancel_download_pending
 from .downloads import DownloadError as _DownloadError
-from .browser_common import ARCHIVE_DECODER_RELEASE_MS, ARCHIVE_DECODER_TRANSITION_TICKS, ARCHIVE_PORTAL_KEEPALIVE_SECONDS, ARCHIVE_PORTAL_REQUEST_SECONDS, ARCHIVE_POSITION_NEAR_ZERO_TICKS, ARCHIVE_PROVIDER_RETRY_SECONDS, ARCHIVE_STARTUP_ACQUIRE_SECONDS, ARCHIVE_STARTUP_OVERALL_SECONDS, ARCHIVE_STARTUP_SAMPLE_MS, ARCHIVE_STARTUP_SECONDS, ARCHIVE_STARTUP_SETTLE_SECONDS, BLUE_LONG_REPEAT_SUPPRESS_SECONDS, BLUE_LONG_SHORT_SUPPRESS_SECONDS, CHANNEL_KEY_DUPLICATE_GUARD_MS, CHANNEL_LINK_POLL_MS, CHANNEL_LINK_TIMEOUT_SECONDS, CHANNEL_SWITCH_DEBOUNCE_MS, DIRECTION_HOLD_MS, LIVE_DETAIL_EMPTY_RETRY_SECONDS, LIVE_EPG_CACHE_MAX_ENTRIES, LIVE_EPG_FETCH_LIMIT, LIVE_FULLSCREEN_RESULT_KIND, LIVE_INFO_EPG_TIMEOUT_SECONDS, LIVE_INFO_FALLBACK_MS, LIVE_INFO_METADATA_INITIAL_DELAY_MS, LIVE_INFO_POLL_MS, LIVE_INFO_READY_MIN_SAMPLES, LIVE_INFO_SETTLE_MS, LIVE_METADATA_INITIAL_DELAY_MS, LIVE_METADATA_MAX_SAMPLES, LIVE_METADATA_RETRY_DELAY_MS, LIVE_PICON_DOWNLOAD_TIMEOUT, LIVE_RECONNECT_RELEASE_DELAY_MS, MAX_AUDIO_TRACKS, RESUME_4097_STABLE_SAMPLES, RESUME_INITIAL_DELAY_MS, RESUME_LENGTH_STABILITY_TOLERANCE_SECONDS, RESUME_MAX_ATTEMPTS, RESUME_RETRY_DELAY_MS, SEEK_ASYNC_VERIFY_TIMEOUT_SECONDS, SEEK_STARTUP_GRACE_SECONDS, SEEK_VERIFY_DELAY_MS, SEEK_VERIFY_MAX_CHECKS, STALKER_LIVE_EPG_QUIET_MS, SUBTITLE_AUTO_MATCH_DELAY_MS, SUBTITLE_MESSAGE_TIMEOUT_SECONDS, VIDEO_CODECS, WEATHER_ICON_DIR, WORKER_LIST_TIMEOUT_SECONDS, WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS, WORKER_POSTER_TIMEOUT_SECONDS, WORKER_WEATHER_TIMEOUT_SECONDS, _ARCHIVE_PTS_MASK, _ARCHIVE_PTS_MODULO, _ARCHIVE_RETRY_PENDING, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _connect_timer, _debug, _debug_identifier, _desktop_size, _disable_live_window_animation, _download_client_image, _epg_event_starts_in_future, _is_stalker_client, _load_live_picon_path, _load_shared_live_epg, _normalise_video_codec, _picon_cache_path, _picon_failure_active, _read_proc_number, _read_proc_text, _safe_picon_url, _scale, _trace_fullscreen_osd, _valid_live_picon_file
+from .browser_common import ARCHIVE_DECODER_RELEASE_MS, ARCHIVE_DECODER_TRANSITION_TICKS, ARCHIVE_PORTAL_KEEPALIVE_SECONDS, ARCHIVE_PORTAL_REQUEST_SECONDS, ARCHIVE_POSITION_NEAR_ZERO_TICKS, ARCHIVE_PROVIDER_RETRY_SECONDS, ARCHIVE_STARTUP_ACQUIRE_SECONDS, ARCHIVE_STARTUP_OVERALL_SECONDS, ARCHIVE_STARTUP_SAMPLE_MS, ARCHIVE_STARTUP_SECONDS, ARCHIVE_STARTUP_SETTLE_SECONDS, BLUE_LONG_REPEAT_SUPPRESS_SECONDS, BLUE_LONG_SHORT_SUPPRESS_SECONDS, CHANNEL_KEY_DUPLICATE_GUARD_MS, CHANNEL_LINK_POLL_MS, CHANNEL_LINK_TIMEOUT_SECONDS, CHANNEL_SWITCH_DEBOUNCE_MS, DIRECTION_HOLD_MS, LIVE_DETAIL_EMPTY_RETRY_SECONDS, LIVE_EPG_CACHE_MAX_ENTRIES, LIVE_EPG_FETCH_LIMIT, LIVE_FULLSCREEN_RESULT_KIND, LIVE_INFO_EPG_TIMEOUT_SECONDS, LIVE_INFO_FALLBACK_MS, LIVE_INFO_METADATA_INITIAL_DELAY_MS, LIVE_INFO_POLL_MS, LIVE_INFO_READY_MIN_SAMPLES, LIVE_INFO_SETTLE_MS, LIVE_METADATA_INITIAL_DELAY_MS, LIVE_METADATA_MAX_SAMPLES, LIVE_METADATA_RETRY_DELAY_MS, LIVE_PICON_DOWNLOAD_TIMEOUT, LIVE_RECONNECT_RELEASE_DELAY_MS, MAX_AUDIO_TRACKS, RESUME_4097_STABLE_SAMPLES, RESUME_INITIAL_DELAY_MS, RESUME_LENGTH_STABILITY_TOLERANCE_SECONDS, RESUME_MAX_ATTEMPTS, RESUME_RETRY_DELAY_MS, SEEK_ASYNC_VERIFY_TIMEOUT_SECONDS, SEEK_STARTUP_GRACE_SECONDS, SEEK_VERIFY_DELAY_MS, SEEK_VERIFY_MAX_CHECKS, STALKER_LIVE_EPG_QUIET_MS, SUBTITLE_AUTO_MATCH_DELAY_MS, SUBTITLE_MESSAGE_TIMEOUT_SECONDS, VIDEO_CODECS, WEATHER_ICON_DIR, WORKER_LIST_TIMEOUT_SECONDS, WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS, WORKER_POSTER_TIMEOUT_SECONDS, WORKER_WEATHER_TIMEOUT_SECONDS, _ARCHIVE_PTS_MASK, _ARCHIVE_PTS_MODULO, _ARCHIVE_RETRY_PENDING, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _connect_timer, _debug, _debug_identifier, _desktop_size, _disable_live_window_animation, _download_client_image, _epg_event_starts_in_future, _is_stalker_client, _load_live_picon_path, _load_shared_live_epg, _normalise_video_codec, _picon_cache_path, _picon_failure_active, _read_proc_number, _read_proc_text, _live_picon_path_is_current, _live_picon_url, _scale, _trace_fullscreen_osd, _valid_live_picon_file
 from .browser_live import _LiveStartupRecoverySupport
 from .browser_common import _picon_failure_remaining, _discard_invalid_live_picon_cache
 from .live_picon_retry import LivePiconRetry, DOWNLOAD_TIMEOUT as LIVE_INFO_PICON_TIMEOUT, DOWNLOAD_BUDGET as LIVE_INFO_PICON_BUDGET
-from .vod_seek import VodSeekSupport
+from .vod_seek import SeekKeyHold, VodSeekSupport
 
 def _player_skin():
     width, height = _desktop_size()
@@ -1506,6 +1506,9 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         self._minute_seek_open = False
         self._held_direction = None
         self._held_direction_long = False
+        self._seek_key_hold = None
+        self._seek_key_priming = False
+        self._seek_key_directions = {}
         self._player_key_callback = self._handle_player_key
         self._player_keys_bound = False
         self._player_key_map = None
@@ -1513,7 +1516,6 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         self._subtitle_sync_overlay = None
         self._subtitle_sync_keys = SubtitleSyncKeys(self._subtitle_sync_context, self._adjust_subtitle_sync, finished=self._persist_subtitle_sync)
         self._live_zero_key = LiveZeroKey(eTimer, self._live_zero_is_active, self.recall_previous_live_channel, self.restart_live_stream, prime_native=self._prime_live_zero_key)
-        self._short_direction_is_seek = True
         self._subtitle_menu_open = False
         self._subtitle_menu_generation = None
         self._subtitle_message_tokens = set()
@@ -1585,6 +1587,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         self._playback_timer = eTimer()
         self._resume_timer = eTimer()
         self._direction_hold_timer = eTimer()
+        self._seek_key_timer = eTimer()
         self._seek_verify_timer = eTimer()
         self._subtitle_auto_timer = eTimer()
         self._reconnect_timer = eTimer()
@@ -1600,6 +1603,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         _connect_timer(self._playback_timer, self._playback_tick)
         _connect_timer(self._resume_timer, self._resume_tick)
         _connect_timer(self._direction_hold_timer, self._direction_hold_timeout)
+        _connect_timer(self._seek_key_timer, self._finish_seek_key)
         _connect_timer(self._seek_verify_timer, self._verify_seek_result)
         _connect_timer(self._subtitle_auto_timer, self._start_automatic_subtitle_search)
         _connect_timer(self._reconnect_timer, self._complete_live_restart)
@@ -2051,6 +2055,9 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         if not stream_id or snapshot_stream_id != stream_id:
             _debug('live snapshot rejected expected_id={} actual_id={}'.format(stream_id, snapshot_stream_id))
             return common
+        picon = snapshot.get('picon_path')
+        if picon and not _live_picon_path_is_current(self.client, self.current_item, picon):
+            snapshot.pop('picon_path')
         return snapshot
 
     def _remember_live_snapshot_component(self, stream_id, component, value):
@@ -2069,7 +2076,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         if component == 'events':
             entry[component] = list(value or [])
         else:
-            entry[component] = str(value or '').strip()
+            entry[component] = artwork_path(value)
         entry['captured_at'] = time.time()
         top_stream_id = str(self._live_snapshot.get('stream_id', '') or '')
         if top_stream_id == stream_id:
@@ -2144,7 +2151,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         self._picon_visible = False
         self._cached_picon_generation = self._picon_request_generation = -1
         self._sync_picon_visibility()
-        url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
+        url = _live_picon_url(self.client, self.current_item)
         delay = state.defer(time.monotonic(), _picon_failure_remaining(url) if url else 0.0)
         if delay is None:
             self._picon_timer.stop()
@@ -2184,7 +2191,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             return
         if self._apply_live_snapshot_picon():
             return
-        url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
+        url = _live_picon_url(self.client, self.current_item)
         if not url or self.client is None:
             return
         if _picon_failure_active(url):
@@ -2212,7 +2219,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             return False
         path = artwork_path(snapshot.get('picon_path', '') or '')
         if not path or not _valid_live_picon_file(path):
-            url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
+            url = _live_picon_url(self.client, self.current_item)
             path = _cached_picon_path(url) if url else ''
             if path and _valid_live_picon_file(path):
                 self._remember_live_snapshot_component(getattr(self.current_item, 'stream_id', ''), 'picon_path', path)
@@ -2275,7 +2282,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             retry_after = 0.0
         needs_epg = bool((not has_epg or self._live_info_epg_refresh_generation == self._generation) and now_mono >= retry_after and (self._live_info_loader() is not None))
         has_picon = self._apply_live_snapshot_picon(snapshot)
-        picon_url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
+        picon_url = _live_picon_url(self.client, self.current_item)
         needs_picon = False
         if not has_picon and picon_url and self._live_picon_status().ready(time.monotonic()):
             if _picon_failure_active(picon_url):
@@ -2446,8 +2453,9 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
                 self._refresh_front_panel()
             return bool(events)
         if component == 'picon_path':
-            path = str(value or '').strip()
-            if not path or not _valid_live_picon_file(path):
+            path = artwork_path(value)
+            if (not path or not _valid_live_picon_file(path)
+                    or not _live_picon_path_is_current(self.client, self.current_item, path)):
                 self._defer_live_picon()
                 return False
             self._remember_live_snapshot_component(stream_id, 'picon_path', path)
@@ -2645,19 +2653,19 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             self._save_resume_position()
         state = {'generation': self._generation, 'item': self.current_item, 'reference': self.reference, 'position': max(0, int(position)), 'paused': self._web_resume_paused if pending_return else self._paused, 'subtitle': subtitle_state}
         self._web_suspended = state
+        self._take_seek_key()
+        self._clear_direction_hold()
         self._cancel_seek_verification()
         self._hide_subtitle_overlay()
         self._stop_player_weather()
         self._network_rate_sampler.reset()
-        for name in ('_hide_timer', '_metadata_timer', '_picon_timer', '_clock_timer', '_infobar_telemetry_timer', '_weather_timer', '_playback_timer', '_resume_timer', '_direction_hold_timer', '_seek_verify_timer', '_subtitle_auto_timer'):
+        for name in ('_hide_timer', '_metadata_timer', '_picon_timer', '_clock_timer', '_infobar_telemetry_timer', '_weather_timer', '_playback_timer', '_resume_timer', '_seek_verify_timer', '_subtitle_auto_timer'):
             timer = getattr(self, name, None)
             if timer is not None:
                 try:
                     timer.stop()
                 except Exception:
                     pass
-        self._held_direction = None
-        self._held_direction_long = False
         if controller is not None:
             try:
                 controller.reset_for_service_change()
@@ -2801,6 +2809,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             recovery.cancel()
 
     def _after_zap(self, refresh_epg=False):
+        self._take_seek_key()
         self._episode_watcher.arm()
         self._arm_resume_bookmark_guard()
         if self._started and self._is_live_item():
@@ -2981,6 +2990,12 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             from enigma import eActionMap
             from keyids import KEYIDS
             self._player_key_ids = {name: KEYIDS[name] for name in ('KEY_0', 'KEY_1', 'KEY_2', 'KEY_3', 'KEY_4', 'KEY_5', 'KEY_6', 'KEY_7', 'KEY_8', 'KEY_9', 'KEY_YELLOW', 'KEY_GREEN', 'KEY_LEFT', 'KEY_RIGHT', 'KEY_EPG', 'KEY_INFO') if name in KEYIDS}
+            self._seek_key_directions = {
+                KEYIDS[name]: direction
+                for name, direction in (('KEY_REWIND', -1), ('KEY_FASTFORWARD', 1))
+                if name in KEYIDS
+            }
+            self._seek_key_directions.update(self._seek_alias_directions(KEYIDS))
             self._player_key_map = eActionMap.getInstance()
             self._player_key_map.bindAction('', -100, self._player_key_callback)
             self._player_keys_bound = True
@@ -2989,19 +3004,47 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             log_event('minute_seek', 'remote-bind-failed', error)
             _debug('player remote binding failed error={}'.format(error.__class__.__name__))
 
+    def _seek_alias_directions(self, key_ids):
+        """Use previous/next media keys only with a seek binding in this player."""
+        if self._is_live_item():
+            return {}
+        alias_keys = {key_ids.get('KEY_PREVIOUSSONG'), key_ids.get('KEY_NEXTSONG')}
+        alias_keys.difference_update(
+            (None, key_ids.get('KEY_LEFT'), key_ids.get('KEY_RIGHT'), *self._seek_key_directions)
+        )
+        if not alias_keys:
+            return {}
+        directions = {
+            'seekBack': -1, 'rewind': -1, 'SeekbarBack': -1, 'seekBackManual': -1,
+            'seekFwd': 1, 'fastForward': 1, 'fastforward': 1, 'SeekbarFwd': 1, 'seekFwdManual': 1,
+        }
+        matches = {key: set() for key in alias_keys}
+        try:
+            try:
+                from Components.ActionMap import queryKeyBinding
+            except ImportError:
+                from Tools.KeyBindings import queryKeyBinding
+            action_map = self['actions']
+            for context in action_map.contexts:
+                for action in action_map.actions:
+                    for key, flags in queryKeyBinding(context, action):
+                        if flags and key in matches:
+                            matches[key].add(directions.get(action))
+        except Exception as error:
+            _debug('seek key mapping unavailable error={}'.format(error.__class__.__name__))
+            return {}
+        return {key: next(iter(roles)) for key, roles in matches.items()
+                if len(roles) == 1 and None not in roles}
+
     def _unbind_player_key_handler(self):
+        self._take_seek_key()
         self._reset_live_patch_code()
         self._subtitle_sync_keys.cancel()
         self._dismiss_subtitle_sync_offset()
         zero_key = getattr(self, '_live_zero_key', None)
         if zero_key is not None:
             zero_key.cancel()
-        try:
-            self._direction_hold_timer.stop()
-        except Exception:
-            pass
-        self._held_direction = None
-        self._held_direction_long = False
+        self._clear_direction_hold()
         if not self._player_keys_bound:
             return
         self._player_keys_bound = False
@@ -3012,10 +3055,15 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
 
     def _handle_player_key(self, key, flag):
         """Consume player keys only while the fullscreen player owns focus."""
-        key_ids = self._player_key_ids
-        if self._closed or getattr(self.session, 'current_dialog', None) is not self:
+        if getattr(self, '_closed', True) or getattr(self.session, 'current_dialog', None) is not self:
             return 0
+        if self._seek_key_priming:
+            return 1
+        key_ids = self._player_key_ids
         kind = getattr(self.current_item, 'content_type', '')
+        seek_direction = self._seek_key_directions.get(key) if kind != 'live' else None
+        if flag == 0 and seek_direction is None:
+            self._take_seek_key()
         if self._handle_live_patch_key(key, flag):
             return 1
         for name, command in (('KEY_4', 'minus'), ('KEY_5', 'reset'), ('KEY_6', 'plus')):
@@ -3045,6 +3093,8 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
                 else:
                     self.open_aspect_selection()
             return 1
+        if seek_direction is not None:
+            return self._handle_seek_key(key, seek_direction, flag)
         if kind not in ('movie', 'series'):
             return 0
         if key == key_ids.get('KEY_YELLOW'):
@@ -3071,7 +3121,9 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         return bool(not self._closed and self._started and self._is_live_item() and getattr(self.session, 'in_exec', True) and (getattr(self.session, 'current_dialog', None) is self) and (getattr(self, '_web_suspended', None) is None))
 
     def _prime_live_zero_key(self):
-        key = self._player_key_ids.get('KEY_0')
+        self._prime_player_key(self._player_key_ids.get('KEY_0'))
+
+    def _prime_player_key(self, key):
         if self._player_key_map is not None and key is not None:
             self._player_key_map.keyPressed('dreambox remote control (native)', key, 0)
 
@@ -4875,28 +4927,28 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             self._seek_ready = True
         return (position, length)
 
-    def _show_seek_overlay(self, state, hint):
+    def _show_seek_overlay(self, state, hint, timeline=None):
         if getattr(self, '_subtitle_menu_open', False) or getattr(self, '_subtitle_message_tokens', None):
             return
-        seeker = self._seek_interface()
-        position, length = self._seek_position(seeker)
-        if self._seeking:
-            position = self._seek_target
-            length = self._seek_length
-        safe_length = max(0, length)
-        ratio = min(1.0, max(0.0, float(position) / float(safe_length))) if safe_length > 0 and position >= 0 else 0.0
+        if timeline is None:
+            timeline = (self._seek_target, self._seek_length) if self._seeking else self._seek_position()
         self._info_dialog['seek_state'].setText(_(state))
-        self._info_dialog['seek_times'].setText('{}   /   {}'.format(self._format_play_time(position), self._format_play_time(safe_length)))
-        self._info_dialog['seek_hint'].setText(_(hint))
-        try:
-            self._info_dialog['seek_progress_fill'].instance.resize(eSize(max(1, int(round(self._seek_width * ratio))), self._seek_height))
-        except Exception:
-            pass
+        self._render_seek_timeline(*timeline)
+        self._info_dialog['seek_hint'].setText(_(hint) if hint else '')
         for name in ('seek_panel', 'seek_state', 'seek_progress_bg', 'seek_progress_fill', 'seek_times', 'seek_hint'):
             self._info_dialog[name].show()
         self._info_dialog.show()
         self._info_visible = True
         self._set_subtitle_infobar_visible(True)
+
+    def _render_seek_timeline(self, position, length):
+        length = max(0, length)
+        ratio = min(1.0, max(0.0, position / length)) if length > 0 and position >= 0 else 0.0
+        self._info_dialog['seek_times'].setText('{}   /   {}'.format(self._format_play_time(position), self._format_play_time(length)))
+        try:
+            self._info_dialog['seek_progress_fill'].instance.resize(eSize(max(1, int(round(self._seek_width * ratio))), self._seek_height))
+        except Exception:
+            pass
 
     def _hide_seek_overlay(self):
         for name in ('seek_panel', 'seek_state', 'seek_progress_bg', 'seek_progress_fill', 'seek_times', 'seek_hint'):
@@ -5104,35 +5156,38 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         self._cancel_seek_verification()
         self._seek_unavailable()
 
-    def _seek_immediately(self, delta_seconds):
-        if getattr(self.current_item, 'content_type', '') == 'live':
-            self._seek_unavailable()
-            return
+    def _seek_step_state(self):
         pending = self._pending_seek_verification
         if self._vod_seek_enabled() and isinstance(pending, dict) and 'guard' in pending and self._vod_seek_context(pending):
-            base = pending.get('queued_target') if pending.get('queued_target') is not None else pending['target']
-            target = min(max(0, int(base) + int(delta_seconds)), max(0, int(pending['length'])))
-            self._queue_vod_seek(target)
-            self.show_info()
-            return
+            queued = pending.get('queued_target')
+            base = int(pending['target'] if queued is None else queued)
+            # The VOD verifier owns the decoder until this request completes.
+            return None, base, max(0, int(pending['length'])), base
         seeker = self._seek_interface()
         position, length = self._seek_position(seeker)
         if seeker is None or position < 0 or length <= 0:
-            self._seek_not_ready()
-            return
-        delta_seconds = int(delta_seconds)
-        pending = self._pending_seek_verification
-        base_position = int(pending['target']) if pending is not None and str(pending.get('stream_id', '')) == str(getattr(self.current_item, 'stream_id', '') or '') else position
-        target = min(max(0, base_position + delta_seconds), length)
-        actual_delta = target - position
-        if actual_delta == 0:
-            self._cancel_seek_verification()
-            self.show_info()
-            return
-        self._cancel_seek_verification()
-        if not self._request_seek(seeker, position, target):
+            return None
+        stream_id = str(getattr(self.current_item, 'stream_id', '') or '')
+        base = int(pending['target']) if pending is not None and str(pending.get('stream_id', '')) == stream_id else position
+        return seeker, position, length, base
+
+    def _seek_immediately(self, seconds, absolute=False):
+        if getattr(self.current_item, 'content_type', '') == 'live':
             self._seek_unavailable()
             return
+        state = self._seek_step_state()
+        if state is None:
+            self._seek_not_ready()
+            return
+        seeker, position, length, base = state
+        target = min(length, max(0, int(seconds) if absolute else base + int(seconds)))
+        if seeker is None:
+            self._queue_vod_seek(target)
+        else:
+            self._cancel_seek_verification()
+            if target != position and not self._request_seek(seeker, position, target):
+                self._seek_unavailable()
+                return
         self.show_info()
 
     def seek_forward(self):
@@ -5146,6 +5201,14 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
             self._begin_or_adjust_seek(-30)
         else:
             self._seek_immediately(-60)
+
+    def _clear_direction_hold(self):
+        try:
+            self._direction_hold_timer.stop()
+        except Exception:
+            pass
+        self._held_direction = None
+        self._held_direction_long = False
 
     def _direction_press(self, direction):
         if self._closed or not self._started or self._minute_seek_open or (self._pending_engine_reference is not None):
@@ -5194,6 +5257,92 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
         log_event('minute_seek', 'hold-accepted direction={}'.format(direction))
         self.open_minute_seek(direction)
         return True
+
+
+    def _seek_keys_active(self):
+        return (not getattr(self, '_closed', True) and self._started and
+                not self._is_live_item() and self._pending_engine_reference is None and
+                self._web_suspended is None and self._seek_foreground() and
+                not self._aspect_menu_open and not self._subtitle_message_tokens)
+
+    def _take_seek_key(self):
+        hold = getattr(self, '_seek_key_hold', None)
+        if hold is not None:
+            self._seek_key_hold = None
+            self._seek_key_timer.stop()
+            if hold.target is not None:
+                self._hide_seek_overlay()
+                self._start_info_hide_timer()
+        return hold
+
+    def _finish_seek_key(self):
+        hold = self._take_seek_key()
+        if hold is None or not self._seek_keys_active() or hold.generation != self._generation:
+            return
+        if self._playing_reference_identity() != self._reference_identity(self.reference):
+            return
+        if hold.target is None:
+            if self._seeking:
+                self._begin_or_adjust_seek(hold.direction)
+            else:
+                self._seek_immediately(hold.direction)
+        elif self._seeking:
+            self._seek_target = hold.target
+            self.show_info()
+        else:
+            self._seek_immediately(hold.target, absolute=True)
+
+    def _preview_seek_key(self, hold):
+        if hold.target is not None:
+            previous = hold.target
+            hold.advance(previous)
+            if hold.target != previous:
+                self._render_seek_timeline(hold.target, hold.length)
+            return
+        if self._seeking:
+            position, hold.length = self._seek_target, self._seek_length
+        else:
+            state = self._seek_step_state()
+            if state is None:
+                return
+            _, _, hold.length, position = state
+        hold.advance(position)
+        self._hide_timer.stop()
+        title = N_('SEEK FORWARD') if hold.direction > 0 else N_('SEEK BACKWARD')
+        self._show_seek_overlay(title, '', timeline=(hold.target, hold.length))
+
+    def _handle_seek_key(self, key, direction, flag):
+        if flag not in (0, 1, 2, 3, 5):
+            return 0
+        if not self._seek_keys_active():
+            self._take_seek_key()
+            return 1
+        if flag == 0:
+            self._clear_direction_hold()
+            self._finish_seek_key()
+            self._seek_key_hold = SeekKeyHold(key, direction, self._generation)
+            self._seek_key_timer.start(SeekKeyHold.PRESS_TIMEOUT_MS, True)
+            return 1
+        hold = self._seek_key_hold
+        if hold is None or hold.key != key or hold.generation != self._generation:
+            return 1
+        if flag in (1, 5):
+            self._finish_seek_key()
+            return 1
+        if flag == 3:
+            # OpenPLi suppresses break after long. Re-prime the native make,
+            # as for the live 0 key, so the release reaches this handler.
+            self._seek_key_priming = True
+            try:
+                self._prime_player_key(key)
+            except Exception as error:
+                _debug('seek key priming failed error={}'.format(error.__class__.__name__))
+            finally:
+                self._seek_key_priming = False
+        self._seek_key_timer.start(SeekKeyHold.REPEAT_TIMEOUT_MS, True)
+        if (flag == 2 or hold.first_repeat_at is None) and hold.step_due(time.monotonic()):
+            self._preview_seek_key(hold)
+        return 1
 
     def open_minute_seek(self, direction):
         """Open native minute input above VOD without stopping the video."""
@@ -5963,7 +6112,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
                 self._cached_picon_generation = generation
                 self._apply_picon(generation, path)
                 return
-        url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
+        url = _live_picon_url(self.client, self.current_item)
         if not url:
             return
         destination = _picon_cache_path(url)
@@ -6052,7 +6201,7 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
                     # After the alpha path and compatibility decoder both
                     # fail, remove only this URL's recognised disposable file.
                     if state.decode_attempts == 2:
-                        url = _safe_picon_url(getattr(self.current_item, 'icon', ''))
+                        url = _live_picon_url(self.client, self.current_item)
                         if url:
                             try:
                                 _discard_invalid_live_picon_cache(url, path)
@@ -6078,12 +6227,8 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
 
     def stop_playback(self):
         self._stop_player_stream_diag()
-        try:
-            self._direction_hold_timer.stop()
-        except Exception:
-            pass
-        self._held_direction = None
-        self._held_direction_long = False
+        self._take_seek_key()
+        self._clear_direction_hold()
         stop_archive_keepalive = getattr(self, '_stop_archive_portal_keepalive', None)
         if callable(stop_archive_keepalive):
             stop_archive_keepalive()
@@ -6223,8 +6368,6 @@ class GTExternalPlayerScreen(VodSeekSupport, _LiveStartupRecoverySupport, _Favor
                 self.session.deleteDialog(sync_overlay)
             except Exception:
                 sync_overlay.dismiss()
-        self._held_direction = None
-        self._held_direction_long = False
         self._save_resume_position()
         self._episode_watcher.close()
         stop_archive_keepalive = getattr(self, '_stop_archive_portal_keepalive', None)

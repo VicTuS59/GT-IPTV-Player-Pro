@@ -15,7 +15,7 @@ import unicodedata
 from collections import OrderedDict
 from copy import copy
 from urllib.parse import urlsplit
-from Components.ActionMap import ActionMap
+from .action_map import ActionMap
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Screens.Screen import Screen
@@ -855,6 +855,7 @@ class GTAsyncListScreen(Screen):
         self._error = ''
         self._load_generation = 0
         self._load_token = None
+        self._load_result_lock = threading.Lock()
         self._timer = eTimer()
         _connect_timer(self._timer, self._poll_result)
         self['top_accent'] = Label('')
@@ -957,9 +958,10 @@ class GTAsyncListScreen(Screen):
     def start_load(self):
         if self._loading or self._closed:
             return
-        _cancel_worker_token(self._load_token)
-        self._load_generation += 1
-        generation = self._load_generation
+        with self._load_result_lock:
+            _cancel_worker_token(self._load_token)
+            self._load_generation += 1
+            generation = self._load_generation
         timeout = WORKER_LIST_TIMEOUT_SECONDS
         client = getattr(self, 'client', None)
         if _is_m3u_client(client) and getattr(getattr(client, 'account', None), 'kind', None) == 'url':
@@ -997,8 +999,13 @@ class GTAsyncListScreen(Screen):
         self.start_load()
 
     def _run_load(self, generation=None, token=None):
+        lock = getattr(self, '_load_result_lock', None)
+        if lock is None or getattr(self, '_closed', True) is not False:
+            return
         if generation is None:
-            generation = self._load_generation
+            generation = getattr(self, '_load_generation', None)
+            if generation is None:
+                return
         prepared = []
         error = ''
         try:
@@ -1011,14 +1018,18 @@ class GTAsyncListScreen(Screen):
             error = RAM_UNAVAILABLE
         except Exception:
             error = N_('Could not load content')
-        if self._closed or generation != self._load_generation or (token is not None and (not token.active())):
-            return
-        self._commit_loaded_items(prepared, generation)
-        self._error = error
-        self._ready = True
+        with lock:
+            # Screen.doClose can erase the screen state while the provider is working.
+            if (getattr(self, '_closed', True) is not False
+                    or generation != getattr(self, '_load_generation', None)
+                    or (token is not None and not token.active())):
+                return
+            self._commit_loaded_items(prepared, generation)
+            self._error = error
+            self._ready = True
 
     def _poll_result(self):
-        if self._closed:
+        if getattr(self, '_closed', True) is not False:
             return
         if not self._ready:
             if self._load_token is not None and self._load_token.expired():
@@ -1081,10 +1092,14 @@ class GTAsyncListScreen(Screen):
         pass
 
     def _stop(self):
-        self._closed = True
-        self._load_generation += 1
-        _cancel_worker_token(self._load_token)
-        self._load_token = None
+        lock = getattr(self, '_load_result_lock', None)
+        if lock is None:
+            return
+        with lock:
+            self._closed = True
+            self._load_generation += 1
+            _cancel_worker_token(self._load_token)
+            self._load_token = None
         try:
             self._timer.stop()
         except Exception:
@@ -1171,6 +1186,21 @@ def _safe_picon_url(value):
     except (NetworkSecurityError, TypeError, ValueError):
         return ''
 
+def _live_picon_url(client, item):
+    icon = getattr(item, 'icon', '')
+    if icon:
+        return _safe_picon_url(icon)
+    lookup = getattr(client, 'epg_picon_url', None)
+    return lookup(item) if callable(lookup) else ''
+
+def _live_picon_path_is_current(client, item, path):
+    """Reject prefetched EPG artwork when the channel's logo URL changes."""
+    lookup = getattr(client, 'epg_picon_url', None)
+    if getattr(item, 'icon', '') or not callable(lookup):
+        return True
+    url = lookup(item)
+    return bool(url and os.path.splitext(str(path))[0] == os.path.splitext(_picon_cache_path(url))[0])
+
 def _provider_image_request_context(client, url):
     """Return optional provider headers for one already-validated image URL."""
     context_loader = getattr(client, 'picon_request_context', None)
@@ -1197,7 +1227,7 @@ def _load_live_picon_path(client, item, worker_token=None, timeout=None):
     """Return one validated live logo using the shared bounded downloader."""
     if worker_token is not None:
         worker_token.check()
-    url = _safe_picon_url(getattr(item, 'icon', ''))
+    url = _live_picon_url(client, item)
     if not url:
         return ''
     path = _cached_picon_path(url)

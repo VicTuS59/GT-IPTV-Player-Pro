@@ -1,0 +1,861 @@
+# FreeEPG settings and region labels
+# Region display names from Unicode CLDR. See LICENSING.md.
+msgid ""
+msgstr ""
+"Language: sl\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Could not open the country list."
+msgstr "Seznama držav ni bilo mogoče odpreti."
+
+msgid "Custom URL"
+msgstr "URL po meri"
+
+msgid "FreeEPG country AC"
+msgstr "Otok Ascension"
+
+msgid "FreeEPG country AD"
+msgstr "Andora"
+
+msgid "FreeEPG country AE"
+msgstr "Združeni arabski emirati"
+
+msgid "FreeEPG country AF"
+msgstr "Afganistan"
+
+msgid "FreeEPG country AG"
+msgstr "Antigva in Barbuda"
+
+msgid "FreeEPG country AI"
+msgstr "Angvila"
+
+msgid "FreeEPG country AL"
+msgstr "Albanija"
+
+msgid "FreeEPG country AM"
+msgstr "Armenija"
+
+msgid "FreeEPG country AN"
+msgstr "Curaçao"
+
+msgid "FreeEPG country AO"
+msgstr "Angola"
+
+msgid "FreeEPG country AQ"
+msgstr "Antarktika"
+
+msgid "FreeEPG country AR"
+msgstr "Argentina"
+
+msgid "FreeEPG country AS"
+msgstr "Ameriška Samoa"
+
+msgid "FreeEPG country AT"
+msgstr "Avstrija"
+
+msgid "FreeEPG country AU"
+msgstr "Avstralija"
+
+msgid "FreeEPG country AW"
+msgstr "Aruba"
+
+msgid "FreeEPG country AX"
+msgstr "Alandski otoki"
+
+msgid "FreeEPG country AZ"
+msgstr "Azerbajdžan"
+
+msgid "FreeEPG country BA"
+msgstr "Bosna in Hercegovina"
+
+msgid "FreeEPG country BB"
+msgstr "Barbados"
+
+msgid "FreeEPG country BD"
+msgstr "Bangladeš"
+
+msgid "FreeEPG country BE"
+msgstr "Belgija"
+
+msgid "FreeEPG country BF"
+msgstr "Burkina Faso"
+
+msgid "FreeEPG country BG"
+msgstr "Bolgarija"
+
+msgid "FreeEPG country BH"
+msgstr "Bahrajn"
+
+msgid "FreeEPG country BI"
+msgstr "Burundi"
+
+msgid "FreeEPG country BJ"
+msgstr "Benin"
+
+msgid "FreeEPG country BL"
+msgstr "Sveti Bartolomej"
+
+msgid "FreeEPG country BM"
+msgstr "Bermudi"
+
+msgid "FreeEPG country BN"
+msgstr "Brunej"
+
+msgid "FreeEPG country BO"
+msgstr "Bolivija"
+
+msgid "FreeEPG country BQ"
+msgstr "Nizozemski Karibi"
+
+msgid "FreeEPG country BR"
+msgstr "Brazilija"
+
+msgid "FreeEPG country BS"
+msgstr "Bahami"
+
+msgid "FreeEPG country BT"
+msgstr "Butan"
+
+msgid "FreeEPG country BU"
+msgstr "Mjanmar (Burma)"
+
+msgid "FreeEPG country BV"
+msgstr "Bouvetov otok"
+
+msgid "FreeEPG country BW"
+msgstr "Bocvana"
+
+msgid "FreeEPG country BY"
+msgstr "Belorusija"
+
+msgid "FreeEPG country BZ"
+msgstr "Belize"
+
+msgid "FreeEPG country CA"
+msgstr "Kanada"
+
+msgid "FreeEPG country CC"
+msgstr "Kokosovi otoki"
+
+msgid "FreeEPG country CD"
+msgstr "Demokratična republika Kongo"
+
+msgid "FreeEPG country CF"
+msgstr "Srednjeafriška republika"
+
+msgid "FreeEPG country CG"
+msgstr "Kongo - Brazzaville"
+
+msgid "FreeEPG country CH"
+msgstr "Švica"
+
+msgid "FreeEPG country CI"
+msgstr "Slonokoščena obala"
+
+msgid "FreeEPG country CK"
+msgstr "Cookovi otoki"
+
+msgid "FreeEPG country CL"
+msgstr "Čile"
+
+msgid "FreeEPG country CM"
+msgstr "Kamerun"
+
+msgid "FreeEPG country CN"
+msgstr "Kitajska"
+
+msgid "FreeEPG country CO"
+msgstr "Kolumbija"
+
+msgid "FreeEPG country CP"
+msgstr "Otok Clipperton"
+
+msgid "FreeEPG country CQ"
+msgstr "Sark"
+
+msgid "FreeEPG country CR"
+msgstr "Kostarika"
+
+msgid "FreeEPG country CS"
+msgstr "Srbija"
+
+msgid "FreeEPG country CU"
+msgstr "Kuba"
+
+msgid "FreeEPG country CV"
+msgstr "Zelenortski otoki"
+
+msgid "FreeEPG country CW"
+msgstr "Curaçao"
+
+msgid "FreeEPG country CX"
+msgstr "Božični otok"
+
+msgid "FreeEPG country CY"
+msgstr "Ciper"
+
+msgid "FreeEPG country CZ"
+msgstr "Češka"
+
+msgid "FreeEPG country DD"
+msgstr "Nemčija"
+
+msgid "FreeEPG country DE"
+msgstr "Nemčija"
+
+msgid "FreeEPG country DG"
+msgstr "Diego Garcia"
+
+msgid "FreeEPG country DJ"
+msgstr "Džibuti"
+
+msgid "FreeEPG country DK"
+msgstr "Danska"
+
+msgid "FreeEPG country DM"
+msgstr "Dominika"
+
+msgid "FreeEPG country DO"
+msgstr "Dominikanska republika"
+
+msgid "FreeEPG country DY"
+msgstr "Benin"
+
+msgid "FreeEPG country DZ"
+msgstr "Alžirija"
+
+msgid "FreeEPG country EA"
+msgstr "Ceuta in Melilla"
+
+msgid "FreeEPG country EC"
+msgstr "Ekvador"
+
+msgid "FreeEPG country EE"
+msgstr "Estonija"
+
+msgid "FreeEPG country EG"
+msgstr "Egipt"
+
+msgid "FreeEPG country EH"
+msgstr "Zahodna Sahara"
+
+msgid "FreeEPG country ER"
+msgstr "Eritreja"
+
+msgid "FreeEPG country ES"
+msgstr "Španija"
+
+msgid "FreeEPG country ET"
+msgstr "Etiopija"
+
+msgid "FreeEPG country EU"
+msgstr "Evropska unija"
+
+msgid "FreeEPG country EZ"
+msgstr "evroobmočje"
+
+msgid "FreeEPG country FI"
+msgstr "Finska"
+
+msgid "FreeEPG country FJ"
+msgstr "Fidži"
+
+msgid "FreeEPG country FK"
+msgstr "Falklandski otoki"
+
+msgid "FreeEPG country FM"
+msgstr "Mikronezija"
+
+msgid "FreeEPG country FO"
+msgstr "Ferski otoki"
+
+msgid "FreeEPG country FR"
+msgstr "Francija"
+
+msgid "FreeEPG country FX"
+msgstr "Francija"
+
+msgid "FreeEPG country GA"
+msgstr "Gabon"
+
+msgid "FreeEPG country GB"
+msgstr "Združeno kraljestvo"
+
+msgid "FreeEPG country GD"
+msgstr "Grenada"
+
+msgid "FreeEPG country GE"
+msgstr "Gruzija"
+
+msgid "FreeEPG country GF"
+msgstr "Francoska Gvajana"
+
+msgid "FreeEPG country GG"
+msgstr "Guernsey"
+
+msgid "FreeEPG country GH"
+msgstr "Gana"
+
+msgid "FreeEPG country GI"
+msgstr "Gibraltar"
+
+msgid "FreeEPG country GL"
+msgstr "Grenlandija"
+
+msgid "FreeEPG country GM"
+msgstr "Gambija"
+
+msgid "FreeEPG country GN"
+msgstr "Gvineja"
+
+msgid "FreeEPG country GP"
+msgstr "Gvadelup"
+
+msgid "FreeEPG country GQ"
+msgstr "Ekvatorialna Gvineja"
+
+msgid "FreeEPG country GR"
+msgstr "Grčija"
+
+msgid "FreeEPG country GS"
+msgstr "Južna Georgia in Južni Sandwichevi otoki"
+
+msgid "FreeEPG country GT"
+msgstr "Gvatemala"
+
+msgid "FreeEPG country GU"
+msgstr "Gvam"
+
+msgid "FreeEPG country GW"
+msgstr "Gvineja Bissau"
+
+msgid "FreeEPG country GY"
+msgstr "Gvajana"
+
+msgid "FreeEPG country HK"
+msgstr "Posebno upravno območje Ljudske republike Kitajske Hongkong"
+
+msgid "FreeEPG country HM"
+msgstr "Heardov otok in McDonaldovi otoki"
+
+msgid "FreeEPG country HN"
+msgstr "Honduras"
+
+msgid "FreeEPG country HR"
+msgstr "Hrvaška"
+
+msgid "FreeEPG country HT"
+msgstr "Haiti"
+
+msgid "FreeEPG country HU"
+msgstr "Madžarska"
+
+msgid "FreeEPG country HV"
+msgstr "Burkina Faso"
+
+msgid "FreeEPG country IC"
+msgstr "Kanarski otoki"
+
+msgid "FreeEPG country ID"
+msgstr "Indonezija"
+
+msgid "FreeEPG country IE"
+msgstr "Irska"
+
+msgid "FreeEPG country IL"
+msgstr "Izrael"
+
+msgid "FreeEPG country IM"
+msgstr "Otok Man"
+
+msgid "FreeEPG country IN"
+msgstr "Indija"
+
+msgid "FreeEPG country IO"
+msgstr "Britansko ozemlje v Indijskem oceanu"
+
+msgid "FreeEPG country IQ"
+msgstr "Irak"
+
+msgid "FreeEPG country IR"
+msgstr "Iran"
+
+msgid "FreeEPG country IS"
+msgstr "Islandija"
+
+msgid "FreeEPG country IT"
+msgstr "Italija"
+
+msgid "FreeEPG country JE"
+msgstr "Jersey"
+
+msgid "FreeEPG country JM"
+msgstr "Jamajka"
+
+msgid "FreeEPG country JO"
+msgstr "Jordanija"
+
+msgid "FreeEPG country JP"
+msgstr "Japonska"
+
+msgid "FreeEPG country KE"
+msgstr "Kenija"
+
+msgid "FreeEPG country KG"
+msgstr "Kirgizistan"
+
+msgid "FreeEPG country KH"
+msgstr "Kambodža"
+
+msgid "FreeEPG country KI"
+msgstr "Kiribati"
+
+msgid "FreeEPG country KM"
+msgstr "Komori"
+
+msgid "FreeEPG country KN"
+msgstr "Sveti Krištof in Nevis"
+
+msgid "FreeEPG country KP"
+msgstr "Severna Koreja"
+
+msgid "FreeEPG country KR"
+msgstr "Južna Koreja"
+
+msgid "FreeEPG country KW"
+msgstr "Kuvajt"
+
+msgid "FreeEPG country KY"
+msgstr "Kajmanji otoki"
+
+msgid "FreeEPG country KZ"
+msgstr "Kazahstan"
+
+msgid "FreeEPG country LA"
+msgstr "Laos"
+
+msgid "FreeEPG country LB"
+msgstr "Libanon"
+
+msgid "FreeEPG country LC"
+msgstr "Sveta Lucija"
+
+msgid "FreeEPG country LI"
+msgstr "Lihtenštajn"
+
+msgid "FreeEPG country LK"
+msgstr "Šrilanka"
+
+msgid "FreeEPG country LR"
+msgstr "Liberija"
+
+msgid "FreeEPG country LS"
+msgstr "Lesoto"
+
+msgid "FreeEPG country LT"
+msgstr "Litva"
+
+msgid "FreeEPG country LU"
+msgstr "Luksemburg"
+
+msgid "FreeEPG country LV"
+msgstr "Latvija"
+
+msgid "FreeEPG country LY"
+msgstr "Libija"
+
+msgid "FreeEPG country MA"
+msgstr "Maroko"
+
+msgid "FreeEPG country MC"
+msgstr "Monako"
+
+msgid "FreeEPG country MD"
+msgstr "Moldavija"
+
+msgid "FreeEPG country ME"
+msgstr "Črna gora"
+
+msgid "FreeEPG country MF"
+msgstr "Francoski Sveti Martin"
+
+msgid "FreeEPG country MG"
+msgstr "Madagaskar"
+
+msgid "FreeEPG country MH"
+msgstr "Marshallovi otoki"
+
+msgid "FreeEPG country MK"
+msgstr "Severna Makedonija"
+
+msgid "FreeEPG country ML"
+msgstr "Mali"
+
+msgid "FreeEPG country MM"
+msgstr "Mjanmar (Burma)"
+
+msgid "FreeEPG country MN"
+msgstr "Mongolija"
+
+msgid "FreeEPG country MO"
+msgstr "Posebno upravno območje Kitajske Makav"
+
+msgid "FreeEPG country MP"
+msgstr "Severni Marianski otoki"
+
+msgid "FreeEPG country MQ"
+msgstr "Martinik"
+
+msgid "FreeEPG country MR"
+msgstr "Mavretanija"
+
+msgid "FreeEPG country MS"
+msgstr "Montserrat"
+
+msgid "FreeEPG country MT"
+msgstr "Malta"
+
+msgid "FreeEPG country MU"
+msgstr "Mavricij"
+
+msgid "FreeEPG country MV"
+msgstr "Maldivi"
+
+msgid "FreeEPG country MW"
+msgstr "Malavi"
+
+msgid "FreeEPG country MX"
+msgstr "Mehika"
+
+msgid "FreeEPG country MY"
+msgstr "Malezija"
+
+msgid "FreeEPG country MZ"
+msgstr "Mozambik"
+
+msgid "FreeEPG country NA"
+msgstr "Namibija"
+
+msgid "FreeEPG country NC"
+msgstr "Nova Kaledonija"
+
+msgid "FreeEPG country NE"
+msgstr "Niger"
+
+msgid "FreeEPG country NF"
+msgstr "Norfolški otok"
+
+msgid "FreeEPG country NG"
+msgstr "Nigerija"
+
+msgid "FreeEPG country NH"
+msgstr "Vanuatu"
+
+msgid "FreeEPG country NI"
+msgstr "Nikaragva"
+
+msgid "FreeEPG country NL"
+msgstr "Nizozemska"
+
+msgid "FreeEPG country NO"
+msgstr "Norveška"
+
+msgid "FreeEPG country NP"
+msgstr "Nepal"
+
+msgid "FreeEPG country NR"
+msgstr "Nauru"
+
+msgid "FreeEPG country NU"
+msgstr "Niue"
+
+msgid "FreeEPG country NZ"
+msgstr "Nova Zelandija"
+
+msgid "FreeEPG country OM"
+msgstr "Oman"
+
+msgid "FreeEPG country PA"
+msgstr "Panama"
+
+msgid "FreeEPG country PE"
+msgstr "Peru"
+
+msgid "FreeEPG country PF"
+msgstr "Francoska Polinezija"
+
+msgid "FreeEPG country PG"
+msgstr "Papua Nova Gvineja"
+
+msgid "FreeEPG country PH"
+msgstr "Filipini"
+
+msgid "FreeEPG country PK"
+msgstr "Pakistan"
+
+msgid "FreeEPG country PL"
+msgstr "Poljska"
+
+msgid "FreeEPG country PM"
+msgstr "Sveta Peter in Mihael"
+
+msgid "FreeEPG country PN"
+msgstr "Pitcairn"
+
+msgid "FreeEPG country PR"
+msgstr "Portoriko"
+
+msgid "FreeEPG country PS"
+msgstr "Palestinsko ozemlje"
+
+msgid "FreeEPG country PT"
+msgstr "Portugalska"
+
+msgid "FreeEPG country PW"
+msgstr "Palav"
+
+msgid "FreeEPG country PY"
+msgstr "Paragvaj"
+
+msgid "FreeEPG country QA"
+msgstr "Katar"
+
+msgid "FreeEPG country QO"
+msgstr "Ostala oceanija"
+
+msgid "FreeEPG country RE"
+msgstr "Reunion"
+
+msgid "FreeEPG country RH"
+msgstr "Zimbabve"
+
+msgid "FreeEPG country RO"
+msgstr "Romunija"
+
+msgid "FreeEPG country RS"
+msgstr "Srbija"
+
+msgid "FreeEPG country RU"
+msgstr "Rusija"
+
+msgid "FreeEPG country RW"
+msgstr "Ruanda"
+
+msgid "FreeEPG country SA"
+msgstr "Saudova Arabija"
+
+msgid "FreeEPG country SB"
+msgstr "Salomonovi otoki"
+
+msgid "FreeEPG country SC"
+msgstr "Sejšeli"
+
+msgid "FreeEPG country SD"
+msgstr "Sudan"
+
+msgid "FreeEPG country SE"
+msgstr "Švedska"
+
+msgid "FreeEPG country SG"
+msgstr "Singapur"
+
+msgid "FreeEPG country SH"
+msgstr "Sveta Helena"
+
+msgid "FreeEPG country SI"
+msgstr "Slovenija"
+
+msgid "FreeEPG country SJ"
+msgstr "Svalbard in Jan Mayen"
+
+msgid "FreeEPG country SK"
+msgstr "Slovaška"
+
+msgid "FreeEPG country SL"
+msgstr "Sierra Leone"
+
+msgid "FreeEPG country SM"
+msgstr "San Marino"
+
+msgid "FreeEPG country SN"
+msgstr "Senegal"
+
+msgid "FreeEPG country SO"
+msgstr "Somalija"
+
+msgid "FreeEPG country SR"
+msgstr "Surinam"
+
+msgid "FreeEPG country SS"
+msgstr "Južni Sudan"
+
+msgid "FreeEPG country ST"
+msgstr "Sveti Tomaž in Princ"
+
+msgid "FreeEPG country SU"
+msgstr "Rusija"
+
+msgid "FreeEPG country SV"
+msgstr "Salvador"
+
+msgid "FreeEPG country SX"
+msgstr "Nizozemski Sveti Martin"
+
+msgid "FreeEPG country SY"
+msgstr "Sirija"
+
+msgid "FreeEPG country SZ"
+msgstr "Esvatini"
+
+msgid "FreeEPG country TA"
+msgstr "Tristan da Cunha"
+
+msgid "FreeEPG country TC"
+msgstr "Otoki Turks in Caicos"
+
+msgid "FreeEPG country TD"
+msgstr "Čad"
+
+msgid "FreeEPG country TF"
+msgstr "Francosko južno ozemlje"
+
+msgid "FreeEPG country TG"
+msgstr "Togo"
+
+msgid "FreeEPG country TH"
+msgstr "Tajska"
+
+msgid "FreeEPG country TJ"
+msgstr "Tadžikistan"
+
+msgid "FreeEPG country TK"
+msgstr "Tokelav"
+
+msgid "FreeEPG country TL"
+msgstr "Timor-Leste"
+
+msgid "FreeEPG country TM"
+msgstr "Turkmenistan"
+
+msgid "FreeEPG country TN"
+msgstr "Tunizija"
+
+msgid "FreeEPG country TO"
+msgstr "Tonga"
+
+msgid "FreeEPG country TP"
+msgstr "Timor-Leste"
+
+msgid "FreeEPG country TR"
+msgstr "Turčija"
+
+msgid "FreeEPG country TT"
+msgstr "Trinidad in Tobago"
+
+msgid "FreeEPG country TV"
+msgstr "Tuvalu"
+
+msgid "FreeEPG country TW"
+msgstr "Tajvan"
+
+msgid "FreeEPG country TZ"
+msgstr "Tanzanija"
+
+msgid "FreeEPG country UA"
+msgstr "Ukrajina"
+
+msgid "FreeEPG country UG"
+msgstr "Uganda"
+
+msgid "FreeEPG country UK"
+msgstr "Združeno kraljestvo"
+
+msgid "FreeEPG country UM"
+msgstr "Stranski zunanji otoki Združenih držav"
+
+msgid "FreeEPG country UN"
+msgstr "Združeni narodi"
+
+msgid "FreeEPG country US"
+msgstr "Združene države Amerike"
+
+msgid "FreeEPG country UY"
+msgstr "Urugvaj"
+
+msgid "FreeEPG country UZ"
+msgstr "Uzbekistan"
+
+msgid "FreeEPG country VA"
+msgstr "Vatikan"
+
+msgid "FreeEPG country VC"
+msgstr "Sveti Vincencij in Grenadine"
+
+msgid "FreeEPG country VD"
+msgstr "Vietnam"
+
+msgid "FreeEPG country VE"
+msgstr "Venezuela"
+
+msgid "FreeEPG country VG"
+msgstr "Britanski Deviški otoki"
+
+msgid "FreeEPG country VI"
+msgstr "Ameriški Deviški otoki"
+
+msgid "FreeEPG country VN"
+msgstr "Vietnam"
+
+msgid "FreeEPG country VU"
+msgstr "Vanuatu"
+
+msgid "FreeEPG country WF"
+msgstr "Wallis in Futuna"
+
+msgid "FreeEPG country WS"
+msgstr "Samoa"
+
+msgid "FreeEPG country XA"
+msgstr "psevdonaglasi"
+
+msgid "FreeEPG country XB"
+msgstr "psevdobidi"
+
+msgid "FreeEPG country XK"
+msgstr "Kosovo"
+
+msgid "FreeEPG country YD"
+msgstr "Jemen"
+
+msgid "FreeEPG country YE"
+msgstr "Jemen"
+
+msgid "FreeEPG country YT"
+msgstr "Mayotte"
+
+msgid "FreeEPG country YU"
+msgstr "Srbija"
+
+msgid "FreeEPG country ZA"
+msgstr "Južnoafriška republika"
+
+msgid "FreeEPG country ZM"
+msgstr "Zambija"
+
+msgid "FreeEPG country ZR"
+msgstr "Demokratična republika Kongo"
+
+msgid "FreeEPG country ZW"
+msgstr "Zimbabve"
+
+msgid "FreeEPG country ZZ"
+msgstr "Neznano ali neveljavno območje"
+
+msgid "No FreeEPG countries are available."
+msgstr "V FreeEPG ni na voljo nobene države."
+
+msgid "Select a country"
+msgstr "Izberite državo"
+
+msgid "Showing the saved country list."
+msgstr "Prikazan je shranjeni seznam držav."

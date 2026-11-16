@@ -20,6 +20,7 @@ import uuid
 from contextlib import contextmanager
 from urllib.parse import urlsplit
 
+from .free_epg import country_code as free_epg_country_code, xmltv_url as free_epg_xmltv_url
 from .m3u import LOCAL_M3U_ROOTS, MAX_M3U_CHANNELS, _remote_url_info, is_epg_name_key
 
 
@@ -100,6 +101,10 @@ def _root_tuple(roots):
     return tuple(roots)
 
 
+class LocalXMLTVPathError(ValueError):
+    """The XMLTV file endpoint could not be validated."""
+
+
 def _local_location(value, roots=None):
     value = os.fspath(value) if isinstance(value, os.PathLike) else str(value or "")
     value = value.strip()
@@ -109,9 +114,9 @@ def _local_location(value, roots=None):
         or not os.path.isabs(value)
         or any(ord(character) < 32 or ord(character) == 127 for character in value)
     ):
-        raise ValueError("M3U XMLTV file path is invalid")
+        raise LocalXMLTVPathError("M3U XMLTV file path is invalid")
     if any(component in (".", "..") for component in value.split(os.sep)):
-        raise ValueError("M3U XMLTV file path traversal is not allowed")
+        raise LocalXMLTVPathError("M3U XMLTV file path traversal is not allowed")
 
     absolute = os.path.abspath(value)
     real = os.path.realpath(absolute)
@@ -119,7 +124,7 @@ def _local_location(value, roots=None):
     # allowed to be absent so a removable/NAS source can be configured while
     # it is temporarily offline.
     if real != absolute:
-        raise ValueError("Symbolic links cannot be used as M3U XMLTV sources")
+        raise LocalXMLTVPathError("Symbolic links cannot be used as M3U XMLTV sources")
 
     allowed = False
     for root in _root_tuple(roots):
@@ -131,13 +136,36 @@ def _local_location(value, roots=None):
         except ValueError:
             continue
     if not allowed:
-        raise ValueError("M3U XMLTV file is outside the allowed directories")
+        raise LocalXMLTVPathError("M3U XMLTV file is outside the allowed directories")
 
-    if os.path.lexists(absolute):
+    try:
         details = os.lstat(absolute)
-        if stat.S_ISLNK(details.st_mode) or not stat.S_ISREG(details.st_mode):
-            raise ValueError("M3U XMLTV source must be a regular file")
+    except FileNotFoundError:
+        return absolute
+    if not stat.S_ISREG(details.st_mode):
+        raise LocalXMLTVPathError("M3U XMLTV source must be a regular file")
     return absolute
+
+
+def _remembered_locations(value):
+    """Validate saved alternatives without accessing an inactive local mount."""
+    if not isinstance(value, dict):
+        return {}
+    result = {}
+    filename = value.get("file")
+    if (isinstance(filename, str) and 0 < len(filename) <= MAX_LOCAL_PATH_LENGTH
+            and filename.isprintable() and os.path.isabs(filename)):
+        result["file"] = filename
+    address = value.get("url")
+    if isinstance(address, str) and address:
+        try:
+            result["url"] = _remote_url_info(address)["url"]
+        except ValueError:
+            pass
+    country = free_epg_country_code(value.get("freeepg"))
+    if country:
+        result["freeepg"] = country
+    return result
 
 
 class Binding(object):
@@ -161,6 +189,8 @@ class Binding(object):
         "last_channel_count",
         "last_event_count",
         "name_mappings",
+        "free_epg_country",
+        "source_locations",
     )
 
     def __init__(
@@ -178,6 +208,8 @@ class Binding(object):
         last_event_count=0,
         local_roots=None,
         name_mappings=None,
+        free_epg_country=None,
+        source_locations=None,
     ):
         self._source_id = _source_id(source_id)
         self.enabled = bool(enabled)
@@ -197,13 +229,25 @@ class Binding(object):
             # user enables it or chooses an endpoint.
             self.location = ""
         elif kind == "file":
-            self.location = _local_location(location, local_roots)
+            try:
+                self.location = _local_location(location, local_roots)
+            except OSError as error:
+                raise LocalXMLTVPathError("M3U XMLTV file path is invalid") from error
         else:
             # Reuse the M3U provider's canonical URL validator.  In
             # particular this rejects credentials, fragments, unsafe schemes,
             # invalid ports and control characters without ever resolving or
             # contacting the endpoint.
             self.location = _remote_url_info(location)["url"]
+
+        self.free_epg_country = None
+        if kind == "url":
+            country = free_epg_country_code(free_epg_country)
+            if country and self.location == free_epg_xmltv_url(country):
+                self.free_epg_country = country
+            elif free_epg_country == "" and not self.location:
+                self.free_epg_country = ""
+        self.source_locations = _remembered_locations(source_locations)
 
         update_mode = str(update_mode or "").strip().lower()
         self.update_mode = (
@@ -255,6 +299,10 @@ class Binding(object):
         return self._source_id
 
     @property
+    def source_selection(self):
+        return "freeepg" if self.free_epg_country is not None else self.kind
+
+    @property
     def fingerprint(self):
         raw = "\x1f".join((self.source_id, self.kind, self.location))
         return hashlib.sha256(raw.encode("utf-8", "replace")).hexdigest()
@@ -277,7 +325,7 @@ class Binding(object):
         return "{}://{}".format(parsed.scheme.lower(), hostname)
 
     def as_dict(self):
-        return {
+        payload = {
             "source_id": self.source_id,
             "enabled": self.enabled,
             "kind": self.kind,
@@ -291,6 +339,11 @@ class Binding(object):
             "last_event_count": self.last_event_count,
             "name_mappings": dict(self.name_mappings),
         }
+        if self.free_epg_country is not None:
+            payload["free_epg_country"] = self.free_epg_country
+        if self.source_locations:
+            payload["source_locations"] = dict(self.source_locations)
+        return payload
 
     to_dict = as_dict
 
@@ -352,6 +405,8 @@ class Binding(object):
             last_event_count=payload.get("last_event_count", 0),
             local_roots=local_roots,
             name_mappings=payload.get("name_mappings"),
+            free_epg_country=payload.get("free_epg_country"),
+            source_locations=payload.get("source_locations"),
         )
 
     def copy(self):
@@ -713,7 +768,7 @@ def save_m3u_epg_binding(binding, path=M3U_XMLTV_SETTINGS_PATH):
                 raise ValueError("Too many M3U XMLTV bindings are configured")
             output.append(candidate)
         _write_unlocked(directory_descriptor, filename, M3UEPGSettings(output))
-    return _binding_copy(candidate)
+    return candidate
 
 
 def update_m3u_epg_binding(
@@ -754,7 +809,7 @@ def update_m3u_epg_binding(
             for binding in settings.bindings
         ]
         _write_unlocked(directory_descriptor, filename, M3UEPGSettings(output))
-    return _binding_copy(candidate)
+    return candidate
 
 
 def delete_m3u_epg_binding(source_id, path=M3U_XMLTV_SETTINGS_PATH):

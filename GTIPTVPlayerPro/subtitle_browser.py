@@ -24,7 +24,7 @@ from .typography import fit_dynamic_text
 from .subtitle_search_cache import subtitle_search_context
 
 try:
-    from Components.ActionMap import ActionMap
+    from .action_map import ActionMap
     from Components.Label import Label
     from Components.Pixmap import Pixmap
     from Screens.Screen import Screen
