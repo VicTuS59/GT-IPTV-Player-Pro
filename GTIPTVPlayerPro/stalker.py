@@ -47,6 +47,7 @@ from .content import (
     CONTENT_CACHE_SECONDS,
     LIVE_INITIAL_ITEMS,
     LIVE_MORE_ITEMS,
+    LIVE_SEARCH_RESULT_LIMIT,
     MAX_RESULTS,
     ContentCategory,
     ContentError,
@@ -55,9 +56,12 @@ from .content import (
     MovieInfo,
     MovieSearchPage,
     SeriesInfo,
+    channel_name_matcher,
     _normalise_media_url,
     _select_current_epg_window,
 )
+from .category_preferences import content_item_category_ids
+from .category_visibility import category_ids_visible, hidden_category_match_ids
 from .diagnostics import log_event
 from .persistence import guarded_mutation
 from .content_sort import assign_sort_metadata
@@ -5209,7 +5213,7 @@ class StalkerPortalClient(object):
             state["raw_seen"].add(identity)
             state["pending"].append((entry, False))
 
-    def _consume_live_pending(self, state, target, added):
+    def _consume_live_pending(self, state, target, added, predicate=None):
         category_id = state["category_id"]
         while (
             state["pending"]
@@ -5231,6 +5235,8 @@ class StalkerPortalClient(object):
                         continue
                 elif category_id not in category_ids:
                     continue
+            if predicate is not None and not predicate(entry, category_ids):
+                continue
             with self._cache_state_lock:
                 self._check_catalog_generation(state)
                 item = self._channel_item(entry)
@@ -5242,7 +5248,7 @@ class StalkerPortalClient(object):
             state["results"].append(item)
             added.append(item)
 
-    def _load_live_batch(self, state, target, request_budget):
+    def _load_live_batch(self, state, target, request_budget, predicate=None):
         self._check_catalog_generation(state)
         added = []
         requests = 0
@@ -5251,7 +5257,7 @@ class StalkerPortalClient(object):
             and len(added) < target
             and len(state["results"]) < MAX_RESULTS
         ):
-            self._consume_live_pending(state, target, added)
+            self._consume_live_pending(state, target, added, predicate)
             if len(added) >= target or len(state["results"]) >= MAX_RESULTS:
                 break
             if state["pending"]:
@@ -5260,7 +5266,7 @@ class StalkerPortalClient(object):
                 state["complete"] = True
                 break
             if state["ordered_done"]:
-                if state["results"]:
+                if state["results"] or (predicate is not None and state["ordered_raw_count"]):
                     state["complete"] = True
                     break
                 if requests >= request_budget:
@@ -5302,7 +5308,47 @@ class StalkerPortalClient(object):
             self._check_catalog_generation(state)
             return list(state["results"])
 
-    def _load_all_channels(self):
+    def search_live_channels(self, query, category_id="", hidden_category_ids=None):
+        """Search all pages of this category without filling the browsing list."""
+        matches = channel_name_matcher(query)
+        if matches is None:
+            return []
+        category_id = str(category_id or "")
+        hidden = hidden_category_match_ids((), hidden_category_ids)
+        with self._cache_state_lock:
+            cached = self._live_catalog_states.get(category_id)
+            complete = (
+                cached is not None and cached["complete"] and not cached["last_error"]
+                and self.clock() - cached["cached_at"] < CONTENT_CACHE_SECONDS
+            )
+            ready = tuple(cached["results"]) if complete else None
+        if ready is not None:
+            results = []
+            for item in ready:
+                self._check_request_limits()
+                if matches(item.name) and category_ids_visible(
+                    content_item_category_ids(item), hidden, category_id
+                ):
+                    results.append(item)
+                    if len(results) == LIVE_SEARCH_RESULT_LIMIT:
+                        break
+            return results
+
+        def match_entry(entry, category_ids):
+            self._check_request_limits()
+            return matches(entry.get("name") or entry.get("title")) and category_ids_visible(
+                category_ids + (category_id,), hidden, category_id
+            )
+
+        state = self._new_live_catalog_state(category_id)
+        results = self._load_live_batch(
+            state, LIVE_SEARCH_RESULT_LIMIT, MAX_PORTAL_PAGES + 3, match_entry,
+        )
+        if not results and state["complete"] and state["last_error"] is not None:
+            raise state["last_error"]
+        return results
+
+    def _load_all_channels(self, *, allow_ordered=True):
         if (
             self._channel_cache is not None
             and self.clock() - self._channel_cached_at < CONTENT_CACHE_SECONDS
@@ -5313,22 +5359,26 @@ class StalkerPortalClient(object):
             value = self._request("itv", "get_all_channels")
             entries = self._data_list(value)
         except ContentError as error:
-            if error.reason in REQUEST_ABORT_REASONS:
+            if error.reason in REQUEST_ABORT_REASONS or (
+                not allow_ordered and error.reason in (ContentError.ACCESS_DENIED, ContentError.RATE_LIMITED)
+            ):
                 raise
             entries = []
         if not entries:
+            if not allow_ordered:
+                return []
             entries = self._load_ordered_channels("")
         self._channel_cache = list(entries[:MAX_RESULTS])
         self._channel_cached_at = self.clock()
         return list(self._channel_cache)
 
-    def _load_ordered_channels(self, category_id):
+    def _load_ordered_channels(self, category_id, *, stream_id=""):
         genre = str(category_id or "").strip() or "*"
         entries = []
         seen = set()
         page = 1
         tried_zero_page = False
-        while page <= MAX_PORTAL_PAGES and len(entries) < MAX_RESULTS:
+        while page <= MAX_PORTAL_PAGES and len(seen) < MAX_RESULTS:
             try:
                 value = self._request(
                     "itv",
@@ -5336,9 +5386,11 @@ class StalkerPortalClient(object):
                     self._live_order_parameters(genre, page),
                 )
             except ContentError as error:
-                if error.reason in REQUEST_ABORT_REASONS:
+                if error.reason in REQUEST_ABORT_REASONS or (
+                    stream_id and error.reason in (ContentError.ACCESS_DENIED, ContentError.RATE_LIMITED)
+                ):
                     raise
-                if entries:
+                if seen:
                     break
                 raise
             batch = self._data_list(value)
@@ -5354,28 +5406,26 @@ class StalkerPortalClient(object):
             for entry in batch:
                 if not isinstance(entry, dict):
                     continue
-                identity = str(
-                    entry.get("id")
-                    or entry.get("ch_id")
-                    or entry.get("channel_id")
-                    or entry.get("stream_id")
-                    or entry.get("cmd")
-                    or entry.get("url")
-                    or ""
-                ).strip()
+                channel_id = self._channel_stream_id(entry)
+                if stream_id and channel_id == stream_id and self._channel_command(entry):
+                    return [entry]
+                identity = channel_id or str(entry.get("cmd") or entry.get("url") or "").strip()
                 if not identity:
                     identity = repr(sorted(entry.items()))
                 if identity in seen:
                     continue
                 seen.add(identity)
-                entries.append(entry)
+                if not stream_id:
+                    entries.append(entry)
                 added += 1
-                if len(entries) >= MAX_RESULTS:
+                if len(seen) >= MAX_RESULTS:
                     break
             if added == 0:
                 break
             total = self._total_items(value)
-            if total is not None and len(entries) >= total:
+            # Some portals report just the current page size as the total.
+            # A targeted lookup confirms the end with an empty/repeated page.
+            if not stream_id and total is not None and len(entries) >= total:
                 break
             if page == 0:
                 # p=1 was already tried and returned empty.
@@ -5748,16 +5798,20 @@ class StalkerPortalClient(object):
             candidates.append(rows)
         return tuple(candidates)
 
-    def _channel_item(self, entry):
-        if not isinstance(entry, dict):
-            return None
-        stream_id = str(
+    @staticmethod
+    def _channel_stream_id(entry):
+        return str(
             entry.get("id")
             or entry.get("ch_id")
             or entry.get("channel_id")
             or entry.get("stream_id")
             or ""
         ).strip()
+
+    def _channel_item(self, entry):
+        if not isinstance(entry, dict):
+            return None
+        stream_id = self._channel_stream_id(entry)
         command = StalkerPortalClient._channel_command(entry)
         if not stream_id or not command:
             return None
@@ -8082,18 +8136,59 @@ class StalkerPortalClient(object):
                     self._paced_catalog_wait()
         return None
 
+    def _find_live_favorite(self, item, stream_id):
+        """Rehydrate old and new live favorites without saving temporary links."""
+        # Playback cannot wait on a browsing worker that is itself waiting for
+        # playback priority. Use already loaded rows only when the lock is free.
+        if self._live_catalog_lock.acquire(blocking=False):
+            try:
+                with self._cache_state_lock:
+                    for state in self._live_catalog_states.values():
+                        if (stream_id in state["result_ids"]
+                                and self.clock() - state["cached_at"] < CONTENT_CACHE_SECONDS):
+                            for candidate in state["results"]:
+                                if candidate.stream_id == stream_id and candidate.portal_command:
+                                    return candidate
+            finally:
+                self._live_catalog_lock.release()
+
+        categories = dict.fromkeys(
+            str(getattr(item, name, "") or "").strip()
+            for name in ("catalog_category_id", "category_id")
+        )
+        for category_id in categories:
+            if category_id and category_id != "*":
+                candidate = self._find_ordered_live_channel(category_id, stream_id)
+                if candidate is not None:
+                    return candidate
+
+        for entry in self._load_all_channels(allow_ordered=False):
+            if isinstance(entry, dict) and self._channel_stream_id(entry) == stream_id:
+                with self._cache_state_lock:
+                    candidate = self._channel_item(entry)
+                if candidate is not None:
+                    return candidate
+        return self._find_ordered_live_channel("", stream_id)
+
+    def _find_ordered_live_channel(self, category_id, stream_id):
+        try:
+            entries = self._load_ordered_channels(category_id, stream_id=stream_id)
+        except ContentError as error:
+            if error.reason in REQUEST_ABORT_REASONS or error.reason in (
+                ContentError.ACCESS_DENIED, ContentError.RATE_LIMITED,
+            ):
+                raise
+            return None
+        with self._cache_state_lock:
+            return self._channel_item(entries[0]) if entries else None
+
     def _resolve_item_command(self, item):
         command = str(getattr(item, "portal_command", "") or "").strip()
         content_type = str(getattr(item, "content_type", "") or "").lower()
         stream_id = str(getattr(item, "stream_id", "") or "").strip()
         if not command and content_type == "live" and stream_id:
-            # Favorite snapshots intentionally do not persist portal commands,
-            # because those values can contain temporary URLs.  Rehydrate the
-            # selected channel from the authenticated in-memory catalogue.
-            for entry in self._load_all_channels():
-                candidate = self._channel_item(entry)
-                if candidate is None or str(candidate.stream_id) != stream_id:
-                    continue
+            candidate = self._find_live_favorite(item, stream_id)
+            if candidate is not None:
                 command = str(
                     getattr(candidate, "portal_command", "") or ""
                 ).strip()
@@ -8110,7 +8205,6 @@ class StalkerPortalClient(object):
                     setattr(item, attribute, getattr(candidate, attribute, ""))
                 if not getattr(item, "icon", ""):
                     item.icon = candidate.icon
-                break
         if not command and content_type == "movie" and stream_id.isdigit():
             candidate = self._movie_playback_item(item)
             if candidate is not None:

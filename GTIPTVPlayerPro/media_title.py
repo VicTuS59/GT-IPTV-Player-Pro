@@ -7,7 +7,6 @@ from datetime import date
 import re
 
 from .subtitle_language import LANGUAGE_ALIASES as _LANGUAGE_ALIASES
-from .subtitle_match_model import score_title_year
 
 
 _TITLE_YEAR = r"(?:19|20)[0-9]{2}"
@@ -39,6 +38,12 @@ _TITLE_MULTI_CODE_PREFIX = re.compile(
     r"^((?:DE|NL)(?:\s*[/+-]\s*|\s+)(?:DE|NL))(?=\s|[|¦•┃:–—-])\s*"
 )
 _TITLE_BARE_COUNTRY_PREFIX = re.compile(r"^(?:DE|NL)\s+")
+_SUBTITLE_LANGUAGE_PREFIX = re.compile(
+    r"^(?:NL|TR)(?:[\s./+–—-]+|(?=[(\[{]))", re.I
+)
+_SUBTITLE_LANGUAGE_SUFFIX = re.compile(
+    r"(?:[\s./+–—-]+|(?<=[)\]}]))(?:NL|TR)$", re.I
+)
 _TITLE_PLAIN_TAG_SUFFIX = re.compile(
     r"\s+([^\s\(\)\[\]\{\}|¦•]{1,24})\s*$"
 )
@@ -120,7 +125,7 @@ def _title_label_year(value):
     return 0
 
 
-def _bare_year_options(title, year, release_suffix):
+def _bare_year_options(title, year):
     full = (title, year)
     match = _TITLE_BARE_YEAR.search(title)
     if not match:
@@ -133,16 +138,11 @@ def _bare_year_options(title, year, release_suffix):
     if not stem or re.search(r"(?i)\b(?:of|in|from|since|de|van|von)$", stem):
         return (full,)
     split = (stem, number)
-    score = score_title_year(
-        known_year=bool(year),
-        recent_year=number >= _TITLE_CURRENT_YEAR - 12,
-        release_suffix=release_suffix,
-        preceding_number=bool(re.search(r"(?:^|\s)[0-9]{1,4}$", stem)),
-    )
-    return (split, full) if score > 0 else (full, split)
+    prefer_year = year or number >= _TITLE_CURRENT_YEAR - 12 or re.search(r"(?:^|\s)[0-9]{1,4}$", stem)
+    return (split, full) if prefer_year else (full, split)
 
 
-def title_options(value, year=0, *, bare_year=True, limit=120):
+def title_options(value, year=0, *, bare_year=True, limit=120, subtitle_labels=False):
     """Remove explicit catalogue labels and rank ambiguous title/year splits."""
     original = " ".join(str(value or "").split())[:limit]
     title = original
@@ -177,6 +177,20 @@ def title_options(value, year=0, *, bare_year=True, limit=120):
         if title != before:
             continue
 
+        if subtitle_labels:
+            prefix = _SUBTITLE_LANGUAGE_PREFIX.match(title)
+            if prefix:
+                rest = title[prefix.end():].lstrip(" -–—|¦•┃:/")
+                if rest:
+                    title = rest
+                    continue
+            suffix = _SUBTITLE_LANGUAGE_SUFFIX.search(title)
+            if suffix:
+                stem = title[:suffix.start()].rstrip(" -–—|¦•┃:/")
+                if stem:
+                    title = stem
+                    continue
+
         match = _TITLE_PLAIN_TAG_SUFFIX.search(title)
         if match:
             tag = _plain_release_tag(match[1])
@@ -208,7 +222,7 @@ def title_options(value, year=0, *, bare_year=True, limit=120):
     if marked_year or not bare_year:
         options = ((title, year),)
     else:
-        options = _bare_year_options(title, year, release_suffix_removed)
+        options = _bare_year_options(title, year)
     # Without a delimiter DE can also be the Dutch article. Try removing an
     # uppercase bare code only after the full title, with a year to validate it.
     country = _TITLE_BARE_COUNTRY_PREFIX.match(options[0][0])

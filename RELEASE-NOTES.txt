@@ -1,5 +1,10 @@
-- Added one-second seeking for movies and series, with faster seeking when holding the remote buttons.
-- Added **CH+ / CH−** category switching in the Live TV channel list.
-- M3U now loads EPG details and channel logos as rows come into view. XMLTV supplies logos when `tvg-logo` is missing and the channel matches.
-- Improved M3U EPG matching with an on-device model and added **FreeEPG** country selection.
-- Fixed OpenDroid remote-control errors, crashes when exiting a loading list, and invalid local or NAS XMLTV path handling.
+- Added **YouTube Live**. Broadcasts are listed in the receiver's language. The broadcast language and category are selectable, and the feature works without an API key.
+- Added **Live TV channel search** on the green button. Search by first letter or channel name in Xtream, Stalker and M3U.
+- Fixed channel playback from **Stalker favorites**.
+- Improved **M3U EPG matching** for provider labels and alternative channel names.
+- Updated **subtitle search** to use clean titles and TMDb. Series results are checked against the season and episode. Press **OK** to download the selected subtitle.
+- Fixed issues when closing channel and subtitle search screens with **EXIT**.
+
+**HD Satelit compatibility note**
+
+On the tested HD Satelit image, category names may appear blank on the Movies screen. The issue was reported to the HD Satelit team.

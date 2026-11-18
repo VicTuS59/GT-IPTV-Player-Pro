@@ -75,6 +75,17 @@ def subtitle_episode_numbers(value):
     return pairs[0] if len(pairs) == 1 else ()
 
 
+def subtitle_series_title(value):
+    """Separate the series title from an appended episode marker and name."""
+    title = str(value or "")
+    marker = _EPISODE_MARKER.search(title[:512])
+    if marker:
+        stem = title[:marker.start()].rstrip(" ._-:–—|¦•┃([{")
+        if any(character.isalnum() for character in stem):
+            return stem
+    return title
+
+
 def _episode_number(value):
     try:
         number = int(value or 0)

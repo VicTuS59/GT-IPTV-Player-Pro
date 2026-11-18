@@ -793,6 +793,8 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             callbacks.append(self._m3u_search_closed)
 
     def _m3u_search_closed(self, *args):
+        if getattr(self, '_closed', True) is not False:
+            return
         self._reload_favorite_keys()
         self._weather_child_closed(*args)
 

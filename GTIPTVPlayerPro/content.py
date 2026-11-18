@@ -23,6 +23,7 @@ from .http_transport import build_credential_urlopen
 from .content_sort import assign_sort_metadata
 from .i18n import N_, _
 from .portal_identity import safe_composite_id
+from .category_preferences import content_item_category_ids
 from .category_visibility import category_ids_visible, hidden_category_match_ids
 
 
@@ -42,6 +43,13 @@ _SURROGATE_CODE_POINT = re.compile(r"[\ud800-\udfff]")
 _ASCII_SEARCH_SEPARATOR = re.compile(r"[^a-z0-9]+")
 LIVE_INITIAL_ITEMS = 36
 LIVE_MORE_ITEMS = 60
+LIVE_SEARCH_RESULT_LIMIT = 500
+_LIVE_NAME_PREFIX = re.compile(
+    r"^\s*(?:(?:\[[a-z]{2}(?:-[a-z]{2})?\]|\([a-z]{2}\)|"
+    r"[a-z]{2}(?:\s*[:|]|\s+-\s+)|\d{1,4}\s*[.)|:])\s*)+",
+    re.IGNORECASE,
+)
+
 
 CONTENT_LABELS = {
     "live": (N_("Live TV"), N_("All Channels")),
@@ -343,6 +351,19 @@ def _movie_search_text(value):
             for character in value
         ).split()
     )
+
+
+def channel_name_matcher(query):
+    """Use the first letter of the channel name for a one-character query."""
+    needle = _movie_search_text(query)
+    if not needle:
+        return None
+    if len(needle) == 1:
+        def starts_with(value):
+            name = _LIVE_NAME_PREFIX.sub("", str(value or ""), count=1)
+            return _movie_search_text(name).startswith(needle)
+        return starts_with
+    return lambda value: needle in _movie_search_text(value)
 
 
 def _safe_extension(value, content_type):
@@ -1468,6 +1489,42 @@ class XtreamContentClient(object):
                 if not state["results"] and not state["complete"]:
                     self._append_live_items(state, LIVE_INITIAL_ITEMS)
                 return list(state["results"])
+
+    def search_live_channels(self, query, category_id="", hidden_category_ids=None):
+        """Search both pending provider rows and fully loaded live lists."""
+        matches = channel_name_matcher(query)
+        if matches is None:
+            return []
+        category_id = str(category_id or "")
+        hidden = hidden_category_match_ids((), hidden_category_ids)
+        state = self._live_item_state(category_id)
+        with self._cache_lock:
+            # Browsing releases the raw payload when it has built all rows.
+            # Pick one list while the transition is protected by this lock.
+            complete = state["complete"]
+            rows = state["results"] if complete else state["entries"]
+        results = []
+        seen = set()
+        for index, row in enumerate(rows):
+            if index % 128 == 0:
+                self._check_request_limits()
+            if complete:
+                if not matches(row.name):
+                    continue
+                item = row
+            elif isinstance(row, dict) and matches(row.get("name")):
+                item = self._content_item("live", row, category_id)
+            else:
+                continue
+            if item is None or item.stream_id in seen:
+                continue
+            if not category_ids_visible(content_item_category_ids(item), hidden, category_id):
+                continue
+            seen.add(item.stream_id)
+            results.append(item)
+            if len(results) >= LIVE_SEARCH_RESULT_LIMIT:
+                break
+        return results
 
     def load_items(self, content_type, category_id=""):
         content_type = self._validate_type(content_type)

@@ -26,7 +26,7 @@ from . import sorting_ui as content_sort_ui
 from .artwork_cache import PICON_CACHE as _PICON_CACHE_BUDGET
 from .artwork_file import ArtworkPath
 from .artwork import RETRY_DELAY_SECONDS, artwork_failure_ttl, artwork_request_profile, is_tmdb_artwork_url, prepare_webp, retryable_artwork_error, webp_dimensions
-from .content import ContentItem, ContentError, XtreamContentClient
+from .content import LIVE_SEARCH_RESULT_LIMIT, ContentItem, ContentError, XtreamContentClient
 from .diagnostics import log_event, redact
 from .movie_catalog import RAM_UNAVAILABLE
 from .i18n import N_, _, metadata_language
@@ -232,7 +232,7 @@ EPISODE_PAGE_SIZE = EPISODE_ROWS
 MOVIE_CATEGORY_PAGE_SIZE = 10
 MOVIE_RAIL_PAGE_SIZE = CINEMATIC_POSTER_COLUMNS
 ALL_MOVIES_SEARCH_PAGE_SIZE = 10
-M3U_SEARCH_RESULT_LIMIT = 500
+M3U_SEARCH_RESULT_LIMIT = LIVE_SEARCH_RESULT_LIMIT
 SERIES_CATEGORY_PAGE_SIZE = 8
 CINEMATIC_CATEGORY_PAGE_SIZE = 12
 CINEMATIC_CATEGORY_ROW_HEIGHT = 72
@@ -323,14 +323,14 @@ ALL_SERIES_SEARCH_FOOTER_ITEMS = (footer_item('arrows', 'navigate', 1.1), footer
 SERIES_FOOTER_ITEMS = (footer_item('arrows', 'navigate', 1.15), footer_item('channel', 'page', 0.95), footer_item('ok', 'open'), footer_item('red', 'favorite'), footer_item('green', 'continue'), footer_item('yellow', 'edit'), footer_item('blue', 'search'), footer_item('menu', 'download'), footer_item('exit', 'back'))
 EPISODE_FOOTER_ITEMS = (footer_item('up_down', 'navigate', 0.9), footer_item('left_right', 'Season', 0.9), footer_item('channel', 'page', 0.9), footer_item('ok', 'play', 0.8), footer_item('ok_long', 'Mark watched', 1.2), footer_item('red', 'favorite', 0.9), footer_item('green', 'refresh', 0.9), footer_item('menu', 'download', 0.9), footer_item('exit', 'back', 0.8))
 EPISODE_DOWNLOAD_FOOTER_ITEMS = tuple((footer_item(key, 'download' if key == 'ok' else action, weight) for key, action, weight in EPISODE_FOOTER_ITEMS))
-LIVE_STREAM_FOOTER_ITEMS = (footer_item('up_down', 'select'), footer_item('left_right', 'page'), footer_item('ok', 'play', 1.05), footer_item('red', 'favorite', 0.95), footer_item('green', 'refresh'), footer_item('exit', 'back'))
+LIVE_STREAM_FOOTER_ITEMS = (footer_item('up_down', 'select'), footer_item('left_right', 'page'), footer_item('ok', 'play', 1.05), footer_item('red', 'favorite', 0.95), footer_item('green', 'search'), footer_item('exit', 'back'))
 LIVE_CHANNEL_ORDER_FOOTER_ITEMS = LIVE_STREAM_FOOTER_ITEMS[:-1] + (footer_item('yellow', 'edit', 0.85), LIVE_STREAM_FOOTER_ITEMS[-1])
 LIVE_CHANNEL_MOVE_FOOTER_ITEMS = (footer_item('up_down', 'move'), footer_item('left_right', 'page'), footer_item('ok', 'save', 1.05), footer_item('', '', 0.95), footer_item('', ''), footer_item('', '', 0.85), footer_item('exit', 'cancel'))
 M3U_LIVE_STREAM_FOOTER_ITEMS = (
     footer_item('up_down', 'select'), footer_item('left_right', 'page'),
     footer_item('ok', 'play'), footer_item('red', 'favorite', 0.9),
-    footer_item('green', 'refresh'), footer_item('yellow', 'edit', 0.85),
-    footer_item('blue', 'search', 0.85), footer_item('exit', 'back'),
+    footer_item('green', 'search'), footer_item('yellow', 'edit', 0.85),
+    footer_item('blue', N_('All Channels'), 1.25), footer_item('exit', 'back'),
 )
 M3U_LIVE_CHANNEL_MOVE_FOOTER_ITEMS = (
     footer_item('up_down', 'select'), footer_item('left_right', 'page'),
@@ -339,6 +339,10 @@ M3U_LIVE_CHANNEL_MOVE_FOOTER_ITEMS = (
     footer_item('', '', 0.85), footer_item('exit', 'cancel'),
 )
 M3U_SEARCH_FOOTER_ITEMS = (footer_item('up_down', 'select'), footer_item('left_right', 'page'), footer_item('ok', 'fullscreen', 1.2), footer_item('red', 'favorite', 0.9), footer_item('blue', 'search', 0.85), footer_item('exit', 'back'))
+LIVE_SEARCH_FOOTER_ITEMS = (
+    M3U_SEARCH_FOOTER_ITEMS[:4] + (footer_item('green', 'search', 0.85),)
+    + M3U_SEARCH_FOOTER_ITEMS[5:]
+)
 CATEGORY_MANAGER_FOOTER_ITEMS = (footer_item('ok', 'visibility', 0.9), footer_item('red', 'mark', 0.8), footer_item('yellow', 'move', 0.85), footer_item('green', 'save', 0.85), footer_item('blue', 'reset', 0.82), footer_item('menu', 'hide_all', 1.3), footer_item('exit', 'cancel', 0.78))
 CATEGORY_MANAGER_MOVE_FOOTER_ITEMS = (footer_item('up_down', 'select', 1.0), footer_item('left_right', 'page', 0.9), footer_item('ok', 'confirm', 0.9), footer_item('', '', 0.85), footer_item('', '', 0.85), footer_item('', '', 0.82), footer_item('exit', 'cancel', 0.78))
 VIDEO_CODECS = {0: 'MPEG-2', 1: 'H.264', 3: 'VC-1', 4: 'MPEG-4', 5: 'VC-1 SM', 6: 'MPEG-1', 7: 'H.265 / HEVC', 16: 'AVS', 22: 'H.265 / HEVC', 40: 'AVS2'}
@@ -549,18 +553,23 @@ class _FavoriteSupport(_DownloadSupport):
 
     def _stop_favorite_keys(self):
         self._favorite_load_deadline = 0.0
-        timer = self._favorite_keys_timer
+        timer = getattr(self, '_favorite_keys_timer', None)
         if timer is not None:
-            timer.stop()
+            try:
+                timer.stop()
+            except Exception:
+                pass
 
     def _poll_favorite_keys(self):
+        if getattr(self, '_closed', True) is not False:
+            return
         pending = getattr(self, '_favorite_mutations', {})
         for key, result in list(pending.items()):
             if result['done']:
                 pending.pop(key, None)
                 if not result['ok']:
                     self['message'].setText(_('Could not update favorites.'))
-        if getattr(self, '_closed', False) or (not pending and time.monotonic() >= self._favorite_load_deadline):
+        if not pending and time.monotonic() >= self._favorite_load_deadline:
             self._stop_favorite_keys()
             return
         changed = self._reload_favorite_keys()

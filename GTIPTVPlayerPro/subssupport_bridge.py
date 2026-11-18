@@ -14,6 +14,8 @@ import unicodedata
 import math
 
 from .i18n import N_
+from .media_title import title_options
+from .subtitle_language import subtitle_episode_numbers, subtitle_series_title
 
 
 _API_UNSET = object()
@@ -148,34 +150,23 @@ def subtitle_search_titles(
     content_type = str(content_type or "").strip().lower()
     is_series = content_type == "series"
     title = _bounded_text(title, limit=100 if is_series else 120)
-    if not title:
-        title = "Series" if is_series else "Movie"
-    candidates = []
+    raw_title = title
+    options = title_options(
+        subtitle_series_title(title) if is_series else title, year, subtitle_labels=True,
+    )
+    names = list(dict.fromkeys(name for name, unused_year in options if name))
+    if not names:
+        names = ["Series" if is_series else "Movie"]
     if is_series:
         season_number = _bounded_episode_number(season)
         episode_number = _bounded_episode_number(episode)
+        if season_number is None or episode_number is None:
+            pair = subtitle_episode_numbers(episode_title) or subtitle_episode_numbers(raw_title)
+            if pair and season_number in (None, pair[0]) and episode_number in (None, pair[1]):
+                season_number, episode_number = pair
         if season_number is not None and episode_number is not None:
-            candidates.append(
-                "{} S{:02d}E{:02d}".format(
-                    title,
-                    season_number,
-                    episode_number,
-                )
-            )
-        episode_title = _bounded_text(episode_title)
-        if episode_title and episode_title != title:
-            candidates.append(episode_title)
-        candidates.append(title)
-        return candidates
-
-    try:
-        numeric_year = int(str(year or "").strip()[:4])
-    except (TypeError, ValueError, OverflowError):
-        numeric_year = 0
-    if 1888 <= numeric_year <= 2100:
-        candidates.append("{} ({})".format(title, numeric_year))
-    candidates.append(title)
-    return candidates
+            return ["{} S{:02d}E{:02d}".format(name, season_number, episode_number) for name in names]
+    return names
 
 
 def _local_subtitle_path(args):

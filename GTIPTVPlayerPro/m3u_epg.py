@@ -654,7 +654,9 @@ def refresh_source(
                 cancel_event,
                 deadline,
                 icon_base_url=icon_base_url,
-                **({"wanted_names": wanted_names, "name_mappings": _binding_value(binding, "name_mappings")}
+                **({"wanted_names": wanted_names,
+                    "name_mappings": _binding_value(binding, "name_mappings"),
+                    "guide_country": _binding_value(binding, "free_epg_country")}
                    if wanted_names else {}),
                 **({"archive_days": archive_days} if archive_days is not None else {}),
                 **({"guide_all_dates": True} if guide_all_dates else {}),
@@ -1369,9 +1371,10 @@ def _expand_gzip(source_path, destination, cancel_event, deadline):
     return total
 
 
-def _without_epg_quality(name, guide_label=False):
+def _without_epg_quality(name, guide_label=False, provider_label=False):
     parts = name.split()
-    while len(parts) > 1 and parts[-1].strip("()[]") in _EPG_QUALITY_LABELS:
+    labels = _EPG_PROVIDER_QUALITY_LABELS if provider_label else _EPG_QUALITY_LABELS
+    while len(parts) > 1 and parts[-1].strip("()[]") in labels:
         if guide_label and parts[-1] in ("4k", "8k"):
             break
         parts.pop()
@@ -1380,8 +1383,26 @@ def _without_epg_quality(name, guide_label=False):
 
 _EPG_COUNTRY_PREFIX = re.compile(r"^(?:\[([a-z]{2})\]|\(([a-z]{2})\)|([a-z]{2})(?:\s*[:|]\s*|\s+[-–—]\s+))\s*")
 _EPG_NAME_ANNOTATION = re.compile(r"\s*(?:\(\s*#\s*\)|\[\s*#\s*\])$")
+_EPG_PROVIDER_NUMBER = re.compile(r"\s+\(([1-9][0-9]?)\)$")
+_EPG_LEADING_QUALITY = re.compile(r"^(?:4k|8k|uhd|fhd|hd|sd)\s+")
 _EPG_SERVICE_NUMBER = re.compile(r"(?:\+\s*)?\d+(?:[.,]\d+)?")
 _EPG_QUALITY_LABELS = dvb_epg._QUALITY_SUFFIXES | {"hevc", "720p", "1080p", "2160p", "4320p"}
+_EPG_PROVIDER_QUALITY_LABELS = _EPG_QUALITY_LABELS | {"hd+", "sd+", "raw", "h264", "h265"}
+_EPG_NAME_ALIASES = {
+    "tr": {
+        "ssport": "s spor",
+        "ssport2": "s spor 2",
+        "sinema2": "sinema tv 2",
+        "sinema1001": "sinema tv 1001",
+        "sinema1002": "sinema tv 1002",
+        "sinemaaile": "sinema tv aile",
+        "sinemaaile2": "sinema tv aile 2",
+        "sinemaaksiyon": "sinema tv aksiyon",
+        "sinemaaksiyon2": "sinema tv aksiyon 2",
+        "sinemakomedi": "sinema tv comedy",
+        "sinemakomedi2": "sinema tv comedy 2",
+    },
+}
 
 
 def _epg_id_country(xmltv_id):
@@ -1410,19 +1431,59 @@ def _compact_epg_label(name):
     return "".join(char for char in name if not char.isspace() and char not in "._-–—")
 
 
-def _epg_name_forms(value, guide_label=False):
+def _epg_name_forms(value, guide_label=False, provider_label=False):
     label = m3u.normalise_epg_name(value)
     prefix = _EPG_COUNTRY_PREFIX.match(label)
     country = m3u.epg_country_code(prefix.group(prefix.lastindex)) if prefix else ""
     if country:
         label = label[prefix.end():]
     plain = _EPG_NAME_ANNOTATION.sub("", label)
-    name = _without_epg_quality(plain, guide_label)
+    name = _without_epg_quality(plain, guide_label, provider_label)
     compact = _compact_epg_label(name)
     folded = _fold_epg_latin(compact)
     short = folded[:-2] if name.endswith(" tv") and len(folded) > 3 else folded
     numbers = tuple(value.replace(" ", "").replace(",", ".") for value in _EPG_SERVICE_NUMBER.findall(name))
     return country, (label, _compact_epg_label(plain), compact, folded, short), numbers
+
+
+def _epg_provider_label(value):
+    label = m3u.normalise_epg_name(value)
+    without_quality = _EPG_LEADING_QUALITY.sub("", label, count=1)
+    prefix = _EPG_COUNTRY_PREFIX.match(without_quality)
+    if prefix and m3u.epg_country_code(prefix.group(prefix.lastindex)):
+        return without_quality
+    return label
+
+
+def _epg_provider_numbers(wanted_names, cancel_event, deadline):
+    counts = defaultdict(int)
+    separate_numbers = set()
+    for index, entry in enumerate(wanted_names.values()):
+        if index % 128 == 0:
+            _check_limits(cancel_event, deadline)
+        label = entry[0] if isinstance(entry, tuple) and entry else entry
+        if not isinstance(label, str):
+            continue
+        label = _epg_provider_label(label)
+        suffix = _EPG_PROVIDER_NUMBER.search(label)
+        if not suffix:
+            continue
+        number = suffix[1]
+        counts[number] += 1
+        if number not in separate_numbers:
+            _, _, numbers = _epg_name_forms(label[:suffix.start()], provider_label=True)
+            if numbers:
+                separate_numbers.add(number)
+    # Recognize a playlist convention from repeated markers and names that
+    # carry a separate service number, such as "TRT 1 HD (6)".
+    if len(counts) < 2 or sum(counts.values()) * 4 < len(wanted_names) * 3:
+        return frozenset()
+    return frozenset(number for number in separate_numbers if counts[number] >= 6)
+
+
+def _epg_alias_forms(forms, country):
+    alias = _EPG_NAME_ALIASES.get(country, {}).get(forms[3])
+    return _epg_name_forms(alias, guide_label=True)[1] if alias else ()
 
 
 def _epg_candidates(index, forms, country):
@@ -1622,9 +1683,12 @@ def _build_snapshot(
     wanted_names=None,
     name_mappings=None,
     icon_base_url="",
+    guide_country="",
 ):
     normalised_wanted = set(normalise_tvg_id(value) for value in wanted)
     explicit_ids = frozenset(wanted)
+    guide_country = m3u.epg_country_code(guide_country)
+    provider_numbers = _epg_provider_numbers(wanted_names or {}, cancel_event, deadline)
     name_rows = []
     names_index = {}
     for index, (key, entry) in enumerate((wanted_names or {}).items()):
@@ -1652,11 +1716,37 @@ def _build_snapshot(
                 alternate_forms = extra
                 if not country and not country_conflict:
                     country = alternate_country
-        for variants in (forms, alternate_forms):
+        fallback_forms = numbered_forms = ()
+        fallback_country = country or guide_country
+        if not country_conflict:
+            cleaned = _epg_provider_label(label)
+            suffix = _EPG_PROVIDER_NUMBER.search(cleaned)
+            marker = suffix[1] if suffix and suffix[1] in provider_numbers else ""
+            if marker:
+                cleaned = cleaned[:suffix.start()]
+            clean_country, cleaned_forms, _ = _epg_name_forms(
+                cleaned, guide_label=True, provider_label=True
+            )
+            if not country or not clean_country or country == clean_country:
+                fallback_country = clean_country or country or guide_country
+                alias_forms = _epg_alias_forms(cleaned_forms, fallback_country)
+                fallback_forms = tuple(
+                    variant for variant in (cleaned_forms, alias_forms)
+                    if variant and variant not in (forms, alternate_forms)
+                )
+                if marker and fallback_forms:
+                    _, numbered, _ = _epg_name_forms(
+                        "{} {}".format(cleaned, marker), guide_label=True, provider_label=True
+                    )
+                    numbered_forms = (numbered, _epg_alias_forms(numbered, fallback_country))
+        for variants in (forms, alternate_forms) + fallback_forms + numbered_forms:
             for rank, name in enumerate(variants):
                 if name:
                     names_index[(rank, name)] = None
-        name_rows.append((key, label, tvg_id, country, country_conflict, forms, alternate_forms))
+        name_rows.append((
+            key, label, tvg_id, country, country_conflict, forms, alternate_forms,
+            fallback_country, fallback_forms, numbered_forms,
+        ))
     name_mappings = name_mappings if isinstance(name_mappings, dict) else {}
     channels = OrderedDict()
     normalised_channels = defaultdict(set)
@@ -1752,7 +1842,9 @@ def _build_snapshot(
     learned_aliases = []
     name_model = None
     model_reserve = max(0.5, time.monotonic() - first_scan_started)
-    for index, (key, label, tvg_id, country, conflict, forms, alternate) in enumerate(name_rows):
+    for index, row in enumerate(name_rows):
+        (key, label, tvg_id, country, conflict, forms, alternate,
+         fallback_country, fallback, numbered) = row
         if index % 128 == 0:
             _check_limits(cancel_event, deadline)
         if tvg_id in matched_wanted:
@@ -1760,6 +1852,14 @@ def _build_snapshot(
         candidates = _epg_candidates(names_index, forms, country)
         if alternate:
             candidates.update(_epg_candidates(names_index, alternate, country))
+        if not candidates and not conflict:
+            for variant in fallback:
+                candidates = _epg_candidates(names_index, variant, fallback_country)
+                if candidates:
+                    # Keep a plausible numbered service available for manual selection.
+                    for number_variant in numbered:
+                        candidates.update(_epg_candidates(names_index, number_variant, fallback_country))
+                    break
         if not candidates and country:
             exact = names_index.get((0, forms[0]))
             if exact:

@@ -10,8 +10,8 @@ import json
 def subtitle_search_context(metadata, settings, identity=(), providers=None):
     metadata = metadata if isinstance(metadata, dict) else {}
     content = {
-        name: " ".join(str(metadata.get(name) or "").split()).casefold()
-        for name in ("title", "year", "content_type", "season", "episode",
+        name: " ".join(str(metadata[name]).split()).casefold() if metadata.get(name) is not None else ""
+        for name in ("title", "year", "content_type", "season", "season_known", "episode", "episode_title",
                      "tmdb_id", "imdb_id", "sd_id")
     }
     preferences = {

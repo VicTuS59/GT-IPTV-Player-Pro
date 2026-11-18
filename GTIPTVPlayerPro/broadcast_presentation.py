@@ -379,7 +379,7 @@ def _live_page(s):
         pages=(count+s.page_size-1)//s.page_size;text(s,'message','{} / {}'.format(s.selected_index//s.page_size+1,pages),27)
     elif s._error or not count:
         text(s,'message','',27)
-        text(s,'ribbon_now_title',_(s._error) if s._error else s['message'].getText() or _('No channels found; press GREEN to try again.'),28,2)
+        text(s,'ribbon_now_title',_(s._error) if s._error else _('No content found.'),28,2)
 
 
 def refresh_live_selection(s, rows_changed, previous_row):

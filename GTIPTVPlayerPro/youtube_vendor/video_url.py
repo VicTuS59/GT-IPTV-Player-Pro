@@ -24,6 +24,7 @@ from .compat import SUBURI
 from .jsinterp import JSInterpreter
 from ..youtube_playback import youtube_stream_parts, native_audio_player_available
 from ..youtube_audio import audio_bitrate, audio_sort_key, hls_audio_format
+from ..youtube_live import player_is_live
 
 
 IGNORE_VIDEO_FORMAT = (
@@ -147,6 +148,7 @@ class YouTubeVideoUrl():
 		self.use_dash_mp4 = ()
 		self.exact_quality = 0
 		self.preferred_quality = 0
+		self.require_live = False
 		self.allowed_codecs = frozenset(('h264',))
 		self.allow_separate_audio = None
 		self.response_received = False
@@ -947,11 +949,14 @@ class YouTubeVideoUrl():
 			age_restricted |= status.get('status') == 'LOGIN_REQUIRED'
 			if status.get('status', 'OK') != 'OK':
 				return
+			live_now = player_is_live(response) if self.require_live else self.try_get(response, ('videoDetails', 'isLive'))
+			if self.require_live and not live_now:
+				return
 			duration = max(duration, self._response_duration(response))
 			streaming = response.get('streamingData') or {}
 			formats = (streaming.get('formats') or []) + (streaming.get('adaptiveFormats') or [])
 			choices = []
-			if not self.try_get(response, ('videoDetails', 'isLive')):
+			if not live_now:
 				url, unused_itag = self._extract_fmt_video_format(formats, player_id, stream_mode, audio_preference)
 				self._compatible_formats.append((formats, player_id))
 				if url:
@@ -1017,6 +1022,10 @@ class YouTubeVideoUrl():
 			return self._preferred_extract(video_id, yt_auth, lang, stream_mode, audio_preference)
 
 		player_response, player_id, is_live = self._load_player_response(video_id, yt_auth, lang)
+		if self.require_live:
+			is_live = player_is_live(player_response)
+			if not is_live:
+				raise RuntimeError('The selected YouTube broadcast has ended')
 
 		# Preserve authoritative metadata when a native decoder does not expose
 		# the duration until its separate video/audio inputs have opened.

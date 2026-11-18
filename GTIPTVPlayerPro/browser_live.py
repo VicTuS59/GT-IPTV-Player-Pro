@@ -57,7 +57,7 @@ from .typography import _line_fits, clean_dynamic_text, current_text_size, ellip
 from .ui_update import set_size, set_visible
 from .download_guard import allow as _allow_account_playback
 from .download_guard import cancel_pending as _cancel_download_pending
-from .browser_common import LIVE_PAGE_EPG_DWELL_MS, M3U_LIVE_CHANNEL_MOVE_FOOTER_ITEMS, M3U_LIVE_STREAM_FOOTER_ITEMS
+from .browser_common import LIVE_PAGE_EPG_DWELL_MS, LIVE_SEARCH_FOOTER_ITEMS, M3U_LIVE_CHANNEL_MOVE_FOOTER_ITEMS, M3U_LIVE_STREAM_FOOTER_ITEMS
 from .browser_common import CATEGORY_MANAGER_FOOTER_ITEMS, CATEGORY_MANAGER_MOVE_FOOTER_ITEMS, FAVORITE_STAR_PATH, GTAsyncListScreen, LIVE_CHANNEL_MOVE_FOOTER_ITEMS, LIVE_CHANNEL_ORDER_FOOTER_ITEMS, LIVE_DETAIL_CACHE_TTL_SECONDS, LIVE_DETAIL_EMPTY_RETRY_SECONDS, LIVE_DETAIL_EPG_RETRY_LIMIT, LIVE_DETAIL_EPG_TIMEOUT_SECONDS, LIVE_DETAIL_PROGRESS_INTERVAL_MS, LIVE_EPG_CACHE_MAX_ENTRIES, LIVE_EPG_CACHE_TTL_SECONDS, LIVE_EPG_FETCH_LIMIT, LIVE_FULLSCREEN_RESULT_KIND, LIVE_PICON_DOWNLOAD_TIMEOUT, LIVE_PICON_PREFETCH_POLL_MS, LIVE_PICON_PREFETCH_WORKERS, LIVE_PREVIEW_FRAME_PATH, LIVE_PREVIEW_LINK_POLL_MS, LIVE_PREVIEW_VIDEO_ERROR_CHECKS, LIVE_PREVIEW_VIDEO_INITIAL_MS, LIVE_PREVIEW_VIDEO_MAX_CHECKS, LIVE_PREVIEW_VIDEO_RETRY_MS, LIVE_STREAM_FOOTER_ITEMS, LIVE_STREAM_PAGE_SIZE, M3U_SEARCH_FOOTER_ITEMS, M3U_SEARCH_RESULT_LIMIT, STALKER_LIVE_EPG_QUIET_MS, STALKER_LIVE_PICON_QUIET_MS, WORKER_LIST_TIMEOUT_SECONDS, WORKER_PLAYBACK_LINK_TIMEOUT_SECONDS, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _client_epg_state, _client_supports, _connect_timer, _debug, _debug_identifier, _desktop_size, _disable_live_window_animation, _epg_event_starts_in_future, _is_m3u_client, _is_stalker_client, _live_detail_dwell_ms, _load_live_picon_path, _load_shared_live_epg, _mark_picon_failure, _picon_failure_active, _picon_failure_remaining, _read_proc_number, _live_picon_path_is_current, _live_picon_url, _scale, _stream_diag_pts_progress, _trace_fullscreen_osd, _valid_live_picon_file, _validated_content_type, _wrap_live_summary, content_client_for
 
 LIVE_INITIAL_RESULT_POLL_MS = 45
@@ -697,52 +697,73 @@ class GTLiveCategoryManagerScreen(GTAsyncListScreen):
         self._refresh()
 
 class GTM3UChannelSearchScreen(_FavoriteSupport, GTAsyncListScreen):
-    """Search the already prepared M3U catalogue without artwork or EPG I/O."""
+    """Search a live category or use the existing M3U source-wide search."""
 
-    def __init__(self, session, account, client=None, favorite_store=None, hidden_category_ids=None):
+    def __init__(self, session, account, client=None, favorite_store=None, hidden_category_ids=None, category=None):
         self.account = account
         self.client = client or content_client_for(account)
+        self._search_category = category
+        self._search_title = N_('Search All Channels') if category is None else N_('Search')
         self._query = ''
         self._keyboard_requested = False
+        self._keyboard_active = False
         self._keyboard_timer = eTimer()
         _connect_timer(self._keyboard_timer, self.open_keyboard)
-        self._init_favorite_support(favorite_store)
         self._hidden_category_ids = hidden_category_match_ids((), hidden_category_ids)
-        self._footer_layout_items = M3U_SEARCH_FOOTER_ITEMS
+        search_key = 'blue' if category is None else 'green'
+        self._footer_layout_items = M3U_SEARCH_FOOTER_ITEMS if category is None else LIVE_SEARCH_FOOTER_ITEMS
         self._opaque_background = True
-        GTAsyncListScreen.__init__(self, session, 'GTM3UChannelSearchScreen', N_('Search All Channels'), '{}  >  {}'.format(account.display_name, _('All Channels')))
-        self['screen_label'].setText(_('M3U CHANNEL SEARCH'))
-        self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions'], {'ok': self.open_selected, 'cancel': self.close, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'red': self.toggle_favorite, 'blue': self.open_keyboard}, -1)
+        scope_label = _('All Channels') if category is None else category.name
+        GTAsyncListScreen.__init__(self, session, 'GTM3UChannelSearchScreen', self._search_title, '{}  >  {}'.format(account.display_name, scope_label))
+        self._init_favorite_support(favorite_store)
+        self._hook_favorite_close()
+        self['screen_label'].setText(_('M3U CHANNEL SEARCH') if category is None else scope_label)
+        self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions'], {'ok': self.open_selected, 'cancel': self.close, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'red': self.toggle_favorite, search_key: self.open_keyboard}, -1)
         if hasattr(self, 'onClose'):
             self.onClose.append(self._stop_search)
 
-        setup_aux(self, 'channels', M3U_SEARCH_FOOTER_ITEMS)
+        setup_aux(self, 'channels', self._footer_layout_items)
 
     def _start_initial_load(self):
-        if self._closed or self._keyboard_requested:
+        if getattr(self, '_closed', True) is not False or self._keyboard_requested:
             return
         self._keyboard_requested = True
         self._keyboard_timer.start(40, True)
 
     def open_keyboard(self):
-        if self._closed:
+        if getattr(self, '_closed', True) is not False or self._keyboard_active:
             return
         if self._loading:
             self['message'].setText(_('Please wait'))
             return
         try:
-            from Screens.VirtualKeyBoard import VirtualKeyBoard
-        except ImportError:
-            self['message'].setText(_('The virtual keyboard is unavailable on this image.'))
-            return
-        opener = getattr(self.session, 'openWithCallback', None)
-        if not callable(opener):
-            self['message'].setText(_('Could not open the virtual keyboard.'))
-            return
-        opener(self._query_entered, VirtualKeyBoard, title=_('Search All Channels'), text=self._query)
+            try:
+                from Screens.VirtualKeyBoard import VirtualKeyBoard
+            except ImportError:
+                from Screens.VirtualKeyBoard import VirtualKeyboard as VirtualKeyBoard
+            opener = getattr(self.session, 'openWithCallback', None)
+            if not callable(opener):
+                raise RuntimeError('Keyboard callback unavailable')
+            self._keyboard_active = True
+            opener(self._query_entered, VirtualKeyBoard, title=_(self._search_title), text=self._query)
+        except Exception as error:
+            log_event('browser', 'Could not open live search keyboard', error)
+            if getattr(self, '_closed', True) is False:
+                self._keyboard_active = False
+                message = N_('Could not open the virtual keyboard.')
+                if self._entries and not self._error:
+                    set_text_if_changed(self['message'], _(message))
+                else:
+                    self._error = message
+                    self._refresh()
 
     def _query_entered(self, value):
-        if self._closed or value is None:
+        if getattr(self, '_closed', True) is not False:
+            return
+        self._keyboard_active = False
+        if value is None:
+            if self._search_category is not None and not self._query:
+                self.close()
             return
         self._query = ' '.join(str(value or '').split())[:120]
         if not self._query:
@@ -752,8 +773,13 @@ class GTM3UChannelSearchScreen(_FavoriteSupport, GTAsyncListScreen):
             self._refresh()
             return
         self.start_load()
+        self._refresh()
 
     def load_items(self):
+        if self._search_category is not None:
+            return self.client.search_live_channels(
+                self._query, self._search_category.category_id, self._hidden_category_ids,
+            )
         searcher = getattr(self.client, 'search_items', None)
         if not callable(searcher):
             return []
@@ -790,7 +816,7 @@ class GTM3UChannelSearchScreen(_FavoriteSupport, GTAsyncListScreen):
             set_text_if_changed(self['message'], message)
 
     def toggle_favorite(self):
-        if not self._entries or self._loading:
+        if getattr(self, '_closed', True) is not False or not self._entries or self._loading:
             return
         item = self._entries[self.selected_index]
         added = self._toggle_favorite_item(item)
@@ -798,10 +824,15 @@ class GTM3UChannelSearchScreen(_FavoriteSupport, GTAsyncListScreen):
         ellipsize_dynamic_text(self['message'], self._favorite_message(item, added), fallback_chars=80)
 
     def open_selected(self):
-        if not self._entries or self._loading:
+        if getattr(self, '_closed', True) is not False or not self._entries or self._loading or self._error:
             return
-        from .browser_player import open_extplayer
-        open_extplayer(self.session, self.client, self._entries[self.selected_index], self._entries, self.selected_index, owner=self)
+        try:
+            from .browser_player import open_extplayer
+            open_extplayer(self.session, self.client, self._entries[self.selected_index], self._entries, self.selected_index, owner=self)
+        except Exception as error:
+            log_event('browser', 'Could not open a live search result', error)
+            if getattr(self, '_closed', True) is False:
+                set_text_if_changed(self['message'], _('Could not open the stream.'))
 
     def _stop_search(self):
         try:
@@ -1371,7 +1402,18 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._capture_pre_list_service()
         self._setup_live_widgets(px)
         self['header'].setText('GT IPTV PLAYER PRO  •  {}'.format(localized_upper(_('LIVE TV'))))
-        self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions', 'MoviePlayerActions'], {name: self._live_list_action(name, action) for name, action in {'ok': self.open_selected, 'cancel': self.close_list, 'stop': self.close_list, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'green': self.refresh_streams, 'red': self.toggle_selected_favorite, 'blue': self.open_channel_search, 'yellow': self.open_content_edit}.items()}, -1)
+        actions = {
+            'ok': self.open_selected, 'cancel': self.close_list, 'stop': self.close_list,
+            'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down,
+            'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down,
+            'green': self.open_channel_search, 'red': self.toggle_selected_favorite, 'yellow': self.open_content_edit,
+        }
+        if _is_m3u_client(self.client):
+            actions['blue'] = partial(self.open_channel_search, all_channels=True)
+        self['actions'] = ActionMap(
+            ['OkCancelActions', 'DirectionActions', 'ColorActions', 'MoviePlayerActions'],
+            {name: self._live_list_action(name, action) for name, action in actions.items()}, -1,
+        )
         if len(self._visible_live_categories) > 1:
             next_category = partial(self._move_live_category, 1)
             previous_category = partial(self._move_live_category, -1)
@@ -1416,7 +1458,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
     def _live_list_action(self, name, action):
 
         def dispatch():
-            if getattr(self, '_m3u_name_save', None) is not None:
+            if getattr(self, '_closed', True) is not False or getattr(self, '_m3u_name_save', None) is not None:
                 return
             if self._preview_fullscreen_pending is not None:
                 if name == 'ok':
@@ -2053,10 +2095,19 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._refresh_live_streams()
         ellipsize_dynamic_text(self['message'], self._favorite_message(item, added), fallback_chars=60)
 
-    def open_channel_search(self):
-        if self._channel_move is not None:
+    def open_channel_search(self, *, all_channels=False):
+        if getattr(self, '_closed', True) is not False:
             return
-        if not _is_m3u_client(self.client) or not _client_supports(self.client, 'search') or self._fullscreen_active:
+        if self._channel_move is not None:
+            if self._bulk_channel_move_enabled and not all_channels:
+                self.finish_channel_move()
+            return
+        if self._fullscreen_active or self._live_modal_active:
+            return
+        if self._loading:
+            set_text_if_changed(self['message'], _('Please wait'))
+            return
+        if all_channels and (not _is_m3u_client(self.client) or not _client_supports(self.client, 'search')):
             return
         with self._preview_link_lock:
             self._preview_generation += 1
@@ -2071,22 +2122,38 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             self._epg_clock_timer.stop()
         except Exception:
             pass
-        opener = getattr(self.session, 'openWithCallback', None)
-        if callable(opener):
-            opener(self._m3u_search_closed, GTM3UChannelSearchScreen, self.account, self.client, self.favorite_store, self._hidden_category_ids)
-            return
-        dialog = self.session.open(GTM3UChannelSearchScreen, self.account, self.client, self.favorite_store, self._hidden_category_ids)
-        callbacks = getattr(dialog, 'onClose', None)
-        if isinstance(callbacks, list):
-            callbacks.append(self._m3u_search_closed)
+        category = None if all_channels else self.category
+        args = (GTM3UChannelSearchScreen, self.account, self.client,
+                self.favorite_store, self._hidden_category_ids, category)
+        try:
+            opener = getattr(self.session, 'openWithCallback', None)
+            if callable(opener):
+                opener(self._channel_search_closed, *args)
+            else:
+                dialog = self.session.open(*args)
+                callbacks = getattr(dialog, 'onClose', None)
+                if isinstance(callbacks, list):
+                    callbacks.append(self._channel_search_closed)
+                else:
+                    self._channel_search_closed()
+        except Exception as error:
+            log_event('browser', 'Could not open the live channel search', error)
+            self._channel_search_closed()
+            if getattr(self, '_closed', True) is False:
+                set_text_if_changed(self['message'], _('Could not load content'))
 
-    def _m3u_search_closed(self, *args):
-        if self._closed:
+    def _channel_search_closed(self, *args):
+        if getattr(self, '_closed', True) is not False:
             return
         self._live_modal_active = False
         self._reload_favorite_keys()
         self._live_render_page_key = None
         self._refresh_live_streams()
+        if (self._preview_service_active
+                and self._same_service_reference(
+                    self._current_navigation_reference(), self._playing_preview_reference,
+                ) and not self._preview_video_timer.isActive()):
+            self._resume_preview_pig()
         self.start_epg_clock()
 
     def refresh_streams(self):
@@ -2156,7 +2223,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
             hide_scrollbar(self, 'list_scroll')
             return
         if not self._entries:
-            set_text_if_changed(self['message'], _('No channels found; press GREEN to try again.'))
+            set_text_if_changed(self['message'], _('No content found.'))
             self._clear_live_stream_rows()
             hide_scrollbar(self, 'list_scroll')
             self._maybe_load_more_live()

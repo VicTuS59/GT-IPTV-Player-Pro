@@ -204,15 +204,19 @@ class NapiProjektClient:
     def search(self, metadata, languages):
         if not polish_search_providers(languages):
             return []
-        from .online_subtitles import normalized_metadata, subtitle_title_queries, title_query_results
-        for meta in subtitle_title_queries(normalized_metadata(metadata, 'pl')):
-            results = self._search_title(meta)
+        from .online_subtitles import normalized_metadata, subtitle_search_available, subtitle_title_queries, title_query_results
+        meta = normalized_metadata(metadata, 'pl')
+        if not subtitle_search_available(meta):
+            return []
+        for query_meta in subtitle_title_queries(meta):
+            results = self._search_title(query_meta)
             if results:
-                return title_query_results(results, meta)
+                return title_query_results(results, query_meta)
         return []
 
     def _search_title(self, meta):
         query = meta['search_title']
+        series = meta['content_type'] == 'series'
         queries = [query]
         shorter = re.sub(r'(?i)^(?:the|a|an)\s+', '', query)
         if shorter != query:
@@ -220,8 +224,8 @@ class NapiProjektClient:
         catalog = []
         for query in queries:
             raw = _raw(self.BASE + '/ajax/search_catalog.php', 'napiprojekt.pl', {
-                'queryString': query, 'queryKind': '1' if meta['season'] else '2',
-                'queryYear': '' if meta['season'] else meta['year'], 'associate': '',
+                'queryString': query, 'queryKind': '1' if series else '2',
+                'queryYear': '' if series else meta['year'], 'associate': '',
             })
             html = CatalogueHTML(_decode(raw))
             for href, title in html.links:
@@ -230,7 +234,7 @@ class NapiProjektClient:
                 names = [name, re.sub(r'\s*\([^)]*\)\s*$', '', name)]
                 names.extend(re.findall(r'\(([^)]*)\)', name))
                 year = re.search(r'((?:19|20)\d{2})(?:\)|r\.?)?\s*$', title)
-                year_matches = (not meta['year'] or meta['season'] or not year
+                year_matches = (not meta['year'] or series or not year
                                 or int(year.group(1)) == meta['year'])
                 if path and year_matches and any(_title_key(n) == _title_key(meta['search_title']) for n in names):
                     catalog.append(path)
@@ -246,7 +250,7 @@ class NapiProjektClient:
             if not subtitle_path:
                 continue
             subtitle_url = self.BASE + '/' + subtitle_path
-            if meta['season'] and meta['episode']:
+            if series and meta['season_known'] and meta['episode']:
                 # The public season/episode form uses this redirect endpoint.
                 # Select the requested episode instead of scanning page one.
                 identifier = re.match(r'napisy-(\d+)-', path).group(1)
@@ -254,7 +258,7 @@ class NapiProjektClient:
                 subtitle_url = self.BASE + '/movie-subtitles-redirect.php?' + urlencode({
                     'sezon': meta['season'], 'odcinek': meta['episode'],
                     'rok': year.group(1) if year else meta['year'],
-                    'id': identifier, 'tytul': meta['title'],
+                    'id': identifier, 'tytul': meta['search_title'],
                 })
             page = CatalogueHTML(_decode(_raw(subtitle_url, 'napiprojekt.pl')))
             for row in page.rows:
@@ -307,8 +311,10 @@ class Napisy24Client:
     def search(self, metadata, languages):
         if not polish_search_providers(languages):
             return []
-        from .online_subtitles import normalized_metadata, subtitle_title_queries, title_query_results
+        from .online_subtitles import normalized_metadata, subtitle_search_available, subtitle_title_queries, title_query_results
         meta = normalized_metadata(metadata, 'pl')
+        if not subtitle_search_available(meta):
+            return []
         if meta['imdb_id']:
             results = self._search_query(meta, {'imdb': meta['imdb_id']})
             if results:
@@ -334,7 +340,8 @@ class Napisy24Client:
             identity = bool(imdb and values.get('imdb') == imdb)
             if not identity and not any(_title_key(t) == _title_key(meta['search_title']) for t in titles):
                 continue
-            if meta['year'] and values.get('year') and str(meta['year']) != values['year'] and not meta['season']:
+            if (meta['content_type'] != 'series' and meta['year'] and values.get('year')
+                    and str(meta['year']) != values['year']):
                 continue
             release = values.get('release') or values.get('title')
             if not _episode_match(meta,values.get('season'),values.get('episode'),release):

@@ -21,7 +21,7 @@ IDENTITY_MISS_SECONDS = 60
 MAX_IDENTITY_ENTRIES = 128
 _RESOLVERS = OrderedDict()
 _RESOLVER_LOCK = threading.Lock()
-_CONTEXT_FIELDS = ("title", "year", "content_type", "season", "episode",
+_CONTEXT_FIELDS = ("title", "year", "content_type", "season", "season_known", "episode", "episode_title",
                    "tmdb_id", "imdb_id", "parent_tmdb_id", "parent_imdb_id",
                    "episode_tmdb_id", "episode_imdb_id")
 
@@ -29,7 +29,7 @@ _CONTEXT_FIELDS = ("title", "year", "content_type", "season", "episode",
 def subtitle_identity_context(metadata):
     metadata = metadata if isinstance(metadata, dict) else {}
     value = ["subtitle-identity-v1"] + [
-        " ".join(str(metadata.get(name) or "").split()).casefold()
+        " ".join(str(metadata[name]).split()).casefold() if metadata.get(name) is not None else ""
         for name in _CONTEXT_FIELDS
     ]
     return sha256(json.dumps(value, ensure_ascii=False).encode("utf-8")).hexdigest()
@@ -194,21 +194,27 @@ class SubtitleIdentityResolver(object):
             params["primary_release_year" if kind == "movie" else "first_air_date_year"] = year
         payload = self._get("/search/" + kind, params)
         rows = payload.get("results") if isinstance(payload, dict) else None
+        title_key = _title_key(meta["search_title"])
         matches = {}
+        possible = {}
         for item in rows[:20] if isinstance(rows, list) else ():
             if not isinstance(item, dict):
                 continue
             identifier = _identifier(item.get("id"))
             found_year = _year(item.get("release_date") or item.get("first_air_date"))
-            if (not identifier or _title_key(meta["search_title"]) not in {
-                    _title_key(name) for name in _aliases(item)}
-                    or year and (not found_year or abs(year - found_year) > 1)):
+            if not identifier or year and (not found_year or abs(year - found_year) > 1):
                 continue
-            matches[identifier] = (abs(year - found_year) if year else 0, item)
-        if not matches:
+            distance = abs(year - found_year) if year else 0
+            possible[identifier] = distance
+            if title_key in {_title_key(name) for name in _aliases(item)}:
+                matches[identifier] = distance
+        # A localized search result may only disclose the queried alternate
+        # title in its detail response. Verify it if the best candidate is unique.
+        candidates = matches or possible
+        if not candidates:
             return None
-        best = min(value[0] for value in matches.values())
-        choices = [identifier for identifier, value in matches.items() if value[0] == best]
+        best = min(candidates.values())
+        choices = [identifier for identifier, distance in candidates.items() if distance == best]
         # Do not turn popularity/API order into proof of the intended remake.
         return self._detail(kind, choices[0]) if len(choices) == 1 else None
 
@@ -256,13 +262,14 @@ class SubtitleIdentityResolver(object):
         ), ("", 0))
         data = {"title": str(title)[:120], "year": actual_year or query_year,
                 "_verified_title_query": source_query, "_catalogue_title": meta["title"],
+                "_tmdb_localized_title": payload.get("title" if kind == "movie" else "name") or "",
                 "tmdb_id": tmdb_id, "imdb_id": "tt" + found_imdb.zfill(7) if found_imdb else "",
                 "sd_id": "", "_title_aliases": aliases, "_tmdb_verified": True}
         if kind == "tv":
             data.update(parent_tmdb_id=tmdb_id, parent_imdb_id=data["imdb_id"],
+                        season=meta["season"], season_known=meta["season_known"], episode=meta["episode"],
                         episode_tmdb_id="", episode_imdb_id="", _episode_verified=False)
-            raw_season = original.get("season")
-            if raw_season is not None and str(raw_season).strip() and meta["episode"] > 0:
+            if meta["season_known"] and meta["episode"] > 0:
                 season, episode = meta["season"], meta["episode"]
                 try:
                     detail = self._get("/tv/{}/season/{}/episode/{}".format(tmdb_id, season, episode),

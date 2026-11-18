@@ -48,6 +48,7 @@ HISTORY_ROWS = 7
 ARTWORK_SETTLE_MS = 230
 RESULT_REFIT_STEP_MS = 35
 QUALITY = YOUTUBE_QUALITIES
+LIVE_TAB = footer_item("green", "Live")
 FOOTER = (
     footer_item("up_down", "select"),
     footer_item("left_right", "page"),
@@ -55,6 +56,7 @@ FOOTER = (
     footer_item("blue", "new_search"),
     footer_item("yellow", "quality"),
     footer_item("red", "search_history"),
+    LIVE_TAB,
     footer_item("exit", "back"),
 )
 
@@ -243,7 +245,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
     RESULTS_FOOTER = FOOTER
 
     def __init__(self, session, search_service=None):
-        self.skin = prepared_skin(_skin)
+        self.skin = prepared_skin(_skin, self.RESULTS_FOOTER)
         Screen.__init__(self, session)
         self._service = search_service if search_service is not None else WEB_YOUTUBE
         self._closed = False
@@ -326,6 +328,8 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
             "blue": self.open_keyboard, "yellow": self.change_quality,
             "red": self.open_history, "menu": self.retry,
         }
+        if LIVE_TAB in self.RESULTS_FOOTER:
+            actions["green"] = self.open_live
         for number in range(1, 10):
             actions[str(number)] = lambda page=number: self.jump_page(page)
         self["actions"] = ActionMap(
@@ -353,7 +357,8 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         self._sync_quality()
         if not self._keyboard_requested:
             self._keyboard_requested = True
-            self._keyboard_timer.start(60, True)
+            if LIVE_TAB not in self.RESULTS_FOOTER:
+                self._keyboard_timer.start(60, True)
         self._render()
         self._preview_window_applied = False
         self._resume_youtube_window()
@@ -397,6 +402,20 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
 
     def _open_initial_search(self):
         self.open_history()
+
+    def open_live(self):
+        if self._closed or self._keyboard_open or self._history_fullscreen_id:
+            return
+        from .youtube_live_ui import GTYouTubeLiveScreen
+
+        if self._play_token:
+            self._service.cancel_play(self._play_token)
+            self._play_token = self._pending_play_id = ""
+        preview_service = getattr(self, "_youtube_service_owner", None)
+        if preview_service is not None:
+            self._close_youtube_preview()
+            preview_service._player_closed(self)
+        self.session.open(GTYouTubeLiveScreen, self._service)
 
     def open_history(self):
         if self._closed or self._keyboard_open:

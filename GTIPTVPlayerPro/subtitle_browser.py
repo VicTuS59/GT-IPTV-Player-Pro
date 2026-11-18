@@ -391,7 +391,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             self._profile_timer = None
 
     def _profile_tick(self):
-        if self._closed:
+        if getattr(self, "_closed", True) is not False:
             return
         context = self._state_context()
         if not self._busy and context != self._cache_context:
@@ -788,10 +788,13 @@ class GTOnlineSubtitleBrowserScreen(Screen):
 
     def edit_title(self):
         """Open Enigma2's keyboard for a manual provider search title."""
-        if self._closed or (self._busy and not self._cancel_automatic_wait()):
+        if getattr(self, "_closed", True) is not False or (self._busy and not self._cancel_automatic_wait()):
             return
         try:
-            from Screens.VirtualKeyBoard import VirtualKeyBoard
+            try:
+                from Screens.VirtualKeyBoard import VirtualKeyBoard
+            except ImportError:
+                from Screens.VirtualKeyBoard import VirtualKeyboard as VirtualKeyBoard
         except ImportError:
             set_text_if_changed(self["message"], _("The virtual keyboard is unavailable on this image."))
             return
@@ -811,7 +814,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             set_text_if_changed(self["message"], _("Could not open the virtual keyboard."))
 
     def _title_entered(self, value):
-        if value is None or self._closed:
+        if value is None or getattr(self, "_closed", True) is not False:
             return
         metadata = manual_subtitle_metadata(self.metadata, value)
         if metadata is None:
@@ -830,7 +833,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         self._remember_state()
 
     def search(self):
-        if self._closed or (self._busy and not self._cancel_automatic_wait()):
+        if getattr(self, "_closed", True) is not False or (self._busy and not self._cancel_automatic_wait()):
             return
         self._refresh_playback_profile()
         searcher = getattr(self.controller, "search_combined", None)
@@ -861,7 +864,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
                 if getattr(self.controller, "busy", False) else _("Error"))
 
     def _search_ready(self, results, notices):
-        if self._closed:
+        if getattr(self, "_closed", True) is not False:
             return
         if self._search_context != self._state_context():
             self.results = []
@@ -885,14 +888,14 @@ class GTOnlineSubtitleBrowserScreen(Screen):
         self._remember_state()
 
     def _search_finished(self):
-        if self._closed:
+        if getattr(self, "_closed", True) is not False:
             return
         self._busy = False
         self._waiting_for_automatic = False
         self._render()
 
     def download_selected(self):
-        if self._closed or self._busy:
+        if getattr(self, "_closed", True) is not False or self._busy:
             return
         self._refresh_playback_profile()
         if self._cache_context != self._state_context():
@@ -919,7 +922,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             set_text_if_changed(self["message"], _("Error"))
 
     def _download_finished(self):
-        if self._closed:
+        if getattr(self, "_closed", True) is not False:
             return
         self._busy = False
         if getattr(self.controller, "last_download_succeeded", False):
@@ -930,7 +933,7 @@ class GTOnlineSubtitleBrowserScreen(Screen):
             self._render()
 
     def _stop(self):
-        if self._closed:
+        if getattr(self, "_closed", True) is not False:
             return
         if self._profile_timer is not None:
             try:

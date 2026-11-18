@@ -800,7 +800,8 @@ class WebYouTube(object):
                 or not same_reference(candidate["reference"],
                     WEB_REMOTE.session.nav.getCurrentlyPlayingServiceReference())):
             return False
-        dialog.set_youtube_end_callback(self._video_ended)
+        if not candidate.get("live"):
+            dialog.set_youtube_end_callback(self._video_ended)
         with self._lock:
             self._sequence = sequence
             self._playing = dict(id=candidate["id"], title=candidate["title"],
@@ -809,7 +810,7 @@ class WebYouTube(object):
             self._jobs[token].update(state="playing", phase="playing")
         return True
 
-    def _youtube_start_failed(self, token, candidate, code):
+    def _youtube_start_failed(self, token, candidate, code, notify=True):
         """Release only this failed service; never stop a newer/user service."""
         with self._lock:
             if token != self._latest_play_token:
@@ -835,6 +836,8 @@ class WebYouTube(object):
                 elif getattr(session, "current_dialog", None) is dialog:
                     if rejected_initial_start or dialog.stop_playback():
                         dialog.close()
+        if not notify:
+            return
         # A preview keeps its dedicated status line. Other callers (including
         # automatic playback/trailers) need the localized receiver notification.
         preview = dialog if getattr(dialog, "_youtube_preview", False) else None
@@ -845,15 +848,15 @@ class WebYouTube(object):
 
     def play(self, video_id, title, context="", _automatic=False, _guard=None,
              _sequence_override=None, _preview_owner=None, _request_owner=None,
-             _on_closed=None, _original_audio=False, _trailer=False):
+             _on_closed=None, _original_audio=False, _trailer=False, _live=False):
         if not isinstance(video_id, str) or not VIDEO_ID.fullmatch(video_id):
             raise WebServiceError("invalid_video", "Invalid video selection", 400)
         if not isinstance(context, str) or len(context) > 100:
             raise WebServiceError("invalid_video", "Invalid video selection", 400)
         player = load_player_settings()
         quality = str(player.youtube_resolution)
-        sequence = (_sequence_override if _automatic and _guard is not None
-                    else self._play_sequence(context, video_id, quality))
+        sequence = None if _live else (_sequence_override if _automatic and _guard is not None
+                                      else self._play_sequence(context, video_id, quality))
         if _automatic and (not sequence or sequence["quality"] != quality):
             return {"token": "", "state": "cancelled"}
         title = str(title or "YouTube")[:160]
@@ -873,7 +876,7 @@ class WebYouTube(object):
 
         service_type = 4097 if _trailer and player.movie_service_type == 1 else player.movie_service_type
         native = service_type == NATIVE_AUDIO_SERVICE_TYPE
-        resume_store = None if _trailer else self._playback_history
+        resume_store = None if _trailer or _live else self._playback_history
         avc = frozenset(("h264",))
         resolver, codecs, supports_separate_audio = None, avc, False
 
@@ -944,19 +947,23 @@ class WebYouTube(object):
                         raise YouTubePlaybackError(
                             "youtube_native_player_required" if native else "youtube_service_unavailable")
                     resolver = YouTubeVideoUrl()
+                    if _live:
+                        resolver.require_live = True
                 stream = resolve_stream(previous)
                 if stream is None:
                     state = "cancelled"
                     return state
                 url, audio = stream["url"], stream["separate_audio"]
                 video_codec, selected_quality, duration_seconds = stream["codec"], stream["quality"], stream["duration"]
+                if _live:
+                    duration_seconds = 0
                 try:
                     playback_url = native_youtube_service_url(url) if native else url
                 except (ImportError, OSError, RuntimeError, ValueError) as error:
                     log_event("youtube", "native-link-adaptation-failed error_type={}".format(type(error).__name__))
                     raise YouTubePlaybackError("youtube_service_unavailable") from None
                 candidate = dict(id=video_id, title=title, quality=selected_quality,
-                                 duration=duration_seconds, codec=video_codec, stream=stream)
+                                 duration=duration_seconds, codec=video_codec, stream=stream, live=_live)
                 print("[GTYouTube] video_id={} requested={} selected={} "
                       "video_itag={} audio_itag={} audio_bitrate={} engine={} native_audio={} duration={}".format(
                           video_id, player.youtube_resolution, selected_quality,
@@ -1096,7 +1103,7 @@ class WebYouTube(object):
                                 return session.openWithCallback(_on_closed, *args, **kwargs)
                             return session.open(*args, **kwargs)
                         try:
-                            resume = {} if _trailer else dict(resume_store=resume_store,
+                            resume = {} if _trailer or _live else dict(resume_store=resume_store,
                                 resume_key_value=video_id, start_position=start_position)
                             if return_state is not None:
                                 dialog = open_player(
@@ -1151,7 +1158,7 @@ class WebYouTube(object):
                 if state == "playing":
                     log_event("youtube", "playback-started video_id={} selected={} engine={} attempt={} confirmed_by={}".format(
                         video_id, selected_quality, service_type, attempt, monitor.confirmation or "-"))
-                    if not _trailer:
+                    if not _trailer and not _live:
                         try:
                             self._playback_history.add(video_id, title, selected_quality, duration_seconds)
                         except OSError as exc:
@@ -1191,7 +1198,8 @@ class WebYouTube(object):
                 log_event("youtube", "playback-stage-failed video_id={} stage={} code={} attempt={}".format(
                     video_id, "startup" if candidate else "resolve", code, attempt))
                 try:
-                    WEB_REMOTE._run_on_gui(lambda: self._youtube_start_failed(token, candidate or previous, code))
+                    WEB_REMOTE._run_on_gui(
+                        lambda: self._youtube_start_failed(token, candidate or previous, code, notify=not _live))
                 except Exception:
                     pass
             finally:

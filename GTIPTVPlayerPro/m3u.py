@@ -25,7 +25,10 @@ from functools import lru_cache
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
 from . import PLUGIN_VERSION
-from .content import ContentCategory, ContentError, ContentItem
+from .content import (
+    LIVE_SEARCH_RESULT_LIMIT, ContentCategory, ContentError, ContentItem,
+    channel_name_matcher,
+)
 from .i18n import N_, _
 from .live_channel_order import LiveChannelOrderStore, channel_order_key_for_id, channel_order_scope
 from .persistence import guarded_mutation
@@ -1127,7 +1130,26 @@ class M3UContentClient(object):
             limit = int(limit)
         except (TypeError, ValueError, OverflowError):
             limit = 200
-        limit = max(1, min(500, limit))
+        limit = max(1, min(LIVE_SEARCH_RESULT_LIMIT, limit))
+
+        def matches(record, name):
+            return query in _search_text(
+                "{} {} {} {}".format(record["name"], record["group"], record["tvg_id"], name)
+            )
+
+        return self._search_channel_records(matches, "", limit, hidden_category_ids)
+
+    def search_live_channels(self, query, category_id="", hidden_category_ids=None):
+        """Match names and local aliases in the selected catalogue scope."""
+        name_matches = channel_name_matcher(query)
+        if name_matches is None:
+            return []
+        return self._search_channel_records(
+            lambda record, name: name_matches(name) or name_matches(record["name"]),
+            str(category_id or ""), LIVE_SEARCH_RESULT_LIMIT, hidden_category_ids,
+        )
+
+    def _search_channel_records(self, predicate, category_id, limit, hidden_category_ids):
         hidden_category_ids = hidden_category_match_ids((), hidden_category_ids)
         self.prepare()
         matches = []
@@ -1138,22 +1160,16 @@ class M3UContentClient(object):
             # Unicode scan so playback and EPG lookups remain responsive.
             records = self._records
             names = self._channel_names
-        for index, record in enumerate(records):
+            rows = self._category_rows.get(category_id, ()) if category_id else range(len(records))
+        for index, row in enumerate(rows):
             if index % 128 == 0:
                 self._check_limits(deadline)
+            record = records[row]
             if not category_ids_visible(
-                (record["category_id"],), hidden_category_ids
+                (record["category_id"],), hidden_category_ids, category_id
             ):
                 continue
-            searchable = _search_text(
-                "{} {} {} {}".format(
-                    record["name"],
-                    record["group"],
-                    record["tvg_id"],
-                    names.get(record["stream_id"], ""),
-                )
-            )
-            if query in searchable:
+            if predicate(record, names.get(record["stream_id"], "")):
                 matches.append(self._content_item(record, names))
                 if len(matches) >= limit:
                     break

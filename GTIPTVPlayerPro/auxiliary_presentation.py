@@ -222,7 +222,7 @@ def refresh(s):
     if getattr(s,'_closed',False):return
     text(s,'aux_gt','GT',60);text(s,'aux_brand','IPTV PLAYER PRO',40)
     text(s,'aux_web_hint',_('Hold MENU for 3 seconds: Web interface'),20)
-    titles={'source':'Add M3U source','history':getattr(s,'HISTORY_TITLE','Search history'),'youtube':'YouTube','online':'Subtitles','local':'Choose a subtitle file','categories':'Category Management','channels':'Search All Channels','weather':'Weather','about':'About'}
+    titles={'source':'Add M3U source','history':getattr(s,'HISTORY_TITLE','Search history'),'youtube':'YouTube','online':'Subtitles','local':'Choose a subtitle file','categories':'Category Management','channels':getattr(s,'_search_title','Search All Channels'),'weather':'Weather','about':'About'}
     text(s,'aux_title',_(titles[s._aux_kind]),46)
     {'source':_source,'history':refresh_history,'youtube':_youtube,'online':_online,'local':_local,'categories':_categories,'channels':_channels,'weather':_weather,'about':_about}[s._aux_kind](s)
     _footer(s)
@@ -410,7 +410,8 @@ def _channels(s):
     entries=s._entries if not s._loading and not s._error else []
     total=len(entries);start=s.selected_index//s.page_size*s.page_size
     text(s,'aux_query',s._query or _('Enter a channel name.'),33)
-    text(s,'aux_source_type',_('M3U CHANNEL SEARCH'),26)
+    category=getattr(s,'_search_category',None)
+    text(s,'aux_source_type',_('LIVE TV') if category is not None else _('M3U CHANNEL SEARCH'),26)
     text(s,'aux_channel_count',_('{} channels found').format(total) if total else '',27)
     for i in range(10):
         entry=entries[start+i] if i<s.page_size and start+i<total else None
@@ -421,9 +422,14 @@ def _channels(s):
         show(s,'aux_channel_favorite_'+str(i),entry is not None and s._is_favorite(entry))
     empty=not total
     for name in ('aux_empty_icon','aux_empty_title','aux_empty_help'):show(s,name,empty)
-    title=_('Loading content...') if s._loading else s._error or _(s.empty_message())
+    title=_('Loading content...') if s._loading else _(s._error or s.empty_message())
     text(s,'aux_empty_title',title,46,2)
-    text(s,'aux_empty_help',_('Please wait') if s._loading else _('Press BLUE to enter another channel name.'),31,2)
+    hint=''
+    if s._loading:
+        hint=_('Please wait')
+    elif category is None:
+        hint=_('Press BLUE to enter another channel name.')
+    text(s,'aux_empty_help',hint,31,2)
     show(s,'items',False)
     if empty:
         text(s,'message','');hide_scrollbar(s,'list_scroll')
