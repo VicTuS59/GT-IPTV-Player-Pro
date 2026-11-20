@@ -53,6 +53,9 @@ def content_client_for(account):
     if source_type == 'm3u':
         from .m3u import M3UContentClient
         return M3UContentClient(account)
+    if source_type == 'mhub':
+        from .mhub import MHubContentClient
+        return MHubContentClient(account)
     return _protect_download_client(XtreamContentClient(account))
 
 def _client_supports(client, capability):

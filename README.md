@@ -1,11 +1,8 @@
-# GT IPTV Player Pro 1.9.6-r0
+# GT IPTV Player Pro 1.9.7-r0
 
-- Added **YouTube Live**. Broadcasts are listed in the receiver's language. The broadcast language and category are selectable, and the feature works without an API key.
-- Added **Live TV channel search** on the green button. Search by first letter or channel name in Xtream, Stalker and M3U.
-- Fixed channel playback from **Stalker favorites**.
-- Improved **M3U EPG matching** for provider labels and alternative channel names.
-- Updated **subtitle search** to use clean titles and TMDb. Series results are checked against the season and episode. Press **OK** to download the selected subtitle.
-- Fixed issues when closing channel and subtitle search screens with **EXIT**.
+Added **mHub v2 support for Live TV**. Enter your own manifest URL to browse categories and play channels directly from the source.
+
+Press the **green button** on the **Add Source** or **Manage Sources** screen to open mHub v2.
 
 **HD Satelit compatibility note**
 

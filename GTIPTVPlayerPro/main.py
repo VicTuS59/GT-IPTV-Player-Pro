@@ -736,11 +736,13 @@ ACCOUNT_BATCH_REVIEW_FOOTER_ITEMS = (
 MANAGE_SOURCES_FOOTER_ITEMS = (
     footer_item("up_down", "navigate"),
     footer_item("ok", "open"),
+    footer_item("green", "mHub v2"),
     footer_item("exit", "back"),
 )
 ADD_SOURCE_TYPE_FOOTER_ITEMS = (
     footer_item("up_down", "navigate"),
     footer_item("ok", "continue"),
+    footer_item("green", "mHub v2"),
     footer_item("exit", "cancel"),
 )
 ADD_M3U_SOURCE_FOOTER_ITEMS = (
@@ -6215,6 +6217,12 @@ class GTAccountsScreen(Screen):
             self._direct_connector.stop()
 
 
+def _open_mhub_sources(screen):
+    from .mhub_ui import open_mhub_sources
+
+    open_mhub_sources(screen.session)
+
+
 class GTManageSourcesScreen(SourcePresentation, Screen):
     """Local-only source type chooser used by Manage Sources."""
 
@@ -6277,9 +6285,10 @@ class GTManageSourcesScreen(SourcePresentation, Screen):
         install_remote_footer(self, MANAGE_SOURCES_FOOTER_ITEMS)
         self._setup_source_presentation(_scale(), MANAGE_SOURCES_FOOTER_ITEMS, manage=True)
         self["actions"] = ActionMap(
-            ["OkCancelActions", "DirectionActions", "WizardActions"],
+            ["OkCancelActions", "DirectionActions", "WizardActions", "ColorActions"],
             {
                 "ok": self.open_selected,
+                "green": lambda: _open_mhub_sources(self),
                 "cancel": self.close,
                 "back": self.close,
                 "up": self.move_up,
@@ -6447,6 +6456,7 @@ class GTAddSourceTypeScreen(SourcePresentation, Screen):
             ["OkCancelActions", "DirectionActions", "ColorActions"],
             {
                 "ok": self.open_selected,
+                "green": lambda: _open_mhub_sources(self),
                 "cancel": self.close,
                 "up": self.move_up,
                 "down": self.move_down,
