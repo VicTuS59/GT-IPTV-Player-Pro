@@ -16,6 +16,7 @@ from .utility_design import bind_missing
 from .seven_presentation import text as fit_text,show,rect,progress,_footer_style,_paint_footer
 from .remote_footer import prepared_skin, skin_metadata, layout_needs_fit, _cached_skin
 from .scrollbar import update_scrollbar
+from .selected_row_scroll import clear_selection, select_label
 from .typography import current_text_size, font_px
 from .broadcast_layout import restyle
 
@@ -279,6 +280,10 @@ def _playlists(s):
         show(s,'r101_side_status_'+k,bool(path) and k==state)
     text(s,'r101_source_caption',_('Source type'),28);text(s,'r101_source_value',s['subtitle'].getText(),34)
     text(s,'r101_path_caption',_('Save location'),28);text(s,'r101_path_value',os.path.dirname(path) if path else _('Not configured'),31,3)
+    if path:
+        select_label(s, 'row_name_'+str(s.selected_index-start), os.path.basename(path), key=s.selected_index)
+    else:
+        clear_selection(s)
     show(s,'r101_file_icon',bool(path))
 
 def refresh_category_list(screen, full=False):
@@ -472,3 +477,10 @@ def refresh_archive_programmes(s, previous_index=None):
     show(s,'r101_archive_icon',programme is not None)
     count = '{}/{}'.format(s.programme_index + 1, len(s.programmes)) if s.programmes else ''
     text(s, 'programme_count', count, 26)
+    if s.focus == 'channels' and 0 <= s.channel_index < len(s.channels):
+        channel = s.channels[s.channel_index]
+        select_label(s, 'channel_'+str(s.channel_index % 12), channel.name, key=('channel', s.channel_index))
+    elif s.focus == 'programmes' and programme:
+        select_label(s, 'programme_'+str(s.programme_index-start), programme.title, key=('programme', s.programme_index))
+    else:
+        clear_selection(s)

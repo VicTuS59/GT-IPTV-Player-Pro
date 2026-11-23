@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import datetime
+import errno
 import os
 import platform
 import threading
@@ -14,7 +15,7 @@ from .search_file_presentation import skin_after as search_file_skin_after, refr
 from .broadcast_presentation import skin_after as broadcast_skin_after, refresh_after as broadcast_refresh_after, setup as setup_broadcast
 from .seven_presentation import skin_after as seven_skin_after, refresh_after as seven_refresh_after, setup as setup_seven
 from .utility_pages import skin_after, refresh_after, setup as setup_utility_pages
-from .source_loader import SourceLoader
+from .source_loader import SourceLoader, connect_timer as _connect_timer
 import textwrap
 import time
 
@@ -90,6 +91,7 @@ from .remote_footer import (
     set_remote_footer,
 )
 from .scrollbar import hide_scrollbar, update_scrollbar
+from .selected_row_scroll import clear_selection, select_label
 from .settings import (
     DEFAULT_INFOBAR_TIMEOUT,
     INFOBAR_TIMEOUT_CHOICES,
@@ -209,13 +211,6 @@ def _cancel_ui_job(token):
             token.cancel()
         except Exception:
             pass
-
-
-def _connect_timer(timer, callback):
-    try:
-        timer.timeout.connect(callback)
-    except AttributeError:
-        timer.callback.append(callback)
 
 
 def _is_modal_open_error(error):
@@ -541,17 +536,27 @@ def _about_notice():
         "to TMDb. The IPTV username and password are not sent to these services."
     )
 
-PROVIDER_CREDITS = (
-    "Weather data by Open-Meteo.com — CC BY 4.0\n"
-    "https://open-meteo.com/\n"
-    "https://creativecommons.org/licenses/by/4.0/\n"
-    "Forecast data is reformatted for television display.\n"
-    "This product uses the TMDB API but is not endorsed or certified by TMDB.\n"
-    "https://www.themoviedb.org\n"
-    "TVmaze — CC BY-SA 4.0\n"
-    "https://www.tvmaze.com/\n"
-    "https://creativecommons.org/licenses/by-sa/4.0/"
+TMDB_ATTRIBUTION = N_(
+    "This product uses the TMDB API but is not endorsed or certified by TMDB."
 )
+
+
+def _provider_credits():
+    tmdb_attribution = _(TMDB_ATTRIBUTION)
+    if tmdb_attribution != TMDB_ATTRIBUTION:
+        # TMDB's attribution guidelines require the original notice.
+        tmdb_attribution += "\n" + TMDB_ATTRIBUTION
+    return "\n".join((
+        _("Weather data by Open-Meteo.com — CC BY 4.0"),
+        "https://open-meteo.com/",
+        "https://creativecommons.org/licenses/by/4.0/",
+        _("Forecast data is reformatted for television display."),
+        tmdb_attribution,
+        "https://www.themoviedb.org",
+        _("TV data by TVmaze — CC BY-SA 4.0"),
+        "https://www.tvmaze.com/",
+        "https://creativecommons.org/licenses/by-sa/4.0/",
+    ))
 
 
 def _about_text():
@@ -570,10 +575,19 @@ def _about_text():
             PLUGIN_LICENSE_URL,
         ),
     )
-    sections = [notice, _("For live TV posters, programme titles may also be sent to TVmaze."), "\n".join(links)]
-    # Provider attribution text is kept verbatim to satisfy the providers'
-    # public attribution requirements in every UI language.
-    sections.append(PROVIDER_CREDITS)
+    notice_sections = notice.split("\n\n", 1)
+    sections = [
+        notice_sections[0],
+        _(
+            "Users add their own mHub v2 source URLs. "
+            "The selected source supplies the streams, and GT IPTV Player Pro "
+            "plays them directly on the receiver."
+        ),
+        *notice_sections[1:],
+        _("For live TV posters, programme titles may also be sent to TVmaze."),
+        "\n".join(links),
+        _provider_credits(),
+    ]
     return "\n\n".join(sections)
 
 
@@ -2819,7 +2833,7 @@ class GTWeatherLocationSearchScreen(Screen):
         self._search_result = []
         self._search_job = None
         self._timer = eTimer()
-        _connect_timer(self._timer, self._poll_search)
+        self._timer_connection = _connect_timer(self._timer, self._poll_search)
 
         self["top_accent"] = Label("")
         self["header"] = Label(_("Weather"))
@@ -3145,7 +3159,7 @@ class GTWeatherSettingsScreen(Screen):
         self._pending_location = None
         self._city_job = None
         self._timer = eTimer()
-        _connect_timer(self._timer, self._poll_city)
+        self._timer_connection = _connect_timer(self._timer, self._poll_city)
 
         self["top_accent"] = Label("")
         self["header"] = Label(_("Settings"))
@@ -3705,7 +3719,7 @@ class GTPlayerSettingsScreen(SettingsPresentation, Screen):
         except Exception:
             self._category_lock_status = "corrupt"
         self._tmdb_test_timer = eTimer()
-        _connect_timer(self._tmdb_test_timer, self._poll_tmdb_test)
+        self._tmdb_test_timer_connection = _connect_timer(self._tmdb_test_timer, self._poll_tmdb_test)
 
         self["top_accent"] = Label("")
         self["header"] = Label(_("Settings"))
@@ -4590,7 +4604,17 @@ class _DirectAccountConnection(object):
         self._result_ready = False
         self._job = None
         self._timer = eTimer()
-        _connect_timer(self._timer, self._poll_result)
+        # The timer must not keep a discarded connection attempt alive.
+        from weakref import WeakMethod
+
+        poll_result = WeakMethod(self._poll_result)
+
+        def poll():
+            callback = poll_result()
+            if callback is not None:
+                callback()
+
+        self._timer_connection = _connect_timer(self._timer, poll)
 
     @property
     def active(self):
@@ -4729,6 +4753,7 @@ class GTAccountBatchTestScreen(Screen):
         )
         self._state = "testing"
         self._started = False
+        self._start_error = ""
         self._closed = False
         self._completed = 0
         self._tests_complete = False
@@ -4744,7 +4769,7 @@ class GTAccountBatchTestScreen(Screen):
         self._cancel_event = threading.Event()
         self._close_after_delete_cancel = False
         self._timer = eTimer()
-        _connect_timer(self._timer, self._poll_events)
+        self._timer_connection = _connect_timer(self._timer, self._poll_events)
         unused_width, unused_height, px = _scale()
         del unused_width, unused_height
         self._progress_width = max(1, px(1030))
@@ -4813,18 +4838,26 @@ class GTAccountBatchTestScreen(Screen):
         return events
 
     def start(self):
-        if self._started or self._closed:
+        if getattr(self, "_closed", True) is not False or self._started:
             return False
         self._started = True
-        worker = threading.Thread(
-            target=self._run_tests,
-            args=(self.accounts, self.account_checker, self._cancel_event,
-                  self._event_lock, self._events),
-        )
-        worker.daemon = True
-        worker.start()
+        try:
+            worker = threading.Thread(
+                target=self._run_tests,
+                args=(self.accounts, self.account_checker, self._cancel_event,
+                      self._event_lock, self._events),
+                daemon=True,
+            )
+            worker.start()
+        except (OSError, RuntimeError, MemoryError) as error:
+            if isinstance(error, MemoryError) or getattr(error, "errno", None) == errno.ENOMEM:
+                self._start_error = _("Not enough memory to start the account test.")
+            else:
+                self._start_error = _("Could not start a thread for the account test.")
+            log_event("account_batch", "stage=test-start-failed detail={}".format(error), error)
+        # Finish creating the dialog before the timer returns the error to the list.
         self._timer.start(ACCOUNT_BATCH_QUERY_POLL_MS, True)
-        return True
+        return not self._start_error
 
     @staticmethod
     def _run_tests(accounts, account_checker, cancel_event, event_lock, events):
@@ -4855,7 +4888,10 @@ class GTAccountBatchTestScreen(Screen):
         queue_event("complete")
 
     def _poll_events(self):
-        if getattr(self, "_closed", True):
+        if getattr(self, "_closed", True) is not False:
+            return
+        if self._start_error:
+            self._close_result()
             return
         terminal = False
         for event in self._drain_events():
@@ -4981,7 +5017,7 @@ class GTAccountBatchTestScreen(Screen):
             pass
 
     def _finish_testing(self):
-        if getattr(self, "_closed", True) or self._state != "testing":
+        if getattr(self, "_closed", True) is not False or self._state != "testing":
             return
         self._tests_complete = (
             not self._cancel_event.is_set()
@@ -4997,7 +5033,7 @@ class GTAccountBatchTestScreen(Screen):
         self._current_pending = False
         self._apply_progress_fill(100)
         if not self._inactive_accounts:
-            self.close(self._result_payload())
+            self._close_result()
             return
         # Keep the review and confirmation on the batch screen. The parent
         # account list resumes once the operation has finished.
@@ -5061,7 +5097,7 @@ class GTAccountBatchTestScreen(Screen):
     @seven_refresh_after
     def delete_inactive(self):
         if (
-            getattr(self, "_closed", True)
+            getattr(self, "_closed", True) is not False
             or self._state != "review"
             or not self._inactive_accounts
         ):
@@ -5115,21 +5151,23 @@ class GTAccountBatchTestScreen(Screen):
             events.append(("delete_done", removed, error))
 
     def _finish_delete(self, removed, error):
-        if getattr(self, "_closed", True) or self._state != "deleting":
+        if getattr(self, "_closed", True) is not False or self._state != "deleting":
             return
         if error:
             if self._close_after_delete_cancel:
-                self.close(self._result_payload(cancelled=True))
+                self._close_result(cancelled=True)
                 return
             self._state = "review"
             set_remote_footer(self, ACCOUNT_BATCH_REVIEW_FOOTER_ITEMS)
             self._refresh_review(error)
             return
-        self.close(self._result_payload(
+        self._close_result(
             deleted=removed, cancelled=self._close_after_delete_cancel and not removed,
-        ))
+        )
 
     def _result_payload(self, deleted=0, cancelled=False):
+        if self._start_error:
+            return {"start_error": self._start_error}
         errors, inactive = self._review_counts()
         return {
             "results": dict(self._results),
@@ -5140,15 +5178,23 @@ class GTAccountBatchTestScreen(Screen):
             "cancelled": bool(cancelled),
         }
 
+    def _close_result(self, deleted=0, cancelled=False):
+        if getattr(self, "_closed", True) is not False:
+            return
+        # Enigma2 can defer onClose until the next main-loop iteration.
+        self._stop()
+        self.close(self._result_payload(deleted=deleted, cancelled=cancelled))
+
     def keep_inactive(self):
-        if self._state == "review":
-            self.close(self._result_payload())
+        if getattr(self, "_closed", True) is False and self._state == "review":
+            self._close_result()
 
     def continue_or_keep(self):
-        if self._state == "review":
-            self.keep_inactive()
+        self.keep_inactive()
 
     def cancel_or_keep(self):
+        if getattr(self, "_closed", True) is not False:
+            return
         if self._state == "deleting":
             self._close_after_delete_cancel = True
             self._cancel_event.set()
@@ -5157,11 +5203,10 @@ class GTAccountBatchTestScreen(Screen):
         if self._state == "review":
             self.keep_inactive()
             return
-        self._cancel_event.set()
-        self.close(self._result_payload(cancelled=True))
+        self._close_result(cancelled=True)
 
     def _stop(self):
-        if getattr(self, "_closed", True):
+        if getattr(self, "_closed", True) is not False:
             return
         self._closed = True
         self._cancel_event.set()
@@ -5239,12 +5284,12 @@ class GTAccountsScreen(Screen):
         self._delete_closed = False
         self._delete_state_lock = threading.Lock()
         self._automatic_test_timer = eTimer()
-        _connect_timer(
+        self._automatic_test_timer_connection = _connect_timer(
             self._automatic_test_timer,
             self._start_automatic_test,
         )
         self._delete_timer = eTimer()
-        _connect_timer(self._delete_timer, self._poll_delete_result)
+        self._delete_timer_connection = _connect_timer(self._delete_timer, self._poll_delete_result)
         self["account_panel_art"] = Pixmap()
         self["accounts_icon"] = Pixmap()
         self["count_badge_art"] = Pixmap()
@@ -5306,8 +5351,8 @@ class GTAccountsScreen(Screen):
         install_remote_footer(self, footer_items)
         actions = {
             "ok": self.connect_selected,
-            "cancel": self.close,
-            "back": self.close,
+            "cancel": self._close_accounts,
+            "back": self._close_accounts,
             "up": self.move_up,
             "down": self.move_down,
             "upRepeated": self.move_up,
@@ -5387,6 +5432,8 @@ class GTAccountsScreen(Screen):
         reader.request(self.account_loader)
 
     def _apply_accounts_reload(self, result, error=None):
+        if getattr(self, "_account_screen_closed", True) is not False:
+            return
         self._sources_loading = False
         if error is not None:
             if self.load_result is None:
@@ -5437,14 +5484,14 @@ class GTAccountsScreen(Screen):
         return removed
 
     def _arm_automatic_test(self):
-        if getattr(self, "_sources_loading", False):
-            self._account_screen_shown = True
-            return
         """Defer the child dialog until this account screen is fully modal."""
+        if getattr(self, "_account_screen_closed", True) is not False:
+            return False
         self._account_screen_shown = True
+        if getattr(self, "_sources_loading", False):
+            return False
         if (
-            self._account_screen_closed
-            or self._automatic_test_started
+            self._automatic_test_started
             or self._automatic_test_open
             or self._automatic_test_armed
             or self._automatic_test_open_attempts
@@ -5461,14 +5508,15 @@ class GTAccountsScreen(Screen):
         return True
 
     def _start_automatic_test(self):
+        if getattr(self, "_account_screen_closed", True) is not False:
+            return False
         self._automatic_test_armed = False
         try:
             self._automatic_test_timer.stop()
         except Exception:
             pass
         if (
-            self._account_screen_closed
-            or self._automatic_test_started
+            self._automatic_test_started
             or self._automatic_test_open
             or self._automatic_test_open_attempts
             >= ACCOUNT_BATCH_OPEN_MAX_ATTEMPTS
@@ -5513,13 +5561,18 @@ class GTAccountsScreen(Screen):
         return True
 
     def _automatic_test_closed(self, payload=None):
-        if getattr(self, "_account_screen_closed", True):
+        if getattr(self, "_account_screen_closed", True) is not False:
             return
         self._automatic_test_open = False
         tested = self._automatic_test_accounts
         self._automatic_test_accounts = ()
         if not isinstance(payload, dict):
             self._refresh()
+            return
+        start_error = payload.get("start_error")
+        if start_error:
+            self._refresh()
+            fit_dynamic_text(self["message"], start_error, fallback_chars=88)
             return
         results = payload.get("results")
         if isinstance(results, dict):
@@ -5565,7 +5618,15 @@ class GTAccountsScreen(Screen):
         elif inactive_count or error_count:
             set_text_if_changed(self["message"], _account_test_review_summary(error_count, inactive_count))
 
+    def _close_accounts(self, *result):
+        if getattr(self, "_account_screen_closed", True) is not False:
+            return
+        self._stop_automatic_test_timer()
+        self.close(*result)
+
     def _stop_automatic_test_timer(self):
+        if getattr(self, "_account_screen_closed", True) is not False:
+            return
         self._account_screen_closed = True
         self._automatic_test_armed = False
         try:
@@ -5599,6 +5660,7 @@ class GTAccountsScreen(Screen):
                 _("Page"), current_page, page_count,
             ))
         if not count:
+            clear_selection(self)
             loading = bool(getattr(self, "_sources_loading", False))
             source_error = getattr(self.load_result, "error", "") or ""
             empty_text = _("Please wait") if loading else _(
@@ -5848,6 +5910,12 @@ class GTAccountsScreen(Screen):
             self.page_size,
             (round(1322*width/1920.), round(184*height/1080.), max(2,round(5*width/1920.)), round(780*height/1080.)) if modern else (round(1867*width/1920.), round(208*height/1080.), max(2,round(5*width/1920.)), round(706*height/1080.)),
         )
+        self._scroll_selected_source()
+
+    def _scroll_selected_source(self):
+        index = self.selected_index
+        primary, _secondary = _source_list_labels(self.accounts[index])
+        select_label(self, "row_{}".format(index % self.page_size), primary, key=index)
 
     def _select(self, index):
         if not self.accounts:
@@ -5861,6 +5929,7 @@ class GTAccountsScreen(Screen):
                 set_visible(self['account_focus_art_{}'.format(previous % self.page_size)], False)
                 set_visible(self['account_focus_art_{}'.format(self.selected_index % self.page_size)], True)
                 refresh_accounts(self, selection_only=True)
+                self._scroll_selected_source()
             set_text_if_changed(self["message"], "")
             return
         self._refresh()
@@ -6146,8 +6215,10 @@ class GTAccountsScreen(Screen):
         self._direct_connector.start()
 
     def _connection_returned(self, *args):
+        if getattr(self, "_account_screen_closed", True) is not False:
+            return
         if args and args[0] == PLAYLIST_FILES_CONNECTED:
-            self.close(PLAYLIST_FILES_CONNECTED)
+            self._close_accounts(PLAYLIST_FILES_CONNECTED)
             return
         self._refresh()
 
@@ -8101,7 +8172,7 @@ class GTServerHealthScreen(Screen):
         self._health_job = None
         self._health_signal = HEALTH_SIGNAL_NEUTRAL
         self._timer = eTimer()
-        _connect_timer(self._timer, self._poll_result)
+        self._timer_connection = _connect_timer(self._timer, self._poll_result)
 
         for widget_name in (
             "health_panel",
@@ -8615,7 +8686,7 @@ class GTDashboardScreen(DashboardPresentation, Screen):
         self._dashboard_child_open = False
         self._dashboard_closed = False
         self._clock_timer = eTimer()
-        _connect_timer(self._clock_timer, self._update_clock)
+        self._clock_timer_connection = _connect_timer(self._clock_timer, self._update_clock)
 
         status = getattr(health, "status", "") or "ONLINE"
         self._dashboard_status_text = clean_dynamic_text(_localized_runtime_text(status))
@@ -8725,6 +8796,7 @@ class GTDashboardScreen(DashboardPresentation, Screen):
     def _shutdown_dashboard(self):
         self._dashboard_closed = True
         self._stop_clock()
+        self._clock_timer_connection = None
         self._content_client = None
         self._archive_client = None
 
@@ -8990,21 +9062,24 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
         self._auto_login_attempted = False
         self._auto_login_connecting = False
         self._auto_login_timer = eTimer()
-        _connect_timer(self._auto_login_timer, self._begin_auto_login)
+        self._auto_login_timer_connection = _connect_timer(self._auto_login_timer, self._begin_auto_login)
         self._auto_login_spinner_timer = eTimer()
-        _connect_timer(self._auto_login_spinner_timer, self._animate_auto_login)
+        self._auto_login_spinner_connection = _connect_timer(
+            self._auto_login_spinner_timer,
+            self._animate_auto_login,
+        )
         self._account_preview_closed = False
         self._account_preview_generation = 0
         self._account_preview_job = None
         self._account_preview_mailbox = None
         self._account_preview_cache = {}
         self._account_preview_debounce_timer = eTimer()
-        _connect_timer(
+        self._account_preview_debounce_connection = _connect_timer(
             self._account_preview_debounce_timer,
             self._start_account_preview_check,
         )
         self._account_preview_poll_timer = eTimer()
-        _connect_timer(
+        self._account_preview_poll_connection = _connect_timer(
             self._account_preview_poll_timer,
             self._poll_account_preview_check,
         )
@@ -9162,6 +9237,8 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
     def _stop_auto_login(self):
         self._auto_login_timer.stop()
         self._auto_login_spinner_timer.stop()
+        self._auto_login_timer_connection = None
+        self._auto_login_spinner_connection = None
         self._auto_login_connecting = False
 
     def toggle_auto_login(self):
@@ -9255,6 +9332,10 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
                     label = "{}\n{}".format(label, endpoint)
                 set_text_if_changed(account_widget, label)
                 self._welcome_account_card = (card_key, label)
+            if not host or host == name:
+                select_label(self, "account_card", name, key=self.selected_account_index)
+            else:
+                clear_selection(self)
             automatic = bool(self._auto_login_source) and source_identity_key(account) == self._auto_login_source
             set_text_if_changed(self["account_status"], _("Automatic login: On") if automatic else _("Ready to connect"))
             cached = self._account_preview_cache.get(id(account))
@@ -9277,6 +9358,7 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
             set_text_if_changed(self["hint"], _("Source status is checked automatically when connecting."))
         else:
             self._welcome_account_card = None
+            clear_selection(self)
             set_text_if_changed(self["account_card"], _("No saved source found"))
             set_text_if_changed(self["account_status"], _("Create a new source from the ADD SOURCE panel."))
             self._set_account_preview_line(
@@ -9474,23 +9556,28 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
         if _source_type(account) == "m3u":
             self._show_unknown_account_preview()
             return
-        generation = self._account_preview_generation
-        job = _UIJobToken(WELCOME_ACCOUNT_QUERY_TIMEOUT_SECONDS)
-        self._account_preview_job = job
-        mailbox = {"lock": threading.Lock(), "ready": False, "result": None}
-        self._account_preview_mailbox = mailbox
-        worker = threading.Thread(
-            target=GTIPTVPlayerProScreen._run_account_preview_check,
-            args=(
-                account,
-                generation,
-                job,
-                self.account_checker,
-                mailbox,
-            ),
-        )
-        worker.daemon = True
-        worker.start()
+        try:
+            job = _UIJobToken(WELCOME_ACCOUNT_QUERY_TIMEOUT_SECONDS)
+            self._account_preview_job = job
+            mailbox = {"lock": threading.Lock(), "ready": False, "result": None}
+            self._account_preview_mailbox = mailbox
+            worker = threading.Thread(
+                target=GTIPTVPlayerProScreen._run_account_preview_check,
+                args=(
+                    account,
+                    self._account_preview_generation,
+                    job,
+                    self.account_checker,
+                    mailbox,
+                ),
+                daemon=True,
+            )
+            worker.start()
+        except (OSError, RuntimeError, MemoryError):
+            self._cancel_account_preview()
+            if id(account) not in self._account_preview_cache:
+                self._show_unknown_account_preview()
+            return
         self._account_preview_poll_timer.start(
             WELCOME_ACCOUNT_QUERY_POLL_MS,
             True,
@@ -9568,6 +9655,8 @@ class GTIPTVPlayerProScreen(WelcomePresentation, Screen):
     def _stop_account_preview(self):
         self._account_preview_closed = True
         self._cancel_account_preview()
+        self._account_preview_debounce_connection = None
+        self._account_preview_poll_connection = None
 
     def open_selected(self):
         if self.selected_action == 0:

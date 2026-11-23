@@ -6,6 +6,9 @@ from .paths import plugin_path
 from .utility_design import NativeSkin
 
 INK='#EDF2F8';MUTED='#AFC1D8';CYAN='#20D5ED'
+FAVORITE_COLUMNS = 4
+FAVORITE_ROWS = 3
+
 def art(name):return plugin_path('skin','images','seven-r100',name+'.png')
 def state_art(state):return plugin_path('skin','images','accounts-r99','status-'+state+'.png')
 def panel(s,name,box,right=False):s.pic(name,box,art('right-panel' if right else 'left-panel'),z=1)
@@ -119,25 +122,34 @@ def health(s):
 
 def media(s,favorites=False):
     if favorites:
-        panel(s,'r100_media_panel',(42,234,1284,700));panel(s,'r100_side_panel',(1338,140,548,794),True)
+        panel(s,'r100_media_panel',(42,234,1388,700))
+        panel(s,'r100_side_panel',(1444,140,442,794),True)
         for i in range(4):
-            x=42+i*322
-            s.pic('r100_tab_idle_'+str(i),(x,140,310,76),art('badge'),z=2)
-            s.pic('r100_tab_'+str(i),(x,140,310,76),art('tab-focus'),z=3)
-            s.label('favorite_filter_'+str(i),(x+8,143,294,68),32,align='center')
-        count=6
+            x=42+i*350
+            s.pic('r100_tab_idle_'+str(i),(x,140,338,76),art('badge'),z=2)
+            s.pic('r100_tab_'+str(i),(x,140,338,76),art('tab-focus'),z=3)
+            s.label('favorite_filter_'+str(i),(x+8,143,322,68),32,align='center')
+        count=FAVORITE_COLUMNS*FAVORITE_ROWS
     else:panel(s,'r100_side_panel',(1376,174,504,734),True);count=3
     for i in range(count):
-        x=54+(i%3)*430 if favorites else 44+i*444;y=250+(i//3)*320 if favorites else 174
-        cw,ch=(414,300) if favorites else (432,734)
+        if favorites:
+            row,column=divmod(i,FAVORITE_COLUMNS)
+            x,y=54+column*344,248+row*226
+            cw,ch=332,216
+        else:
+            x,y=44+i*444,174
+            cw,ch=432,734
         s.pic('continue_card_'+str(i),(x,y,cw,ch),art('favorite-card' if favorites else 'media-card'))
         s.pic('r100_media_focus_'+str(i),(x,y,cw,ch),art('favorite-focus' if favorites else 'media-focus'),z=7)
-        poster=(x+12,y+10,cw-24,220) if favorites else (x+16,y+16,cw-32,494)
+        poster=(x+10,y+8,cw-20,156) if favorites else (x+16,y+16,cw-32,494)
         s.label('continue_poster_placeholder_'+str(i),poster,28,MUTED,background='#020A14',z=3,align='center',lines=3)
         s.pic('continue_poster_'+str(i),poster,z=4)
-        badge(s,'r100_type_bg_'+str(i),(x+16,y+18,152,52))
-        s.label('continue_type_'+str(i),(x+20,y+20,144,48),25,CYAN,z=6,align='center')
-        s.label('continue_title_'+str(i),(x+18,y+238 if favorites else y+518,cw-36,56),31 if favorites else 38,lines=1)
+        if favorites:
+            s.label('continue_title_'+str(i),(x+14,y+166,cw-28,46),31)
+        else:
+            badge(s,'r100_type_bg_'+str(i),(x+16,y+18,152,52))
+            s.label('continue_type_'+str(i),(x+20,y+20,144,48),25,CYAN,z=6,align='center')
+            s.label('continue_title_'+str(i),(x+18,y+518,cw-36,56),38)
         if not favorites:
             s.label('continue_meta_'+str(i),(x+22,y+590,cw-44,44),30,MUTED)
             s.label('continue_progress_bg_'+str(i),(x+24,y+650,cw-48,18),background='#203B5D',z=4)
@@ -145,21 +157,25 @@ def media(s,favorites=False):
             s.label('r100_percent_'+str(i),(x+24,y+679,110,42),29)
             s.label('r100_remaining_'+str(i),(x+140,y+679,cw-164,42),29,align='right')
         else:
-            for edge,box in (('top',(x,y,cw,4)),('bottom',(x,y+ch-4,cw,4)),('left',(x,y,4,ch)),('right',(x+cw-4,y,4,ch))):
+            # Keep the outline within the card when SD coordinates round to pixels.
+            move_edges = (
+                ('top', (x+3, y+3, cw-6, 4)), ('bottom', (x+3, y+ch-7, cw-6, 4)),
+                ('left', (x+3, y+3, 4, ch-6)), ('right', (x+cw-7, y+3, 4, ch-6)),
+            )
+            for edge,box in move_edges:
                 s.label('continue_move_{}_{}'.format(i,edge),box,background='#FFD239',z=8)
-    rx=1372 if favorites else 1412;rw=480 if favorites else 432
-    s.label('r100_side_caption',(rx,158 if favorites else 194,rw,64),34,CYAN)
-    line(s,'r100_side_divider',rx,222 if favorites else 262,rw)
     if favorites:
-        s.label('r100_logo_placeholder',(1380,254,464,248),45,CYAN,background='#020A14',align='center')
-        s.pic('r100_side_logo',(1380,254,464,248),z=4)
-        s.label('r100_side_title',(1372,516,480,80),44,lines=2)
-        s.label('r100_side_info',(1372,610,480,60),32,CYAN)
-        line(s,'r100_side_line2',1372,672,480)
-        s.label('r100_side_label',(1372,700,480,44),29,MUTED)
-        s.label('r100_side_value',(1372,754,480,64),34,lines=2)
-        badge(s,'r100_open_hint_bg',(1372,842,480,68));s.label('r100_open_hint',(1372,848,480,56),32,align='center')
+        rx,rw=1474,382
+        s.label('r100_side_caption',(rx,156,rw,82),34,CYAN,lines=2)
+        line(s,'r100_side_divider',rx,239,rw)
+        s.label('r100_side_title',(rx,260,rw,132),44,lines=3)
+        s.label('r100_side_info',(rx,403,rw,68),32,CYAN,lines=2)
+        line(s,'r100_side_line2',rx,477,rw)
+        s.label('r100_side_label',(rx,494,rw,44),29,MUTED)
+        s.label('r100_side_value',(rx,541,rw,94),34,lines=2)
     else:
+        s.label('r100_side_caption',(1412,194,432,64),34,CYAN)
+        line(s,'r100_side_divider',1412,262,432)
         s.pic('r100_side_icon',(1540,326,160,160),art('play'))
         s.label('r100_side_title',(1412,500,432,94),42,lines=2)
         s.label('r100_side_info',(1412,606,432,60),32,MUTED,lines=2)
@@ -176,7 +192,7 @@ def restyle(markup,kind):
     s.label('r100_gt',(60,14,78,72),60,CYAN);s.label('r100_brand',(150,18,310,68),40)
     s.label('r100_header_divider',(470,26,2,52),background='#3F9CBD')
     s.label('r100_title',(506,16,1364,76),50)
-    if kind!='batch':s.label('subtitle',(506 if kind in ('mapping','favorites') else 64,86,1300,48),28,MUTED)
+    if kind not in ('batch','favorites'):s.label('subtitle',(506 if kind=='mapping' else 64,86,1300,48),28,MUTED)
     s.label('r100_counter',(1450,84 if kind!='favorites' else 18,430,48),28,MUTED,align='right')
     s.label('r100_web_hint',(1430,1010,410,44) if kind=='batch' else (1430,936,450,30),20,MUTED,align='right',z=50)
     s.pic('r100_footer_panel',(36,978,1848,88),art('strip'),z=29)

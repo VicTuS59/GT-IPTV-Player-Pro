@@ -4445,3 +4445,27 @@ msgstr "Pêşniyarkirî"
 
 msgid "Restore source name"
 msgstr "Navê orîjînal vegerîne"
+
+msgid "Could not start a thread for the account test."
+msgstr "Ji bo testa hesabê xebata paşperdeyê nehat destpêkirin."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "Daneyên pêşbîniya hewayê ji bo nîşandana li ser televîzyonê ji nû ve tên formatkirin."
+
+msgid "Not enough memory to start the account test."
+msgstr "Bîr ji bo destpêkirina testa hesabê têrê nake."
+
+msgid "Search Episodes on YouTube"
+msgstr "Li YouTubeê li beşan bigere"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "Daneyên televîzyonê ji TVmaze — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Ev berhem API-ya TMDB bi kar tîne, lê ji aliyê TMDB ve nayê piştgirîkirin an sertîfîkakirin."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "Bikarhêner navnîşanên çavkaniyên xwe yên mHub v2 zêde dikin. Weşan ji çavkaniya hilbijartî tên û GT IPTV Player Pro wan rasterast li ser wergirê dileyizîne."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "Daneyên hewayê ji Open-Meteo.com — CC BY 4.0"

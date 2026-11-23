@@ -33,7 +33,9 @@ from .category_visibility import category_visibility_ids
 from .content import ContentError
 from .diagnostics import log_event
 from .discovery import TMDbDiscoveryClient, DiscoverySearchClient
-from .i18n import N_, _, localized_upper, metadata_language, ngettext
+from .free_epg import country_name
+from .selected_row_scroll import clear_selection, select_label
+from .i18n import N_, _, device_country, localized_upper, metadata_language, ngettext
 from .main import _connect_timer, _scale
 from .metadata import MetadataError
 from .paths import plugin_path
@@ -43,6 +45,7 @@ from .remote_footer import footer_item, remote_action_text, web_shortcut_hint_te
 from .settings import load_player_settings
 from .source_loader import SourceLoader
 from .typography import ellipsize_dynamic_text, fit_dynamic_text, font_px
+from .youtube_series_catalog import COUNTRY_CODES
 
 
 MEDIA_TABS = (("movie", N_("Movies")), ("tv", N_("Series")))
@@ -50,6 +53,8 @@ FILTERS = (("popular", N_("Popular")), ("top", N_("Top Rated")),
            ("new", N_("New Releases")), ("genres", N_("Genres")))
 LOADING = N_("Loading data... Please wait.")
 KEY_REQUIRED = N_("TMDb API key is not configured")
+YOUTUBE_EPISODES = N_("Search Episodes on YouTube")
+YOUTUBE_MOVIE = N_("Search YouTube")
 HINTS = {"movie": N_("Choose a movie, then search in IPTV."),
          "tv": N_("Choose a series, then search in IPTV.")}
 SIMILAR = {"movie": N_("Similar Movies"), "tv": N_("Similar Series")}
@@ -95,6 +100,7 @@ class GTMovieDiscoveryScreen(Screen):
         self._started = False
         self._busy = False
         self._media_type = "movie"
+        self._country = device_country(COUNTRY_CODES)
         self._entries = []
         self._selected_index = 0
         self._page = self._pages = 1
@@ -181,6 +187,8 @@ class GTMovieDiscoveryScreen(Screen):
         self._render()
 
     def _layout_ready(self):
+        if getattr(self, "_closed", True):
+            return
         from .remote_footer import bind_layout_text
         bind_layout_text(self)
         # Hiding a component before its native instance exists is insufficient
@@ -210,6 +218,8 @@ class GTMovieDiscoveryScreen(Screen):
                              preferred_size=font_px(px, 23), min_size=px(13))
 
     def _shown(self):
+        if getattr(self, "_closed", True):
+            return
         self._refresh_chrome()
         self._child_open = False
         if not self._started:
@@ -460,8 +470,9 @@ class GTMovieDiscoveryScreen(Screen):
         self._render()
         ellipsize_dynamic_text(self["status"], _(LOADING), fallback_chars=100)
         mode, section, genre_id, similar_id = self._media_type, self._section, self._genre_id, self._similar_id
-        client = self._client
-        self._submit("list", lambda token: client.titles(mode, section, page, genre_id, similar_id, force),
+        client, country = self._client, self._country
+        self._submit("list", lambda token: client.titles(mode, section, page, genre_id, similar_id, force,
+                                                        country=country),
                      self._loaded)
 
     def _loaded(self, result):
@@ -501,7 +512,9 @@ class GTMovieDiscoveryScreen(Screen):
             set_visible(self["tab_focus_{}".format(index)], focused)
         section = dict(filters).get(self._section, SIMILAR[self._media_type])
         suffix = self._genre_name if self._section == "genres" else self._similar_title if self._section == "similar" else ""
-        ellipsize_dynamic_text(self["section"], localized_upper(_(section)) + ("  •  " + suffix if suffix else ""), fallback_chars=65)
+        country = country_name(self._country) if self._country else ""
+        caption = "  •  ".join(filter(None, (localized_upper(_(section)), country, suffix)))
+        ellipsize_dynamic_text(self["section"], caption, fallback_chars=65)
         set_text_if_changed(self["counter"], "{}/{}  ·  {}/{}".format(self._page, self._pages,
                                   self._selected_index + 1 if self._entries else 0, len(self._entries)))
         start = self._selected_index // 6 * 6
@@ -529,6 +542,12 @@ class GTMovieDiscoveryScreen(Screen):
             self._visible_ids = identities
             if visible and not self._busy:
                 self._load_posters(visible)
+        selected = self._selected_index - start
+        if 0 <= selected < len(visible) and not self._tabs_focused and not self._busy:
+            title = visible[selected]
+            select_label(self, 'name_{}'.format(selected), title['title'], key=self._identity(title))
+        else:
+            clear_selection(self)
 
     def _hide_art(self, name):
         loader = getattr(self, "_gt_pixmap_loaders", {}).pop(name, None)
@@ -815,6 +834,9 @@ class GTMovieDiscoveryScreen(Screen):
         if mode == self._media_type:
             self.focus_tabs(False)
             return
+        self._reset_catalogue(mode)
+
+    def _reset_catalogue(self, mode):
         self._cancel_playback()
         for channel in tuple(self._jobs):
             self._cancel(channel)
@@ -994,9 +1016,12 @@ class GTMovieDiscoveryScreen(Screen):
                 set_text_if_changed(self["status"], _("The trailer could not be played."))
 
     def _cancel_playback(self):
-        if self._play_token:
-            self._youtube.cancel_play(self._play_token)
-            self._play_token = ""
+        token, self._play_token = self._play_token, ""
+        if token:
+            try:
+                self._youtube.cancel_play(token)
+            except (AttributeError, RuntimeError, OSError, TypeError, ValueError) as error:
+                log_event("discovery", "Could not cancel YouTube playback", error)
 
     def _trailer_closed(self, *unused):
         if not getattr(self, "_closed", True):
@@ -1004,20 +1029,69 @@ class GTMovieDiscoveryScreen(Screen):
             self._busy = False
             self._hint()
 
+    def choose_country(self):
+        if getattr(self, "_closed", True) or self._child_open:
+            return
+        countries = sorted(((country_name(code), code) for code in COUNTRY_CODES),
+                           key=lambda item: item[0].casefold())
+        automatic = device_country(COUNTRY_CODES)
+        caption = _("Automatic") + ("  ·  " + country_name(automatic) if automatic else "")
+        self._open_child(self._country_chosen, ChoiceBox, _("Select a country"),
+                         [(caption, "auto"), (_("All"), "")] + countries)
+
+    def _country_chosen(self, choice=None):
+        if getattr(self, "_closed", True) or not isinstance(choice, (tuple, list)) or len(choice) < 2:
+            return
+        code = choice[1]
+        if code == "auto":
+            code = device_country(COUNTRY_CODES)
+        if isinstance(code, str) and code != self._country and (not code or code in COUNTRY_CODES):
+            self._country = code
+            self._reset_catalogue(self._media_type)
+
+    def open_youtube_results(self):
+        if getattr(self, "_closed", True) or self._busy or self._child_open or self._client is None:
+            return
+        title = self._selected()
+        if not title:
+            return
+        try:
+            from .web_remote import WEB_REMOTE
+            from .web_youtube import WEB_YOUTUBE
+            from .youtube_series_ui import GTYouTubeSeriesScreen
+
+            if WEB_REMOTE.session is not self.session:
+                WEB_REMOTE.bind_session(self.session)
+        except (ImportError, AttributeError, RuntimeError, OSError, TypeError, ValueError) as error:
+            log_event("discovery", "Could not attach YouTube playback", error)
+            set_text_if_changed(self["status"], _("Temporarily unavailable"))
+            return
+        self._open_child(None, GTYouTubeSeriesScreen, WEB_YOUTUBE, title, self._client, self._country)
+
     def open_menu(self):
+        if getattr(self, "_closed", True) or self._child_open:
+            return
         mode, label = MEDIA_TABS[0 if self._media_type == "tv" else 1]
-        self._open_child(self._menu_chosen, ChoiceBox, _("Discover"),
-                         [(_(label), mode), (_("Refresh"), "refresh"), (_("Genres"), "genres"),
-                          (_("Trailer"), "trailer"), (_("Settings"), "settings"), (_("Back"), "back")])
+        choices = [(_(label), mode), (_("Select a country"), "country"),
+                   (_("Refresh"), "refresh"), (_("Genres"), "genres"), (_("Trailer"), "trailer")]
+        if not self._busy and self._selected():
+            message = YOUTUBE_EPISODES if self._media_type == "tv" else YOUTUBE_MOVIE
+            choices.append((_(message), "youtube_results"))
+        choices.extend([(_("Settings"), "settings"), (_("Back"), "back")])
+        self._open_child(self._menu_chosen, ChoiceBox, _("Discover"), choices)
 
     def _menu_chosen(self, choice=None):
-        if not choice:
+        if getattr(self, "_closed", True) or not isinstance(choice, (tuple, list)) or len(choice) < 2:
             return
         action = choice[1]
         if action in ("movie", "tv") and self._client is not None:
             self._change_media(action)
         elif action == "settings":
             self.open_settings()
+        elif action == "country":
+            self.choose_country()
+        elif action == "youtube_results":
+            self.open_youtube_results()
         elif action == "refresh":
             self._cancel_playback()
             for channel in tuple(self._jobs):

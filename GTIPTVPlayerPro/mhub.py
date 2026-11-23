@@ -6,6 +6,7 @@
 import hashlib
 import json
 import math
+import re
 import threading
 import time
 from collections import OrderedDict, deque
@@ -16,13 +17,16 @@ from fnmatch import fnmatchcase
 from urllib.parse import quote, urlencode, urljoin, urlsplit, urlunsplit
 
 from . import PLUGIN_VERSION
+from .category_visibility import category_ids_visible, hidden_category_match_ids
 from .content import (
+    LIVE_SEARCH_RESULT_LIMIT,
     ContentCategory,
     ContentError,
     ContentItem,
     EPGEvent,
     _bounded_provider_integer,
     _validate_provider_json_depth,
+    channel_name_matcher,
 )
 from .i18n import N_, _, device_language
 from .network_security import (
@@ -37,7 +41,7 @@ MANIFEST_FILE = "mhub-addon.json"
 DEFAULT_TIMEOUT = 12
 MAX_JSON_BYTES = 4 * 1024 * 1024
 MAX_PROVIDER_ENTRIES = 8
-MAX_CATEGORIES = 128
+MAX_CATEGORIES = 500
 MAX_ITEMS_PER_PAGE = 8192
 MAX_CATALOG_ITEMS = 20000
 MAX_CATALOG_PAGES = 128
@@ -113,11 +117,24 @@ def _response_error():
     return ContentError(N_("Server returned an invalid content response"), ContentError.INVALID_RESPONSE)
 
 
-def _unsupported_stream(value):
-    return (
-        value.get("headers") not in (None, {}) or bool(value.get("drm"))
-        or bool(value.get("licenseUrl") or value.get("licenseServer"))
-    )
+def _playback_header_suffix(value):
+    """Return native playback options, or None for an unsupported stream."""
+    if value.get("drm") or value.get("licenseUrl") or value.get("licenseServer"):
+        return None
+    headers = value.get("headers")
+    if headers in (None, {}):
+        return ""
+    if not isinstance(headers, dict) or len(headers) != 1:
+        return None
+    name, user_agent = next(iter(headers.items()))
+    if not isinstance(name, str) or name.lower() != "user-agent":
+        return None
+    # ServiceMP3 reads the fragment literally. ServiceApp may decode it first.
+    if not isinstance(user_agent, str) or not re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9 ._()/;,:-]{0,511}", user_agent,
+    ):
+        return None
+    return "#User-Agent=" + user_agent.rstrip()
 
 
 @dataclass(frozen=True)
@@ -162,7 +179,7 @@ class _Page:
 class MHubContentClient:
     source_type = "mhub"
     source_label = "mHub"
-    capabilities = frozenset(("live", "epg"))
+    capabilities = frozenset(("live", "epg", "search"))
     async_playback_resolution = True
 
     def __init__(self, account, timeout=DEFAULT_TIMEOUT, fetcher=None, resolver=None):
@@ -423,7 +440,7 @@ class MHubContentClient:
             return next(iter(self._categories.values()), None)
         return self._categories.get(str(category_id))
 
-    def _fetch_next_page(self, category, page):
+    def _fetch_next_page(self, category, page, *, keep_first_page=False):
         first_page = self._first_pages.get(category.key) if page.page_count == 0 else None
         payload, size = first_page or self._fetch_page(category, page.next_cursor)
         if page.bytes_loaded + size > MAX_CATALOG_BYTES:
@@ -448,10 +465,9 @@ class MHubContentClient:
                 break
         cursor = _identifier(payload.get("nextCursor"), 512)
         self._check_scope()
-        # This method runs under the pagination lock. Only the small cursor
-        # and completion snapshot are also read by the player UI thread.
         with self._state_lock:
-            self._first_pages.pop(category.key, None)
+            if not keep_first_page:
+                self._first_pages.pop(category.key, None)
             page.seen_ids.update(incoming_ids)
             page.pending.extend(incoming)
             page.page_count += 1
@@ -517,6 +533,47 @@ class MHubContentClient:
                 page = self._pages.get(category.key) if category else None
                 return self._fill_page(category, page, MORE_ITEMS) if page is not None else []
 
+    def search_live_channels(self, query, category_id="", hidden_category_ids=None):
+        """Find matching channels throughout the selected live catalogue."""
+        matches = channel_name_matcher(query)
+        if matches is None:
+            return []
+        hidden = hidden_category_match_ids((), hidden_category_ids)
+        with self.request_scope():
+            category = self._get_category(category_id)
+            if category is None or not category_ids_visible((category.key,), hidden, category.key):
+                return []
+
+            # Search from the latest complete snapshot of the browsing pages.
+            # Keep the original cursor and pending rows available to the list.
+            with self._state_lock:
+                cached = self._pages.get(category.key)
+                page = _Page()
+                if cached is not None:
+                    page.pending.extend(item._mhub_item for item in cached.values)
+                    page.pending.extend(cached.pending)
+                    page.seen_ids = cached.seen_ids.copy()
+                    page.seen_cursors = cached.seen_cursors.copy()
+                    page.next_cursor = cached.next_cursor
+                    page.page_count = cached.page_count
+                    page.bytes_loaded = cached.bytes_loaded
+                    page.end = cached.end
+
+            results = []
+            while True:
+                self._check_scope()
+                for index, raw in enumerate(page.pending):
+                    if index % 64 == 0:
+                        self._check_scope()
+                    if matches(_text(raw.get("name"))):
+                        results.append(self._item(category, raw))
+                        if len(results) == LIVE_SEARCH_RESULT_LIMIT:
+                            return results
+                if page.end:
+                    return results
+                page.pending.clear()
+                self._fetch_next_page(category, page, keep_first_page=True)
+
     def has_more_items(self, content_type, category_id=""):
         self._verify_type(content_type)
         categories = self._categories
@@ -563,9 +620,8 @@ class MHubContentClient:
             value = candidate.get("url")
             if not isinstance(value, str) or candidate.get("kind", "stream") != "stream":
                 continue
-            if _unsupported_stream(candidate):
-                # The native Enigma2 engine owns its HTTP requests and may
-                # redirect them. It cannot promise origin-scoped auth headers.
+            suffix = _playback_header_suffix(candidate)
+            if suffix is None:
                 continue
             if value in seen:
                 continue
@@ -575,11 +631,12 @@ class MHubContentClient:
                 resolvers = [provider for provider in providers if "resolve" in provider.resources
                              and any(fnmatchcase(source_url, pattern) for pattern in provider.patterns)]
                 if not resolvers:
-                    return source_url
+                    return source_url + suffix
                 for provider in resolvers:
                     resolved = self._get_optional(provider, "resolve", {"url": source_url})
-                    if resolved.get("url") and not _unsupported_stream(resolved):
-                        return self._playable_url(resolved["url"])
+                    resolved_suffix = _playback_header_suffix(resolved)
+                    if resolved.get("url") and resolved_suffix is not None:
+                        return self._playable_url(resolved["url"]) + resolved_suffix
             except ContentError as error:
                 if error.reason != ContentError.PLAYBACK_URL:
                     raise

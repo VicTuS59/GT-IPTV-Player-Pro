@@ -16,6 +16,7 @@ from collections import OrderedDict
 from copy import copy
 from urllib.parse import urlsplit
 from .action_map import ActionMap
+from .selected_row_scroll import clear_selection
 from Components.Label import Label
 from Components.Pixmap import Pixmap
 from Screens.Screen import Screen
@@ -41,6 +42,7 @@ from .paths import plugin_path
 from .portal_identity import safe_composite_id
 from .remote_footer import decorate_remote_footer, prepared_skin, footer_item, install_remote_footer
 from .scrollbar import hide_scrollbar, update_scrollbar
+from .source_loader import connect_timer as _connect_timer
 from .typography import _grapheme_boundaries, _text_units, ellipsize_dynamic_text, visible_count
 from .download_guard import protect_client as _protect_download_client
 
@@ -548,7 +550,7 @@ class _FavoriteSupport(_DownloadSupport):
     def _arm_favorite_keys(self):
         if self._favorite_keys_timer is None:
             self._favorite_keys_timer = eTimer()
-            _connect_timer(self._favorite_keys_timer, self._poll_favorite_keys)
+            self._favorite_keys_connection = _connect_timer(self._favorite_keys_timer, self._poll_favorite_keys)
         if not self._favorite_load_deadline:
             self._favorite_load_deadline = time.monotonic() + 10.0
         self._hook_favorite_close()
@@ -869,7 +871,7 @@ class GTAsyncListScreen(Screen):
         self._load_token = None
         self._load_result_lock = threading.Lock()
         self._timer = eTimer()
-        _connect_timer(self._timer, self._poll_result)
+        self._load_timer_connection = _connect_timer(self._timer, self._poll_result)
         self['top_accent'] = Label('')
         self['header'] = Label(_(title))
         self['screen_label'] = Label(_('CONTENT BROWSER'))
@@ -970,6 +972,7 @@ class GTAsyncListScreen(Screen):
     def start_load(self):
         if self._loading or self._closed:
             return
+        clear_selection(self)
         with self._load_result_lock:
             _cancel_worker_token(self._load_token)
             self._load_generation += 1
@@ -1116,6 +1119,8 @@ class GTAsyncListScreen(Screen):
             self._timer.stop()
         except Exception:
             pass
+        finally:
+            self._load_timer_connection = None
 _ARCHIVE_RETRY_PENDING = object()
 _ARCHIVE_PTS_MODULO = 1 << 33
 _ARCHIVE_PTS_MASK = _ARCHIVE_PTS_MODULO - 1
@@ -1144,13 +1149,6 @@ def _disable_live_window_animation(screen):
             setter(0)
         except Exception:
             pass
-
-def _connect_timer(timer, callback):
-    try:
-        timer.timeout.connect(callback)
-    except AttributeError:
-        timer.callback.append(callback)
-
 
 def _start_browser_worker(target, args):
     try:

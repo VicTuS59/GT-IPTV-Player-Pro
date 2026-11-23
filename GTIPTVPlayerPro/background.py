@@ -11,7 +11,7 @@ import weakref
 
 from .artwork_cache import ArtworkCacheBusy, PICON_CACHE
 from .alpha_artwork import prepare_alpha, prepared_destination, source_identity
-from .source_loader import SourceLoader
+from .source_loader import SourceLoader, connect_timer
 from .artwork_file import decode_identity
 from .graphics_policy import cache_budget, wallpaper_size, wallpaper_path, window_path
 
@@ -91,12 +91,7 @@ def _retire_native_decoder(picload, connection):
         return
     if _DECODE_RETIRE_TIMER is None:
         _DECODE_RETIRE_TIMER = eTimer()
-        signal = getattr(_DECODE_RETIRE_TIMER, "timeout", None)
-        connect = getattr(signal, "connect", None)
-        if callable(connect):
-            _DECODE_RETIRE_CONNECTION = connect(_release_native_decoders)
-        else:
-            _DECODE_RETIRE_TIMER.callback.append(_release_native_decoders)
+        _DECODE_RETIRE_CONNECTION = connect_timer(_DECODE_RETIRE_TIMER, _release_native_decoders)
     _DECODE_RETIRE_TIMER.start(0, True)
 
 _SCREEN_ART_FAMILIES = {
@@ -202,12 +197,7 @@ def _arm_cache_maintenance():
         return
     if _CACHE_MAINTENANCE_TIMER is None:
         _CACHE_MAINTENANCE_TIMER = eTimer()
-        signal = getattr(_CACHE_MAINTENANCE_TIMER, 'timeout', None)
-        connect = getattr(signal, 'connect', None)
-        if callable(connect):
-            _CACHE_MAINTENANCE_CONNECTION = connect(_cache_maintenance)
-        else:
-            _CACHE_MAINTENANCE_TIMER.callback.append(_cache_maintenance)
+        _CACHE_MAINTENANCE_CONNECTION = connect_timer(_CACHE_MAINTENANCE_TIMER, _cache_maintenance)
         _CACHE_MAINTENANCE_TIMER.start(5000, True)
     elif not _CACHE_MAINTENANCE_TIMER.isActive():
         _CACHE_MAINTENANCE_TIMER.start(5000, True)
@@ -676,15 +666,7 @@ class _AlphaPreparationQueue(object):
     def __init__(self):
         self.jobs = OrderedDict()
         self.active = None
-        self.connection = None
-        self.reader = SourceLoader(eTimer(), self._connect, self._loaded)
-
-    def _connect(self, timer, callback):
-        connect = getattr(getattr(timer, 'timeout', None), 'connect', None)
-        if callable(connect):
-            self.connection = connect(callback)
-        else:
-            timer.callback.append(callback)
+        self.reader = SourceLoader(eTimer(), connect_timer, self._loaded)
 
     def request(self, owner):
         key = owner._cache_key
@@ -947,13 +929,7 @@ class _PageBackgroundTransition(object):
             if was_shown:
                 self.previous = weakref.ref(previous)
         self.timer = eTimer()
-        signal = getattr(self.timer, "timeout", None)
-        connect = getattr(signal, "connect", None)
-        if callable(connect):
-            self.connection = connect(self._timeout)
-        else:
-            self.connection = None
-            self.timer.callback.append(self._timeout)
+        self.connection = connect_timer(self.timer, self._timeout)
         screen.show = self.show
         screen.hide = self.hide
         # This must precede loader.close(): cancellation notifies its listener.
@@ -1030,12 +1006,7 @@ class _PageBackgroundTransition(object):
             return
         if self.handoff_timer is None:
             self.handoff_timer = eTimer()
-            signal = getattr(self.handoff_timer, "timeout", None)
-            connect = getattr(signal, "connect", None)
-            if callable(connect):
-                self.handoff_connection = connect(self._finish_handoff)
-            else:
-                self.handoff_timer.callback.append(self._finish_handoff)
+            self.handoff_connection = connect_timer(self.handoff_timer, self._finish_handoff)
         try:
             self.screen.instance.show()
             self.handoff_pending = True

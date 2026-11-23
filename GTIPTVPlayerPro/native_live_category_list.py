@@ -12,6 +12,7 @@ from skin import parseColor
 from .broadcast_layout import (CATEGORY_ICON_BOX, CATEGORY_LIST_BOX, CATEGORY_PAGE_SIZE,
                                CATEGORY_PANEL_BOX, CATEGORY_ROW_ART_BOX, CATEGORY_ROW_HEIGHT, INK, MUTED, art)
 from .i18n import localized_upper
+from .selected_row_scroll import clear_selection, native_list_row, redraw_native_row, select_native
 from .typography import fit_dynamic_text
 from .utility_design import CANVAS, NativeSkin
 
@@ -81,6 +82,7 @@ class NativeLiveCategoryList(MenuList):
         super().__init__([], enableWrapAround=True, content=enigma.eListboxPythonMultiContent)
         rect = NativeSkin('GTContentBrowserScreen', width, height, None).rect
         row_height = rect((0, 0, 1, CATEGORY_ROW_HEIGHT))[3]
+        self._row_height = row_height
         self.l.setItemHeight(row_height)
         self._origin = rect(CATEGORY_LIST_BOX)[:2]
         x, y, w, h = rect(CATEGORY_ICON_BOX)
@@ -101,9 +103,11 @@ class NativeLiveCategoryList(MenuList):
         self._number_color = parseColor(MUTED).argb()
         self._name_color = parseColor(INK).argb()
         self._font_indices = {}
+        self._fonts = []
         self._entries = None
         self._style = None
         self._painted_selection = -1
+        self._hidden_title = None
 
     @property
     def has_opaque_rows(self):
@@ -123,6 +127,7 @@ class NativeLiveCategoryList(MenuList):
             index = len(self._font_indices)
             self.l.setFont(index, enigma.gFont(family, size))
             self._font_indices[font] = index
+            self._fonts.append(font)
         position = label.instance.position()
         dimensions = label.instance.size()
         flags = enigma.RT_HALIGN_LEFT | enigma.RT_VALIGN_CENTER | getattr(enigma, 'RT_BLEND', 0)
@@ -147,14 +152,17 @@ class NativeLiveCategoryList(MenuList):
 
     def sync(self, screen, entries, selected, page_start):
         if self.instance is None:
+            clear_selection(screen)
             return
         number = screen['r101_category_measure_number']
         name = screen['r101_category_measure_name']
         if number.instance is None or name.instance is None:
+            clear_selection(screen)
             return
         fonts = screen._r101_category_fonts
         style = (id(self.instance), id(number.instance), id(name.instance), fonts[30], fonts[33])
         if entries is not self._entries or style != self._style:
+            clear_selection(screen)
             minimum = max(9, screen._seven_px(20))
             if self._tiles is not None:
                 self.instance.setTransparent(False)
@@ -169,5 +177,37 @@ class NativeLiveCategoryList(MenuList):
         if selected >= 0:
             if self.getSelectedIndex() != selected:
                 self.moveToIndex(selected)
-            if hasattr(self.instance, 'getTopIndex') and self.instance.getTopIndex() != page_start:
-                self.instance.setTopIndex(page_start)
+            get_top = getattr(self.instance, 'getTopIndex', None)
+            set_top = getattr(self.instance, 'setTopIndex', None)
+            if callable(get_top) and callable(set_top) and get_top() != page_start:
+                set_top(page_start)
+            self._scroll_category(screen, entries[selected], selected)
+        else:
+            clear_selection(screen)
+
+    def _scroll_category(self, screen, item, index):
+        rows = self.list
+        if not 0 <= index < len(rows):
+            clear_selection(screen)
+            return
+        row = rows[index]
+        # The title is the last MultiContentEntryText; its font is the one
+        # chosen by the original fit logic for this particular category.
+        hidden_title = self._hidden_title
+        entry = hidden_title[1] if hidden_title is not None and hidden_title[0] is row else row[-1]
+        box = entry[1:5]
+        rectangle = native_list_row(self, index, box, self._row_height)
+        if rectangle is None:
+            clear_selection(screen)
+            return
+        empty = (*entry[:7], '', *entry[8:])
+        instance = self.instance
+
+        def paint(hidden):
+            self._hidden_title = (row, entry) if hidden else None
+            row[-1] = empty if hidden else entry
+            if self.instance is instance and self.list is rows:
+                redraw_native_row(self, index)
+
+        select_native(screen, self, rectangle, item.name, self._fonts[entry[5]], self._name_color,
+                      key=(id(self), id(rows), index), paint=paint)

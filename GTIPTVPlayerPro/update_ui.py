@@ -11,7 +11,7 @@ from Screens.MessageBox import MessageBox
 from enigma import eTimer,getDesktop
 from . import PLUGIN_VERSION
 from .i18n import _
-from .source_loader import SourceLoader
+from .source_loader import SourceLoader, connect_timer as connect
 from .utility_design import NativeSkin,bind_missing
 from .auxiliary_layout import shell,panel,shared
 from .auxiliary_presentation import _footer_skin,_footer,text
@@ -36,10 +36,6 @@ FOOTER=tuple(footer_item(key,action) for key,action in (
  ('blue',LABELS['install']),('menu','Menu'),('exit','back')))
 
 def message(key):return _(LABELS[key])
-
-def connect(timer,callback):
-    try:timer.callback.append(callback)
-    except AttributeError:return timer.timeout.connect(callback)
 
 def update_skin():
     desktop=getDesktop(0).size();w,h=desktop.width(),desktop.height();px=lambda n:max(1,round(n*min(w/1920.,h/1080.)))
@@ -79,7 +75,7 @@ class GTSoftwareUpdateScreen(Screen):
         w,h=skin_metadata(self.skin).size;self._seven_size=(w,h)
         self._seven_px=lambda n:max(1,round(n*min(w/1920.,h/1080.)));self._seven_rects={};self._seven_items=FOOTER
         install_remote_footer(self,FOOTER);bind_missing(self);self.skin=_footer_skin(self,FOOTER)
-        self._reader=SourceLoader(eTimer(),self._connect_timer,self._applied)
+        self._reader=SourceLoader(eTimer(),connect,self._applied)
         self._progress_timer=eTimer();self._connect_timer(self._progress_timer,self._poll_progress)
         self._restart_timer=eTimer();self._connect_timer(self._restart_timer,self._restart_ready)
         self._error_timer=eTimer();self._connect_timer(self._error_timer,self._show_error)
@@ -285,6 +281,7 @@ class GTSoftwareUpdateScreen(Screen):
         self.close()
     def _stop(self):
         self._closed=True;self._cancel_event.set();self._reader.close();self._progress_timer.stop();self._restart_timer.stop();self._error_timer.stop()
+        self._timer_connections.clear()
         self._error_pending=''
         self._restart_pending=False
         with self._activity_lock:
@@ -343,7 +340,7 @@ class UpdateMonitor:
         self._timer_connections=[]
         self.timer=eTimer();self._connect_timer(self.timer,self._check)
         self.notice_timer=eTimer();self._connect_timer(self.notice_timer,self._notify)
-        self.reader=SourceLoader(eTimer(),self._connect_timer,self._applied)
+        self.reader=SourceLoader(eTimer(),connect,self._applied)
 
     def _connect_timer(self,timer,callback):
         connection=connect(timer,callback)
@@ -417,6 +414,7 @@ class UpdateMonitor:
         if self.open_requested is notice:self.open_requested=None
         if not self.notices:
             self.closed=True;self.cancel.set();self.timer.stop();self.notice_timer.stop();self.reader.close()
+            self._timer_connections.clear()
             self.offer=None
             if getattr(self.session,'_gtiptv_update_monitor',None) is self:
                 self.session._gtiptv_update_monitor=None

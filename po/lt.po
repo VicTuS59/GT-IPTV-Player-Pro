@@ -4457,3 +4457,27 @@ msgstr "Rekomenduojama"
 
 msgid "Restore source name"
 msgstr "Atkurti pradinį pavadinimą"
+
+msgid "Could not start a thread for the account test."
+msgstr "Nepavyko paleisti paskyros tikrinimo gijos."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "Prognozių duomenų formatas pritaikytas rodyti per televizorių."
+
+msgid "Not enough memory to start the account test."
+msgstr "Nepakanka atminties paskyrai pradėti tikrinti."
+
+msgid "Search Episodes on YouTube"
+msgstr "Ieškoti serijų „YouTube“"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "Televizijos duomenys iš TVmaze — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Šis produktas naudoja TMDB API, tačiau TMDB jo nepatvirtino ir nesertifikavo."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "Naudotojai prideda savo mHub v2 šaltinių adresus. Pasirinktas šaltinis teikia srautus, o GT IPTV Player Pro juos atkuria tiesiogiai imtuve."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "Orų duomenys iš Open-Meteo.com — CC BY 4.0"

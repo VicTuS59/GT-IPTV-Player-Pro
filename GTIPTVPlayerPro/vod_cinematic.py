@@ -14,6 +14,7 @@ from .browser_common import _WorkerToken, _cancel_worker_token, _connect_timer, 
 from .i18n import _, localized_upper
 from .remote_footer import bind_layout_text, prepared_skin
 from .scrollbar import update_horizontal_scrollbar
+from .selected_row_scroll import clear_selection, select_label
 from .series_trailer_ui import add_hint_skin
 from .source_loader import SourceLoader
 from .typography import clean_dynamic_text, ellipsize_dynamic_text, fit_dynamic_text, set_text_if_changed
@@ -66,7 +67,7 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
         self._rail_request = None
         self._rail_loader = SourceLoader(eTimer(), _connect_timer, self._rail_ready)
         self._rail_timer = eTimer()
-        _connect_timer(self._rail_timer, self._rail_start)
+        self._rail_timer_connection = _connect_timer(self._rail_timer, self._rail_start)
         self._setup_vod_runtime()
         ensure_keys()
         self['cinematic_actions'] = ActionMap(['GTIPTVCinematicActions'], {
@@ -86,11 +87,15 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
     _setup_series_widgets = _setup_cinematic_widgets
 
     def _light_layout_ready(self):
+        if getattr(self, '_closed', True) is not False:
+            return
         bind_layout_text(self)
         self._discovery_navigation_signature = None
         self._light_render_rows()
 
     def _light_shown(self):
+        if getattr(self, '_closed', True) is not False:
+            return
         LightVODMethods._light_shown(self)
         self._light_render_categories()
         self._rail_schedule()
@@ -101,7 +106,10 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
 
     def _light_close(self):
         LightVODMethods._light_close(self)
-        self._rail_loader.close()
+        self._rail_timer_connection = None
+        loader = getattr(self, '_rail_loader', None)
+        if loader is not None:
+            loader.close()
 
     def _rail_move(self, direction, repeated=False):
         if self._light_content_focus() and self._rail_page:
@@ -120,6 +128,38 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
             self._refresh_discovery_categories()
         else:
             self._render_discovery_navigation()
+
+    def _render_discovery_navigation(self):
+        if getattr(self, '_closed', True) is not False:
+            return
+        super()._render_discovery_navigation()
+        if not self._vod_discovery_layout or self._loading or self._error:
+            clear_selection(self)
+            return
+        if self._discovery_drawer_open:
+            index = self._discovery_category_cursor
+            if 0 <= index < len(self._entries):
+                entry = self._entries[index]
+                slot = index % self.page_size
+                select_label(self, '{}_category_{}'.format(self.content_type, slot), entry.name,
+                             key=str(entry.category_id))
+                return
+        elif self._discovery_tabs_focused:
+            slot = self._discovery_tab_cursor
+            indices = self._discovery_tab_indices
+            if 0 <= slot < len(indices) and 0 <= indices[slot] < len(self._entries):
+                entry = self._entries[indices[slot]]
+                select_label(self, 'vod_tab_{}'.format(slot), entry.name, key=str(entry.category_id))
+                return
+        elif self._light_content_focus() and not self._light_field('loading', False) and not self._light_field('error', ''):
+            index = self._light_field('selected_index', 0)
+            entries = self._light_field('entries', ())
+            if 0 <= index < len(entries):
+                entry = entries[index]
+                select_label(self, '{}_tile_title_{}'.format(self.content_type, index % POSTERS), entry.name,
+                             key=str(entry.stream_id))
+                return
+        clear_selection(self)
 
     def _light_render_rows(self):
         kind = self.content_type
@@ -189,6 +229,8 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
                 set_text_if_changed(self['movie_genre'], '')
 
     def _light_schedule_detail(self, immediate=False):
+        if getattr(self, '_closed', True) is not False:
+            return
         first_title = (self._light_visible and self._light_visual_identity is None
                        and not self._light_navigation_held)
         LightVODMethods._light_schedule_detail(self, immediate=immediate or first_title)
@@ -201,6 +243,8 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
                              min_size=self._light_geometry['font'](21), fallback_chars=125)
 
     def _light_apply_detail(self, info, *args, **kwargs):
+        if getattr(self, '_closed', True) is not False:
+            return
         LightVODMethods._light_apply_detail(self, info, *args, **kwargs)
         if not self._light_field('entries', ()):
             return
@@ -216,16 +260,21 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
         return self._light_field('selected_index', 0) % POSTERS
 
     def _rail_cancel(self):
-        self._rail_timer.stop()
-        if self._rail_request is not None:
-            slot, token = self._rail_request
+        timer = getattr(self, '_rail_timer', None)
+        if timer is not None:
+            timer.stop()
+        request = getattr(self, '_rail_request', None)
+        if request is not None:
+            slot, token = request
             self._rail_request = None
             self._rail_attempted.discard(slot)
             _cancel_worker_token(token)
-            self._rail_loader.cancel()
+            loader = getattr(self, '_rail_loader', None)
+            if loader is not None:
+                loader.cancel()
 
     def _rail_next_slot(self):
-        if (self._closed or not self._light_visible or self._light_field('loading', False)
+        if (getattr(self, '_closed', True) is not False or not self._light_visible or self._light_field('loading', False)
                 or self._light_navigation_held or self._rail_request is not None
                 or self._light_detail_identity is None
                 or self._light_detail_identity[-1] != self._light_field('generation')):
@@ -257,10 +306,11 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
         token = _WorkerToken(5)
         self._rail_attempted.add(slot)
         self._rail_request = slot, token
+        client, metadata_client, width = self.client, self._metadata_client, self._poster_image_width
 
         def load():
-            found = load_poster(self.client, self._metadata_client, kind, item, None,
-                                poster_urls(item, None), token, width=self._poster_image_width, priority=False)
+            found = load_poster(client, metadata_client, kind, item, None,
+                                poster_urls(item, None), token, width=width, priority=False)
             return key, slot, found
 
         self._rail_loader.request(load)
@@ -284,15 +334,19 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
         self._rail_loader.request(load)
 
     def _rail_ready(self, result, error):
+        if getattr(self, '_closed', True) is not False:
+            return
+        if result is not None and result[0] != self._rail_key:
+            return
         checking_cache = self._rail_request is not None and self._rail_request[0] is None
         self._rail_request = None
-        if self._closed or not self._light_visible:
+        if not self._light_visible:
             return
         if checking_cache:
             self._rail_cache_checked = True
         if error is None and result is not None:
-            key, slot, found = result
-            if key == self._rail_key and found:
+            _, slot, found = result
+            if found:
                 if slot is None:
                     self._rail_cached.update(found)
                     self._rail_cached.pop(self._rail_selected_slot(), None)
@@ -301,7 +355,7 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
         self._rail_schedule()
 
     def _rail_paint(self, slot, url, path):
-        if not 0 <= slot < len(self._rail_page):
+        if getattr(self, '_closed', True) is not False or not 0 <= slot < len(self._rail_page):
             return
         kind = self.content_type
         self._rail_images[slot] = url, path
@@ -309,6 +363,8 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
             slot, path, str(self._rail_page[slot].stream_id), self._light_field('poster_generation'))
 
     def _light_cover(self, item, path, url, info=None):
+        if getattr(self, '_closed', True) is not False:
+            return
         slot = self._rail_selected_slot()
         if slot < len(self._rail_page) and str(self._rail_page[slot].stream_id) == str(item.stream_id):
             cached = self._rail_cached.pop(slot, None)
@@ -323,6 +379,8 @@ class GTCinematicContentBrowserScreen(GTContentBrowserScreen):
         LightVODMethods._light_cover(self, item, path, url, info)
 
     def _apply_detail_poster(self, kind, item, path):
+        if getattr(self, '_closed', True) is not False:
+            return
         slot = self._rail_selected_slot()
         if slot >= len(self._rail_page) or str(self._rail_page[slot].stream_id) != str(item.stream_id):
             self._light_render_rows()

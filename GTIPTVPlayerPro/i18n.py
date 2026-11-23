@@ -280,7 +280,7 @@ def _register_language_callback(language_service=None):
     return True
 
 
-def device_language():
+def _device_locale():
     language_service = _get_language_service()
     if language_service is not None:
         _register_language_callback(language_service)
@@ -294,14 +294,37 @@ def device_language():
                 continue
             code = _normalise_language(value, fallback="")
             if code:
-                return code
+                return value, code
     for name in ("LANGUAGE", "LC_ALL", "LC_MESSAGES", "LANG"):
         value = os.environ.get(name, "")
         for candidate in value.split(":"):
             code = _normalise_language(candidate, fallback="")
             if code:
-                return code
-    return "en"
+                return candidate, code
+    return "en", "en"
+
+
+def device_language():
+    return _device_locale()[1]
+
+
+def device_country(country_codes):
+    """Use the active locale's region or its usual metadata country."""
+    value, language = _device_locale()
+    if isinstance(value, bytes):
+        value = value.decode("utf-8")
+    locale = str(value).strip().split(".", 1)[0].split("@", 1)[0].replace("-", "_")
+    parts = locale.split("_")
+    if len(parts) > 2 and len(parts[1]) == 4 and parts[1].isalpha():
+        region = parts[2].upper()
+    else:
+        region = parts[1].upper() if len(parts) > 1 else ""
+    if region == "UK":
+        region = "GB"
+    if region in country_codes:
+        return region
+    fallback = _METADATA_LOCALES.get(language, "en-US").rsplit("-", 1)[-1]
+    return fallback if fallback in country_codes else ""
 
 
 def _ui_language_code():

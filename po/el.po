@@ -4445,3 +4445,27 @@ msgstr "Προτεινόμενο"
 
 msgid "Restore source name"
 msgstr "Επαναφορά αρχικού ονόματος"
+
+msgid "Could not start a thread for the account test."
+msgstr "Δεν ήταν δυνατή η εκκίνηση νήματος για τον έλεγχο λογαριασμού."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "Τα δεδομένα πρόγνωσης έχουν προσαρμοστεί για προβολή στην τηλεόραση."
+
+msgid "Not enough memory to start the account test."
+msgstr "Ανεπαρκής μνήμη για την εκκίνηση του ελέγχου λογαριασμού."
+
+msgid "Search Episodes on YouTube"
+msgstr "Αναζήτηση επεισοδίων στο YouTube"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "Τηλεοπτικά δεδομένα από το TVmaze — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Αυτό το προϊόν χρησιμοποιεί το API του TMDB, αλλά δεν έχει εγκριθεί ή πιστοποιηθεί από το TMDB."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "Οι χρήστες προσθέτουν τις διευθύνσεις των δικών τους πηγών mHub v2. Η επιλεγμένη πηγή παρέχει τις ροές και το GT IPTV Player Pro τις αναπαράγει απευθείας στον δέκτη."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "Δεδομένα καιρού από το Open-Meteo.com — CC BY 4.0"

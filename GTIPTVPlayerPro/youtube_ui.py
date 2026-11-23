@@ -8,6 +8,7 @@ import time
 from collections import OrderedDict, deque
 from .ui_update import set_visible
 from .typography import set_text_if_changed
+from .selected_row_scroll import clear_selection, select_label
 
 from .auxiliary_presentation import (
     skin_after as aux_skin_after, refresh_after as aux_refresh_after, setup as setup_aux,
@@ -289,10 +290,12 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         self._keyboard_timer = eTimer()
         self._thumb_timer = eTimer()
         self._result_settle_timer = eTimer()
-        _connect_timer(self._poll_timer, self._poll)
-        _connect_timer(self._keyboard_timer, self._open_initial_search)
-        _connect_timer(self._thumb_timer, self._start_thumbnails)
-        _connect_timer(self._result_settle_timer, self._settle_result_navigation)
+        self._timer_connections = (
+            _connect_timer(self._poll_timer, self._poll),
+            _connect_timer(self._keyboard_timer, self._open_initial_search),
+            _connect_timer(self._thumb_timer, self._start_thumbnails),
+            _connect_timer(self._result_settle_timer, self._settle_result_navigation),
+        )
         self._init_youtube_preview(VideoWindow is not None)
 
         for name in ("video_guard", "header", "header_divider", "youtube_brand", "quality", "search_text", "section",
@@ -393,6 +396,8 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         self._keyboard_timer.stop()
         self._thumb_timer.stop()
         self._result_settle_timer.stop()
+        self._timer_connections = ()
+        self._preview_timer_connection = None
         with self._event_lock:
             self._events.clear()
         self._pages.clear()
@@ -401,7 +406,8 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         self._thumbnail_paths.clear()
 
     def _open_initial_search(self):
-        self.open_history()
+        if not getattr(self, "_closed", True):
+            self.open_history()
 
     def open_live(self):
         if self._closed or self._keyboard_open or self._history_fullscreen_id:
@@ -915,6 +921,15 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
             item = visible[index] if index < len(visible) else {}
             self._render_result_row(index,item,cached_only=cached_only)
         self._load_thumbnails(visible,thumbnail_delay)
+        self._scroll_selected_result(visible)
+
+    def _scroll_selected_result(self, visible):
+        slot = self._selected-self._top
+        if 0 <= slot < len(visible):
+            item = visible[slot]
+            select_label(self, "title_{}".format(slot), item.get("title", ""), key=item.get("id"))
+        else:
+            clear_selection(self)
 
     def _render_result_row(self, index, item, *, cached_only=False):
         paint_youtube_row(self,index,bool(item),self._top + index == self._selected)
@@ -983,6 +998,7 @@ class GTYouTubeSearchScreen(YouTubePreviewMixin, Screen):
         else:
             paint_youtube_row(self,previous-self._top,True,False)
             paint_youtube_row(self,self._selected-self._top,True,True)
+            self._scroll_selected_result(self._visible())
         self._schedule_result_settle(refit_rows=moved_window)
 
     def previous_page(self):

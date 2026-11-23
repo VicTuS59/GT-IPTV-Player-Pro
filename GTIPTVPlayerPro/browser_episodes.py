@@ -26,6 +26,7 @@ from .vod_discovery import style_footer, refresh_plain_footer
 from .paths import plugin_path
 from .remote_footer import prepared_skin, remote_action_text
 from .scrollbar import hide_scrollbar, update_scrollbar
+from .selected_row_scroll import clear_selection, select_label
 from .settings import load_player_settings
 from .typography import ellipsize_dynamic_text, fit_dynamic_text, set_text_if_changed
 from .browser_common import CINEMATIC_CANDIDATE_TIMEOUT_SECONDS, GTAsyncListScreen, _FavoriteSupport, _WorkerCancelled, _WorkerToken, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _cinematic_cover_ratio, _connect_timer, _download_client_image, _picon_cache_path, _rating_label, _safe_picon_url, _scale, _valid_cinematic_fallback_file, content_client_for
@@ -185,6 +186,7 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
     def start_load(self):
         if self._loading or self._closed:
             return
+        clear_selection(self)
         if self._entries:
             self._episode_reload_selection = (self._season_groups[self._season_index][0], episode_watch_key(self.client, self._entries[self.selected_index]))
         self._clear_episode_rows()
@@ -388,6 +390,7 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
         set_text_if_changed(self['items'], '')
         self._episode_fit('episode_favorite_text', _('Remove from favorites') if self._is_series_favorite() else _('Add to favorites'))
         if self._error or not self._entries:
+            clear_selection(self)
             self._clear_episode_rows()
             set_text_if_changed(self['message'], _(self._error or self.empty_message()))
             hide_scrollbar(self, 'list_scroll')
@@ -398,6 +401,7 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
         from .episode_view import watched_view, season_completed
         current_watched = watched_view(self)
         self._clear_episode_rows(min(self.page_size, len(self._entries)-start))
+        scroll_target = None
         for row, item in enumerate(self._entries[start:start + self.page_size]):
             number = episode_number(item, start + row + 1)
             set_text_if_changed(self['episode_number_{}'.format(row)], str(number).zfill(2))
@@ -431,6 +435,8 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
             focused = start + row == self.selected_index and self._episode_pane == 'episodes'
             self._episode_show(self['episode_focus_{}'.format(row)], focused)
             self._episode_show(self['episode_focus_fill_{}'.format(row)], focused)
+            if focused and not self._loading:
+                scroll_target = ('episode_name_{}'.format(row), title, key)
         first_tab = min(max(0, self._season_index - 1), max(0, len(self._season_groups) - 3))
         for slot in range(3):
             index = first_tab + slot
@@ -457,6 +463,11 @@ class GTEpisodeListScreen(_FavoriteSupport, GTAsyncListScreen):
         set_text_if_changed(self['message'], '')
         self._render_episode_resume()
         update_scrollbar(self, 'list_scroll', len(self._entries), self.selected_index, self.page_size, self._list_scroll_geometry)
+        if scroll_target is None:
+            clear_selection(self)
+        else:
+            widget, title, key = scroll_target
+            select_label(self, widget, title, key=key)
 
     def _clear_episode_rows(self, first=0):
         for i in range(first, self.page_size):

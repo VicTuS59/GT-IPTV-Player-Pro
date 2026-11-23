@@ -4445,3 +4445,27 @@ msgstr "Rekomanduar"
 
 msgid "Restore source name"
 msgstr "Rikthe emrin origjinal"
+
+msgid "Could not start a thread for the account test."
+msgstr "Nuk u nis dot një fill ekzekutimi për testimin e llogarisë."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "Të dhënat e parashikimit janë riformatuar për t’u shfaqur në televizor."
+
+msgid "Not enough memory to start the account test."
+msgstr "Nuk ka memorie të mjaftueshme për të nisur testimin e llogarisë."
+
+msgid "Search Episodes on YouTube"
+msgstr "Kërko episode në YouTube"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "Të dhëna televizive nga TVmaze — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Ky produkt përdor API-n e TMDB-së, por TMDB nuk e miraton dhe as nuk e certifikon."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "Përdoruesit shtojnë adresat e burimeve të tyre mHub v2. Burimi i zgjedhur siguron transmetimet dhe GT IPTV Player Pro i luan drejtpërdrejt në marrës."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "Të dhënat e motit nga Open-Meteo.com — CC BY 4.0"

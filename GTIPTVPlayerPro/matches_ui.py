@@ -32,6 +32,7 @@ from .welcome_text import fit_action_caption
 from .scrollbar import update_scrollbar
 from .remote_footer import prepared_skin, skin_metadata, bind_layout_text
 from .typography import fit_dynamic_text
+from .selected_row_scroll import clear_selection, select_label
 
 TABS = (("live", "Live"), ("finished", "Finished"), ("upcoming", "Upcoming"), ("broadcasts", "LiveOnSat"))
 
@@ -352,6 +353,16 @@ class GTMatchesScreen(Screen):
 
     def _render_selection(self):
         match=self.matches[self.selected] if self.matches else None
+        if match and self._is_broadcast():
+            row = self._broadcast_rows[self.selected]
+            channel = row.channels[0].name if row.channels else ''
+            select_label(self, 'tv_row_channels_'+str(self.selected-self.window), channel, key=match.id)
+        elif match:
+            teams = (('home', str(match.home or '')), ('away', str(match.away or '')))
+            field, title = max(teams, key=lambda pair: len(pair[1]))
+            select_label(self, 'row_{}_{}'.format(self.selected-self.window, field), title, key=match.id)
+        else:
+            clear_selection(self)
         current_id=match.id if match else None
         if current_id!=self._logo_for:
             self._logo_for=current_id

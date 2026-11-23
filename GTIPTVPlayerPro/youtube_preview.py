@@ -48,7 +48,7 @@ class YouTubePreviewMixin(object):
         self._preview_ended = False
         self._youtube_resolution_tracker = ResolutionTracker()
         self._preview_timer = eTimer()
-        _connect_timer(self._preview_timer, self._preview_tick)
+        self._preview_timer_connection = _connect_timer(self._preview_timer, self._preview_tick)
 
     def createSummary(self):
         if self._preview_available:

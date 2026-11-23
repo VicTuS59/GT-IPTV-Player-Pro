@@ -4451,3 +4451,27 @@ msgstr "Ieteikts"
 
 msgid "Restore source name"
 msgstr "Atjaunot sākotnējo nosaukumu"
+
+msgid "Could not start a thread for the account test."
+msgstr "Neizdevās palaist konta pārbaudes pavedienu."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "Prognožu dati ir pārformatēti attēlošanai televizorā."
+
+msgid "Not enough memory to start the account test."
+msgstr "Nepietiek atmiņas, lai sāktu konta pārbaudi."
+
+msgid "Search Episodes on YouTube"
+msgstr "Meklēt sērijas vietnē YouTube"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "Televīzijas dati no TVmaze — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Šis produkts izmanto TMDB API, taču TMDB to nav apstiprinājusi vai sertificējusi."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "Lietotāji pievieno savu mHub v2 avotu adreses. Izvēlētais avots nodrošina straumes, un GT IPTV Player Pro tās atskaņo tieši uztvērējā."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "Laikapstākļu dati no Open-Meteo.com — CC BY 4.0"

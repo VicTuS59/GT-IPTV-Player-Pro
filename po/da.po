@@ -4445,3 +4445,27 @@ msgstr "Anbefalet"
 
 msgid "Restore source name"
 msgstr "Gendan det oprindelige navn"
+
+msgid "Could not start a thread for the account test."
+msgstr "Kunne ikke starte en tråd til kontotesten."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "Prognosedataene er omformateret til visning på tv."
+
+msgid "Not enough memory to start the account test."
+msgstr "Ikke nok hukommelse til at starte kontotesten."
+
+msgid "Search Episodes on YouTube"
+msgstr "Søg efter afsnit på YouTube"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "Tv-data fra TVmaze — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Dette produkt bruger TMDB’s API, men er ikke godkendt eller certificeret af TMDB."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "Brugerne tilføjer adresserne på deres egne mHub v2-kilder. Den valgte kilde leverer streamene, og GT IPTV Player Pro afspiller dem direkte på modtageren."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "Vejrdata fra Open-Meteo.com — CC BY 4.0"

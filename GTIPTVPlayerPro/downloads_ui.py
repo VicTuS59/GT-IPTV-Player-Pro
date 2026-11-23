@@ -11,6 +11,7 @@ from .action_map import ActionMap
 from .ui_update import set_visible
 from .ui_update import set_foreground
 from .typography import set_text_if_changed
+from .selected_row_scroll import clear_selection, select_label
 from Components.FileList import FileList
 from Components.Label import Label
 from Components.Pixmap import Pixmap
@@ -455,6 +456,10 @@ class GTDownloadsScreen(Screen):
             except Exception:
                 pass
         job = self.selected()
+        if job:
+            select_label(self, "name_{}".format(self.index-self._start), job.get("name", ""), key=job.get("id"))
+        else:
+            clear_selection(self)
         self._poster("poster", job.get("poster", ""))
         set_text_if_changed(self["detail_title"], clean_dynamic_text(job.get("name") or _("No downloads or local videos.")))
         set_text_if_changed(self["detail"], self._details(job) if job else "")

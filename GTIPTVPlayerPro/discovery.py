@@ -10,10 +10,12 @@ import re
 import threading
 import time
 from collections import OrderedDict
+from datetime import date, timedelta
 
 from .content import ContentError, _movie_search_text
 from .i18n import N_
 from .metadata import MetadataError, TMDbMetadataClient, _image_url, _year, clean_media_title
+from .youtube_series_catalog import COUNTRY_CODES
 
 
 DISCOVERY_CACHE_SECONDS = 6 * 60 * 60
@@ -97,11 +99,17 @@ class TMDbDiscoveryClient(TMDbMetadataClient):
     def movies(self, section="popular", page=1, genre_id=0, movie_id=0, force=False):
         return self.titles("movie", section, page, genre_id, movie_id, force)
 
-    def titles(self, media_type, section="popular", page=1, genre_id=0, title_id=0, force=False):
+    def titles(self, media_type, section="popular", page=1, genre_id=0, title_id=0, force=False, *, country=""):
         media_type = "tv" if media_type == "tv" else "movie"
         page = max(1, _number(page, 1, 500))
         parameters = {"page": page, "include_adult": "false"}
-        if section == "top":
+        country = country.strip().upper() if isinstance(country, str) else ""
+        if country not in COUNTRY_CODES:
+            country = ""
+        if country:
+            path = "/discover/{}".format(media_type)
+            parameters.update(self._country_filters(media_type, section, country, genre_id, title_id))
+        elif section == "top":
             path = "/{}/top_rated".format(media_type)
         elif section == "new":
             path = "/tv/on_the_air" if media_type == "tv" else "/movie/now_playing"
@@ -120,6 +128,12 @@ class TMDbDiscoveryClient(TMDbMetadataClient):
         entries, seen = [], set()
         for value in payload["results"][:20]:
             record = _title_record(value, media_type, self._backdrop_size)
+            if country and record:
+                origins = value.get("origin_country")
+                if isinstance(origins, list) and origins and country not in origins:
+                    continue
+                if section == "similar" and record["id"] == _number(title_id):
+                    continue
             if record and record["id"] not in seen:
                 seen.add(record["id"])
                 entries.append(record)
@@ -127,6 +141,26 @@ class TMDbDiscoveryClient(TMDbMetadataClient):
             "entries": entries, "page": page,
             "pages": max(1, _number(payload.get("total_pages"), 1, 500)),
         }
+
+    def _country_filters(self, media_type, section, country, genre_id, title_id):
+        parameters = {"with_origin_country": country, "sort_by": "popularity.desc"}
+        if section == "top":
+            parameters.update({"sort_by": "vote_average.desc", "vote_count.gte": 10})
+        elif section == "new":
+            day = date.today()
+            field = "air_date" if media_type == "tv" else "primary_release_date"
+            parameters[field + ".gte"] = (day - timedelta(days=29)).isoformat()
+            parameters[field + ".lte"] = day.isoformat()
+        elif section == "genres" and _number(genre_id):
+            parameters["with_genres"] = _number(genre_id)
+        elif section == "similar" and _number(title_id):
+            detail = self._cached_request("/{}/{}".format(media_type, _number(title_id)))
+            genres = detail.get("genres")
+            if isinstance(genres, list):
+                ids = [_number(item.get("id")) for item in genres if isinstance(item, dict)]
+                if any(ids):
+                    parameters["with_genres"] = "|".join(str(gid) for gid in list(filter(None, ids))[:2])
+        return parameters
 
     def genres(self, force=False, *, media_type="movie"):
         media_type = "tv" if media_type == "tv" else "movie"

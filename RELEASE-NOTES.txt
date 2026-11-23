@@ -1,3 +1,3 @@
-Added **mHub v2 support for Live TV**. Enter your own manifest URL to browse categories and play channels directly from the source.
-
-Press the **green button** on the **Add Source** or **Manage Sources** screen to open mHub v2.
+- **Favorites** now displays a 4×3 grid of cards with a narrower details panel on the right.
+- Overflowing text on the selected row or card starts scrolling after **1.5 seconds** and stops when the selection changes.
+- Improved stability at startup and when pressing **EXIT**. The account list now shows a warning if the automatic **Xtream** or **Stalker** account test fails to start.

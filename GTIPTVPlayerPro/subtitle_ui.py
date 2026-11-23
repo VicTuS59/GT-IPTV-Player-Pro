@@ -43,6 +43,7 @@ from .subtitle_settings import (
     save_subtitle_settings,
 )
 from .typography import fit_dynamic_text, font_px
+from .selected_row_scroll import clear_selection, select_label
 
 
 ROWS = 16
@@ -451,6 +452,14 @@ class GTSubtitleSettingsScreen(Screen):
             )
         set_text_if_changed(self['preview_detail'], '{}  •  {}  •  {}'.format(self._value(11), self._value(13), self._value(14)))
         self._apply_preview_style()
+        self._scroll_selected_option()
+
+    def _scroll_selected_option(self):
+        index = self.selected_index
+        if 2 <= index <= 6:
+            clear_selection(self)
+        else:
+            select_label(self, "value_{}".format(index), self._value(index), key=index)
 
     def move(self, step):
         previous = self.selected_index
@@ -458,6 +467,7 @@ class GTSubtitleSettingsScreen(Screen):
         if previous != self.selected_index:
             set_visible(self['r97_focus_{}'.format(previous)], False)
             set_visible(self['r97_focus_{}'.format(self.selected_index)], True)
+            self._scroll_selected_option()
 
     @staticmethod
     def _cycled(current, choices, step):

@@ -6,6 +6,8 @@
 import time
 from collections import deque
 
+from .source_loader import connect_timer as _connect_timer
+
 HOLD_SECONDS = 3.0
 _PLUGIN_MODULE = __package__
 _SHORTCUT = None
@@ -33,15 +35,6 @@ def plugin_owns_focus(session):
         if module == _PLUGIN_MODULE or module.startswith(_PLUGIN_MODULE + "."):
             return True
     return False
-
-
-def _connect_timer(timer, callback):
-    signal = getattr(timer, "timeout", None)
-    connect = getattr(signal, "connect", None)
-    if callable(connect):
-        return connect(callback)
-    timer.callback.append(callback)
-    return None
 
 
 class WebMenuShortcut(object):
@@ -218,6 +211,7 @@ class WebMenuShortcut(object):
         self._closed = True
         self._hold_timer.stop()
         self._short_timer.stop()
+        self._connections = ()
         self._pending_short.clear()
         self._detach_focus_callback()
         self._press_dialog = None

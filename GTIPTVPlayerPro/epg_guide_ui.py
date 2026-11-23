@@ -32,6 +32,7 @@ from .paths import plugin_path
 from .remote_footer import prepared_skin
 from .remote_footer import decorate_remote_footer, footer_item, install_remote_footer
 from .scrollbar import hide_scrollbar, update_scrollbar
+from .selected_row_scroll import clear_selection, select_label
 from .smooth_scroll import GTSmoothScrollLabel
 from .typography import fit_dynamic_text, font_px
 
@@ -436,6 +437,9 @@ class GTEPGGuideScreen(Screen):
             self._description_key = description_key
         if event is None:
             self._render_progress(None, moment)
+            clear_selection(self)
+        else:
+            select_label(self, "programme_title_{}".format(self.programme_index-page), event.title, key=description_key)
         self._tick()
 
     def _render_progress(self, event, moment):

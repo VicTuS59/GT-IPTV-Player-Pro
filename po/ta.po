@@ -4445,3 +4445,27 @@ msgstr "பரிந்துரைக்கப்பட்டது"
 
 msgid "Restore source name"
 msgstr "அசல் பெயரை மீட்டமை"
+
+msgid "Could not start a thread for the account test."
+msgstr "கணக்கைச் சோதிப்பதற்கான இழையைத் தொடங்க முடியவில்லை."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "தொலைக்காட்சியில் காட்டுவதற்காக வானிலை முன்னறிவிப்புத் தரவு மறுவடிவமைக்கப்பட்டுள்ளது."
+
+msgid "Not enough memory to start the account test."
+msgstr "கணக்குச் சோதனையைத் தொடங்கப் போதிய நினைவகம் இல்லை."
+
+msgid "Search Episodes on YouTube"
+msgstr "YouTube-இல் அத்தியாயங்களைத் தேடு"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "தொலைக்காட்சித் தரவு TVmaze வழங்கியது — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "இந்தத் தயாரிப்பு TMDB API-ஐப் பயன்படுத்துகிறது. இதற்கு TMDB ஒப்புதலோ சான்றிதழோ வழங்கவில்லை."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "பயனர்கள் தங்கள் mHub v2 மூல முகவரிகளைத் தாங்களே சேர்க்கிறார்கள். தேர்ந்தெடுத்த மூலத்திலிருந்து வரும் ஒளிபரப்புகளை GT IPTV Player Pro பெறுநர் சாதனத்தில் நேரடியாக இயக்குகிறது."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "வானிலைத் தரவு Open-Meteo.com வழங்கியது — CC BY 4.0"

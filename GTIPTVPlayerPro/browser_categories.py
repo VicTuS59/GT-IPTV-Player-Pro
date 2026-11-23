@@ -187,13 +187,15 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._movie_search_resume_detail = False
             self._movie_search_resume_posters = False
             self._movie_timer = eTimer()
-            _connect_timer(self._movie_timer, self._poll_movie_result)
             self._movie_category_timer = eTimer()
-            _connect_timer(self._movie_category_timer, self._commit_movie_category_load)
             self._movie_detail_timer = eTimer()
-            _connect_timer(self._movie_detail_timer, self._commit_movie_detail)
             self._movie_search_resume_timer = eTimer()
-            _connect_timer(self._movie_search_resume_timer, self._poll_movie_search_resume)
+            self._vod_timer_connections = (
+                _connect_timer(self._movie_timer, self._poll_movie_result),
+                _connect_timer(self._movie_category_timer, self._commit_movie_category_load),
+                _connect_timer(self._movie_detail_timer, self._commit_movie_detail),
+                _connect_timer(self._movie_search_resume_timer, self._poll_movie_search_resume),
+            )
         elif self.content_type == 'series':
             self._configure_vod()
             self._series_entries = []
@@ -242,15 +244,17 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             self._series_search_drain_event = None
             self._series_search_resume_categories = False
             self._series_search_resume_timer = eTimer()
-            _connect_timer(self._series_search_resume_timer, self._resume_series_after_search)
             self._series_timer = eTimer()
-            _connect_timer(self._series_timer, self._poll_series_result)
             self._series_scan_timer = eTimer()
-            _connect_timer(self._series_scan_timer, self._resume_series_scan)
             self._series_category_timer = eTimer()
-            _connect_timer(self._series_category_timer, self._commit_series_category_load)
             self._series_detail_timer = eTimer()
-            _connect_timer(self._series_detail_timer, self._commit_series_detail)
+            self._vod_timer_connections = (
+                _connect_timer(self._series_search_resume_timer, self._resume_series_after_search),
+                _connect_timer(self._series_timer, self._poll_series_result),
+                _connect_timer(self._series_scan_timer, self._resume_series_scan),
+                _connect_timer(self._series_category_timer, self._commit_series_category_load),
+                _connect_timer(self._series_detail_timer, self._commit_series_detail),
+            )
         if self._vod_discovery_layout:
             from .vod_discovery import CATEGORY_ROWS, footer, place_trailer_hint, scroll_geometry
             self.page_size = CATEGORY_ROWS
@@ -464,7 +468,7 @@ class GTContentBrowserScreen(_FavoriteSupport, GTAsyncListScreen):
             refresh_category_list(self, full=True)
 
     def _client_has_more_items(self, content_type, category_id):
-        checker = getattr(self.client, 'has_more_items', None)
+        checker = getattr(getattr(self, 'client', None), 'has_more_items', None)
         if not callable(checker):
             return False
         try:

@@ -4451,3 +4451,27 @@ msgstr "Odporúčané"
 
 msgid "Restore source name"
 msgstr "Obnoviť pôvodný názov"
+
+msgid "Could not start a thread for the account test."
+msgstr "Nepodarilo sa spustiť vlákno na kontrolu účtu."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "Údaje predpovede boli preformátované na zobrazenie v televízore."
+
+msgid "Not enough memory to start the account test."
+msgstr "Nedostatok pamäte na spustenie kontroly účtu."
+
+msgid "Search Episodes on YouTube"
+msgstr "Vyhľadať epizódy na YouTube"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "Televízne údaje od TVmaze — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Tento produkt používa rozhranie API služby TMDB, ale služba TMDB ho neschválila ani necertifikovala."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "Používatelia pridávajú vlastné adresy zdrojov mHub v2. Vybraný zdroj poskytuje streamy a GT IPTV Player Pro ich prehráva priamo v prijímači."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "Údaje o počasí od Open-Meteo.com — CC BY 4.0"

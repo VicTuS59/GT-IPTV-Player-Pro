@@ -9,6 +9,7 @@ from .remote_footer import remote_action_text, set_remote_footer
 from .remote_footer import prepared_skin, skin_metadata, layout_needs_fit, _cached_skin
 from .seven_presentation import text as fit_text, show, rect, _footer_style
 from .scrollbar import update_scrollbar, hide_scrollbar
+from .selected_row_scroll import clear_selection, select_label
 from .utility_design import bind_missing
 from .typography import font_px
 from .auxiliary_layout import restyle
@@ -248,6 +249,12 @@ def _source(s):
     text(s,'aux_side_help',_('Direct HTTP(S) M3U playlist address.') if remote else _('Select a playlist from the receiver, USB or mounted network storage.'),30,4)
     text(s,'aux_type_caption',_('Supported format'),28);text(s,'aux_type_value','M3U / M3U8',36)
     text(s,'aux_save_hint',_('Press GREEN to save the source.'),26,2)
+    if s.selected_field == 0:
+        select_label(s, 'name_value', s._field_values[0], key=0)
+    elif s.selected_field == 2 and not remote:
+        select_label(s, 'location_value', s._field_values[2], key=2)
+    else:
+        clear_selection(s)
 
 
 def paint_youtube_row(s,slot,present,selected):
@@ -282,6 +289,11 @@ def refresh_history_selection(s,previous=None):
     text(s,'aux_history_value',selected.get('title','') if isinstance(selected,dict) else selected or '—',45,3)
     if total:update_scrollbar(s,'aux_history_scroll',total,s._selected,7,box(s,(1200,210,7,596)))
     else:hide_scrollbar(s,'aux_history_scroll')
+    if total:
+        title = selected.get('title', '') if isinstance(selected, dict) else selected
+        select_label(s, 'title_'+str(s._selected-s._top), title, key=s._selected)
+    else:
+        clear_selection(s)
 
 
 def _youtube(s):
@@ -352,6 +364,11 @@ def _online(s):
         s._aux_flag_key=path
         attach_native_alpha_pixmap(s,'aux_selected_flag',path,key='aux_selected_flag',show_on_load=False)
     show(s,'aux_selected_flag',bool(path and selected))
+    if selected:
+        select_label(s, 'release_'+str(s.selected-s.top),
+                     b.subtitle_display_release(selected, first=s.selected==0), key=s.selected)
+    else:
+        clear_selection(s)
 
 
 def _local(s):
@@ -375,6 +392,11 @@ def _local(s):
     text(s,'aux_language_value',localized_language_name(s._language) if s._language else _('Automatic detection'),30)
     text(s,'aux_local_action',_('Press GREEN to use this folder.') if picker else _('Subtitle files: SRT / ASS / SSA / SUB / VTT'),24)
     show(s,'aux_local_empty',selected is None);text(s,'aux_local_empty',s['message'].getText() or _('No files found.'),31,4)
+    if selected:
+        value = _(selected['label']) if selected.get('label') else selected.get('name', '')
+        select_label(s, 'name_'+str(s.selected-s.top), value, key=s.selected)
+    else:
+        clear_selection(s)
 
 
 def _categories(s):
@@ -404,6 +426,11 @@ def _categories(s):
     text(s,'manager_move_help',s._move_guidance() if s._move_mode else _('Changes are applied when you press GREEN.'),26,5)
     if selected:update_scrollbar(s,'list_scroll',len(entries),s.selected_index,s.page_size,s._list_scroll_geometry)
     else:hide_scrollbar(s,'list_scroll')
+    if selected:
+        value = '{:02d}.  {}'.format(s.selected_index+1, selected.name)
+        select_label(s, 'category_row_'+str(s.selected_index-start), value, key=s.selected_index)
+    else:
+        clear_selection(s)
 
 
 def _channels(s):
@@ -434,6 +461,13 @@ def _channels(s):
     if empty:
         text(s,'message','');hide_scrollbar(s,'list_scroll')
     else:update_scrollbar(s,'list_scroll',total,s.selected_index,s.page_size,s._list_scroll_geometry)
+    if 0 <= s.selected_index < total:
+        selected = entries[s.selected_index]
+        group = getattr(selected, 'group_title', '')
+        value = selected.name+('  ·  '+group if group else '')
+        select_label(s, 'aux_channel_name_'+str(s.selected_index-start), value, key=s.selected_index)
+    else:
+        clear_selection(s)
 
 
 def _weather(s):
@@ -457,6 +491,10 @@ def _weather(s):
     text(s,'aux_city_help',_('Press OK to select this location.'),24)
     if total:update_scrollbar(s,'location_scroll',total,s.selected_index,7,box(s,(1236,324,5,556)))
     else:hide_scrollbar(s,'location_scroll')
+    if selected:
+        select_label(s, 'result_'+str(s.selected_index-start), selected.name, key=s.selected_index)
+    else:
+        clear_selection(s)
 
 
 def _about(s):

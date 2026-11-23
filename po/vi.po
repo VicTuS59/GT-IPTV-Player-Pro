@@ -4439,3 +4439,27 @@ msgstr "Đề xuất"
 
 msgid "Restore source name"
 msgstr "Khôi phục tên gốc"
+
+msgid "Could not start a thread for the account test."
+msgstr "Không thể khởi chạy luồng để kiểm tra tài khoản."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "Dữ liệu dự báo đã được định dạng lại để hiển thị trên TV."
+
+msgid "Not enough memory to start the account test."
+msgstr "Không đủ bộ nhớ để bắt đầu kiểm tra tài khoản."
+
+msgid "Search Episodes on YouTube"
+msgstr "Tìm tập phim trên YouTube"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "Dữ liệu truyền hình từ TVmaze — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Sản phẩm này sử dụng API của TMDB, nhưng không được TMDB bảo chứng hay chứng nhận."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "Người dùng thêm địa chỉ nguồn mHub v2 của mình. Nguồn được chọn cung cấp luồng phát và GT IPTV Player Pro phát trực tiếp trên thiết bị thu."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "Dữ liệu thời tiết từ Open-Meteo.com — CC BY 4.0"

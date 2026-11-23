@@ -8,6 +8,7 @@ all network/XML work on daemon workers and applies the already validated
 event tuples to ``eEPGCache`` only from the GUI timer callback.
 """
 from .typography import set_text_if_changed
+from .selected_row_scroll import clear_selection, select_label
 from .utility_pages import _text as utility_text
 from .ui_update import set_visible
 
@@ -990,6 +991,7 @@ class GTDVBEPGSettingsScreen(Screen):
                 set_text_if_changed(widget, str(value))
             if index == self.selected_index:
                 set_visible(self["focus_{}".format(index)], True)
+                select_label(self, "value_{}".format(index), str(value), key=index)
             else:
                 set_visible(self["focus_{}".format(index)], False)
 
@@ -1773,8 +1775,25 @@ class GTDVBEPGMappingScreen(Screen):
             _release_update_runtime(self._mapping_runtime_owner)
             self._mapping_runtime_acquired = False
 
-    @seven_refresh_after
     def _refresh_rows(self):
+        self._render_mapping_rows()
+        self._scroll_mapping_selection()
+
+    def _scroll_mapping_selection(self):
+        index = self.selected_index
+        if not 0 <= index < len(self._services) or self._loading:
+            clear_selection(self)
+            return
+        service = self._services[index]
+        slot = index % self.page_size
+        if getattr(self, '_seven_kind', None) == 'mapping':
+            select_label(self, "r100_map_name_{}".format(slot), service.name, key=index)
+        else:
+            text = "{}  •  {}".format(clean_dynamic_text(service.name), self._row_status(service))
+            select_label(self, "row_{}".format(slot), text, key=index)
+
+    @seven_refresh_after
+    def _render_mapping_rows(self):
         count = len(self._services)
         mapped_count = len(self._match.mappings) if self._match is not None else 0
         set_text_if_changed(self["summary"], _("{} DVB services  •  {} XMLTV channels  •  {} mapped").format(
@@ -1831,6 +1850,7 @@ class GTDVBEPGMappingScreen(Screen):
             if previous != self.selected_index:
                 from .seven_presentation import refresh_mapping
                 refresh_mapping(self, previous)
+                self._scroll_mapping_selection()
             return
         self._refresh_rows()
 
@@ -2078,6 +2098,8 @@ class GTXMLTVChannelSelectScreen(Screen):
 
     def _refresh_rows(self):
         count = len(self._entries)
+        if not count:
+            clear_selection(self)
         summary = _("{} XMLTV channels").format(count)
         if self.query:
             summary += "  •  {}: {}".format(_("Search"), self.query)
@@ -2100,18 +2122,20 @@ class GTXMLTVChannelSelectScreen(Screen):
                 set_visible(marker, False)
                 continue
             channel = page[offset]
+            value = "{}  •  {}".format(
+                clean_dynamic_text(channel.display_name),
+                clean_dynamic_text(channel.xmltv_id),
+            )
             ellipsize_dynamic_text(
                 row,
-                "{}  •  {}".format(
-                    clean_dynamic_text(channel.display_name),
-                    clean_dynamic_text(channel.xmltv_id),
-                ),
+                value,
                 fallback_chars=94,
             )
             selected = page_start + offset == self.selected_index
             if selected:
                 set_visible(focus, True)
                 set_visible(marker, True)
+                select_label(self, "row_{}".format(offset), value, key=self.selected_index)
             else:
                 set_visible(focus, False)
                 set_visible(marker, False)

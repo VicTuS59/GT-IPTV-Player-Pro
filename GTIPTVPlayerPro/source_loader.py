@@ -10,6 +10,22 @@ except ImportError:
     ePythonMessagePump = None
 
 
+def connect_timer(timer, callback):
+    """Connect an Enigma2 timer. Keep the returned connection while it is in use."""
+    signal = getattr(timer, "timeout", None)
+    connect = getattr(signal, "connect", None)
+    if callable(connect):
+        try:
+            return connect(callback)
+        except AttributeError:
+            pass
+    callbacks = getattr(timer, "callback", None)
+    if callbacks is None:
+        callbacks = signal.get()
+    callbacks.append(callback)
+    return None
+
+
 class SourceLoader:
     def __init__(self, timer, connect, apply):
         self.timer = timer
@@ -24,7 +40,7 @@ class SourceLoader:
         self._wake_pending = False
         self._pump_failed = False
         self._pump = self._pump_connection = self._pump_callbacks = None
-        connect(timer, self.poll)
+        self._timer_connection = connect(timer, self.poll)
         if ePythonMessagePump is not None:
             try:
                 pump = ePythonMessagePump()
@@ -145,12 +161,12 @@ class SourceLoader:
             load = value = error = None
 
     def poll(self):
-        self.timer.stop()
         with self.condition:
-            result = self.result
-            self.result = None
             if self.closed:
                 return
+            self.timer.stop()
+            result = self.result
+            self.result = None
             if result is not None and result[0] == self.generation:
                 self.waiting = False
                 if self._wake_pending:
@@ -179,5 +195,6 @@ class SourceLoader:
             self.pending = self.result = None
             self.apply = None
             self.waiting = False
+            self._timer_connection = None
             self._disconnect_pump()
             self.condition.notify_all()

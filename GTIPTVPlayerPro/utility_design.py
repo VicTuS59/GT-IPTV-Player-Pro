@@ -12,6 +12,7 @@ from .episode_design import episode_focus_assets
 from .i18n import _,localized_upper
 from .paths import plugin_path
 from .remote_footer import remote_action_text, skin_metadata, bind_layout_text
+from .selected_row_scroll import select_label
 from .typography import current_text_size,fit_dynamic_text,font_px
 from .vod_discovery import style_footer,refresh_plain_footer
 from .welcome_design import sentence_caption
@@ -137,18 +138,23 @@ class SourcePresentation(object):
             for prefix in ('r96_source_fill_','r96_source_focus_'):
                 set_visible(self[prefix+str(slot)],active and rows is None)
         set_text_if_changed(self['step'], '{} / 3 · {}'.format(selected+1,_('Source type')))
+        if getattr(self, '_r96_source_titles', ()):
+            select_label(self, 'title_'+str(selected), self._r96_source_titles[selected], key=selected)
 
     def _refresh_source_presentation(self):
         px=self._r96_source_px;manage=self._r96_source_manage
         set_text_if_changed(self['r96_brand_gt'], 'GT');set_text_if_changed(self['r96_brand'], 'IPTV PLAYER PRO');set_text_if_changed(self['r96_crumb'], _('Sources'))
         set_text_if_changed(self['header'], _('Manage Sources') if manage else _('Add Source'))
         titles=(_('Xtream Codes Accounts'),_('M3U Sources'),_('Stalker / MAC Portal Accounts')) if manage else ('Xtream Codes','M3U '+_('Live TV'),'Stalker / MAC '+_('Portal'))
+        self._r96_source_titles = tuple(
+            sentence_caption(title).replace('Xtream codes','Xtream Codes').replace('M3u','M3U').replace(' / mac',' / MAC').replace(' tv',' TV')
+            for title in titles
+        )
         palette=saved_selection_palette()
         if palette!=self._r96_source_palette:
             self._load_source_selection_art(palette)
             self._r96_source_palette=palette
-        for i,title in enumerate(titles):
-            title=sentence_caption(title).replace('Xtream codes','Xtream Codes').replace('M3u','M3U').replace(' / mac',' / MAC').replace(' tv',' TV')
+        for i,title in enumerate(self._r96_source_titles):
             fit_dynamic_text(self['title_'+str(i)],title,max_lines=1,preferred_size=font_px(px,39),min_size=max(11,int(px(23))))
             for name in ('count_'+str(i),'r96_count_bg_'+str(i)):set_visible(self[name], manage)
             if manage:set_text_if_changed(self['count_'+str(i)], sentence_caption(self['count_'+str(i)].getText()))
@@ -244,14 +250,18 @@ class SettingsPresentation(object):
         profile = current_text_size()
         index = self.selected_index
         value = self._value_text(index)
+        selected_slot = self._settings_order.index(index) - self._settings_window
+        selected_label = _(self.LABELS[index])
+        if self._settings_move_backup is not None:
+            selected_label = "↕ " + selected_label
         fit_dynamic_text(self['r96_setting_title'], _(self.LABELS[index]), max_lines=2, preferred_size=font_px(px,34,value=profile), min_size=max(12,int(px(23))))
         fit_dynamic_text(self['r96_setting_help'], _(SETTING_HELP.get(index,self.LABELS[index])), max_lines=3, preferred_size=font_px(px,26,value=profile), min_size=max(11,int(px(20))))
         fit_dynamic_text(self['r96_setting_value'], value, max_lines=2, preferred_size=font_px(px,29,value=profile), min_size=max(11,int(px(20))))
         if previous_slot is not None:
-            selected_slot = self._settings_order.index(index) - self._settings_window
             if previous_slot != selected_slot:
                 self._paint_settings_row(previous_slot, False)
             self._paint_settings_row(selected_slot, True)
+            select_label(self, 'row_label_'+str(selected_slot), selected_label, key=index)
             return
         set_text_if_changed(self['r96_brand_gt'], 'GT')
         set_text_if_changed(self['brand'], 'IPTV PLAYER PRO')
@@ -281,3 +291,4 @@ class SettingsPresentation(object):
             fit_dynamic_text(self['row_value_'+str(slot)], row_value, max_lines=1, preferred_size=value_font, min_size=max(11,int(px(20))))
         items=self._r96_settings_move_items if self._settings_move_backup is not None else self._r96_settings_items
         plain_footer(self,items,px)
+        select_label(self, 'row_label_'+str(selected_slot), selected_label, key=index)

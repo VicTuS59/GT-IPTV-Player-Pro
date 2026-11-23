@@ -18,8 +18,9 @@ except (ImportError, AttributeError):
 
 from .action_map import ActionMap
 from .i18n import _, device_language, supported_language_names
-from .main import _connect_timer, _scale
+from .main import _scale
 from .remote_footer import decorate_remote_footer, footer_item, install_remote_footer, prepared_skin
+from .selected_row_scroll import clear_selection, native_list_row, redraw_native_row, select_native
 from .source_loader import SourceLoader
 from .typography import clean_dynamic_text, fit_dynamic_text, font_px
 from .utility_design import NativeSkin
@@ -40,9 +41,17 @@ _VISIBLE_ROWS = 5
 _CYAN = "#22D3EE"
 
 
-def _live_skin():
+def _connect_timer(timer, callback):
+    try:
+        return timer.timeout.connect(callback)
+    except AttributeError:
+        timer.callback.append(callback)
+        return None
+
+
+def _live_skin(screen_name="GTYouTubeLiveScreen", footer=_FOOTER):
     width, height, px = _scale()
-    skin = NativeSkin("GTYouTubeLiveScreen", width, height, px)
+    skin = NativeSkin(screen_name, width, height, px)
     skin.label("brand_gt", (62, 20, 90, 68), 43, _CYAN)
     skin.label("brand_name", (150, 20, 404, 68), 36)
     skin.label("brand_divider", (560, 26, 2, 57), background="#395879")
@@ -58,7 +67,7 @@ def _live_skin():
         'backgroundColorSelected="#0C3655" foregroundColorSelected="#FFFFFF" />'.format(
             x, y, list_width, row_height * _VISIBLE_ROWS, row_height, max(5, px(15))))
     skin.label("status", (50, 868, 1810, 81), 29, "#ACCFEA", lines=2)
-    return decorate_remote_footer(skin.finish(), _FOOTER, skin_fonts_scaled=True, show_web_hint=False)
+    return decorate_remote_footer(skin.finish(), footer, skin_fonts_scaled=True, show_web_hint=False)
 
 
 class _BroadcastList(MenuList):
@@ -68,6 +77,7 @@ class _BroadcastList(MenuList):
         _x, _y, list_width, row_height = NativeSkin("", width, height, px).rect(_ROW_BOX)
         self._plain_font = max(10, font_px(px, 36))
         self._frame = ()
+        self._hidden_title = None
         content = getattr(enigma, "eListboxPythonMultiContent", None)
         if content is not None and MultiContentEntryText is not None:
             try:
@@ -80,6 +90,7 @@ class _BroadcastList(MenuList):
         super().__init__([])
 
     def _configure_rows(self, list_width, row_height, px):
+        self._row_height = row_height
         row_width = max(1, list_width - max(12, px(24)))
         edge = max(1, px(2))
         pad = px(36)
@@ -92,7 +103,8 @@ class _BroadcastList(MenuList):
         self._channel_box = (pad, channel_y, text_width, channel_height)
         self._flags = (getattr(enigma, "RT_HALIGN_LEFT", 0) | getattr(enigma, "RT_VALIGN_CENTER", 0)
                        | getattr(enigma, "RT_ELLIPSIS", 0))
-        self.l.setFont(0, enigma.gFont("Regular", min(self._plain_font + px(5), title_height)))
+        self._title_font = ("Regular", min(self._plain_font + px(5), title_height))
+        self.l.setFont(0, enigma.gFont(*self._title_font))
         self.l.setFont(1, enigma.gFont("Regular", min(max(9, font_px(px, 31)), channel_height)))
         self.l.setItemHeight(row_height)
 
@@ -120,6 +132,30 @@ class _BroadcastList(MenuList):
         return MultiContentEntryText(pos=(x, y), size=(w, h), font=font, flags=self._flags,
                                      text=clean_dynamic_text(value), color=color, color_sel=color)
 
+    def scroll_selected_title(self, screen, index, title):
+        if not self._frame or not 0 <= index < len(self.list):
+            clear_selection(screen)
+            return
+        rectangle = native_list_row(self, index, self._title_box, self._row_height)
+        if rectangle is None:
+            clear_selection(screen)
+            return
+        rows = self.list
+        row = rows[index]
+        hidden_title = self._hidden_title
+        original = hidden_title[1] if hidden_title is not None and hidden_title[0] is row else row[-2]
+        empty = self._row_text(self._title_box, 0, '', 0xF4F8FF)
+        instance = self.instance
+
+        def paint(hidden):
+            self._hidden_title = (row, original) if hidden else None
+            row[-2] = empty if hidden else original
+            if self.instance is instance and self.list is rows:
+                redraw_native_row(self, index)
+
+        select_native(screen, self, rectangle, title, self._title_font, 0xF4F8FF,
+                      key=(id(self), id(rows), index, row[0]), paint=paint)
+
     def set_plain_font(self):
         if self._frame:
             return
@@ -131,11 +167,94 @@ class _BroadcastList(MenuList):
                 pass
 
 
-class GTYouTubeLiveScreen(Screen):
+class _YouTubePlaybackActions:
+    """Resolve playback only while the requesting screen owns the selection."""
+
+    def _init_playback(self, service):
+        self._service = service
+        self._play_token = ""
+        self._play_timer = enigma.eTimer()
+        self._play_timer_connection = _connect_timer(self._play_timer, self._poll_play)
+
+    def _play_video(self, video_id, title, *, live=False):
+        if getattr(self, "_closed", True) or self._play_token or self._play_timer is None:
+            return
+        self._set_action_message(_("Please wait"))
+        try:
+            job = self._service.play(video_id, title, _request_owner=self, _live=live)
+            self._play_token = job.get("token") or ""
+        except Exception:
+            self._play_token = ""
+        if self._play_token:
+            self._resume_playback()
+        else:
+            self._set_action_message(_("Could not start the player."))
+
+    def _resume_playback(self):
+        if not getattr(self, "_closed", True) and self._play_token and self._play_timer is not None:
+            self._play_timer.start(100, True)
+
+    def _poll_play(self):
+        if getattr(self, "_closed", True) or not self._play_token or self._play_timer is None:
+            return
+        try:
+            job = self._service.status(self._play_token).get("job") or {}
+        except Exception:
+            job = {}
+        state = job.get("state")
+        if state == "resolving":
+            if job.get("attempt"):
+                self._set_action_message(_(RETRY_MESSAGE))
+            self._play_timer.start(150, True)
+            return
+        if state not in ("playing", "cancelled") and getattr(self.session, "current_dialog", None) is not self:
+            # A failed player may still be closing. onShown will check again.
+            return
+        self._play_token = ""
+        message = "" if state in ("playing", "cancelled") else youtube_error_message(job.get("error"))
+        self._set_action_message(message)
+
+    def _cancel_play_request(self):
+        token = getattr(self, "_play_token", "")
+        if not token:
+            return
+        self._play_token = ""
+        timer = getattr(self, "_play_timer", None)
+        if timer is not None:
+            try:
+                timer.stop()
+            except (AttributeError, RuntimeError, TypeError):
+                pass
+        try:
+            self._service.cancel_play(token)
+        except Exception:
+            pass
+
+    def _stop_playback(self):
+        self._cancel_play_request()
+        timer = getattr(self, "_play_timer", None)
+        connection = getattr(self, "_play_timer_connection", None)
+        self._play_timer = self._play_timer_connection = None
+        if timer is None:
+            return
+        try:
+            timer.stop()
+        except (AttributeError, RuntimeError, TypeError):
+            pass
+        try:
+            disconnect = getattr(connection, "disconnect", None)
+            if callable(disconnect):
+                disconnect()
+            elif connection is None:
+                timer.callback.remove(self._poll_play)
+        except (AttributeError, RuntimeError, TypeError, ValueError):
+            pass
+
+
+class GTYouTubeLiveScreen(_YouTubePlaybackActions, Screen):
     def __init__(self, session, service):
         self.skin = prepared_skin(_live_skin)
         Screen.__init__(self, session)
-        self._service = service
         self._language = ""
         self._category = "all"
         self._language_names = dict(supported_language_names())
@@ -143,10 +262,9 @@ class GTYouTubeLiveScreen(Screen):
         self._picker = None
         self._entries = []
         self._cancel = None
-        self._list_message = self._action_message = self._play_token = ""
+        self._list_message = self._action_message = ""
         self._reader = SourceLoader(enigma.eTimer(), _connect_timer, self._loaded)
-        self._play_timer = enigma.eTimer()
-        _connect_timer(self._play_timer, self._poll_play)
+        self._init_playback(service)
 
         title = "YouTube · " + _("Live")
         self["brand_gt"] = Label("GT")
@@ -171,6 +289,7 @@ class GTYouTubeLiveScreen(Screen):
             "yellow": partial(self._open_picker, True),
         }, -1)
         install_remote_footer(self, _FOOTER, fit_horizontal=True)
+        self["channels"].onSelectionChanged.append(self._scroll_selection)
         self.onLayoutFinish.append(self["channels"].set_plain_font)
         self.onShown.append(self._shown)
         self.onClose.append(self._stop)
@@ -181,8 +300,9 @@ class GTYouTubeLiveScreen(Screen):
             return
         if not self._started:
             self._refresh()
-        if self._play_token:
-            self._play_timer.start(100, True)
+        else:
+            self._scroll_selection()
+        self._resume_playback()
 
     def _refresh(self):
         if self._closed or self._picker is not None:
@@ -193,6 +313,7 @@ class GTYouTubeLiveScreen(Screen):
             self._cancel.set()
             self._reader.cancel()
         if self._entries:
+            clear_selection(self)
             self._entries = []
             self["channels"].set_broadcasts(self._entries)
         self._action_message = ""
@@ -219,8 +340,19 @@ class GTYouTubeLiveScreen(Screen):
         else:
             self._entries = entries
             self["channels"].set_broadcasts(entries)
+            self._scroll_selection()
             self._list_message = "" if self._entries else _("No results found")
         self._update_status()
+
+    def _scroll_selection(self):
+        if getattr(self, "_closed", True):
+            return
+        menu = self["channels"]
+        index = menu.getSelectedIndex()
+        if not isinstance(index, int) or not 0 <= index < len(self._entries):
+            clear_selection(self)
+            return
+        menu.scroll_selected_title(self, index, self._entries[index].title)
 
     def _open_picker(self, choose_language):
         if self._closed or self._picker is not None:
@@ -274,36 +406,7 @@ class GTYouTubeLiveScreen(Screen):
         if not isinstance(index, int) or not 0 <= index < len(self._entries):
             return
         row = self._entries[index]
-        self._set_action_message(_("Please wait"))
-        try:
-            job = self._service.play(row.video_id, row.title, _request_owner=self, _live=True)
-            self._play_token = job.get("token") or ""
-        except Exception:
-            self._play_token = ""
-        if self._play_token:
-            self._play_timer.start(100, True)
-        else:
-            self._set_action_message(_("Could not start the player."))
-
-    def _poll_play(self):
-        if self._closed or not self._play_token:
-            return
-        try:
-            job = self._service.status(self._play_token).get("job") or {}
-        except Exception:
-            job = {}
-        state = job.get("state")
-        if state == "resolving":
-            if job.get("attempt"):
-                self._set_action_message(_(RETRY_MESSAGE))
-            self._play_timer.start(150, True)
-            return
-        if state not in ("playing", "cancelled") and getattr(self.session, "current_dialog", None) is not self:
-            # A failed player may still be closing. onShown will check again.
-            return
-        self._play_token = ""
-        message = "" if state in ("playing", "cancelled") else youtube_error_message(job.get("error"))
-        self._set_action_message(message)
+        self._play_video(row.video_id, row.title, live=True)
 
     def _set_action_message(self, message):
         self._action_message = message
@@ -312,12 +415,6 @@ class GTYouTubeLiveScreen(Screen):
     def _update_status(self):
         fit_dynamic_text(self["status"], self._action_message or self._list_message,
                          max_lines=2, fallback_chars=80)
-
-    def _cancel_play_request(self):
-        if self._play_token:
-            self._play_timer.stop()
-            self._service.cancel_play(self._play_token)
-            self._play_token = ""
 
     def _move(self, step):
         if self._closed or self._picker is not None or not self._entries:
@@ -334,5 +431,7 @@ class GTYouTubeLiveScreen(Screen):
         if self._cancel is not None:
             self._cancel.set()
             self._cancel = None
-        self._reader.close()
-        self._cancel_play_request()
+        try:
+            self._reader.close()
+        finally:
+            self._stop_playback()

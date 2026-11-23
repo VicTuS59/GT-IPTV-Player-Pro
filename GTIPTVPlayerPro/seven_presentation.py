@@ -3,7 +3,6 @@
 """Presentation adapters; providers, jobs, persistence and actions stay in controllers."""
 from functools import wraps
 from types import MethodType
-from collections import OrderedDict
 from xml.etree import ElementTree as ET
 import re
 from .background import attach_pixmap
@@ -12,6 +11,7 @@ from .paths import plugin_path
 from .remote_footer import remote_action_text
 from .remote_footer import prepared_skin, skin_metadata, _cached_skin
 from .scrollbar import update_scrollbar,hide_scrollbar
+from .selected_row_scroll import clear_selection, select_label
 from .typography import current_text_size,fit_dynamic_text,font_px
 from .utility_design import bind_missing
 from .welcome_design import sentence_caption
@@ -65,7 +65,7 @@ def setup(screen,kind,items):
     screen._seven_kind=kind;screen._seven_items=tuple(items)
     w,h=skin_metadata(screen.skin).size;screen._seven_size=(w,h)
     screen._seven_px=lambda n:max(1,round(n*min(w/1920.,h/1080.)))
-    screen._seven_rects={};screen._seven_poster_paths=OrderedDict();screen._seven_logo_key=None
+    screen._seven_rects={}
     bind_missing(screen);screen.skin=prepared_skin(_footer_style,screen.skin,tuple(items))
     if kind=='batch':screen._progress_width=round(476*w/1920.);screen._progress_height=max(1,round(24*h/1080.))
     if kind in ('continue','favorites'):
@@ -235,7 +235,6 @@ def refresh_mapping(s, previous_index=None):
     w,h=s._seven_size
     update_scrollbar(s,'list_scroll',count,s.selected_index,s.page_size,(round(1320*w/1920.),round(252*h/1080.),max(2,round(5*w/1920.)),round(687*h/1080.)))
 
-def _poster_key(item):return tuple(str(getattr(item,k,'') or '') for k in ('content_type','stream_id','parent_id','season','episode','icon'))
 def _resume(item):
     position=int(getattr(item,'resume_position',0) or 0);length=int(getattr(item,'resume_length',0) or 0)
     return max(0,min(100,round(position*100./length))) if length>0 else 0,max(1,round(max(0,length-position)/60.)) if length>0 else None
@@ -251,10 +250,12 @@ def refresh_media(s, previous_index=None):
         show(s, 'r100_media_focus_'+str(previous_index-start), False)
         show(s, 'r100_media_focus_'+str(s.selected_index-start), True)
         _media_details(s, selected, favorites)
+        _scroll_media_title(s, selected, start, favorites)
         return
     from . import main
     source=main._safe_source_name(s.account)
-    text(s,'subtitle',source if favorites else source+' · '+_('Unfinished movies and series episodes'),28)
+    if not favorites:
+        text(s,'subtitle',source+' · '+_('Unfinished movies and series episodes'),28)
     pages=(count+s.page_size-1)//s.page_size if count else 0;page=s.selected_index//s.page_size+1 if count else 0
     total=int(s._favorite_counts.get('',0)) if favorites else count
     text(s,'r100_counter',_('{} favorites · Page {} / {}').format(total,page,pages) if favorites else _('{} items · {} / {} pages').format(count,page,pages),28)
@@ -265,41 +266,46 @@ def refresh_media(s, previous_index=None):
     for i in range(s.page_size):
         item=items[start+i] if start+i<count else None
         show(s,'r100_media_focus_'+str(i),item is not None and start+i==s.selected_index and not getattr(s,'_move_active',False))
-        show(s,'r100_type_bg_'+str(i),item is not None)
         if item:
             text(s,'continue_title_'+str(i),item.name if favorites else _media_name(item),31 if favorites else 38)
-            label=_({'live':'Live TV','movie':'Movies','series':'Series'}.get(item.content_type,'Favorite'))
-            text(s,'continue_type_'+str(i),label if favorites else localized_upper(label),25)
         if not favorites:
+            show(s,'r100_type_bg_'+str(i),item is not None)
+            if item:
+                label=_({'live':'Live TV','movie':'Movies','series':'Series'}.get(item.content_type,'Favorite'))
+                text(s,'continue_type_'+str(i),localized_upper(label),25)
             p,remaining=_resume(item) if item else (0,None)
             text(s,'r100_percent_'+str(i),'{}%'.format(p) if item else '',29)
             text(s,'r100_remaining_'+str(i),_('{} min remaining').format(remaining) if remaining is not None else '—' if item else '',29)
             show(s,'r100_percent_'+str(i),item is not None);show(s,'r100_remaining_'+str(i),item is not None)
             if item:progress(s,'continue_progress_fill_'+str(i),p,(68+i*444,824,384,18))
-    text(s,'r100_side_caption',localized_upper(_('Selected favorite') if favorites else _('Playback information')),34)
     if favorites:
+        text(s,'r100_side_caption',localized_upper(_('Selected favorite')),34,2)
         text(s,'r100_side_label',_('Source'),29);text(s,'r100_side_value',source,34,2)
-        text(s,'r100_open_hint','OK   '+_('Open'),32)
     else:
+        text(s,'r100_side_caption',localized_upper(_('Playback information')),34)
         text(s,'r100_resume_hint',_('Continue from where you left off.'),27,2)
     _media_details(s, selected, favorites)
     if not items or s._error:text(s,'message',s['favorite_info'].getText() if favorites else s['message'].getText(),26,2)
     else:text(s,'message','',23)
     hide_scrollbar(s,'list_scroll')
+    _scroll_media_title(s, selected, start, favorites)
+
+
+def _scroll_media_title(screen, selected, page_start, favorites):
+    if selected is None or screen._loading or screen._error:
+        clear_selection(screen)
+        return
+    name = selected.name if favorites else _media_name(selected)
+    key = (screen.selected_index, getattr(selected, 'favorite_key' if favorites else 'resume_key', ''))
+    select_label(screen, 'continue_title_{}'.format(screen.selected_index - page_start), name, key=key)
 
 
 def _media_details(s, selected, favorites):
-    text(s,'r100_side_title',_media_name(selected) if selected else '—',44 if favorites else 42,2)
     if favorites:
-        text(s,'r100_side_info',_({'live':'Live TV','movie':'Movies','series':'Series'}.get(selected.content_type,'Favorite')) if selected else '',32)
-        key=_poster_key(selected) if selected else None
-        if key!=s._seven_logo_key:
-            s._seven_logo_key=key;show(s,'r100_side_logo',False);show(s,'r100_logo_placeholder',True)
-            text(s,'r100_logo_placeholder','GT' if selected else '—',45)
-        if selected:
-            path=s._seven_poster_paths.get(key)
-            if path:_selected_logo(s,key,path)
+        text(s,'r100_side_title',selected.name if selected else '—',44,3)
+        text(s,'r100_side_info',_({'live':'Live TV','movie':'Movies','series':'Series'}.get(selected.content_type,'Favorite')) if selected else '',32,2)
     else:
+        text(s,'r100_side_title',_media_name(selected) if selected else '—',42,2)
         p,remaining=_resume(selected) if selected else (0,None)
         meta=_('Season {} · Episode {}').format(getattr(selected,'season','—') or '—',getattr(selected,'episode','—') or '—') if selected and selected.content_type=='series' else str(getattr(selected,'year','') or '')
         text(s,'r100_side_info',meta,32,2)
@@ -307,23 +313,19 @@ def _media_details(s, selected, favorites):
         text(s,'r100_resume_percent','{}%'.format(p) if selected else '',29)
         progress(s,'r100_resume_fill',p,(1412,776,432,18));show(s,'r100_resume_bg',selected is not None)
 
-
-def _selected_logo(s,key,path):
-    signature=(key,path,id(getattr(s['r100_side_logo'],'instance',None)))
-    if getattr(s,'_r27_selected_logo',None)==signature and getattr(s['r100_side_logo'],'visible',False):return
-    def loaded(success):
-        if s._closed or key!=s._seven_logo_key:return
-        if success:
-            s._r27_selected_logo=signature
-            show(s,'r100_side_logo',True);show(s,'r100_logo_placeholder',False)
-    attach_pixmap(s,'r100_side_logo',path,key='seven-selected-logo',on_loaded=loaded,show_on_load=False)
-
 def poster_after(method):
     @wraps(method)
     def applied(s,slot,path,stream_id,generation,page_start):
+        if getattr(s, '_closed', True) is not False:
+            return
         if not hasattr(s,'_seven_kind'):return method(s,slot,path,stream_id,generation,page_start)
         def valid():
-            return not s._closed and generation==s._continue_generation and page_start==s.selected_index//s.page_size*s.page_size and 0<=slot<s.page_size and page_start+slot<len(s._entries) and str(s._entries[page_start+slot].stream_id)==str(stream_id)
+            return (getattr(s, '_closed', True) is False
+                    and generation == s._continue_generation
+                    and page_start == s.selected_index // s.page_size * s.page_size
+                    and 0 <= slot < s.page_size
+                    and page_start + slot < len(s._entries)
+                    and str(s._entries[page_start + slot].stream_id) == str(stream_id))
         if not valid():return
         signature=(generation,page_start,str(stream_id),path,id(getattr(s['continue_poster_'+str(slot)],'instance',None)))
         applied=getattr(s,'_r27_applied_posters',None)
@@ -335,10 +337,4 @@ def poster_after(method):
             show(s,'continue_poster_'+str(slot),success)
             show(s,'continue_poster_placeholder_'+str(slot),not success)
         attach_pixmap(s,'continue_poster_'+str(slot),path,key='continue-poster-'+str(slot),on_loaded=loaded,show_on_load=False)
-        if getattr(s,'_seven_kind',None)=='favorites' and generation==s._continue_generation and page_start==s.selected_index//s.page_size*s.page_size:
-            item=s._entries[page_start+slot] if page_start+slot<len(s._entries) else None
-            if item is not None and str(item.stream_id)==str(stream_id):
-                key=_poster_key(item);s._seven_poster_paths[key]=path;s._seven_poster_paths.move_to_end(key)
-                while len(s._seven_poster_paths)>24:s._seven_poster_paths.popitem(last=False)
-                if page_start+slot==s.selected_index:_selected_logo(s,key,path)
     return applied

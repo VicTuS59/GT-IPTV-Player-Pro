@@ -4457,3 +4457,27 @@ msgstr "Priporočeno"
 
 msgid "Restore source name"
 msgstr "Obnovi izvirno ime"
+
+msgid "Could not start a thread for the account test."
+msgstr "Ni bilo mogoče zagnati niti za preverjanje računa."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "Podatki napovedi so preoblikovani za prikaz na televizorju."
+
+msgid "Not enough memory to start the account test."
+msgstr "Premalo pomnilnika za zagon preverjanja računa."
+
+msgid "Search Episodes on YouTube"
+msgstr "Poišči epizode na YouTubu"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "Televizijski podatki iz TVmaze — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Ta izdelek uporablja API TMDB, vendar ga TMDB ni odobril niti certificiral."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "Uporabniki dodajo naslove svojih virov mHub v2. Izbrani vir zagotavlja prenose, GT IPTV Player Pro pa jih predvaja neposredno na sprejemniku."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "Vremenski podatki s spletnega mesta Open-Meteo.com — CC BY 4.0"

@@ -24,6 +24,7 @@ from .playback import PlaybackResumeStore, resume_account_scope, resume_key
 from .persistence import queue_playback_clear
 from .remote_footer import prepared_skin, set_remote_footer
 from .scrollbar import hide_scrollbar, update_scrollbar
+from .seven_layout import FAVORITE_COLUMNS, FAVORITE_ROWS
 from .settings import load_player_settings
 from .typography import ellipsize_dynamic_text, set_text_if_changed
 from .browser_common import APP_BACKGROUND_PATH, CONTINUE_FOOTER_ITEMS, CONTINUE_POSTER_WORKERS, FAVORITES_FOOTER_ITEMS, FAVORITES_MOVE_FOOTER_ITEMS, FAVORITE_STAR_PATH, GTAsyncListScreen, PICON_DOWNLOAD_TIMEOUT, WORKER_POSTER_TIMEOUT_SECONDS, _DownloadSupport, _WorkerToken, _attach_subtitle_detail_metadata, _bounded_client_call, _cached_picon_path, _cancel_worker_token, _connect_timer, _debug, _debug_identifier, _download_client_image, _is_m3u_client, _is_stalker_client, _picon_cache_path, _safe_picon_url, _scale, _series_provider_id, content_client_for
@@ -61,7 +62,7 @@ def _continue_watching_skin(screen_name='GTContinueWatchingScreen'):
 
 @seven_skin_after('favorites')
 def _favorites_skin():
-    """Favorites-only 5×3 poster grid; Continue Watching stays 4×2."""
+    """Base widgets for the Favorites poster grid."""
     width, height, px = _scale()
     variant = {(720, 576): 'sd576', (720, 480): 'sd480', (640, 480): 'sd640'}.get((width, height))
     if variant is None:
@@ -83,8 +84,8 @@ def _favorites_skin():
     poster_h = px(154)
     focus_h = max(2, px(4))
     cards = []
-    for index in range(15):
-        row, column = divmod(index, 5)
+    for index in range(FAVORITE_COLUMNS * FAVORITE_ROWS):
+        row, column = divmod(index, FAVORITE_COLUMNS)
         card_x = grid_x + column * (card_w + card_gap)
         card_y = grid_y[row]
         hidden = px(1)
@@ -148,13 +149,13 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
             for edge in ('top', 'bottom', 'left', 'right'):
                 self['continue_focus_{}_{}'.format(slot, edge)] = Label('')
         self._poster_timer = eTimer()
-        _connect_timer(self._poster_timer, self._poll_continue_posters)
+        self._poster_timer_connection = _connect_timer(self._poster_timer, self._poll_continue_posters)
         self['download_actions'] = ActionMap(['MenuActions'], {'menu': self.request_selected_download}, -1)
         self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions'], {'ok': self.open_selected, 'cancel': self.close, 'left': self.move_left, 'right': self.move_right, 'up': self.move_grid_up, 'down': self.move_grid_down, 'red': self.remove_selected, 'green': self.start_load}, -1)
         if hasattr(self, 'onShown'):
             self.onShown.append(self._reload_after_return)
         if hasattr(self, 'onClose'):
-            self.onClose.append(self._stop_continue_posters)
+            self.onClose.append(self._close_continue_posters)
         self._clear_continue_cards()
         setup_seven(self, self._seven_pending_kind, self._footer_layout_items)
 
@@ -418,7 +419,7 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
             state['pending'] -= 1
 
     def _poll_continue_posters(self):
-        if self._closed:
+        if getattr(self, '_closed', True) is not False:
             return
         state = self._continue_poster_state
         if state is None:
@@ -492,6 +493,10 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
         self._continue_generation += 1
         self._cancel_continue_poster_work()
 
+    def _close_continue_posters(self):
+        self._stop_continue_posters()
+        self._poster_timer_connection = None
+
     def _suspend_for_playback(self):
         self._stop_continue_posters()
 
@@ -559,7 +564,7 @@ class GTContinueWatchingScreen(_DownloadSupport, GTAsyncListScreen):
 
 class GTFavoritesScreen(GTContinueWatchingScreen):
     """Local mixed-media favorites with one filterable poster grid."""
-    page_size = 6
+    page_size = FAVORITE_COLUMNS * FAVORITE_ROWS
     FILTERS = (('', N_('All')), ('live', N_('Live TV')), ('movie', N_('Movies')), ('series', N_('Series')))
 
     def __init__(self, session, account, client=None, favorite_store=None, metadata_client=None):
@@ -684,9 +689,8 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
             placeholder.setText('GT\n{}'.format(content_label))
             set_visible(placeholder, True)
             set_visible(self['continue_poster_{}'.format(slot)], False)
-            set_text_if_changed(self['continue_type_{}'.format(slot)], content_label)
             ellipsize_dynamic_text(self['continue_title_{}'.format(slot)], item.name, fallback_chars=25)
-            for name in ('continue_card_{}', 'continue_type_{}', 'continue_title_{}'):
+            for name in ('continue_card_{}', 'continue_title_{}'):
                 set_visible(self[name.format(slot)], True)
             set_visible(self['continue_meta_{}'.format(slot)], False)
             set_visible(self['continue_progress_bg_{}'.format(slot)], False)
@@ -798,15 +802,15 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
 
     def move_grid_up(self):
         if self._move_active:
-            self._move_reordered_item(-3)
-        elif self.selected_index >= 3:
-            self._select_favorite(self.selected_index - 3)
+            self._move_reordered_item(-FAVORITE_COLUMNS)
+        elif self.selected_index >= FAVORITE_COLUMNS:
+            self._select_favorite(self.selected_index - FAVORITE_COLUMNS)
 
     def move_grid_down(self):
         if self._move_active:
-            self._move_reordered_item(3)
+            self._move_reordered_item(FAVORITE_COLUMNS)
         else:
-            self._select_favorite(self.selected_index + 3)
+            self._select_favorite(self.selected_index + FAVORITE_COLUMNS)
 
     def _change_page(self, direction):
         if not self._entries or self._loading:
@@ -847,18 +851,21 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
         set_remote_footer(self, FAVORITES_FOOTER_ITEMS)
 
     def _watch_favorite_operation(self, result, failure, success=''):
+        if getattr(self, '_closed', True) is not False:
+            return
         operations = getattr(self, '_favorite_operations', None)
         if operations is None:
             operations = self._favorite_operations = []
             self._favorite_operation_timer = eTimer()
-            _connect_timer(self._favorite_operation_timer, self._poll_favorite_operations)
-            self.onClose.append(self._favorite_operation_timer.stop)
+            self._favorite_operation_timer_connection = _connect_timer(
+                self._favorite_operation_timer, self._poll_favorite_operations)
+            self.onClose.append(self._stop_favorite_operations)
         operations[:] = [entry for entry in operations if not entry[0]['done']][-31:]
         operations.append((result, failure, success))
         self._favorite_operation_timer.start(80, True)
 
     def _poll_favorite_operations(self):
-        if self._closed:
+        if getattr(self, '_closed', True) is not False:
             return
         pending = []
         for result, failure, success in self._favorite_operations:
@@ -872,6 +879,15 @@ class GTFavoritesScreen(GTContinueWatchingScreen):
         self._favorite_operations = pending
         if pending:
             self._favorite_operation_timer.start(80, True)
+
+    def _stop_favorite_operations(self):
+        try:
+            self._favorite_operation_timer.stop()
+        except Exception:
+            pass
+        finally:
+            self._favorite_operation_timer_connection = None
+            self._favorite_operations = []
 
     def save_move(self):
         if not self._move_active:

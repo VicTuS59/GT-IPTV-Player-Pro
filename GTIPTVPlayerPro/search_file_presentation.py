@@ -10,6 +10,7 @@ from .remote_footer import prepared_skin, skin_metadata, layout_needs_fit, _cach
 from .utility_design import bind_missing
 from .seven_presentation import text as fit_text,show,_footer_style,_paint_footer
 from .scrollbar import update_scrollbar,hide_scrollbar
+from .selected_row_scroll import clear_selection, select_label
 from .typography import font_px
 from .search_file_layout import restyle,search_scroll_geometry,file_list_geometry
 
@@ -110,6 +111,7 @@ def _search(s):
     count=len(s._results)
     start=s.selected_index//s.page_size*s.page_size if count else 0
     global_start=(s._current_page-1)*s._result_page_size
+    scroll_target=None
     for row in range(s.page_size):
         item=s._results[start+row] if start+row<count else None
         present=item is not None
@@ -121,6 +123,8 @@ def _search(s):
         # The year has its own column. Retain all other provider identity tags.
         if year and re.fullmatch(r'\d{4}',year):name=re.sub(r'\s*\('+re.escape(year)+r'\)\s*$','',name).rstrip()
         text(s,'catalog_result_'+str(row),name,32)
+        if present and start+row==s.selected_index and not s._loading:
+            scroll_target=('catalog_result_'+str(row),name,str(getattr(item,'stream_id','') or ''))
         text(s,'r102_result_number_'+str(row),'{:05d}'.format(global_start+start+row+1) if present else '',28)
         text(s,'r102_result_year_'+str(row),year,29)
     show(s,'message',not count)
@@ -143,6 +147,11 @@ def _search(s):
         text(s,'message',s['message'].getText(),31,4)
         text(s,'detail_title',s['detail_title'].getText(),36,2)
         text(s,'detail_plot',s['detail_plot'].getText(),27,2)
+    if scroll_target is None:
+        clear_selection(s)
+    else:
+        widget,name,key=scroll_target
+        select_label(s,widget,name,key=key)
     s._r102_poster.schedule()
 
 def _file_entry(raw):

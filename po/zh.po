@@ -4439,3 +4439,27 @@ msgstr "推荐"
 
 msgid "Restore source name"
 msgstr "恢复原名称"
+
+msgid "Could not start a thread for the account test."
+msgstr "无法启动账户测试线程。"
+
+msgid "Forecast data is reformatted for television display."
+msgstr "预报数据已重新排版，以便在电视上显示。"
+
+msgid "Not enough memory to start the account test."
+msgstr "内存不足，无法启动账户测试。"
+
+msgid "Search Episodes on YouTube"
+msgstr "在 YouTube 上搜索剧集"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "电视节目数据由 TVmaze 提供 — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "本产品使用 TMDB API，但未获得 TMDB 的认可或认证。"
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "用户自行添加 mHub v2 源地址。串流由所选来源提供，GT IPTV Player Pro 直接在接收设备上播放。"
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "天气数据由 Open-Meteo.com 提供 — CC BY 4.0"

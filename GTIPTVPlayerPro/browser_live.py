@@ -51,6 +51,7 @@ from .paths import plugin_path
 from .persistence import RESTORE_COORDINATOR
 from .remote_footer import prepared_skin, set_remote_footer
 from .scrollbar import hide_scrollbar, update_scrollbar
+from .selected_row_scroll import clear_selection, select_label
 from .settings import load_player_settings, service_engine_label
 from .seven_presentation import progress as set_broadcast_progress
 from .typography import _line_fits, clean_dynamic_text, current_text_size, ellipsize_dynamic_text, fit_dynamic_text, font_px, set_static_text, set_text_if_changed, visible_count
@@ -708,7 +709,7 @@ class GTM3UChannelSearchScreen(_FavoriteSupport, GTAsyncListScreen):
         self._keyboard_requested = False
         self._keyboard_active = False
         self._keyboard_timer = eTimer()
-        _connect_timer(self._keyboard_timer, self.open_keyboard)
+        self._keyboard_timer_connection = _connect_timer(self._keyboard_timer, self.open_keyboard)
         self._hidden_category_ids = hidden_category_match_ids((), hidden_category_ids)
         search_key = 'blue' if category is None else 'green'
         self._footer_layout_items = M3U_SEARCH_FOOTER_ITEMS if category is None else LIVE_SEARCH_FOOTER_ITEMS
@@ -718,7 +719,25 @@ class GTM3UChannelSearchScreen(_FavoriteSupport, GTAsyncListScreen):
         self._init_favorite_support(favorite_store)
         self._hook_favorite_close()
         self['screen_label'].setText(_('M3U CHANNEL SEARCH') if category is None else scope_label)
-        self['actions'] = ActionMap(['OkCancelActions', 'DirectionActions', 'ColorActions'], {'ok': self.open_selected, 'cancel': self.close, 'up': self.move_up, 'down': self.move_down, 'upRepeated': self.move_up, 'downRepeated': self.move_down, 'left': self.page_up, 'right': self.page_down, 'leftRepeated': self.page_up, 'rightRepeated': self.page_down, 'red': self.toggle_favorite, search_key: self.open_keyboard}, -1)
+        self['actions'] = ActionMap(
+            ['OkCancelActions', 'DirectionActions', 'ColorActions', 'WizardActions'],
+            {
+                'ok': self.open_selected,
+                'cancel': self._close_search,
+                'back': self._close_search,
+                'up': self.move_up,
+                'down': self.move_down,
+                'upRepeated': self.move_up,
+                'downRepeated': self.move_down,
+                'left': self.page_up,
+                'right': self.page_down,
+                'leftRepeated': self.page_up,
+                'rightRepeated': self.page_down,
+                'red': self.toggle_favorite,
+                search_key: self.open_keyboard,
+            },
+            -1,
+        )
         if hasattr(self, 'onClose'):
             self.onClose.append(self._stop_search)
 
@@ -763,7 +782,7 @@ class GTM3UChannelSearchScreen(_FavoriteSupport, GTAsyncListScreen):
         self._keyboard_active = False
         if value is None:
             if self._search_category is not None and not self._query:
-                self.close()
+                self._close_search()
             return
         self._query = ' '.join(str(value or '').split())[:120]
         if not self._query:
@@ -834,11 +853,21 @@ class GTM3UChannelSearchScreen(_FavoriteSupport, GTAsyncListScreen):
             if getattr(self, '_closed', True) is False:
                 set_text_if_changed(self['message'], _('Could not open the stream.'))
 
+    def _close_search(self):
+        if getattr(self, '_closed', True) is not False:
+            return
+        self._stop()
+        self._stop_search()
+        self._stop_favorite_keys()
+        self.close()
+
     def _stop_search(self):
         try:
             self._keyboard_timer.stop()
         except Exception:
             pass
+        finally:
+            self._keyboard_timer_connection = None
 
 class _GTStreamListBase(GTAsyncListScreen):
     """Shared catalogue primitives; live browsing never owns a decoder."""
@@ -2181,6 +2210,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         return _GTStreamListBase.refresh_streams(self)
 
     def start_load(self):
+        clear_selection(self)
         content_sort_ui.cancel(self)
         content_sort_ui.release_live(self)
         if getattr(self, '_preview_service_active', False):
@@ -2214,6 +2244,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
     @broadcast_refresh_after
     def _refresh_live_streams(self, *, selection_only=False):
         if self._closed or self._fullscreen_active:
+            clear_selection(self)
             self._live_render_page_key = None
             return
         fit_dynamic_text(self['list_caption'], self._channel_move_guidance() if self._channel_move is not None else self._live_list_caption(), max_lines=1)
@@ -2296,6 +2327,13 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         self._prefetch_remaining_live_catalog()
         if selection_only:
             refresh_live_selection(self, page_changed, previous_row)
+        if (self._loading or getattr(self, '_live_modal_active', False)
+                or not 0 <= selected_row < len(page_items)):
+            clear_selection(self)
+        else:
+            selected = page_items[selected_row]
+            select_label(self, 'stream_name_{}'.format(selected_row), selected.name,
+                         key=self._selection_key(selected))
 
     def _prefetch_remaining_live_catalog(self):
         """Read only enough catalogue rows for the visible and next page."""
@@ -2308,6 +2346,7 @@ class GTStreamListScreen(LiveProgrammePosterMixin, _LiveStartupRecoverySupport, 
         return self._start_live_more(force=True)
 
     def _clear_live_stream_rows(self):
+        clear_selection(self)
         self._clear_live_active_picon()
         self._clear_live_visible_picons()
         self._clear_live_selected_picon()

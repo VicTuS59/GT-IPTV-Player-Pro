@@ -5,8 +5,10 @@
 
 import json
 import re
+import socket
 import time
-from threading import Lock
+from contextvars import ContextVar
+from threading import Event, Lock
 from typing import NamedTuple
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlsplit
@@ -100,6 +102,14 @@ _PAGE_LIMIT = 4 * 1024 * 1024
 _LOOKUP_SECONDS = 6.0
 _LIVE_EXECUTOR = None
 _LIVE_EXECUTOR_LOCK = Lock()
+_PUBLIC_LOOKUP = ContextVar("youtube_public_lookup", default=None)
+_TIMEOUT_MESSAGES = frozenset(("TMDb request timed out", "Image download timed out.",
+                               "Image host name resolution timed out."))
+
+
+class _PublicLookupTiming(NamedTuple):
+    request_timeout: float
+    timed_out: Event
 
 
 class LiveLookupError(RuntimeError):
@@ -108,8 +118,34 @@ class LiveLookupError(RuntimeError):
         super().__init__(code)
 
 
+def _record_lookup_timeout(error=None):
+    timing = _PUBLIC_LOOKUP.get()
+    if timing is None:
+        return False
+    if error is None:
+        timing.timed_out.set()
+        return True
+    for _ in range(5):
+        if error is None:
+            break
+        if (isinstance(error, (TimeoutError, socket.timeout))
+                or getattr(error, "code", None) in ("timeout", 408, 504)
+                or getattr(error, "http_status", None) in (408, 504)
+                or str(error) in _TIMEOUT_MESSAGES):
+            timing.timed_out.set()
+            return True
+        reason = error.reason if isinstance(error, URLError) else None
+        error = reason if isinstance(reason, BaseException) else error.__cause__ or error.__context__
+    return False
+
+
 class _PublicRedirects(HTTPRedirectHandler):
     max_redirections = 3
+
+    def __init__(self, deadline=None, cancel=None):
+        super().__init__()
+        self.deadline = deadline
+        self.cancel = cancel
 
     def redirect_request(self, request, fp, code, message, headers, new_url):
         target = urlsplit(new_url)
@@ -117,6 +153,8 @@ class _PublicRedirects(HTTPRedirectHandler):
                 or target.port not in (None, 443) or target.username is not None
                 or target.password is not None):
             raise LiveLookupError()
+        if self.deadline is not None:
+            request.timeout = _time_left(self.deadline, self.cancel)
         return super().redirect_request(request, fp, code, message, headers, new_url)
 
 
@@ -125,12 +163,16 @@ def _time_left(deadline, cancel):
         raise LiveLookupError("cancelled")
     remaining = deadline - time.monotonic()
     if remaining <= 0:
+        _record_lookup_timeout()
         raise LiveLookupError("timeout")
     return remaining
 
 
 def _public_page(path, deadline, cancel, accept_language):
-    timeout = min(4.0, _time_left(deadline, cancel))
+    timing = _PUBLIC_LOOKUP.get()
+    timeout = min(timing.request_timeout if timing is not None else 4.0, _time_left(deadline, cancel))
+    request_deadline = min(deadline, time.monotonic() + timeout) if timing is not None else deadline
+    redirects = _PublicRedirects(request_deadline, cancel) if timing is not None else _PublicRedirects()
     request = Request(_ORIGIN + path, headers={
         "Accept": "text/html,application/xhtml+xml",
         "Accept-Encoding": "identity",
@@ -139,18 +181,31 @@ def _public_page(path, deadline, cancel, accept_language):
     })
     payload = bytearray()
     try:
-        with build_opener(_PublicRedirects()).open(request, timeout=timeout) as response:
+        with build_opener(redirects).open(request, timeout=timeout) as response:
             read = getattr(response, "read1", response.read)
             while len(payload) <= _PAGE_LIMIT:
-                _time_left(deadline, cancel)
+                remaining = _time_left(request_deadline, cancel)
+                if timing is not None:
+                    raw = getattr(getattr(response, "fp", None), "raw", None)
+                    set_timeout = getattr(getattr(raw, "_sock", None), "settimeout", None)
+                    if callable(set_timeout):
+                        set_timeout(remaining)
                 chunk = read(min(65536, _PAGE_LIMIT + 1 - len(payload)))
                 if not chunk:
+                    if timing is not None:
+                        _time_left(request_deadline, cancel)
                     return payload.decode("utf-8", "replace")
                 payload.extend(chunk)
     except HTTPError as error:
         error.close()
+        if _record_lookup_timeout(error):
+            raise LiveLookupError("timeout") from None
         raise LiveLookupError("rate_limited" if error.code == 429 else "unavailable") from None
-    except (URLError, OSError, ValueError):
+    except (URLError, OSError, ValueError) as error:
+        if timing is not None:
+            _time_left(request_deadline, cancel)
+            if _record_lookup_timeout(error):
+                raise LiveLookupError("timeout") from None
         raise LiveLookupError() from None
     raise LiveLookupError()
 

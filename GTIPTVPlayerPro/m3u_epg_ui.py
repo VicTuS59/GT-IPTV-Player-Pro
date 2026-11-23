@@ -13,6 +13,7 @@ import os
 from urllib.parse import urlsplit
 from .ui_update import set_visible
 from .typography import set_text_if_changed
+from .selected_row_scroll import clear_selection, select_label
 
 from .action_map import ActionMap
 try:
@@ -889,8 +890,16 @@ class GTM3UXMLTVSettingsScreen(Screen):
             _status_text(self.binding, self._refresh_runtime_state),
         )
 
-    @seven_refresh_after
     def _refresh(self):
+        self._render_settings()
+        index = self.selected_index
+        if index == 0 and getattr(self, '_seven_kind', None) == 'xmltv':
+            clear_selection(self)
+        else:
+            select_label(self, "value_{}".format(index), str(self._values()[index]), key=index)
+
+    @seven_refresh_after
+    def _render_settings(self):
         source_label = _("Country") if self.binding.source_selection == "freeepg" else _(self.LABELS[2])
         set_text_if_changed(self["label_2"], source_label)
         if getattr(self, '_seven_kind', None) == 'xmltv':

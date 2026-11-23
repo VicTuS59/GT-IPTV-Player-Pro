@@ -287,7 +287,7 @@ class LightVODMethods:
         self._light_list_delivery=SourceLoader(eTimer(),_connect_timer,self._light_list_ready)
         self._light_list_delivery_job=None
         self._light_cover_start_timer=eTimer()
-        _connect_timer(self._light_cover_start_timer,self._light_start_cover)
+        self._light_cover_start_connection = _connect_timer(self._light_cover_start_timer, self._light_start_cover)
         self.onShown.append(self._light_shown)
         self.onLayoutFinish.append(self._light_layout_ready)
         self.onHide.append(self._light_hidden)
@@ -313,7 +313,10 @@ class LightVODMethods:
                 preferred_size=font_px(font,size),min_size=font(minimum),fallback_chars=24)
 
     def _light_shown(self):
+        if getattr(self, '_closed', True) is not False:
+            return
         self._light_visible=True
+        self._light_scroll_focused_list()
         self['light_video_guard'].show()
         backing=self.content_type+'_poster_backing'
         if backing in self:self[backing].show()
@@ -326,7 +329,8 @@ class LightVODMethods:
 
     def _light_cancel_cover(self):
         from .browser_common import _cancel_worker_token
-        if self._light_cover_request is None:return
+        if getattr(self, '_light_cover_request', None) is None:
+            return
         _cancel_worker_token(getattr(self,'_light_cover_token',None))
         self._light_cover_token=None
         self._light_cover_request=None
@@ -341,15 +345,20 @@ class LightVODMethods:
         self._light_hero_request=None
         self._light_hero_after_cache=None
         self._light_hero_decoding=False
-        if self._light_hero_token is not None:
-            _cancel_worker_token(self._light_hero_token)
+        token = getattr(self, '_light_hero_token', None)
+        if token is not None:
+            _cancel_worker_token(token)
             self._light_hero_token=None
-            self._light_hero_loader.cancel()
+            loader = getattr(self, '_light_hero_loader', None)
+            if loader is not None:
+                loader.cancel()
 
     def _light_cancel_art(self):
         self._light_cancel_cover()
         self._light_cancel_hero()
-        loaders=getattr(self,'_gt_pixmap_loaders',{})
+        loaders = getattr(self, '_gt_pixmap_loaders', None)
+        if not loaders:
+            return
         for key in ('light-hero',self.content_type+'-detail'):
             decoder=loaders.pop(key,None)
             if decoder is not None:decoder.close()
@@ -370,29 +379,46 @@ class LightVODMethods:
         self._light_show(self.content_type+'_poster_placeholder',True)
 
     def _light_hidden(self):
+        if getattr(self, '_light_visible', None) is None:
+            return
         self._light_visible=False
         self._light_cancel_art()
-        self._light_field('detail_timer').stop()
+        detail_timer = self._light_field('detail_timer')
+        if detail_timer is not None:
+            detail_timer.stop()
         self._light_release()
 
     def _light_close(self):
         self._light_hidden()
-        self._light_cover_loader.close()
-        self._light_hero_loader.close()
-        self._light_list_delivery.close()
+        timer = getattr(self, '_light_cover_start_timer', None)
+        if timer is not None:
+            timer.stop()
+        self._light_cover_start_connection = None
         self._light_list_delivery_job=None
+        for name in ('_light_cover_loader', '_light_hero_loader', '_light_list_delivery'):
+            loader = getattr(self, name, None)
+            if loader is not None:
+                loader.close()
 
     def _light_begin_list(self,kind,generation):
-        self._light_list_delivery_job=(kind,generation,self._light_list_delivery.expect())
+        if getattr(self, '_closed', True) is not False:
+            return
+        delivery = getattr(self, '_light_list_delivery', None)
+        if delivery is not None:
+            self._light_list_delivery_job = (kind, generation, delivery.expect())
 
     def _light_publish_list(self,kind,generation):
         # Worker-side publication only; native widgets stay on the GUI loop.
-        job=self._light_list_delivery_job
-        if job is not None and job[:2]==(kind,generation):
-            self._light_list_delivery.publish(job[2],(kind,generation))
+        if getattr(self, '_closed', True) is not False:
+            return
+        job = getattr(self, '_light_list_delivery_job', None)
+        delivery = getattr(self, '_light_list_delivery', None)
+        if delivery is not None and job is not None and job[:2] == (kind, generation):
+            delivery.publish(job[2], (kind, generation))
 
     def _light_list_ready(self,value,error):
-        if self._closed or error is not None or not value:return
+        if getattr(self, '_closed', True) is not False or error is not None or not value:
+            return
         kind,generation=value
         if generation!=getattr(self,'_'+kind+'_generation',None):return
         if not getattr(self,'_'+kind+'_loading',False):return
@@ -400,6 +426,8 @@ class LightVODMethods:
         getattr(self,'_poll_'+kind+'_result')()
 
     def _light_layout_ready(self):
+        if getattr(self, '_closed', True) is not False:
+            return
         from .remote_footer import bind_layout_text
         bind_layout_text(self)
         self._light_rows_signature=self._light_categories_signature=None
@@ -424,6 +452,8 @@ class LightVODMethods:
         if self.content_type=='series':self._series_pending_clamp_to_end=False
 
     def _light_release(self, *, arm=True):
+        if getattr(self, '_closed', True) is not False:
+            return
         from .browser_common import NAVIGATION_DEBOUNCE_MS
         held=self._light_navigation_held
         repeated=self._light_navigation_repeated
@@ -587,18 +617,21 @@ class LightVODMethods:
         self.toggle_selected_favorite()
 
     def _light_native_title(self,title,identity):
-        if not self._favorite_keys:return title
+        if getattr(self, '_closed', True) is not False or not self._favorite_keys:
+            return title
         item=SimpleNamespace(stream_id=identity,content_type=self.content_type,
             source_type=str(getattr(self.client,'source_type','')))
         return ('★ ' if self._is_favorite(item) else '')+title
 
     def _light_native_category_changed(self):
-        if self._light_list_sync or self._closed:return
+        if getattr(self, '_closed', True) is not False or self._light_list_sync:
+            return
         self.selected_index=self['light_category_list'].getSelectedIndex()
         self._light_render_categories(schedule_load=False)
 
     def _light_native_content_changed(self):
-        if self._light_list_sync or self._closed:return
+        if getattr(self, '_closed', True) is not False or self._light_list_sync:
+            return
         self._light_select(self['light_content_list'].getSelectedIndex())
 
     def _light_assign_list(self,name,rows,index,focused,replace=False):
@@ -612,6 +645,25 @@ class LightVODMethods:
                 widget.selectionEnabled(focused)
                 widget._light_focus_key=focus_key
         finally:self._light_list_sync=False
+
+    def _light_scroll_focused_list(self):
+        if getattr(self, '_closed', True) is not False or not self._light_visible:
+            return
+        from .selected_row_scroll import clear_selection
+
+        if self._light_content_focus():
+            name = 'light_content_list'
+            loading = self._light_field('loading', False)
+            error = self._light_field('error', '')
+        else:
+            name = 'light_category_list'
+            loading = self._loading
+            error = self._error
+        if loading or error or name not in self:
+            clear_selection(self)
+            return
+        widget = self[name]
+        widget.scroll_selected_title(self, widget.getSelectedIndex())
 
     def _light_search(self):
         return getattr(self,'open_movie_search' if self.content_type=='movie' else 'open_series_search')()
@@ -709,6 +761,8 @@ class LightVODMethods:
             set_text_if_changed(self['message'],_('Loading...') if self._loading else _('No category found.'))
         elif not self._light_field('category_load_started',False):
             set_text_if_changed(self['message'],_('Open')+' : OK')
+        if focused:
+            self._light_scroll_focused_list()
 
     def _refresh_movie_categories(self,schedule_load=True):self._light_render_categories(schedule_load)
     def _refresh_series_categories(self):self._light_render_categories()
@@ -772,6 +826,8 @@ class LightVODMethods:
         if hint is not None:
             hint.refresh_hint()
             self._light_show(kind+'_trailer_hint_bg_frame',bool(getattr(self[kind+'_trailer_hint_bg'],'visible',False)))
+        if focused:
+            self._light_scroll_focused_list()
 
     def _light_refresh_count(self):
         entries=self._light_field('entries',());selected=self._light_field('selected_index',0)
@@ -829,6 +885,8 @@ class LightVODMethods:
 
     def _light_apply_detail(self,info,poster_path='',metadata_status='',poster_url='',catalogue_poster_url='',
                             *, cache_only=False):
+        if getattr(self, '_closed', True) is not False:
+            return
         from .browser_common import _rating_label,_attach_subtitle_detail_metadata
         kind=self.content_type;entries=self._light_field('entries',())
         if not entries:return
@@ -857,8 +915,10 @@ class LightVODMethods:
     def _apply_series_detail(self,*args):self._light_apply_detail(*args)
 
     def _light_preview_cached_hero(self):
+        if getattr(self, '_closed', True) is not False or not self._light_visible:
+            return
         entries = self._light_field('entries', ())
-        if self._closed or not self._light_visible or not entries:
+        if not entries:
             return
         try:
             item = entries[self._light_field('selected_index', 0)]
@@ -868,9 +928,11 @@ class LightVODMethods:
         self._light_hero(item, info, cache_only=True)
 
     def _light_schedule_detail(self,immediate=False):
+        if getattr(self, '_closed', True) is not False:
+            return
         from .browser_common import _cancel_worker_token,NAVIGATION_DEBOUNCE_MS
         kind=self.content_type;prefix='_'+kind+'_';entries=self._light_field('entries',())
-        if self._closed or not entries:return
+        if not entries:return
         index=self._light_field('selected_index',0)
         item=self._light_labels(index,index+1)[0]
         identity=(self._light_field('loaded_category_id'),str(item.stream_id),self._light_field('generation'))
@@ -891,9 +953,11 @@ class LightVODMethods:
     def _schedule_series_detail(self,immediate=False):self._light_schedule_detail(immediate)
 
     def _light_commit_detail(self):
+        if getattr(self, '_closed', True) is not False or not self._light_visible:
+            return
         kind=self.content_type;prefix='_'+kind+'_'
-        if (self._closed or not self._light_visible
-                or self._light_field('pending_detail_generation')!=self._light_field('generation')):return
+        if self._light_field('pending_detail_generation') != self._light_field('generation'):
+            return
         if self._light_navigation_held:self._light_release(arm=False)
         setattr(self,prefix+'pending_detail_generation',None)
         entries=self._light_field('entries',())
@@ -908,7 +972,8 @@ class LightVODMethods:
     def _commit_series_detail(self):self._light_commit_detail()
 
     def _light_cover(self,item,path,url,info=None):
-        if not self._light_visible:return
+        if getattr(self, '_closed', True) is not False or not self._light_visible:
+            return
         kind=self.content_type
         identity=self._light_item_identity(item)
         if identity!=self._light_cover_identity:
@@ -937,37 +1002,46 @@ class LightVODMethods:
         self._light_cover_start_timer.start(0,True)
 
     def _light_start_cover(self):
+        if getattr(self, '_closed', True) is not False:
+            return
         from .browser_common import _WorkerToken
         job,self._light_cover_job=self._light_cover_job,None
-        if job is None or self._closed or not self._light_visible:return
+        if job is None or not self._light_visible:return
         request,item,info=job
         if request!=self._light_cover_request:return
         kind=self.content_type
         token=self._light_cover_token=_WorkerToken(12)
         width=getattr(self,'_poster_image_width',342)
+        client, metadata_client = self.client, self._metadata_client
         def load():
-            found=load_poster(self.client,self._metadata_client,kind,item,info,request[1],token,width=width)
+            found=load_poster(client,metadata_client,kind,item,info,request[1],token,width=width)
             token.check()
             return request,found
         self._light_cover_loader.request(load)
 
     def _light_cover_done(self,result,error):
-        if self._closed or not self._light_visible or error is not None or not result:return
+        if (getattr(self, '_closed', True) is not False or not self._light_visible
+                or error is not None or not result):
+            return
         request,found=result
         if request!=self._light_cover_request:return
         entries=self._light_field('entries',())
-        if not entries:return
-        item=entries[self._light_field('selected_index',0)]
+        index = self._light_field('selected_index', 0)
+        if not 0 <= index < len(entries):
+            return
+        item = entries[index]
         if self._light_item_identity(item)!=request[0]:return
         if found:
             self._light_poster_url,path=found
             self._apply_detail_poster(self.content_type,item,path)
 
     def _light_hero(self,item,info,*,cache_only=False):
+        if getattr(self, '_closed', True) is not False or not self._light_visible:
+            return
         identity=self._light_item_identity(item)
-        if not self._light_visible or (self._light_visual_identity==identity and self._light_hero_ready):return
+        if self._light_visual_identity==identity and self._light_hero_ready:return
         from .browser_common import _WorkerToken,_cinematic_cover_ratio
-        from .hero_artwork import is_composite,preparation_allowance,prepare_hero,vod_hero_plan
+        from .hero_artwork import is_composite, preparation_allowance, prepare_hero, release_prepared, vod_hero_plan
         cinema=getattr(self,'_vod_discovery_layout',False)
         urls=backdrop_urls(item,info)
         if not urls and (not cinema or cache_only or not getattr(self._metadata_client,'available',False)):
@@ -982,37 +1056,44 @@ class LightVODMethods:
         self._light_cancel_hero()
         self._light_hero_request=request
         token=self._light_hero_token=_WorkerToken(8)
-        plan=None if cinema else vod_hero_plan(*self._light_geometry['hero'][2:])
+        dimensions = self._light_geometry['hero'][2:]
+        plan = None if cinema else vod_hero_plan(*dimensions)
+        client, metadata_client, kind = self.client, self._metadata_client, self.content_type
 
         def load():
             if cinema:
                 found=(cached_preview_backdrop(urls,token) if cache_only else
-                       load_preview_backdrop(self.client,self._metadata_client,self.content_type,item,info,urls,token))
+                       load_preview_backdrop(client,metadata_client,kind,item,info,urls,token))
             else:
                 found=cached_backdrop(urls,token)
                 if found is None and not cache_only:
-                    found=download_backdrop(self.client,urls,token)
+                    found=download_backdrop(client,urls,token)
             if found is None:return None
             url,path=found
             if cinema:
                 # The restored skin already provides native gradient layers.
                 # Limit the decoded texture on UHD receivers.
-                width,height=self._light_geometry['hero'][2:]
+                width,height=dimensions
                 size=(min(width,1420),min(height,650))
                 return request,url,path,size,False,_cinematic_cover_ratio(path),info
             path=prepare_hero(path,plan,token,preparation_allowance())
-            token.check()
-            composited=is_composite(path,plan)
-            return request,url,path,plan.size,composited,None if composited else _cinematic_cover_ratio(path),info
+            try:
+                token.check()
+                composited=is_composite(path,plan)
+                return request,url,path,plan.size,composited,None if composited else _cinematic_cover_ratio(path),info
+            except Exception:
+                release_prepared(path)
+                raise
 
         self._light_hero_loader.request(load)
 
     def _light_hero_done(self,result,error):
         from .background import attach_pixmap
         from .hero_artwork import release_prepared
-        self._light_hero_token=None
-        if error is not None or result is None:
-            self._light_resume_hero_after_cache(self._light_hero_request)
+        if result is None:
+            if getattr(self, '_closed', True) is False:
+                self._light_hero_token = None
+                self._light_resume_hero_after_cache(self._light_hero_request)
             return
         request,url,path,size,composited,ratio,info=result
 
@@ -1028,6 +1109,12 @@ class LightVODMethods:
             if not success:self._light_resume_hero_after_cache(request)
 
         try:
+            if getattr(self, '_closed', True) is not False or request != self._light_hero_request:
+                return
+            self._light_hero_token = None
+            if error is not None:
+                self._light_resume_hero_after_cache(self._light_hero_request)
+                return
             if not self._light_hero_current(request):return
             if request[0]!=self._light_visual_identity:
                 self._light_apply_detail(info,cache_only=True)
@@ -1041,7 +1128,8 @@ class LightVODMethods:
             release_prepared(path)
 
     def _light_hero_current(self,request):
-        if (request is None or self._closed or not self._light_visible or request!=self._light_hero_request
+        if (request is None or getattr(self, '_closed', True) is not False or not self._light_visible
+                or request != self._light_hero_request
                 or request[0][0]!=self._light_field('loaded_category_id')
                 or request[0][2]!=self._light_field('generation')):
             return False

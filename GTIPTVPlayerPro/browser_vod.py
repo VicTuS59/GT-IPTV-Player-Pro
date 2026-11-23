@@ -1467,8 +1467,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             self._render_movie_posters()
 
     def _poll_movie_search_resume(self):
-        if self._closed:
-            self._movie_search_drain_event = None
+        if getattr(self, '_closed', True) is not False:
             return
         if self._movie_search_child_open:
             self._movie_search_resume_timer.start(100, True)
@@ -1512,7 +1511,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             self._movie_category_timer.start(NAVIGATION_DEBOUNCE_MS, True)
 
     def _commit_movie_category_load(self):
-        if not self._entries or self._closed:
+        if getattr(self, '_closed', True) is not False or not self._entries:
             return
         category = self._entries[self.selected_index]
         if category.category_id != self._movie_pending_category_id:
@@ -1638,7 +1637,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
         except Exception:
             entries = []
             error = N_('Could not load movies')
-        if self._closed or generation != self._movie_generation or (token is not None and (not token.active())):
+        if (getattr(self, '_closed', True) is not False or generation != getattr(self, '_movie_generation', None)
+                or (token is not None and not token.active())):
             return
         if native_window is not None and (not error):
             try:
@@ -1646,19 +1646,30 @@ class VODBrowserMethods(DiscoveryVODMethods):
             except Exception:
                 entries = []
                 error = N_('Search incomplete.')
-        self._movie_window_base = getattr(page, 'sort_base', 0) if browse_catalog is not None and (not error) else 0
-        self._movie_selected_index = getattr(page, 'sort_selected', 0) if browse_catalog is not None and (not error) else 0
-        self._movie_known_ids = set() if getattr(entries, 'full_category', False) else {str(item.stream_id) for item in entries}
-        self._movie_entries = self._movie_catalog_entries = entries
-        self._movie_error = error
-        if browse_catalog is not None and (not error):
-            self._movie_browse_cursor = page.next_cursor
-            self._movie_has_more = page.has_more
-        else:
-            self._movie_has_more = self._client_has_more_items('movie', category_id) if browse_catalog is None else False
+        has_page = browse_catalog is not None and not error
         if native_window is not None and (not error):
-            self._movie_has_more = native_window.has_more or native_window.count > len(entries)
-        self._movie_ready = True
+            has_more = native_window.has_more or native_window.count > len(entries)
+        elif browse_catalog is None:
+            has_more = self._client_has_more_items('movie', category_id)
+        else:
+            has_more = page.has_more if has_page else False
+        known_ids = set() if getattr(entries, 'full_category', False) else {str(item.stream_id) for item in entries}
+        lock = getattr(self, '_load_result_lock', None)
+        if lock is None:
+            return
+        with lock:
+            if (getattr(self, '_closed', True) is not False or generation != getattr(self, '_movie_generation', None)
+                    or (token is not None and not token.active())):
+                return
+            self._movie_window_base = getattr(page, 'sort_base', 0) if has_page else 0
+            self._movie_selected_index = getattr(page, 'sort_selected', 0) if has_page else 0
+            self._movie_known_ids = known_ids
+            self._movie_entries = self._movie_catalog_entries = entries
+            self._movie_error = error
+            if has_page:
+                self._movie_browse_cursor = page.next_cursor
+            self._movie_has_more = has_more
+            self._movie_ready = True
         publish = getattr(self, '_light_publish_list', None)
         if callable(publish): publish('movie', generation)
 
@@ -1892,7 +1903,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
 
 
     def _poll_movie_result(self):
-        if self._closed:
+        if getattr(self, '_closed', True) is not False:
             return
         browse_catalog = getattr(self, '_movie_browser_catalog', None)
         if browse_catalog is not None:
@@ -2022,7 +2033,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             self._movie_timer.start(self._vod_poster_poll_delay('movie'), True)
 
     def _apply_detail_poster(self, kind, item, path=''):
-        if getattr(self, '_vod_discovery_layout', False):
+        if getattr(self, '_closed', True) is not False or getattr(self, '_vod_discovery_layout', False):
             return False
         if getattr(self, '_poster_grid_enabled', False):
             return False
@@ -2065,6 +2076,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
         signatures[kind] = request
 
         def loaded(success):
+            if getattr(self, '_closed', True) is not False:
+                return
             try:
                 if kind == 'movie':
                     current_generation = self._movie_generation
@@ -2181,13 +2194,15 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._hero_start_request = (kind, getattr(self, '_' + kind + '_loaded_category_id', ''), str(item.stream_id), getattr(self, '_' + kind + '_generation'))
         if self._hero_start_timer is None:
             self._hero_start_timer = eTimer()
-            _connect_timer(self._hero_start_timer, self._commit_hero_start)
+            self._hero_start_connection = _connect_timer(self._hero_start_timer, self._commit_hero_start)
             self.onClose.append(self._cancel_hero_start)
         self._hero_start_timer.start(0 if immediate else HERO_DEBOUNCE_MS, True)
 
     def _commit_hero_start(self):
+        if getattr(self, '_closed', True) is not False:
+            return
         request, self._hero_start_request = (self._hero_start_request, None)
-        if not request or self._closed or getattr(self, '_vod_work_suspended', False):
+        if not request or getattr(self, '_vod_work_suspended', False):
             return
         kind, category, identity, generation = request
         if kind != self.content_type or category != getattr(self, '_' + kind + '_loaded_category_id', '') or generation != getattr(self, '_' + kind + '_generation'):
@@ -2208,7 +2223,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         return self._cinematic_delivery_epoch
 
     def _publish_cinematic_result(self, result, epoch=None):
-        if (getattr(self, '_closed', False) or getattr(self, '_vod_work_suspended', False)
+        if (getattr(self, '_closed', True) is not False or getattr(self, '_vod_work_suspended', False)
                 or result[3] != getattr(self, '_cinematic_generation', -1)):
             release_prepared(result[2])
             return
@@ -2223,7 +2238,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         # Both native message delivery and preparation callbacks run on GUI.
         if result is None:
             return
-        if (getattr(self, '_closed', False) or getattr(self, '_vod_work_suspended', False)
+        if (getattr(self, '_closed', True) is not False or getattr(self, '_vod_work_suspended', False)
                 or result[3] != getattr(self, '_cinematic_generation', -1)
                 or not self._cinematic_selection_matches(result[0], result[1])):
             release_prepared(result[2])
@@ -2464,8 +2479,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
             self._publish_cinematic_result((kind, stream_id, path, generation, tuple(current_candidates), selected_url), delivery_epoch)
 
     def _apply_cinematic_backdrop(self, kind, stream_id, path, generation):
-        if (not path or generation != self._cinematic_generation
-                or getattr(self, '_closed', False) or getattr(self, '_vod_work_suspended', False)
+        if (not path or getattr(self, '_closed', True) is not False or generation != self._cinematic_generation
+                or getattr(self, '_vod_work_suspended', False)
                 or not self._cinematic_selection_matches(kind, stream_id)):
             release_prepared(path)
             return False
@@ -2488,6 +2503,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
                     component.hide()
 
         def loaded(success):
+            if getattr(self, '_closed', True) is not False:
+                return
             try:
                 if kind == 'movie':
                     current = self._movie_entries[self._movie_selected_index]
@@ -2531,7 +2548,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         return True
 
     def _poll_cinematic_backdrop(self):
-        if not getattr(self, '_cinematic_enabled', False):
+        if getattr(self, '_closed', True) is not False or not getattr(self, '_cinematic_enabled', False):
             return False
         result = getattr(self, '_cinematic_result', None)
         if result is not None:
@@ -2707,7 +2724,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             return
         if timer is None:
             timer = self._vod_poster_retry_timer = eTimer()
-            _connect_timer(timer, self._retry_visible_vod_posters)
+            self._vod_poster_retry_connection = _connect_timer(timer, self._retry_visible_vod_posters)
             self.onClose.append(self._reset_vod_poster_retries)
         timer.start(max(100, int(math.ceil(delay * 1000.0))), True)
 
@@ -2735,8 +2752,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         return scheduled
 
     def _retry_visible_vod_posters(self):
-        if self._closed:
-            self._reset_vod_poster_retries()
+        if getattr(self, '_closed', True) is not False:
             return
         kind = self.content_type
         context = (kind, getattr(self, '_{}_poster_generation'.format(kind)), getattr(self, '_{}_poster_page_key'.format(kind)))
@@ -2774,7 +2790,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             return set(self._vod_decode_failures.get((kind, str(item.stream_id)), ()))
 
     def _retry_vod_poster_after_decode(self, kind, slot, item, path):
-        if self._closed:
+        if getattr(self, '_closed', True) is not False:
             return
         url = self._vod_card_url(getattr(item, 'icon', ''))
         if not url or os.path.splitext(os.path.abspath(path))[0] != os.path.splitext(_picon_cache_path(url))[0]:
@@ -2980,7 +2996,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._load_vod_posters_worker('movie', jobs, state, token)
 
     def _apply_movie_tile_poster(self, slot, path, stream_id='', generation=None):
-        if not path:
+        if getattr(self, '_closed', True) is not False or not path:
             return
         generation = getattr(self, '_movie_poster_generation', self._movie_generation) if generation is None else generation
         requests = getattr(self, '_vod_tile_requests', None)
@@ -3005,7 +3021,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         was_visible = bool(previous_display is not None and previous_display[:2] == signature[:2] and getattr(self['movie_tile_poster_{}'.format(slot)], 'visible', False))
 
         def loaded(success):
-            if self._closed or requests.get(key) is not request:
+            if getattr(self, '_closed', True) is not False or requests.get(key) is not request:
                 return
             try:
                 page_size = getattr(self, '_poster_page_size', CINEMATIC_POSTER_COLUMNS)
@@ -3236,6 +3252,9 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 timer.stop()
             except Exception:
                 pass
+        self._vod_timer_connections = ()
+        self._vod_poster_retry_connection = None
+        self._hero_start_connection = None
 
 
     def _set_series_title(self, value):
@@ -3321,7 +3340,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
             self._series_category_timer.start(NAVIGATION_DEBOUNCE_MS, True)
 
     def _commit_series_category_load(self):
-        if not self._entries or self._closed:
+        if getattr(self, '_closed', True) is not False or not self._entries:
             return
         category = self._entries[self.selected_index]
         if category.category_id != self._series_pending_category_id:
@@ -3419,7 +3438,8 @@ class VODBrowserMethods(DiscoveryVODMethods):
         except Exception:
             entries = []
             error = N_('Could not load series')
-        if self._closed or generation != self._series_generation or (token is not None and (not token.active())):
+        if (getattr(self, '_closed', True) is not False or generation != getattr(self, '_series_generation', None)
+                or (token is not None and not token.active())):
             return
         if native_window is not None and (not error):
             try:
@@ -3427,20 +3447,30 @@ class VODBrowserMethods(DiscoveryVODMethods):
             except Exception:
                 entries = []
                 error = N_('Search incomplete.')
-        self._series_window_base = getattr(page, 'sort_base', 0) if browse_catalog is not None and (not error) else 0
-        self._series_selected_index = getattr(page, 'sort_selected', 0) if browse_catalog is not None and (not error) else 0
-        self._series_known_ids = set() if getattr(entries, 'full_category', False) else {str(item.stream_id) for item in entries}
-        self._series_entries = entries
-        self._series_error = error
-        if browse_catalog is not None:
-            self._series_has_more = page.has_more if not error else False
-            if not error:
-                self._series_browse_cursor = page.next_cursor
-        else:
-            self._series_has_more = self._client_has_more_items('series', category_id)
+        has_page = browse_catalog is not None and not error
         if native_window is not None and (not error):
-            self._series_has_more = native_window.has_more or native_window.count > len(entries)
-        self._series_ready = True
+            has_more = native_window.has_more or native_window.count > len(entries)
+        elif browse_catalog is None:
+            has_more = self._client_has_more_items('series', category_id)
+        else:
+            has_more = page.has_more if has_page else False
+        known_ids = set() if getattr(entries, 'full_category', False) else {str(item.stream_id) for item in entries}
+        lock = getattr(self, '_load_result_lock', None)
+        if lock is None:
+            return
+        with lock:
+            if (getattr(self, '_closed', True) is not False or generation != getattr(self, '_series_generation', None)
+                    or (token is not None and not token.active())):
+                return
+            self._series_window_base = getattr(page, 'sort_base', 0) if has_page else 0
+            self._series_selected_index = getattr(page, 'sort_selected', 0) if has_page else 0
+            self._series_known_ids = known_ids
+            self._series_entries = entries
+            self._series_error = error
+            if has_page:
+                self._series_browse_cursor = page.next_cursor
+            self._series_has_more = has_more
+            self._series_ready = True
         publish = getattr(self, '_light_publish_list', None)
         if callable(publish): publish('series', generation)
 
@@ -3531,7 +3561,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         return True
 
     def _resume_series_scan(self):
-        if self._closed or self._series_loading or self._series_more_loading or (not self._series_has_more) or (self._series_entries and (not self._series_pending_advance) and (len(self._series_entries) - self._series_selected_index - 1 > getattr(self, '_poster_page_size', 14))):
+        if getattr(self, '_closed', True) is not False or self._series_loading or self._series_more_loading or (not self._series_has_more) or (self._series_entries and (not self._series_pending_advance) and (len(self._series_entries) - self._series_selected_index - 1 > getattr(self, '_poster_page_size', 14))):
             return
         if self._series_detail_pending or self._series_pending_detail_generation is not None:
             self._schedule_series_scan()
@@ -3621,7 +3651,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
 
 
     def _poll_series_result(self):
-        if self._closed or getattr(self, '_series_search_child_open', False):
+        if getattr(self, '_closed', True) is not False or getattr(self, '_series_search_child_open', False):
             return
         browse_catalog = getattr(self, '_series_browser_catalog', None)
         if browse_catalog is not None:
@@ -3841,7 +3871,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._load_vod_posters_worker('series', jobs, state, token)
 
     def _apply_series_tile_poster(self, slot, path, stream_id='', generation=None):
-        if not path:
+        if getattr(self, '_closed', True) is not False or not path:
             return
         generation = getattr(self, '_series_poster_generation', self._series_generation) if generation is None else generation
         requests = getattr(self, '_vod_tile_requests', None)
@@ -3866,7 +3896,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         was_visible = bool(previous_display is not None and previous_display[:2] == signature[:2] and getattr(self['series_tile_poster_{}'.format(slot)], 'visible', False))
 
         def loaded(success):
-            if self._closed or requests.get(key) is not request:
+            if getattr(self, '_closed', True) is not False or requests.get(key) is not request:
                 return
             try:
                 page_size = getattr(self, '_poster_page_size', CINEMATIC_POSTER_COLUMNS if getattr(self, '_cinematic_enabled', False) else SERIES_GRID_PAGE_SIZE)
@@ -4317,8 +4347,7 @@ class VODBrowserMethods(DiscoveryVODMethods):
         self._resume_series_after_search()
 
     def _resume_series_after_search(self):
-        if self._closed:
-            self._series_search_drain_event = None
+        if getattr(self, '_closed', True) is not False:
             return
         event = self._series_search_drain_event
         if self._series_search_child_open or (event is not None and (not event.is_set())):
@@ -4388,6 +4417,9 @@ class VODBrowserMethods(DiscoveryVODMethods):
                 timer.stop()
             except Exception:
                 pass
+        self._vod_timer_connections = ()
+        self._vod_poster_retry_connection = None
+        self._hero_start_connection = None
 
 def install_vod_methods(target):
     if target.__dict__.get('_vod_methods_installed', False):

@@ -4445,3 +4445,27 @@ msgstr "Ajánlott"
 
 msgid "Restore source name"
 msgstr "Eredeti név visszaállítása"
+
+msgid "Could not start a thread for the account test."
+msgstr "Nem sikerült elindítani a fiókellenőrzés szálát."
+
+msgid "Forecast data is reformatted for television display."
+msgstr "Az előrejelzési adatokat televíziós megjelenítéshez formáztuk át."
+
+msgid "Not enough memory to start the account test."
+msgstr "Nincs elég memória a fiókellenőrzés indításához."
+
+msgid "Search Episodes on YouTube"
+msgstr "Epizódok keresése a YouTube-on"
+
+msgid "TV data by TVmaze — CC BY-SA 4.0"
+msgstr "Televíziós adatok a TVmaze szolgáltatástól — CC BY-SA 4.0"
+
+msgid "This product uses the TMDB API but is not endorsed or certified by TMDB."
+msgstr "Ez a termék a TMDB API-ját használja, de a TMDB nem hagyta jóvá és nem tanúsította."
+
+msgid "Users add their own mHub v2 source URLs. The selected source supplies the streams, and GT IPTV Player Pro plays them directly on the receiver."
+msgstr "A felhasználók adják meg saját mHub v2 forrásaik címét. Az adásokat a kiválasztott forrás biztosítja, a GT IPTV Player Pro pedig közvetlenül a vevőkészüléken játssza le őket."
+
+msgid "Weather data by Open-Meteo.com — CC BY 4.0"
+msgstr "Időjárási adatok az Open-Meteo.com szolgáltatástól — CC BY 4.0"
